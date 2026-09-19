@@ -46,7 +46,7 @@ An installer should:
 2. install the skills into the location expected by the selected coding agent;
 3. copy `PROTOCOL.md` to `.standards/PROTOCOL.md` in the target project;
 4. install the common `AGENTS.md` and `CLAUDE.md` entry files;
-5. install the selected mode template as `.standards/MODE.md`;
+5. install the selected mode template, including `.standards/MODE.md` and the mode's initial `.standards/STATE.md`;
 6. let the owning skills create scope, technical design, project context, tests, reviews, documentation, and other workflow artifacts when those phases run.
 
 The installer should not create fake scope or architecture documents merely to populate directories.
@@ -59,8 +59,11 @@ project/
 ├── CLAUDE.md
 ├── .standards/
 │   ├── PROTOCOL.md
-│   └── MODE.md
+│   ├── MODE.md
+│   └── STATE.md
 └── <agent-specific skill installation>
 ```
 
-The initial workflow state is derived from the selected project mode by `PROTOCOL.md`.
+`STATE.md` is version-controlled and records the active workflow state so work can be resumed after a disconnected session or by another agent after pulling the branch. Every legal handoff updates it.
+
+`GREENFIELD` is a bootstrap mode only. When the initial greenfield cycle successfully reaches `AWAITING_HUMAN_SIGNOFF`, `MODE.md` transitions permanently to `BROWNFIELD`; future cycles therefore start in `AUDITING`.

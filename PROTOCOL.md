@@ -31,10 +31,12 @@ ProjectMode
 - BROWNFIELD
 ```
 
-- `GREENFIELD`: work begins without an existing project implementation that must first be audited.
-- `BROWNFIELD`: work modifies, extends, repairs, or depends on an existing project implementation.
+- `GREENFIELD`: bootstrap mode for a project's initial workflow cycle when no existing implementation must first be audited.
+- `BROWNFIELD`: normal operating mode once a project has an implementation; work modifies, extends, repairs, or depends on that implementation.
 
-The initial workflow state is determined by project mode:
+`GREENFIELD` is temporary. When the initial greenfield cycle successfully reaches `AWAITING_HUMAN_SIGNOFF`, the project must transition permanently to `BROWNFIELD`. Future workflow cycles begin as brownfield work.
+
+The initial workflow state for a new cycle is determined by project mode:
 
 - `GREENFIELD` starts in `SCOPING`.
 - `BROWNFIELD` starts in `AUDITING`.
@@ -58,6 +60,23 @@ WorkflowState
 ```
 
 A workflow has exactly one active `WorkflowState` at a time.
+
+## Persisted Workflow State
+
+`.standards/STATE.md` is the authoritative, branch-persisted record of the active `WorkflowState`. It must be version-controlled so another session, agent, or developer can pull the branch and resume from the same workflow state.
+
+Before performing workflow work, read `.standards/PROTOCOL.md`, `.standards/MODE.md`, and `.standards/STATE.md`. Resume from the state recorded in `STATE.md`; do not infer a different state from chat history or from which artifacts happen to exist.
+
+State changes follow these rules:
+
+1. Installation initializes `STATE.md` to `SCOPING` for `GREENFIELD` or `AUDITING` for `BROWNFIELD`.
+2. Every legal forward handoff or failure handoff updates `STATE.md` to the target workflow state as part of the handoff.
+3. `NAVIGATOR` never changes `STATE.md`.
+4. `AWAITING_HUMAN_SIGNOFF` remains recorded until the human either requests rework or starts additional work.
+5. A new human-requested workflow cycle resets `STATE.md` to the initial state for the current `ProjectMode`.
+6. During the initial greenfield cycle, the successful `SYNCHRONIZING -> AWAITING_HUMAN_SIGNOFF` handoff also changes `.standards/MODE.md` from `GREENFIELD` to `BROWNFIELD`. This mode transition is permanent.
+
+`STATE.md` records workflow position only. Role-owned artifacts remain the source of truth for scope, architecture, project context, implementation, verification, review, and documentation.
 
 The owning role for each state is:
 
@@ -187,8 +206,9 @@ or ARCHITECTING if scope remains valid.
 3. A handoff must identify the target role or workflow state and, for failures, the `FailureType`.
 4. A role must not silently change an artifact or decision owned by another role.
 5. If resolving a failure invalidates previously completed downstream work, rerun the affected downstream states.
-6. Human sign-off is terminal for the current workflow cycle. Starting additional work begins a new cycle at the appropriate state.
-7. `NAVIGATOR` may be invoked from any state but must not mutate artifacts or change workflow state.
+6. Human sign-off is terminal for the current workflow cycle. Starting additional work begins a new cycle at the initial state for the current `ProjectMode`.
+7. Every handoff that changes workflow state must update `.standards/STATE.md` to the target state.
+8. `NAVIGATOR` may be invoked from any state but must not mutate artifacts or change workflow state.
 
 ## Installed Runtime Contract
 
@@ -197,10 +217,13 @@ An installed S.T.A.N.D.A.R.D.S. project should provide:
 - `AGENTS.md`: the project-facing entrypoint that tells coding agents to follow the installed protocol and role skills;
 - `CLAUDE.md`: a Claude Code compatibility entrypoint that imports `AGENTS.md`;
 - `.standards/PROTOCOL.md`: the installed copy of this canonical protocol;
-- `.standards/MODE.md`: the project's selected `ProjectMode`;
+- `.standards/MODE.md`: the project's current `ProjectMode`;
+- `.standards/STATE.md`: the branch-persisted active `WorkflowState`;
 - the S.T.A.N.D.A.R.D.S. skills installed in the location required by the selected coding agent.
 
-`.standards/MODE.md` must identify exactly one canonical `ProjectMode`. It does not track the current workflow state; the legal initial state and transitions are defined by this protocol.
+`.standards/MODE.md` must identify exactly one canonical `ProjectMode`. A project installed as `GREENFIELD` must change this file permanently to `BROWNFIELD` when its initial greenfield cycle successfully reaches `AWAITING_HUMAN_SIGNOFF`.
+
+`.standards/STATE.md` must identify exactly one canonical `WorkflowState`. Installation initializes it from `ProjectMode`, and every legal state transition updates it as defined above.
 
 Workflow artifacts such as scopes, technical designs, project context, tests, reviews, and documentation are created or updated by their owning roles when those phases run. Installation should not fabricate completed workflow artifacts.
 
