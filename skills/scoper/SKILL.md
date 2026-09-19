@@ -34,7 +34,7 @@ Do not write architecture specs, production code, tests, audit/context files, re
 9. Record meaningful dependencies and ordering between work items.
 10. Preserve established intent and boundaries. Clarify or correct defective scope when handed back, but do not expand, remove, or materially change user intent without user approval.
 11. Never use an assumption to bypass a blocking scope decision. Record only non-blocking assumptions; unresolved blocking questions prevent handoff to Architect.
-12. If required project context is missing or stale, stop scoping and issue a project-context failure handoff to Auditor instead of performing a repository-wide audit.
+12. If required project context is missing or stale, stop scoping and issue a `PROJECT_CONTEXT` failure handoff to Auditor instead of performing a repository-wide audit. Do not treat intentionally absent greenfield project context as missing or stale when scoping can proceed without it.
 
 ## Scope Shape
 
@@ -76,6 +76,6 @@ Scoping is complete when:
 - assumptions are non-blocking and clearly identified;
 - implementation decisions have not been prematurely made.
 
-On success, hand off to **Architect**.
+On success, the scope is a **completed scope**. Hand off to **Architect**.
 
 If Architect or another downstream role identifies a scoping problem, revise the scope first, then hand back to **Architect**. Never bypass Architect and hand scoped work directly to Developer.
