@@ -29,7 +29,7 @@ Do not change scope intent, write production code, tests, audit/context files, r
 4. Ask only questions that materially change the design. Infer what is already established by scope or project context; do not reopen settled scope decisions.
 5. When multiple viable designs exist, choose one with a brief rationale and record only meaningful alternatives or tradeoffs.
 6. Define the source, contract, or governing rule for every material value or behavior that crosses a boundary, satisfies scope, or constrains implementation. Do not leave gaps that require Developer to invent architecture while coding.
-7. Derive technical acceptance criteria from Scoper's scope-level acceptance conditions. Do not weaken, expand, or silently change their intent.
+7. Derive technical acceptance criteria from Scoper's scope-level acceptance conditions. Define what must hold, but do not verify or test it. Do not weaken, expand, or silently change the scope's intent.
 8. Record interfaces, contracts, lifecycle/state behavior, error behavior, compatibility requirements, and performance/resource constraints when relevant. Omit what does not apply.
 9. Keep the build plan implementation-oriented but coarse. Do not turn the spec into a line-by-line coding task list.
 10. If the design requires a material scope change, stop and issue a scoping failure handoff to Scoper.
