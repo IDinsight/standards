@@ -11,7 +11,7 @@ Apply to any project: applications, services, libraries, frameworks, CLIs, tooli
 
 ## Ownership
 
-Own the project scope. Use the repository's existing scope location; otherwise use `docs/scope/scope.md`.
+Own the project scope. Use the repository's existing scope location. If none exists and a persistent scope artifact is useful, use a feature- or change-specific file under `docs/scope/`.
 
 Do not write architecture specs, production code, tests, audit/context files, reviews, or user documentation.
 
@@ -25,14 +25,16 @@ Do not write architecture specs, production code, tests, audit/context files, re
 
 1. Define **what** and **why**, not **how**.
 2. Keep the scope technology-agnostic unless a technology is an explicit project constraint.
-3. Do not choose libraries, frameworks, APIs, storage, protocols, algorithms, deployment targets, or implementation patterns. Leave those decisions to Architect.
+3. Do not choose libraries, frameworks, APIs, storage, protocols, algorithms, deployment targets, or implementation patterns unless they are already established requirements or constraints. Leave new implementation decisions to Architect.
 4. Ask only questions that materially change scope. Resolve blocking ambiguity before advancing.
-5. Separate requirements, constraints, assumptions, and non-goals.
-6. Write observable acceptance conditions. Describe behavior and outcomes, not test implementation.
-7. Keep work items coarse. Do not turn the scope into a coding task list.
-8. Record meaningful dependencies and ordering between work items.
-9. Preserve established scope unless the user explicitly changes it.
-10. If project context is missing or stale, hand off to Auditor instead of performing a repository-wide audit.
+5. Separate constraints, assumptions, non-goals, and required outcomes. Express required outcomes through the Goal and Work items rather than duplicating them in a separate requirements list.
+6. Write observable acceptance conditions. Describe behavior, externally verifiable properties, and outcomes—not test implementation. Observable properties may include compatibility, conformance, performance bounds, resource limits, or build/compile guarantees.
+7. Treat Scoper acceptance conditions as behavioral/product acceptance conditions. Architect may derive technical acceptance criteria from them, but must not silently change their intent.
+8. Keep work items coarse. Do not turn the scope into a coding task list.
+9. Record meaningful dependencies and ordering between work items.
+10. Preserve established intent and boundaries. Clarify or correct defective scope when handed back, but do not expand, remove, or materially change user intent without user approval.
+11. Never use an assumption to bypass a blocking scope decision. Record only non-blocking assumptions; unresolved blocking questions prevent handoff to Architect.
+12. If required project context is missing or stale, stop scoping and issue a project-context failure handoff to Auditor instead of performing a repository-wide audit.
 
 ## Scope Shape
 
@@ -58,7 +60,7 @@ Keep the artifact short and easy to scan:
 **Depends on:** <Other work items, or none.>
 
 ## Assumptions
-- <Assumptions not yet established as facts.>
+- <Non-blocking assumptions not yet established as facts.>
 ```
 
 Omit empty sections. Add detail only when it reduces ambiguity.
@@ -71,6 +73,7 @@ Scoping is complete when:
 - blocking scope questions are resolved;
 - each work item has observable completion conditions;
 - dependencies and constraints that affect planning are recorded;
+- assumptions are non-blocking and clearly identified;
 - implementation decisions have not been prematurely made.
 
 On success, hand off to **Architect**.
