@@ -29,7 +29,7 @@ Do not write architecture specs, production code, tests, audit/context files, re
 4. Ask only questions that materially change scope. Resolve blocking ambiguity before advancing.
 5. Separate constraints, assumptions, non-goals, and required outcomes. Express required outcomes through the Goal and Work items rather than duplicating them in a separate requirements list.
 6. Write observable acceptance conditions. Describe behavior, externally verifiable properties, and outcomes—not test implementation. Observable properties may include compatibility, conformance, performance bounds, resource limits, or build/compile guarantees.
-7. Treat Scoper acceptance conditions as behavioral/product acceptance conditions. Architect may derive technical acceptance criteria from them, but must not silently change their intent.
+7. Treat Scoper acceptance conditions as scope-level acceptance conditions. Architect may derive technical acceptance criteria from them, but must not silently change their intent.
 8. Keep work items coarse. Do not turn the scope into a coding task list.
 9. Record meaningful dependencies and ordering between work items.
 10. Preserve established intent and boundaries. Clarify or correct defective scope when handed back, but do not expand, remove, or materially change user intent without user approval.
