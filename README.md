@@ -66,6 +66,8 @@ project/
 └── <agent-specific skill installation>
 ```
 
-`STATE.md` is version-controlled and records the active workflow state so work can be resumed after a disconnected session or by another agent after pulling the branch. Every legal handoff updates it.
+`STATE.md` is version-controlled and records the current workflow state plus minimal handoff/recovery context so work can be resumed after a disconnected session or by another agent after pulling the branch. Failure and human-rework handoffs preserve the interrupted state as `Recovery.ResumeAt` until the workflow returns there. Every legal state-changing handoff updates the file.
+
+`AWAITING_HUMAN_SIGNOFF` means a cycle is still waiting on a human decision. Explicit approval transitions it to terminal `SIGNED_OFF`; subsequent requested changes begin a new cycle.
 
 `GREENFIELD` is a bootstrap mode only. When the initial greenfield cycle successfully reaches `AWAITING_HUMAN_SIGNOFF`, `MODE.md` transitions permanently to `BROWNFIELD`; future cycles therefore start in `AUDITING`.

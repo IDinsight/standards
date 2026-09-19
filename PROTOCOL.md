@@ -57,41 +57,67 @@ WorkflowState
 - REVIEWING_FINAL
 - SYNCHRONIZING
 - AWAITING_HUMAN_SIGNOFF
+- SIGNED_OFF
 ```
 
-A workflow has exactly one active `WorkflowState` at a time.
+`.standards/STATE.md` records exactly one `WorkflowState` value at a time. `SIGNED_OFF` is a terminal state and means there is no active workflow cycle.
 
 ## Persisted Workflow State
 
-`.standards/STATE.md` is the authoritative, branch-persisted record of the active `WorkflowState`. It must be version-controlled so another session, agent, or developer can pull the branch and resume from the same workflow state.
+`.standards/STATE.md` is the authoritative, branch-persisted record of the current `WorkflowState` plus the minimum handoff and recovery context needed to resume work. It must be version-controlled so another session, agent, or developer can pull the branch and continue without relying on chat history.
 
-Before performing workflow work, read `.standards/PROTOCOL.md`, `.standards/MODE.md`, and `.standards/STATE.md`. Resume from the state recorded in `STATE.md`; do not infer a different state from chat history or from which artifacts happen to exist.
+Before performing workflow work, read `.standards/PROTOCOL.md`, `.standards/MODE.md`, and `.standards/STATE.md`. Resume from the state and handoff context recorded in `STATE.md`; do not infer a different state from chat history or from which artifacts happen to exist.
+
+`STATE.md` uses this shape:
+
+```markdown
+# S.T.A.N.D.A.R.D.S. Workflow State
+
+`WorkflowState`: `ARCHITECTING`
+
+## Handoff
+`Kind`: `FAILURE`
+`From`: `TESTING`
+`FailureType`: `ARCHITECTURE`
+`Reason`: `Retry behavior is not defined by the current technical design.`
+
+## Recovery
+`Active`: `true`
+`ResumeAt`: `TESTING`
+```
+
+`Handoff.Kind` is one of `INITIAL`, `FORWARD`, `FAILURE`, `HUMAN_REWORK`, `NEW_CYCLE`, or `SIGNOFF`. Use `NONE` for fields that do not apply. Keep `Reason` concise; it exists to make the transition resumable, not to duplicate role-owned artifacts.
 
 State changes follow these rules:
 
-1. Installation initializes `STATE.md` to `SCOPING` for `GREENFIELD` or `AUDITING` for `BROWNFIELD`.
-2. Every legal forward handoff or failure handoff updates `STATE.md` to the target workflow state as part of the handoff.
+1. Installation initializes `STATE.md` from the selected mode template: `SCOPING` for `GREENFIELD` or `AUDITING` for `BROWNFIELD`, with `Handoff.Kind` set to `INITIAL` and recovery inactive.
+2. Every legal forward handoff, failure handoff, human rework handoff, new-cycle transition, or sign-off transition updates `STATE.md` as part of the handoff.
 3. `NAVIGATOR` never changes `STATE.md`.
-4. `AWAITING_HUMAN_SIGNOFF` remains recorded while waiting for human action and, after sign-off, remains recorded until rework or additional work begins.
-5. A new human-requested workflow cycle resets `STATE.md` to the initial state for the current `ProjectMode`.
-6. During the initial greenfield cycle, the successful `SYNCHRONIZING -> AWAITING_HUMAN_SIGNOFF` handoff also changes `.standards/MODE.md` from `GREENFIELD` to `BROWNFIELD`. This mode transition is permanent.
+4. A failure handoff records `Kind: FAILURE`, the state that encountered the failure in `From`, the applicable `FailureType`, and a concise `Reason`.
+5. When a failure handoff moves to a different state and no recovery is already active, set `Recovery.Active` to `true` and `Recovery.ResumeAt` to the state that encountered the failure. If recovery is already active, preserve its existing `ResumeAt` through nested failures and corrective handoffs.
+6. While recovery is active, preserve the recovery block across subsequent state changes until the workflow returns to `ResumeAt`. When `WorkflowState` becomes `ResumeAt` again, clear recovery to `Active: false` and `ResumeAt: NONE`.
+7. Human-requested rework from `AWAITING_HUMAN_SIGNOFF` records `Kind: HUMAN_REWORK`, classifies the affected artifact with a `FailureType`, and starts recovery with `ResumeAt: AWAITING_HUMAN_SIGNOFF`.
+8. `AWAITING_HUMAN_SIGNOFF` means the current cycle is pending a human decision. Explicit sign-off transitions the state to `SIGNED_OFF`; do not leave a signed-off cycle recorded as awaiting action.
+9. `SIGNED_OFF` is terminal for the completed cycle. A new human-requested workflow cycle resets `STATE.md` to the initial state for the current `ProjectMode`, records `Kind: NEW_CYCLE`, and clears recovery.
+10. During the initial greenfield cycle, the successful `SYNCHRONIZING -> AWAITING_HUMAN_SIGNOFF` handoff also changes `.standards/MODE.md` from `GREENFIELD` to `BROWNFIELD`. This mode transition is permanent.
 
-`STATE.md` records workflow position only. Role-owned artifacts remain the source of truth for scope, architecture, project context, implementation, verification, review, and documentation.
+`STATE.md` does not replace role-owned artifacts. Scope, architecture, project context, implementation, verification, review, and documentation remain authoritative in their own artifacts; the state file stores only enough transition context to resume the workflow safely.
 
 The owning role for each state is:
 
-| Workflow state             | Owning role    |
-|----------------------------|----------------|
-| `SCOPING`                  | `SCOPER`       |
-| `ARCHITECTING`             | `ARCHITECT`    |
-| `AUDITING`                 | `AUDITOR`      |
-| `DEVELOPING`               | `DEVELOPER`    |
-| `TESTING`                  | `TESTER`       |
-| `REVIEWING_IMPLEMENTATION` | `REVIEWER`     |
-| `DOCUMENTING`              | `DOCUMENTER`   |
-| `REVIEWING_FINAL`          | `REVIEWER`     |
-| `SYNCHRONIZING`            | `SYNCHRONIZER` |
-| `AWAITING_HUMAN_SIGNOFF`   | Human          |
+| Workflow state             | Owning role      |
+|----------------------------|------------------|
+| `SCOPING`                  | `SCOPER`         |
+| `ARCHITECTING`             | `ARCHITECT`      |
+| `AUDITING`                 | `AUDITOR`        |
+| `DEVELOPING`               | `DEVELOPER`      |
+| `TESTING`                  | `TESTER`         |
+| `REVIEWING_IMPLEMENTATION` | `REVIEWER`       |
+| `DOCUMENTING`              | `DOCUMENTER`     |
+| `REVIEWING_FINAL`          | `REVIEWER`       |
+| `SYNCHRONIZING`            | `SYNCHRONIZER`   |
+| `AWAITING_HUMAN_SIGNOFF`   | Human            |
+| `SIGNED_OFF`               | Human (terminal) |
 
 ## Review Kinds
 
@@ -206,21 +232,23 @@ or ARCHITECTING if scope remains valid.
 3. A handoff must identify the target role or workflow state and, for failures, the `FailureType`.
 4. A role must not silently change an artifact or decision owned by another role.
 5. If resolving a failure invalidates previously completed downstream work, rerun the affected downstream states.
-6. Human sign-off is terminal for the current workflow cycle.
+6. Human sign-off transitions `AWAITING_HUMAN_SIGNOFF -> SIGNED_OFF` and is terminal for the completed workflow cycle.
 7. Human-requested rework from `AWAITING_HUMAN_SIGNOFF` remains part of the current cycle. Classify the requested rework by the affected artifact or decision, route to the corresponding owning state, and resume using the failure-recovery rules above.
-8. Human-requested additional work begins a new cycle at the initial state for the current `ProjectMode`.
-9. Every handoff that changes workflow state must update `.standards/STATE.md` to the target state.
+8. Human-requested additional work begins a new cycle at the initial state for the current `ProjectMode`. After `SIGNED_OFF`, any further requested change is additional work and therefore begins a new cycle.
+9. Every handoff that changes workflow state must update `.standards/STATE.md`, including its handoff and recovery fields, according to the persisted-state rules above.
 10. `NAVIGATOR` may be invoked from any state but must not mutate artifacts or change workflow state.
 
 ## Human Decisions at Sign-off
 
 When `STATE.md` is `AWAITING_HUMAN_SIGNOFF`, the workflow waits for an explicit human action:
 
-- **Sign off:** end the current workflow cycle. Leave `STATE.md` at `AWAITING_HUMAN_SIGNOFF` until rework or additional work begins.
-- **Request rework:** identify the affected artifact or decision, route to its owning workflow state, update `STATE.md`, and continue the existing cycle using failure-recovery semantics. Rerun every downstream gate invalidated by the correction.
-- **Start additional work:** begin a new workflow cycle and reset `STATE.md` to the initial state for the current `ProjectMode`.
+- **Sign off:** transition `STATE.md` to `SIGNED_OFF`, record `Handoff.Kind: SIGNOFF`, set `From: AWAITING_HUMAN_SIGNOFF`, and clear recovery. The current workflow cycle is complete.
+- **Request rework:** identify the affected artifact or decision, route to its owning workflow state, record `Handoff.Kind: HUMAN_REWORK` with the corresponding `FailureType`, and start recovery with `ResumeAt: AWAITING_HUMAN_SIGNOFF`. Rerun every downstream gate invalidated by the correction.
+- **Start additional work:** begin a new workflow cycle, reset `STATE.md` to the initial state for the current `ProjectMode`, record `Handoff.Kind: NEW_CYCLE`, and clear recovery.
 
-Do not treat additional work as rework merely because it is requested at sign-off. Rework corrects or revises the current cycle's deliverable; additional work starts a new cycle.
+When `STATE.md` is `SIGNED_OFF`, there is no active workflow cycle. Further requested changes begin a new cycle; they do not reopen the signed-off cycle.
+
+Do not treat additional work as rework merely because it is requested at sign-off. Rework corrects or revises the current cycle's pending deliverable; additional work starts a new cycle.
 
 ## Installed Runtime Contract
 
@@ -230,12 +258,12 @@ An installed S.T.A.N.D.A.R.D.S. project should provide:
 - `CLAUDE.md`: a Claude Code compatibility entrypoint that imports `AGENTS.md`;
 - `.standards/PROTOCOL.md`: the installed copy of this canonical protocol;
 - `.standards/MODE.md`: the project's current `ProjectMode`;
-- `.standards/STATE.md`: the branch-persisted active `WorkflowState`;
+- `.standards/STATE.md`: the branch-persisted active `WorkflowState` plus resumable handoff/recovery context;
 - the S.T.A.N.D.A.R.D.S. skills installed in the location required by the selected coding agent.
 
 `.standards/MODE.md` must identify exactly one canonical `ProjectMode`. A project installed as `GREENFIELD` must change this file permanently to `BROWNFIELD` when its initial greenfield cycle successfully reaches `AWAITING_HUMAN_SIGNOFF`.
 
-`.standards/STATE.md` must identify exactly one canonical `WorkflowState`. Installation initializes it from `ProjectMode`, and every legal state transition updates it as defined above.
+`.standards/STATE.md` must identify exactly one canonical `WorkflowState` and follow the persisted handoff/recovery shape defined above. Installation initializes it from `ProjectMode`, and every legal state transition updates it as defined above.
 
 
 ### Installer File Preservation
