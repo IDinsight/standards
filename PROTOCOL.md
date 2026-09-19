@@ -72,7 +72,7 @@ State changes follow these rules:
 1. Installation initializes `STATE.md` to `SCOPING` for `GREENFIELD` or `AUDITING` for `BROWNFIELD`.
 2. Every legal forward handoff or failure handoff updates `STATE.md` to the target workflow state as part of the handoff.
 3. `NAVIGATOR` never changes `STATE.md`.
-4. `AWAITING_HUMAN_SIGNOFF` remains recorded until the human either requests rework or starts additional work.
+4. `AWAITING_HUMAN_SIGNOFF` remains recorded while waiting for human action and, after sign-off, remains recorded until rework or additional work begins.
 5. A new human-requested workflow cycle resets `STATE.md` to the initial state for the current `ProjectMode`.
 6. During the initial greenfield cycle, the successful `SYNCHRONIZING -> AWAITING_HUMAN_SIGNOFF` handoff also changes `.standards/MODE.md` from `GREENFIELD` to `BROWNFIELD`. This mode transition is permanent.
 
@@ -206,9 +206,21 @@ or ARCHITECTING if scope remains valid.
 3. A handoff must identify the target role or workflow state and, for failures, the `FailureType`.
 4. A role must not silently change an artifact or decision owned by another role.
 5. If resolving a failure invalidates previously completed downstream work, rerun the affected downstream states.
-6. Human sign-off is terminal for the current workflow cycle. Starting additional work begins a new cycle at the initial state for the current `ProjectMode`.
-7. Every handoff that changes workflow state must update `.standards/STATE.md` to the target state.
-8. `NAVIGATOR` may be invoked from any state but must not mutate artifacts or change workflow state.
+6. Human sign-off is terminal for the current workflow cycle.
+7. Human-requested rework from `AWAITING_HUMAN_SIGNOFF` remains part of the current cycle. Classify the requested rework by the affected artifact or decision, route to the corresponding owning state, and resume using the failure-recovery rules above.
+8. Human-requested additional work begins a new cycle at the initial state for the current `ProjectMode`.
+9. Every handoff that changes workflow state must update `.standards/STATE.md` to the target state.
+10. `NAVIGATOR` may be invoked from any state but must not mutate artifacts or change workflow state.
+
+## Human Decisions at Sign-off
+
+When `STATE.md` is `AWAITING_HUMAN_SIGNOFF`, the workflow waits for an explicit human action:
+
+- **Sign off:** end the current workflow cycle. Leave `STATE.md` at `AWAITING_HUMAN_SIGNOFF` until rework or additional work begins.
+- **Request rework:** identify the affected artifact or decision, route to its owning workflow state, update `STATE.md`, and continue the existing cycle using failure-recovery semantics. Rerun every downstream gate invalidated by the correction.
+- **Start additional work:** begin a new workflow cycle and reset `STATE.md` to the initial state for the current `ProjectMode`.
+
+Do not treat additional work as rework merely because it is requested at sign-off. Rework corrects or revises the current cycle's deliverable; additional work starts a new cycle.
 
 ## Installed Runtime Contract
 
@@ -224,6 +236,18 @@ An installed S.T.A.N.D.A.R.D.S. project should provide:
 `.standards/MODE.md` must identify exactly one canonical `ProjectMode`. A project installed as `GREENFIELD` must change this file permanently to `BROWNFIELD` when its initial greenfield cycle successfully reaches `AWAITING_HUMAN_SIGNOFF`.
 
 `.standards/STATE.md` must identify exactly one canonical `WorkflowState`. Installation initializes it from `ProjectMode`, and every legal state transition updates it as defined above.
+
+
+### Installer File Preservation
+
+Installation must preserve existing project-level agent instructions. Installer behavior must be idempotent:
+
+- If `AGENTS.md` does not exist, create it from `templates/common/AGENTS.md`.
+- If `AGENTS.md` already exists, preserve all existing content and add the S.T.A.N.D.A.R.D.S. integration block if absent. If the block already exists, update only the content between `<!-- standards:start -->` and `<!-- standards:end -->`.
+- If `CLAUDE.md` does not exist, create it from `templates/common/CLAUDE.md`.
+- If `CLAUDE.md` already exists, preserve all existing content and ensure it imports `AGENTS.md` with `@AGENTS.md` exactly once.
+- If `.standards/MODE.md` or `.standards/STATE.md` already exists, preserve it during normal reinstallation. Initialize these files only when S.T.A.N.D.A.R.D.S. is first installed or when the human explicitly requests reinitialization.
+- Re-running installation must not duplicate the integration block, duplicate the Claude import, reset workflow mode/state, or erase project-specific instructions.
 
 Workflow artifacts such as scopes, technical designs, project context, tests, reviews, and documentation are created or updated by their owning roles when those phases run. Installation should not fabricate completed workflow artifacts.
 

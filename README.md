@@ -45,11 +45,13 @@ An installer should:
 1. select a `ProjectMode` of `GREENFIELD` or `BROWNFIELD`;
 2. install the skills into the location expected by the selected coding agent;
 3. copy `PROTOCOL.md` to `.standards/PROTOCOL.md` in the target project;
-4. install the common `AGENTS.md` and `CLAUDE.md` entry files;
-5. install the selected mode template, including `.standards/MODE.md` and the mode's initial `.standards/STATE.md`;
+4. install or safely merge the common `AGENTS.md` and `CLAUDE.md` integration without overwriting existing project instructions;
+5. initialize the selected mode template, including `.standards/MODE.md` and the mode's initial `.standards/STATE.md`, when those files do not already exist;
 6. let the owning skills create scope, technical design, project context, tests, reviews, documentation, and other workflow artifacts when those phases run.
 
 The installer should not create fake scope or architecture documents merely to populate directories.
+
+The installer must be safe for existing brownfield repositories. If `AGENTS.md` or `CLAUDE.md` already exists, preserve its existing content. Add or update only the bounded S.T.A.N.D.A.R.D.S. integration block in `AGENTS.md`, and ensure `CLAUDE.md` imports `AGENTS.md` with `@AGENTS.md` exactly once. If `.standards/MODE.md` or `.standards/STATE.md` already exists, preserve it unless the human explicitly requests reinitialization. Re-running installation should be idempotent.
 
 A typical installed project will begin with:
 

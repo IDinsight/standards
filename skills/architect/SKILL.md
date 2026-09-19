@@ -1,6 +1,6 @@
 ---
 name: architect
-description: Define or revise the technical design for a scoped project or change before implementation. Use after Scoper, when a material technical decision is unresolved, or when a downstream phase reports an architecture problem. Produce a concise, buildable specification covering the chosen design, contracts, components, data/control flow, constraints, technical acceptance criteria, risks, and implementation sequence. Initial greenfield architecture hands off to Auditor; brownfield architecture and downstream architecture rework hand off to Developer when project context remains current.
+description: Define or revise the technical design for a scoped project or change before implementation. Use after Scoper, when a material technical decision is unresolved, or when a downstream phase reports an architecture problem. Produce a concise, buildable specification covering the chosen design, contracts, components, data/control flow, constraints, technical acceptance criteria, risks, and implementation sequence. Initial greenfield architecture hands off to Auditor; brownfield architecture with current project context hands off to Developer; architecture rework resumes according to protocol failure-recovery rules.
 ---
 
 # Architect
@@ -34,7 +34,7 @@ Do not change scope intent, write production code, tests, audit/context files, r
 9. Keep the build plan implementation-oriented but coarse. Do not turn the spec into a line-by-line coding task list.
 10. If the design requires a material scope change, stop and issue a `SCOPING` failure handoff to Scoper.
 11. If required project context is missing or stale, stop and issue a `PROJECT_CONTEXT` failure handoff to Auditor instead of performing a repository-wide audit. Do not treat intentionally absent greenfield project context as missing or stale; initial greenfield architecture completes before its normal handoff to Auditor.
-12. Do not implement or fix production code. After architecture rework, hand off to Developer unless the revised design makes project context stale; in that case, hand off to Auditor first.
+12. Do not implement or fix production code. After architecture rework, resume according to the protocol's failure-recovery rules. Return to the earliest workflow state invalidated or interrupted by the correction; do not hardcode Developer as the return target.
 
 ## Specification Shape
 
@@ -89,4 +89,4 @@ On success:
 - for initial greenfield architecture, hand off to **Auditor**;
 - for brownfield architecture with current project context, hand off to **Developer**.
 
-If a downstream role identifies an architecture problem, revise the specification first, then hand back to **Developer** unless the revision makes project context stale; in that case, hand off to **Auditor** first. This rework rule applies even if the project is still in its initial greenfield cycle. If the problem is actually scope or project context, route it to **Scoper** or **Auditor** instead of fixing outside Architect ownership.
+If a downstream role identifies an architecture problem, revise the specification first, then resume according to the protocol's failure-recovery rules. Return to the earliest workflow state whose completed or interrupted work was invalidated by the correction; if none was invalidated, return to the state that originally encountered the failure. If the problem is actually scope or project context, route it to **Scoper** or **Auditor** instead of fixing outside Architect ownership.
