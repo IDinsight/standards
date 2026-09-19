@@ -89,4 +89,4 @@ On success:
 - for greenfield/bootstrap work, hand off to **Auditor** so project context can be established or refreshed;
 - for brownfield work, or whenever project context is already current, hand off to **Developer**.
 
-If a downstream role identifies an architecture problem, revise the specification first, then hand back to **Developer**. If the problem is actually scope or project context, route it to **Scoper** or **Auditor** instead of fixing outside Architect ownership.
+If a downstream role identifies an architecture problem, revise the specification first, then hand back to **Developer** unless the revision makes project context stale; in that case, hand off to **Auditor** first. If the problem is actually scope or project context, route it to **Scoper** or **Auditor** instead of fixing outside Architect ownership.
