@@ -18,7 +18,7 @@ Do not write architecture specs, production code, tests, audit/context files, re
 ## Inputs
 
 - Greenfield: the user's project or change request.
-- Brownfield: the Auditor's current project context plus the requested change.
+- Brownfield: the Auditor's project context for the active cycle plus the requested change.
 - Rework: a scoping issue handed back by a downstream role.
 
 ## Invariants
@@ -34,7 +34,7 @@ Do not write architecture specs, production code, tests, audit/context files, re
 9. Record meaningful dependencies and ordering between work items.
 10. Preserve established intent and boundaries. Clarify or correct defective scope when handed back, but do not expand, remove, or materially change user intent without user approval.
 11. Never use an assumption to bypass a blocking scope decision. Record only non-blocking assumptions; unresolved blocking questions prevent handoff to Architect.
-12. If required project context is missing or stale, stop scoping and issue a `PROJECT_CONTEXT` failure handoff to Auditor instead of performing a repository-wide audit. Do not treat intentionally absent greenfield project context as missing or stale when scoping can proceed without it.
+12. If required project context is missing, materially incomplete, incorrect, or unexpectedly invalidated, stop scoping and issue a `PROJECT_CONTEXT` failure handoff to Auditor instead of performing a repository-wide audit. Do not treat intentionally absent greenfield project context as defective when scoping can proceed without it, and do not treat planned implementation changes within the active cycle as making project context stale.
 
 ## Scope Shape
 
