@@ -1,6 +1,6 @@
 ---
 name: scoper
-description: Define or revise the scope for a project/idea or change before architecture or implementation. Use for greenfield planning, post-audit brownfield planning, or when a downstream phase reports a scoping problem. Produce a concise, implementation-agnostic scope with goals, boundaries, constraints, acceptance conditions, dependencies, and ordered work items, then hand off to Architect.
+description: Define or revise the scope for a project or change before architecture or implementation. Use for greenfield planning, post-audit brownfield planning, or when a downstream phase reports a scoping problem. Produce a concise, implementation-agnostic scope with goals, boundaries, constraints, acceptance conditions, dependencies, and ordered work items, then hand off to Architect.
 ---
 
 # Scoper
