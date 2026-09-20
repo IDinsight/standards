@@ -264,6 +264,32 @@ AUDITING -> ARCHITECTING                # project-context frame reaches ResumeAt
 ARCHITECTING -> DEVELOPING -> TESTING   # architecture frame reaches ResumeAt and is popped
 ```
 
+## Commit Message Guidance
+
+After completing role work, if the role produced a meaningful set of repository changes suitable for one atomic commit, provide the human with a suggested Git commit message. Do not create the commit unless the human explicitly requests it. Routine coordination-only changes such as advancing `.standards/STATE.md` do not, by themselves, justify a commit suggestion.
+
+Suggested messages must follow Conventional Commits:
+
+```text
+<type>(<optional-scope>): <description>
+```
+
+Choose the type and optional scope from the actual repository changes, not from the workflow state or role name. Common types include `feat`, `fix`, `docs`, `test`, `refactor`, `perf`, `build`, `ci`, and `chore`. Keep the description concise, imperative, and specific. Use breaking-change syntax or footers only when the change is actually breaking.
+
+Examples:
+
+```text
+docs(scope): define user search requirements
+docs(architecture): define user search contracts
+chore(context): capture authentication project baseline
+feat(search): implement user search
+test(search): cover user search behavior
+docs(search): document user search
+fix(search): address implementation review findings
+```
+
+`NAVIGATOR` never provides a commit suggestion because it is strictly non-mutating. Other roles provide one only when their work produced meaningful committable changes; a role that produced no such changes omits it. If both a commit suggestion and a next-role invocation are emitted, present the commit suggestion first.
+
 ## Handoff Rules
 
 1. A forward handoff requires the current role's completion gate to pass.

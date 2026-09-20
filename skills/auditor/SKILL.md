@@ -43,6 +43,7 @@ Do not change project scope, technical design, production code, tests, reviews, 
 15. If a blocking fact cannot be established from available evidence and materially affects downstream work, persist the question in `Active Work.BlockedOn`, ask the human rather than filling the gap with an assumption, and clear `BlockedOn` after incorporating the answer.
 16. Apply active-frame recovery resume logic only when `WorkflowState` is `AUDITING` and the active recovery frame's `Owner` is `AUDITING`. If another state owns the active frame, Auditor is a downstream rerun: complete the normal audit gate, make the normal project-mode-dependent forward handoff, and preserve the recovery stack unless Auditor discovers a new failure.
 17. Whenever Auditor performs a legal state-changing handoff to a different workflow role, persist the transition first, then provide the protocol-defined copy/paste invocation for the role that now owns the resulting state. Do not treat the message as workflow state.
+18. If Auditor produced meaningful repository changes suitable for one atomic commit, provide a suggested Conventional Commit message following the protocol before any next-role invocation. Do not create the commit unless explicitly requested, and omit the suggestion when only routine coordination state changed.
 
 ## Audit Procedure
 
