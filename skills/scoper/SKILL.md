@@ -30,7 +30,9 @@ Select exactly one Scoper invocation mode before changing the scope. These modes
 - **PLAN** — use when the active cycle does not yet have a persisted scope for `Active Work`. Read and follow [`modes/plan.md`](modes/plan.md).
 - **REPLAN** — use when `Active Work.Scope` identifies an existing persisted scope that must be corrected, revised, or reconciled with changed inputs. Read and follow [`modes/replan.md`](modes/replan.md).
 
-Load only the selected mode file. A request phrased as "add X" does not create a separate mode or bypass lifecycle rules: if it starts a new cycle with no current-cycle scope, use PLAN; if it changes an existing active-cycle scope, use REPLAN.
+Load only the selected mode file from `modes/`. A request phrased as "add X" does not create a separate mode or bypass lifecycle rules: if it starts a new cycle with no current-cycle scope, use PLAN; if it changes an existing active-cycle scope, use REPLAN.
+
+For either mode, read and follow [`template.md`](template.md). It is the authoritative shape and authoring contract for the persisted scope artifact.
 
 ## Invariants
 
@@ -47,38 +49,6 @@ Load only the selected mode file. A request phrased as "add X" does not create a
 11. Never use an assumption to bypass a blocking scope decision. Record only non-blocking assumptions; unresolved blocking questions prevent handoff. Persist any blocking human question in `Active Work.BlockedOn` before asking and clear it after incorporating the answer.
 12. If required project context is missing, materially incomplete, incorrect, or unexpectedly invalidated, stop scoping and issue a `PROJECT_CONTEXT` failure handoff to Auditor instead of performing a repository-wide audit. Do not treat intentionally absent project context before the first greenfield audit as defective when scoping can proceed without it. Once `.standards/CONTEXT.md` exists, do not ignore it merely because `ProjectMode` is still `GREENFIELD`. Planned implementation changes within the active cycle do not by themselves make project context stale.
 13. Apply active-frame recovery resume logic only when `WorkflowState` is `SCOPING` and the active recovery frame's `Owner` is `SCOPING`. If another state owns the active frame, Scoper is a downstream rerun: complete normal Scoping, make the normal `SCOPING -> ARCHITECTING` handoff, and preserve the recovery stack unless Scoper discovers a new failure.
-14. Whenever Scoper performs a legal state-changing handoff to a different workflow role, persist the transition first, then provide the protocol-defined copy/paste invocation for the role that now owns the resulting state. Do not treat the message as workflow state.
-15. If Scoper produced meaningful repository changes suitable for one atomic commit, provide a suggested Conventional Commit message following the protocol before any next-role invocation. Do not create the commit unless explicitly requested, and omit the suggestion when only routine coordination state changed.
-
-## Scope Shape
-
-Keep the artifact short and easy to scan:
-
-```markdown
-# Scope
-
-## Goal
-<What this project or change should achieve.>
-
-## Constraints
-- <Required limits or fixed conditions.>
-
-## Non-goals
-- <Explicitly excluded work.>
-
-## Work
-
-### 1. <Work item>
-**Intent:** <Why it exists.>
-**Done when:** <Observable completion conditions.>
-**Depends on:** <Other work items, or none.>
-
-## Assumptions
-- <Non-blocking assumptions not yet established as facts.>
-```
-
-Omit empty sections. Add detail only when it reduces ambiguity.
-
 ## Completion Gate
 
 Scoping is complete when:

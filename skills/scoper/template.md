@@ -1,6 +1,6 @@
 # Scoper Artifact Template
 
-Use this template for the persisted scope owned by Scoper.
+This file is the authoritative artifact shape and authoring contract for the persisted scope owned by Scoper.
 
 The scope defines **what must be built, why it matters, what is excluded, and what counts as done**. It must remain implementation-agnostic except where a technology or implementation constraint is already established by the human request or project context.
 

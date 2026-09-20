@@ -37,9 +37,6 @@ Do not change scope intent, write production code, tests, audit/context files, r
 10. If the design requires a material scope change, stop and issue a `SCOPING` failure handoff to Scoper.
 11. If required project context is missing, materially incomplete, incorrect, or unexpectedly invalidated, stop and issue a `PROJECT_CONTEXT` failure handoff to Auditor instead of performing a repository-wide audit. Do not treat intentionally absent project context before the first greenfield audit as defective; initial greenfield architecture completes before its normal handoff to Auditor. Once `.standards/CONTEXT.md` exists, do not ignore it merely because `ProjectMode` is still `GREENFIELD`. Planned implementation changes within the active cycle do not by themselves invalidate project context.
 12. Do not implement or fix production code. Apply active-frame recovery resume logic only when `WorkflowState` is `ARCHITECTING` and the active recovery frame's `Owner` is `ARCHITECTING`. If another state owns the active frame, Architect is a downstream rerun: complete normal Architecture, make the normal project-mode-dependent forward handoff, and preserve the recovery stack unless Architect discovers a new failure.
-13. Whenever Architect performs a legal state-changing handoff to a different workflow role, persist the transition first, then provide the protocol-defined copy/paste invocation for the role that now owns the resulting state. Do not treat the message as workflow state.
-14. If Architect produced meaningful repository changes suitable for one atomic commit, provide a suggested Conventional Commit message following the protocol before any next-role invocation. Do not create the commit unless explicitly requested, and omit the suggestion when only routine coordination state changed.
-
 ## Specification Shape
 
 Keep the artifact short and buildable:
