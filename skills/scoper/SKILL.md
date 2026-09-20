@@ -23,6 +23,15 @@ Do not write architecture specs, production code, tests, audit/context files, re
 - When the active recovery frame's `Owner` is `SCOPING`, use that frame as the defect Scoper must correct.
 - When recovery is active but the active frame's `Owner` is not `SCOPING`, Scoper is a downstream rerun after another correction. Re-evaluate the scope against the updated inputs and preserve the active recovery frame.
 
+## Mode Selection
+
+Select exactly one Scoper invocation mode before changing the scope. These modes are local execution paths for Scoper and are separate from `.standards/MODE.md` (`GREENFIELD` / `BROWNFIELD`).
+
+- **PLAN** — use when the active cycle does not yet have a persisted scope for `Active Work`. Read and follow [`modes/plan.md`](modes/plan.md).
+- **REPLAN** — use when `Active Work.Scope` identifies an existing persisted scope that must be corrected, revised, or reconciled with changed inputs. Read and follow [`modes/replan.md`](modes/replan.md).
+
+Load only the selected mode file. A request phrased as "add X" does not create a separate mode or bypass lifecycle rules: if it starts a new cycle with no current-cycle scope, use PLAN; if it changes an existing active-cycle scope, use REPLAN.
+
 ## Invariants
 
 1. Define **what** and **why**, not **how**.
