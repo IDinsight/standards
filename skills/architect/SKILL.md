@@ -23,56 +23,17 @@ Do not change scope intent, write production code, tests, audit/context files, r
 - When the active recovery frame's `Owner` is `ARCHITECTING`, use that frame as the architecture defect Architect must correct.
 - When recovery is active but the active frame's `Owner` is not `ARCHITECTING`, Architect is a downstream rerun after another correction. Re-evaluate the design against updated scope/context and preserve the active recovery frame.
 
+When creating or revising the persisted technical design, read and follow [`template.md`](template.md). It is the authoritative shape and authoring contract for the architecture artifact.
+
 ## Invariants
 
 1. Define **how** the completed scope will be satisfied. Treat scope intent and scope-level acceptance conditions as binding.
 2. Decide only choices that materially affect contracts, dependencies, data or control flow, compatibility, performance, security, build/deployment, maintainability, or future work. Leave local and easily reversible coding choices to Developer.
 3. Respect established architecture, conventions, dependencies, and constraints unless satisfying the completed scope or resolving an architecture defect requires a change. Make replacements explicit.
 4. Ask only questions that materially change the design. Infer what is already established by scope or project context; do not reopen settled scope decisions. Persist any blocking human question in `Active Work.BlockedOn` before asking and clear it after incorporating the answer.
-5. When multiple viable designs exist, choose one with a brief rationale and record only meaningful alternatives or tradeoffs.
-6. Define the source, contract, or governing rule for every material value or behavior that crosses a boundary, satisfies scope, or constrains implementation. Do not leave gaps that require Developer to invent architecture while coding.
-7. Derive technical acceptance criteria from Scoper's scope-level acceptance conditions. Define what must hold, but do not verify or test it. Do not weaken, expand, or silently change the scope's intent.
-8. Record interfaces, contracts, lifecycle/state behavior, error behavior, compatibility requirements, and performance/resource constraints when relevant. Omit what does not apply.
-9. Keep the build plan implementation-oriented but coarse. Do not turn the spec into a line-by-line coding task list.
-10. If the design requires a material scope change, stop and issue a `SCOPING` failure handoff to Scoper.
-11. If required project context is missing, materially incomplete, incorrect, or unexpectedly invalidated, stop and issue a `PROJECT_CONTEXT` failure handoff to Auditor instead of performing a repository-wide audit. Do not treat intentionally absent project context before the first greenfield audit as defective; initial greenfield architecture completes before its normal handoff to Auditor. Once `.standards/CONTEXT.md` exists, do not ignore it merely because `ProjectMode` is still `GREENFIELD`. Planned implementation changes within the active cycle do not by themselves invalidate project context.
-12. Do not implement or fix production code. Apply active-frame recovery resume logic only when `WorkflowState` is `ARCHITECTING` and the active recovery frame's `Owner` is `ARCHITECTING`. If another state owns the active frame, Architect is a downstream rerun: complete normal Architecture, make the normal project-mode-dependent forward handoff, and preserve the recovery stack unless Architect discovers a new failure.
-## Specification Shape
-
-Keep the artifact short and buildable:
-
-```markdown
-# Technical Design
-
-## Context
-<Scope item, relevant constraints, and existing context.>
-
-## Decision
-<Chosen technical design and brief rationale.>
-
-## Components
-- <Major component/module and responsibility.>
-
-## Interfaces and Contracts
-- <API, ABI, protocol, schema, file format, boundary, or other contract.>
-
-## Data and Control Flow
-<How relevant data, state, or execution moves through the design.>
-
-## Technical Acceptance
-- <Technical condition that must hold for the scope to be satisfied.>
-
-## Build Plan
-1. <Coarse implementation step or dependency order.>
-
-## Risks and Follow-up
-- <Known risk, unresolved non-blocking item, or later work.>
-
-## Alternatives
-- <Meaningful rejected alternative and why it was not chosen.>
-```
-
-Omit empty sections. Add detail only when it prevents Developer from having to make an unowned technical decision.
+5. If the design requires a material scope change, stop and issue a `SCOPING` failure handoff to Scoper.
+6. If required project context is missing, materially incomplete, incorrect, or unexpectedly invalidated, stop and issue a `PROJECT_CONTEXT` failure handoff to Auditor instead of performing a repository-wide audit. Do not treat intentionally absent project context before the first greenfield audit as defective; initial greenfield architecture completes before its normal handoff to Auditor. Once `.standards/CONTEXT.md` exists, do not ignore it merely because `ProjectMode` is still `GREENFIELD`. Planned implementation changes within the active cycle do not by themselves invalidate project context.
+7. Do not implement or fix production code. Apply active-frame recovery resume logic only when `WorkflowState` is `ARCHITECTING` and the active recovery frame's `Owner` is `ARCHITECTING`. If another state owns the active frame, Architect is a downstream rerun: complete normal Architecture, make the normal project-mode-dependent forward handoff, and preserve the recovery stack unless Architect discovers a new failure.
 
 ## Completion Gate
 

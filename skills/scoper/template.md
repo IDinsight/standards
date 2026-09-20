@@ -10,7 +10,7 @@ Omit empty sections. Add detail only when it materially reduces ambiguity.
 
 ---
 
-# <Project or Change Name>
+# Project or Change Name
 
 ## Goal
 
@@ -28,24 +28,24 @@ Describe the intended outcome and why this work is needed. State the result the 
 
 ## Work
 
-### 1. <Outcome-oriented work item>
+### 1. Outcome-oriented work item
 
-**Intent:** <Explain why this work item exists and what user, system, or project outcome it serves.>
+**Intent:** Explain why this work item exists and what user, system, or project outcome it serves.
 
 **Done when:**
 - Observable scope-level acceptance condition.
 - Another externally verifiable behavior or required property, when needed.
 
-**Depends on:** <Other numbered work items, an established external dependency, or `None`.>
+**Depends on:** Other numbered work items, an established external dependency, or `None`.
 
-### 2. <Outcome-oriented work item>
+### 2. Outcome-oriented work item
 
-**Intent:** <Why this work item exists.>
+**Intent:** Why this work item exists.
 
 **Done when:**
 - Observable scope-level acceptance condition.
 
-**Depends on:** <Dependency or `None`.>
+**Depends on:** Dependency or `None`.
 
 ## Assumptions
 
