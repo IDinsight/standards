@@ -42,55 +42,30 @@ Do not change project scope, technical design, production code, tests, reviews, 
 14. If auditing reveals that a completed scope or technical design is now invalid, do not edit those artifacts. Finish the corrected context, then resume at the earliest invalidated workflow state according to the protocol.
 15. If a blocking fact cannot be established from available evidence and materially affects downstream work, persist the question in `Active Work.BlockedOn`, ask the human rather than filling the gap with an assumption, and clear `BlockedOn` after incorporating the answer.
 16. Apply active-frame recovery resume logic only when `WorkflowState` is `AUDITING` and the active recovery frame's `Owner` is `AUDITING`. If another state owns the active frame, Auditor is a downstream rerun: complete the normal audit gate, make the normal project-mode-dependent forward handoff, and preserve the recovery stack unless Auditor discovers a new failure.
+17. Use `template.md` as the authoritative shape for `.standards/CONTEXT.md`. Omit empty sections and keep the artifact coherent rather than appending an audit diary.
+18. Load exactly one audit mode for the current run. Audit modes change inspection strategy only; they do not change Auditor's authority, ownership, protocol transitions, or completion gate.
+
+## Mode Selection
+
+After reading protocol state and the existing context artifact, select and read exactly one mode:
+
+- `modes/greenfield.md` — initial audit while `ProjectMode` is `GREENFIELD`.
+- `modes/subtree.md` — a usable project-level context exists and an explicit target area requires deeper inspection or refresh.
+- `modes/gapfill.md` — a usable project-level context exists and needs verification or refresh for the active cycle, with no narrower subtree target; reconcile any omissions, stale claims, incorrect claims, or weak grounding discovered along the way.
+- `modes/whole-repo.md` — `BROWNFIELD` work has no usable project-level context baseline, or the existing baseline is too incomplete or unreliable to repair safely.
+
+Prefer the narrowest mode that can establish a trustworthy baseline. A subtree scan must not substitute for a missing project-level baseline.
+
 ## Audit Procedure
 
 1. Read `.standards/PROTOCOL.md`, `.standards/MODE.md`, and `.standards/STATE.md` first. Read the existing `.standards/CONTEXT.md` if present.
 2. Identify why `AUDITING` is active: initial brownfield audit, initial greenfield audit, ownership of the active `PROJECT_CONTEXT` recovery frame, or a downstream rerun while another state owns the active frame. Preserve the full recovery stack in all recovery cases.
-3. Read only the upstream artifacts and project instructions relevant to this audit. For greenfield, this normally includes completed scope and technical design. For brownfield, begin from `Active Work.Request` and the repository itself.
-4. Map the relevant project baseline: purpose, stack/toolchain, structural boundaries, entry points, commands, conventions, external boundaries, persistence/state, testing, build/deployment constraints, and affected areas as applicable.
-5. Cross-check material claims against primary evidence. Resolve contradictions where possible; record a concise unknown only when it is non-blocking.
-6. Write or refresh `.standards/CONTEXT.md` using the shape below. Replace stale baseline claims instead of appending an audit diary.
-7. If Auditor owns the active recovery frame, determine whether the corrected context invalidates any completed or interrupted workflow state and apply that frame's resume logic. Otherwise, perform the normal audit handoff while preserving any active frame owned by another state. If the audit exposes a new defect owned elsewhere, create the appropriate failure handoff instead. Update `.standards/STATE.md` for the resulting transition.
-
-## Project Context Shape
-
-Keep the artifact concise and optimized for downstream agents:
-
-```markdown
-# Project Context
-
-## Project Baseline
-- What the project is and the relevant current state.
-
-## Stack and Tooling
-- Languages, runtimes, frameworks, package/build tools, versions or constraints when material.
-
-## Structure and Boundaries
-- `path` — responsibility or boundary relevant to this cycle.
-
-## Commands
-- `command` — what it does and when to use it.
-
-## Conventions and Constraints
-- Established rule, invariant, compatibility requirement, or project-specific instruction.
-
-## External Systems and Data
-- Relevant service, API, persistence boundary, schema, protocol, or integration.
-
-## Testing and Verification Baseline
-- Existing test locations, frameworks, verification mechanisms, or known limitations.
-
-## Relevant Existing Behavior
-- Behavior downstream work must preserve or intentionally change through owned scope/design decisions.
-
-## Known Unknowns
-- Non-blocking fact that could not be established, with why it matters.
-
-## Evidence
-- `path or command` — what it grounds.
-```
-
-Omit empty sections. Prefer a few high-value paths and commands over exhaustive inventories. Do not restate the scope or technical design except where needed to distinguish planned constraints from existing implementation facts.
+3. Select and read the applicable file under `modes/` using the rules above.
+4. Read only the upstream artifacts and project instructions relevant to this audit and selected mode.
+5. Execute the selected mode while applying all shared invariants in this file.
+6. Cross-check material claims against primary evidence. Resolve contradictions where possible; record a concise unknown only when it is non-blocking.
+7. Write or refresh `.standards/CONTEXT.md` using `template.md` as the authoritative artifact shape.
+8. If Auditor owns the active recovery frame, determine whether the corrected context invalidates any completed or interrupted workflow state and apply that frame's resume logic. Otherwise, perform the normal audit handoff while preserving any active frame owned by another state. If the audit exposes a new defect owned elsewhere, create the appropriate failure handoff instead. Update `.standards/STATE.md` for the resulting transition.
 
 ## Completion Gate
 
