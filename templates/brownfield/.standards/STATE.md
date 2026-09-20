@@ -2,6 +2,13 @@
 
 `WorkflowState`: `AUDITING`
 
+## Active Work
+`Id`: `UNSET`
+`Request`: `UNSET`
+`Scope`: `NONE`
+`Architecture`: `NONE`
+`BlockedOn`: `NONE`
+
 ## Handoff
 `Kind`: `INITIAL`
 `From`: `NONE`
@@ -10,4 +17,3 @@
 
 ## Recovery
 `Active`: `false`
-`ResumeAt`: `NONE`
