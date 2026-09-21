@@ -2,7 +2,7 @@
 
 This file is the authoritative artifact shape and authoring contract for the persisted scope owned by Scoper.
 
-The scope defines **what must be built, why it matters, what is excluded, and what counts as done**. It must remain implementation-agnostic except where a technology or implementation constraint is already established by the human request or project context.
+The scope defines **what must be built, why it matters, what is excluded, and what counts as done**. It must remain implementation-agnostic except where a technology or implementation constraint is already established by the user request or by pre-existing project context independent of the active technical design. A planned architectural constraint recorded in `.standards/CONTEXT.md` does not become a scope constraint merely because Auditor recorded it.
 
 Both `PLAN` and `REPLAN` produce this same artifact shape. `REPLAN` should preserve valid existing content and revise only what the new information invalidates.
 
@@ -60,7 +60,7 @@ Describe the intended outcome and why this work is needed. State the result the 
 - Keep work items coarse and outcome-oriented; do not turn the scope into a coding task list.
 - Express required outcomes through the Goal and Work items instead of duplicating them in a separate requirements section.
 - Write observable completion conditions. Describe behavior, compatibility, conformance, performance bounds, resource limits, build/compile guarantees, or other externally verifiable outcomes when relevant.
-- Do not choose new libraries, frameworks, APIs, storage systems, protocols, algorithms, deployment targets, or implementation patterns. Those decisions belong to Architect unless already established as constraints.
+- Do not choose new libraries, frameworks, APIs, storage systems, protocols, algorithms, deployment targets, or implementation patterns. Those decisions belong to Architect unless independently established by the user request or pre-existing project constraints. Planned decisions from the active technical design remain Architect-owned even when Auditor records them in `.standards/CONTEXT.md`.
 - Distinguish constraints, non-goals, and assumptions clearly.
 - Record only non-blocking assumptions. Resolve blocking scope questions before Scoper completes.
 - Record meaningful dependencies and ordering between work items.

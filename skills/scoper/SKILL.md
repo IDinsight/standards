@@ -3,6 +3,7 @@ name: scoper
 description: Define or revise the scope for a project or change before architecture or implementation. Use for greenfield planning, post-audit brownfield planning, or when a downstream phase reports a scoping problem. Produce a concise, persisted, implementation-agnostic scope with goals, boundaries, constraints, acceptance conditions, dependencies, and ordered work items. Normal completion hands off to Architect; recovery follows the protocol's recovery-stack and invalidation rules.
 ---
 
+<!-- standards:framework-owned -->
 # Scoper
 
 Turn an idea or requested change into a clear, bounded statement of **what must be built and what counts as done**.
@@ -17,7 +18,7 @@ Do not write architecture specs, production code, tests, audit/context files, re
 
 ## Inputs
 
-- Always: `Active Work.Request`, explicit human constraints, the current persisted scope when one exists, and `.standards/CONTEXT.md` when it exists and is relevant.
+- Always: `Active Work.Request`, explicit user constraints, the current persisted scope when one exists, and `.standards/CONTEXT.md` when it exists and is relevant.
 - Initial greenfield Scoping before the first audit may proceed without `CONTEXT.md`; its absence is intentional unless the requested work requires project facts that cannot otherwise be established.
 - Brownfield Scoping requires the Auditor's project context for the active cycle.
 - When the active recovery frame's `Owner` is `SCOPING`, use that frame as the defect Scoper must correct.
@@ -36,33 +37,18 @@ For either mode, read and follow [`template.md`](template.md). It is the authori
 
 ## Invariants
 
-1. Define **what** and **why**, not **how**.
-2. Keep the scope technology-agnostic unless a technology is an explicit project constraint.
-3. Do not choose libraries, frameworks, APIs, storage, protocols, algorithms, deployment targets, or implementation patterns unless they are already established requirements or constraints. Leave new implementation decisions to Architect.
-4. Ask only questions that materially change scope. Resolve blocking ambiguity before advancing.
-5. Separate constraints, assumptions, non-goals, and required outcomes. Express required outcomes through the Goal and Work items rather than duplicating them in a separate requirements list.
-6. Write observable acceptance conditions. Describe behavior, externally verifiable properties, and outcomes—not test implementation. Observable properties may include compatibility, conformance, performance bounds, resource limits, or build/compile guarantees.
-7. Treat Scoper acceptance conditions as scope-level acceptance conditions. Architect may derive technical acceptance criteria from them, but must not silently change their intent.
-8. Keep work items coarse. Do not turn the scope into a coding task list.
-9. Record meaningful dependencies and ordering between work items.
-10. Preserve established intent and boundaries. Clarify or correct defective scope when handed back, but do not expand, remove, or materially change user intent without user approval.
-11. Never use an assumption to bypass a blocking scope decision. Record only non-blocking assumptions; unresolved blocking questions prevent handoff. Persist any blocking human question in `Active Work.BlockedOn` before asking and clear it after incorporating the answer.
-12. If required project context is missing, materially incomplete, incorrect, or unexpectedly invalidated, stop scoping and issue a `PROJECT_CONTEXT` failure handoff to Auditor instead of performing a repository-wide audit. Do not treat intentionally absent project context before the first greenfield audit as defective when scoping can proceed without it. Once `.standards/CONTEXT.md` exists, do not ignore it merely because `ProjectMode` is still `GREENFIELD`. Planned implementation changes within the active cycle do not by themselves make project context stale.
-13. Apply active-frame recovery resume logic only when `WorkflowState` is `SCOPING` and the active recovery frame's `Owner` is `SCOPING`. If another state owns the active frame, Scoper is a downstream rerun: complete normal Scoping, make the normal `SCOPING -> ARCHITECTING` handoff, and preserve the recovery stack unless Scoper discovers a new failure.
+1. Ask only questions that materially change scope. Resolve blocking ambiguity before advancing. Persist any blocking user question in `Active Work.BlockedOn` before asking and clear it after incorporating the answer.
+2. If required project context is missing, materially incomplete, incorrect, or unexpectedly invalidated, stop scoping and issue a `PROJECT_CONTEXT` failure handoff to Auditor instead of performing a repository-wide audit. Do not treat intentionally absent project context before the first greenfield audit as defective when scoping can proceed without it. Once `.standards/CONTEXT.md` exists, do not ignore it merely because `ProjectMode` is still `GREENFIELD`. Planned implementation changes within the active cycle do not by themselves make project context stale.
+3. Treat planned architectural constraints recorded in `.standards/CONTEXT.md` as Architect-owned design information, not as independently established scope constraints. They constrain Scoper only when the same constraint is independently established by the user request or by pre-existing project requirements, policy, platform, compatibility, or other baseline constraints.
+
 ## Completion Gate
 
 Scoping is complete when:
 
-- the intended outcome and boundaries are clear;
-- blocking scope questions are resolved;
-- each work item has observable completion conditions;
-- dependencies and constraints that affect planning are recorded;
-- assumptions are non-blocking and clearly identified;
-- implementation decisions have not been prematurely made;
-- the completed scope is persisted and `Active Work.Scope` points to it.
+- the persisted scope satisfies the artifact shape and authoring contract in `template.md`;
+- no blocking scope question remains unresolved;
+- `Active Work.Scope` points to the completed persisted scope.
 
 On normal success, the scope is a **completed scope**. Hand off to **Architect**.
 
-When Scoper owns the active recovery frame, do not assume Architect is always the next state. Follow the protocol's recovery-stack and invalidation rules: resume at the earliest completed or interrupted state invalidated by the scope correction, or at the active frame's `ResumeAt` if no earlier work was invalidated. Rerun required downstream gates from there.
-
-When recovery is active but another state owns the active frame, Scoper is only a downstream rerun. On success, make the normal handoff to **Architect** and preserve the recovery stack.
+When recovery is active, apply `.standards/PROTOCOL.md` **Recovery Mechanics** after the completion gate succeeds. Scoper determines downstream invalidation only when it owns the active frame; otherwise it follows the protocol as a downstream rerun.

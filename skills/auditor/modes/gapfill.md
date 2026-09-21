@@ -8,11 +8,10 @@ The goal is to reconcile the existing baseline against current authoritative evi
 
 1. Read the existing `.standards/CONTEXT.md` as claims to verify, not as authoritative truth.
 2. Identify which claims or omissions matter to the active request or `PROJECT_CONTEXT` defect.
-3. Verify those areas against primary repository evidence, project instructions, completed upstream artifacts, and explicit human input where applicable.
+3. Verify those areas against primary repository evidence, project instructions, completed upstream artifacts, and explicit user input where applicable.
 4. Preserve claims that remain correct and relevant.
 5. Replace stale or incorrect claims; add missing material facts; remove details that are no longer useful to downstream roles.
-6. Broaden into a whole-repository scan only when the existing baseline is too incomplete or unreliable to repair safely.
-7. Rewrite `.standards/CONTEXT.md` as a coherent current baseline using `../template.md`; do not append change history or an audit diary.
+6. Rewrite `.standards/CONTEXT.md` as a coherent current baseline using `../template.md`; do not append change history or an audit diary.
 
 ## Mode-specific completion condition
 

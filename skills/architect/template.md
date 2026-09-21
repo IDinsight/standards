@@ -32,7 +32,7 @@ State the chosen technical design and the brief rationale for the material choic
 
 Describe how relevant data, state, events, or execution move through the design. Include lifecycle or state transitions when they materially affect behavior.
 
-## Technical Acceptance
+## Technical Acceptance Criteria
 
 - Technical condition that must hold for the completed scope and its acceptance conditions to be satisfied.
 - Define what must hold; do not prescribe test implementation or perform verification here.

@@ -32,4 +32,4 @@
 
 ---
 
-Omit empty sections. Prefer a few high-value paths and commands over exhaustive inventories. Do not restate scope or technical design except where needed to distinguish planned constraints from existing implementation facts.
+Omit empty sections. Prefer a few high-value paths and commands over exhaustive inventories. Do not restate planned technical decisions from `Active Work.Architecture`. When necessary, note that the active design contains planned changes not yet represented by the repository and defer to the Architecture artifact for their contents.

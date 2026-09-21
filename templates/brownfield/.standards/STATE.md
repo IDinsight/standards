@@ -7,6 +7,7 @@
 `Request`: `UNSET`
 `Scope`: `NONE`
 `Architecture`: `NONE`
+`AuditTarget`: `NONE`
 `BlockedOn`: `NONE`
 
 ## Handoff

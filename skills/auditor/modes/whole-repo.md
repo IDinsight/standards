@@ -1,8 +1,8 @@
 # Whole-Repository Audit
 
-Use for `BROWNFIELD` work when no usable project-context baseline exists.
+Use whenever no usable project-context baseline exists, except for the scheduled initial `GREENFIELD` audit after Scope and Architecture are complete. This includes the initial `BROWNFIELD` audit and an early `GREENFIELD` `PROJECT_CONTEXT` recovery before the scheduled post-Architecture greenfield audit.
 
-The goal is to establish `.standards/CONTEXT.md` from primary repository evidence without turning it into an exhaustive repository inventory.
+The goal is to establish `.standards/CONTEXT.md` from primary repository evidence and whatever upstream workflow artifacts already exist, without requiring artifacts that have not yet been completed and without turning the result into an exhaustive repository inventory.
 
 ## Procedure
 
