@@ -26,6 +26,19 @@ Do not change scope intent, write production code, tests, audit/context files, r
 
 When creating or revising the persisted technical design, read and follow [`template.md`](template.md). It is the authoritative shape and authoring contract for the architecture artifact.
 
+## Mode Selection
+
+After confirming the required inputs are usable, select and read one mode that best matches the architecture problem:
+
+- `modes/foundation.md` — establish or materially redefine foundational system structure, major boundaries, or platform-level technical choices.
+- `modes/feature.md` — design a bounded capability when the capability itself—not foundational structure, transition/compatibility, or a shared cross-boundary rule—is the primary design concern.
+- `modes/evolution.md` — materially change, replace, migrate, or restructure an existing technical design where transition or compatibility is a primary concern.
+- `modes/cross-cutting.md` — define one technical mechanism, contract, or rule that must apply consistently across multiple project boundaries.
+
+If modes overlap, choose by the primary design risk: transition/compatibility -> `evolution`; a shared cross-boundary technical rule -> `cross-cutting`; foundational structure -> `foundation`; otherwise -> `feature`.
+
+Maintain exactly one active mode at a time. Modes change design emphasis only; they do not change Architect ownership, the `template.md` artifact contract, protocol transitions, or the completion gate. If later evidence shows the problem was misclassified, replace the active mode before finalizing the design; do not apply multiple mode files concurrently.
+
 ## Invariants
 
 1. Ask only questions that materially change the design. Infer what is already established by scope or project context; do not reopen settled scope decisions. Persist any blocking user question in `Active Work.BlockedOn` before asking and clear it after incorporating the answer.
