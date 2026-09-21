@@ -1,0 +1,76 @@
+{
+  "skill_name": "auditor",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Continue the active STANDARDS workflow as Auditor. ProjectMode is BROWNFIELD, WorkflowState is AUDITING, recovery is inactive, .standards/CONTEXT.md does not exist, and Active Work.Request is to add CSV export to an existing product. Inspect only what is needed to establish the active-cycle baseline; do not propose the export design or implementation.",
+      "expected_output": "A WHOLE-REPO audit that establishes an evidence-backed CONTEXT.md baseline from the existing repository, keeps proposed CSV behavior out of project context, and hands off to Scoper.",
+      "files": [],
+      "assertions": [
+        "The response selects WHOLE-REPO because no usable project-level context baseline exists for initial brownfield work",
+        "It begins at repository level and deepens only where needed for the active request rather than producing an exhaustive inventory",
+        "Material claims are grounded in repository evidence, project instructions, or explicit user input and unknowns are not promoted to facts",
+        "CONTEXT.md records current project reality and constraints but does not design the CSV export or copy proposed architecture into the baseline",
+        "Established commands are recorded only when supported by project configuration, documentation, scripts, or safe verification",
+        "Normal brownfield success hands off AUDITING -> SCOPING and provides the next-role Scoper invocation required by the protocol"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Continue the active STANDARDS workflow as Auditor. ProjectMode is GREENFIELD, WorkflowState is AUDITING, Scope and Architecture are complete, recovery is inactive, and the repository currently contains only a minimal scaffold with a package manifest and empty source/test directories. Architecture plans an HTTP API, PostgreSQL persistence, and a background worker, none of which has been implemented yet.",
+      "expected_output": "A GREENFIELD audit that records the scaffold and independently established constraints as current facts, clearly distinguishes the planned API/database/worker design from existing implementation, and hands off to Developer.",
+      "files": [],
+      "assertions": [
+        "The response selects GREENFIELD because this is the scheduled initial audit after greenfield Scope and Architecture",
+        "It treats the current scaffold, manifests, directories, and established instructions as repository facts only when supported by evidence",
+        "It does not describe the planned API, PostgreSQL persistence, or worker as existing implementation",
+        "It does not duplicate the contents of the Architect artifact into CONTEXT.md and instead defers planned technical design to Active Work.Architecture",
+        "The resulting baseline makes the pre-implementation state clear enough for Developer to distinguish what exists from what must be created",
+        "Normal greenfield success hands off AUDITING -> DEVELOPING and provides the next-role Developer invocation required by the protocol"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Continue the active STANDARDS workflow as Auditor. ProjectMode is BROWNFIELD, WorkflowState is AUDITING, recovery is inactive, a usable-looking CONTEXT.md exists, Active Work.AuditTarget is services/billing, and the audit begins in SUBTREE mode. During inspection, you discover the context's project-wide claims about language version, build system, test command, and workspace boundaries are stale or wrong, so the project-level baseline is no longer trustworthy.",
+      "expected_output": "A mode escalation from SUBTREE to WHOLE-REPO that replaces rather than combines the inspection strategy, clears the no-longer-applicable AuditTarget, rebuilds the project baseline from evidence, and keeps Auditor within factual context ownership.",
+      "files": [],
+      "assertions": [
+        "The response initially selects SUBTREE because a project baseline exists and an explicit target area is persisted",
+        "Once project-level baseline reliability fails, it escalates SUBTREE -> WHOLE-REPO rather than continuing the targeted scan as if the baseline were valid",
+        "Only the replacement WHOLE-REPO procedure governs the continued audit; the response does not combine concurrent mode procedures",
+        "Active Work.AuditTarget is cleared when services/billing no longer represents the active audit focus",
+        "The refreshed CONTEXT.md corrects stale global claims using primary evidence and remains a coherent baseline rather than an audit diary",
+        "The audit still does not make scope, architecture, or implementation decisions while rebuilding context"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Continue the active STANDARDS workflow as Auditor. ProjectMode is BROWNFIELD, WorkflowState is AUDITING, Active Work.Architecture points to a completed technical design that assumes the service can rely on a single-instance in-memory scheduler, and the active recovery frame is Owner=AUDITING, FailureType=PROJECT_CONTEXT, From=DEVELOPING, ResumeAt=DEVELOPING, RerunThrough=NONE. Developer routed here after discovering that deployment topology in project context might be stale. During evidence-backed audit you establish that the production service is deployed with multiple replicas and project policy requires stateless application instances. Correct the factual context, but do not edit or replace the architecture artifact yourself.",
+      "expected_output": "An Auditor-owned PROJECT_CONTEXT recovery that corrects CONTEXT.md, recognizes that the completed technical design must be re-established, sets the existing recovery frame's RerunThrough to ARCHITECTING, and routes to Architect without creating a nested architecture failure or redesigning the scheduler.",
+      "files": [],
+      "assertions": [
+        "The response records the multi-replica deployment and stateless-instance policy in CONTEXT.md as evidence-backed current constraints",
+        "It does not rewrite the Architect artifact or choose a replacement scheduling mechanism",
+        "It identifies the completed technical design as invalidated by corrected project context",
+        "Because Auditor owns the active PROJECT_CONTEXT recovery frame, it does not push a nested ARCHITECTURE failure frame for the same invalidation",
+        "It keeps ResumeAt=DEVELOPING, sets the existing frame's RerunThrough to ARCHITECTING, and preserves the frame on the recovery stack",
+        "It transitions AUDITING -> ARCHITECTING as a recovery-directed RESUME handoff rather than taking the normal brownfield AUDITING -> SCOPING path",
+        "It provides the next-role Architect invocation after persisting the transition"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Continue the active STANDARDS workflow as Auditor. ProjectMode is BROWNFIELD, WorkflowState is AUDITING, recovery is inactive, a generally usable .standards/CONTEXT.md exists, Active Work.AuditTarget is NONE, and the current cycle depends on the project's runtime version and test command. The baseline still describes runtime version 20 and `npm test`, but current manifests and scripts establish runtime version 22 and `npm run test:unit`; the rest of the project-level context remains accurate.",
+      "expected_output": "A GAPFILL audit that verifies and repairs only the material stale baseline claims, preserves still-valid context, rewrites CONTEXT.md coherently, and continues with the normal brownfield handoff without rebuilding the repository baseline from scratch.",
+      "files": [],
+      "assertions": [
+        "The response selects GAPFILL because a usable project-level context exists, no narrower audit target is active, and only material baseline claims need refresh",
+        "It verifies the stale runtime and command claims against authoritative project evidence rather than accepting the existing context as truth",
+        "It updates the runtime version and test command while preserving unrelated context that remains correct and relevant",
+        "It does not escalate to WHOLE-REPO because the existing baseline remains usable and safely repairable",
+        "CONTEXT.md is rewritten as one coherent current baseline rather than appended with an audit history",
+        "Normal brownfield success hands off AUDITING -> SCOPING and provides the next-role Scoper invocation required by the protocol"
+      ]
+    }
+  ]
+}

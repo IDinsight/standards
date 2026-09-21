@@ -1,0 +1,75 @@
+{
+  "skill_name": "architect",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Continue the active STANDARDS workflow as Architect. ProjectMode is BROWNFIELD, WorkflowState is ARCHITECTING, recovery is inactive, valid project context exists, and scope requires adding an optional 'preferred_name' field to an existing customer profile capability. The field must appear in profile reads and edits, existing records may remain null, and a small database migration may be required. No foundational structure, shared cross-boundary rule, or compatibility rollout is requested.",
+      "expected_output": "A FEATURE-mode technical design for the bounded capability, including the material contract, data/state, integration, migration implications, acceptance criteria, and build sequence without treating the incidental migration as an Evolution problem or writing implementation code.",
+      "files": [],
+      "assertions": [
+        "The response selects FEATURE because the bounded capability is the primary design concern and the migration is incidental rather than transition-driven",
+        "It reuses established project architecture and limits design to the components, contracts, state ownership, control flow, and compatibility behavior materially affected by the field",
+        "It addresses the nullable existing-record behavior and any required schema migration only to the extent needed for a buildable design",
+        "It leaves reversible local implementation choices to Developer and does not write production code or tests",
+        "The persisted technical design follows the Architect template and Active Work.Architecture is updated to its repository-relative path",
+        "Normal brownfield success with valid context hands off ARCHITECTING -> DEVELOPING and provides the next-role Developer invocation required by the protocol"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Continue the active STANDARDS workflow as Architect. ProjectMode is BROWNFIELD, WorkflowState is ARCHITECTING, recovery is inactive, and valid active-cycle project context exists. Scope requires replacing the existing session-cookie authentication contract with short-lived access tokens across the API, web app, and worker. Existing sessions must continue working during a staged rollout, clients cannot all update at once, and rollback must remain possible until migration completes. The new auth contract is shared across several project boundaries.",
+      "expected_output": "An EVOLUTION-mode technical design that gives transition and compatibility precedence over the cross-cutting nature of the new authentication contract, defining current-to-target behavior, coexistence, rollout, rollback, and retirement conditions.",
+      "files": [],
+      "assertions": [
+        "The response selects EVOLUTION because transition and compatibility are the primary design risks even though the target contract is cross-cutting",
+        "It identifies the existing authentication contract and the intended target contract without treating the work as greenfield design",
+        "It defines coexistence or compatibility boundaries, staged cutover behavior, rollback expectations, and retirement conditions where material",
+        "Temporary architecture is clearly distinguished from the intended steady state",
+        "It preserves unaffected established behavior and constraints from project context",
+        "It does not replace the required technical design with only a coding task list or generic coding-standard document"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Continue the active STANDARDS workflow as Architect. ProjectMode is GREENFIELD, WorkflowState is ARCHITECTING, recovery is inactive, Active Work.Scope points to a completed scope, .standards/CONTEXT.md does not yet exist, and the scope is for a new event-processing service that needs an HTTP ingestion boundary, durable event storage, asynchronous processing, and a deployable runtime. The scope does not mandate specific frameworks or vendors.",
+      "expected_output": "A FOUNDATION-mode greenfield technical design that establishes the major runtime and persistence boundaries and required contracts without treating the intentionally absent pre-audit CONTEXT.md as a defect, then hands off to Auditor.",
+      "files": [],
+      "assertions": [
+        "The response selects FOUNDATION because foundational runtime, persistence, processing, and deployment boundaries are the primary design concern",
+        "It does not raise PROJECT_CONTEXT merely because CONTEXT.md is intentionally absent before the scheduled initial greenfield audit",
+        "It resolves only material foundational choices needed to make the design buildable and leaves reversible local implementation choices to Developer",
+        "The design defines major boundaries, ownership, dependency direction or lifecycle constraints, and cross-boundary contracts where they materially constrain implementation",
+        "It does not introduce product requirements or expand scope beyond the completed Scoper artifact",
+        "Normal greenfield success hands off ARCHITECTING -> AUDITING and provides the next-role Auditor invocation required by the protocol"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Continue the active STANDARDS workflow as Architect. ProjectMode is BROWNFIELD, WorkflowState is ARCHITECTING, recovery is inactive, and valid active-cycle project context exists. Scope requires every externally initiated request and asynchronous job to carry the same correlation identifier through the API, message bus, worker, logs, and outbound callbacks. Existing project structure remains valid; no staged compatibility migration is a primary concern.",
+      "expected_output": "A CROSS_CUTTING-mode technical design that defines one canonical correlation contract, its propagation and enforcement boundaries, integration points, material exceptions, and adoption behavior without redesigning unrelated architecture.",
+      "files": [],
+      "assertions": [
+        "The response selects CROSS_CUTTING because one technical contract must apply consistently across multiple project boundaries and transition risk is not primary",
+        "It defines the canonical identifier behavior and where the contract begins, propagates, is enforced, and terminates",
+        "It identifies affected integration points and ownership boundaries without turning the artifact into a broad coding-style guide",
+        "It addresses exceptions or rollout only when materially required by the scoped technical requirement",
+        "It preserves established project structure and avoids unrelated foundational redesign",
+        "The resulting design remains one Architect artifact governed by template.md rather than creating a mode-specific artifact format"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Continue the active STANDARDS workflow as Architect. ProjectMode is BROWNFIELD, WorkflowState is ARCHITECTING, recovery is inactive, valid active-cycle project context exists, and scope says: 'Add shareable report links.' The scope does not state whether links are public, require authentication, expire, or may be revoked. Those choices materially change who can access reports and what users are being promised. Do not silently choose product behavior.",
+      "expected_output": "A SCOPING failure handoff to Scoper because the persisted scope is materially incomplete, with no invented access policy and no architecture artifact finalized from the ambiguous requirement.",
+      "files": [],
+      "assertions": [
+        "The response recognizes the missing access semantics as a scope defect rather than an architecture implementation detail",
+        "It does not choose public versus authenticated access, expiration, or revocation behavior on the user's behalf",
+        "It does not finalize a technical design while the material scope ambiguity remains unresolved",
+        "It records a failure handoff from ARCHITECTING to SCOPING with FailureType SCOPING",
+        "Because routing changes state, it creates a recovery frame owned by SCOPING with ResumeAt ARCHITECTING and RerunThrough NONE",
+        "It provides the next-role Scoper invocation after persisting the transition"
+      ]
+    }
+  ]
+}

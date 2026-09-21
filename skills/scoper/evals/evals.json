@@ -1,0 +1,60 @@
+{
+  "skill_name": "scoper",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Continue the active STANDARDS workflow as Scoper. ProjectMode is GREENFIELD, WorkflowState is SCOPING, Active Work.Scope is NONE, recovery is inactive, and the request is: build a small internal web tool that lets support staff search customers by email, view the customer's current plan and account status, and copy the customer ID. Only authenticated support staff may use it. Do not choose frameworks, storage, APIs, or UI libraries unless already established by project constraints.",
+      "expected_output": "A PLAN-mode scoping result that persists one implementation-agnostic scope for the active cycle, defines observable completion conditions and boundaries, records the scope path in Active Work.Scope, and hands off to Architect without making technical design decisions.",
+      "files": [],
+      "assertions": [
+        "The response selects PLAN because the active cycle has no persisted scope",
+        "The scope defines the requested outcome, in-scope behavior, material constraints, non-goals or boundaries, dependencies, and observable acceptance conditions without choosing architecture or implementation details",
+        "The scope preserves the authentication requirement as a product or project constraint but does not invent an authorization mechanism",
+        "The work is decomposed into coarse outcome-oriented items rather than implementation tasks or file-level changes",
+        "A repository-relative scope artifact path is persisted in Active Work.Scope before completion",
+        "Normal success hands off SCOPING -> ARCHITECTING and provides the next-role Architect invocation required by the protocol"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Continue the active recovery as Scoper. ProjectMode is BROWNFIELD, WorkflowState is SCOPING, Active Work.Scope points to docs/scope/export-audit-log.md, valid active-cycle project context exists, and the active recovery frame is Owner=SCOPING, FailureType=SCOPING, ResumeAt=DEVELOPING, RerunThrough=NONE. The existing scope requires administrators to export the audit log as CSV. The approved user change adds JSON export with the same filters and permissions. The completed architecture artifact defines a CSV-only export contract, so the new JSON outcome invalidates that downstream design. Revise only what the new requirement invalidates.",
+      "expected_output": "A REPLAN-mode correction that preserves unaffected scope, adds the approved JSON outcome and acceptance conditions, recognizes that completed architecture must be re-established, and resumes recovery through Architect before returning to Developing.",
+      "files": [],
+      "assertions": [
+        "The response selects REPLAN because Active Work.Scope already identifies the active-cycle scope",
+        "It preserves unaffected CSV behavior, filters, permissions, and other valid scope content instead of rewriting the scope wholesale",
+        "It adds JSON export as an outcome and updates only affected work items, dependencies, and observable completion conditions",
+        "It does not define serialization libraries, API shapes, storage changes, or other Architect or Developer decisions",
+        "Because the Scoper-owned correction invalidates already-completed architecture, the active frame is retained with RerunThrough set to ARCHITECTING and the workflow moves to ARCHITECTING",
+        "The recovery frame is not popped at Scoper completion and ResumeAt remains DEVELOPING",
+        "It records SCOPING -> ARCHITECTING as the normal forward rerun handoff with Handoff.Kind FORWARD while preserving the active recovery frame, then provides the next-role Architect invocation required by the protocol"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Continue the active STANDARDS workflow as Scoper. ProjectMode is BROWNFIELD, WorkflowState is SCOPING, recovery is inactive, Active Work.Scope is NONE, and .standards/CONTEXT.md is missing. The request is to add a new background job to an existing service, but the repository's current runtime, queueing mechanism, deployment shape, and established commands have not been audited for this cycle.",
+      "expected_output": "A PROJECT_CONTEXT failure handoff to Auditor rather than an attempted repository audit or speculative scope, preserving Scoper ownership boundaries and the interrupted SCOPING state through protocol recovery.",
+      "files": [],
+      "assertions": [
+        "The response treats missing active-cycle brownfield context as a blocking PROJECT_CONTEXT defect",
+        "It does not perform or simulate a repository-wide audit and does not invent runtime, queueing, deployment, or command facts",
+        "It does not complete or persist a speculative scope while required context is missing",
+        "It records a failure handoff from SCOPING to AUDITING with FailureType PROJECT_CONTEXT",
+        "Because the corrective routing changes state, it creates a recovery frame owned by AUDITING with ResumeAt SCOPING and RerunThrough NONE",
+        "It provides the next-role Auditor invocation after persisting the transition"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Invoke Scoper in a STANDARDS project where WorkflowState is ARCHITECTING, Active Work.Scope already points to a completed scope, recovery is inactive, and the user has not requested rework or another control-plane transition. The request is simply: continue the workflow.",
+      "expected_output": "No Scoper role-owned work. The response respects workflow-state ownership, leaves the completed scope and state unchanged, and identifies Architect as the role that owns the current state.",
+      "files": [],
+      "assertions": [
+        "Scoper does not revise, replace, or revalidate the persisted scope merely because it was invoked",
+        "It does not change WorkflowState or create a failure or recovery frame without a valid protocol reason",
+        "It identifies that ARCHITECTING is owned by Architect and that Scoper may not perform role-owned work in the current state",
+        "It leaves existing workflow artifacts and coordination state unchanged"
+      ]
+    }
+  ]
+}
