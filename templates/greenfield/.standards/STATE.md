@@ -3,18 +3,15 @@
 `WorkflowState`: `SCOPING`
 
 ## Active Work
-`Id`: `UNSET`
-`Request`: `UNSET`
-`Scope`: `NONE`
-`Architecture`: `NONE`
-`AuditTarget`: `NONE`
-`BlockedOn`: `NONE`
+
+`Id`: `UNSET` `Request`: `UNSET` `Scope`: `NONE` `Architecture`: `NONE`
+`AuditTarget`: `NONE` `BlockedOn`: `NONE`
 
 ## Handoff
-`Kind`: `INITIAL`
-`From`: `NONE`
-`FailureType`: `NONE`
-`Reason`: `Initial greenfield workflow state.`
+
+`Kind`: `INITIAL` `From`: `NONE` `FailureType`: `NONE` `Reason`:
+`Initial greenfield workflow state.`
 
 ## Recovery
+
 `Active`: `false`
