@@ -21,7 +21,8 @@ role-specific behavior.
 ## Roles
 
 - **Scoper** defines what must be built and what counts as done.
-- **Tester** verifies implementation behavior and technical acceptance criteria.
+- **Tester** verifies implemented behavior and records traceability status for
+  current scope acceptance conditions and technical acceptance criteria.
 - **Architect** defines consequential technical decisions and contracts.
 - **Navigator** provides read-only explanation, tracing, diagnosis, and project
   understanding outside the workflow state machine.
@@ -52,6 +53,9 @@ role-specific behavior.
    copy/paste invocation for that role using the active client's syntax. The
    invocation points the next role back to persisted state rather than
    duplicating workflow context.
+8. Give scope acceptance conditions stable identifiers and carry those
+   identifiers through downstream design and verification evidence until every
+   current condition is evidenced before user sign-off.
 
 See [`PROTOCOL.md`](PROTOCOL.md) for the authoritative workflow contract.
 

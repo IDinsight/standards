@@ -5,11 +5,11 @@ description:
   implementation. Use after Scoper, when a material technical decision is
   unresolved, or when a downstream phase reports an architecture problem.
   Produce a concise, buildable specification covering the chosen design,
-  contracts, components, data/control flow, constraints, technical acceptance
-  criteria, risks, and implementation sequence. Initial greenfield architecture
-  hands off to Auditor; brownfield architecture with valid project context hands
-  off to Developer; architecture rework resumes according to protocol
-  failure-recovery rules.
+  contracts, components, data/control flow, acceptance coverage, technical
+  acceptance criteria, risks, and implementation sequence. Initial greenfield
+  architecture hands off to Auditor; brownfield architecture with valid project
+  context hands off to Developer; architecture rework resumes according to
+  protocol failure-recovery rules.
 ---
 
 <!-- standards:framework-owned -->
@@ -85,7 +85,10 @@ do not apply multiple mode files concurrently.
    decisions. Persist any blocking user question in `Active Work.BlockedOn`
    before asking and clear it after incorporating the answer.
 2. If the design requires a material scope change, stop and issue a `SCOPING`
-   failure handoff to Scoper.
+   failure handoff to Scoper. Treat missing, duplicate, or reused acceptance
+   identifiers, or materially ambiguous acceptance conditions, as a scoping
+   defect because Architect must preserve traceability rather than invent or
+   repair Scoper-owned acceptance identity.
 3. If required project context is missing, materially incomplete, incorrect, or
    unexpectedly invalidated, stop and issue a `PROJECT_CONTEXT` failure handoff
    to Auditor instead of performing a repository-wide audit. Do not treat
@@ -102,6 +105,9 @@ Architecture is complete when:
 
 - the persisted technical design satisfies the artifact shape and authoring
   contract in `template.md`;
+- every current scope-level acceptance identifier is accounted for without
+  redefining its meaning, including an explicit no-architectural-impact
+  disposition when no Architect-owned technical decision applies;
 - no blocking architecture question remains unresolved;
 - `Active Work.Architecture` points to the completed persisted technical design.
 

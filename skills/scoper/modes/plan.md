@@ -25,7 +25,12 @@ Use the Scoper skill's shared inputs and invariants. In particular:
 2. Resolve only ambiguities that materially change scope. Persist a blocking
    user question in `Active Work.BlockedOn` before asking it.
 3. Break the work into coarse, outcome-oriented work items with observable
-   completion conditions and meaningful dependencies.
+   completion conditions and meaningful dependencies. Ensure the acceptance
+   conditions cover every verifiable in-scope obligation that must be proven at
+   completion. Keep separable obligations in different acceptance conditions
+   when their satisfaction or evidence will be established in different workflow
+   phases, and assign each condition a unique `AC-NNN` identifier for the active
+   cycle.
 4. Keep implementation choices out of the scope unless they are already
    established project constraints or requirements.
 5. Persist the completed scope using the repository's existing scope location

@@ -27,6 +27,9 @@ repository's existing scope location; if none exists, use a feature- or
 change-specific file under `docs/scope/`. Record its repository-relative path in
 `STATE.md` as `Active Work.Scope`.
 
+Own the wording and stable `AC-NNN` identifiers of scope-level acceptance
+conditions for the active cycle.
+
 Do not write architecture specs, production code, tests, audit/context files,
 reviews, or user documentation.
 
@@ -92,6 +95,13 @@ Scoping is complete when:
 
 - the persisted scope satisfies the artifact shape and authoring contract in
   `template.md`;
+- every verifiable in-scope obligation that must be proven at completion is
+  represented by one or more current scope-level acceptance conditions;
+- separable obligations whose satisfaction or verification evidence is
+  established in different workflow phases are not combined under one acceptance
+  identifier;
+- every current scope-level acceptance condition has a unique, stable `AC-NNN`
+  identifier, and retired identifiers remain recorded and unreused;
 - no blocking scope question remains unresolved;
 - `Active Work.Scope` points to the completed persisted scope.
 

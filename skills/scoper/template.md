@@ -46,8 +46,9 @@ outcome it serves.
 
 **Done when:**
 
-- Observable scope-level acceptance condition.
-- Another externally verifiable behavior or required property, when needed.
+- `AC-001`: Observable scope-level acceptance condition.
+- `AC-002`: Another externally verifiable behavior or required property, when
+  needed.
 
 **Depends on:** Other numbered work items, an established external dependency,
 or `None`.
@@ -58,9 +59,14 @@ or `None`.
 
 **Done when:**
 
-- Observable scope-level acceptance condition.
+- `AC-003`: Observable scope-level acceptance condition.
 
 **Depends on:** Dependency or `None`.
+
+## Retired Acceptance Identifiers
+
+- `AC-004`: Retired because the condition was removed or materially replaced.
+  When replaced, reference the new acceptance identifier when useful.
 
 ## Assumptions
 
@@ -81,6 +87,21 @@ or `None`.
 - Write observable completion conditions. Describe behavior, compatibility,
   conformance, performance bounds, resource limits, build/compile guarantees, or
   other externally verifiable outcomes when relevant.
+- Represent every verifiable in-scope obligation that must be proven at
+  completion with at least one acceptance condition. Do not leave such an
+  obligation only in Goal or Constraints.
+- Do not combine separable obligations under one acceptance identifier when
+  their satisfaction or verification evidence is established in different
+  workflow phases. Give those obligations separate acceptance conditions so
+  downstream roles can establish evidence without masking unfinished work.
+- Assign every scope-level acceptance condition a unique `AC-NNN` identifier
+  within the active cycle. Treat the identifier as a stable reference, not as an
+  ordering guarantee.
+- During REPLAN, preserve an acceptance identifier when the condition keeps the
+  same meaning. Use a new, previously unused identifier for a new or materially
+  replaced condition. Record removed or replaced identifiers under **Retired
+  Acceptance Identifiers**. Do not renumber surviving identifiers or reuse
+  retired identifiers within the active cycle.
 - Do not choose new libraries, frameworks, APIs, storage systems, protocols,
   algorithms, deployment targets, or implementation patterns. Those decisions
   belong to Architect unless independently established by the user request or

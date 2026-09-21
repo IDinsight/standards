@@ -241,6 +241,58 @@ path, setting or clearing `AuditTarget`, or setting or clearing `BlockedOn`.
 `.standards/PROTOCOL.md` is framework-owned and may be changed only by
 installing or upgrading the framework, not by a workflow role.
 
+## Acceptance Traceability
+
+Traceability follows Scoper-owned scope acceptance conditions through downstream
+role-owned artifacts. It does not create a shared traceability artifact or add
+acceptance data to `STATE.md`.
+
+1. Scoper represents every verifiable in-scope obligation that must be proven at
+   completion as one or more scope-level acceptance conditions and assigns each
+   a stable, unique `AC-NNN` identifier within the active cycle. Do not combine
+   separable obligations under one identifier when their satisfaction or
+   verification evidence is established in different workflow phases. The
+   identifier is a reference, not an ordering guarantee.
+2. During REPLAN, preserve the identifier when the acceptance condition keeps
+   the same meaning. Assign a new, previously unused identifier to a new or
+   materially replaced condition. When a condition is removed or materially
+   replaced, retain its identifier in the scope's retired-identifier record. Do
+   not renumber surviving identifiers or reuse retired identifiers within the
+   active cycle.
+3. Scoper owns the wording and meaning of scope-level acceptance conditions.
+   Downstream roles reference their identifiers but must not redefine their
+   intent. Route a material acceptance-condition defect to Scoper.
+4. Architect accounts for every current acceptance identifier in the technical
+   design. For each identifier, record either the relevant technical design
+   coverage or an explicit no-architectural-impact disposition when satisfaction
+   depends entirely on established nontechnical behavior or work owned by
+   another workflow phase. Architect may group identifiers only when the same
+   disposition applies. Do not invent architecture or claim the technical design
+   satisfies a condition it does not own.
+5. When a downstream role records coverage, work, or evidence for a scope
+   acceptance condition, it references the same current acceptance identifier.
+   Downstream roles do not create substitute requirement identifiers for the
+   same condition.
+6. Tester accounts for every current acceptance identifier. For a condition
+   whose satisfaction should be established by `TESTING`, record a verification
+   result with supporting evidence or an explicit blocker. If a condition
+   explicitly depends on work owned by a later workflow phase, record that
+   dependency as pending rather than treating the not-yet-run phase as a Tester
+   blocker; pending status is not verification evidence and must be resolved
+   downstream under the same acceptance identifier.
+7. The workflow must not transition to `AWAITING_USER_SIGNOFF` while any current
+   acceptance identifier lacks sufficient verification evidence or has an
+   unresolved blocker. Missing or failed evidence must be routed to the role
+   that owns the defective artifact or decision under the normal failure and
+   recovery rules; do not treat an unevidenced condition as satisfied by
+   assumption.
+8. When Scoper adds, replaces, or retires acceptance identifiers during recovery
+   or user rework, any completed downstream artifact whose completion contract
+   requires accounting for every current acceptance identifier becomes stale
+   until reconciled. Include those states in downstream invalidation under
+   **Recovery Mechanics** even when the underlying technical decision or
+   behavior otherwise remains valid.
+
 The owning role for each state is:
 
 | Workflow state             | Owning role     |
@@ -754,9 +806,19 @@ Use these terms consistently across all skills:
 - **completed scope**: a scope artifact that has passed Scoper's completion
   gate. This does not imply separate user approval unless a project explicitly
   adds such a gate.
-- **scope-level acceptance conditions**: observable outcomes owned by Scoper.
+- **scope-level acceptance conditions**: observable outcomes owned by Scoper,
+  each identified by a stable `AC-NNN` acceptance identifier for the active
+  cycle.
+- **acceptance identifier**: the stable `AC-NNN` reference assigned by Scoper to
+  one scope-level acceptance condition and reused by downstream artifacts for
+  traceability.
+- **retired acceptance identifier**: an acceptance identifier whose condition
+  was removed or materially replaced during the active cycle. Scoper preserves
+  it in the scope so it cannot be reused; it is not a current coverage or
+  verification obligation.
 - **technical acceptance criteria**: technical conditions derived by Architect
-  from scope-level acceptance conditions.
+  from scope-level acceptance conditions and linked to their acceptance
+  identifiers.
 - **project context**: the Auditor-owned baseline of relevant project state and
   constraints for the active workflow cycle, stored canonically at
   `.standards/CONTEXT.md`. Planned implementation changes within that cycle do
