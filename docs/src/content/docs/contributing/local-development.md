@@ -16,8 +16,9 @@ pnpm --dir docs install --frozen-lockfile
 pnpm --dir docs run dev
 ```
 
-Open the local URL printed by Astro. The development command first synchronizes
-the protocol and template references, then starts the server.
+Open the local URL printed by Astro, including its `/standards/` prefix. The
+development command first synchronizes the protocol and template references,
+then starts the server.
 
 ## Build and check links
 
@@ -56,5 +57,14 @@ patterns are listed in `docs/.gitignore`. The docs-local `pnpm-workspace.yaml`
 keeps reference-generation hooks enabled and permits the existing native
 dependency install scripts.
 
-No deployment workflow is included in this setup. A public host, canonical URL,
-and any deployment path prefix should be configured when publishing is ready.
+## GitHub Pages deployment
+
+`.github/workflows/docs.yml` builds and checks pull requests and deploys pushes
+or manual runs on `main`. GitHub Pages must use **GitHub Actions** as its source
+in the repository settings. The workflow uses the docs project's pinned pnpm
+version and publishes `docs/dist/` without a `gh-pages` branch.
+
+`astro.config.mjs` sets the public site to
+<https://idinsight.github.io/standards/> using the `/standards/` base path.
+Local development and preview use that prefix too. The link checker reads this
+configuration to validate deployed URLs against the generated files.

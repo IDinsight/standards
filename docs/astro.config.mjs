@@ -2,6 +2,8 @@ import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
 
 export default defineConfig({
+  site: "https://idinsight.github.io",
+  base: "/standards",
   integrations: [
     starlight({
       title: "S.T.A.N.D.A.R.D.S.",
