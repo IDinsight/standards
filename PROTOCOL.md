@@ -290,12 +290,15 @@ transition context to resume the workflow safely.
 
 `.standards/CONTEXT.md` is the canonical Auditor-owned project-context artifact.
 Auditor creates or refreshes it when `AUDITING` runs; installation does not
-fabricate it. Downstream roles should treat it as the active-cycle baseline when
-present, subject to the ownership and freshness rules below. Any
-**Active-Cycle Non-Baseline Work** recorded there is scoped to the `Active Work.Id`
-that produced it; it is not a permanent exclusion from project baseline. An
-entry is applicable only while the workflow is in a nonterminal state and its
-recorded cycle matches the current `Active Work.Id`. `SIGNED_OFF` and
+fabricate it. When Auditor has established or refreshed it for the active
+`STANDARD` cycle, downstream standard roles should treat it as that cycle's
+project baseline, subject to the ownership and freshness rules below. In an
+`EXPEDITED` cycle, an existing `CONTEXT.md` may be consulted as prior
+project-context evidence but is not presumed to have been refreshed for the
+active cycle. Any **Active-Cycle Non-Baseline Work** recorded there is scoped to
+the `Active Work.Id` that produced it; it is not a permanent exclusion from
+project baseline. An entry is applicable only while the workflow is in a nonterminal
+state and its recorded cycle matches the current `Active Work.Id`. `SIGNED_OFF` and
 `CANCELLED` have no active cycle, so matching entries are stale cycle-scoped
 context there as well. On a later audit, Auditor must reconcile each prior-cycle
 exclusion against current repository and version-control evidence, remove or
