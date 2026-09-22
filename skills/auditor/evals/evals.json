@@ -3,7 +3,7 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "Continue the active STANDARDS workflow as Auditor. ProjectMode is BROWNFIELD, WorkflowState is AUDITING, recovery is inactive, .standards/CONTEXT.md does not exist, and Active Work.Request is to add CSV export to an existing product. Inspect only what is needed to establish the active-cycle baseline; do not propose the export design or implementation.",
+      "prompt": "Continue the active STANDARDS workflow as Auditor. ProjectMode is BROWNFIELD, CycleMode is STANDARD, WorkflowState is AUDITING, recovery is inactive, .standards/CONTEXT.md does not exist, and Active Work.Request is to add CSV export to an existing product. Inspect only what is needed to establish the active-cycle baseline; do not propose the export design or implementation.",
       "expected_output": "A WHOLE-REPO audit that establishes an evidence-backed CONTEXT.md baseline from the existing repository, keeps proposed CSV behavior out of project context, and hands off to Scoper.",
       "files": [],
       "assertions": [
@@ -17,7 +17,7 @@
     },
     {
       "id": 2,
-      "prompt": "Continue the active STANDARDS workflow as Auditor. ProjectMode is GREENFIELD, WorkflowState is AUDITING, Scope and Architecture are complete, recovery is inactive, and the repository currently contains only a minimal scaffold with a package manifest and empty source/test directories. Architecture plans an HTTP API, PostgreSQL persistence, and a background worker, none of which has been implemented yet.",
+      "prompt": "Continue the active STANDARDS workflow as Auditor. ProjectMode is GREENFIELD, CycleMode is STANDARD, WorkflowState is AUDITING, Scope and Architecture are complete, recovery is inactive, and the repository currently contains only a minimal scaffold with a package manifest and empty source/test directories. Architecture plans an HTTP API, PostgreSQL persistence, and a background worker, none of which has been implemented yet.",
       "expected_output": "A GREENFIELD audit that records the scaffold and independently established constraints as current facts, clearly distinguishes the planned API/database/worker design from existing implementation, and hands off to Developer.",
       "files": [],
       "assertions": [
@@ -31,7 +31,7 @@
     },
     {
       "id": 3,
-      "prompt": "Continue the active STANDARDS workflow as Auditor. ProjectMode is BROWNFIELD, WorkflowState is AUDITING, recovery is inactive, a usable-looking CONTEXT.md exists, Active Work.AuditTarget is services/billing, and the audit begins in SUBTREE mode. During inspection, you discover the context's project-wide claims about language version, build system, test command, and workspace boundaries are stale or wrong, so the project-level baseline is no longer trustworthy.",
+      "prompt": "Continue the active STANDARDS workflow as Auditor. ProjectMode is BROWNFIELD, CycleMode is STANDARD, WorkflowState is AUDITING, recovery is inactive, a usable-looking CONTEXT.md exists, Active Work.AuditTarget is services/billing, and the audit begins in SUBTREE mode. During inspection, you discover the context's project-wide claims about language version, build system, test command, and workspace boundaries are stale or wrong, so the project-level baseline is no longer trustworthy.",
       "expected_output": "A mode escalation from SUBTREE to WHOLE-REPO that replaces rather than combines the inspection strategy, clears the no-longer-applicable AuditTarget, rebuilds the project baseline from evidence, and keeps Auditor within factual context ownership.",
       "files": [],
       "assertions": [
@@ -45,7 +45,7 @@
     },
     {
       "id": 4,
-      "prompt": "Continue the active STANDARDS workflow as Auditor. ProjectMode is BROWNFIELD, WorkflowState is AUDITING, Active Work.Architecture points to a completed technical design that assumes the service can rely on a single-instance in-memory scheduler, and the active recovery frame is Owner=AUDITING, FailureType=PROJECT_CONTEXT, From=DEVELOPING, ResumeAt=DEVELOPING, RerunThrough=NONE. Developer routed here after discovering that deployment topology in project context might be stale. During evidence-backed audit you establish that the production service is deployed with multiple replicas and project policy requires stateless application instances. Correct the factual context, but do not edit or replace the architecture artifact yourself.",
+      "prompt": "Continue the active STANDARDS workflow as Auditor. ProjectMode is BROWNFIELD, CycleMode is STANDARD, WorkflowState is AUDITING, Active Work.Architecture points to a completed technical design that assumes the service can rely on a single-instance in-memory scheduler, and the active recovery frame is Owner=AUDITING, FailureType=PROJECT_CONTEXT, From=DEVELOPING, ResumeAt=DEVELOPING, RerunThrough=NONE. Developer routed here after discovering that deployment topology in project context might be stale. During evidence-backed audit you establish that the production service is deployed with multiple replicas and project policy requires stateless application instances. Correct the factual context, but do not edit or replace the architecture artifact yourself.",
       "expected_output": "An Auditor-owned PROJECT_CONTEXT recovery that corrects CONTEXT.md, recognizes that the completed technical design must be re-established, sets the existing recovery frame's RerunThrough to ARCHITECTING, and routes to Architect without creating a nested architecture failure or redesigning the scheduler.",
       "files": [],
       "assertions": [
@@ -60,7 +60,7 @@
     },
     {
       "id": 5,
-      "prompt": "Continue the active STANDARDS workflow as Auditor. ProjectMode is BROWNFIELD, WorkflowState is AUDITING, recovery is inactive, a generally usable .standards/CONTEXT.md exists, Active Work.AuditTarget is NONE, and the current cycle depends on the project's runtime version and test command. The baseline still describes runtime version 20 and `npm test`, but current manifests and scripts establish runtime version 22 and `npm run test:unit`; the rest of the project-level context remains accurate.",
+      "prompt": "Continue the active STANDARDS workflow as Auditor. ProjectMode is BROWNFIELD, CycleMode is STANDARD, WorkflowState is AUDITING, recovery is inactive, a generally usable .standards/CONTEXT.md exists, Active Work.AuditTarget is NONE, and the current cycle depends on the project's runtime version and test command. The baseline still describes runtime version 20 and `npm test`, but current manifests and scripts establish runtime version 22 and `npm run test:unit`; the rest of the project-level context remains accurate.",
       "expected_output": "A GAPFILL audit that verifies and repairs only the material stale baseline claims, preserves still-valid context, rewrites CONTEXT.md coherently, and continues with the normal brownfield handoff without rebuilding the repository baseline from scratch.",
       "files": [],
       "assertions": [
@@ -70,6 +70,52 @@
         "It does not escalate to WHOLE-REPO because the existing baseline remains usable and safely repairable",
         "CONTEXT.md is rewritten as one coherent current baseline rather than appended with an audit history",
         "Normal brownfield success hands off AUDITING -> SCOPING and provides the next-role Scoper invocation required by the protocol"
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "Continue the active STANDARDS workflow as Auditor. ProjectMode is BROWNFIELD, CycleMode is STANDARD, WorkflowState is AUDITING, Handoff.Kind is PROMOTE from REVIEWING_IMPLEMENTATION, Active Work.PromotionReason is \"a consequential compatibility decision requires the standard workflow\", recovery is inactive, Active Work.Id is shareable-report-links, Scope and Architecture are NONE, and the prior EXPEDITED cycle was promoted because implementation review established that a consequential compatibility decision requires the standard workflow. A generally usable .standards/CONTEXT.md already exists. Developer has already made tentative active-cycle code changes for the expedited request, visible in version-control evidence. Establish or refresh only the factual pre-cycle project baseline needed for the promoted standard cycle; do not treat those tentative changes as established constraints and do not make the missing scope or architecture decisions yourself.",
+      "expected_output": "An Auditor pass for an expedited-to-standard promotion that treats PROMOTE as a topology change rather than recovery, refreshes the established project baseline using the narrowest valid audit mode, keeps tentative expedited implementation separate from baseline facts, leaves Scope and Architecture to their owners, and continues the standard brownfield flow to Scoper.",
+      "files": [],
+      "assertions": [
+        "The response recognizes Handoff.Kind=PROMOTE as the reason AUDITING is active and does not invent a recovery frame",
+        "It treats Active Work.PromotionReason as durable workflow context that must survive later forward handoffs, not as Auditor-owned scope or architecture",
+        "Because a generally usable project-level context exists and no narrower target is specified, it selects GAPFILL unless evidence invalidates that mode's preconditions",
+        "It uses the promotion reason only to focus factual inspection and does not turn the compatibility decision into Auditor-owned architecture",
+        "It distinguishes tentative active-cycle expedited implementation from the established pre-cycle baseline and does not copy those implementation choices into CONTEXT.md as project constraints merely because they are present in the repository",
+        "When material for downstream work, CONTEXT.md records tentative expedited changes under Active-Cycle Non-Baseline Work rather than mixing them into the project baseline and labels each entry with the current Active Work.Id",
+        "If evidence cannot reliably distinguish a material tentative change from the pre-cycle baseline, it blocks for user clarification rather than guessing",
+        "It does not treat Scope=NONE or Architecture=NONE as a defect because those roles have not yet run in the promoted standard topology",
+        "The refreshed CONTEXT.md remains an evidence-backed baseline rather than a replacement scope or technical design",
+        "Normal brownfield success hands off AUDITING -> SCOPING and provides the next-role Scoper invocation required by the protocol"
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "Continue the active STANDARDS workflow as Auditor. ProjectMode is BROWNFIELD, CycleMode is STANDARD, WorkflowState is AUDITING, recovery is inactive, Active Work.Id is add-invoice-search, Active Work.PromotionReason is NONE, and an existing .standards/CONTEXT.md is otherwise usable but still contains an Active-Cycle Non-Baseline Work entry labeled Cycle: previous-share-links for src/share-links.ts from the prior cycle. The current repository still contains that file. Establish the current cycle baseline without assuming the prior-cycle exclusion is still current or automatically treating the file as established baseline.",
+      "expected_output": "An Auditor refresh that recognizes the mismatched cycle identifier as stale cycle-scoped context, re-establishes the file's current baseline status from authoritative evidence, removes or reclassifies the old exclusion instead of carrying it forward, and blocks for user clarification if the status cannot be determined safely.",
+      "files": [],
+      "assertions": [
+        "The response recognizes that Active-Cycle Non-Baseline Work is scoped to the cycle identifier recorded with the entry and that previous-share-links does not match the current Active Work.Id",
+        "It does not copy the prior-cycle exclusion forward as current-cycle non-baseline work merely because the file still exists",
+        "It re-establishes whether src/share-links.ts is now part of the project baseline using repository, version-control, prior context, and other authoritative evidence",
+        "If the prior cycle's outcome or the file's baseline status cannot be established safely, it persists a blocking question and asks the user rather than guessing",
+        "The resulting CONTEXT.md contains only current-cycle Active-Cycle Non-Baseline Work entries and remains a coherent current baseline"
+      ]
+    },
+    {
+      "id": 8,
+      "prompt": "Continue the active STANDARDS workflow as Auditor. The previous retained brownfield cycle ended in CANCELLED after implementation work may have changed project files. A NEW_CYCLE transition has started a STANDARD cycle in AUDITING specifically because the user did not confirm that no project changes from the cancelled cycle remain. Handoff.Kind is NEW_CYCLE, Handoff.From is CANCELLED, and Handoff.Reason says baseline reconciliation is required for cancelled cycle invoice-cache-hotfix, whose request was to change invoice-cache invalidation behavior. Recovery is inactive, and the new Active Work.Request is for an unrelated change. The working tree still contains material project changes whose provenance relative to invoice-cache-hotfix is not fully clear. Establish the baseline for the new cycle without silently accepting or reassigning those changes.",
+      "expected_output": "A post-cancellation brownfield audit that treats leftover cancelled-cycle changes as unresolved provenance rather than established baseline or current-cycle work, uses version-control evidence and explicit user input to classify them, blocks when material status remains ambiguous, and proceeds to Scoper only after the baseline is safe to use.",
+      "files": [],
+      "assertions": [
+        "The response recognizes NEW_CYCLE from CANCELLED with a reconciliation reason as a baseline-reconciliation audit, not as ordinary initial brownfield context that can blindly accept the current working tree",
+        "It uses the cancelled cycle ID invoice-cache-hotfix and its preserved request summary from Handoff.Reason as durable provenance rather than relying on chat history",
+        "It does not treat project changes left by the cancelled cycle as established baseline merely because they are present in the repository",
+        "It does not relabel cancelled-cycle residue as the new cycle's Active-Cycle Non-Baseline Work, because that section is reserved for implementation belonging to the current active cycle",
+        "It uses repository and version-control evidence plus explicit user input to determine whether material cancelled-cycle changes were reverted, deliberately adopted, or remain unresolved",
+        "If material provenance or baseline status cannot be established safely, it persists Active Work.BlockedOn and asks the user instead of guessing",
+        "Only after material cancellation residue is resolved does the audit produce a coherent current CONTEXT.md and hand off AUDITING -> SCOPING"
       ]
     }
   ]

@@ -15,8 +15,8 @@ Each skill owns a specific class of decisions or artifacts, and work moves
 between roles through explicit completion gates and failure handoffs.
 
 `PROTOCOL.md` is the canonical definition of workflow states, project modes,
-transitions, failure types, and shared terminology. Individual skills define
-role-specific behavior.
+cycle modes, transitions, failure types, and shared terminology. Individual
+skills define role-specific behavior.
 
 ## Roles
 
@@ -26,7 +26,8 @@ role-specific behavior.
 - **Architect** defines consequential technical decisions and contracts.
 - **Navigator** provides read-only explanation, tracing, diagnosis, and project
   understanding outside the workflow state machine.
-- **Developer** implements the current technical design.
+- **Developer** implements the active change within established constraints and,
+  when present, the current technical design.
 - **Auditor** establishes and refreshes project context for the active workflow
   cycle.
 - **Reviewer** evaluates implementation and final deliverables at defined review
@@ -53,9 +54,16 @@ role-specific behavior.
    copy/paste invocation for that role using the active client's syntax. The
    invocation points the next role back to persisted state rather than
    duplicating workflow context.
-8. Give scope acceptance conditions stable identifiers and carry those
-   identifiers through downstream design and verification evidence until every
-   current condition is evidenced before user sign-off.
+8. In `STANDARD` cycles, give scope acceptance conditions stable identifiers and
+   carry those identifiers through downstream design and verification evidence
+   until every current condition is evidenced before user sign-off.
+9. Keep project baseline and per-change rigor separate. `ProjectMode` describes
+   whether the project is greenfield or brownfield; `CycleMode` selects either
+   the full `STANDARD` topology or, for bounded brownfield changes, the shorter
+   `EXPEDITED` Developer -> implementation Reviewer path.
+10. Shorten the workflow by omitting roles, never by merging their ownership
+    into another role. If an expedited change needs a skipped guarantee, promote
+    the active cycle to `STANDARD` and run the owning roles.
 
 See [`PROTOCOL.md`](PROTOCOL.md) for the authoritative workflow contract.
 
@@ -88,8 +96,9 @@ project/
 └── <agent-specific skill installation>
 ```
 
-`STATE.md` is the persisted coordination record for the active cycle. Role
-ownership, forward transitions, recovery, user intervention, project-mode
+`STATE.md` is the persisted coordination record for the active cycle, including
+its `WorkflowState` and `CycleMode`. Role ownership, standard and expedited
+forward transitions, promotion, recovery, user intervention, project-mode
 changes, cancellation/reset behavior, project context, installation ownership
 checks, and client-setting preservation are defined only in
 [`PROTOCOL.md`](PROTOCOL.md) and are intentionally not restated here.

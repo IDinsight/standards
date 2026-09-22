@@ -38,9 +38,12 @@ Workflow-state ownership governs role-owned workflow work, not protocol
 coordination. An explicit user instruction may authorize a control-plane
 transition even when the current state is owned by another role or by the user.
 The agent receiving that instruction may make only the coordination changes
-required by the applicable `USER_REWORK`, `NEW_CYCLE`, `SIGNOFF`, or `CANCEL`
-rule. It must not perform the target role's work unless that workflow skill was
-explicitly invoked by the user and owns the resulting state.
+required by the applicable cycle-selection, user-authorized `PROMOTE`,
+`USER_REWORK`, `NEW_CYCLE`, `SIGNOFF`, or `CANCEL` rule. It must not perform
+the target role's work unless that workflow skill was explicitly invoked by the
+user and owns the resulting state. An active workflow role may also perform the
+protocol-defined `PROMOTE` transition without a separate user instruction when
+an `EXPEDITED` cycle can no longer safely remain expedited.
 
 ## Project Modes
 
@@ -73,7 +76,8 @@ Bootstrap Cancellation**. If it is cancelled after the mode has become
 `BROWNFIELD`, retain the installed runtime and enter terminal `CANCELLED`.
 Future workflow cycles then begin as brownfield work.
 
-The initial workflow state for a new cycle is determined by project mode:
+For a `STANDARD` cycle, the initial workflow state is determined by project
+mode:
 
 - `GREENFIELD` starts in `SCOPING`.
 - `BROWNFIELD` starts in `AUDITING`.
@@ -82,6 +86,50 @@ For `GREENFIELD` work before `AUDITING`, the absence of Auditor-produced project
 context is intentional. Do not classify that absence as a `PROJECT_CONTEXT`
 failure unless the active role actually requires context that cannot be
 established from the completed upstream artifacts and known project constraints.
+
+## Cycle Modes
+
+```text
+CycleMode
+- STANDARD
+- EXPEDITED
+```
+
+- `STANDARD`: the full workflow topology for the current `ProjectMode`.
+- `EXPEDITED`: a bounded brownfield change path that intentionally omits formal
+  Scoping, Architecture, Auditing, Testing, Documentation, Final Review, and
+  Synchronization unless the cycle is promoted to `STANDARD`.
+
+`ProjectMode` and `CycleMode` answer different questions. `ProjectMode`
+describes the project's implementation baseline and persists across cycles.
+`CycleMode` describes the assurance topology selected for one active cycle and
+is persisted in `.standards/STATE.md`.
+
+Cycle-mode rules:
+
+1. Installation initializes `CycleMode: STANDARD`.
+2. `GREENFIELD` supports `STANDARD` only.
+3. `BROWNFIELD` supports `STANDARD` and `EXPEDITED`.
+4. A new brownfield cycle defaults to `STANDARD` unless the user explicitly
+   requests an expedited cycle or, when the user has not explicitly selected
+   `STANDARD`, explicitly invokes Developer as the entry role for a new bounded
+   implementation change. A direct Developer invocation is sufficient user
+   intent to select `EXPEDITED` only when the initialized cycle still has
+   `Active Work.Id: UNSET` and `Active Work.Request: UNSET`, or when there is no
+   active cycle and the invocation starts a new cycle, subject to the
+   post-`CANCELLED` baseline-reconciliation restrictions under **User Decisions
+   and Intervention**. An explicit `STANDARD` selection takes precedence over
+   this entry-role inference; Developer then does not own the initial standard
+   state and must hand off to the role that does.
+5. `EXPEDITED` is appropriate only while the active request is a sufficiently
+   bounded implementation contract and no omitted workflow role is required to
+   establish a consequential decision, authoritative project context, formal
+   verification, documentation, final-deliverable review, or synchronization.
+6. Skipping a role in `EXPEDITED` does not transfer that role's ownership to
+   Developer or Reviewer. The role simply does not run, and its artifacts and
+   completion guarantees are absent for that cycle.
+7. An `EXPEDITED` cycle may be promoted to `STANDARD` under **Expedited
+   Promotion**. Promotion is one-way for the active cycle.
 
 ## Workflow States
 
@@ -101,17 +149,21 @@ WorkflowState
 - CANCELLED
 ```
 
-`.standards/STATE.md` records exactly one `WorkflowState` value at a time.
-`SIGNED_OFF` and `CANCELLED` are terminal states and mean there is no active
-workflow cycle.
+`.standards/STATE.md` records exactly one `WorkflowState` value and one
+`CycleMode` value at a time. `SIGNED_OFF` and `CANCELLED` are terminal states
+and mean there is no active workflow cycle. In a terminal state, the persisted
+`CycleMode` and `Active Work` describe the just-completed or cancelled cycle for
+traceability until a `NEW_CYCLE` transition replaces them; they do not denote an
+active cycle.
 
 ## Persisted Workflow State
 
 `.standards/STATE.md` is the authoritative, branch-persisted record of the
-current `WorkflowState`, active work, latest handoff, blocking user question,
-and recovery context needed to resume work. It must be version-controlled so
-work can resume across sessions and, once state changes are shared through
-version control, by another agent or developer without relying on chat history.
+current `WorkflowState`, `CycleMode`, active work, latest handoff, blocking user
+question, and recovery context needed to resume work. It must be
+version-controlled so work can resume across sessions and, once state changes
+are shared through version control, by another agent or developer without
+relying on chat history.
 
 Before performing workflow work, read `.standards/PROTOCOL.md`,
 `.standards/MODE.md`, and `.standards/STATE.md`. Resume from the state, active
@@ -124,12 +176,13 @@ different state from chat history or from which artifacts happen to exist.
 # S.T.A.N.D.A.R.D.S. Workflow State
 
 `WorkflowState`: `ARCHITECTING`
+`CycleMode`: `STANDARD`
 
 ## Active Work
 
 `Id`: `add-user-search` `Request`: `Add user search by name and email.` `Scope`:
 `docs/scope/add-user-search.md` `Architecture`: `docs/specs/add-user-search.md`
-`AuditTarget`: `NONE` `BlockedOn`: `NONE`
+`PromotionReason`: `NONE` `AuditTarget`: `NONE` `BlockedOn`: `NONE`
 
 ## Handoff
 
@@ -153,16 +206,27 @@ requested change at enough fidelity for the initial role to understand the work.
 `Scope` and `Architecture` are repository-relative artifact paths. Use `NONE`
 before the owning role creates the artifact; Scoper and Architect must replace
 those values with persisted artifact paths before their normal completion gates
-pass. `AuditTarget` records a transient repository-relative path or area label
+pass. `PromotionReason` is `NONE` unless an `EXPEDITED` cycle has been promoted
+to `STANDARD`; promotion sets it to the concise persisted reason the shorter
+topology became insufficient. Preserve it for the remainder of that active cycle
+so downstream roles do not depend on the latest handoff or chat history to know
+that promotion occurred. It is workflow context, not a new user requirement,
+scope decision, architecture decision, or project-baseline fact. `AuditTarget`
+records a transient repository-relative path or area label
 for an in-progress targeted audit only when that focus is not already
 recoverable from persisted active work, scope, architecture, or recovery
 context; otherwise use `NONE`. Auditor must persist an ad-hoc user-directed
 audit target before relying on it, and clear `AuditTarget` when the targeted
-audit completes, is abandoned, or no longer needs separate persistence. A legacy
-`Active Work` block that does not yet contain `AuditTarget` is interpreted as
-`NONE` until the next update to `STATE.md`, at which point `AuditTarget` must be
-persisted explicitly. `BlockedOn` records an unresolved user question that
-prevents the active role from completing; otherwise use `NONE`.
+audit completes, is abandoned, or no longer needs separate persistence.
+`BlockedOn` records an unresolved user question that prevents the active role
+from completing; otherwise use `NONE`.
+
+`CycleMode` records the assurance topology for the active cycle. `STANDARD`
+uses the full topology for the current `ProjectMode`. `EXPEDITED` uses the
+bounded brownfield topology defined below. In an expedited cycle, `Scope` and
+`Architecture` normally remain `NONE`; their absence is intentional and must
+not be treated as a missing-artifact failure unless the cycle has been promoted
+to `STANDARD`.
 
 Installation may initialize `Id` and `Request` as `UNSET` because the installer
 may not know the first request. Before the first workflow role performs
@@ -171,7 +235,7 @@ substantive work, persist the user's request in `Active Work` and replace
 must initialize `Active Work` from the new user request as part of the
 transition.
 
-`Handoff.Kind` is one of `INITIAL`, `FORWARD`, `FAILURE`, `RESUME`,
+`Handoff.Kind` is one of `INITIAL`, `FORWARD`, `FAILURE`, `RESUME`, `PROMOTE`,
 `USER_REWORK`, `NEW_CYCLE`, `SIGNOFF`, or `CANCEL`. Use `NONE` for fields that
 do not apply. Keep `Reason` concise; it describes only the most recent
 transition and is not the authoritative record of outstanding recovery work. Use
@@ -185,29 +249,35 @@ recovery frame only when the current `WorkflowState` equals that frame's
 `Owner`. `RerunThrough` is `NONE` until the owner resolves the defect; if
 completed downstream work must be re-established before the interrupted state
 can resume, the owner sets `RerunThrough` to the last state in that required
-rerun sequence. A legacy frame that does not yet contain `RerunThrough` is
-interpreted as `NONE` until its owner next updates the frame. Recovery being
-active does not, by itself, make every role that runs during the recovery path
-responsible for resolving or resuming that frame.
+rerun sequence. Recovery being active does not, by itself, make every role that
+runs during the recovery path responsible for resolving or resuming that frame.
 
 State changes follow these rules:
 
 1. Installation initializes `STATE.md` from the selected mode template:
    `SCOPING` for `GREENFIELD` or `AUDITING` for `BROWNFIELD`, with
-   `Handoff.Kind` set to `INITIAL`, `Active Work` unset, and recovery inactive.
-2. Before substantive work begins on an initialized cycle, record the user
+   `CycleMode: STANDARD`, `Handoff.Kind` set to `INITIAL`, `Active Work` unset,
+   and recovery inactive.
+2. Before substantive work begins on an initialized brownfield cycle, an
+   explicit user request may select `EXPEDITED` under **Cycle Modes**. Persist
+   `CycleMode: EXPEDITED`, change `WorkflowState` to `DEVELOPING`, initialize
+   `Active Work` with `PromotionReason: NONE`, keep `Handoff.Kind: INITIAL`, and
+   record a concise reason for
+   the expedited entry. Otherwise the initialized cycle remains `STANDARD`.
+3. Before substantive work begins on an initialized cycle, record the user
    request in `Active Work`. Every legal state-changing handoff updates the
-   applicable `Active Work`, `Handoff`, and `Recovery` fields as part of the
-   transition.
-3. `NAVIGATOR` never changes `STATE.md`.
-4. Blocking user questions do not change workflow state. Record the question in
+   applicable `CycleMode`, `Active Work`, `Handoff`, and `Recovery` fields as
+   part of the transition.
+4. `NAVIGATOR` never changes `STATE.md`.
+5. Blocking user questions do not change workflow state. Record the question in
    `Active Work.BlockedOn` before asking, and clear it when the answer is
    incorporated.
-5. Failure and recovery transitions follow **Failure Handoffs** and **Recovery
+6. Failure and recovery transitions follow **Failure Handoffs** and **Recovery
    Mechanics** below.
-6. User-requested rework, cancellation, sign-off, and new-cycle transitions
+7. Expedited-to-standard transitions follow **Expedited Promotion** below.
+8. User-requested rework, cancellation, sign-off, and new-cycle transitions
    follow **User Decisions and Intervention** below.
-7. During the initial greenfield cycle, Developer changes `.standards/MODE.md`
+9. During the initial greenfield cycle, Developer changes `.standards/MODE.md`
    permanently from `GREENFIELD` to `BROWNFIELD` when the first material project
    implementation change succeeds. After that transition, recovery and
    cancellation use brownfield semantics regardless of the current
@@ -221,7 +291,16 @@ transition context to resume the workflow safely.
 `.standards/CONTEXT.md` is the canonical Auditor-owned project-context artifact.
 Auditor creates or refreshes it when `AUDITING` runs; installation does not
 fabricate it. Downstream roles should treat it as the active-cycle baseline when
-present, subject to the ownership and freshness rules below.
+present, subject to the ownership and freshness rules below. Any
+**Active-Cycle Non-Baseline Work** recorded there is scoped to the `Active Work.Id`
+that produced it; it is not a permanent exclusion from project baseline. An
+entry is applicable only while the workflow is in a nonterminal state and its
+recorded cycle matches the current `Active Work.Id`. `SIGNED_OFF` and
+`CANCELLED` have no active cycle, so matching entries are stale cycle-scoped
+context there as well. On a later audit, Auditor must reconcile each prior-cycle
+exclusion against current repository and version-control evidence, remove or
+reclassify it rather than copying it forward as current-cycle state, and block
+for user clarification when its baseline status cannot be established safely.
 `ProjectMode: GREENFIELD` means the project entered S.T.A.N.D.A.R.D.S. without a
 meaningful pre-existing implementation baseline and Developer has not yet
 created or materially modified project implementation; it does not mean project
@@ -237,7 +316,9 @@ state.
 artifacts, not role-owned workflow artifacts. A role or user may change them
 only as required by a legal protocol transition or by a protocol-required
 coordination update such as initializing `Active Work`, recording an artifact
-path, setting or clearing `AuditTarget`, or setting or clearing `BlockedOn`.
+path, selecting or promoting `CycleMode`, setting or clearing
+`PromotionReason`, setting or clearing `AuditTarget`, or setting or clearing
+`BlockedOn`.
 `.standards/PROTOCOL.md` is framework-owned and may be changed only by
 installing or upgrading the framework, not by a workflow role.
 
@@ -246,6 +327,11 @@ installing or upgrading the framework, not by a workflow role.
 Traceability follows Scoper-owned scope acceptance conditions through downstream
 role-owned artifacts. It does not create a shared traceability artifact or add
 acceptance data to `STATE.md`.
+
+These traceability obligations apply to `STANDARD` cycles. `EXPEDITED` cycles
+do not fabricate Scoper-owned acceptance conditions or substitute identifiers.
+If an expedited cycle is promoted, Scoper establishes the acceptance conditions
+when the resulting standard workflow reaches `SCOPING`.
 
 1. Scoper represents every verifiable in-scope obligation that must be proven at
    completion as one or more scope-level acceptance conditions and assigns each
@@ -292,6 +378,50 @@ acceptance data to `STATE.md`.
    until reconciled. Include those states in downstream invalidation under
    **Recovery Mechanics** even when the underlying technical decision or
    behavior otherwise remains valid.
+
+## Expedited Cycle Contract
+
+An `EXPEDITED` cycle intentionally provides a narrower completion contract than
+a `STANDARD` cycle.
+
+1. `EXPEDITED` is valid only when `ProjectMode` is `BROWNFIELD`.
+2. `Active Work.Request` is the persisted change contract. `Scope` and
+   `Architecture` remain `NONE` unless the cycle is later promoted and those
+   roles create their owned artifacts.
+3. Existing `.standards/CONTEXT.md` may be consulted when useful, but an
+   expedited cycle does not require Auditor to refresh project context before
+   Developer acts. An **Active-Cycle Non-Baseline Work** entry applies only when
+   its recorded cycle matches the current `Active Work.Id`; a prior-cycle entry
+   is stale workflow context and must not be treated as a current exclusion. If
+   the baseline status of such work matters to the expedited change and cannot
+   be established safely without Auditor-owned context, promote the cycle rather
+   than assigning Auditor ownership to Developer.
+4. Implementation produced during the active expedited cycle remains tentative
+   active-cycle work. If the cycle is promoted, persist the promotion reason in
+   `Active Work.PromotionReason`. Auditor must not convert those
+   changes into established project-context facts merely because they are now
+   present in the repository. Auditor must distinguish pre-cycle baseline from
+   active-cycle changes using existing context, version-control evidence, the
+   active request, and other authoritative evidence. If that distinction is
+   materially ambiguous, Auditor must block and ask the user rather than
+   laundering the tentative implementation into `.standards/CONTEXT.md`.
+5. Developer owns implementation and its normal implementation-level
+   self-checks. Those checks do not become Tester-owned formal verification and
+   must not be represented as such.
+6. Reviewer still owns `REVIEWING_IMPLEMENTATION`. An expedited implementation
+   review evaluates the bounded change and may route implementation defects
+   through normal recovery.
+7. Scoper, Architect, Auditor, Tester, Documenter, `REVIEWING_FINAL`, and
+   Synchronizer are intentionally absent from the expedited forward topology.
+   Their missing artifacts or gates are not failures merely because they did
+   not run.
+8. An expedited cycle may reach `AWAITING_USER_SIGNOFF` after Developer and
+   implementation Reviewer complete their applicable gates, recovery is empty,
+   and no blocking user question remains. Scope-level acceptance traceability is
+   not required because no Scoper-owned acceptance identifiers exist.
+9. If completing the request safely requires any omitted role or guarantee,
+   promote the cycle to `STANDARD` instead of weakening role ownership or
+   fabricating skipped artifacts.
 
 The owning role for each state is:
 
@@ -360,7 +490,7 @@ failure to its owning role.
 A forward transition occurs only after the current state's completion gate
 succeeds.
 
-### Greenfield
+### Standard Greenfield
 
 ```text
 SCOPING
@@ -375,7 +505,7 @@ SCOPING
 -> AWAITING_USER_SIGNOFF
 ```
 
-### Brownfield
+### Standard Brownfield
 
 ```text
 AUDITING
@@ -391,10 +521,66 @@ AUDITING
 ```
 
 `ARCHITECTING -> DEVELOPING` in `BROWNFIELD` work requires valid project context
-for the active cycle. If required project context is missing, materially
-incomplete, incorrect, or unexpectedly invalidated, route to `AUDITING` instead.
-Planned implementation changes within the active cycle do not by themselves make
-project context stale.
+for the active `STANDARD` cycle. If required project context is missing,
+materially incomplete, incorrect, or unexpectedly invalidated, route to
+`AUDITING` instead. Planned implementation changes within the active cycle do
+not by themselves make project context stale.
+
+### Expedited Brownfield
+
+```text
+DEVELOPING
+-> REVIEWING_IMPLEMENTATION
+-> AWAITING_USER_SIGNOFF
+```
+
+This topology is valid only while `ProjectMode: BROWNFIELD` and
+`CycleMode: EXPEDITED`. The absence of skipped standard states is intentional;
+do not synthesize their work inside Developer or Reviewer.
+
+## Expedited Promotion
+
+Promotion changes an active `EXPEDITED` cycle into a `STANDARD` brownfield
+cycle when the bounded path is no longer sufficient. Promotion is a topology
+change, not a failure handoff.
+
+Promote when the active role determines that safe completion requires formal
+Scoping, consequential Architecture, authoritative Auditor-owned project
+context, Tester-owned verification, Documentation, Final Review,
+Synchronization, or another guarantee intentionally omitted by the expedited
+contract.
+
+Promotion rules:
+
+1. Promotion is valid only from a nonterminal `EXPEDITED` brownfield cycle.
+2. The active role may promote without first fabricating work owned by a skipped
+   role. At `AWAITING_USER_SIGNOFF`, promotion requires user authorization
+   because the state is user-owned. An explicit request to promote qualifies,
+   and an explicit rework request whose changed contract requires a skipped
+   standard role or guarantee also qualifies; do not require a second
+   confirmation merely to name the topology change that the requested rework
+   makes necessary.
+3. Set `CycleMode: STANDARD`, set `WorkflowState: AUDITING`, record
+   `Handoff.Kind: PROMOTE`, set `From` to the interrupted state, use
+   `FailureType: NONE`, and record a concise reason explaining which standard
+   guarantee is now required. Persist that same reason in
+   `Active Work.PromotionReason`; unlike `Handoff.Reason`, it remains available
+   after later forward handoffs overwrite the latest handoff.
+4. Preserve the active cycle's `Id` and `Request`. Do not fabricate, rewrite, or
+   delete role-owned artifacts during promotion. `Scope` and `Architecture`
+   normally remain `NONE` until their owning roles run. Implementation already
+   produced by the expedited cycle remains tentative active-cycle work; the
+   promotion does not make it part of the established project baseline.
+5. Auditor must establish or refresh context without treating tentative
+   active-cycle implementation as a pre-existing constraint. If the pre-cycle
+   baseline cannot be distinguished from expedited changes with sufficient
+   confidence, Auditor blocks for user clarification instead of guessing.
+6. Clear the recovery stack. The standard brownfield topology restarts at
+   `AUDITING` and supersedes any outstanding expedited-only resume path; all
+   required standard gates are re-established from that point forward.
+7. Promotion is one-way for the active cycle. Do not return it to `EXPEDITED`.
+8. After promotion, all standard forward, failure, recovery, traceability, and
+   sign-off rules apply.
 
 ## Failure Handoffs
 
@@ -412,9 +598,19 @@ REVIEW failure          -> REVIEWING_IMPLEMENTATION or REVIEWING_FINAL, matching
 SYNCHRONIZATION failure -> SYNCHRONIZING
 ```
 
-If the handoff moves to a different state, recovery proceeds according to
-**Recovery Mechanics**. A same-state failure records the failure handoff but
-does not create a new recovery frame.
+In a `STANDARD` cycle, route failures according to the table above. In an
+`EXPEDITED` cycle, a failure may route directly only to a state that exists in
+the expedited topology: `DEVELOPING` for an `IMPLEMENTATION` failure or
+`REVIEWING_IMPLEMENTATION` for an implementation `REVIEW` failure. If the
+defect or newly required guarantee belongs to Scoper, Architect, Auditor,
+Tester, Documenter, final Reviewer, or Synchronizer, do not enter that skipped
+state through a `FAILURE` handoff. Promote the cycle under **Expedited
+Promotion** and let the resulting `STANDARD` topology establish or correct the
+owned artifact.
+
+If a legal failure handoff moves to a different state, recovery proceeds
+according to **Recovery Mechanics**. A same-state failure records the failure
+handoff but does not create a new recovery frame.
 
 ## Recovery Mechanics
 
@@ -422,6 +618,14 @@ This section is the canonical recovery algorithm for all workflow roles.
 Individual skills define only how their role corrects its owned artifact or
 decision, how its completion gate works, and which previously completed
 downstream states its correction invalidates.
+
+Recovery follows the active `CycleMode` topology. An expedited recovery reruns
+only states that exist in the expedited topology. If the work instead requires
+a skipped standard role or guarantee, use **Expedited Promotion**. Promotion is
+the explicit exception to preserving the expedited recovery stack: because it
+restarts the active cycle under the complete standard brownfield topology, its
+outstanding expedited-only resume paths are superseded and cleared as defined
+there.
 
 1. **Create a frame when corrective routing changes state.** For a `FAILURE` or
    `USER_REWORK` transition that moves to a different state, push a frame with
@@ -540,17 +744,19 @@ suggestion first.
 8. User cancellation follows **User Decisions and Intervention**, including the
    greenfield bootstrap-reset exception.
 9. New-cycle transitions follow **User Decisions and Intervention**.
-10. Every handoff that changes workflow state must update `.standards/STATE.md`,
+10. Expedited promotion follows **Expedited Promotion** and must not be encoded
+    as a `FAILURE` merely because the shorter topology proved insufficient.
+11. Every handoff that changes workflow state must update `.standards/STATE.md`,
     including its active-work, handoff, and recovery fields, according to the
     persisted-state rules above.
-11. After a legal handoff changes workflow state to a state owned by a different
+12. After a legal handoff changes workflow state to a state owned by a different
     workflow role, the agent performing the handoff must provide the user with a
     concise copy/paste invocation for the next role, unless the user explicitly
     invoked that target workflow skill in the same instruction and it will
     continue immediately in the resulting state. Persist the state change before
     presenting any invocation. The message is convenience only;
     `.standards/STATE.md` and role-owned artifacts remain authoritative.
-12. A next-role handoff message should identify the next role and invoke its
+13. A next-role handoff message should identify the next role and invoke its
     explicit skill using the active coding client's syntax, while directing it
     to resume from `.standards/STATE.md`. Do not duplicate scope, architecture,
     recovery reasons, or other authoritative workflow content into the message
@@ -576,11 +782,11 @@ Claude Code:    /<skill> Continue the active recovery from `.standards/STATE.md`
 
 Again, emit only the line for the active client.
 
-13. Do not emit a next-role invocation when the workflow remains with the same
+14. Do not emit a next-role invocation when the workflow remains with the same
     role, a blocking user question is unresolved, the resulting state is
     `AWAITING_USER_SIGNOFF`, `SIGNED_OFF`, or `CANCELLED`, or Navigator is used.
     At `AWAITING_USER_SIGNOFF`, present the available user actions instead.
-14. `NAVIGATOR` may be invoked from any state but must not mutate artifacts or
+15. `NAVIGATOR` may be invoked from any state but must not mutate artifacts or
     change workflow state.
 
 ## User Decisions and Intervention
@@ -593,6 +799,23 @@ proceed only when the user explicitly invoked that workflow skill and it owns
 the resulting state; otherwise stop after persisting the transition and provide
 the next-role invocation when the handoff rules require one.
 
+- **Select expedited mode for the initialized cycle:** before substantive work
+  begins and while `Active Work.Id` and `Active Work.Request` are still `UNSET`,
+  a brownfield user may explicitly request `EXPEDITED` or, when they have not
+  explicitly selected `STANDARD`, invoke Developer with the new bounded
+  implementation request. Set `CycleMode: EXPEDITED`, set
+  `WorkflowState: DEVELOPING`, initialize `Active Work` with
+  `PromotionReason: NONE`, keep `Handoff.Kind: INITIAL`, use `From: NONE` and
+  `FailureType: NONE`, record a concise expedited-entry reason, and keep recovery
+  inactive. This selection is not available in `GREENFIELD`.
+
+- **Promote an expedited cycle:** from any nonterminal `EXPEDITED` brownfield
+  cycle, an explicit user instruction may authorize the `PROMOTE` transition
+  defined by **Expedited Promotion**, including from `AWAITING_USER_SIGNOFF`.
+  This user authorization is a control-plane action only; after promotion, stop
+  and hand off to Auditor unless Auditor was explicitly invoked in the same
+  instruction. An active workflow role may also promote without a separate user
+  instruction when the expedited contract becomes insufficient.
 - **Rework an active cycle:** from any nonterminal state, update
   `Active Work.Request` when the request changed, identify the earliest owned
   artifact or decision invalidated by the change, record
@@ -600,30 +823,63 @@ the next-role invocation when the handoff rules require one.
   that owning state. If routing changes state, create the recovery frame defined
   by **Recovery Mechanics** with `ResumeAt` equal to the interrupted state.
   Existing recovery frames remain intact. Do not classify user-requested changes
-  as agent-discovered failures.
+  as agent-discovered failures. In `EXPEDITED`, bounded implementation rework
+  routes to `DEVELOPING`; if the changed request now requires a skipped standard
+  role or guarantee, promote under **Expedited Promotion** instead of inventing
+  that role's work.
 - **Cancel an active cycle:** from any nonterminal state, if `ProjectMode` is
   `GREENFIELD`, follow **Greenfield Bootstrap Cancellation** below. If
   `ProjectMode` is `BROWNFIELD`, transition to `CANCELLED`, record
   `Handoff.Kind: CANCEL`, set `From` to the interrupted state, use
   `FailureType: NONE`, preserve `Active Work` for traceability, and clear
-  recovery.
+  recovery. Cancellation does not revert project artifacts. Project changes
+  produced during the cancelled cycle may remain physically present, but
+  cancellation does not by itself make them established project baseline.
 - **Sign off:** from `AWAITING_USER_SIGNOFF`, transition to `SIGNED_OFF`, record
   `Handoff.Kind: SIGNOFF`, set `From: AWAITING_USER_SIGNOFF`, use
   `FailureType: NONE`, and clear recovery. The cycle is complete.
 - **Start a new cycle:** from `SIGNED_OFF` or a retained `CANCELLED` state,
-  reset `STATE.md` to the initial state for the current `ProjectMode`, record
-  `Handoff.Kind: NEW_CYCLE`, initialize `Active Work.Id` and
+  select the new `CycleMode`, record `Handoff.Kind: NEW_CYCLE`, set `Handoff.From`
+  to the prior terminal state, use `FailureType: NONE`, record a concise reason
+  for starting the new cycle, initialize `Active Work.Id` and
   `Active Work.Request` from the new request, reset `Scope`, `Architecture`,
-  `AuditTarget`, and `BlockedOn` to `NONE`, and clear recovery. The prior cycle
-  is not reopened. A greenfield bootstrap cancellation has no retained runtime
-  and therefore requires a fresh installation before future workflow work; that
-  installation must select `ProjectMode` again from the project's then-current
-  state using the normal installation rules.
+  `PromotionReason`, `AuditTarget`, and `BlockedOn` to `NONE`, and clear
+  recovery. Before replacing `Active Work` from retained `CANCELLED`, preserve
+  the cancelled cycle's `Active Work.Id` and a brief summary of its `Request` in
+  `Handoff.Reason` whenever post-cancellation baseline reconciliation is
+  required. This handoff metadata is the durable provenance Auditor uses until
+  the reconciliation audit completes; do not rely on chat history to recover the
+  cancelled request. `STANDARD` is the default. A brownfield user may select `EXPEDITED`
+  explicitly or, when they have not explicitly selected `STANDARD`, by invoking
+  Developer as the entry role for a new bounded implementation request. However,
+  when the prior terminal state is retained `CANCELLED`, do not enter
+  `EXPEDITED` unless the user explicitly confirms that no project changes from
+  the cancelled cycle remain because no such changes were produced or they were
+  reverted. If the user wants to retain or adopt project changes from the
+  cancelled cycle, require `CycleMode: STANDARD` so Auditor can reconcile those
+  changes into the project baseline before later roles rely on them. Without the
+  required no-residue confirmation, require `CycleMode: STANDARD`, set
+  `WorkflowState: AUDITING`, and make `Handoff.Reason` identify the cancelled
+  cycle by its prior `Active Work.Id`, briefly summarize that cycle's request,
+  and state that baseline reconciliation after cancellation is required. For
+  other `STANDARD` starts, set the initial `WorkflowState` from `ProjectMode`; for
+  allowed `EXPEDITED` starts, require `ProjectMode: BROWNFIELD` and set
+  `WorkflowState: DEVELOPING`. The prior cycle is not reopened. A greenfield bootstrap
+  cancellation has no retained runtime and therefore requires a fresh installation
+  before future workflow work; that installation must select `ProjectMode` again from
+  the project's then-current state using the normal installation rules.
 
 At `AWAITING_USER_SIGNOFF`, the available user actions are sign off, request
-rework, or cancel. Rework uses the active-cycle rule above, so its recovery
-frame resumes at `AWAITING_USER_SIGNOFF` and every invalidated downstream gate
-must complete before sign-off is offered again.
+rework, or cancel. For an `EXPEDITED` cycle, the user may also explicitly
+promote the active cycle to `STANDARD`; apply **Expedited Promotion** and hand
+off to Auditor. Rework uses the active-cycle rule above. Bounded expedited
+rework creates the normal recovery path back to `AWAITING_USER_SIGNOFF`; if the
+requested rework requires a skipped standard role or guarantee, the rework
+request itself authorizes the required promotion and the standard brownfield
+topology restarts at `AUDITING` instead. For `STANDARD`, sign-off remains
+subject to full acceptance traceability and all standard gates. For
+`EXPEDITED`, sign-off covers the narrower **Expedited Cycle Contract**; do not
+represent skipped standard phases as having completed.
 
 ### Greenfield Bootstrap Cancellation
 
@@ -689,8 +945,8 @@ An installed S.T.A.N.D.A.R.D.S. project should provide:
   client-setting mutations that S.T.A.N.D.A.R.D.S. actually created and may
   later remove safely;
 - `.standards/MODE.md`: the project's current `ProjectMode`;
-- `.standards/STATE.md`: the branch-persisted active `WorkflowState`,
-  active-work identity, and resumable handoff/recovery context;
+- `.standards/STATE.md`: the branch-persisted active `WorkflowState`, active
+  `CycleMode`, active-work identity, and resumable handoff/recovery context;
 - the S.T.A.N.D.A.R.D.S. skills installed in the location required by the
   selected coding agent;
 - client-specific invocation controls that keep workflow role skills
@@ -706,9 +962,10 @@ project implementation artifact. The mode must not revert during recovery or
 later cycles.
 
 `.standards/STATE.md` must identify exactly one canonical `WorkflowState` and
-follow the persisted active-work, handoff, and recovery shape defined above.
-Installation initializes it from `ProjectMode`, and every legal state transition
-updates it as defined above.
+one canonical `CycleMode`, and follow the persisted active-work, handoff, and
+recovery shape defined above. Installation initializes `CycleMode: STANDARD`
+and initializes `WorkflowState` from `ProjectMode`; every legal state transition
+or cycle-mode change updates it as defined above.
 
 `.standards/INSTALLATION.json` is installer-owned metadata, not workflow state.
 Initialize it on first installation and preserve/update it across normal
@@ -725,20 +982,17 @@ path or skill package, verify ownership deterministically:
 
 - Treat the `.standards/` runtime as S.T.A.N.D.A.R.D.S.-owned only when
   `.standards/PROTOCOL.md` contains the `<!-- standards:framework-owned -->`
-  marker or matches a recognized legacy S.T.A.N.D.A.R.D.S. protocol signature
-  from a released version. If `.standards/` already exists without a recognized
-  S.T.A.N.D.A.R.D.S. protocol, stop and report a path collision for user
-  resolution; do not adopt, overwrite, or remove that runtime.
+  marker. If `.standards/` already exists without that ownership marker, stop
+  and report a path collision for user resolution; do not adopt, overwrite, or
+  remove that runtime.
 - Treat an existing installed skill package as S.T.A.N.D.A.R.D.S.-owned only
   when its root `SKILL.md` contains the `<!-- standards:framework-owned -->`
-  marker or matches a recognized legacy S.T.A.N.D.A.R.D.S. skill signature from
-  a released version. If a destination skill name already exists without
-  recognized ownership, stop and report a skill collision for user resolution;
-  do not overwrite, merge into, or remove that skill package.
+  marker. If a destination skill name already exists without that ownership
+  marker, stop and report a skill collision for user resolution; do not
+  overwrite, merge into, or remove that skill package.
 - Framework-owned source `PROTOCOL.md` and root workflow `SKILL.md` files must
   carry the ownership marker so future installs, upgrades, and bootstrap resets
-  can identify them deterministically. Recognition of a legacy signature is an
-  upgrade compatibility rule only; it must not be inferred from a generic
+  can identify them deterministically. Do not infer ownership from a generic
   filename, skill name, directory name, or similar-looking content.
 
 After ownership checks pass:
@@ -775,9 +1029,9 @@ After ownership checks pass:
   valid only for the exact setting path and installed value it records.
 - If `.standards/INSTALLATION.json` already exists in a verified
   S.T.A.N.D.A.R.D.S. runtime, preserve it during normal reinstallation and
-  update only installer-owned metadata. If upgrading a recognized legacy runtime
-  that predates the manifest, initialize it without claiming ownership of
-  compatible client settings that already exist.
+  update only installer-owned metadata. If the manifest is unexpectedly missing
+  from an otherwise verified runtime, stop and report the incomplete runtime;
+  do not reconstruct configuration ownership by inference.
 - If `.standards/MODE.md` or `.standards/STATE.md` already exists, preserve it
   during normal reinstallation. Initialize these files only when
   S.T.A.N.D.A.R.D.S. is first installed or when the user explicitly requests
@@ -820,10 +1074,12 @@ Use these terms consistently across all skills:
   from scope-level acceptance conditions and linked to their acceptance
   identifiers.
 - **project context**: the Auditor-owned baseline of relevant project state and
-  constraints for the active workflow cycle, stored canonically at
-  `.standards/CONTEXT.md`. Planned implementation changes within that cycle do
-  not automatically make the baseline stale. A `PROJECT_CONTEXT` failure means
-  project context is materially incomplete, incorrect, or unexpectedly
+  constraints, stored canonically at `.standards/CONTEXT.md` and refreshed for
+  the active workflow cycle when Auditor runs. The artifact may persist across
+  cycles as evidence, but cycle-scoped non-baseline entries apply only under the
+  lifecycle rules defined above. Planned implementation changes within a cycle
+  do not automatically make the baseline stale. A `PROJECT_CONTEXT` failure
+  means project context is materially incomplete, incorrect, or unexpectedly
   invalidated and must be refreshed before dependent work continues.
 - **completion gate**: the conditions that must be satisfied before a role may
   perform a forward handoff.
@@ -834,12 +1090,23 @@ Use these terms consistently across all skills:
 - **resume handoff**: the transition that completes a recovery frame by
   returning to its `ResumeAt`, or another recovery-directed transition that is
   not the normal forward handoff.
+- **cycle mode**: the active cycle's assurance topology, persisted as
+  `STANDARD` or `EXPEDITED` in `.standards/STATE.md`; it does not replace or
+  redefine `ProjectMode`.
+- **expedited cycle**: a bounded brownfield cycle that runs Developer followed
+  by implementation Reviewer and may reach user sign-off without fabricating
+  the standard roles or artifacts it intentionally skipped.
+- **promotion handoff**: the one-way `PROMOTE` transition that changes an active
+  expedited cycle to `STANDARD` and restarts the brownfield topology at
+  `AUDITING` because a skipped standard guarantee is required.
 - **recovery frame**: one outstanding corrective obligation on the `Recovery`
   stack, preserving the defect owner, reason, interrupted `ResumeAt` state, and
   any `RerunThrough` boundary that must complete before execution returns there.
 - **active work**: the persisted identity, request, artifact references,
-  transient audit target when needed, and blocking user question for the current
-  workflow cycle.
+  promotion reason when applicable, transient audit target when needed, and
+  blocking user question for the current active cycle; in a terminal state, the
+  retained block describes the just-completed or cancelled cycle for
+  traceability until `NEW_CYCLE` replaces it.
 
 Do not introduce alternate names for these concepts inside individual skills
 unless this protocol is updated first.

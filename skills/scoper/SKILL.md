@@ -43,6 +43,11 @@ reviews, or user documentation.
   project facts that cannot otherwise be established.
 - Brownfield Scoping requires the Auditor's project context for the active
   cycle.
+- When `Active Work.PromotionReason` is not `NONE`, treat it as durable workflow
+  context explaining why a former expedited cycle required the standard
+  topology. Use it to surface any unresolved scope question, but do not treat
+  the promotion reason itself as user-approved scope unless supported by the
+  request, project context, or explicit user input.
 - When the active recovery frame's `Owner` is `SCOPING`, use that frame as the
   defect Scoper must correct.
 - When recovery is active but the active frame's `Owner` is not `SCOPING`,
@@ -77,12 +82,15 @@ authoritative shape and authoring contract for the persisted scope artifact.
    answer.
 2. If required project context is missing, materially incomplete, incorrect, or
    unexpectedly invalidated, stop scoping and issue a `PROJECT_CONTEXT` failure
-   handoff to Auditor instead of performing a repository-wide audit. Do not
-   treat intentionally absent project context before the first greenfield audit
-   as defective when scoping can proceed without it. Once
-   `.standards/CONTEXT.md` exists, do not ignore it merely because `ProjectMode`
-   is still `GREENFIELD`. Planned implementation changes within the active cycle
-   do not by themselves make project context stale.
+   handoff to Auditor instead of performing a repository-wide audit. Treat an
+   **Active-Cycle Non-Baseline Work** entry whose recorded cycle does not match
+   the current `Active Work.Id` as stale project context that Auditor must
+   reconcile before Scoper relies on it. Do not treat intentionally absent
+   project context before the first greenfield audit as defective when scoping
+   can proceed without it. Once `.standards/CONTEXT.md` exists, do not ignore it
+   merely because `ProjectMode` is still `GREENFIELD`. Planned implementation
+   changes within the active cycle do not by themselves make project context
+   stale.
 3. Treat planned architectural constraints recorded in `.standards/CONTEXT.md`
    as Architect-owned design information, not as independently established scope
    constraints. They constrain Scoper only when the same constraint is

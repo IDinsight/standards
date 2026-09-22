@@ -41,7 +41,14 @@ reviews, or user documentation.
 - Initial greenfield Architecture before the first audit may proceed without
   `CONTEXT.md`; its absence is intentional at that point.
 - Brownfield Architecture requires the Auditor's project context for the active
-  cycle plus relevant existing design/code.
+  cycle plus relevant existing design/code. When `Active Work.PromotionReason`
+  is not `NONE`, the cycle was promoted from `EXPEDITED`; use that persisted
+  reason and any **Active-Cycle Non-Baseline Work** recorded in project context
+  to distinguish earlier tentative implementation from established baseline. Use
+  tentative work only as implementation evidence to reconcile against the new
+  scope and design; do not infer project constraints or architectural intent
+  from it merely because it exists in the working tree or version-control
+  history.
 - When the active recovery frame's `Owner` is `ARCHITECTING`, use that frame as
   the architecture defect Architect must correct.
 - When recovery is active but the active frame's `Owner` is not `ARCHITECTING`,
@@ -91,13 +98,19 @@ do not apply multiple mode files concurrently.
    repair Scoper-owned acceptance identity.
 3. If required project context is missing, materially incomplete, incorrect, or
    unexpectedly invalidated, stop and issue a `PROJECT_CONTEXT` failure handoff
-   to Auditor instead of performing a repository-wide audit. Do not treat
-   intentionally absent project context before the first greenfield audit as
-   defective; initial greenfield architecture completes before its normal
-   handoff to Auditor. Once `.standards/CONTEXT.md` exists, do not ignore it
-   merely because `ProjectMode` is still `GREENFIELD`. Planned implementation
-   changes within the active cycle do not by themselves invalidate project
-   context.
+   to Auditor instead of performing a repository-wide audit. Treat an
+   **Active-Cycle Non-Baseline Work** entry whose recorded cycle does not match
+   the current `Active Work.Id` as stale project context that Auditor must
+   reconcile before Architect relies on it. Do not treat intentionally absent
+   project context before the first greenfield audit as defective; initial
+   greenfield architecture completes before its normal handoff to Auditor. Once
+   `.standards/CONTEXT.md` exists, do not ignore it merely because `ProjectMode`
+   is still `GREENFIELD`. Planned implementation changes within the active cycle
+   do not by themselves invalidate project context. When
+   `Active Work.PromotionReason` is not `NONE`, treat implementation from the
+   prior expedited path as tentative active-cycle work and keep
+   Auditor-established baseline facts authoritative for what pre-existed the
+   cycle.
 
 ## Completion Gate
 

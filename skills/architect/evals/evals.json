@@ -3,7 +3,7 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "Continue the active STANDARDS workflow as Architect. ProjectMode is BROWNFIELD, WorkflowState is ARCHITECTING, recovery is inactive, Active Work.Scope points to the completed scope, valid project context exists, and the completed scope contains AC-001: an optional 'preferred_name' field appears in customer profile reads; AC-002: users may edit that field; and AC-003: existing records may remain null. A small database migration may be required. No foundational structure, shared cross-boundary rule, or compatibility rollout is requested.",
+      "prompt": "Continue the active STANDARDS workflow as Architect. ProjectMode is BROWNFIELD, CycleMode is STANDARD, WorkflowState is ARCHITECTING, recovery is inactive, Active Work.Scope points to the completed scope, valid project context exists, and the completed scope contains AC-001: an optional 'preferred_name' field appears in customer profile reads; AC-002: users may edit that field; and AC-003: existing records may remain null. A small database migration may be required. No foundational structure, shared cross-boundary rule, or compatibility rollout is requested.",
       "expected_output": "A FEATURE-mode technical design for the bounded capability, including the material contract, data/state, integration, migration implications, acceptance criteria, and build sequence without treating the incidental migration as an Evolution problem or writing implementation code.",
       "files": [],
       "assertions": [
@@ -19,7 +19,7 @@
     },
     {
       "id": 2,
-      "prompt": "Continue the active STANDARDS workflow as Architect. ProjectMode is BROWNFIELD, WorkflowState is ARCHITECTING, recovery is inactive, Active Work.Scope points to the completed scope, and valid active-cycle project context exists. The completed scope contains AC-001: replace the existing session-cookie authentication contract with short-lived access tokens across the API, web app, and worker; AC-002: existing sessions continue working during a staged rollout; AC-003: clients may update at different times; and AC-004: rollback remains possible until migration completes. The new auth contract is shared across several project boundaries.",
+      "prompt": "Continue the active STANDARDS workflow as Architect. ProjectMode is BROWNFIELD, CycleMode is STANDARD, WorkflowState is ARCHITECTING, recovery is inactive, Active Work.Scope points to the completed scope, and valid active-cycle project context exists. The completed scope contains AC-001: replace the existing session-cookie authentication contract with short-lived access tokens across the API, web app, and worker; AC-002: existing sessions continue working during a staged rollout; AC-003: clients may update at different times; and AC-004: rollback remains possible until migration completes. The new auth contract is shared across several project boundaries.",
       "expected_output": "An EVOLUTION-mode technical design that gives transition and compatibility precedence over the cross-cutting nature of the new authentication contract, defining current-to-target behavior, coexistence, rollout, rollback, and retirement conditions.",
       "files": [],
       "assertions": [
@@ -35,7 +35,7 @@
     },
     {
       "id": 3,
-      "prompt": "Continue the active STANDARDS workflow as Architect. ProjectMode is GREENFIELD, WorkflowState is ARCHITECTING, recovery is inactive, Active Work.Scope points to a completed scope, .standards/CONTEXT.md does not yet exist, and the completed scope contains AC-001: expose an HTTP event-ingestion boundary; AC-002: persist accepted events durably; AC-003: process accepted events asynchronously; and AC-004: provide a deployable runtime. The scope does not mandate specific frameworks or vendors.",
+      "prompt": "Continue the active STANDARDS workflow as Architect. ProjectMode is GREENFIELD, CycleMode is STANDARD, WorkflowState is ARCHITECTING, recovery is inactive, Active Work.Scope points to a completed scope, .standards/CONTEXT.md does not yet exist, and the completed scope contains AC-001: expose an HTTP event-ingestion boundary; AC-002: persist accepted events durably; AC-003: process accepted events asynchronously; and AC-004: provide a deployable runtime. The scope does not mandate specific frameworks or vendors.",
       "expected_output": "A FOUNDATION-mode greenfield technical design that establishes the major runtime and persistence boundaries and required contracts without treating the intentionally absent pre-audit CONTEXT.md as a defect, then hands off to Auditor.",
       "files": [],
       "assertions": [
@@ -51,7 +51,7 @@
     },
     {
       "id": 4,
-      "prompt": "Continue the active STANDARDS workflow as Architect. ProjectMode is BROWNFIELD, WorkflowState is ARCHITECTING, recovery is inactive, Active Work.Scope points to the completed scope, and valid active-cycle project context exists. The completed scope contains AC-001: every externally initiated request and asynchronous job carries the same correlation identifier through the API, message bus, worker, logs, and outbound callbacks. Existing project structure remains valid; no staged compatibility migration is a primary concern.",
+      "prompt": "Continue the active STANDARDS workflow as Architect. ProjectMode is BROWNFIELD, CycleMode is STANDARD, WorkflowState is ARCHITECTING, recovery is inactive, Active Work.Scope points to the completed scope, and valid active-cycle project context exists. The completed scope contains AC-001: every externally initiated request and asynchronous job carries the same correlation identifier through the API, message bus, worker, logs, and outbound callbacks. Existing project structure remains valid; no staged compatibility migration is a primary concern.",
       "expected_output": "A CROSS_CUTTING-mode technical design that defines one canonical correlation contract, its propagation and enforcement boundaries, integration points, material exceptions, and adoption behavior without redesigning unrelated architecture.",
       "files": [],
       "assertions": [
@@ -67,7 +67,7 @@
     },
     {
       "id": 5,
-      "prompt": "Continue the active STANDARDS workflow as Architect. ProjectMode is BROWNFIELD, WorkflowState is ARCHITECTING, recovery is inactive, Active Work.Scope points to the completed scope, valid active-cycle project context exists, and the completed scope contains AC-001: 'Users can create shareable report links.' The scope does not state whether links are public, require authentication, expire, or may be revoked. Those choices materially change who can access reports and what users are being promised. Do not silently choose product behavior.",
+      "prompt": "Continue the active STANDARDS workflow as Architect. ProjectMode is BROWNFIELD, CycleMode is STANDARD, WorkflowState is ARCHITECTING, recovery is inactive, Active Work.Scope points to the completed scope, valid active-cycle project context exists, and the completed scope contains AC-001: 'Users can create shareable report links.' The scope does not state whether links are public, require authentication, expire, or may be revoked. Those choices materially change who can access reports and what users are being promised. Do not silently choose product behavior.",
       "expected_output": "A SCOPING failure handoff to Scoper because the persisted scope is materially incomplete, with no invented access policy and no architecture artifact finalized from the ambiguous requirement.",
       "files": [],
       "assertions": [
@@ -81,7 +81,7 @@
     },
     {
       "id": 6,
-      "prompt": "Continue the active STANDARDS workflow as Architect. ProjectMode is BROWNFIELD, WorkflowState is ARCHITECTING, recovery is inactive, valid active-cycle project context exists, and Active Work.Scope points to a completed scope whose Done when conditions are observable but have no AC-NNN acceptance identifiers. Do not edit the Scoper-owned scope on Architect's behalf.",
+      "prompt": "Continue the active STANDARDS workflow as Architect. ProjectMode is BROWNFIELD, CycleMode is STANDARD, WorkflowState is ARCHITECTING, recovery is inactive, valid active-cycle project context exists, and Active Work.Scope points to a completed scope whose Done when conditions are observable but have no AC-NNN acceptance identifiers. Do not edit the Scoper-owned scope on Architect's behalf.",
       "expected_output": "A SCOPING failure handoff to Scoper because the completed scope lacks the Scoper-owned acceptance identifiers required for traceability, with no Architect-assigned substitute IDs and no technical design finalized.",
       "files": [],
       "assertions": [
@@ -95,7 +95,7 @@
     },
     {
       "id": 7,
-      "prompt": "Continue the active STANDARDS workflow as Architect. ProjectMode is BROWNFIELD, WorkflowState is ARCHITECTING, recovery is inactive, Active Work.Scope points to the completed scope, and valid active-cycle project context exists. The completed scope contains AC-001: users can rotate API credentials without downtime; and AC-002: the project-facing operations guide documents the credential-rotation procedure before sign-off. Existing documentation ownership remains with the later DOCUMENTING phase. No broader foundational or cross-cutting redesign is requested.",
+      "prompt": "Continue the active STANDARDS workflow as Architect. ProjectMode is BROWNFIELD, CycleMode is STANDARD, WorkflowState is ARCHITECTING, recovery is inactive, Active Work.Scope points to the completed scope, and valid active-cycle project context exists. The completed scope contains AC-001: users can rotate API credentials without downtime; and AC-002: the project-facing operations guide documents the credential-rotation procedure before sign-off. Existing documentation ownership remains with the later DOCUMENTING phase. No broader foundational or cross-cutting redesign is requested.",
       "expected_output": "A FEATURE-mode technical design that defines the material credential-rotation design for AC-001, accounts for AC-002 as having no architectural impact with its later documentation dependency preserved, and does not invent technical architecture or technical acceptance criteria merely to make the documentation condition look architect-owned.",
       "files": [],
       "assertions": [
@@ -104,6 +104,19 @@
         "Acceptance Coverage accounts for AC-002 explicitly as no architectural impact and identifies the later DOCUMENTING dependency rather than claiming the technical design satisfies the documentation condition",
         "The design does not invent architecture, implementation work, or a technical acceptance criterion solely for AC-002",
         "Any technical acceptance criteria that are included reference the relevant AC-NNN identifiers without redefining Scoper-owned acceptance meaning",
+        "Normal brownfield success hands off ARCHITECTING -> DEVELOPING and provides the next-role Developer invocation required by the protocol"
+      ]
+    },
+    {
+      "id": 8,
+      "prompt": "Continue the active STANDARDS workflow as Architect. ProjectMode is BROWNFIELD, CycleMode is STANDARD, WorkflowState is ARCHITECTING, recovery is inactive, Active Work.Id is credential-persistence, Active Work.PromotionReason records that a consequential persistence decision required promotion from EXPEDITED to STANDARD, Active Work.Scope now points to the completed scope, valid Auditor-owned project context describes the pre-cycle baseline and identifies the earlier tentative persistence changes as Active-Cycle Non-Baseline Work labeled Cycle: credential-persistence, and Developer's earlier expedited attempt remains present as tentative active-cycle code. That tentative code chose a new persistence pattern that is not established by project context or scope. Design the change without treating the tentative implementation choice as a pre-existing project constraint.",
+      "expected_output": "A brownfield architecture pass that treats Auditor-owned context as the established baseline, treats the earlier expedited implementation as tentative active-cycle work rather than architectural precedent, and produces the design from scope plus established constraints before handing off to Developer.",
+      "files": [],
+      "assertions": [
+        "The response uses Active Work.PromotionReason and Auditor-owned Active-Cycle Non-Baseline Work as durable evidence that earlier expedited implementation is not established baseline",
+        "The response does not infer architectural intent or baseline constraints from the tentative expedited implementation merely because the code exists",
+        "The response uses the completed scope and Auditor-owned project context as authoritative inputs for the promoted standard design",
+        "It may inspect tentative code as implementation evidence, but it reconciles that code against the new design rather than allowing the code to define the design",
         "Normal brownfield success hands off ARCHITECTING -> DEVELOPING and provides the next-role Developer invocation required by the protocol"
       ]
     }

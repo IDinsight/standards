@@ -3,7 +3,7 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "Continue the active STANDARDS workflow as Scoper. ProjectMode is GREENFIELD, WorkflowState is SCOPING, Active Work.Scope is NONE, recovery is inactive, and the request is: build a small internal web tool that lets support staff search customers by email, view the customer's current plan and account status, and copy the customer ID. Only authenticated support staff may use it. Do not choose frameworks, storage, APIs, or UI libraries unless already established by project constraints.",
+      "prompt": "Continue the active STANDARDS workflow as Scoper. ProjectMode is GREENFIELD, CycleMode is STANDARD, WorkflowState is SCOPING, Active Work.Scope is NONE, recovery is inactive, and the request is: build a small internal web tool that lets support staff search customers by email, view the customer's current plan and account status, and copy the customer ID. Only authenticated support staff may use it. Do not choose frameworks, storage, APIs, or UI libraries unless already established by project constraints.",
       "expected_output": "A PLAN-mode scoping result that persists one implementation-agnostic scope for the active cycle, assigns stable AC-NNN identifiers to observable acceptance conditions, defines boundaries, records the scope path in Active Work.Scope, and hands off to Architect without making technical design decisions.",
       "files": [],
       "assertions": [
@@ -19,7 +19,7 @@
     },
     {
       "id": 2,
-      "prompt": "Continue the active recovery as Scoper. ProjectMode is BROWNFIELD, WorkflowState is SCOPING, Active Work.Scope points to docs/scope/export-audit-log.md, valid active-cycle project context exists, and the active recovery frame is Owner=SCOPING, FailureType=SCOPING, ResumeAt=DEVELOPING, RerunThrough=NONE. The existing scope has AC-001 for administrators exporting the audit log as CSV and AC-002 for preserving the existing filters and permissions. The approved user change adds JSON export with the same filters and permissions. The completed architecture artifact defines a CSV-only export contract, so the new JSON outcome invalidates that downstream design. Revise only what the new requirement invalidates.",
+      "prompt": "Continue the active recovery as Scoper. ProjectMode is BROWNFIELD, CycleMode is STANDARD, WorkflowState is SCOPING, Active Work.Scope points to docs/scope/export-audit-log.md, valid active-cycle project context exists, and the active recovery frame is Owner=SCOPING, FailureType=SCOPING, ResumeAt=DEVELOPING, RerunThrough=NONE. The existing scope has AC-001 for administrators exporting the audit log as CSV and AC-002 for preserving the existing filters and permissions. The approved user change adds JSON export with the same filters and permissions. The completed architecture artifact defines a CSV-only export contract, so the new JSON outcome invalidates that downstream design. Revise only what the new requirement invalidates.",
       "expected_output": "A REPLAN-mode correction that preserves unaffected scope and existing acceptance identifiers, adds the approved JSON outcome under a new previously unused acceptance identifier, recognizes that completed architecture must be re-established, and resumes recovery through Architect before returning to Developing.",
       "files": [],
       "assertions": [
@@ -34,7 +34,7 @@
     },
     {
       "id": 3,
-      "prompt": "Continue the active STANDARDS workflow as Scoper. ProjectMode is BROWNFIELD, WorkflowState is SCOPING, recovery is inactive, Active Work.Scope is NONE, and .standards/CONTEXT.md is missing. The request is to add a new background job to an existing service, but the repository's current runtime, queueing mechanism, deployment shape, and established commands have not been audited for this cycle.",
+      "prompt": "Continue the active STANDARDS workflow as Scoper. ProjectMode is BROWNFIELD, CycleMode is STANDARD, WorkflowState is SCOPING, recovery is inactive, Active Work.Scope is NONE, and .standards/CONTEXT.md is missing. The request is to add a new background job to an existing service, but the repository's current runtime, queueing mechanism, deployment shape, and established commands have not been audited for this cycle.",
       "expected_output": "A PROJECT_CONTEXT failure handoff to Auditor rather than an attempted repository audit or speculative scope, preserving Scoper ownership boundaries and the interrupted SCOPING state through protocol recovery.",
       "files": [],
       "assertions": [
@@ -48,7 +48,7 @@
     },
     {
       "id": 4,
-      "prompt": "Invoke Scoper in a STANDARDS project where WorkflowState is ARCHITECTING, Active Work.Scope already points to a completed scope, recovery is inactive, and the user has not requested rework or another control-plane transition. The request is simply: continue the workflow.",
+      "prompt": "Invoke Scoper in a STANDARDS project where CycleMode is STANDARD, WorkflowState is ARCHITECTING, Active Work.Scope already points to a completed scope, recovery is inactive, and the user has not requested rework or another control-plane transition. The request is simply: continue the workflow.",
       "expected_output": "No Scoper role-owned work. The response respects workflow-state ownership, leaves the completed scope and state unchanged, and identifies Architect as the role that owns the current state.",
       "files": [],
       "assertions": [
@@ -60,7 +60,7 @@
     },
     {
       "id": 5,
-      "prompt": "Continue the active STANDARDS workflow as Scoper. ProjectMode is BROWNFIELD, WorkflowState is SCOPING, Active Work.Scope points to docs/scope/session-policy.md, valid active-cycle project context exists, and recovery is inactive. The current scope has AC-001: sessions expire after 30 minutes of inactivity and AC-002: users are signed out when the browser closes. The user has explicitly replaced the browser-close behavior with AC-002's requirement no longer applying; instead, sessions must survive browser restarts for up to 8 hours. Revise the current scope without reusing retired acceptance identity.",
+      "prompt": "Continue the active STANDARDS workflow as Scoper. ProjectMode is BROWNFIELD, CycleMode is STANDARD, WorkflowState is SCOPING, Active Work.Scope points to docs/scope/session-policy.md, valid active-cycle project context exists, and recovery is inactive. The current scope has AC-001: sessions expire after 30 minutes of inactivity and AC-002: users are signed out when the browser closes. The user has explicitly replaced the browser-close behavior with AC-002's requirement no longer applying; instead, sessions must survive browser restarts for up to 8 hours. Revise the current scope without reusing retired acceptance identity.",
       "expected_output": "A REPLAN-mode scope revision that preserves AC-001, retires AC-002, assigns a new previously unused AC-NNN identifier to the materially replaced 8-hour persistence condition, records AC-002 in the retired-identifier section, and leaves unrelated scope unchanged.",
       "files": [],
       "assertions": [
@@ -75,7 +75,7 @@
     },
     {
       "id": 6,
-      "prompt": "Continue the active recovery as Scoper. ProjectMode is BROWNFIELD, WorkflowState is SCOPING, Active Work.Scope points to docs/scope/report-export.md, valid active-cycle project context exists, and the active recovery frame is Owner=SCOPING, FailureType=SCOPING, ResumeAt=DEVELOPING, RerunThrough=NONE. The current scope has AC-001: users can export a report as CSV and AC-002: the exported filename includes the report date. A completed Architect artifact accounts for AC-001 and AC-002. The user has removed only the filename requirement; that removal does not change any technical architecture decision. Revise the scope and preserve traceability.",
+      "prompt": "Continue the active recovery as Scoper. ProjectMode is BROWNFIELD, CycleMode is STANDARD, WorkflowState is SCOPING, Active Work.Scope points to docs/scope/report-export.md, valid active-cycle project context exists, and the active recovery frame is Owner=SCOPING, FailureType=SCOPING, ResumeAt=DEVELOPING, RerunThrough=NONE. The current scope has AC-001: users can export a report as CSV and AC-002: the exported filename includes the report date. A completed Architect artifact accounts for AC-001 and AC-002. The user has removed only the filename requirement; that removal does not change any technical architecture decision. Revise the scope and preserve traceability.",
       "expected_output": "A REPLAN-mode correction that preserves AC-001, retires AC-002, and still reruns Architect because the completed technical design's Acceptance Coverage is stale even though its underlying technical decisions remain valid, before resuming Developing.",
       "files": [],
       "assertions": [
@@ -89,7 +89,7 @@
     },
     {
       "id": 7,
-      "prompt": "Continue the active STANDARDS workflow as Scoper. ProjectMode is GREENFIELD, WorkflowState is SCOPING, Active Work.Scope is NONE, recovery is inactive, and the request is: add a command that exports an account backup archive, and ensure the project-facing operations guide documents how to restore that archive before sign-off. Do not choose implementation technology.",
+      "prompt": "Continue the active STANDARDS workflow as Scoper. ProjectMode is GREENFIELD, CycleMode is STANDARD, WorkflowState is SCOPING, Active Work.Scope is NONE, recovery is inactive, and the request is: add a command that exports an account backup archive, and ensure the project-facing operations guide documents how to restore that archive before sign-off. Do not choose implementation technology.",
       "expected_output": "A PLAN-mode scope that gives the export behavior and the later documentation outcome separate AC-NNN identifiers because they are independently verifiable and acquire evidence in different workflow phases, without deciding architecture or writing the documentation.",
       "files": [],
       "assertions": [
@@ -98,6 +98,19 @@
         "The response does not combine the implementation behavior and later documentation obligation into one acceptance condition whose evidence would resolve in different workflow phases",
         "The scope remains implementation-agnostic and does not write the operations guide on Documenter's behalf",
         "Normal success hands off SCOPING -> ARCHITECTING and provides the next-role Architect invocation required by the protocol"
+      ]
+    },
+    {
+      "id": 8,
+      "prompt": "Continue the active STANDARDS workflow as Scoper. ProjectMode is BROWNFIELD, CycleMode is STANDARD, WorkflowState is SCOPING, recovery is inactive, Active Work.Id is shareable-report-links, Active Work.Scope is NONE, Active Work.PromotionReason says the former EXPEDITED implementation review found that public share links require an unresolved access-policy decision, and Auditor-owned project context records the pre-cycle baseline while excluding the tentative expedited share-link code as Active-Cycle Non-Baseline Work labeled Cycle: shareable-report-links. The original Active Work.Request is to add shareable report links. Define scope without treating the tentative implementation or promotion wording as an already-approved product policy.",
+      "expected_output": "A PLAN-mode scope that uses the durable promotion context to recognize the unresolved access-policy question, does not launder tentative expedited code into requirements, and blocks for the user if the access policy materially changes scope before handing off to Architect.",
+      "files": [],
+      "assertions": [
+        "The response recognizes Active Work.PromotionReason as workflow context explaining why the cycle is now STANDARD even though Handoff.Kind may no longer be PROMOTE",
+        "It does not treat tentative expedited share-link behavior as established project baseline or approved scope",
+        "It does not copy the promotion reason verbatim into scope as if Reviewer owned product requirements",
+        "Because public versus authenticated/revocable access materially changes user-visible scope, it persists a blocking question and asks the user rather than silently choosing policy",
+        "It creates acceptance conditions only after the material scope ambiguity is resolved"
       ]
     }
   ]

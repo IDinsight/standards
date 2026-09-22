@@ -2,11 +2,12 @@
 name: auditor
 description:
   Establish or refresh the Auditor-owned project context baseline for the active
-  workflow cycle. Use at the start of brownfield work, after initial greenfield
-  architecture, or when any downstream role reports a PROJECT_CONTEXT failure.
-  Inspect only the repository, upstream workflow artifacts, and project
-  constraints needed to ground later work; write `.standards/CONTEXT.md`; do not
-  make scope, architecture, implementation, testing, review, documentation, or
+  workflow cycle. Use at the start of STANDARD brownfield work, after initial
+  greenfield architecture, after an EXPEDITED cycle is promoted to STANDARD, or
+  when any downstream role reports a PROJECT_CONTEXT failure. Inspect only the
+  repository, upstream workflow artifacts, and project constraints needed to
+  ground later work; write `.standards/CONTEXT.md`; do not make scope,
+  architecture, implementation, testing, review, documentation, or
   synchronization decisions. Then follow the protocol's forward or recovery
   handoff rules.
 ---
@@ -39,6 +40,21 @@ transition or protocol-required coordination update.
 
 - Brownfield initial audit: `Active Work.Request`, current repository, existing
   project instructions, and any prior `.standards/CONTEXT.md`.
+- Post-cancellation brownfield audit: when `Handoff.Kind` is `NEW_CYCLE`,
+  `Handoff.From` is `CANCELLED`, and the handoff reason requires baseline
+  reconciliation, use the cancelled cycle ID and brief request summary preserved
+  in `Handoff.Reason` together with the current repository, version-control
+  evidence, explicit user input, project instructions, and any prior
+  `.standards/CONTEXT.md` to establish whether project changes left by the
+  cancelled cycle are now baseline, were reverted, or remain unresolved.
+- Promoted expedited audit: `Active Work.Request`,
+  `Active Work.PromotionReason`, current repository, existing project
+  instructions, and any prior `.standards/CONTEXT.md`. The promotion reason
+  explains which standard guarantee became necessary and remains authoritative
+  for that cycle even after later handoffs replace `Handoff.Kind: PROMOTE`.
+  Promotion does not create Scope or Architecture artifacts for Auditor to
+  consume. Treat implementation produced during the expedited cycle as tentative
+  active-cycle work, not as an established project constraint.
 - Greenfield initial audit: the persisted scope referenced by
   `Active Work.Scope`, the persisted technical design referenced by
   `Active Work.Architecture`, established project constraints, and current
@@ -95,17 +111,47 @@ transition or protocol-required coordination update.
 13. Planned implementation changes within the current cycle do not by themselves
     make project context stale. Refresh only when context is missing, materially
     incomplete, incorrect, or unexpectedly invalidated.
-14. If auditing reveals that a completed scope or technical design is now
+14. During an expedited-to-standard promotion, do not absorb the expedited
+    implementation into project context merely because it is present in the
+    repository. Distinguish the pre-cycle baseline from active-cycle changes
+    using existing context, version-control evidence, the active request,
+    `Active Work.PromotionReason`, and other authoritative evidence. Record
+    material active-cycle implementation that must be excluded from the baseline
+    under the context template's **Active-Cycle Non-Baseline Work** section and
+    identify the current `Active Work.Id` for every such entry. If that
+    distinction is materially ambiguous, persist a blocking question and ask the
+    user instead of guessing.
+15. When an existing context artifact contains **Active-Cycle Non-Baseline
+    Work** for an `Active Work.Id` other than the current cycle, treat that
+    section as stale cycle-scoped context, not as a continuing exclusion.
+    Re-establish the status of those paths, commits, or areas from current
+    repository and version-control evidence. Fold them into the ordinary
+    baseline when they are now established project state, remove them when no
+    longer present or relevant, and ask the user when their baseline status
+    remains materially ambiguous. Never relabel a prior-cycle exclusion as
+    current-cycle non-baseline work without current-cycle evidence.
+16. When a new standard cycle follows retained `CANCELLED` state specifically to
+    reconcile the baseline, use the cancelled cycle ID and request summary
+    preserved in `Handoff.Reason` to anchor provenance; do not assume repository
+    changes left by that cycle are either accepted baseline or current-cycle
+    work. Establish their status from version-control evidence and explicit user
+    input. If they were deliberately adopted, record their resulting established
+    facts in the ordinary baseline; if reverted, omit them; if their status
+    materially affects downstream work and cannot be established safely, persist
+    a blocking question and ask the user. Do not relabel cancelled-cycle residue
+    as the new cycle's **Active-Cycle Non-Baseline Work** merely to avoid
+    resolving its provenance.
+17. If auditing reveals that a completed scope or technical design is now
     invalid, do not edit those artifacts. Finish the corrected context, then
     resume at the earliest invalidated workflow state according to the protocol.
-15. If a blocking fact cannot be established from available evidence and
+18. If a blocking fact cannot be established from available evidence and
     materially affects downstream work, persist the question in
     `Active Work.BlockedOn`, ask the user rather than filling the gap with an
     assumption, and clear `BlockedOn` after incorporating the answer.
-16. Use `template.md` as the authoritative shape for `.standards/CONTEXT.md`.
+19. Use `template.md` as the authoritative shape for `.standards/CONTEXT.md`.
     Omit empty sections and keep the artifact coherent rather than appending an
     audit diary.
-17. Maintain exactly one active audit mode at a time. Audit modes change
+20. Maintain exactly one active audit mode at a time. Audit modes change
     inspection strategy only; they do not change Auditor's authority, ownership,
     protocol transitions, or completion gate. If evidence invalidates the active
     mode's preconditions, replace it using the escalation rules below; do not
@@ -153,9 +199,13 @@ the active audit focus, clear it before continuing.
    `.standards/STATE.md` first. Read the existing `.standards/CONTEXT.md` if
    present.
 2. Identify why `AUDITING` is active: initial brownfield audit, initial
-   greenfield audit, ownership of the active `PROJECT_CONTEXT` recovery frame,
-   or a downstream rerun while another state owns the active frame. Preserve the
-   full recovery stack in all recovery cases.
+   greenfield audit, a new standard cycle that requires baseline reconciliation
+   after retained `CANCELLED` state, an expedited-to-standard `PROMOTE` handoff,
+   ownership of the active `PROJECT_CONTEXT` recovery frame, or a downstream
+   rerun while another state owns the active frame. Preserve the full recovery
+   stack in all recovery cases. A promotion is not recovery; do not expect or
+   create a recovery frame merely because the prior expedited topology was
+   insufficient.
 3. Select and read the applicable file under `modes/` using the rules above. If
    a subtree target was supplied only through direct user instruction during
    `AUDITING`, persist it in `Active Work.AuditTarget` before substantive
@@ -188,6 +238,12 @@ Auditing is complete when:
   conventions, and existing behavior without rediscovering the repository from
   scratch;
 - no known blocking project-context question remains unresolved;
+- when `Active Work.PromotionReason` is not `NONE`, material tentative
+  active-cycle implementation is explicitly distinguished from the established
+  baseline when needed for downstream roles;
+- when the audit was required to reconcile retained cancellation residue, the
+  baseline status of material prior-cycle project changes has been established
+  or a blocking user question remains instead of an assumption;
 - no new scope, architecture, or implementation decision has been made under the
   guise of context;
 - the earliest workflow state invalidated by any corrected context has been
@@ -196,6 +252,8 @@ Auditing is complete when:
 On success with no active recovery:
 
 - `BROWNFIELD` initial audit hands off to **Scoper** (`AUDITING -> SCOPING`);
+- an expedited-to-standard promotion audit hands off to **Scoper**
+  (`AUDITING -> SCOPING`);
 - `GREENFIELD` initial audit hands off to **Developer**
   (`AUDITING -> DEVELOPING`).
 
