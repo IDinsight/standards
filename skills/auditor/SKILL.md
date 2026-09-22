@@ -40,13 +40,13 @@ transition or protocol-required coordination update.
 
 - Brownfield initial audit: `Active Work.Request`, current repository, existing
   project instructions, and any prior `.standards/CONTEXT.md`.
-- Post-cancellation brownfield audit: when `Handoff.Kind` is `NEW_CYCLE`,
-  `Handoff.From` is `CANCELLED`, and the handoff reason requires baseline
-  reconciliation, use the cancelled cycle ID and brief request summary preserved
-  in `Handoff.Reason` together with the current repository, version-control
-  evidence, explicit user input, project instructions, and any prior
-  `.standards/CONTEXT.md` to establish whether project changes left by the
-  cancelled cycle are now baseline, were reverted, or remain unresolved.
+- Post-cancellation brownfield audit: when `Active Work.BaselineReconciliation`
+  is not `NONE`, use its persisted source cycle IDs and brief request summaries
+  together with the current repository, version-control evidence, explicit user
+  input, project instructions, and any prior `.standards/CONTEXT.md` to
+  establish whether project changes left by the cancelled cycles are now
+  baseline, were reverted, or remain unresolved. Do not depend on the latest
+  `Handoff` to preserve this obligation.
 - Promoted expedited audit: `Active Work.Request`,
   `Active Work.PromotionReason`, current repository, existing project
   instructions, and any prior `.standards/CONTEXT.md`. The promotion reason
@@ -130,17 +130,19 @@ transition or protocol-required coordination update.
     longer present or relevant, and ask the user when their baseline status
     remains materially ambiguous. Never relabel a prior-cycle exclusion as
     current-cycle non-baseline work without current-cycle evidence.
-16. When a new standard cycle follows retained `CANCELLED` state specifically to
-    reconcile the baseline, use the cancelled cycle ID and request summary
-    preserved in `Handoff.Reason` to anchor provenance; do not assume repository
-    changes left by that cycle are either accepted baseline or current-cycle
-    work. Establish their status from version-control evidence and explicit user
-    input. If they were deliberately adopted, record their resulting established
-    facts in the ordinary baseline; if reverted, omit them; if their status
-    materially affects downstream work and cannot be established safely, persist
-    a blocking question and ask the user. Do not relabel cancelled-cycle residue
-    as the new cycle's **Active-Cycle Non-Baseline Work** merely to avoid
-    resolving its provenance.
+16. When `Active Work.BaselineReconciliation` is not `NONE`, use every persisted
+    source cycle ID and request summary in that field to anchor provenance; do
+    not assume repository changes left by those cancelled cycles are either
+    accepted baseline or current-cycle work. Establish their status from
+    version-control evidence and explicit user input. If they were deliberately
+    adopted, record their resulting established facts in the ordinary baseline;
+    if reverted, omit them; if their status materially affects downstream work
+    and cannot be established safely, persist a blocking question and ask the
+    user. Do not relabel cancelled-cycle residue as the new cycle's
+    **Active-Cycle Non-Baseline Work** merely to avoid resolving its provenance.
+    Clear `Active Work.BaselineReconciliation` to `NONE` only after all listed
+    source-cycle residue has been reconciled sufficiently for downstream roles
+    to rely on the baseline.
 17. If auditing reveals that a completed scope or technical design is now
     invalid, do not edit those artifacts. Finish the corrected context, then
     resume at the earliest invalidated workflow state according to the protocol.
@@ -199,13 +201,13 @@ the active audit focus, clear it before continuing.
    `.standards/STATE.md` first. Read the existing `.standards/CONTEXT.md` if
    present.
 2. Identify why `AUDITING` is active: initial brownfield audit, initial
-   greenfield audit, a new standard cycle that requires baseline reconciliation
-   after retained `CANCELLED` state, an expedited-to-standard `PROMOTE` handoff,
-   ownership of the active `PROJECT_CONTEXT` recovery frame, or a downstream
-   rerun while another state owns the active frame. Preserve the full recovery
-   stack in all recovery cases. A promotion is not recovery; do not expect or
-   create a recovery frame merely because the prior expedited topology was
-   insufficient.
+   greenfield audit, a standard cycle with non-`NONE`
+   `Active Work.BaselineReconciliation`, an expedited-to-standard `PROMOTE`
+   handoff, ownership of the active `PROJECT_CONTEXT` recovery frame, or a
+   downstream rerun while another state owns the active frame. Preserve the full
+   recovery stack in all recovery cases. A promotion is not recovery; do not
+   expect or create a recovery frame merely because the prior expedited topology
+   was insufficient.
 3. Select and read the applicable file under `modes/` using the rules above. If
    a subtree target was supplied only through direct user instruction during
    `AUDITING`, persist it in `Active Work.AuditTarget` before substantive
@@ -219,12 +221,15 @@ the active audit focus, clear it before continuing.
    where possible; record a concise unknown only when it is non-blocking.
 7. Write or refresh `.standards/CONTEXT.md` using `template.md` as the
    authoritative artifact shape.
-8. Before leaving `AUDITING`, clear `Active Work.AuditTarget` when the targeted
-   audit is complete, abandoned, or no longer needs separate persistence. If the
-   audit exposes a new defect owned elsewhere, create the appropriate failure
-   handoff. Otherwise apply the normal forward handoff or
-   `.standards/PROTOCOL.md` **Recovery Mechanics**, as applicable, and persist
-   the resulting transition in `.standards/STATE.md`.
+8. Before leaving `AUDITING`, when `Active Work.BaselineReconciliation` is not
+   `NONE`, clear it only after every listed cancellation-residue source has been
+   reconciled into an established, reverted, or otherwise safely resolved
+   baseline status. Then clear `Active Work.AuditTarget` when the targeted audit
+   is complete, abandoned, or no longer needs separate persistence. If the audit
+   exposes a new defect owned elsewhere, create the appropriate failure handoff.
+   Otherwise apply the normal forward handoff or `.standards/PROTOCOL.md`
+   **Recovery Mechanics**, as applicable, and persist the resulting transition
+   in `.standards/STATE.md`.
 
 ## Completion Gate
 
@@ -241,9 +246,9 @@ Auditing is complete when:
 - when `Active Work.PromotionReason` is not `NONE`, material tentative
   active-cycle implementation is explicitly distinguished from the established
   baseline when needed for downstream roles;
-- when the audit was required to reconcile retained cancellation residue, the
-  baseline status of material prior-cycle project changes has been established
-  or a blocking user question remains instead of an assumption;
+- when `Active Work.BaselineReconciliation` was not `NONE`, every listed source
+  cycle's material residue has been reconciled and the field has been cleared to
+  `NONE`;
 - no new scope, architecture, or implementation decision has been made under the
   guise of context;
 - the earliest workflow state invalidated by any corrected context has been

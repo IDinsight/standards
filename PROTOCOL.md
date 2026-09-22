@@ -182,7 +182,8 @@ different state from chat history or from which artifacts happen to exist.
 
 `Id`: `add-user-search` `Request`: `Add user search by name and email.` `Scope`:
 `docs/scope/add-user-search.md` `Architecture`: `docs/specs/add-user-search.md`
-`PromotionReason`: `NONE` `AuditTarget`: `NONE` `BlockedOn`: `NONE`
+`PromotionReason`: `NONE` `BaselineReconciliation`: `NONE` `AuditTarget`: `NONE`
+`BlockedOn`: `NONE`
 
 ## Handoff
 
@@ -201,7 +202,12 @@ different state from chat history or from which artifacts happen to exist.
 ```
 
 `Active Work` identifies the current cycle independently of chat history. `Id`
-is a stable, user-readable identifier for the cycle. `Request` records the
+is a stable, user-readable identifier for the cycle. Assign a fresh identifier
+for every new cycle. Before assigning it, ensure it does not match any prior
+cycle identifier still referenced by persisted workflow state or Auditor-owned
+cycle-scoped context, including `BaselineReconciliation` and **Active-Cycle
+Non-Baseline Work**. Use a concise request-derived slug and add a uniqueness
+suffix when needed to avoid such collisions. `Request` records the
 requested change at enough fidelity for the initial role to understand the work.
 `Scope` and `Architecture` are repository-relative artifact paths. Use `NONE`
 before the owning role creates the artifact; Scoper and Architect must replace
@@ -211,8 +217,18 @@ to `STANDARD`; promotion sets it to the concise persisted reason the shorter
 topology became insufficient. Preserve it for the remainder of that active cycle
 so downstream roles do not depend on the latest handoff or chat history to know
 that promotion occurred. It is workflow context, not a new user requirement,
-scope decision, architecture decision, or project-baseline fact. `AuditTarget`
-records a transient repository-relative path or area label
+scope decision, architecture decision, or project-baseline fact.
+`BaselineReconciliation` is `NONE` unless unresolved project changes from one or
+more retained cancelled cycles must be reconciled before the current cycle may
+rely on the repository as established baseline. When set, it stores concise
+durable provenance for each unresolved source cycle using that cycle's unique
+`Id` and a brief `Request` summary. If multiple source cycles remain unresolved,
+preserve each source distinctly; do not overwrite an older source with a newer
+one. Preserve the field across handoffs, failures, user rework, recovery, and
+cancellation until Auditor establishes the baseline status
+of the referenced residue and clears the field. It is authoritative for this
+obligation; `Handoff.Reason` is not. `AuditTarget` records a transient
+repository-relative path or area label
 for an in-progress targeted audit only when that focus is not already
 recoverable from persisted active work, scope, architecture, or recovery
 context; otherwise use `NONE`. Auditor must persist an ad-hoc user-directed
@@ -261,8 +277,8 @@ State changes follow these rules:
 2. Before substantive work begins on an initialized brownfield cycle, an
    explicit user request may select `EXPEDITED` under **Cycle Modes**. Persist
    `CycleMode: EXPEDITED`, change `WorkflowState` to `DEVELOPING`, initialize
-   `Active Work` with `PromotionReason: NONE`, keep `Handoff.Kind: INITIAL`, and
-   record a concise reason for
+   `Active Work` with `PromotionReason: NONE` and `BaselineReconciliation: NONE`,
+   keep `Handoff.Kind: INITIAL`, and record a concise reason for
    the expedited entry. Otherwise the initialized cycle remains `STANDARD`.
 3. Before substantive work begins on an initialized cycle, record the user
    request in `Active Work`. Every legal state-changing handoff updates the
@@ -320,8 +336,8 @@ artifacts, not role-owned workflow artifacts. A role or user may change them
 only as required by a legal protocol transition or by a protocol-required
 coordination update such as initializing `Active Work`, recording an artifact
 path, selecting or promoting `CycleMode`, setting or clearing
-`PromotionReason`, setting or clearing `AuditTarget`, or setting or clearing
-`BlockedOn`.
+`PromotionReason`, setting, carrying, or clearing `BaselineReconciliation`,
+setting or clearing `AuditTarget`, or setting or clearing `BlockedOn`.
 `.standards/PROTOCOL.md` is framework-owned and may be changed only by
 installing or upgrading the framework, not by a workflow role.
 
@@ -808,7 +824,8 @@ the next-role invocation when the handoff rules require one.
   explicitly selected `STANDARD`, invoke Developer with the new bounded
   implementation request. Set `CycleMode: EXPEDITED`, set
   `WorkflowState: DEVELOPING`, initialize `Active Work` with
-  `PromotionReason: NONE`, keep `Handoff.Kind: INITIAL`, use `From: NONE` and
+  `PromotionReason: NONE` and `BaselineReconciliation: NONE`, keep
+  `Handoff.Kind: INITIAL`, use `From: NONE` and
   `FailureType: NONE`, record a concise expedited-entry reason, and keep recovery
   inactive. This selection is not available in `GREENFIELD`.
 
@@ -844,33 +861,35 @@ the next-role invocation when the handoff rules require one.
 - **Start a new cycle:** from `SIGNED_OFF` or a retained `CANCELLED` state,
   select the new `CycleMode`, record `Handoff.Kind: NEW_CYCLE`, set `Handoff.From`
   to the prior terminal state, use `FailureType: NONE`, record a concise reason
-  for starting the new cycle, initialize `Active Work.Id` and
-  `Active Work.Request` from the new request, reset `Scope`, `Architecture`,
+  for starting the new cycle, initialize a fresh non-colliding `Active Work.Id`
+  under the persisted-reference rule above and the new `Active Work.Request`,
+  reset `Scope`, `Architecture`,
   `PromotionReason`, `AuditTarget`, and `BlockedOn` to `NONE`, and clear
-  recovery. Before replacing `Active Work` from retained `CANCELLED`, preserve
-  the cancelled cycle's `Active Work.Id` and a brief summary of its `Request` in
-  `Handoff.Reason` whenever post-cancellation baseline reconciliation is
-  required. This handoff metadata is the durable provenance Auditor uses until
-  the reconciliation audit completes; do not rely on chat history to recover the
-  cancelled request. `STANDARD` is the default. A brownfield user may select `EXPEDITED`
-  explicitly or, when they have not explicitly selected `STANDARD`, by invoking
-  Developer as the entry role for a new bounded implementation request. However,
-  when the prior terminal state is retained `CANCELLED`, do not enter
-  `EXPEDITED` unless the user explicitly confirms that no project changes from
-  the cancelled cycle remain because no such changes were produced or they were
-  reverted. If the user wants to retain or adopt project changes from the
-  cancelled cycle, require `CycleMode: STANDARD` so Auditor can reconcile those
-  changes into the project baseline before later roles rely on them. Without the
-  required no-residue confirmation, require `CycleMode: STANDARD`, set
-  `WorkflowState: AUDITING`, and make `Handoff.Reason` identify the cancelled
-  cycle by its prior `Active Work.Id`, briefly summarize that cycle's request,
-  and state that baseline reconciliation after cancellation is required. For
-  other `STANDARD` starts, set the initial `WorkflowState` from `ProjectMode`; for
-  allowed `EXPEDITED` starts, require `ProjectMode: BROWNFIELD` and set
-  `WorkflowState: DEVELOPING`. The prior cycle is not reopened. A greenfield bootstrap
-  cancellation has no retained runtime and therefore requires a fresh installation
-  before future workflow work; that installation must select `ProjectMode` again from
-  the project's then-current state using the normal installation rules.
+  recovery. From `SIGNED_OFF`, initialize `BaselineReconciliation: NONE`. Before
+  replacing `Active Work` from retained `CANCELLED`, preserve any existing
+  non-`NONE` `BaselineReconciliation`; it remains unresolved until Auditor clears
+  it. If the user does not explicitly confirm that no project changes from the
+  just-cancelled cycle remain because no such changes were produced or they were
+  reverted, append that cancelled cycle's unique `Id` and a brief summary of its
+  `Request` to `BaselineReconciliation`. Do not store this durable provenance in
+  `Handoff.Reason`; the handoff remains only the latest-transition record.
+  `STANDARD` is the default. A brownfield user may select `EXPEDITED` explicitly
+  or, when they have not explicitly selected `STANDARD`, by invoking Developer as
+  the entry role for a new bounded implementation request. However, after
+  retained `CANCELLED`, `EXPEDITED` is allowed only when
+  `BaselineReconciliation` is `NONE` after applying the rules above. Any
+  unresolved reconciliation obligation, or any cancelled-cycle project changes
+  the user wants to retain or adopt, requires `CycleMode: STANDARD` and
+  `WorkflowState: AUDITING` so Auditor can reconcile the project baseline before
+  later roles rely on it. When reconciliation is required, state that fact
+  concisely in `Handoff.Reason` without duplicating the source-cycle provenance
+  stored in `BaselineReconciliation`. For other `STANDARD` starts, set the
+  initial `WorkflowState` from `ProjectMode`; for allowed `EXPEDITED` starts,
+  require `ProjectMode: BROWNFIELD` and set `WorkflowState: DEVELOPING`. The prior
+  cycle is not reopened. A greenfield bootstrap cancellation has no retained
+  runtime and therefore requires a fresh installation before future workflow
+  work; that installation must select `ProjectMode` again from the project's
+  then-current state using the normal installation rules.
 
 At `AWAITING_USER_SIGNOFF`, the available user actions are sign off, request
 rework, or cancel. For an `EXPEDITED` cycle, the user may also explicitly
@@ -1106,10 +1125,11 @@ Use these terms consistently across all skills:
   stack, preserving the defect owner, reason, interrupted `ResumeAt` state, and
   any `RerunThrough` boundary that must complete before execution returns there.
 - **active work**: the persisted identity, request, artifact references,
-  promotion reason when applicable, transient audit target when needed, and
-  blocking user question for the current active cycle; in a terminal state, the
-  retained block describes the just-completed or cancelled cycle for
-  traceability until `NEW_CYCLE` replaces it.
+  promotion reason when applicable, unresolved baseline-reconciliation
+  provenance when applicable, transient audit target when needed, and blocking
+  user question for the current active cycle; in a terminal state, the retained
+  block describes the just-completed or cancelled cycle for traceability until
+  `NEW_CYCLE` replaces it.
 
 Do not introduce alternate names for these concepts inside individual skills
 unless this protocol is updated first.

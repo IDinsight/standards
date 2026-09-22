@@ -10,10 +10,10 @@ Before performing workflow work:
    failure types, and shared terminology.
 2. Read `.standards/MODE.md` for the project's current `ProjectMode`.
 3. Read `.standards/STATE.md` for the branch's active `WorkflowState`,
-   `CycleMode`, `Active Work` (including any persisted `PromotionReason`), and
-   handoff/recovery context. If this is the first real request and `Active Work`
-   is `UNSET`, persist the request and any legal initial cycle-mode selection
-   before substantive workflow work.
+   `CycleMode`, `Active Work` (including any persisted `PromotionReason` or
+   `BaselineReconciliation`), and handoff/recovery context. If this is the first
+   real request and `Active Work` is `UNSET`, persist the request and any legal
+   initial cycle-mode selection before substantive workflow work.
 4. Read `.standards/CONTEXT.md` when it exists and the active role depends on
    project context. Initial greenfield Scoping/Architecture may run before it
    exists, but later reruns must not ignore an existing context file merely

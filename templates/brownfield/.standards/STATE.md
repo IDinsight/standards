@@ -5,7 +5,8 @@
 ## Active Work
 
 `Id`: `UNSET` `Request`: `UNSET` `Scope`: `NONE` `Architecture`: `NONE`
-`PromotionReason`: `NONE` `AuditTarget`: `NONE` `BlockedOn`: `NONE`
+`PromotionReason`: `NONE` `BaselineReconciliation`: `NONE` `AuditTarget`: `NONE`
+`BlockedOn`: `NONE`
 
 ## Handoff
 
