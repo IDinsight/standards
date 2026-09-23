@@ -35,9 +35,9 @@ constraint requires otherwise.
   consistent with established contracts.
 - Prefer deterministic behavior. Make ordering, time, randomness, locale, and
   concurrency assumptions explicit when they affect outcomes.
-- Verify the changed behavior with the repository's existing checks. Add
-  focused tests for new behavior, bug fixes, and important failure or boundary
-  cases when the project has a test layer for them. Do not weaken tests merely
-  to make a change pass.
+- Verify the changed behavior with the repository's existing checks. Add focused
+  tests for new behavior, bug fixes, and important failure or boundary cases
+  when the project has a test layer for them. Do not weaken tests merely to make
+  a change pass.
 - Use the repository's formatter, linter, type checker, build system, and
   generated-code workflow rather than creating competing tooling.
