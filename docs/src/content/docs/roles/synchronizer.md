@@ -1,20 +1,20 @@
 ---
 title: Synchronizer
-description: Reconcile completed work before user sign-off.
+description:
+  Check that finished code, docs, and records agree before user sign-off.
 sidebar:
   badge:
     text: WIP
     variant: caution
 ---
 
-:::caution[Work in progress] This role's implementation and detailed usage
-documentation are WIP. :::
+:::caution[Work in progress]
 
-Synchronizer owns reconciliation in `SYNCHRONIZING`. The workflow must not
-advance to user sign-off while a current acceptance condition lacks sufficient
-verification evidence or has an unresolved blocker.
+Implementation and detailed usage instructions are still in progress.
 
-The [protocol](../../reference/protocol/) defines the shared ownership and
-transition rules. This page will expand with inputs, outputs, invocation
-examples, and the role's completion procedure as the implementation is
-completed.
+:::
+
+Synchronizer checks that finished code, docs, and records agree in
+`SYNCHRONIZING`. The workflow must not advance to user sign-off while a current
+acceptance condition lacks sufficient verification evidence or has an unresolved
+blocker.

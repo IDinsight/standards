@@ -1,29 +1,29 @@
 ---
 title: Installation and Setup
 description:
-  Understand the installed runtime and client integration requirements.
+  Prepare the workflow files and connect the skills to your coding agent.
 ---
 
-This page describes the installation contract. A packaged installer command is
-not yet provided in this repository. Do not treat copying a single skill file as
-a complete installation: state, protocol, client controls, and ownership
-metadata must agree.
+This page describes what installation must set up. The repository does not yet
+provide an installer command. Copying one skill file is not enough: the workflow
+files, client settings, and record of installer changes must work together.
 
 ## Choose the initial project mode
 
-Use `GREENFIELD` when no meaningful project implementation exists that must be
-treated as an established baseline. Otherwise use `BROWNFIELD`.
+Use `GREENFIELD` when there is no substantial existing implementation to
+preserve. Otherwise use `BROWNFIELD`.
 
 Installation sets `CycleMode: STANDARD`. The selected project mode initializes
 `WorkflowState` at `SCOPING` or `AUDITING`, respectively. An existing README or
-planning artifact alone does not determine the project mode. See
+planning document alone does not determine the project mode. See
 [Project Modes](../../concepts/project-modes/).
 
-Before substantive work, an initialized brownfield cycle whose identifier and
-request are both `UNSET` may select `EXPEDITED` and enter `DEVELOPING`. Keep an
-`INITIAL` handoff with `From: NONE`, `FailureType: NONE`, and an expedited-entry
-reason; initialize active work with `PromotionReason: NONE` and empty recovery.
-See [cycle selection](../../concepts/project-modes/#choose-the-cycle-mode) for
+Before work begins, an initialized brownfield cycle whose ID and request are
+both `UNSET` may select `EXPEDITED` and enter `DEVELOPING`. Keep an `INITIAL`
+handoff with `From: NONE`, `FailureType: NONE`, and an expedited-entry reason;
+initialize active work with `PromotionReason: NONE`,
+`BaselineReconciliation: NONE`, and empty recovery. See
+[cycle selection](../../concepts/project-modes/#choose-the-cycle-mode) for
 explicit selection and Developer-entry rules. Greenfield supports standard only.
 
 ## Required installed files
@@ -41,15 +41,16 @@ project/
 ```
 
 `CONTEXT.md` is created by Auditor when an audit runs. Installation must not
-fabricate completed context, scope, or architecture artifacts.
+create context, scope, or design files that pretend those roles have completed
+their work.
 
 ## Client integration
 
 The managed block in `AGENTS.md` directs the agent to read the installed
 protocol and state. The Claude Code integration imports `AGENTS.md`.
 
-Workflow skills must remain explicitly invoked by the user. Codex adapters
-preserve `allow_implicit_invocation: false`; Claude Code settings use
+Users must explicitly run each workflow skill. Codex adapters preserve
+`allow_implicit_invocation: false`; Claude Code settings use
 `skillOverrides.<skill>: "user-invocable-only"`. Installation records only
 client-setting changes it actually owns in `INSTALLATION.json`.
 
@@ -60,8 +61,8 @@ may perform its work.
 ## Preserve the host project
 
 Installation must verify framework ownership before updating an existing runtime
-or skill package. It merges bounded integration blocks while preserving
-project-owned text, settings, workflow state, and artifacts. Conflicting
+or skill package. It updates marked integration sections while preserving
+project-owned text, settings, workflow state, and work files. Conflicting
 instructions or settings require user resolution.
 
 Reinstallation must not reset an active cycle, duplicate integration blocks, or
@@ -69,4 +70,4 @@ claim ownership of settings that already existed.
 
 The precise rules are in
 [Installed Runtime Contract](../../reference/protocol/#installed-runtime-contract).
-Use that contract to review any installation tooling before relying on it.
+Check installation tools against those rules before using them.

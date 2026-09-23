@@ -3,60 +3,47 @@ title: Revising Scope or Design
 description: Route an active change to the owner while preserving valid work.
 ---
 
-A new requirement during an active cycle is user-directed rework. A discovered
-defect normally uses a failure handoff. In an expedited cycle, either may
-instead require promotion when a skipped role or guarantee becomes necessary.
+A requested change uses `USER_REWORK`; a mistake found by an agent uses
+`FAILURE`. In expedited work, either may require promotion first.
 
 ## Identify what changed
 
-A changed outcome or acceptance meaning belongs to Scoper. An undefined or
-incorrect technical contract belongs to Architect. New evidence that invalidates
-the project baseline belongs to Auditor.
+- A changed outcome or requirement belongs to Scoper.
+- An unclear or incorrect design decision belongs to Architect.
+- Missing or wrong facts about the existing project belong to Auditor.
 
 For example, adding email search to a name-only search request changes scope.
-Correcting the encoding of an already-scoped search parameter may be an
-architecture issue.
+Deciding how a search parameter is encoded may require a design change.
 
 ## Check for expedited promotion first
 
-In `EXPEDITED`, bounded implementation rework routes to `DEVELOPING`. If the
-changed request needs Scoper, Architect, Auditor, or another skipped
-responsibility, update `Active Work.Request` when needed and
-[promote to STANDARD](../../concepts/states-and-handoffs/#promote-an-expedited-cycle).
-Do not route directly to the skipped role through `USER_REWORK` or `FAILURE`.
+In `EXPEDITED`, a clearly defined implementation change goes back to Developer.
+If it needs a skipped role, update `Active Work.Request` as needed and follow
+[the promotion steps](../../concepts/states-and-handoffs/#promote-an-expedited-cycle).
+Do not enter a skipped state through `USER_REWORK` or `FAILURE`.
 
-Promotion enters `AUDITING`, persists the promotion reason, and clears recovery.
-The explicit rework request authorizes a necessary promotion even at user
-sign-off; a second confirmation is not needed. Existing expedited implementation
-remains tentative; Auditor must distinguish it from the pre-cycle baseline. The
-standard sequence then establishes scope and design through their owners.
+A rework request that needs a skipped role already authorizes promotion,
+including at sign-off. The user does not need to confirm the same change again.
 
 ## Record and route a correction within the current workflow
 
-When promotion is not required, update `Active Work.Request` if needed and
-record `USER_REWORK` with the corresponding failure type. In `STANDARD`, route
-to the earliest invalidated owner; bounded expedited implementation rework goes
-to `DEVELOPING`. If state changes, push a recovery frame with the interrupted
-state as `ResumeAt`, preserving existing frames.
+For user-requested rework that does not need promotion, update
+`Active Work.Request` if the request changed, record `USER_REWORK` with its
+failure type, and return to the earliest role whose work must change. In
+expedited work, that is Developer. If the state changes, add a recovery frame
+with `ResumeAt` set to the interrupted state. Keep existing frames.
 
-The receiving agent can record that authorized transition, but the target role's
-work still requires explicit skill invocation and ownership of the new state.
+The next role's work still requires the user to run that skill in its assigned
+state. For an agent-discovered mistake, follow
+[Failure Recovery](../../concepts/recovery/).
 
 ## Preserve unaffected content
 
-Scoper uses REPLAN for an existing active-cycle scope. Keep acceptance
-identifiers whose meaning remains unchanged. Retire removed or replaced
-identifiers and assign new ones where appropriate.
+Scoper uses REPLAN to revise existing scope and follows the
+[acceptance-ID rules](../../concepts/acceptance-traceability/#replanning-preserves-history).
+Architect updates the design without changing the meaning of requirements.
 
-Architect revises affected design decisions without rewriting scope intent. A
-change to the current acceptance-identifier set requires reconciliation of
-completed downstream artifacts that must account for that full set.
-
-## Re-establish invalidated work
-
-The active frame owner determines which completed downstream gates must rerun.
-The workflow returns to the interrupted state only after those obligations have
-been satisfied. A small wording change and a changed system contract need not
-invalidate the same work.
-
-For exact stack behavior, see [Failure Recovery](../../concepts/recovery/).
+The role responsible for the correction decides which later steps must repeat.
+Follow the
+[recovery procedure](../../concepts/recovery/#correct-then-decide-what-to-repeat)
+to finish those steps and return to the interrupted work.

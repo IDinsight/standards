@@ -3,9 +3,9 @@ title: Scoper
 description: Define what must be built and what counts as done.
 ---
 
-Scoper turns a request into a bounded scope with observable acceptance
-conditions. It owns the outcome and acceptance meaning; material technical
-choices belong to Architect unless already established as constraints.
+Scoper turns a request into a clear description of what to build and how to
+check that it is done. It decides what the requirements mean. Architect makes
+the important technical choices unless existing constraints already settle them.
 
 ## When to use Scoper
 
@@ -14,16 +14,16 @@ audit, or when recovery or user rework requires a scope correction.
 
 ## Inputs and output
 
-Read the persisted request, explicit constraints, current scope when present,
-and relevant project context. Brownfield scoping requires active-cycle Auditor
-context. Initial greenfield scoping may precede the first context artifact.
+Read the saved request, constraints, existing scope, and relevant project
+context. In brownfield work, Auditor must have checked that context for the
+current cycle. Initial greenfield scoping can happen before the first audit.
 
-Persist the scope in the project's established location, or a change-specific
-file under `docs/scope/` when none exists. Record its repository-relative path
-in `Active Work.Scope`.
+Save the scope in the project's established location, or a change-specific file
+under `docs/scope/` when none exists. Record its repository-relative path in
+`Active Work.Scope`.
 
-The [scope template](../../reference/templates/scoper/) defines the artifact:
-goal, constraints, non-goals, work with acceptance conditions and dependencies,
+The [scope template](../../reference/templates/scoper/) covers: goal,
+constraints, non-goals, work with acceptance conditions and dependencies,
 retired acceptance identifiers when applicable, and non-blocking assumptions.
 
 ## Modes
@@ -31,9 +31,10 @@ retired acceptance identifiers when applicable, and non-blocking assumptions.
 **PLAN** creates the active cycle's first scope. A brownfield feature can use
 PLAN; this mode does not mean the whole project is greenfield.
 
-**REPLAN** reconciles an existing active-cycle scope with corrected context,
-recovery, or requested changes. Preserve valid intent and identifiers. Add new
-identifiers for new or materially replaced conditions, and retain retired ones.
+**REPLAN** updates the cycle's existing scope after a correction or changed
+request. Follow the
+[acceptance-ID rules](../../concepts/acceptance-traceability/#replanning-preserves-history)
+to keep valid requirements and their history.
 
 ## Example invocation
 
@@ -49,13 +50,13 @@ all prior context in the invocation.
 
 ## Completion and handoff
 
-Scoper completes when the persisted scope meets its template contract, every
-verifiable in-scope obligation is covered, acceptance identifiers are unique and
-stable, no blocking scope question remains, and the state points to the scope
-artifact.
+Scoper finishes when the saved scope meets its template requirements, covers
+every outcome that needs checking, and uses unique, stable acceptance IDs.
+Resolve any question preventing completion and record the scope path in state.
 
 Normal completion hands off to Architect. During recovery, the protocol's
-invalidation and resume rules determine the next transition.
+recovery rules determine what must repeat before work returns to the interrupted
+state.
 
 ## Boundaries
 

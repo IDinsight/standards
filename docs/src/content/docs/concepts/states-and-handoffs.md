@@ -4,8 +4,8 @@ description: Follow normal transitions and understand explicit invocation.
 ---
 
 `STATE.md` records one `WorkflowState` and one `CycleMode`. The state determines
-which role may perform role-owned work; the cycle mode determines its required
-workflow and gates. Neither invokes a role automatically.
+which role may do its work; cycle mode selects the required steps and checks.
+You still need to run each role explicitly.
 
 ## Standard forward paths
 
@@ -28,9 +28,9 @@ DEVELOPING → TESTING → REVIEWING_IMPLEMENTATION → DOCUMENTING
 → REVIEWING_FINAL → SYNCHRONIZING → AWAITING_USER_SIGNOFF
 ```
 
-Each forward transition requires the current completion gate to pass. Brownfield
-Architecture also requires valid active-cycle project context before handing off
-to Developer.
+Each role must pass its completion checks before handing off. In brownfield
+work, Architect also needs valid project context for the current cycle before
+handing off to Developer.
 
 ## Expedited forward path
 
@@ -40,20 +40,20 @@ A brownfield cycle with `CycleMode: EXPEDITED` follows:
 DEVELOPING → REVIEWING_IMPLEMENTATION → AWAITING_USER_SIGNOFF
 ```
 
-`Active Work.Request` is the bounded change contract. Scope and architecture
-paths remain `NONE`; their missing artifacts are intentional. Developer performs
-implementation self-checks, which do not count as Tester-owned verification.
-Sign-off becomes available after Developer and implementation Reviewer pass
-their applicable gates, recovery is empty, and no blocking user question
-remains. No Scoper-owned acceptance identifiers or skipped standard gates are
-required. See [cycle selection](../project-modes/#choose-the-cycle-mode).
+`Active Work.Request` defines the change. Scope and architecture paths stay
+`NONE` because those roles are skipped. Developer performs implementation
+self-checks, which do not count as Tester-owned verification. Sign-off becomes
+available after Developer and implementation Reviewer pass their required
+checks, recovery is empty, and no unanswered question prevents completion.
+Scoper's acceptance IDs and the checks from skipped steps are not required. See
+[cycle selection](../project-modes/#choose-the-cycle-mode).
 
 ## Promote an expedited cycle
 
-When safe completion requires any skipped responsibility, such as scope,
-architecture, authoritative context, formal verification, or documentation,
-promote the cycle instead of assigning that work to Developer or Reviewer.
-Promotion is one-way for the active cycle:
+When the change needs a skipped role to define requirements, design it, check
+project facts, verify behavior, or write documentation, promote the cycle
+instead of assigning that work to Developer or Reviewer. Promotion is one-way
+for the active cycle:
 
 1. Set `CycleMode: STANDARD` and `WorkflowState: AUDITING`.
 2. Record `Handoff.Kind: PROMOTE`, `From` as the interrupted state, and
@@ -65,22 +65,23 @@ Promotion is one-way for the active cycle:
 4. Clear recovery. Auditor starts the standard brownfield sequence, replacing
    any expedited resume path. All required standard gates must then pass.
 
-An active workflow role may promote when the expedited contract is insufficient.
-At the user-owned sign-off gate, promotion requires user authorization; a rework
-request requiring a skipped responsibility already supplies that authorization.
-Hand off to Auditor, whose work still requires explicit invocation.
+An active workflow role may promote when expedited checks are not enough. At
+sign-off, promotion requires user authorization; a rework request requiring a
+skipped responsibility already supplies that authorization. Hand off to Auditor,
+whose work still requires explicit invocation.
 
-Existing expedited implementation remains tentative, not an established design
-constraint. [Auditor](../../roles/auditor/#promotion-and-cancellation-audits)
-must distinguish it from the pre-cycle baseline and block if that distinction is
-materially ambiguous. See the
+Changes made during expedited work are still tentative. They must not dictate
+the design just because the code is already present.
+[Auditor](../../roles/auditor/#promotion-and-cancellation-audits) must separate
+those changes from what existed before the cycle, and ask the user if
+uncertainty about that distinction would affect later work. See the
 [full promotion contract](../../reference/protocol/#expedited-promotion).
 
 ## What a handoff records
 
 The latest handoff records its kind, originating state, failure type when
-applicable, and a concise reason. The active-work and recovery records are
-updated as required by the transition.
+applicable, and a concise reason. Update active work and recovery as required by
+that transition.
 
 A typical normal handoff to Architect includes an invocation such as:
 
@@ -89,8 +90,8 @@ $architect Continue the active workflow from `.standards/STATE.md`.
 ```
 
 For Claude Code, use `/architect`. A complete handoff directs the next role to
-read the relevant active work, project context, owned artifacts, and recovery
-record. Persisted artifacts carry the detail; the message need not duplicate it.
+read the relevant active work, project context, role outputs, and recovery
+record. Keep the detail in those files instead of repeating it in the message.
 
 ## Blocking questions and recovery
 
@@ -104,9 +105,8 @@ returns from recovery. Neither should be treated as an ordinary forward step.
 ## Terminal states
 
 `SIGNED_OFF` and `CANCELLED` mean there is no active cycle. New work starts a
-new cycle rather than reopening the previous one. Greenfield bootstrap
-cancellation instead removes the installed runtime under the protocol's reset
-rules.
+new cycle. Cancellation while still greenfield removes the framework
+installation; see [cancellation rules](../../guides/cancelling-and-new-cycles/).
 
 See [Human Decisions and Sign-off](../human-decisions/) and the
 [canonical transition rules](../../reference/protocol/#forward-transitions).

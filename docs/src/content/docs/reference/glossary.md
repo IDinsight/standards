@@ -3,82 +3,88 @@ title: Glossary
 description: Look up the shared language used throughout the framework.
 ---
 
-These explanations summarize the protocol's vocabulary. The
-[Canonical Terms](../protocol/#canonical-terms) section is authoritative.
+These are the main terms used in the docs. The
+[protocol](../protocol/#canonical-terms) defines their exact meaning.
 
 ## Active work
 
-The persisted identity, request, artifact references, promotion reason when
-applicable, transient audit target, and blocking question for one workflow
-cycle. A terminal state retains this record until a new cycle replaces it.
+The `Active Work` record in `STATE.md`: the cycle's ID, request, file paths,
+promotion reason, unresolved cancelled changes, audit target, and open question.
+[Runtime Files](../runtime-files/) explains how each field is used.
+
+## Baseline reconciliation
+
+Auditor's check of changes left by cancelled cycles: which are accepted parts of
+the project, which were reverted, and which still need a decision.
+`Active Work.BaselineReconciliation` keeps the IDs and request summaries until
+that check is complete.
 
 ## Completed scope
 
-A persisted scope that has passed Scoper's completion gate. This does not imply
-an additional user approval unless the project explicitly requires one.
+A saved scope that has passed Scoper's checks. A separate user approval is
+needed only if the project requires it.
 
 ## Scope-level acceptance condition
 
-An observable outcome owned by Scoper and identified by a stable `AC-NNN`
-reference within the active cycle.
+An outcome that can be checked to decide whether a requirement is met. Scoper
+writes it and gives it an `AC-NNN` ID.
 
 ## Acceptance identifier
 
-The reference reused by downstream design and evidence artifacts for the same
-scope-level condition. It is an identity, not an ordering guarantee.
+The ID used for the same acceptance condition in scope, design, and evidence. It
+identifies the condition, not its priority or execution order.
 
 ## Retired acceptance identifier
 
-An identifier whose condition was removed or materially replaced. It remains
-recorded in scope and cannot be reused within the active cycle. Retired
-identifiers are not current coverage obligations.
+An ID for a removed or replaced condition. Keep it in the record, but do not
+reuse it in that cycle or count it among the current requirements.
 
 ## Technical acceptance criterion
 
-A technical condition Architect derives from a scope-level acceptance condition
-and links to its existing acceptance identifier.
+A technical check Architect derives from a scope acceptance condition. It uses
+that condition's existing ID.
 
 ## Project context
 
-Auditor's grounded baseline of relevant project facts and constraints, stored in
-`.standards/CONTEXT.md`. Planned changes alone do not make the baseline stale.
+Auditor's record of the existing project in `.standards/CONTEXT.md`. Its
+established facts form the **baseline** that other roles use when planning a
+change.
 
 ## Completion gate
 
-The conditions that a role must satisfy before a forward handoff.
+The checks a role must pass before handing work to the next step.
 
 ## Forward handoff
 
-A transition to the next legal state after the current completion gate passes.
+Moving to the next workflow step after passing those checks.
 
 ## Failure handoff
 
-Routing a defect to the owner of the affected artifact or decision.
+Sending a problem to the role responsible for fixing it.
 
 ## Resume handoff
 
-The transition that completes a recovery frame by returning to `ResumeAt`, or
-another recovery-directed transition that is not an ordinary forward handoff.
+Returning to `ResumeAt` after a recovery frame is complete, or another recovery
+step outside the normal forward sequence.
 
 ## Cycle mode
 
-`CycleMode` selects `STANDARD` or `EXPEDITED` for one cycle. Standard follows
-the full workflow for the project mode; expedited is a bounded brownfield path
-through Developer, implementation Reviewer, and user sign-off.
+`STANDARD` selects the full workflow. `EXPEDITED` selects the shorter workflow
+for a small, clearly defined change to an existing project.
 
 ## Promotion
 
-The one-way `PROMOTE` transition from an active expedited cycle to `STANDARD` at
-`AUDITING` when a skipped responsibility is required. It preserves the cycle
-identity, persists `PromotionReason`, and clears expedited recovery.
+Switching an active expedited cycle to standard work through Auditor because a
+skipped role is needed. The cycle cannot switch back to expedited work. See
+[promotion steps](../../concepts/states-and-handoffs/#promote-an-expedited-cycle).
 
 ## Recovery frame
 
-One outstanding correction on the recovery stack. It preserves the owner,
-reason, interrupted state, resume target, and any downstream rerun boundary.
+A saved record of one correction: who must fix it, why, where to return, and
+which steps need repeating. See [Recovery](../../concepts/recovery/).
 
 ## Project mode and workflow state
 
-Project mode identifies the implementation baseline as greenfield or brownfield.
-Workflow state identifies the active phase. Skill modes select procedures within
-a role and do not replace either of these concepts.
+`ProjectMode` records whether the project has an established implementation.
+`WorkflowState` records the current step. A role's internal mode selects how it
+works within that step.

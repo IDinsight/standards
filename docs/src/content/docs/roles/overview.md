@@ -3,41 +3,35 @@ title: Role Overview
 description: Find the owner of each kind of work in the framework.
 ---
 
-The nine roles give S.T.A.N.D.A.R.D.S. its name. The acronym is not the
-execution order: the starting sequence depends on project mode and cycle mode.
+Each of the nine roles has a specific job. Their initials spell
+S.T.A.N.D.A.R.D.S.; the actual [work order](../../concepts/states-and-handoffs/)
+depends on the project and cycle mode.
 
-- [Scoper](../scoper/) defines outcomes, boundaries, and acceptance conditions.
-- [Tester](../tester/) verifies behavior and records acceptance evidence.
-- [Architect](../architect/) defines material technical decisions and contracts.
-- [Navigator](../navigator/) explains and investigates without mutation.
-- [Developer](../developer/) implements the technical design in standard work or
-  the bounded request in expedited work.
-- [Auditor](../auditor/) establishes the relevant project baseline.
-- [Reviewer](../reviewer/) evaluates implementation and final deliverables.
-- [Documenter](../documenter/) owns user- and project-facing documentation.
-- [Synchronizer](../synchronizer/) reconciles completed work before sign-off.
-
-Expedited cycles run only Developer and implementation Reviewer before user
-sign-off. Skipped roles retain their ownership; if needed, the cycle
-[promotes through Auditor](../../concepts/states-and-handoffs/#promote-an-expedited-cycle).
+- [Scoper](../scoper/) defines what to build and what counts as done.
+- [Tester](../tester/) checks behavior and records results.
+- [Architect](../architect/) makes the technical design decisions.
+- [Navigator](../navigator/) explains the project without changing it.
+- [Developer](../developer/) writes code from the design or expedited request.
+- [Auditor](../auditor/) records the facts about the existing project.
+- [Reviewer](../reviewer/) checks the implementation and final work.
+- [Documenter](../documenter/) writes and updates documentation.
+- [Synchronizer](../synchronizer/) checks that finished code, docs, and records
+  agree before sign-off.
 
 ## Choose a role by ownership
 
-An unclear outcome belongs to Scoper. An undefined interface belongs to
-Architect. Incorrect knowledge about the existing repository belongs to Auditor.
-Finding one of those issues while testing does not transfer ownership to Tester.
+The role responsible for a decision also handles corrections to it. For example,
+Scoper resolves unclear requirements; Architect resolves unclear interfaces. See
+[ownership](../../concepts/ownership/) for examples.
 
-Roles normally act only in their owning state. Reviewer owns two states, one for
-implementation review and another for final-deliverable review. Navigator sits
-outside the state machine and never changes it.
+Reviewer runs in two states: implementation review and final review. Navigator
+can run at any time but never changes the workflow state. Other roles act only
+in their assigned states.
 
 ## Invoke the next role explicitly
 
-A handoff tells you which role should act next and provides an invocation for
-your client. Use it after the state change has been persisted. The role must
-read the active work and artifacts rather than reconstructing the cycle from
-chat history.
+Use the command in the handoff to run the next role after the state change is
+saved. The role reads the saved request, files, and recovery records.
 
-See [Workflow States and Handoffs](../../concepts/states-and-handoffs/) for the
-actual execution paths. WIP badges identify role pages awaiting their full
-implementation and usage documentation.
+WIP badges mark roles whose implementation and detailed usage docs are still
+unfinished.

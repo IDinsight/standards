@@ -26,8 +26,9 @@ skills define role-specific behavior.
 - **Architect** defines consequential technical decisions and contracts.
 - **Navigator** provides read-only explanation, tracing, diagnosis, and project
   understanding outside the workflow state machine.
-- **Developer** implements the active change within established constraints and,
-  when present, the current technical design.
+- **Developer** turns the active contract into an approved atomic development
+  plan, then implements it within established constraints using Autonomous,
+  Stepwise, or Code With Me collaboration.
 - **Auditor** establishes and refreshes project context for the active workflow
   cycle.
 - **Reviewer** evaluates implementation and final deliverables at defined review

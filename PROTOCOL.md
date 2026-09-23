@@ -175,8 +175,8 @@ different state from chat history or artifact presence.
 
 `Id`: `add-user-search` `Request`: `Add user search by name and email.` `Scope`:
 `docs/scope/add-user-search.md` `Architecture`: `docs/specs/add-user-search.md`
-`PromotionReason`: `NONE` `BaselineReconciliation`: `NONE` `AuditTarget`: `NONE`
-`BlockedOn`: `NONE`
+`Development`: `docs/development/add-user-search.md` `PromotionReason`: `NONE`
+`BaselineReconciliation`: `NONE` `AuditTarget`: `NONE` `BlockedOn`: `NONE`
 
 ## Handoff
 
@@ -203,10 +203,12 @@ different state from chat history or artifact presence.
   concise request-derived slug plus a uniqueness suffix when needed.
 - `Request`: persisted user request at enough fidelity for the entry role to
   understand the work.
-- `Scope` and `Architecture`: repository-relative paths to the owning artifacts,
-  or `NONE` until created. Scoper and Architect must persist their artifact path
-  before their normal completion gate passes. In expedited work these fields
-  normally remain `NONE` unless the cycle is promoted.
+- `Scope`, `Architecture`, and `Development`: repository-relative paths to the
+  owning artifacts, or `NONE` until created. Scoper, Architect, and Developer
+  must persist their artifact path before their normal completion gate passes.
+  In expedited work `Scope` and `Architecture` normally remain `NONE` unless the
+  cycle is promoted; `Development` is still Developer-owned and is created before
+  implementation begins.
 - `PromotionReason`: durable reason an expedited cycle was promoted, otherwise
   `NONE`. Preserve it for the remainder of the cycle; it is workflow context,
   not a user requirement, scope decision, architecture decision, or baseline
@@ -675,8 +677,9 @@ Developer with a new bounded implementation request unless `STANDARD` was
 explicitly selected.
 
 Set `CycleMode: EXPEDITED`, `WorkflowState: DEVELOPING`, initialize `Active Work`
-with the new ID/request plus `PromotionReason: NONE` and
-`BaselineReconciliation: NONE`, keep `Handoff.Kind: INITIAL`, set `From: NONE`
+with the new ID/request plus `Scope: NONE`, `Architecture: NONE`,
+`Development: NONE`, `PromotionReason: NONE`, and `BaselineReconciliation: NONE`,
+keep `Handoff.Kind: INITIAL`, set `From: NONE`
 and `FailureType: NONE`, record a concise expedited-entry reason, and keep
 recovery inactive. This is unavailable in `GREENFIELD`.
 
@@ -728,8 +731,8 @@ From `SIGNED_OFF` or retained `CANCELLED`:
 1. Record `Handoff.Kind: NEW_CYCLE`, `Handoff.From` = prior terminal state,
    `FailureType: NONE`, and a concise reason.
 2. Create a fresh non-colliding `Active Work.Id` and persist the new `Request`.
-   Reset `Scope`, `Architecture`, `PromotionReason`, `AuditTarget`, and
-   `BlockedOn` to `NONE`; clear recovery.
+   Reset `Scope`, `Architecture`, `Development`, `PromotionReason`,
+   `AuditTarget`, and `BlockedOn` to `NONE`; clear recovery.
 3. From `SIGNED_OFF`, set `BaselineReconciliation: NONE`.
 4. From retained `CANCELLED`, carry any existing reconciliation obligation. If
    the user does not explicitly confirm that the just-cancelled cycle left no
@@ -887,6 +890,10 @@ Use these terms consistently across all skills:
   coverage or verification obligation.
 - **technical acceptance criteria**: Architect-derived technical conditions
   linked to scope-level acceptance identifiers.
+- **development plan**: Developer-owned persisted implementation plan for the
+  active cycle. It decomposes the active contract into stable `DEV-NNN` steps,
+  records collaboration mode and resumable progress, and never replaces scope,
+  architecture, Tester verification, review, or documentation.
 - **project context**: Auditor-owned baseline stored at `.standards/CONTEXT.md`.
   It may persist as evidence across cycles, but cycle-scoped non-baseline entries
   follow the lifecycle in **Persisted Workflow State**. Planned implementation
@@ -909,10 +916,10 @@ Use these terms consistently across all skills:
   is required.
 - **recovery frame**: one corrective obligation preserving owner, reason,
   interrupted `ResumeAt`, and any `RerunThrough` boundary.
-- **active work**: persisted cycle identity, request, artifact references,
-  promotion reason, baseline-reconciliation provenance, transient audit target,
-  and blocking question; in terminal states it describes the latest cycle until
-  `NEW_CYCLE` replaces it.
+- **active work**: persisted cycle identity, request, scope/architecture/
+  development artifact references, promotion reason, baseline-reconciliation
+  provenance, transient audit target, and blocking question; in terminal states
+  it describes the latest cycle until `NEW_CYCLE` replaces it.
 
 Do not introduce alternate names for these concepts inside individual skills
 unless this protocol is updated first.

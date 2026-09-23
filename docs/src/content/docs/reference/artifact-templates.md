@@ -1,31 +1,21 @@
 ---
 title: Artifact Templates
-description:
-  Use the authoritative shapes for scope, design, and project context.
+description: Use the required templates for scope, design, and project context.
 ---
 
-Each implemented role has an authoritative template describing both the artifact
-shape and its authoring rules. These reference pages are generated from the
-repository's template files during docs development and builds.
+Each implemented role has a template defining the file it produces. The site
+copies these templates from the repository during development and builds.
 
-- [Scope template](../templates/scoper/): outcomes, boundaries, acceptance
-  conditions, dependencies, and retired identifiers.
-- [Architecture template](../templates/architect/): decisions, acceptance
-  coverage, contracts, technical criteria, and implementation sequence.
-- [Project context template](../templates/auditor/): grounded baseline,
-  commands, constraints, unknowns, and evidence.
+- [Scope](../templates/scoper/): requirements, acceptance conditions,
+  dependencies, and retired IDs.
+- [Architecture](../templates/architect/): design decisions, interfaces, how the
+  design meets each requirement, and build order.
+- [Project context](../templates/auditor/): existing behavior, tools, commands,
+  constraints, unknowns, and supporting evidence.
 
-## Use the contract, not every heading
+Omit empty sections. Add enough detail to meet the template's requirements and
+resolve important questions; a small change can have a short document.
 
-Omit empty sections and add detail only when it resolves material ambiguity. The
-template is not a requirement to produce a long document. A small change can
-have a concise scope and design while still meeting all completion conditions.
-
-## Keep artifact ownership clear
-
-Scoper owns acceptance meaning and identifiers. Architect references those
-identifiers when recording coverage. Auditor records established project facts
-and does not turn proposed design into baseline requirements.
-
-Workflow state stores artifact paths; it should not accumulate copies of their
-content or acceptance evidence.
+Save file paths in `STATE.md`. Keep the documents themselves at those paths,
+without copying their contents into the state record. See
+[ownership](../../concepts/ownership/) for who may change each document.

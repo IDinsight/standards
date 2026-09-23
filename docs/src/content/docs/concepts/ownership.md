@@ -1,48 +1,40 @@
 ---
 title: Roles and Artifact Ownership
-description: Understand which role may change each decision or artifact.
+description: Understand which role may change each decision or file.
 ---
 
-Ownership answers a specific question: **who may correct this artifact or change
-this decision?** The role that finds a problem is not automatically the role
-that fixes it.
+Each role is responsible for specific decisions and files. Finding a problem
+does not give a role permission to fix another role's work.
 
 ## Three distinct records
 
-- **Scope** records what must be built and what counts as done. Scoper owns it.
-- **Technical design** records material implementation decisions. Architect owns
-  it.
-- **Project context** records the relevant existing baseline. Auditor owns it.
+- **Scope:** what to build and what counts as done. Scoper owns it.
+- **Technical design:** how to build it. Architect owns it.
+- **Project context:** what already exists and what the change must respect.
+  Auditor owns it. These established facts are the project's **baseline**.
 
-A proposed architecture does not become an established project constraint just
-because it is mentioned in the context file. Context must distinguish current
-repository facts from planned changes.
+A proposed design is still a proposal, even if it appears in the context file.
+Keep existing facts separate from planned changes.
 
 ## Coordination has its own rules
 
-`MODE.md` and `STATE.md` are protocol-owned coordination artifacts. Roles may
-update them only for legal transitions or required bookkeeping, such as
-recording an artifact path or a blocking question.
-
-The installed `PROTOCOL.md` is framework-owned. Workflow roles do not edit it to
-make a difficult transition legal.
+Roles may update `MODE.md` and `STATE.md` only as the protocol requires, such as
+to change state, save a file path, or record an unanswered question. They cannot
+edit the installed `PROTOCOL.md` to change those rules.
 
 ## Finding a problem outside your role
 
-Suppose Tester discovers that the design never specified retry behavior. That is
-an `ARCHITECTURE` failure. Architect must resolve the contract; Tester should
-not silently choose the intended behavior in a test.
+Suppose Tester finds that the design never specified retry behavior. That is an
+`ARCHITECTURE` failure: Architect must decide the behavior. Tester must not
+choose it by writing a test.
 
-Conversely, a test that incorrectly checks an already-defined contract is a
-`VERIFICATION` failure. Its owner is Tester.
+If the design already specifies retries and the test checks the wrong behavior,
+that is a `VERIFICATION` failure for Tester to fix.
 
-[Failure Recovery](../recovery/) explains how the workflow returns to the
-interrupted work after correction.
+[Failure Recovery](../recovery/) explains how to return work to the right role.
+See the [role overview](../../roles/overview/) for all responsibilities.
 
 ## Navigator is different
 
-Navigator explains and investigates without modifying artifacts or workflow
-state. It may be invoked at any point, but it cannot repair a defect or advance
-the workflow under the guise of explanation.
-
-See the [role overview](../../roles/overview/) for the full ownership map.
+Navigator explains and investigates at any point in the workflow. It never
+changes project files or workflow state.

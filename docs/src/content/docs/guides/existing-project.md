@@ -1,57 +1,44 @@
 ---
 title: Working on an Existing Project
-description: Ground a change in the implementation that already exists.
+description: Plan a change around the code and behavior already in place.
 ---
 
-Use the brownfield path when the project already has meaningful implementation.
-Installation starts the workflow in `AUDITING` so scope and design can respect
-existing behavior and constraints.
+Use this guide when the project already has code the change must work with.
 
 ## Choose standard or expedited work
 
-Installation defaults to `CycleMode: STANDARD`. Follow the audit, scope, and
-design steps below for that workflow.
+The default is `STANDARD`, starting with Auditor. Follow the steps below for
+that workflow.
 
-For a bounded hotfix, debugging change, or low-risk maintenance task needing no
-skipped role, select `EXPEDITED` under the
-[cycle-selection rules](../../concepts/project-modes/#choose-the-cycle-mode). An
-eligible initialized cycle enters `DEVELOPING` with an `INITIAL` handoff; a new
-cycle from a terminal state uses `NEW_CYCLE`. After cancellation, apply
-[baseline reconciliation](../cancelling-and-new-cycles/#start-the-next-cycle)
-before choosing expedited entry.
-
-Persist a stable identifier and the bounded request. Developer implements that
-request and performs its normal self-checks, then hands off to implementation
-Reviewer and, once the applicable gates pass, user sign-off. Scope and
-architecture remain `NONE`. If any skipped responsibility becomes necessary,
-[promote through Auditor](../../concepts/states-and-handoffs/#promote-an-expedited-cycle).
+For a small, clearly defined fix that needs no skipped role, use the
+[expedited path](../../concepts/states-and-handoffs/#expedited-forward-path).
+Check
+[when expedited entry is allowed](../../concepts/project-modes/#choose-the-cycle-mode),
+especially after cancellation. Expedited work follows its own shorter sequence.
 
 ## Give Auditor a concrete request
 
-Record the requested outcome and stable cycle identifier. Explicitly invoke
-Auditor in the active `AUDITING` state. Its inspection should be proportional to
-the request, with enough project-wide context to avoid local contradictions.
+Save the requested change and a
+[new cycle ID](../../reference/runtime-files/#cycle-identity). Run Auditor in
+`AUDITING`. It checks the existing code, behavior, and project rules needed to
+understand the change.
 
-Without a usable context baseline, use whole-repo mode. With one, gapfill or
-subtree may be appropriate. Auditor selects the procedure from the evidence; a
-narrow target does not justify skipping a missing project baseline.
+Auditor chooses an [inspection mode](../../roles/auditor/#modes) based on how
+much reliable project context already exists.
 
 ## Scope the change against the baseline
 
-After the audit, invoke Scoper. Define what changes, what must remain
-compatible, and the observable acceptance conditions. Existing architecture may
-impose a constraint; an unapproved proposed design does not become a scope
-requirement.
+After the audit, run Scoper. Define what changes, what must keep working, and
+how to check the result. Existing design decisions can constrain the work; a
+proposed design does not become a requirement just because someone has written
+it down.
 
 ## Design and implement
 
-Architect defines material decisions and acceptance coverage. Valid active-cycle
-context allows the normal handoff directly to Developer; a second audit is not
-automatically required simply because implementation will change the codebase.
+Architect makes the design decisions needed to meet the requirements. With valid
+context for this cycle, it hands off directly to Developer. Planning code
+changes does not by itself require a second audit.
 
-If the baseline is materially wrong or incomplete, route to Auditor before
-continuing dependent work. Planned changes alone are not a context failure.
-
-See [Auditor](../../roles/auditor/) for inspection modes and
-[Acceptance Traceability](../../concepts/acceptance-traceability/) for evidence
-rules.
+If important project facts are missing or wrong, return to Auditor before using
+those facts in further work. Then follow the
+[remaining standard steps](../../concepts/states-and-handoffs/#standard-forward-paths).

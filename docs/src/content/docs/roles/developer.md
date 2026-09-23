@@ -1,25 +1,23 @@
 ---
 title: Developer
-description: Implement the standard design or bounded expedited request.
+description: Build the agreed design or a small expedited change.
 sidebar:
   badge:
     text: WIP
     variant: caution
 ---
 
-:::caution[Work in progress] This role's implementation and detailed usage
-documentation are WIP. :::
+:::caution[Work in progress]
 
-Developer owns implementation in `DEVELOPING`. During initial greenfield work,
-its first successful material implementation change permanently changes the
-project mode to `BROWNFIELD`.
+Implementation and detailed usage instructions are still in progress.
 
-In `EXPEDITED`, Developer implements the bounded `Active Work.Request` and
-performs implementation self-checks; these do not become Tester-owned formal
-verification. A need for any skipped responsibility requires promotion to
-`STANDARD` through Auditor, not an expansion of Developer's ownership.
+:::
 
-The [protocol](../../reference/protocol/) defines the shared ownership and
-transition rules. This page will expand with inputs, outputs, invocation
-examples, and the role's completion procedure as the implementation is
-completed.
+Developer owns implementation in `DEVELOPING`. After it first creates or makes a
+significant change to project implementation, it permanently changes the project
+mode from `GREENFIELD` to `BROWNFIELD`.
+
+In `EXPEDITED`, Developer implements the change defined by `Active Work.Request`
+and performs implementation self-checks; these do not become Tester-owned formal
+verification. If it needs a skipped role,
+[promote the cycle](../../concepts/states-and-handoffs/#promote-an-expedited-cycle).

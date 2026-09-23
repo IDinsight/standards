@@ -1,6 +1,6 @@
 ---
 title: Repository Structure
-description: Locate framework contracts, skills, templates, and website sources.
+description: Find the workflow rules, skills, templates, and website sources.
 ---
 
 The repository separates framework behavior from explanatory documentation.
@@ -29,7 +29,7 @@ standards/
 
 `PROTOCOL.md` defines shared states, ownership, transitions, and vocabulary.
 Each skill's `SKILL.md` defines role behavior. Its `modes/` directory contains
-mode-specific procedures, and `template.md` defines the owned artifact contract.
+procedures for each mode, and `template.md` defines the role's required output.
 
 The implemented skill directories also include Codex adapter metadata in
 `agents/openai.yaml` and evaluation cases in `evals/evals.json`.
@@ -50,5 +50,5 @@ Edit the repository originals, not the generated copies.
 ## Keep changes at the right layer
 
 Change shared behavior in the protocol before teaching a different rule in a
-role or guide. Update affected role contracts and examples together. A website
-page should not introduce a new state or redefine a completion gate.
+role or guide. Update affected role instructions and examples together. A
+website page should not introduce a new state or redefine a completion gate.

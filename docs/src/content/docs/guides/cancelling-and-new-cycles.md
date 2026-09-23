@@ -3,64 +3,76 @@ title: Cancelling or Starting a New Cycle
 description: Understand terminal cycles and the greenfield bootstrap reset.
 ---
 
-Cancellation ends the current workflow. Its effect depends on whether the
-project is still in greenfield bootstrap mode.
+Cancellation ends the current workflow. What happens next depends on whether the
+project is still greenfield.
 
 ## Cancel brownfield work
 
-An explicit cancellation transitions an active brownfield cycle to `CANCELLED`.
-The handoff records the interrupted state, preserves active work for
-traceability, and clears recovery. The runtime and project artifacts remain.
+Cancelling an active brownfield cycle sets its state to `CANCELLED`. Record the
+interrupted state in the handoff, keep active work, and clear recovery. The
+workflow files and project work remain.
 
 Cancellation does not revert repository changes or undo commits. Changes left
-behind are not automatically established project baseline.
+behind still need to be checked before treating them as part of the project.
 
 ## Cancel greenfield bootstrap
 
-If Developer has not yet produced a material implementation change and mode is
-still `GREENFIELD`, cancellation resets the framework installation rather than
-retaining a terminal runtime.
+While project mode is still `GREENFIELD`, cancellation removes the framework
+installation. This is a **bootstrap reset**.
 
-The reset removes framework-owned runtime and injected skill files, and removes
-bounded integration blocks while preserving project-owned content. Client
-settings are reverted only when installation metadata owns the setting and its
-current value still matches the recorded installed value.
+The reset removes workflow files, installed skills, and marked integration
+sections that belong to the framework. It preserves project-owned content. A
+client setting is reverted only if the installer changed it and its current
+value still matches the value the installer recorded.
 
-Project files and role-owned artifacts outside the runtime remain. Reverting
-those is a separate user decision. The exact preservation rules are in
+Project files and role outputs outside `.standards/` remain. Reverting those is
+a separate user decision. The exact preservation rules are in
 [Greenfield Bootstrap Cancellation](../../reference/protocol/#greenfield-bootstrap-cancellation).
 
 ## Start the next cycle
 
-From `SIGNED_OFF` or a retained `CANCELLED` state, select the new `CycleMode`.
-`STANDARD` is the default; bounded brownfield work may select `EXPEDITED` under
+From `SIGNED_OFF` or a saved `CANCELLED` state, select the new `CycleMode`.
+`STANDARD` is the default; small brownfield changes may select `EXPEDITED` under
 [the cycle-selection rules](../../concepts/project-modes/#choose-the-cycle-mode),
 subject to the cancellation restriction below.
 
-After `CANCELLED`, expedited entry requires explicit user confirmation that no
-project changes from the cancelled cycle remain, because none were produced or
-they were reverted. If changes remain, the user wants to retain them, or that
-confirmation is absent, start `STANDARD` at `AUDITING` for baseline
-reconciliation. Before replacing the old active work, preserve its identifier
-and a brief request summary in `Handoff.Reason`, and state that reconciliation
-after cancellation is required. Auditor uses this provenance to establish
-whether the old changes are accepted baseline, reverted, or unresolved; it must
-block rather than silently adopt unresolved changes.
+Before replacing active work after `CANCELLED`, carry forward any existing
+`Active Work.BaselineReconciliation`. Unless the user explicitly confirms that
+the just-cancelled cycle left no project changes because none were produced or
+they were reverted, append that cycle's unique identifier and brief request
+summary. Preserve each unresolved source separately, including older cancelled
+cycles; confirmation about the latest cycle does not clear older obligations.
+
+Expedited entry is allowed only when `BaselineReconciliation` is `NONE` after
+these steps. Any unresolved reconciliation, or cancelled changes the user wants
+to retain or adopt, requires `STANDARD` at `AUDITING`. Auditor determines
+whether each source's changes are accepted baseline, reverted, or unresolved,
+and blocks rather than silently adopting unresolved changes. Only Auditor clears
+the field after all listed sources are reconciled.
+
+For example, if cycle A leaves changes and cycle B is cancelled before
+reconciling them, cycle C must keep A's ID and request in the list even if B
+produced no changes.
 
 Initialize the new cycle explicitly:
 
-- Set a new `Active Work.Id` and `Active Work.Request`.
+- Set a fresh `Active Work.Id` and the new `Active Work.Request`. Follow the
+  [cycle ID rules](../../reference/runtime-files/#cycle-identity).
 - Reset `Scope`, `Architecture`, `PromotionReason`, `AuditTarget`, and
   `BlockedOn` to `NONE`, and clear recovery.
+- From `SIGNED_OFF`, initialize `BaselineReconciliation: NONE`. From
+  `CANCELLED`, preserve and extend it under the rules above instead of resetting
+  it with the other cycle fields.
 - Record `Handoff.Kind: NEW_CYCLE`, `From` as the prior terminal state, and
-  `FailureType: NONE`. Give a concise reason, including cancellation provenance
-  whenever reconciliation is required.
+  `FailureType: NONE`. Mention required reconciliation concisely in the reason;
+  keep the cancelled cycles' IDs and requests in `BaselineReconciliation`.
 - For `STANDARD`, enter `SCOPING` in greenfield or `AUDITING` in brownfield. An
   allowed brownfield `EXPEDITED` cycle enters `DEVELOPING`.
 
-The prior cycle is not reopened. Any old cycle's context exclusions are stale
-and must be reconciled on the next audit, not copied into the new cycle as
-current exclusions.
+The prior cycle stays closed. Auditor must recheck any old **Active-Cycle
+Non-Baseline Work** entries against current evidence before using them in the
+new cycle. See
+[Auditor's procedure](../../roles/auditor/#promotion-and-cancellation-audits).
 
 After a greenfield bootstrap reset, reinstall first and choose the mode again
 from the project's actual state. Do not assume that the old mode still applies.

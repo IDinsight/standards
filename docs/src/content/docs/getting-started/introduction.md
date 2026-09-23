@@ -3,55 +3,49 @@ title: Introduction
 description: Understand the purpose and boundaries of the framework.
 ---
 
-S.T.A.N.D.A.R.D.S. is a workflow for collaborating with coding agents across
-applications, libraries, services, infrastructure, and other software projects.
-It separates decisions that are easy to blur together: what to build, how to
-build it, what already exists, and whether the result meets the request.
+S.T.A.N.D.A.R.D.S. separates the main jobs in a software change: deciding what
+to build, designing it, writing code, and checking the result.
 
 ## How work is organized
 
-A **role** owns decisions and artifacts. A **workflow state** identifies the
-work currently allowed. A **completion gate** determines when that work can move
-on. For example, Scoper owns the scope artifact and acts in `SCOPING`. Architect
-acts in `ARCHITECTING` and owns the technical design.
+A **role** is responsible for a kind of work. Scoper defines the requirements;
+Architect decides how to meet them. A **workflow state**, such as `SCOPING`,
+records which role may work now.
 
-You invoke roles explicitly. A handoff records the next state and provides an
-invocation for the next role; it does not silently start that skill.
+Each role has checks it must pass before moving on. The protocol calls these a
+**completion gate**. A **handoff** records the next state and gives you a
+command to run the next role. You run that command yourself.
 
-## What persists
+A **cycle** is one request, from its start to your sign-off or cancellation.
+[Cycle mode](../../concepts/project-modes/#choose-the-cycle-mode) selects the
+full `STANDARD` workflow or the shorter `EXPEDITED` workflow for that request.
 
-The installed `.standards/` directory contains the protocol, project mode,
-workflow state and cycle mode, installation metadata, and project context once
-Auditor creates it. Scope and architecture live in separate project artifacts,
-referenced from `STATE.md`.
+## What the project saves
 
-This separates the record of **where work stands** from the artifacts that
-explain **what the work means**. Chat history can help, but it cannot substitute
-for those records.
+The `.standards/` directory stores the protocol, current mode and state,
+installation records, and Auditor's notes on the existing project. Other files
+hold the scope, design, and results. The protocol calls these saved outputs
+**artifacts**.
+
+`STATE.md` records the scope and design paths and what should happen next. To
+continue in a new session, [read those records](../../guides/resuming-work/)
+rather than relying on chat history.
 
 ## What completion means
 
-In a `STANDARD` cycle, each scope acceptance condition has a stable `AC-NNN`
-identifier. Downstream roles preserve that identity when recording design
-coverage and evidence. The workflow reaches `AWAITING_USER_SIGNOFF` only after
-every current condition has sufficient evidence and no unresolved blocker.
+Standard work must pass all required role checks and provide evidence that each
+requirement is met. Expedited work has fewer steps and checks. It moves to the
+full workflow if it needs a skipped role.
 
-A bounded brownfield `EXPEDITED` cycle instead uses the persisted request as its
-contract and runs Developer followed by implementation Reviewer. It may reach
-sign-off when those gates pass, recovery is empty, and no blocking question
-remains. Skipped roles and their guarantees are absent; needing one requires
-promotion to the standard workflow through Auditor.
-
-User sign-off completes the cycle. It is separate from a role passing its own
-completion gate.
+[Workflow States and Handoffs](../../concepts/states-and-handoffs/) lists both
+paths and their completion rules. Passing a role's checks does not finish the
+cycle: you make the final [sign-off decision](../../concepts/human-decisions/).
 
 ## Choose your starting point
 
-- [New project](../../guides/new-project/): establish scope and design before
-  the first scheduled audit.
-- [Existing project](../../guides/existing-project/): choose standard work or a
-  bounded expedited cycle.
-- [Role overview](../../roles/overview/): find who owns a particular decision.
-
-See [Installation and Setup](../installation/) for the required runtime before
-invoking workflow skills.
+- [Installation and setup](../installation/): prepare the project files and
+  skills.
+- [New project](../../guides/new-project/): plan and design before writing code.
+- [Existing project](../../guides/existing-project/): choose standard or
+  expedited work.
+- [Role overview](../../roles/overview/): find who handles each kind of work.

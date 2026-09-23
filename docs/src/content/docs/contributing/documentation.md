@@ -1,12 +1,11 @@
 ---
 title: Writing and Checking Documentation
-description:
-  Maintain clear pages, working navigation, and authoritative references.
+description: Write clear pages and check their navigation and links.
 ---
 
 Write for someone trying to use the framework. Concepts explain its behavior,
 guides address tasks, role pages explain ownership and invocation, and reference
-pages provide exact contracts.
+pages provide the exact rules and templates.
 
 ## Add a page
 
@@ -34,14 +33,14 @@ For an implemented role, cover purpose, when to use it, inputs and output,
 available modes, invocation examples, completion and handoff, and boundaries.
 Keep mode details on the role page until they justify separate guides.
 
-For an unfinished role, retain its short protocol-grounded purpose, WIP notice,
-and sidebar badge. Replace those with validated usage guidance when the role is
-ready. Do not add a separate project-status section.
+For an unfinished role, retain its short description based on the protocol, WIP
+notice, and sidebar badge. Replace those with validated usage guidance when the
+role is ready. Do not add a separate project-status section.
 
 ## Preserve authoritative sources
 
-Edit `PROTOCOL.md` or a skill's `template.md` when changing the exact contract.
-Then run:
+Edit `PROTOCOL.md` or a skill's `template.md` when changing the rules or
+required output. Then run:
 
 ```sh
 pnpm --dir docs run sync-reference

@@ -1,68 +1,69 @@
 ---
 title: Failure Recovery
 description:
-  Understand defect ownership, recovery frames, and downstream reruns.
+  Fix a problem, repeat affected steps, and return to interrupted work.
 ---
 
-Recovery preserves unfinished obligations when work must return to an earlier
-owner. It records both **what needs correction** and **where work should
-resume**.
+Recovery records what needs fixing and where work should return afterward. It
+lets an earlier role correct a problem without losing track of unfinished work.
 
 ## Follow the active cycle mode
 
-Recovery stays within the active cycle's workflow. In `EXPEDITED`, direct
-failure routing is limited to `IMPLEMENTATION` → `DEVELOPING` and implementation
-`REVIEW` → `REVIEWING_IMPLEMENTATION`. If correction requires a skipped role or
-guarantee,
-[promote the cycle](../states-and-handoffs/#promote-an-expedited-cycle) to
-`STANDARD` through Auditor. Promotion clears expedited recovery instead of
-pushing a frame or preserving its resume path.
+In `EXPEDITED`, a failure can go directly only to Developer for `IMPLEMENTATION`
+or to implementation Reviewer for `REVIEW`. If a skipped role is needed,
+[promote the cycle](../states-and-handoffs/#promote-an-expedited-cycle).
+Promotion clears expedited recovery and starts standard work through Auditor.
 
 ## Route by the defective artifact
 
-Standard-cycle examples include a `SCOPING` failure for ambiguous acceptance
-conditions, an `ARCHITECTURE` failure for an undefined contract, and a
-`PROJECT_CONTEXT` failure for an incorrect baseline. Review failures must
-identify the affected review kind.
+In standard work, send unclear requirements to Scoper (`SCOPING`), missing
+design decisions to Architect (`ARCHITECTURE`), and wrong project facts to
+Auditor (`PROJECT_CONTEXT`). A review failure must name which review is
+affected.
 
-A corrective transition to another state pushes a recovery frame. A same-state
-failure records the handoff but does not add a frame.
+A `FAILURE` or `USER_REWORK` handoff to a different state adds a **recovery
+frame**: a record of one correction. A correction within the same state records
+the handoff without adding a frame.
 
 ## Read the active frame
 
-Frames form a stack, ordered oldest to newest. The last frame is active. Its
-fields include the owner, defect reason, interrupted state (`ResumeAt`), and any
-downstream rerun boundary (`RerunThrough`).
+Frames form a stack. Work on the newest frame first, keeping older ones until
+their corrections are complete. The active frame records:
 
-A role owns that frame only when the current state equals its `Owner`. Running
-during recovery does not automatically make a role the corrective owner.
+- `Owner`: the state responsible for the fix.
+- `Reason`: what needs fixing.
+- `ResumeAt`: where work was interrupted and must return.
+- `RerunThrough`: the last step to repeat before returning, or `NONE`.
 
-## Correct, then establish what became stale
+Only the role in the frame's `Owner` state decides which completed work needs to
+be repeated. Other roles may run during recovery without owning the frame.
 
-After passing its own completion gate, the owner identifies completed downstream
-work invalidated by the correction. If no rerun is needed, it pops the frame and
-resumes directly. Otherwise it records the last required rerun state and hands
-off to the earliest required rerun.
+## Correct, then decide what to repeat
 
-Those roles use their normal gates while preserving the frame. At the boundary,
-the frame is popped and the workflow explicitly returns to `ResumeAt`.
+The owner fixes the problem and passes its completion checks. If no later work
+needs repeating, remove the frame and return to `ResumeAt`. Otherwise, set
+`RerunThrough` and start the first step that needs repeating.
+
+Those roles keep the frame while passing their usual checks. When `RerunThrough`
+finishes, remove the frame and return to `ResumeAt`. Use `RESUME` for that
+return and for other recovery steps that are not normal forward steps.
 
 ## Example: design defect found during testing
 
 ```text
-TESTING → ARCHITECTING    Push frame; resume target is TESTING.
-ARCHITECTING → DEVELOPING Set rerun boundary to DEVELOPING.
-DEVELOPING → TESTING      Pass the gate, pop frame, resume testing.
+TESTING → ARCHITECTING    Record the fix; ResumeAt is TESTING.
+ARCHITECTING → DEVELOPING Repeat implementation; RerunThrough is DEVELOPING.
+DEVELOPING → TESTING      Remove the frame and resume testing.
 ```
 
-This example assumes only implementation must be re-established before testing
-resumes. The actual invalidation decision depends on the correction.
+Here, only implementation needs repeating before testing resumes. Other fixes
+may require more steps.
 
 ## Nested failures remain separate
 
-If a new defect appears during recovery, push a new frame rather than replacing
-the old one. Complete the newest obligation first. Recovery ends only when the
-stack is empty.
+If another failure or user-requested change needs a different state during
+recovery, add a new frame. Finish it before returning to the older correction.
+Recovery ends when no frames remain.
 
-The full algorithm and additional examples are in
-[Recovery Mechanics](../../reference/protocol/#recovery-mechanics).
+See [Recovery Mechanics](../../reference/protocol/#recovery-mechanics) for the
+complete rules and more examples.

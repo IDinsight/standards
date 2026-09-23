@@ -3,41 +3,34 @@ title: Starting a New Project
 description: Follow the greenfield path from request to implementation baseline.
 ---
 
-Use this path when installation finds no meaningful implementation baseline. It
-describes the protocol sequence; see
-[Installation and Setup](../../getting-started/installation/) for runtime
-prerequisites.
+Use this guide when there is no existing implementation to preserve. Complete
+[installation](../../getting-started/installation/) before starting.
 
 ## Establish scope first
 
-The initialized mode is `GREENFIELD` and state is `SCOPING`. Record the first
-request in active work before substantive work begins, then explicitly invoke
-Scoper. Capture outcomes and acceptance conditions before deciding new technical
-mechanisms.
+A new greenfield project starts in `SCOPING`. Save the request and cycle ID in
+active work, then run Scoper to define what to build and how to check the
+result.
 
 ## Define the design
 
-After Scoper's gate passes, invoke Architect. Initial greenfield design can
-proceed without Auditor context when the request, completed scope, and known
-constraints are sufficient. A real missing-context blocker still routes to
-Auditor.
+After Scoper passes its checks, run Architect. It can work from the request,
+scope, and known constraints before the first audit. If it needs project facts
+that are unavailable, it must ask Auditor to establish them.
 
 ## Establish the first project context
 
-Architect's normal handoff goes to Auditor. Auditor uses its greenfield mode to
-capture the actual repository or scaffold and established constraints. It must
-distinguish the current baseline from proposed design.
+Architect hands off to Auditor. Auditor records what already exists in the
+repository and any established constraints, keeping those facts separate from
+the proposed design.
 
 ## Begin implementation
 
-Auditor's normal handoff goes to Developer. Once Developer first successfully
-creates or materially changes project implementation, `MODE.md` changes
-permanently to `BROWNFIELD`.
-
-Planning and coordination artifacts alone do not trigger that change. A later
-failure that returns to Scoper does not change the mode back.
+Auditor hands off to Developer. After Developer first creates or makes a
+significant change to project implementation, the project
+[permanently becomes brownfield](../../concepts/project-modes/#the-project-mode-changes-once).
 
 Continue through the
-[remaining workflow gates](../../concepts/states-and-handoffs/). For a worked
-planning example, see
+[remaining standard steps](../../concepts/states-and-handoffs/#standard-forward-paths).
+For an example of scope and design, see
 [Your First Workflow](../../getting-started/first-workflow/).

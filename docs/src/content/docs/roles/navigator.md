@@ -7,14 +7,11 @@ sidebar:
     variant: caution
 ---
 
-:::caution[Work in progress] This role's implementation and detailed usage
-documentation are WIP. :::
+:::caution[Work in progress]
 
-Navigator provides read-only project explanation and investigation outside the
-workflow state machine. It may be invoked at any point and must not change
-artifacts, workflow state, or coordination records.
+Implementation and detailed usage instructions are still in progress.
 
-The [protocol](../../reference/protocol/) defines the shared ownership and
-transition rules. This page will expand with inputs, outputs, invocation
-examples, and the role's completion procedure as the implementation is
-completed.
+:::
+
+Navigator explains and investigates the project. You can run it at any point,
+but it must not change project files or workflow records.

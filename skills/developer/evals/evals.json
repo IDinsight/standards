@@ -1,0 +1,194 @@
+{
+  "skill_name": "developer",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Continue the active STANDARDS workflow as Developer. ProjectMode is BROWNFIELD, CycleMode is STANDARD, WorkflowState is DEVELOPING, recovery is inactive, Active Work.Scope and Active Work.Architecture point to completed artifacts, valid project context exists, and Active Work.Development is NONE. The feature adds a profile nickname field and the architecture defines the persistence field, API contract, and affected service/component boundaries. The user has not approved a Developer plan yet. Implement it.",
+      "expected_output": "A persisted PROPOSED development plan in default AUTONOMOUS mode with atomic DEV-NNN steps mapped to the current AC-NNN identifiers, followed by a blocking request for user approval and no project implementation changes.",
+      "files": [],
+      "assertions": [
+        "The response reads the active scope, architecture, project context, and only the relevant implementation areas before planning",
+        "It creates a Developer-owned development plan, records its repository-relative path in Active Work.Development, and uses stable DEV-NNN identifiers",
+        "The plan is Status PROPOSED and Mode AUTONOMOUS because the user did not select another collaboration mode",
+        "Each step has a coherent goal, acceptance mapping, dependencies when needed, observable expected outcome, and implementation-level self-check",
+        "The response persists Active Work.BlockedOn as a concise Developer-plan approval request",
+        "It stops before changing project implementation even though the user originally said to implement the feature"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Continue as Developer. ProjectMode is BROWNFIELD, CycleMode is STANDARD, WorkflowState is DEVELOPING, the persisted Development plan is PROPOSED in AUTONOMOUS mode, and Active Work.BlockedOn says Developer build plan approval. The user says: Approved, proceed. The plan has DEV-001 add the persistence field, DEV-002 update the service, and DEV-003 wire the UI; all are PENDING and the architecture fully defines the required contracts.",
+      "expected_output": "The approved plan is marked APPROVED then IN_PROGRESS, the blocker is cleared, Developer executes all remaining steps without routine pauses, records successful self-checks and DONE statuses, marks the plan COMPLETE, and hands off to Tester.",
+      "files": [],
+      "assertions": [
+        "The user's approval is applied to the current persisted material plan rather than causing a new plan",
+        "Active Work.BlockedOn is cleared before implementation continues",
+        "AUTONOMOUS mode does not request confirmation between DEV-001, DEV-002, and DEV-003",
+        "Developer follows the relevant style files for the technologies it materially changes",
+        "Existing checks may be run as self-checks but are not represented as formal Tester verification",
+        "Normal STANDARD completion persists DEVELOPING -> TESTING and provides the next-role Tester invocation"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Continue as Developer in a STANDARD brownfield cycle. WorkflowState is DEVELOPING. The persisted development plan is APPROVED in STEPWISE mode. DEV-001 is PENDING and DEV-002 depends on DEV-001. Implement the next step.",
+      "expected_output": "Developer implements only DEV-001, performs and records its self-check, marks DEV-001 DONE, then persists a blocker asking whether to continue with DEV-002 and stops without implementing DEV-002.",
+      "files": [],
+      "assertions": [
+        "The response loads and follows modes/stepwise.md rather than Autonomous behavior",
+        "Only the first incomplete approved step is implemented",
+        "DEV-001 is not marked DONE until its expected outcome exists and its self-check is satisfactory",
+        "The response gives a concise summary of the completed step and its self-check",
+        "Active Work.BlockedOn records the request to continue with DEV-002",
+        "WorkflowState remains DEVELOPING because this is a Developer-local collaboration pause"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Continue as Developer. WorkflowState is DEVELOPING and the approved plan is in CODE_WITH_ME mode. DEV-002 is the next incomplete step. The user says: show me what I need to change for DEV-002, but do not edit files yet.",
+      "expected_output": "Developer explains the immediate goal, relevant code area, constraints, expected outcome, and self-check for DEV-002 without modifying implementation, then waits for user direction.",
+      "files": [],
+      "assertions": [
+        "The response follows Code With Me mode and does not take over implementation without a user request to write or patch code",
+        "It grounds guidance in the approved DEV-002 step and established architecture/style constraints",
+        "It does not perform Reviewer-owned formal review or Tester-owned formal verification",
+        "DEV-002 remains incomplete because the expected implementation outcome does not yet exist",
+        "The workflow remains DEVELOPING"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Continue as Developer in a STANDARD brownfield cycle. WorkflowState is DEVELOPING. Before proposing the development plan, inspection shows the Architect design says to persist a share-link token but never defines whether the token is globally unique, scoped per report, revocable, or how callers resolve it. These choices affect the persistence contract and public API. Do not choose one silently.",
+      "expected_output": "An ARCHITECTURE failure handoff to Architect before plan approval or project implementation, preserving ownership and creating recovery when routing changes state.",
+      "files": [],
+      "assertions": [
+        "Developer treats the unresolved persistence and API semantics as consequential technical design rather than a local coding detail",
+        "It does not invent token scope, uniqueness, revocation, or resolution behavior",
+        "It does not finalize an implementation plan whose steps depend on the missing architecture",
+        "It records a failure handoff from DEVELOPING to ARCHITECTING with FailureType ARCHITECTURE",
+        "Because state changes, it creates the protocol recovery frame with ResumeAt DEVELOPING",
+        "It provides the next-role Architect invocation after persisting the transition"
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "Use Developer for a new bounded change in an initialized brownfield project. CycleMode is STANDARD, WorkflowState is AUDITING, Active Work.Id and Request are both UNSET, and the user asks Developer to add a small nullable internal note field to an existing admin record. No STANDARD cycle was explicitly selected. The change can be implemented using established persistence and UI patterns without new architecture or formal documentation.",
+      "expected_output": "Developer uses the protocol-authorized initialized-cycle entry to select EXPEDITED, initializes the active work and moves to DEVELOPING, then creates a PROPOSED EXPEDITED_REQUEST development plan and stops for approval before coding.",
+      "files": [],
+      "assertions": [
+        "The response recognizes the explicit Developer entry as an allowed EXPEDITED selection only because the initialized Active Work fields are UNSET and the project is brownfield",
+        "It persists CycleMode EXPEDITED, WorkflowState DEVELOPING, a fresh Active Work.Id and the user request before Developer planning",
+        "Scope and Architecture remain NONE and no skipped standard artifacts are fabricated",
+        "The development plan maps steps to EXPEDITED_REQUEST rather than inventing AC-NNN identifiers",
+        "The response still requires explicit user approval of the development plan before implementation"
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "Continue as Developer in an EXPEDITED brownfield cycle. WorkflowState is DEVELOPING. While preparing the plan for a small admin-link feature, repository inspection shows the request requires choosing whether generated links are public or authenticated and whether they may expose customer data outside the existing access boundary. The request does not answer this.",
+      "expected_output": "Developer promotes the active cycle to STANDARD and AUDITING because safe completion requires omitted scope/architecture guarantees, rather than inventing an access policy or creating skipped artifacts.",
+      "files": [],
+      "assertions": [
+        "The response does not make the public-versus-authenticated access decision as an implementation detail",
+        "It uses Expedited Promotion rather than an ARCHITECTURE or SCOPING failure into a state absent from expedited topology",
+        "It persists CycleMode STANDARD, WorkflowState AUDITING, Handoff.Kind PROMOTE, PromotionReason, and clears expedited recovery as required",
+        "Existing expedited implementation, if any, remains tentative active-cycle work rather than baseline",
+        "It provides the next-role Auditor invocation"
+      ]
+    },
+    {
+      "id": 8,
+      "prompt": "Continue as Developer in a GREENFIELD STANDARD cycle. WorkflowState is DEVELOPING, the plan is approved, and no project implementation artifact exists yet. DEV-001 creates the first application source file and the write succeeds. More build steps remain.",
+      "expected_output": "Developer immediately changes ProjectMode permanently from GREENFIELD to BROWNFIELD after the first successful implementation write, then continues the approved Developer mode without treating the mode transition as a workflow-state change.",
+      "files": [],
+      "assertions": [
+        "Creating or approving the development plan does not itself trigger the project-mode change",
+        "The successful creation of the first project implementation artifact immediately changes .standards/MODE.md to BROWNFIELD",
+        "WorkflowState remains DEVELOPING and the current cycle continues",
+        "The project mode is not reverted later even if recovery or cancellation occurs"
+      ]
+    },
+    {
+      "id": 9,
+      "prompt": "Continue the active recovery as Developer. ProjectMode is BROWNFIELD, CycleMode is STANDARD, WorkflowState is DEVELOPING. The active recovery frame is Owner=DEVELOPING, FailureType=IMPLEMENTATION, From=REVIEWING_IMPLEMENTATION, ResumeAt=REVIEWING_IMPLEMENTATION, RerunThrough=NONE. Reviewer found that an error path leaks an internal exception. The approved development plan already covers the relevant behavior.",
+      "expected_output": "Developer reopens the affected existing DEV-NNN step under the still-valid approved intent, returns the COMPLETE plan to IN_PROGRESS without duplicate approval, corrects and self-checks the implementation, restores the step/plan to DONE/COMPLETE, and because implementation changed after prior Testing, sets the recovery rerun boundary so Testing is re-established before resuming implementation Review.",
+      "files": [],
+      "assertions": [
+        "Developer fixes the implementation without rewriting Reviewer findings or upstream architecture",
+        "The affected existing DEV-NNN step is reopened and a previously COMPLETE plan returns to IN_PROGRESS so the correction is durably resumable",
+        "A plan reapproval is not required because the existing approved step still accurately describes the implementation intent",
+        "After the correction and self-check pass, the reopened step returns to DONE and the plan can return to COMPLETE",
+        "Developer recognizes that the previously completed TESTING state is invalidated by the implementation correction",
+        "The existing recovery frame keeps ResumeAt REVIEWING_IMPLEMENTATION and sets RerunThrough TESTING",
+        "Developer routes DEVELOPING -> TESTING while preserving the frame rather than popping directly to review",
+        "Testing will later pop the frame at the rerun boundary and resume REVIEWING_IMPLEMENTATION under protocol rules"
+      ]
+    },
+    {
+      "id": 10,
+      "prompt": "Continue as Developer. WorkflowState is DEVELOPING and the approved plan calls for modifying a Next.js App Router page written in TypeScript/React plus a SQL query. The local repository has its own formatter and lint commands. No Python files are involved.",
+      "expected_output": "Developer loads universal, TypeScript, React, Next.js, HTML, and SQL styles as applicable to the rendered page and query, avoids loading unrelated Python or CSS guidance, and gives repository-enforced configuration precedence over generic style preferences.",
+      "files": [],
+      "assertions": [
+        "styles/universal.md is always applied",
+        "styles/typescript.md, styles/react.md, styles/nextjs.md, styles/html.md, and styles/sql.md are loaded because they are relevant to the materially changed implementation",
+        "styles/python.md is not loaded merely because it exists, and styles/css.md is not loaded when styling is not materially changed",
+        "Repository formatter, linter, framework version, and project constraints constrain implementation; if they conflict with established scope/design, Developer routes the conflict rather than silently overriding either side",
+        "The response does not refactor unrelated code simply to normalize it to the style files"
+      ]
+    },
+    {
+      "id": 11,
+      "prompt": "Continue as Developer in a STANDARD cycle. WorkflowState is DEVELOPING. The user approved an AUTONOMOUS plan. During DEV-002 the user asks to add a new externally visible bulk-delete capability that is not in the current scope and would require new API behavior. Continue the current role safely.",
+      "expected_output": "Developer does not fold the new capability into the approved plan; it treats the request as user rework whose earliest invalidated ownership is Scoper, persists the appropriate control-plane transition/recovery under the protocol, and stops Developer implementation for that new behavior.",
+      "files": [],
+      "assertions": [
+        "The response distinguishes a material contract change from a Developer-local plan adjustment",
+        "It does not implement the new bulk-delete behavior merely because the current mode is AUTONOMOUS",
+        "It updates Active Work.Request to preserve the changed user request as required for USER_REWORK",
+        "It routes to SCOPING rather than editing the scope or architecture itself",
+        "Because routing changes state, it preserves the interrupted DEVELOPING state as ResumeAt in the recovery frame",
+        "It provides the next-role Scoper invocation after persisting the transition"
+      ]
+    },
+    {
+      "id": 12,
+      "prompt": "Invoke Developer while ProjectMode is BROWNFIELD, CycleMode is STANDARD, WorkflowState is ARCHITECTING, Active Work is already initialized, and no user-authorized transition was requested. The user says only: start coding now.",
+      "expected_output": "Developer refuses to perform role-owned implementation because Architect owns the current state, leaves implementation and Developer artifacts unchanged, and points the user to the current workflow owner without inventing a state transition.",
+      "files": [],
+      "assertions": [
+        "The response validates persisted WorkflowState before Developer work",
+        "It does not create a development plan or edit production code while ARCHITECTING owns the state",
+        "It does not infer EXPEDITED entry because Active Work is already initialized",
+        "It does not change WorkflowState or create a recovery frame without a protocol-authorized transition",
+        "Existing scope, architecture, context, and coordination state remain unchanged"
+      ]
+    },
+    {
+      "id": 13,
+      "prompt": "Continue as Developer. WorkflowState is DEVELOPING and the approved plan changes only a Next.js App Router route handler written in TypeScript. It does not render UI, modify JSX/HTML, or change styles. The repository has established route-handler patterns.",
+      "expected_output": "Developer applies universal, TypeScript, and Next.js styles for the route-handler change without loading React, HTML, CSS, Python, or SQL style files solely because they exist.",
+      "files": [],
+      "assertions": [
+        "styles/universal.md, styles/typescript.md, and styles/nextjs.md are applied",
+        "styles/react.md and styles/html.md are not loaded because no rendered React UI or markup is materially changed",
+        "styles/css.md is not loaded because styling is not materially changed",
+        "The implementation follows established route-handler patterns and installed Next.js semantics"
+      ]
+    },
+    {
+      "id": 14,
+      "prompt": "Continue as Developer after an EXPEDITED cycle was promoted to STANDARD. ProjectMode is BROWNFIELD, CycleMode is STANDARD, WorkflowState is DEVELOPING, recovery is inactive, Active Work.PromotionReason is not NONE, Active Work.Scope and Active Work.Architecture now point to completed standard artifacts, valid refreshed project context exists, and Active Work.Development points to the development plan created during the earlier expedited path. That plan is COMPLETE, its Implementation Contract still has Scope and Architecture as NONE, and its DEV steps still use EXPEDITED_REQUEST. The standard scope and architecture preserve the same implementation behavior but now define AC-001 and AC-002 explicitly. Continue safely.",
+      "expected_output": "Developer reconciles the preserved expedited plan before coding: updates its contract references and AC mappings, preserves still-valid DEV-NNN identities and completed outcomes, does not require duplicate approval because only traceability/bookkeeping changed, and only treats the plan as valid for STANDARD completion after reconciliation.",
+      "files": [],
+      "assertions": [
+        "Developer recognizes the persisted plan as originating from the earlier expedited path and does not resume it as-is merely because it was COMPLETE",
+        "The plan Implementation Contract is updated to the current Active Work.Scope and Active Work.Architecture paths",
+        "EXPEDITED_REQUEST mappings are replaced with the current Scoper-owned AC-NNN identifiers without inventing substitute requirement IDs",
+        "Existing DEV-NNN identities and DONE statuses are preserved when their implementation outcomes remain valid under the standard contract",
+        "No duplicate user approval is required when reconciliation changes only contract references and traceability rather than implementation intent",
+        "If reconciliation had materially changed steps, dependencies, behavior, or technical approach, Developer would return the plan to PROPOSED and require approval before implementation"
+      ]
+    }
+  ]
+}

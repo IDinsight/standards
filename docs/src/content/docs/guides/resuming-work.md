@@ -1,45 +1,42 @@
 ---
 title: Resuming Interrupted Work
-description: Continue from persisted state across sessions and handoffs.
+description: Continue work in a new session using the saved workflow records.
 ---
 
-Resume from version-controlled artifacts, not from a recollection of the last
-chat message. A different agent or developer needs the same state changes shared
-through version control before it can see the same active cycle.
+Start with the project files saved in version control. Make sure the current
+state and work are available in the checkout you or the next agent will use.
 
 ## Read the coordination record
 
-Read `.standards/PROTOCOL.md`, `.standards/MODE.md`, and `.standards/STATE.md`.
-Identify the current state, `CycleMode`, request, scope and architecture paths,
-`PromotionReason`, blocking question, and recovery stack. Read relevant context
-and the owned artifacts. Missing scope and architecture are intentional in an
-expedited cycle. A retained promotion reason explains why standard work became
-necessary even after the latest handoff changes.
+Read `.standards/PROTOCOL.md`, `.standards/MODE.md`, and `.standards/STATE.md`,
+then the relevant project context and work files. Check:
 
-The latest handoff explains the last transition. The recovery stack records
-outstanding corrective obligations; it must not be replaced by that summary.
+- The current state, cycle mode, request, and file paths.
+- `PromotionReason`, if the cycle moved from expedited to standard work.
+- `BaselineReconciliation`, for cancelled changes Auditor still needs to check.
+- `BlockedOn`, for a question awaiting an answer.
+- `Recovery`, for unfinished corrections and where work should return.
+
+The latest handoff describes only the last step. It does not replace these saved
+records. [Runtime Files](../../reference/runtime-files/) explains each one.
 
 ## Resume the owning role
 
-If the state is `ARCHITECTING`, explicitly invoke Architect, for example:
+If the state is `ARCHITECTING`, run Architect:
 
 ```text
 $architect Continue the active workflow from `.standards/STATE.md`.
 ```
 
-Use `/architect` in Claude Code. When recovery is active, direct the role to
-read the active frame and continue the active recovery. Do not infer a new state
-from the existence of an apparently finished file.
+Use `/architect` in Claude Code. During recovery, ask the role to read the
+active recovery frame and continue from it. A file that looks finished does not
+prove that the workflow has advanced.
 
 ## Resolve blockers without skipping gates
 
-If `BlockedOn` contains an unresolved question, incorporate the user's answer
-before clearing it and completing the role. A question alone does not advance
-the state.
+If `BlockedOn` contains an unanswered question, use the answer before clearing
+it and completing the role.
 
-If the state is `AWAITING_USER_SIGNOFF`, the next action belongs to the user. If
-it is `SIGNED_OFF` or `CANCELLED`, new work requires a new cycle rather than a
-resumption of role work.
-
-Navigator may explain the current records without changing them. Its involvement
-does not itself count as progress through a completion gate.
+At `AWAITING_USER_SIGNOFF`, the next action belongs to you. From `SIGNED_OFF` or
+`CANCELLED`, follow the [new-cycle rules](../cancelling-and-new-cycles/).
+Navigator can explain the current state, but does not advance it.
