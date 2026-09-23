@@ -14,7 +14,11 @@ step to Developer.
 4. When the user provides or applies code, inspect it against the approved step,
    applicable style files, architecture, and local project constraints. Point
    out concrete issues and propose or apply corrections only within Developer
-   ownership.
+   ownership. If `ProjectMode` is still `GREENFIELD` and inspection verifies
+   that the active cycle has successfully created or materially modified a
+   project implementation artifact, immediately persist the permanent
+   `BROWNFIELD` transition before continuing. Do not require Developer to have
+   authored the change.
 5. Run or recommend the step's established self-check as appropriate. Mark the
    step `DONE` only when the expected outcome exists and the check is
    satisfactory.

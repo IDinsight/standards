@@ -11,9 +11,10 @@ Before performing workflow work:
 2. Read `.standards/MODE.md` for the project's current `ProjectMode`.
 3. Read `.standards/STATE.md` for the branch's active `WorkflowState`,
    `CycleMode`, `Active Work` (including any persisted `PromotionReason` or
-   `BaselineReconciliation`), and handoff/recovery context. If this is the first
-   real request and `Active Work` is `UNSET`, persist the request and any legal
-   initial cycle-mode selection before substantive workflow work.
+   `BaselineReconciliation`), handoff/recovery context, and the
+   `Outstanding Obligations` section. If this is the first real request and
+   `Active Work` is `UNSET`, persist the request and any legal initial
+   cycle-mode selection before substantive workflow work.
 4. Read `.standards/CONTEXT.md` when it exists and the active role depends on
    project context. Initial greenfield Scoping/Architecture may run before it
    exists, but later reruns must not ignore an existing context file merely
@@ -37,9 +38,11 @@ Before performing workflow work:
    there is no active cycle; further requested work starts a new cycle.
 7. Respect artifact ownership. Route defects and corrective reruns through
    `.standards/PROTOCOL.md` **Failure Handoffs** and **Recovery Mechanics**; do
-   not redefine those mechanics in role-specific behavior. In `EXPEDITED`, a
-   skipped role remains skipped rather than transferring its ownership; use
-   **Expedited Promotion** if that role becomes necessary.
+   not redefine those mechanics in role-specific behavior. Resolve any
+   outstanding obligation owned by the current state before its normal forward
+   handoff. In `EXPEDITED`, a skipped role remains skipped rather than
+   transferring its ownership; use **Expedited Promotion** if that role becomes
+   necessary.
 8. Persist blocking user questions in `Active Work.BlockedOn`. Do not advance
    past a role until its completion gate succeeds. Update all required
    `.standards/STATE.md` fields on every legal state-changing handoff.

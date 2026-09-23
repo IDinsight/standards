@@ -57,11 +57,13 @@ ProjectMode
 
 Choose the initial mode from project state at installation. `GREENFIELD` is
 temporary: during the initial greenfield cycle, Developer must permanently
-change `.standards/MODE.md` to `BROWNFIELD` immediately after the first
-successful creation or material modification of a project implementation
-artifact. Workflow metadata and role-owned planning, context, test, review, or
-documentation artifacts do not count as project implementation. The mode never
-reverts, including during recovery.
+change `.standards/MODE.md` to `BROWNFIELD` as soon as Developer observes and
+verifies that the active cycle has successfully created or materially modified a
+project implementation artifact. The trigger is implementation existence, not
+authorship: it applies equally to code written by Developer and code applied by
+the user during Developer collaboration. Workflow metadata and role-owned
+planning, context, test, review, or documentation artifacts do not count as
+project implementation. The mode never reverts, including during recovery.
 
 For a `STANDARD` cycle:
 
@@ -160,8 +162,9 @@ The owning role for each state is:
 record needed to resume workflow work across sessions or agents. Before workflow
 work, read `.standards/PROTOCOL.md`, `.standards/MODE.md`, and
 `.standards/STATE.md`. Resume
-from persisted state, active work, handoff, and recovery context; do not infer a
-different state from chat history or artifact presence.
+from persisted state, active work, handoff, recovery context, and outstanding
+corrective obligations; do not infer a different state from chat history or
+artifact presence.
 
 `STATE.md` uses this shape:
 
@@ -192,6 +195,10 @@ different state from chat history or artifact presence.
 `From`: `TESTING` `Owner`: `ARCHITECTING` `FailureType`: `ARCHITECTURE`
 `Reason`: `Retry behavior is not defined by the current technical design.`
 `ResumeAt`: `TESTING` `RerunThrough`: `NONE`
+
+## Outstanding Obligations
+
+`Active`: `false`
 ```
 
 ### Active Work
@@ -246,13 +253,42 @@ recovery-directed transition that is not the normal forward handoff.
 ### Recovery
 
 `Recovery` is a stack ordered oldest to newest; the last frame is active. A
-frame preserves one outstanding corrective obligation. A role owns the active
-frame only when the current `WorkflowState` equals its `Owner`.
+frame preserves one corrective defect together with the routing needed to return
+to interrupted work. A role owns the active frame only when the current
+`WorkflowState` equals its `Owner`.
 
 `RerunThrough` is `NONE` until the frame owner resolves the defect. If previously
 completed downstream work must be re-established before `ResumeAt`, the owner
 sets it to the last state in that rerun sequence. Merely running during recovery
 does not make a role responsible for the frame.
+
+### Outstanding Obligations
+
+`Outstanding Obligations` preserves unresolved corrective work when the recovery
+routing that carried it is no longer valid. It is ordered oldest to newest. Each
+obligation records `Owner`, `FailureType`, and `Reason`; it deliberately has no
+`From`, `ResumeAt`, or `RerunThrough`.
+
+Normally the recovery frame itself is the durable corrective obligation and no
+duplicate outstanding obligation is created. `RerunThrough: NONE` means the
+frame's owner has not yet completed its correction; a non-`NONE` `RerunThrough`
+means the owner already passed its corrective gate and the frame remains only to
+finish downstream rerun/resume routing. During **Expedited Promotion**, convert
+each recovery frame whose `RerunThrough` is `NONE` into one outstanding obligation
+before clearing the expedited recovery stack. Do not convert frames whose
+`RerunThrough` is non-`NONE`. Preserve converted obligations in recovery-stack
+order, keep each distinct defect separate, and do not collapse defects merely
+because they share an owner or failure type.
+
+When one or more obligations exist, set `Active: true` and record each as a
+numbered `Obligation N` containing `Owner`, `FailureType`, and `Reason`. When the
+last obligation is removed, set `Active: false` and remove the numbered entries.
+
+An outstanding obligation remains until its owning state is reached, the owner
+corrects the defect, and the owner's normal completion gate passes. Remove only
+resolved obligations. A role may not take its normal forward handoff while an
+unresolved outstanding obligation owned by its current state remains. User
+sign-off is unavailable while any outstanding obligation remains.
 
 ### State-update rules
 
@@ -262,14 +298,17 @@ does not make a role responsible for the frame.
 2. Before substantive work on an initialized brownfield cycle, expedited
    selection follows **Cycle Modes** and **User Decisions and Intervention**.
 3. Every legal state-changing transition updates all applicable `CycleMode`,
-   `Active Work`, `Handoff`, and `Recovery` fields as part of the transition.
+   `Active Work`, `Handoff`, `Recovery`, and `Outstanding Obligations` fields as
+   part of the transition.
 4. Blocking questions do not change workflow state. Set `BlockedOn` before
    asking and clear it after incorporating the answer.
 5. Failure/recovery, promotion, and user-control transitions follow their
    canonical sections below rather than redefining their mechanics here.
 6. During the initial greenfield cycle, Developer performs the permanent
-   `GREENFIELD` -> `BROWNFIELD` mode change when Developer first successfully
-   creates or materially modifies a project implementation artifact.
+   `GREENFIELD` -> `BROWNFIELD` mode change as soon as Developer observes and
+   verifies that the active cycle has successfully created or materially modified
+   a project implementation artifact, regardless of whether Developer or the user
+   authored the change during Developer collaboration.
 
 `STATE.md` coordinates the workflow; it does not replace role-owned artifacts.
 Role-owned artifacts remain authoritative for their own content.
@@ -294,9 +333,10 @@ user clarification.
 
 Greenfield status does not require context to be absent. Initial greenfield
 Scoping and Architecture may run before the first audit, but later reruns must
-use an existing relevant `CONTEXT.md`. After Developer first successfully
-creates or materially modifies a project implementation artifact, `ProjectMode`
-remains `BROWNFIELD` permanently.
+use an existing relevant `CONTEXT.md`. After Developer observes and verifies the
+first successful creation or material modification of a project implementation
+artifact as part of the active cycle, `ProjectMode` remains `BROWNFIELD`
+permanently, regardless of who authored that implementation change.
 
 `.standards/MODE.md` and `.standards/STATE.md` are protocol-owned coordination
 artifacts. A role or user may change them only as required by a legal protocol
@@ -494,11 +534,17 @@ guarantee.
    tentative active-cycle work, not baseline.
 5. Auditor establishes or refreshes context without laundering tentative work
    into pre-existing baseline. Material ambiguity requires a user question.
-6. Clear recovery. The standard brownfield topology restarts at `AUDITING`,
-   superseding expedited-only resume paths.
+6. Before clearing recovery, convert every expedited recovery frame with
+   `RerunThrough: NONE` into an `Outstanding Obligations` entry preserving its
+   `Owner`, `FailureType`, and `Reason`, in recovery-stack order. Those frames
+   still represent unresolved owner corrections. Do not convert frames with a
+   non-`NONE` `RerunThrough`; their owner already passed its corrective gate and
+   they remain only for obsolete expedited rerun/resume routing. Do not carry
+   `From`, `ResumeAt`, or `RerunThrough` into an obligation. Then clear recovery.
+   The standard brownfield topology restarts at `AUDITING`.
 7. Promotion is one-way for the active cycle.
-8. All standard forward, failure, recovery, traceability, and sign-off rules
-   apply afterward.
+8. All standard forward, failure, recovery, outstanding-obligation, traceability,
+   and sign-off rules apply afterward.
 
 ## Failure Handoffs
 
@@ -532,7 +578,9 @@ previously completed downstream states its correction invalidates.
 
 Recovery follows the active `CycleMode` topology. Expedited recovery reruns only
 expedited states; a newly required skipped role or guarantee triggers
-**Expedited Promotion**, which intentionally clears the expedited recovery stack.
+**Expedited Promotion**, which preserves unresolved corrective obligations as
+`Outstanding Obligations` and clears only the now-obsolete expedited recovery
+routing.
 
 1. **Push only when corrective routing changes state.** For `FAILURE` or
    `USER_REWORK` moving to a different state, push a frame with `From` =
@@ -632,7 +680,8 @@ next-role invocation are emitted, present the commit suggestion first.
    Decisions and Intervention**.
 7. Promotion follows **Expedited Promotion** and is not encoded as `FAILURE`.
 8. Every state-changing handoff persists the applicable state, active-work,
-   handoff, and recovery changes before further role work. Persist the state
+   handoff, recovery, and outstanding-obligation changes before further role
+   work. Persist the state
    change before presenting any next-role invocation.
 9. After a legal transition to a different workflow role, provide a concise
    copy/paste invocation for that role unless the same user instruction already
@@ -681,7 +730,8 @@ with the new ID/request plus `Scope: NONE`, `Architecture: NONE`,
 `Development: NONE`, `PromotionReason: NONE`, and `BaselineReconciliation: NONE`,
 keep `Handoff.Kind: INITIAL`, set `From: NONE`
 and `FailureType: NONE`, record a concise expedited-entry reason, and keep
-recovery inactive. This is unavailable in `GREENFIELD`.
+recovery and outstanding obligations inactive. This is unavailable in
+`GREENFIELD`.
 
 ### Promote an expedited cycle
 
@@ -709,14 +759,17 @@ itself authorizes **Expedited Promotion** instead.
 - If `ProjectMode: GREENFIELD`, follow **Greenfield Bootstrap Cancellation**.
 - If `ProjectMode: BROWNFIELD`, transition to `CANCELLED`, record
   `Handoff.Kind: CANCEL`, set `From` to the interrupted state,
-  `FailureType: NONE`, preserve `Active Work`, and clear recovery.
+  `FailureType: NONE`, preserve `Active Work`, and clear recovery plus outstanding
+  obligations. Residual project-change provenance is handled through
+  `BaselineReconciliation` when a later cycle starts.
 
 Cancellation never reverts project artifacts and does not by itself establish
 cancelled-cycle project changes as baseline.
 
 ### Sign off
 
-From `AWAITING_USER_SIGNOFF`, transition to `SIGNED_OFF`, record
+From `AWAITING_USER_SIGNOFF`, sign-off is legal only when the `Outstanding Obligations`
+section is inactive. Then transition to `SIGNED_OFF`, record
 `Handoff.Kind: SIGNOFF`, `From: AWAITING_USER_SIGNOFF`, `FailureType: NONE`, and
 clear recovery. The cycle is complete.
 
@@ -732,7 +785,8 @@ From `SIGNED_OFF` or retained `CANCELLED`:
    `FailureType: NONE`, and a concise reason.
 2. Create a fresh non-colliding `Active Work.Id` and persist the new `Request`.
    Reset `Scope`, `Architecture`, `Development`, `PromotionReason`,
-   `AuditTarget`, and `BlockedOn` to `NONE`; clear recovery.
+   `AuditTarget`, and `BlockedOn` to `NONE`; clear recovery and outstanding
+   obligations.
 3. From `SIGNED_OFF`, set `BaselineReconciliation: NONE`.
 4. From retained `CANCELLED`, carry any existing reconciliation obligation. If
    the user does not explicitly confirm that the just-cancelled cycle left no
@@ -759,9 +813,12 @@ standard guarantee promotes and restarts the standard brownfield topology at
 
 ### Greenfield Bootstrap Cancellation
 
-If cancellation occurs while `ProjectMode` is still `GREENFIELD`, no project
-implementation has yet been produced by the workflow. Treat cancellation as a
-S.T.A.N.D.A.R.D.S. reset rather than a reusable terminal cycle.
+If cancellation occurs while `ProjectMode` is still `GREENFIELD`, first verify
+that the active cycle has not successfully created or materially modified a
+project implementation artifact. If such implementation exists, persist the
+permanent `BROWNFIELD` transition and use retained brownfield `CANCELLED`
+semantics instead. Only when no such implementation exists should cancellation
+be treated as a S.T.A.N.D.A.R.D.S. reset rather than a reusable terminal cycle.
 
 The reset must:
 
@@ -788,10 +845,11 @@ workflow attempt requires fresh installation, which re-evaluates project mode
 from then-current state. Do not carry the cancelled bootstrap's former
 `GREENFIELD` classification across reinstall.
 
-This exception ends permanently after Developer first successfully creates or
-materially modifies a project implementation artifact; cancellation after that
-point uses retained brownfield `CANCELLED` semantics even if recovery has moved
-to an earlier workflow state.
+This exception ends permanently once Developer observes and verifies that the
+active cycle has successfully created or materially modified a project
+implementation artifact, regardless of authorship; cancellation after that point
+uses retained brownfield `CANCELLED` semantics even if recovery has moved to an
+earlier workflow state.
 
 ## Installed Runtime Contract
 
@@ -863,8 +921,11 @@ After ownership checks:
   verified runtime, stop and report the incomplete runtime; never reconstruct
   ownership by inference.
 - Preserve existing `.standards/MODE.md` and `.standards/STATE.md` on normal
-  reinstall; initialize
-  them only on first install or explicit reinitialization.
+  reinstall; initialize them only on first install or explicit reinitialization.
+  On framework upgrade, a required protocol-owned coordination field or section
+  introduced by the new protocol may be added with a semantically neutral default
+  only when it is absent; do not reset, reinterpret, or discard existing workflow
+  state.
 - Preserve `.standards/CONTEXT.md`; it is Auditor-owned, not installer-owned.
 - Preserve conflicting project-level instructions and report the conflict for
   user resolution. Do not silently choose precedence, weaken the protocol, or
@@ -914,8 +975,11 @@ Use these terms consistently across all skills:
 - **promotion handoff**: one-way `PROMOTE` transition from expedited to standard
   that restarts brownfield workflow at `AUDITING` because an omitted guarantee
   is required.
-- **recovery frame**: one corrective obligation preserving owner, reason,
-  interrupted `ResumeAt`, and any `RerunThrough` boundary.
+- **recovery frame**: one corrective defect plus routing, preserving owner,
+  reason, interrupted `ResumeAt`, and any `RerunThrough` boundary.
+- **outstanding obligation**: unresolved corrective work detached from obsolete
+  recovery routing, preserving only its owner, failure type, and reason until the
+  owning state resolves it.
 - **active work**: persisted cycle identity, request, scope/architecture/
   development artifact references, promotion reason, baseline-reconciliation
   provenance, transient audit target, and blocking question; in terminal states

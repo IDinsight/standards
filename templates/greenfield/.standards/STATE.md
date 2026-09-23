@@ -16,3 +16,7 @@
 ## Recovery
 
 `Active`: `false`
+
+## Outstanding Obligations
+
+`Active`: `false`

@@ -99,11 +99,11 @@
     {
       "id": 8,
       "prompt": "Continue as Developer in a GREENFIELD STANDARD cycle. WorkflowState is DEVELOPING, the plan is approved, and no project implementation artifact exists yet. DEV-001 creates the first application source file and the write succeeds. More build steps remain.",
-      "expected_output": "Developer immediately changes ProjectMode permanently from GREENFIELD to BROWNFIELD after the first successful implementation write, then continues the approved Developer mode without treating the mode transition as a workflow-state change.",
+      "expected_output": "Developer immediately changes ProjectMode permanently from GREENFIELD to BROWNFIELD after verifying the first successful project implementation change exists, then continues the approved Developer mode without treating the mode transition as a workflow-state change.",
       "files": [],
       "assertions": [
         "Creating or approving the development plan does not itself trigger the project-mode change",
-        "The successful creation of the first project implementation artifact immediately changes .standards/MODE.md to BROWNFIELD",
+        "The verified existence of the first project implementation artifact immediately changes .standards/MODE.md to BROWNFIELD",
         "WorkflowState remains DEVELOPING and the current cycle continues",
         "The project mode is not reverted later even if recovery or cancellation occurs"
       ]
@@ -188,6 +188,47 @@
         "Existing DEV-NNN identities and DONE statuses are preserved when their implementation outcomes remain valid under the standard contract",
         "No duplicate user approval is required when reconciliation changes only contract references and traceability rather than implementation intent",
         "If reconciliation had materially changed steps, dependencies, behavior, or technical approach, Developer would return the plan to PROPOSED and require approval before implementation"
+      ]
+    },
+    {
+      "id": 15,
+      "prompt": "Continue as Developer in an EXPEDITED brownfield cycle. WorkflowState is DEVELOPING and recovery is active. The active recovery frame has Owner=DEVELOPING, FailureType=IMPLEMENTATION, Reason='an error response leaks an internal exception', ResumeAt=REVIEWING_IMPLEMENTATION, and RerunThrough=NONE. While correcting it, Developer discovers that safe completion now requires a consequential authentication-error contract owned by Architect, which is unavailable in EXPEDITED. Promote the cycle safely.",
+      "expected_output": "Developer promotes to STANDARD and AUDITING, preserves the unresolved implementation defect as an Outstanding Obligation detached from expedited routing, then clears the obsolete expedited recovery stack. The promotion reason records the newly required architecture guarantee, while the earlier implementation defect remains separately durable for Developer to resolve when STANDARD reaches DEVELOPING.",
+      "files": [],
+      "assertions": [
+        "The existing recovery defect is not lost merely because promotion clears expedited recovery routing",
+        "Before clearing Recovery, Developer converts the RerunThrough=NONE frame into an Outstanding Obligations entry preserving Owner DEVELOPING, FailureType IMPLEMENTATION, and the defect reason",
+        "The preserved obligation does not carry From, ResumeAt, or RerunThrough because those belong to the superseded expedited topology",
+        "A recovery frame with non-NONE RerunThrough would not be converted because its owner already passed its corrective gate and only obsolete rerun/resume routing remains",
+        "Active Work.PromotionReason records the architecture guarantee that caused promotion rather than replacing the earlier implementation defect",
+        "CycleMode becomes STANDARD, WorkflowState becomes AUDITING, Handoff.Kind is PROMOTE, and Recovery becomes inactive",
+        "The implementation defect remains unresolved until STANDARD later reaches DEVELOPING and Developer corrects it under the normal completion gate"
+      ]
+    },
+    {
+      "id": 16,
+      "prompt": "Continue as Developer in a GREENFIELD STANDARD cycle using CODE_WITH_ME. WorkflowState is DEVELOPING, the development plan is approved, and no project implementation artifact exists yet. For DEV-001 the user creates and applies the first real application source file. Developer inspects the repository and verifies that the file exists and satisfies the approved step. Developer itself did not author the file.",
+      "expected_output": "Developer immediately changes ProjectMode permanently from GREENFIELD to BROWNFIELD after verifying the user-authored implementation exists, then continues Code With Me. The transition is triggered by implementation existence, not by which actor typed the code.",
+      "files": [],
+      "assertions": [
+        "Developer does not wait for its own code write before changing project mode",
+        "After inspecting and verifying the user-applied project implementation artifact, Developer immediately persists .standards/MODE.md as BROWNFIELD",
+        "Creating or approving the development plan alone would not have triggered the transition",
+        "WorkflowState remains DEVELOPING and Code With Me continues under the same approved plan",
+        "The BROWNFIELD transition is permanent even if later recovery or cancellation occurs"
+      ]
+    },
+    {
+      "id": 17,
+      "prompt": "Promote an EXPEDITED brownfield cycle while nested recovery is active and WorkflowState is DEVELOPING. Frame 1 is older: Owner=DEVELOPING, FailureType=IMPLEMENTATION, Reason='apply the approved bounded rework', ResumeAt=AWAITING_USER_SIGNOFF, and RerunThrough=REVIEWING_IMPLEMENTATION because Developer already corrected that defect and implementation review was being re-established. During that review rerun, Reviewer found a new implementation defect and pushed Frame 2: Owner=DEVELOPING, FailureType=IMPLEMENTATION, Reason='authorization is missing on the new endpoint', ResumeAt=REVIEWING_IMPLEMENTATION, and RerunThrough=NONE. While correcting Frame 2, Developer discovers that safe completion requires a consequential authorization contract owned by Architect, so EXPEDITED must promote to STANDARD.",
+      "expected_output": "Promotion preserves only unresolved Frame 2 as an Outstanding Obligation, does not duplicate already-corrected Frame 1, clears the expedited recovery stack, and restarts STANDARD at AUDITING.",
+      "files": [],
+      "assertions": [
+        "Frame 1 is not converted because its non-NONE RerunThrough proves its owner already passed the corrective gate and the frame remains only for routing",
+        "Frame 2 is converted because RerunThrough is NONE and therefore its owner correction is still unresolved",
+        "The new obligation preserves Owner DEVELOPING, FailureType IMPLEMENTATION, and Frame 2's reason but omits From, ResumeAt, and RerunThrough",
+        "Recovery is cleared only after the unresolved obligation is persisted",
+        "CycleMode becomes STANDARD and WorkflowState becomes AUDITING"
       ]
     }
   ]

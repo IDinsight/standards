@@ -69,6 +69,15 @@ When recovery is active:
   rerun, re-evaluate the approved development plan and implementation against
   corrected upstream artifacts while preserving the recovery stack.
 
+When `Outstanding Obligations` contains an unresolved entry owned by
+`DEVELOPING`, treat its `Reason` as required corrective implementation work for
+the active cycle. Reconcile it into the existing development plan under the same
+approval rules as recovery: reopen an existing `DEV-NNN` when it still
+represents the required outcome, or revise the plan when the obligation
+materially changes approved implementation intent. Do not forward from
+`DEVELOPING` until every Developer-owned outstanding obligation is resolved and
+removed.
+
 ## Entry and State Validation
 
 Perform role-owned implementation only while `WorkflowState` is `DEVELOPING`.
@@ -252,6 +261,10 @@ and current repository evidence.
 - Treat traceability-only updates, path updates, or equivalent bookkeeping as
   non-material when implementation intent is unchanged; they do not require
   duplicate approval.
+- Reconcile any Developer-owned `Outstanding Obligations` preserved from the
+  expedited recovery stack into the current plan. Preserve the obligation until
+  its corrective outcome is actually restored; promotion itself does not satisfy
+  it.
 - If the standard scope or architecture materially changes build steps,
   dependencies, behavior, or technical approach, set the plan to `PROPOSED` and
   obtain user approval before further implementation.
@@ -281,11 +294,13 @@ and current repository evidence.
 9. Continue according to the active collaboration mode until all approved steps
    are complete or a blocker occurs.
 
-When Developer first successfully creates or materially modifies a project
-implementation artifact while `ProjectMode` is `GREENFIELD`, immediately change
-`.standards/MODE.md` permanently to `BROWNFIELD` as required by
-`.standards/PROTOCOL.md` **Project Modes**. This transition occurs after the
-first successful implementation write, not when the plan is created or approved.
+While `ProjectMode` is `GREENFIELD`, immediately change `.standards/MODE.md`
+permanently to `BROWNFIELD` as soon as Developer observes and verifies that the
+active cycle has successfully created or materially modified a project
+implementation artifact. Authorship does not matter: the trigger applies to
+implementation written by Developer and to implementation applied by the user
+during Developer collaboration. This transition occurs after the first verified
+implementation change exists, not when the plan is created or approved.
 
 ## Invariants
 
@@ -324,6 +339,7 @@ Developer is complete when:
 - relevant implementation-level self-checks completed satisfactorily or any
   limitation was routed as a blocker rather than ignored;
 - no unapproved material deviation from the development plan remains;
+- no unresolved `Outstanding Obligations` entry owned by `DEVELOPING` remains;
 - no blocking Developer question remains unresolved.
 
 On normal success with no active recovery:
