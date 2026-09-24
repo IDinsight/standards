@@ -96,10 +96,16 @@ export default defineConfig({
           collapsed: true,
           items: [
             {
+              slug: "guides/starting-a-cycle",
+            },
+            {
               slug: "guides/new-project",
             },
             {
               slug: "guides/existing-project",
+            },
+            {
+              slug: "guides/working-with-developer",
             },
             {
               slug: "guides/revising-scope-or-design",

@@ -10,6 +10,7 @@ These are the main terms used in the docs. The
 
 The `Active Work` record in `STATE.md`: the cycle's ID, request, file paths,
 promotion reason, unresolved cancelled changes, audit target, and open question.
+Paths include Scope, Architecture, and Development.
 [Runtime Files](../runtime-files/) explains how each field is used.
 
 ## Baseline reconciliation
@@ -70,7 +71,8 @@ step outside the normal forward sequence.
 ## Cycle mode
 
 `STANDARD` selects the full workflow. `EXPEDITED` selects the shorter workflow
-for a small, clearly defined change to an existing project.
+for a small, clearly defined change to an existing project. `UNSET` means no
+cycle is active and role-owned work cannot begin yet.
 
 ## Promotion
 
@@ -88,3 +90,35 @@ which steps need repeating. See [Recovery](../../concepts/recovery/).
 `ProjectMode` records whether the project has an established implementation.
 `WorkflowState` records the current step. A role's internal mode selects how it
 works within that step.
+
+## Pending cycle fields
+
+A mode preference or blocked request for the next cycle, stored separately from
+active work. The agent reuses the saved request when the user resolves its
+blocking decision. See [Starting a Cycle](../../guides/starting-a-cycle/).
+
+## Cycle ID registry
+
+The append-only `.standards/CYCLE_IDS.md` list of reserved IDs. IDs cannot be
+reused while that runtime remains installed, even after a failed initialization.
+See [allocation rules](../runtime-files/#cycle-identity).
+
+## Artifact provenance
+
+A block inside a STANDARDS-created Scope, Architecture, or Development file that
+identifies its type and owning cycle. Renaming the file does not change its
+ownership. See
+[artifact provenance](../../concepts/ownership/#artifact-provenance).
+
+## Development plan and step
+
+Developer's saved implementation plan, approved before coding. Each `DEV-NNN`
+identifies a build step with an outcome and self-check. These IDs do not replace
+Scoper's `AC-NNN` requirements. See [Developer](../../roles/developer/).
+
+## Outstanding obligation
+
+An unfinished correction kept when promotion replaces its recovery route. It
+records an owner, failure type, and reason. The owner removes it after verifying
+the specific fix, then still has to pass its completion checks. See
+[recovery obligations](../../concepts/recovery/#outstanding-obligations).

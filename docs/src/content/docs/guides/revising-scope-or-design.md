@@ -37,6 +37,15 @@ The next role's work still requires the user to run that skill in its assigned
 state. For an agent-discovered mistake, follow
 [Failure Recovery](../../concepts/recovery/).
 
+## Recheck the development plan
+
+When corrected requirements or design return to Developer, keep valid `DEV-NNN`
+IDs and reopen only affected steps. An unchanged approved implementation intent
+does not need duplicate approval. A material plan change returns to `PROPOSED`
+and requires approval before coding. After promotion, reconcile the expedited
+plan against the standard inputs first. See
+[Working with Developer](../working-with-developer/).
+
 ## Preserve unaffected content
 
 Scoper uses REPLAN to revise existing scope and follows the

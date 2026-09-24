@@ -19,6 +19,12 @@ const sources = [
     "The Architect artifact contract.",
   ],
   [
+    "skills/developer/template.md",
+    "templates/developer",
+    "Development Plan Template",
+    "The Developer plan format and authoring rules.",
+  ],
+  [
     "skills/auditor/template.md",
     "templates/auditor",
     "Project Context Template",

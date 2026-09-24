@@ -12,13 +12,20 @@ Read `.standards/PROTOCOL.md`, `.standards/MODE.md`, and `.standards/STATE.md`,
 then the relevant project context and work files. Check:
 
 - The current state, cycle mode, request, and file paths.
+- Pending mode, request, and blocker fields if no cycle is active.
+- `Active Work.Development`, including plan approval, mode, and step statuses.
 - `PromotionReason`, if the cycle moved from expedited to standard work.
 - `BaselineReconciliation`, for cancelled changes Auditor still needs to check.
 - `BlockedOn`, for a question awaiting an answer.
 - `Recovery`, for unfinished corrections and where work should return.
+- `Outstanding Obligations`, for corrections retained after promotion.
 
 The latest handoff describes only the last step. It does not replace these saved
 records. [Runtime Files](../../reference/runtime-files/) explains each one.
+
+If `CycleMode` is `UNSET`, resolve any pending request through
+[cycle initialization](../starting-a-cycle/) before role-owned work. Do not
+replace a terminal cycle directly or ask the user to repeat a saved request.
 
 ## Resume the owning role
 
@@ -31,6 +38,11 @@ $architect Continue the active workflow from `.standards/STATE.md`.
 Use `/architect` in Claude Code. During recovery, ask the role to read the
 active recovery frame and continue from it. A file that looks finished does not
 prove that the workflow has advanced.
+
+In `DEVELOPING`, read the saved plan and verify its cycle ownership before
+editing it. Continue from the first incomplete approved step, respecting the
+selected collaboration mode. A proposed plan must wait for approval. See
+[Developer resumption and recovery](../working-with-developer/#resume-or-correct-implementation).
 
 ## Resolve blockers without skipping gates
 

@@ -20,6 +20,19 @@ record that state change even if it does not own the current state.
 This allows the agent to update the workflow record. To do the next role's work,
 you must also have asked to run that skill, and it must own the resulting state.
 
+## Before a cycle and before implementation
+
+Before a cycle starts, you can save a mode preference. If it cannot handle the
+request, the agent saves the request and question in pending fields so you can
+resolve them later. See [Starting a Cycle](../../guides/starting-a-cycle/).
+
+Developer asks you to approve a saved plan before coding, in both standard and
+expedited work. Material changes to that implementation intent require renewed
+approval; correcting a defect within unchanged approved intent does not.
+[Developer collaboration modes](../../roles/developer/#collaboration-modes)
+control whether execution continues automatically, one step at a time, or with
+your direct participation.
+
 ## At the sign-off gate
 
 At `AWAITING_USER_SIGNOFF`, you can:
@@ -35,7 +48,9 @@ At `AWAITING_USER_SIGNOFF`, you can:
   [promotion](../states-and-handoffs/#promote-an-expedited-cycle).
 
 Sign-off accepts the checks required by the selected cycle mode. It does not
-claim that skipped roles completed their work. See
+claim that skipped roles completed their work. No outstanding obligation may
+remain. Validate completion before resetting `CycleMode` to `UNSET` and clearing
+pending fields; keep the finished `Active Work` record. See
 [the completion rules](../states-and-handoffs/) for both modes.
 
 A completed scope means Scoper passed its checks. It does not add a separate

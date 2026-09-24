@@ -1,23 +1,99 @@
 ---
 title: Developer
-description: Build the agreed design or a small expedited change.
-sidebar:
-  badge:
-    text: WIP
-    variant: caution
+description: Plan and implement approved work in resumable steps.
 ---
 
-:::caution[Work in progress]
+Developer owns implementation and the development plan in `DEVELOPING`.
+Architect defines the important design decisions and contracts; Developer turns
+them into concrete build steps and chooses local implementation details.
 
-Implementation and detailed usage instructions are still in progress.
+## When to use Developer
 
-:::
+Run Developer after the standard workflow hands off to it, for an eligible
+expedited brownfield request, or when recovery returns to implementation. It
+cannot start coding in another role's state. See
+[starting a cycle](../../guides/starting-a-cycle/) for entry rules.
 
-Developer owns implementation in `DEVELOPING`. After it first creates or makes a
-significant change to project implementation, it permanently changes the project
-mode from `GREENFIELD` to `BROWNFIELD`.
+## Inputs and output
 
-In `EXPEDITED`, Developer implements the change defined by `Active Work.Request`
-and performs implementation self-checks; these do not become Tester-owned formal
-verification. If it needs a skipped role,
+In `STANDARD`, Developer needs the completed scope, technical design, and valid
+Auditor context for the current cycle. In `EXPEDITED`, `Active Work.Request`
+defines the change; older context is only prior evidence. If a skipped role is
+needed,
 [promote the cycle](../../concepts/states-and-handoffs/#promote-an-expedited-cycle).
+
+Developer saves a [development plan](../../reference/templates/developer/) at
+`docs/development/<Active Work.Id>.md`, or the project's required
+development-plan directory with the same cycle-specific filename. Record the
+path in `Active Work.Development`. The file's `DEVELOPMENT` provenance and
+visible `Cycle` field must match the active ID. A shared plan or a prior cycle's
+plan cannot be reused. See
+[artifact ownership](../../concepts/ownership/#artifact-provenance).
+
+Each `DEV-NNN` step has a goal, affected area, expected outcome, dependencies,
+status, and self-check. Standard steps reference current `AC-NNN` IDs; expedited
+steps use `EXPEDITED_REQUEST`. `DEV-NNN` identifies implementation work, not a
+new requirement.
+
+## Approval before implementation
+
+A new or materially revised plan has `Status: PROPOSED`. Developer records the
+approval question in `Active Work.BlockedOn`, presents the plan, and stops
+before changing implementation. Explicit approval changes the plan to `APPROVED`
+and clears that blocker. Starting implementation changes it to `IN_PROGRESS`.
+
+Changes to build steps, dependencies, behavior, or technical approach that alter
+the approved implementation intent require a new proposal and approval. Wording,
+file hints, and other bookkeeping changes do not. A correction within unchanged
+approved intent can reopen an affected step without duplicate approval.
+
+## Collaboration modes
+
+| Mode           | After plan approval                           |
+| -------------- | --------------------------------------------- |
+| `AUTONOMOUS`   | Finish approved steps without routine pauses. |
+| `STEPWISE`     | Complete one step, then wait for the user.    |
+| `CODE_WITH_ME` | Help; write approved work only when asked.    |
+
+`AUTONOMOUS` is the default. It still stops for blockers, material plan changes,
+or required handoffs. In `STEPWISE`, each completed step includes a self-check
+and progress report before waiting.
+
+Switching modes changes how you collaborate. It does not change `CycleMode` or
+require rework when the implementation intent stays the same. Developer saves
+the selected mode in the plan. See
+[Working with Developer](../../guides/working-with-developer/) for examples and
+resuming work.
+
+## Style and role boundaries
+
+Developer always uses `styles/universal.md`, plus the relevant Python,
+TypeScript, React, Next.js, HTML, CSS, or SQL guidance. Repository tooling and
+project constraints guide implementation; style guidance does not justify
+unrelated refactors. Material conflicts follow the
+[protocol's conflict rules](../../reference/protocol/#instruction-layering-and-conflicts).
+
+Developer can research how to use an already chosen API or technology. Choosing
+important architecture, access policies, or data contracts belongs to Architect.
+It routes missing requirements or project facts to their owners.
+
+Developer may run existing tests and checks for feedback. It does not create or
+rewrite Tester-owned tests, claim formal acceptance verification, or take over
+review or documentation.
+
+## Completion and handoff
+
+Before marking the plan `COMPLETE`, every current approved step must be `DONE`,
+self-checks must be satisfactory, and the implementation must meet its contract.
+Resolve blockers, unapproved deviations, and Developer-owned
+[outstanding obligations](../../concepts/recovery/#outstanding-obligations).
+Remove each obligation after verifying its correction, then finish the remaining
+completion checks and mark the plan complete.
+
+Normal standard completion hands off to Tester. Expedited completion hands off
+to Reviewer for implementation review. Active recovery follows its saved frame.
+
+While still greenfield, Developer records the permanent change to `BROWNFIELD`
+as soon as it verifies that active-cycle implementation has been created or
+materially changed. This includes implementation written by the user during
+collaboration; creating or approving the plan alone does not trigger it.

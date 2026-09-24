@@ -8,9 +8,9 @@ Use this guide when there is no existing implementation to preserve. Complete
 
 ## Establish scope first
 
-A new greenfield project starts in `SCOPING`. Save the request and cycle ID in
-active work, then run Scoper to define what to build and how to check the
-result.
+Follow [cycle initialization](../starting-a-cycle/) to reserve an ID and start
+`STANDARD` work in `SCOPING`. Then run Scoper to define what to build and how to
+check the result.
 
 ## Define the design
 
@@ -26,8 +26,12 @@ the proposed design.
 
 ## Begin implementation
 
-Auditor hands off to Developer. After Developer first creates or makes a
-significant change to project implementation, the project
+Auditor hands off to Developer, which saves an implementation plan and waits for
+your approval before coding. See
+[Working with Developer](../working-with-developer/).
+
+As soon as Developer verifies that the cycle has created or materially changed
+implementation, including code written by the user, the project
 [permanently becomes brownfield](../../concepts/project-modes/#the-project-mode-changes-once).
 
 Continue through the

@@ -46,6 +46,9 @@ required output. Then run:
 pnpm --dir docs run sync-reference
 ```
 
+When adding a role template, register it in `docs/scripts/sync-reference.mjs`
+and link it from the artifact-template index.
+
 The same synchronization runs before development and production builds. If a
 source changes while the development server is running, run it again to refresh
 the reference pages. Generated reference content preserves the source wording;

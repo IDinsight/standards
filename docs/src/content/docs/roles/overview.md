@@ -11,7 +11,8 @@ depends on the project and cycle mode.
 - [Tester](../tester/) checks behavior and records results.
 - [Architect](../architect/) makes the technical design decisions.
 - [Navigator](../navigator/) explains the project without changing it.
-- [Developer](../developer/) writes code from the design or expedited request.
+- [Developer](../developer/) plans implementation, obtains plan approval, and
+  implements the design or expedited request.
 - [Auditor](../auditor/) records the facts about the existing project.
 - [Reviewer](../reviewer/) checks the implementation and final work.
 - [Documenter](../documenter/) writes and updates documentation.

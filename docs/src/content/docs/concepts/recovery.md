@@ -12,7 +12,8 @@ lets an earlier role correct a problem without losing track of unfinished work.
 In `EXPEDITED`, a failure can go directly only to Developer for `IMPLEMENTATION`
 or to implementation Reviewer for `REVIEW`. If a skipped role is needed,
 [promote the cycle](../states-and-handoffs/#promote-an-expedited-cycle).
-Promotion clears expedited recovery and starts standard work through Auditor.
+Promotion saves unfinished corrections as outstanding obligations before
+clearing expedited recovery routes and starting standard work through Auditor.
 
 ## Route by the defective artifact
 
@@ -63,7 +64,44 @@ may require more steps.
 
 If another failure or user-requested change needs a different state during
 recovery, add a new frame. Finish it before returning to the older correction.
-Recovery ends when no frames remain.
+Recovery routing ends when no frames remain. Outstanding obligations may still
+need correction before sign-off.
+
+## Outstanding obligations
+
+Promotion replaces expedited recovery routes, but must not lose unfinished
+corrections. Before clearing the stack:
+
+- Convert each frame with `RerunThrough: NONE` into an obligation, preserving
+  its `Owner`, `FailureType`, and `Reason` in stack order. Its owner has not yet
+  completed the correction.
+- Do not convert frames with a non-`NONE` `RerunThrough`. Their owners already
+  passed the corrective gate; only the old rerun and return route remains.
+- Keep distinct defects separate, even when they share an owner. Obligations
+  have no `From`, `ResumeAt`, or `RerunThrough`.
+
+An obligation stays saved until its owning state is reached and that role fixes
+and verifies the specific defect. Remove it as soon as that correction is
+verified, then finish the role's remaining completion checks. Removing it does
+not by itself complete the role. The role cannot hand off normally while an
+unresolved obligation owned by its state remains.
+
+Set the section's `Active` field to `false` and remove numbered entries when the
+last obligation is removed. Sign-off is blocked while any obligation remains.
+Ordinary recovery uses its frame to track the defect; it does not also create a
+duplicate obligation.
+
+For example, if Developer promotes while fixing a review finding, the unfinished
+implementation correction remains an obligation. When the standard workflow
+returns to Developer, that defect must be fixed and checked before its
+obligation is removed. The old expedited return route is no longer used.
+
+## Recovery before the first greenfield audit
+
+Scoper and Architect can rerun before Auditor has created `CONTEXT.md` if the
+facts they need are otherwise established. Missing context alone does not force
+an early audit. Route to Auditor when needed facts cannot safely be established,
+and use relevant context once it exists.
 
 See [Recovery Mechanics](../../reference/protocol/#recovery-mechanics) for the
 complete rules and more examples.

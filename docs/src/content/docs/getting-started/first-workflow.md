@@ -11,10 +11,11 @@ implemented and do not yet have full usage instructions.
 
 ## 1. Establish the request
 
-Before work begins, save a stable cycle ID and request in `STATE.md`. Use a name
-such as `add-user-search`, following the
-[cycle ID rules](../../reference/runtime-files/#cycle-identity). Scope and
-architecture paths start as `NONE` until their owners create them.
+Start with [cycle initialization](../../guides/starting-a-cycle/): select
+`STANDARD`, reserve a new ID in `CYCLE_IDS.md`, then save that ID and request in
+`STATE.md`. An example ID is `add-user-search-20260924T150000Z-a7f3`; generate a
+fresh token rather than reuse this example. Scope, Architecture, and Development
+paths start as `NONE`.
 
 Because this is standard brownfield work, the cycle starts in `AUDITING`. Invoke
 the installed Auditor skill explicitly:
@@ -51,13 +52,24 @@ Save the design path in `Active Work.Architecture`. Choosing a database, search
 method, or how components communicate belongs here unless existing constraints
 already settle those choices.
 
-## 4. Follow the remaining gates
+## 4. Approve and carry out the development plan
 
-The protocol continues through implementation, testing, implementation review,
-documentation, final review, and synchronization. Invoke each role after its
-handoff. Each role reads the saved records and produces its own work. If it
-finds a problem in an earlier role's work, it sends the problem back to that
-role.
+At `DEVELOPING`, invoke Developer. It turns the design into `DEV-NNN` steps,
+saves the plan at `Active Work.Development`, and asks for approval before
+coding. For example, a step might implement the agreed name filter and map it to
+`AC-001`. Its self-check should use the project's established commands.
+
+Review the proposed plan and approve it or request changes. Choose autonomous,
+stepwise, or Code With Me collaboration. Developer saves progress and performs
+implementation self-checks; these do not replace Tester verification. See
+[Working with Developer](../../guides/working-with-developer/).
+
+## 5. Follow the remaining gates
+
+The protocol continues through testing, implementation review, documentation,
+final review, and synchronization. Invoke each role after its handoff. Each role
+reads the saved records and produces its own work. If it finds a problem in an
+earlier role's work, it sends the problem back to that role.
 
 At `AWAITING_USER_SIGNOFF`, review the deliverables and evidence. You can sign
 off, request rework, or cancel. Completion is not inferred from a successful

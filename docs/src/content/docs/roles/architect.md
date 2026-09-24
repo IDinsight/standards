@@ -16,16 +16,23 @@ requires an architecture correction. It does not reopen settled scope decisions.
 
 Read the scope at `Active Work.Scope`, established constraints, current design
 when present, and relevant project context. In brownfield work, Auditor must
-have checked the context for the current cycle. Initial greenfield design can
-happen before the first scheduled audit.
+have checked the context for the current cycle. Greenfield design and recovery
+reruns can proceed before the first scheduled audit without context when the
+needed facts are otherwise established.
 
-Save the technical design in the project's established location, or a
-change-specific file under `docs/specs/`. Record its path in
-`Active Work.Architecture`.
+An appropriate unmarked project-owned design document can remain the canonical
+location. New files under `docs/specs/` must carry current-cycle `ARCHITECTURE`
+provenance. Never overwrite or adopt another cycle's STANDARDS artifact. Inspect
+ownership before editing and record the selected path in
+`Active Work.Architecture`. See
+[artifact provenance](../../concepts/ownership/#artifact-provenance).
 
 The [architecture template](../../reference/templates/architect/) covers
 decisions, acceptance coverage, components, contracts, data and control flow,
-technical acceptance criteria, build order, and important risks or alternatives.
+technical acceptance criteria, coarse build order, and important risks or
+alternatives. Developer owns the detailed `DEV-NNN` steps, progress, and
+execution; Architect's Build Plan is ordering guidance, not an approved
+development plan.
 
 ## Modes
 

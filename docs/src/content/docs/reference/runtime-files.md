@@ -1,22 +1,20 @@
 ---
 title: Runtime Files
-description:
-  Find the files that save workflow rules, progress, and project context.
+description: Find saved state, cycle IDs, pending requests, and work files.
 ---
 
-The files in `.standards/` save the workflow's rules and progress. Scope,
-design, implementation, and test results stay in their own files.
+The files in `.standards/` save workflow rules and progress. Scope, design,
+development plans, implementation, and test results stay in their own files.
 
 ## Protocol and installation
 
-**`.standards/PROTOCOL.md`** defines the workflow rules. Installation or upgrade
+**`.standards/PROTOCOL.md`** defines the shared rules. Installation or upgrade
 updates it together with the skills. A workflow role cannot edit it to change
 those rules.
 
 **`.standards/INSTALLATION.json`** records client settings changed by the
-installer. Upgrades and bootstrap resets use this record to preserve your
-settings. A setting that already existed does not become framework-owned just
-because it is compatible.
+installer. Upgrades and bootstrap resets use it to preserve your settings. A
+compatible setting that already existed does not become framework-owned.
 
 ## Project mode
 
@@ -26,73 +24,112 @@ changes.
 
 ## Workflow state
 
-**`.standards/STATE.md`** is version-controlled. It contains one `WorkflowState`
-and one `CycleMode` (`STANDARD` or `EXPEDITED`), plus:
+**`.standards/STATE.md`** is version-controlled. Its main fields and sections
+are:
 
-- **Active Work:** the cycle's ID and request, scope and design paths, promotion
-  reason, unresolved cancelled changes, current audit target, and any question
-  preventing completion.
-- **Handoff:** the latest transition's kind, starting state, failure type, and
-  reason.
-- **Recovery:** a stack of unfinished corrections, oldest first. Work on the
-  last frame first. See [recovery](../../concepts/recovery/).
+| Record                    | Purpose                                     |
+| ------------------------- | ------------------------------------------- |
+| `WorkflowState`           | Current step or terminal state.             |
+| `CycleMode`               | `UNSET`, `STANDARD`, or `EXPEDITED`.        |
+| `PendingCycleMode`        | Next-cycle preference, or `UNSET`.          |
+| `PendingCycleRequest`     | Blocked next request, or `UNSET`.           |
+| `PendingCycleBlockedOn`   | Pending decision, or `NONE`.                |
+| `Active Work`             | Request, ID, file paths, and cycle context. |
+| `Handoff`                 | The latest transition.                      |
+| `Recovery`                | Nested corrections and return routes.       |
+| `Outstanding Obligations` | Corrections kept after routes change.       |
 
-Installation uses `UNSET` for the first ID and request. Replace it before work
-begins. Use `NONE` for fields that do not apply. Expedited scope and design
-paths stay `NONE` unless the cycle is promoted and those roles create their
-files.
+`Active Work` includes the Scope, Architecture, and Development paths,
+`PromotionReason`, `BaselineReconciliation`, `AuditTarget`, and `BlockedOn`.
+`Handoff` records kind, starting state, failure type, and reason. Recovery
+frames are ordered oldest first; the last frame is active.
 
-`PromotionReason` keeps the reason for promotion until the cycle ends, even when
-later handoffs replace `Handoff.Reason`. After sign-off or cancellation, the
-saved cycle mode and active work still describe that finished cycle. The
-[new-cycle procedure](../../guides/cancelling-and-new-cycles/#start-the-next-cycle)
-explains what to reset for the next request.
+`PendingCycleRequest` and `PendingCycleBlockedOn` are paired: the request is
+`UNSET` exactly when the blocker is `NONE`. A pre-cycle decision must not change
+`Active Work.BlockedOn`, which belongs to the active or retained previous cycle.
+See [starting a cycle](../../guides/starting-a-cycle/) for selection and
+validation.
 
-The [saved-state rules](../protocol/#persisted-workflow-state) define every
-field and when to update it.
+Installation leaves the ID and request `UNSET`. No role-owned work can begin
+until a mode is validated and an ID reserved. Use `NONE` for artifact paths
+until their owners create the files. Expedited Scope and Architecture paths stay
+`NONE` unless promotion brings those roles into the cycle. Developer still
+creates a plan in expedited work.
+
+`PromotionReason` survives later handoffs. After sign-off or retained
+cancellation, `CycleMode` becomes `UNSET`, while `Active Work` keeps the last
+cycle's record. A later pending preference or blocked request is stored
+separately until
+[new-cycle initialization](../../guides/cancelling-and-new-cycles/#start-the-next-cycle).
+
+The [saved-state rules](../protocol/#persisted-workflow-state) define the exact
+format. [Recovery](../../concepts/recovery/) explains frames and obligations.
 
 ### Cycle identity
 
-Assign a new, stable `Active Work.Id` for each cycle. Do not reuse an ID still
-referenced in workflow state or Auditor's cycle-specific context, including
-`BaselineReconciliation` and **Active-Cycle Non-Baseline Work**. Use a short
-name based on the request, with a suffix if needed to make it unique. Repeating
-a request starts a new cycle with a new ID.
+**`.standards/CYCLE_IDS.md`** is an append-only list of allocated IDs, with one
+ID per Markdown list entry. It reserves names; it does not store requests,
+states, or workflow history.
+
+For each new cycle:
+
+1. Generate a request name plus a fresh collision-resistant token, such as a
+   UUID or timestamp with a random suffix. A bare request name is not enough.
+2. Check the registry, existing cycle-owned file paths, and provenance markers
+   for collisions, including `docs/development/<candidate>.md`.
+3. Append the ID to the registry and save that change.
+4. Only then assign it to `Active Work.Id` and initialize the cycle.
+
+Never reuse, remove, or rewrite an allocated entry while the runtime remains
+installed. If initialization fails after reservation, leave the ID reserved. If
+the append fails, the new cycle must not start.
+
+Installation creates an empty registry. Reinstall, upgrade, and explicit
+workflow reinitialization preserve it. A verified upgrade from an older protocol
+without a registry must seed discoverable IDs from state and existing artifacts
+before replacing the installed protocol. Earlier undiscoverable IDs cannot be
+covered retroactively.
+
+If the installed protocol already requires a registry and it is missing, stop
+new-ID allocation and work that depends on it. Restore the registry or
+intentionally remove the runtime and install afresh; never silently recreate an
+empty registry or guess its history. Runtime removal ends the registry's
+lifetime guarantee, but a fresh installation still checks existing artifact
+paths and provenance for collisions. See the
+[exact registry rules](../protocol/#cycle-id-registry).
 
 ### Outstanding baseline reconciliation
 
 `Active Work.BaselineReconciliation` lists cancelled cycles whose leftover
-changes Auditor still needs to check. Each entry keeps the cycle's ID and a
-brief request summary. Use `NONE` when there are no unresolved entries.
+changes Auditor still needs to check. Keep each cycle's ID and brief request
+summary through handoffs, recovery, rework, and cancellation. Only Auditor
+clears the list after resolving every source. `Handoff.Reason` cannot replace
+it.
 
-Keep this list through handoffs, failures, rework, recovery, and cancellation.
-Only Auditor clears it after checking every listed source. `Handoff.Reason`
-describes the latest transition; it cannot replace this list.
-
-See
-[new-cycle rules](../../guides/cancelling-and-new-cycles/#start-the-next-cycle)
-for when to add a cancelled cycle and how this affects expedited entry.
+This is separate from `Outstanding Obligations`, which tracks defects to fix.
+See [cancellation and new cycles](../../guides/cancelling-and-new-cycles/) for
+when baseline reconciliation is required.
 
 ## Project context
 
-**`.standards/CONTEXT.md`** is Auditor's record of the existing project:
-relevant behavior, commands, boundaries, constraints, and supporting evidence.
-Auditor creates it. Installation preserves an existing file but does not invent
-one.
+**`.standards/CONTEXT.md`** is Auditor's record of relevant existing behavior,
+commands, boundaries, constraints, and evidence. Installation preserves an
+existing file but does not create audit findings.
 
-An expedited cycle may read earlier context, but that context has not
-necessarily been checked for the current change. After promotion, Auditor
-separates the existing project from tentative changes made during the cycle. See
-[promotion and cancellation audits](../../roles/auditor/#promotion-and-cancellation-audits)
-for how those records are maintained.
+Expedited work may consult earlier context without treating it as refreshed for
+that cycle. After promotion, Auditor separates tentative changes from
+established baseline. See
+[Auditor's procedure](../../roles/auditor/#promotion-and-cancellation-audits).
 
-## Agent integration
+## Agent integration and work files
 
 **`AGENTS.md`** contains a marked framework section alongside project
 instructions. **`CLAUDE.md`** imports it for Claude Code. Installation preserves
-text outside the marked sections and asks the user to resolve conflicting
-instructions.
+text outside managed sections and requires resolution of material instruction
+conflicts.
 
-Scope and design live at the paths recorded in active work. Their default
-locations, `docs/scope/` and `docs/specs/`, are in the project using STANDARDS;
-they are separate from this documentation website's source files.
+Scope, Architecture, and Development paths are recorded in active work. Default
+directories are `docs/scope/`, `docs/specs/`, and `docs/development/` in the
+project using STANDARDS, separate from this website's source files. Follow
+[artifact provenance](../../concepts/ownership/#artifact-provenance) before
+creating or editing these files.

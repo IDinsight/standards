@@ -16,11 +16,15 @@ audit, or when recovery or user rework requires a scope correction.
 
 Read the saved request, constraints, existing scope, and relevant project
 context. In brownfield work, Auditor must have checked that context for the
-current cycle. Initial greenfield scoping can happen before the first audit.
+current cycle. Greenfield scoping, including recovery reruns before the first
+scheduled audit, can proceed without context if the needed facts are otherwise
+established.
 
-Save the scope in the project's established location, or a change-specific file
-under `docs/scope/` when none exists. Record its repository-relative path in
-`Active Work.Scope`.
+An appropriate unmarked project-owned scope document can remain the canonical
+location. New scope files under `docs/scope/` must carry current-cycle `SCOPE`
+provenance. Never overwrite or adopt another cycle's STANDARDS artifact. Inspect
+ownership before editing and record the selected path in `Active Work.Scope`.
+See [artifact provenance](../../concepts/ownership/#artifact-provenance).
 
 The [scope template](../../reference/templates/scoper/) covers: goal,
 constraints, non-goals, work with acceptance conditions and dependencies,

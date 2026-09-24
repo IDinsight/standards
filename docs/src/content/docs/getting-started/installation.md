@@ -13,18 +13,17 @@ files, client settings, and record of installer changes must work together.
 Use `GREENFIELD` when there is no substantial existing implementation to
 preserve. Otherwise use `BROWNFIELD`.
 
-Installation sets `CycleMode: STANDARD`. The selected project mode initializes
-`WorkflowState` at `SCOPING` or `AUDITING`, respectively. An existing README or
-planning document alone does not determine the project mode. See
+Installation sets `CycleMode: UNSET`, `PendingCycleMode: UNSET`,
+`PendingCycleRequest: UNSET`, and `PendingCycleBlockedOn: NONE`. The project
+mode sets the initial `WorkflowState` to `SCOPING` or `AUDITING`, respectively,
+but no role-owned work starts until a request initializes the cycle. An existing
+README or planning document alone does not determine the project mode. See
 [Project Modes](../../concepts/project-modes/).
 
-Before work begins, an initialized brownfield cycle whose ID and request are
-both `UNSET` may select `EXPEDITED` and enter `DEVELOPING`. Keep an `INITIAL`
-handoff with `From: NONE`, `FailureType: NONE`, and an expedited-entry reason;
-initialize active work with `PromotionReason: NONE`,
-`BaselineReconciliation: NONE`, and empty recovery. See
-[cycle selection](../../concepts/project-modes/#choose-the-cycle-mode) for
-explicit selection and Developer-entry rules. Greenfield supports standard only.
+The initial ID and request are `UNSET`; artifact paths are `NONE`, and recovery
+and outstanding obligations are inactive. Installation creates an empty cycle-ID
+registry. [Starting a Cycle](../../guides/starting-a-cycle/) explains how a real
+request selects its mode and reserves an ID before work begins.
 
 ## Required installed files
 
@@ -35,14 +34,15 @@ project/
 ├── .standards/
 │   ├── PROTOCOL.md
 │   ├── INSTALLATION.json
+│   ├── CYCLE_IDS.md
 │   ├── MODE.md
 │   └── STATE.md
 └── <client-specific skill installation>
 ```
 
 `CONTEXT.md` is created by Auditor when an audit runs. Installation must not
-create context, scope, or design files that pretend those roles have completed
-their work.
+create context, scope, design, or development-plan files that pretend those
+roles have completed their work.
 
 ## Client integration
 
@@ -67,6 +67,14 @@ instructions or settings require user resolution.
 
 Reinstallation must not reset an active cycle, duplicate integration blocks, or
 claim ownership of settings that already existed.
+
+On upgrade, add newly required state fields only when absent and with neutral
+defaults. Preserve existing workflow data. Preserve the cycle-ID registry even
+during explicit workflow reinitialization. A verified upgrade from a protocol
+without a registry must create and seed it before replacing the installed
+protocol; a missing registry in a runtime that already requires one must not be
+silently recreated. See
+[registry lifecycle](../../reference/runtime-files/#cycle-identity).
 
 The precise rules are in
 [Installed Runtime Contract](../../reference/protocol/#installed-runtime-contract).

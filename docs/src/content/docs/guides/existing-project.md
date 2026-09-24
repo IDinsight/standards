@@ -18,10 +18,9 @@ especially after cancellation. Expedited work follows its own shorter sequence.
 
 ## Give Auditor a concrete request
 
-Save the requested change and a
-[new cycle ID](../../reference/runtime-files/#cycle-identity). Run Auditor in
-`AUDITING`. It checks the existing code, behavior, and project rules needed to
-understand the change.
+Follow [cycle initialization](../starting-a-cycle/) to validate the request and
+reserve its ID before saving active work. Run Auditor in `AUDITING`. It checks
+the existing code, behavior, and project rules needed to understand the change.
 
 Auditor chooses an [inspection mode](../../roles/auditor/#modes) based on how
 much reliable project context already exists.
@@ -37,7 +36,9 @@ it down.
 
 Architect makes the design decisions needed to meet the requirements. With valid
 context for this cycle, it hands off directly to Developer. Planning code
-changes does not by itself require a second audit.
+changes does not by itself require a second audit. Developer prepares its own
+implementation plan for approval; follow
+[Working with Developer](../working-with-developer/).
 
 If important project facts are missing or wrong, return to Auditor before using
 those facts in further work. Then follow the

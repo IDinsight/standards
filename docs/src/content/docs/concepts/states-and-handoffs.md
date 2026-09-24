@@ -5,7 +5,9 @@ description: Follow normal transitions and understand explicit invocation.
 
 `STATE.md` records one `WorkflowState` and one `CycleMode`. The state determines
 which role may do its work; cycle mode selects the required steps and checks.
-You still need to run each role explicitly.
+`CycleMode: UNSET` permits no role-owned work.
+[Initialize the cycle](../../guides/starting-a-cycle/) first, then run each role
+explicitly.
 
 ## Standard forward paths
 
@@ -45,7 +47,8 @@ DEVELOPING → REVIEWING_IMPLEMENTATION → AWAITING_USER_SIGNOFF
 self-checks, which do not count as Tester-owned verification. Sign-off becomes
 available after Developer and implementation Reviewer pass their required
 checks, recovery is empty, and no unanswered question prevents completion.
-Scoper's acceptance IDs and the checks from skipped steps are not required. See
+Developer's plan and approval are required even in expedited work. Scoper's
+acceptance IDs and the checks from skipped steps are not required. See
 [cycle selection](../project-modes/#choose-the-cycle-mode).
 
 ## Promote an expedited cycle
@@ -62,13 +65,18 @@ for the active cycle:
 3. Preserve the cycle's identifier and request. Do not fabricate, rewrite, or
    delete role-owned artifacts; scope and architecture normally remain `NONE`
    until their owners run.
-4. Clear recovery. Auditor starts the standard brownfield sequence, replacing
-   any expedited resume path. All required standard gates must then pass.
+4. Preserve unfinished recovery corrections as
+   [outstanding obligations](../recovery/#outstanding-obligations), then clear
+   the old recovery stack. Auditor starts the standard brownfield sequence. All
+   required standard checks must then pass.
 
 An active workflow role may promote when expedited checks are not enough. At
 sign-off, promotion requires user authorization; a rework request requiring a
 skipped responsibility already supplies that authorization. Hand off to Auditor,
-whose work still requires explicit invocation.
+whose work still requires explicit invocation. When Developer is reached again,
+it must
+[reconcile its earlier plan](../../guides/working-with-developer/#continue-after-expedited-promotion)
+with the standard scope and design before resuming implementation.
 
 Changes made during expedited work are still tentative. They must not dictate
 the design just because the code is already present.
@@ -97,16 +105,20 @@ record. Keep the detail in those files instead of repeating it in the message.
 
 An unresolved blocking question is recorded in `Active Work.BlockedOn`. Asking
 it does not advance the state. The question is cleared after its answer is
-incorporated.
+incorporated. Before a cycle exists, use `PendingCycleRequest` and
+`PendingCycleBlockedOn` instead.
 
 A failure handoff may move backward to the owner of a defect. A resume handoff
-returns from recovery. Neither should be treated as an ordinary forward step.
+returns from recovery. Neither is an ordinary forward step. Sign-off also
+requires no outstanding obligations.
 
 ## Terminal states
 
-`SIGNED_OFF` and `CANCELLED` mean there is no active cycle. New work starts a
-new cycle. Cancellation while still greenfield removes the framework
-installation; see [cancellation rules](../../guides/cancelling-and-new-cycles/).
+`SIGNED_OFF` and retained `CANCELLED` have `CycleMode: UNSET`. `Active Work`
+keeps the previous cycle's record; pending fields can describe the next request
+separately. New work starts a new cycle. Greenfield cancellation may remove the
+installation, but must first check for active-cycle implementation; see
+[cancellation rules](../../guides/cancelling-and-new-cycles/).
 
 See [Human Decisions and Sign-off](../human-decisions/) and the
 [canonical transition rules](../../reference/protocol/#forward-transitions).
