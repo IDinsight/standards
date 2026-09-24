@@ -100,8 +100,12 @@ Resolve blockers, unapproved deviations, and Developer-owned
 Remove each obligation after verifying its correction, then finish the remaining
 completion checks and mark the plan complete.
 
-Normal standard completion hands off to Tester. Expedited completion hands off
-to Reviewer for implementation review. Active recovery follows its saved frame.
+Normal standard completion hands off to Tester in a fresh chat separate from
+Developer's implementation conversation. The persisted plan must include actual
+self-check results and enough context to assess implementation claims without
+that conversation. Expedited completion hands off to Reviewer for implementation
+review. Active recovery follows its saved frame and the same fresh-session rule
+when it enters `TESTING`.
 
 While still greenfield, Developer records the permanent change to `BROWNFIELD`
 as soon as it verifies that active-cycle implementation has been created or

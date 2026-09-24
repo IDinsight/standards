@@ -22,7 +22,9 @@ skills define role-specific behavior.
 
 - **Scoper** defines what must be built and what counts as done.
 - **Tester** verifies implemented behavior and records traceability status for
-  current scope acceptance conditions and technical acceptance criteria.
+  current scope acceptance conditions and technical acceptance criteria. It
+  starts in a fresh chat separate from Developer and uses VERIFY or REVERIFY,
+  preserving coverage and the active change's test budget.
 - **Architect** defines consequential technical decisions and contracts.
 - **Navigator** provides read-only explanation, tracing, diagnosis, and project
   understanding outside the workflow state machine.

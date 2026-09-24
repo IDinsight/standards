@@ -1,6 +1,7 @@
 ---
 title: Artifact Templates
-description: Find the scope, design, development-plan, and context templates.
+description:
+  Find the scope, design, development, verification, and context templates.
 ---
 
 Each implemented role has a template defining the file it produces. The site
@@ -12,6 +13,8 @@ copies these templates from the repository during development and builds.
   design meets each requirement, and build order.
 - [Development plan](../templates/developer/): cycle ownership, collaboration
   mode, approval status, `DEV-NNN` steps, acceptance mapping, and self-checks.
+- [Verification report](../templates/tester/): assessed inputs, acceptance
+  evidence, scenario budget, actual execution, gaps, and resume or handoff.
 - [Project context](../templates/auditor/): existing behavior, tools, commands,
   constraints, unknowns, and supporting evidence.
 
@@ -19,7 +22,9 @@ Omit empty sections. Add enough detail to meet the template's requirements and
 resolve important questions; a small change can have a short document.
 
 Record Scope, Architecture, and Development paths in `STATE.md`; Auditor context
-has the fixed path `.standards/CONTEXT.md`. Keep document contents out of state.
-New Scope, Architecture, and Development files require cycle provenance, and
-development plans always use cycle-specific filenames. See
+has the fixed path `.standards/CONTEXT.md`. Tester's fixed report path is
+`docs/verification/<Active Work.Id>.md`, with no extra state field. Keep
+document contents out of state. New Scope, Architecture, Development, and
+Verification files require cycle provenance. Development plans and verification
+reports always belong to one cycle. See
 [artifact ownership](../../concepts/ownership/#artifact-provenance).

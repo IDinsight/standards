@@ -13,6 +13,8 @@ does not give a role permission to fix another role's work.
   Architect owns it.
 - **Development plan:** concrete implementation steps, progress, and
   self-checks. Developer owns it and asks for approval before implementation.
+- **Verification:** tests and formal evidence of behavior. Tester owns them. Its
+  report records current evidence, gaps, and later-role dependencies.
 - **Project context:** what already exists and what the change must respect.
   Auditor owns it. These established facts are the project's **baseline**.
 
@@ -27,8 +29,8 @@ question. They cannot edit the installed `PROTOCOL.md` to change those rules.
 
 ## Artifact provenance
 
-New STANDARDS Scope, Architecture, and Development files begin with a block
-identifying their type and owning cycle. For example:
+New STANDARDS Scope, Architecture, Development, and Verification files begin
+with a block identifying their type and owning cycle. For example:
 
 ```markdown
 <!-- STANDARDS
@@ -37,11 +39,11 @@ Cycle: add-user-search-20260924T150000Z-a7f3
 -->
 ```
 
-Use the actual active ID and exactly one type: `SCOPE`, `ARCHITECTURE`, or
-`DEVELOPMENT`. The marker keeps ownership visible even if the file is renamed or
-moved. Another cycle may read it as permitted prior evidence, but cannot
-overwrite, repurpose, or adopt it as its own artifact. Choose a different path
-for new work.
+Use the actual active ID and exactly one type: `SCOPE`, `ARCHITECTURE`,
+`DEVELOPMENT`, or `VERIFICATION`. The marker keeps ownership visible even if the
+file is renamed or moved. Another cycle may read it as permitted prior evidence,
+but cannot overwrite, repurpose, or adopt it as its own artifact. Choose a
+different path for new work.
 
 Before editing any referenced artifact, inspect its marker. If it names another
 cycle, correct the active reference without changing the other cycle's file.
@@ -54,6 +56,9 @@ Newly created workflow artifacts must have the marker.
 Development plans always belong to one cycle. Their filename includes the active
 ID, and both their marker and visible `Cycle` field must match it. See
 [Developer](../../roles/developer/#inputs-and-output) for the required location.
+Verification reports follow the same cycle-ownership rule at the fixed path
+`docs/verification/<Active Work.Id>.md`; test suites remain reusable project
+assets. See [Tester](../../roles/tester/#inputs-and-output).
 
 ## Architect and Developer
 

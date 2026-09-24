@@ -342,7 +342,7 @@ Allocate a new cycle ID in this order:
 2. Verify that the candidate does not already appear in `CYCLE_IDS.md`.
 3. As defense in depth, also verify that it does not collide with an existing
    cycle-owned artifact path or STANDARDS provenance marker, including
-   `docs/development/<candidate>.md`.
+   `docs/development/<candidate>.md` and `docs/verification/<candidate>.md`.
 4. Append the candidate to `CYCLE_IDS.md` and persist that registry change.
 5. Only after the registry append succeeds may the candidate be written to
    `Active Work.Id` and cycle initialization continue.
@@ -372,13 +372,13 @@ provenance collision checks still apply.
 ### Workflow Artifact Provenance
 
 Cycle ownership must be recoverable from the artifact itself whenever STANDARDS
-creates a Scope, Architecture, or Development artifact. Every such newly created
-artifact must begin with this provenance block, using exactly one concrete
+creates a Scope, Architecture, Development, or Verification artifact. Every such
+newly created artifact must begin with this provenance block, using exactly one concrete
 artifact type and the exact current cycle ID:
 
 ```markdown
 <!-- STANDARDS
-Artifact: SCOPE | ARCHITECTURE | DEVELOPMENT
+Artifact: SCOPE | ARCHITECTURE | DEVELOPMENT | VERIFICATION
 Cycle: <Active Work.Id>
 -->
 ```
@@ -404,8 +404,18 @@ development-plan directory, in which case preserve the same cycle-specific
 filename. Its provenance block and the plan's visible `Cycle` field must both
 match `Active Work.Id`.
 
-Before editing an artifact referenced by `Active Work.Scope`,
-`Active Work.Architecture`, or `Active Work.Development`, the owning role must
+Tester's verification report is always a STANDARDS cycle-owned artifact at
+`docs/verification/<Active Work.Id>.md`. Its `VERIFICATION` provenance block
+and visible `Cycle` field must match `Active Work.Id`. This fixed path is
+recoverable from the cycle ID; do not add a verification-path field to
+`STATE.md`. Preserve reports from other cycles. If the required path contains
+an unrelated or incorrectly marked file, report the collision and block
+dependent work until it is resolved; do not overwrite or adopt it. Test suites
+and fixtures remain reusable project assets and do not require report provenance.
+
+Before editing the verification report or an artifact referenced by
+`Active Work.Scope`, `Active Work.Architecture`, or `Active Work.Development`,
+the owning role must
 inspect any STANDARDS provenance block. If the block records a different cycle,
 do not overwrite or silently repair the artifact; the persisted reference is
 inconsistent with the active cycle and must be corrected without mutating the
@@ -916,6 +926,32 @@ active recovery frame.
 At `AWAITING_USER_SIGNOFF`, present the applicable user actions rather than a
 next-role invocation.
 
+### Independent Tester Session
+
+Whenever a handoff enters `TESTING`, explicitly request that the user invoke
+Tester in a fresh chat separate from Developer's implementation conversation.
+This also applies to recovery and re-verification. Persist the applicable state,
+owned artifacts, implementation/completion claims, actual self-check commands
+and results, limitations, and resume context before presenting the invocation.
+The scope, architecture, project context, development plan, repository, tests,
+and any current-cycle verification report must be sufficient to reconstruct the
+assessment without Developer's conversation. Record information in the owning
+artifact rather than duplicating it in `Handoff.Reason`.
+
+For Tester, prefix the normal active-client invocation with “Open a fresh chat
+separate from Developer's implementation conversation, then run:”. Keep the
+normal persisted-input and active-recovery directions. Do not use the
+immediate-continuation exception to run Tester in Developer's conversation,
+even when the user invoked both roles together.
+
+A skill cannot erase chat history or prove session freshness without client
+support. If the conversation is known to contain Developer's implementation
+work, stop before formal verification and request the fresh session. If that
+history or client metadata is unavailable, state the visibility limitation and
+reconstruct the assessment from persisted evidence; do not invent a freshness
+attestation or require a routine user confirmation. Resuming Tester's own
+interrupted session is allowed when it is separate from Developer's work.
+
 ## User Decisions and Intervention
 
 These are user-authorized control-plane transitions. An explicit, unambiguous
@@ -1246,6 +1282,10 @@ Use these terms consistently across all skills:
   active cycle. It decomposes the active contract into stable `DEV-NNN` steps,
   records collaboration mode and resumable progress, and never replaces scope,
   architecture, Tester verification, review, or documentation.
+- **verification report**: Tester-owned cycle-specific assessment at
+  `docs/verification/<Active Work.Id>.md`, recording acceptance coverage, scenario
+  allocations, actual execution evidence, gaps, and later-phase dependencies.
+  It does not replace scope, design, or workflow coordination state.
 - **project context**: Auditor-owned baseline stored at `.standards/CONTEXT.md`.
   It may persist as evidence across cycles, but cycle-scoped non-baseline entries
   follow the lifecycle in **Persisted Workflow State**. Planned implementation

@@ -42,7 +42,10 @@ until those steps provide evidence under the same ID.
 
 Before `AWAITING_USER_SIGNOFF`, every current condition must have enough
 evidence to show it is met, with no unresolved blocker. Pending work is not
-proof.
+proof. Tester records this in the cycle's
+[verification report](../../reference/templates/tester/), including relevant
+technical criteria, actual commands/results, and uncovered obligations. Unrun
+tests and Developer self-checks do not substitute for Tester evidence.
 
 ## Replanning preserves history
 

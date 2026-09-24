@@ -25,6 +25,12 @@ const sources = [
     "The Developer plan format and authoring rules.",
   ],
   [
+    "skills/tester/template.md",
+    "templates/tester",
+    "Verification Report Template",
+    "The Tester evidence format and authoring rules.",
+  ],
+  [
     "skills/auditor/template.md",
     "templates/auditor",
     "Project Context Template",

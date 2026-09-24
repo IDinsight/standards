@@ -450,6 +450,11 @@ On normal success with no active recovery:
 - `EXPEDITED` hands off to **Reviewer** for `IMPLEMENTATION` review
   (`DEVELOPING -> REVIEWING_IMPLEMENTATION`).
 
+For any handoff entering `TESTING`, follow the protocol's **Independent Tester
+Session** rule. Persist enough implementation and self-check evidence in the
+development plan for Tester to assess the claims from files, then explicitly
+request a fresh Tester chat in the handoff.
+
 When recovery is active, apply `.standards/PROTOCOL.md` **Recovery Mechanics**
 after the completion gate succeeds. If Developer owns the active frame, decide
 which previously completed downstream states must be re-established because of

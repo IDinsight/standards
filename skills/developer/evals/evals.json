@@ -26,7 +26,8 @@
         "AUTONOMOUS mode does not request confirmation between DEV-001, DEV-002, and DEV-003",
         "Developer follows the relevant style files for the technologies it materially changes",
         "Existing checks may be run as self-checks but are not represented as formal Tester verification",
-        "Normal STANDARD completion persists DEVELOPING -> TESTING and provides the next-role Tester invocation"
+        "Normal STANDARD completion persists DEVELOPING -> TESTING and provides the next-role Tester invocation",
+        "A handoff entering TESTING explicitly requests a fresh Tester chat separate from Developer and persists implementation claims, actual self-check evidence, limitations, and resume context before the invocation."
       ]
     },
     {
@@ -122,7 +123,8 @@
         "Developer recognizes that the previously completed TESTING state is invalidated by the implementation correction",
         "The existing recovery frame keeps ResumeAt REVIEWING_IMPLEMENTATION and sets RerunThrough TESTING",
         "Developer routes DEVELOPING -> TESTING while preserving the frame rather than popping directly to review",
-        "Testing will later pop the frame at the rerun boundary and resume REVIEWING_IMPLEMENTATION under protocol rules"
+        "Testing will later pop the frame at the rerun boundary and resume REVIEWING_IMPLEMENTATION under protocol rules",
+        "A handoff entering TESTING explicitly requests a fresh Tester chat separate from Developer and persists implementation claims, actual self-check evidence, limitations, and resume context before the invocation."
       ]
     },
     {
@@ -256,7 +258,8 @@
         "After DEV-003 corrects the recorded authorization defect and the corrective outcome is verified, the DEVELOPING-owned obligation is removed from Outstanding Obligations",
         "Removing the obligation does not itself imply Developer completion; Developer still evaluates every remaining normal completion-gate condition",
         "After all DEV-NNN steps are DONE and all remaining gate conditions pass, the plan becomes COMPLETE",
-        "With no unresolved DEVELOPING-owned obligation remaining, the full Developer completion gate passes and STANDARD hands off DEVELOPING -> TESTING"
+        "With no unresolved DEVELOPING-owned obligation remaining, the full Developer completion gate passes and STANDARD hands off DEVELOPING -> TESTING",
+        "A handoff entering TESTING explicitly requests a fresh Tester chat separate from Developer and persists implementation claims, actual self-check evidence, limitations, and resume context before the invocation."
       ]
     },
     {
@@ -528,6 +531,18 @@
         "Confirmation about admin-notes-b does not resolve cache-a or import-c",
         "The two SourceCycle/Request entries remain distinct and unchanged",
         "The new cycle still requires STANDARD and AUDITING"
+      ]
+    },
+    {
+      "id": 42,
+      "prompt": "Developer completed all approved steps in STANDARD with satisfactory self-checks. The user explicitly invoked both Developer and Tester in this implementation conversation and asks to proceed directly to formal verification. State is DEVELOPING and recovery inactive.",
+      "expected_output": "Developer persists its completed plan and concrete self-check evidence, transitions to TESTING, and requests a fresh Tester chat instead of running formal verification in its implementation conversation.",
+      "files": [],
+      "assertions": [
+        "The handoff includes a fresh-session request and the active-client Tester invocation.",
+        "The already-invoked-role immediate-continuation exception does not bypass the independent session rule.",
+        "Persisted artifacts and repository evidence carry the context needed to assess implementation.",
+        "Developer does not pretend to erase history or certify freshness."
       ]
     }
   ]

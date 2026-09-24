@@ -64,12 +64,29 @@ stepwise, or Code With Me collaboration. Developer saves progress and performs
 implementation self-checks; these do not replace Tester verification. See
 [Working with Developer](../../guides/working-with-developer/).
 
-## 5. Follow the remaining gates
+## 5. Independently verify the change
 
-The protocol continues through testing, implementation review, documentation,
-final review, and synchronization. Invoke each role after its handoff. Each role
-reads the saved records and produces its own work. If it finds a problem in an
-earlier role's work, it sends the problem back to that role.
+After Developer persists `TESTING`, open a fresh chat separate from the
+implementation conversation and invoke Tester:
+
+```text
+Codex:       $tester Continue from `.standards/STATE.md`.
+Claude Code: /tester Continue from `.standards/STATE.md`.
+```
+
+Tester reconstructs intent from the saved artifacts and repository, extends
+existing coverage where needed, executes appropriate checks, and records actual
+results in `docs/verification/<Active Work.Id>.md`. The default ceiling is five
+added or materially expanded scenarios per source file for the active change;
+existing coverage is preserved. See [Tester](../../roles/tester/) for counting,
+re-verification, and unavailable execution.
+
+## 6. Follow the remaining gates
+
+The protocol continues through implementation review, documentation, final
+review, and synchronization. Invoke each role after its handoff. Each role reads
+the saved records and produces its own work. If it finds a problem in an earlier
+role's work, it sends the problem back to that role.
 
 At `AWAITING_USER_SIGNOFF`, review the deliverables and evidence. You can sign
 off, request rework, or cancel. Completion is not inferred from a successful

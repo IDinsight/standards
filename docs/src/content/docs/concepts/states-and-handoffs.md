@@ -101,6 +101,13 @@ For Claude Code, use `/architect`. A complete handoff directs the next role to
 read the relevant active work, project context, role outputs, and recovery
 record. Keep the detail in those files instead of repeating it in the message.
 
+When entering `TESTING`, the handoff explicitly directs you to open a fresh chat
+separate from Developer's implementation conversation and invoke Tester there.
+The files must carry the context; a skill cannot erase history or certify
+freshness without client support. This applies to recovery handoffs too. See
+[Tester](../../roles/tester/) and the
+[canonical session rule](../../reference/protocol/#independent-tester-session).
+
 ## Blocking questions and recovery
 
 An unresolved blocking question is recorded in `Active Work.BlockedOn`. Asking

@@ -45,6 +45,13 @@ reuse it in that cycle or count it among the current requirements.
 A technical check Architect derives from a scope acceptance condition. It uses
 that condition's existing ID.
 
+## Verification report
+
+Tester's assessment at `docs/verification/<Active Work.Id>.md`: acceptance
+coverage, scenario allocations, actual results, gaps, and later dependencies. It
+is cycle-owned evidence, separate from reusable tests and workflow state. See
+the [verification template](../templates/tester/).
+
 ## Project context
 
 Auditor's record of the existing project in `.standards/CONTEXT.md`. Its

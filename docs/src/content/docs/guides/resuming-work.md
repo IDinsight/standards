@@ -44,6 +44,13 @@ editing it. Continue from the first incomplete approved step, respecting the
 selected collaboration mode. A proposed plan must wait for approval. See
 [Developer resumption and recovery](../working-with-developer/#resume-or-correct-implementation).
 
+In `TESTING`, read `docs/verification/<Active Work.Id>.md` when present. Resume
+VERIFY if the initial pass was merely interrupted with unchanged inputs. Use
+REVERIFY when the assessment needs reconciliation after changes. Preserve valid
+coverage and budget allocations; replace invalid execution evidence. Tester must
+remain separate from Developer's implementation conversation. See
+[Tester modes](../../roles/tester/#modes).
+
 ## Resolve blockers without skipping gates
 
 If `BlockedOn` contains an unanswered question, use the answer before clearing

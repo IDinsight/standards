@@ -142,3 +142,8 @@ directories are `docs/scope/`, `docs/specs/`, and `docs/development/` in the
 project using STANDARDS, separate from this website's source files. Follow
 [artifact provenance](../../concepts/ownership/#artifact-provenance) before
 creating or editing these files.
+
+Tester's report is always `docs/verification/<Active Work.Id>.md` with matching
+`VERIFICATION` provenance. Its location is derived from the active cycle ID,
+without a separate state field. Tests stay in established repository locations.
+See the [verification template](../templates/tester/).

@@ -62,8 +62,11 @@ relevant without treating `DEV-NNN` as the requirement source.
 
 List the smallest relevant Developer-level check: build, compile, typecheck,
 lint, existing test command, targeted runtime sanity check, inspection, or other
-established mechanism. This is implementation feedback, not formal Tester
-verification.
+established mechanism. Record the actual command and working directory, result,
+relevant assessed revision or dirty-tree content, and any limitation when the
+self-check runs. This is implementation feedback, not formal Tester
+verification. Keep the evidence sufficient for the protocol's fresh-session
+Tester handoff.
 
 **Implementation Notes**
 
