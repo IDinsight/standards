@@ -318,12 +318,9 @@ Keep the complete list while any source remains unresolved; only Auditor clears
 it to `NONE` after reconciling every listed source. An empty list is represented
 as `NONE`, not an empty string or `[]`.
 
-When reading an older free-text value, normalize it to this shape only if every
-source ID and its associated request summary are explicit and unambiguous.
-Preserve all sources and summaries. If the pairing is unclear, retain the value,
-persist a blocker, and ask for clarification before using the affected baseline
-or starting a cycle dependent on it. Upgrade must not replace existing
-obligations with `NONE` merely to fit the new format.
+A value that does not match this format is invalid workflow state. Report the
+inconsistency and block work that depends on it until corrected; do not infer
+entries or discard obligations.
 
 ### Cycle ID Registry
 
@@ -358,25 +355,14 @@ artifact-path and provenance checks are additional collision protection, not a
 replacement for the registry.
 
 Initialize `CYCLE_IDS.md` empty on first installation. Preserve it across normal
-reinstall, framework upgrade, and explicit workflow reinitialization. For an
-upgrade from a protocol version that did not require the registry,
-verify that fact from the currently installed pre-update protocol, then create
-and seed `CYCLE_IDS.md` before replacing that installed protocol or allocating
-any further cycle ID. Seed every cycle ID that can be discovered from current
-persisted state and existing STANDARDS cycle-owned artifacts/provenance. IDs
-that cannot be reconstructed from a pre-registry runtime cannot be retroactively
-guaranteed; the registry-backed no-reuse guarantee applies to every ID allocated
-after registry initialization.
+reinstall, framework upgrade, and explicit workflow reinitialization.
 
-If `CYCLE_IDS.md` is unexpectedly missing from an installed runtime whose
-installed protocol already requires the registry, treat the runtime as
-incomplete: stop cycle allocation and workflow work that would require a new
-cycle ID, report the missing registry, and require restoration of the registry
-or intentional runtime removal followed by a fresh installation. Never recreate
-an empty registry or best-effort reconstruct one in place for a registry-aware
-runtime, because doing so would silently break the installed-runtime no-reuse
-guarantee. The only automatic creation-and-seeding exception is the verified
-upgrade path from a pre-registry protocol described above.
+If `CYCLE_IDS.md` is unexpectedly missing from an installed runtime, treat the
+runtime as incomplete: stop cycle allocation and workflow work that would
+require a new cycle ID, report the missing registry, and require restoration of
+the registry or intentional runtime removal followed by a fresh installation.
+Never recreate an empty registry or best-effort reconstruct one in place,
+because doing so would silently break the installed-runtime no-reuse guarantee.
 
 Intentional removal of the S.T.A.N.D.A.R.D.S. runtime may remove the registry
 with `.standards/`; that removal ends the registry-backed lifetime guarantee. A
@@ -1201,20 +1187,14 @@ After ownership checks:
   user-owned unbounded `@AGENTS.md` import exists, preserve it and do not add a
   framework duplicate. Otherwise add or update a bounded integration block. If
   multiple unbounded imports exist, preserve them and report the conflict.
-- Before replacing `.standards/PROTOCOL.md` during an upgrade, inspect the
-  currently installed protocol. If it already requires **Cycle ID Registry**,
-  require the existing registry to be present and valid enough to preserve; if
-  it is unexpectedly missing, stop and report the incomplete runtime. If the
-  currently installed protocol predates the registry, create and seed
-  `.standards/CYCLE_IDS.md` as defined by **Cycle ID Registry** and persist that
-  migration before replacing `PROTOCOL.md`. This pre-update check is what
-  distinguishes a legitimate pre-registry migration from a damaged
-  registry-aware runtime.
+- Before replacing `.standards/PROTOCOL.md` during an upgrade, require the
+  existing cycle-ID registry to be present and valid enough to preserve. If it
+  is missing or invalid, stop and report the incomplete runtime.
 - Update `.standards/PROTOCOL.md` from the installed framework version only
-  after runtime ownership verification and any required cycle-registry migration
-  above. Install or update each skill definition only after that destination
-  skill package passes its ownership check. Keep the installed protocol aligned
-  with the installed skills.
+  after runtime ownership verification and the registry check above. Install or
+  update each skill definition only after that destination skill package passes
+  its ownership check. Keep the installed protocol aligned with the installed
+  skills.
 - Preserve Codex `allow_implicit_invocation: false`.
 - For Claude Code, safely merge `.claude/settings.json` while preserving
   unrelated settings: add each missing required
@@ -1229,20 +1209,14 @@ After ownership checks:
   ownership by inference.
 - Preserve existing `.standards/MODE.md` and `.standards/STATE.md` on normal
   reinstall; initialize them only on first install or explicit reinitialization.
-  On framework upgrade, a required protocol-owned coordination field or section
-  introduced by the new protocol may be added with a semantically neutral default
-  only when it is absent; do not reset, reinterpret, or discard existing workflow
-  state. Normalize older `BaselineReconciliation` values only under
-  **Baseline Reconciliation Format**; retain ambiguous values for clarification
-  rather than discarding their obligations.
+  Do not reset, reinterpret, or discard existing workflow state during upgrades.
+  Missing required fields or invalid formats are runtime inconsistencies, not
+  permission to add inferred defaults.
 - Initialize `.standards/CYCLE_IDS.md` on first install. Thereafter preserve it
   across reinstall, upgrade, and explicit workflow reinitialization; never clear
   or rewrite existing entries while the runtime remains installed. If it is
-  unexpectedly missing from a verified runtime whose installed protocol already
-  requires the registry, stop and report the incomplete runtime; do not recreate
-  it empty or reconstruct it by inference. A verified pre-registry upgrade must
-  complete the pre-`PROTOCOL.md` migration described above before the new
-  protocol is installed or any new cycle is allocated.
+  unexpectedly missing from a verified runtime, stop and report the incomplete
+  runtime; do not recreate it empty or reconstruct it by inference.
 - Preserve `.standards/CONTEXT.md`; it is Auditor-owned, not installer-owned.
 - Preserve project-level instructions. When they materially conflict with the
   protocol, integration contract, workflow artifacts, or other authoritative

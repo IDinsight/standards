@@ -144,13 +144,15 @@
     },
     {
       "id": 11,
-      "prompt": "Auditor resumes an older runtime whose BaselineReconciliation is free text: cache-a and import-b left changes; fix cache and import behavior. It does not unambiguously pair each cycle ID with its own request summary. Repository evidence cannot resolve the missing provenance.",
-      "expected_output": "Auditor preserves the legacy value, blocks for clarification of the per-source requests, and does not invent structured entries or clear the obligation.",
+      "prompt": "Resume Auditor in a current STANDARDS runtime with WorkflowState AUDITING and CycleMode STANDARD. Active Work.BaselineReconciliation is a malformed list: the first entry has SourceCycle cache-a and Request fix cache invalidation; the second has Request adjust imports but no SourceCycle. The current Active Work.Request concerns an unrelated UI change. Existing CONTEXT.md and project files contain useful evidence, but no authoritative source establishes the missing cycle ID. Continue the audit.",
+      "expected_output": "Auditor reports invalid reconciliation state and blocks work that depends on it until corrected. It preserves both entries and existing project data without inventing a source cycle, dropping the incomplete entry, or accepting the affected baseline.",
       "files": [],
       "assertions": [
-        "Normalization is blocked because per-source ID/request pairings are ambiguous",
-        "The original provenance remains persisted rather than replaced with NONE or one guessed source",
-        "Auditor asks for clarification before accepting the affected baseline or handing off"
+        "The malformed list is treated as invalid current-runtime state because every entry requires SourceCycle and Request",
+        "Auditor persists a blocker identifying the incomplete entry, does not establish the affected baseline as accepted, and does not hand off from AUDITING",
+        "The complete cache-a entry and the incomplete entry's request remain intact; existing context and project data are not discarded or overwritten to hide the inconsistency",
+        "Auditor does not infer a SourceCycle from Active Work.Id, the current request, chat history, or a guessed relationship, and does not invent replacement reconciliation entries",
+        "BaselineReconciliation is not cleared to NONE or reduced to only the valid entry; dependent work resumes only after the malformed state is corrected"
       ]
     }
   ]

@@ -352,12 +352,12 @@
     },
     {
       "id": 27,
-      "prompt": "Invoke Developer for a new bounded brownfield change. The installed .standards/PROTOCOL.md already requires Cycle ID Registry, CycleMode is UNSET, PendingCycleMode is UNSET, Active Work.Id and Request are UNSET, but .standards/CYCLE_IDS.md is unexpectedly missing from this otherwise installed runtime. Continue safely.",
+      "prompt": "Invoke Developer for a new bounded brownfield change. CycleMode is UNSET, PendingCycleMode is UNSET, Active Work.Id and Request are UNSET, but .standards/CYCLE_IDS.md is unexpectedly missing from this otherwise installed runtime. Continue safely.",
       "expected_output": "Developer fails closed before allocating or starting a cycle: it reports the installed runtime as incomplete, leaves cycle state unchanged, does not recreate an empty or inferred CYCLE_IDS.md, and requires restoration of the registry or intentional runtime removal followed by fresh installation before a new cycle ID can be allocated.",
       "files": [],
       "assertions": [
         "The response does not allocate or persist a new Active Work.Id while CYCLE_IDS.md is missing",
-        "It treats the missing registry as an incomplete registry-aware runtime rather than a first installation",
+        "It treats the missing registry as an incomplete runtime rather than a first installation",
         "It does not recreate CYCLE_IDS.md empty or reconstruct it from best-effort artifact/state evidence",
         "It leaves cycle state unchanged and requires registry restoration or intentional runtime removal followed by fresh installation before cycle allocation"
       ]
@@ -496,14 +496,15 @@
     },
     {
       "id": 39,
-      "prompt": "Resume Developer with a legacy plan missing User Style Locked. Status is PROPOSED and User Style is tony. It is unclear whether this is the initial proposal or a material revision of a previously approved plan. The user asks to clear the profile and continue.",
-      "expected_output": "Developer preserves the saved style and implementation, persists an approval-history question, and does not infer that PROPOSED means unlocked.",
+      "prompt": "Resume Developer in a current STANDARDS runtime with WorkflowState DEVELOPING. The persisted plan records Status PROPOSED, User Style tony, DEV-001 DONE, and DEV-002 PENDING, but its required User Style Locked field is missing. The selected profile exists. The user says: clear my personal style and continue DEV-002.",
+      "expected_output": "Developer reports an invalid development plan and blocks implementation until the missing field is corrected. It preserves the style selection, existing plan data, and implementation rather than inferring an unlocked default from PROPOSED status.",
       "files": [],
       "assertions": [
-        "The missing lock field is not silently defaulted to false",
-        "Developer asks for the missing approval history before changing the selection",
-        "Established prior approval would lock the existing selection; confirmed never-approved status would allow pre-approval changes",
-        "No implementation or cycle reset occurs while approval history is unresolved"
+        "The missing required User Style Locked field is treated as invalid current-runtime state",
+        "Developer persists a blocker identifying the missing field and does not implement DEV-002 or advance the workflow",
+        "The tony selection, plan status, DEV identifiers and statuses, completed implementation, and other existing data are preserved",
+        "Developer does not invent a lock value, assume PROPOSED means unlocked, clear the style, or replace the plan to bypass the inconsistency",
+        "The response requires correction of the invalid plan before dependent work resumes"
       ]
     },
     {

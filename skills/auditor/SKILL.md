@@ -132,19 +132,18 @@ transition or protocol-required coordination update.
     current-cycle non-baseline work without current-cycle evidence.
 16. When `Active Work.BaselineReconciliation` is not `NONE`, read every
     `SourceCycle`/`Request` entry under the protocol's **Baseline Reconciliation
-    Format** to anchor provenance. Normalize older free-text values only when
-    every pairing is unambiguous; otherwise preserve them and block for
-    clarification. Do not assume changes left by those cancelled cycles are
-    either accepted baseline or current-cycle work. Establish their status from
-    version-control evidence and explicit user input. If they were deliberately
-    adopted, record their resulting established facts in the ordinary baseline;
-    if reverted, omit them; if their status materially affects downstream work
-    and cannot be established safely, persist a blocking question and ask the
-    user. Do not relabel cancelled-cycle residue as the new cycle's
-    **Active-Cycle Non-Baseline Work** merely to avoid resolving its provenance.
-    Clear `Active Work.BaselineReconciliation` to `NONE` only after all listed
-    source-cycle residue has been reconciled sufficiently for downstream roles
-    to rely on the baseline.
+    Format** to anchor provenance. Invalid reconciliation state blocks dependent
+    work until corrected. Do not assume changes left by those cancelled cycles
+    are either accepted baseline or current-cycle work. Establish their status
+    from version-control evidence and explicit user input. If they were
+    deliberately adopted, record their resulting established facts in the
+    ordinary baseline; if reverted, omit them; if their status materially
+    affects downstream work and cannot be established safely, persist a blocking
+    question and ask the user. Do not relabel cancelled-cycle residue as the new
+    cycle's **Active-Cycle Non-Baseline Work** merely to avoid resolving its
+    provenance. Clear `Active Work.BaselineReconciliation` to `NONE` only after
+    all listed source-cycle residue has been reconciled sufficiently for
+    downstream roles to rely on the baseline.
 17. If auditing reveals that a completed scope or technical design is now
     invalid, do not edit those artifacts. Finish the corrected context, then
     resume at the earliest invalidated workflow state according to the protocol.

@@ -68,12 +68,10 @@ instructions or settings require user resolution.
 Reinstallation must not reset an active cycle, duplicate integration blocks, or
 claim ownership of settings that already existed.
 
-On upgrade, add newly required state fields only when absent and with neutral
-defaults. Preserve existing workflow data. Preserve the cycle-ID registry even
-during explicit workflow reinitialization. A verified upgrade from a protocol
-without a registry must create and seed it before replacing the installed
-protocol; a missing registry in a runtime that already requires one must not be
-silently recreated. See
+Preserve existing workflow data during upgrades. Missing required fields or
+invalid formats must be corrected, not filled with inferred defaults. Preserve
+the cycle-ID registry even during explicit workflow reinitialization. A missing
+registry in an installed runtime must not be silently recreated. See
 [registry lifecycle](../../reference/runtime-files/#cycle-identity).
 
 The precise rules are in

@@ -111,12 +111,12 @@ no pending preference exists, Developer may infer `EXPEDITED` only for a
 sufficiently bounded brownfield request. If the request cannot use the selected
 expedited contract, do not silently reinterpret it as `STANDARD`; follow the
 protocol's user-decision rule. For a selected or defaulted `STANDARD` request,
-allocate its cycle ID through the protocol's **Cycle ID Registry** first. If the
-installed protocol requires the registry but `CYCLE_IDS.md` is unexpectedly
-missing, stop and report the incomplete runtime; do not recreate or infer the
-registry. After a valid registry append succeeds, persist the reserved ID and
-initial request, then stop Developer work because the standard entry state
-remains owned by Scoper or Auditor.
+allocate its cycle ID through the protocol's **Cycle ID Registry** first. If
+`CYCLE_IDS.md` is unexpectedly missing from the installed runtime, stop and
+report the incomplete runtime; do not recreate or infer the registry. After a
+valid registry append succeeds, persist the reserved ID and initial request,
+then stop Developer work because the standard entry state remains owned by
+Scoper or Auditor.
 
 If another role owns the active state and no protocol-authorized control-plane
 transition applies, do not perform Developer work. Leave role-owned artifacts
@@ -234,11 +234,8 @@ new cycle and its own development plan under the protocol's terminal-state and
 restyle completed work; persist the blocking choice and ask whether to continue
 with the locked style or end this cycle through an allowed transition.
 
-For an older plan without `User Style Locked`, preserve its recorded selection
-and set the lock to `true` if prior approval is established. Set it to `false`
-only when the plan has never been approved. `PROPOSED` alone does not prove
-that: it may be a revision. If approval history is unclear, block and ask rather
-than infer an unlocked selection.
+A plan missing `User Style Locked` is invalid. Report the inconsistency and
+block implementation until corrected; do not infer the lock from plan status.
 
 Do not refactor unrelated code solely to normalize style.
 

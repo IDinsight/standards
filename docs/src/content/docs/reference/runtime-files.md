@@ -85,18 +85,14 @@ installed. If initialization fails after reservation, leave the ID reserved. If
 the append fails, the new cycle must not start.
 
 Installation creates an empty registry. Reinstall, upgrade, and explicit
-workflow reinitialization preserve it. A verified upgrade from an older protocol
-without a registry must seed discoverable IDs from state and existing artifacts
-before replacing the installed protocol. Earlier undiscoverable IDs cannot be
-covered retroactively.
+workflow reinitialization preserve it.
 
-If the installed protocol already requires a registry and it is missing, stop
-new-ID allocation and work that depends on it. Restore the registry or
-intentionally remove the runtime and install afresh; never silently recreate an
-empty registry or guess its history. Runtime removal ends the registry's
-lifetime guarantee, but a fresh installation still checks existing artifact
-paths and provenance for collisions. See the
-[exact registry rules](../protocol/#cycle-id-registry).
+If the registry is missing from an installed runtime, stop new-ID allocation and
+work that depends on it. Restore the registry or intentionally remove the
+runtime and install afresh; never silently recreate an empty registry or guess
+its history. Runtime removal ends the registry's lifetime guarantee, but a fresh
+installation still checks existing artifact paths and provenance for collisions.
+See the [exact registry rules](../protocol/#cycle-id-registry).
 
 ### Outstanding baseline reconciliation
 
@@ -114,9 +110,9 @@ paths and provenance for collisions. See the
 Each source cycle ID appears once, with its own request summary. Append new
 sources while preserving existing entries through handoffs, recovery, rework,
 and cancellation. Keep the whole list until Auditor resolves every source, then
-set it to `NONE`. `Handoff.Reason` cannot replace it. Older free-text values may
-be normalized only when every ID and summary can be paired without guessing;
-otherwise preserve the value and block for clarification. See the
+set it to `NONE`. `Handoff.Reason` cannot replace it. A value outside the
+required format is invalid workflow state and blocks dependent work until
+corrected. See the
 [canonical format](../protocol/#baseline-reconciliation-format).
 
 This is separate from `Outstanding Obligations`, which tracks defects to fix.

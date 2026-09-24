@@ -16,14 +16,14 @@ Before performing workflow work:
    with `CycleMode: UNSET`. If this is the first real request and `Active Work`
    is `UNSET`, allocate the cycle ID through `.standards/CYCLE_IDS.md` as
    defined by the protocol, persist the request, and persist the legal
-   cycle-mode selection before substantive workflow work. If the installed
-   protocol requires the registry but `CYCLE_IDS.md` is unexpectedly missing,
-   stop and report the incomplete runtime rather than recreating it. Append the
-   new ID to the registry before writing it to `Active Work.Id`; never reuse or
-   remove a registered ID while the runtime remains installed. Consume a
-   persisted `PendingCycleMode` when present. If a pre-cycle request is blocked,
-   use `PendingCycleRequest` and `PendingCycleBlockedOn` rather than asking the
-   user to restate it. Clear all pending-cycle fields when the cycle starts; a
+   cycle-mode selection before substantive workflow work. If `CYCLE_IDS.md` is
+   unexpectedly missing from the installed runtime, stop and report the
+   incomplete runtime rather than recreating it. Append the new ID to the
+   registry before writing it to `Active Work.Id`; never reuse or remove a
+   registered ID while the runtime remains installed. Consume a persisted
+   `PendingCycleMode` when present. If a pre-cycle request is blocked, use
+   `PendingCycleRequest` and `PendingCycleBlockedOn` rather than asking the user
+   to restate it. Clear all pending-cycle fields when the cycle starts; a
    pending `STANDARD` preference prevents Developer from inferring `EXPEDITED`.
    From `SIGNED_OFF` or retained `CANCELLED`, resolve any persisted pending
    request through the protocol's `NEW_CYCLE` transition rather than directly

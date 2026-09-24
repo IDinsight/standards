@@ -97,9 +97,8 @@ on an individual step.
   replacing the current cycle's plan does not unlock it.
 - On resume, reload the persisted user style before implementation. If the
   locked file is unavailable, stop until it is restored rather than clearing or
-  substituting the style. For older plans missing the lock field, apply
-  Developer's approval-history check; do not infer first approval from
-  `PROPOSED` alone.
+  substituting the style. `User Style Locked` is required; a missing field is an
+  invalid plan and blocks implementation until corrected.
 - In `STANDARD`, reference the current Scoper-owned `AC-NNN` identifiers covered
   by each implementation step. Do not redefine their wording or use `DEV-NNN` as
   substitute requirement identity.
