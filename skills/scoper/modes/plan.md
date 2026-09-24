@@ -10,14 +10,7 @@ yet.
 
 ## Inputs
 
-Use the Scoper skill's shared inputs and invariants. In particular:
-
-- read `Active Work.Request` and explicit user constraints;
-- read `.standards/CONTEXT.md` when it exists and is relevant;
-- for brownfield work, require the active-cycle Auditor context;
-- do not adopt a STANDARDS-marked scope owned by a completed prior cycle as the
-  current cycle's scope; an appropriate unmarked project-owned canonical scope
-  document may be selected under the shared provenance rules.
+Apply the Scoper skill's shared **Inputs**, **Ownership**, and **Invariants**.
 
 ## Procedure
 

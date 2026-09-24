@@ -484,31 +484,27 @@ collision: report it and block dependent work until resolved without overwriting
 relabeling, adopting it, or silently choosing an alternate path. The same applies
 when a non-directory or unsafe path prevents the required report location.
 
-Documenter owns the fixed cycle-specific record at
-`docs/documentation/<Active Work.Id>.md`. Its `DOCUMENTATION` provenance block
-and visible `Cycle` field must match `Active Work.Id`. Derive the path from the
-cycle ID; do not add a documentation-path state field. Inspect the path and
-provenance before creating or editing the record. An unrelated, unmarked,
-incorrectly marked, or different-cycle file is a collision; a non-directory or
-unsafe path is also a blocker. Preserve existing content, report the collision,
-and block dependent work until resolved without relabeling, adopting,
-overwriting, or silently choosing another path. Preserve other cycles' records,
-including moved artifacts whose provenance still names their original cycle.
-Ordinary project documentation, comments, and docstrings remain reusable
-project assets and do not acquire cycle provenance merely because Documenter
-updates them.
+The following records have fixed cycle-specific paths:
 
-Synchronizer owns the fixed cycle-specific record at
-`docs/synchronization/<Active Work.Id>.md`. Its `SYNCHRONIZATION` provenance
-block and visible `Cycle` field must match `Active Work.Id`. Derive the path
-from the cycle ID; do not add a synchronization-path state field. Inspect the
-path and provenance before creating or editing the record. An unrelated,
-unmarked, incorrectly marked, or different-cycle file is a collision; a
-non-directory or unsafe path is also a blocker. Preserve the existing content,
-report the collision, and block dependent work until resolved without
+| Owner        | Path                                       | Artifact type     |
+|--------------|--------------------------------------------|-------------------|
+| Documenter   | `docs/documentation/<Active Work.Id>.md`   | `DOCUMENTATION`   |
+| Synchronizer | `docs/synchronization/<Active Work.Id>.md` | `SYNCHRONIZATION` |
+
+For each record, use the listed artifact type; its provenance block's `Cycle`
+and visible `Cycle` field must match `Active Work.Id`. Derive the path from
+the cycle ID; do not add documentation-path or synchronization-path state
+fields. Inspect the path and provenance before creating or editing the record.
+An unrelated, unmarked, incorrectly marked, or different-cycle file is a
+collision; a non-directory or unsafe path is also a blocker. Preserve existing
+content, report the collision, and block dependent work until resolved without
 relabeling, adopting, overwriting, or silently choosing another path. Preserve
 other cycles' records, including moved artifacts whose provenance still names
 their original cycle.
+
+Ordinary project documentation, comments, and docstrings remain reusable
+project assets and do not acquire cycle provenance merely because Documenter
+updates them.
 
 Before editing the verification report or an artifact referenced by
 `Active Work.Scope`, `Active Work.Architecture`, or `Active Work.Development`,
@@ -591,11 +587,8 @@ sign-off is unavailable while any outstanding obligation remains.
    `PendingCycleRequest` and `PendingCycleBlockedOn` instead.
 5. Failure/recovery, promotion, and user-control transitions follow their
    canonical sections below rather than redefining their mechanics here.
-6. During the initial greenfield cycle, Developer performs the permanent
-   `GREENFIELD` -> `BROWNFIELD` mode change as soon as Developer observes and
-   verifies that the active cycle has successfully created or materially modified
-   a project implementation artifact, regardless of whether Developer or the user
-   authored the change during Developer collaboration.
+6. During the initial greenfield cycle, Developer performs the permanent mode
+   change defined in **Project Modes**.
 
 `STATE.md` coordinates the workflow; it does not replace role-owned artifacts.
 Role-owned artifacts remain authoritative for their own content.
@@ -625,11 +618,8 @@ established; absence of context by itself is not a defect. If either role needs
 project facts that cannot safely be established without Auditor-owned context,
 it routes a `PROJECT_CONTEXT` failure to Auditor. Once `CONTEXT.md` exists,
 later Scoping or Architecture work must use it when relevant and must not ignore
-it merely because `ProjectMode` remains `GREENFIELD`. After Developer observes
-and verifies the first successful creation or material modification of a project
-implementation artifact as part of the active cycle, `ProjectMode` remains
-`BROWNFIELD` permanently, regardless of who authored that implementation
-change.
+it merely because `ProjectMode` remains `GREENFIELD`. The permanent change to
+`BROWNFIELD` follows **Project Modes**.
 
 `.standards/MODE.md` and `.standards/STATE.md` are protocol-owned coordination
 artifacts. A role or user may change them only as required by a legal protocol
@@ -1028,14 +1018,10 @@ guarantee.
    tentative active-cycle work, not baseline.
 5. Auditor establishes or refreshes context without laundering tentative work
    into pre-existing baseline. Material ambiguity requires a user question.
-6. Before clearing recovery, convert every expedited recovery frame with
-   `RerunThrough: NONE` into an `Outstanding Obligations` entry preserving its
-   `Owner`, `FailureType`, and `Reason`, in recovery-stack order. Those frames
-   still represent unresolved owner corrections. Do not convert frames with a
-   non-`NONE` `RerunThrough`; their owner already passed its corrective gate and
-   they remain only for obsolete expedited rerun/resume routing. Do not carry
-   `From`, `ResumeAt`, or `RerunThrough` into an obligation. Then clear recovery.
-   The standard brownfield topology restarts at `AUDITING`.
+6. Before clearing recovery, persist the frame-to-obligation conversion defined
+   in **Outstanding Obligations**, preserving each converted frame's `Owner`,
+   `FailureType`, and `Reason`. Then clear the expedited recovery stack. The
+   standard brownfield topology restarts at `AUDITING`.
 7. Promotion is one-way for the active cycle.
 8. All standard forward, failure, recovery, outstanding-obligation, traceability,
    and sign-off rules apply afterward.

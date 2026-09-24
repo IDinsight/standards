@@ -14,10 +14,7 @@ Use the Scoper skill's shared inputs and invariants. Also:
 
 - read the full existing scope before editing it;
 - read the active handoff and recovery frame, when present, to understand why
-  replanning is required;
-- read `.standards/CONTEXT.md` whenever it exists and is relevant, including
-  during the initial `GREENFIELD` lifecycle after Auditor has already created
-  it.
+  replanning is required.
 
 ## Procedure
 
