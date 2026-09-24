@@ -87,7 +87,8 @@ step outside the normal forward sequence.
 
 `STANDARD` selects the full workflow. `EXPEDITED` selects the shorter workflow
 for a small, clearly defined change to an existing project. `UNSET` means no
-cycle is active and role-owned work cannot begin yet.
+cycle is active and role-owned workflow work cannot begin yet. Navigator can
+still explain available project evidence.
 
 ## Promotion
 
@@ -104,7 +105,8 @@ which steps need repeating. See [Recovery](../../concepts/recovery/).
 
 `ProjectMode` records whether the project has an established implementation.
 `WorkflowState` records the current step. A role's internal mode selects how it
-works within that step.
+works. Navigator's EXPLAIN, INVESTIGATE, and GRILL_ME modes operate outside the
+workflow state machine; they do not require a current step.
 
 ## Pending cycle fields
 

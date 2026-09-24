@@ -4,7 +4,16 @@
 
 This project uses the S.T.A.N.D.A.R.D.S. agent workflow.
 
-Before performing workflow work:
+Navigator is explicitly invoked and stays outside workflow work. Apply the
+installed protocol's **Navigator Boundary** when available. Its EXPLAIN
+(default), INVESTIGATE, and GRILL_ME modes never edit files, persist questions
+or quiz results, dispatch roles, or perform control-plane transitions. Keep its
+context in the conversation. Missing runtime metadata or an inactive cycle does
+not prevent ordinary explanation from available project evidence; do not
+initialize or repair the runtime for Navigator. Inspect diagnostics for side
+effects before running them and use only established non-mutating operations.
+
+For workflow roles other than Navigator, before performing workflow work:
 
 1. Read `.standards/PROTOCOL.md` for the canonical roles, states, transitions,
    failure types, and shared terminology.
@@ -80,8 +89,8 @@ Before performing workflow work:
    guidance; it does not rewrite another owner's artifacts or managed framework
    blocks.
 
-Navigator is strictly non-mutating and may be used at any time without changing
-workflow state.
+Navigator may explain workflow status and likely defect owners, but never
+applies failure/recovery routing or gives workflow approval.
 
 Project-specific agent instructions may be added outside the S.T.A.N.D.A.R.D.S.
 integration block. Apply `.standards/PROTOCOL.md` **Instruction Layering and

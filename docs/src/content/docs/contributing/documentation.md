@@ -31,7 +31,9 @@ that links reach the built destination rather than a repository file path.
 
 For an implemented role, cover purpose, when to use it, inputs and output,
 available modes, invocation examples, completion and handoff, and boundaries.
-Keep mode details on the role page until they justify separate guides.
+Keep mode details on the role page until they justify separate guides. For
+Navigator, describe conversational outcomes and stopping instead of workflow
+completion or handoff; it has no persisted artifact or template registration.
 
 For an unfinished role, retain its short description based on the protocol, WIP
 notice, and sidebar badge. Replace those with validated usage guidance when the

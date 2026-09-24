@@ -10,7 +10,8 @@ depends on the project and cycle mode.
 - [Scoper](../scoper/) defines what to build and what counts as done.
 - [Tester](../tester/) checks behavior and records results.
 - [Architect](../architect/) makes the technical design decisions.
-- [Navigator](../navigator/) explains the project without changing it.
+- [Navigator](../navigator/) explains, investigates, and quizzes understanding
+  without changing the project or workflow state.
 - [Developer](../developer/) plans implementation, obtains plan approval, and
   implements the design or expedited request.
 - [Auditor](../auditor/) records the facts about the existing project.
@@ -34,5 +35,5 @@ in their assigned states.
 Use the command in the handoff to run the next role after the state change is
 saved. The role reads the saved request, files, and recovery records.
 
-WIP badges mark roles whose implementation and detailed usage docs are still
-unfinished.
+All nine role packages are implemented. The installer remains unfinished; see
+[installation requirements](../../getting-started/installation/).

@@ -29,8 +29,9 @@ determines whether an invoked role may perform role-owned workflow work; it does
 not dispatch a skill automatically. Where supported, client installation must
 prevent implicit model invocation of workflow role skills.
 
-`NAVIGATOR` is strictly non-mutating and outside the workflow state machine. It
-may be invoked from any state and never changes `.standards/STATE.md`.
+`NAVIGATOR` is explicitly invoked, strictly non-mutating, and outside the
+workflow state machine. Its **Navigator Boundary** below applies instead of
+workflow entry, persistence, completion, and handoff requirements.
 
 State ownership governs role-owned work, not protocol coordination. An explicit
 user instruction may authorize a control-plane transition even when another role
@@ -41,6 +42,47 @@ target role's work unless that skill was also explicitly invoked and owns the
 resulting state. An active workflow role may also `PROMOTE` without separate
 user authorization when an expedited cycle can no longer safely remain
 expedited.
+
+## Navigator Boundary
+
+Navigator helps the user understand existing work, investigate questions, and
+check comprehension. It may run in any workflow state, including user-owned and
+terminal states, with any cycle mode or no active cycle. It owns no workflow
+state or persisted artifact and has no workflow completion gate.
+
+- Navigator never edits project files, installed runtime files, role artifacts,
+  or client settings; stages or commits changes; suggests commits; or dispatches
+  another role. It creates no persisted quiz scores, preferences, or summaries.
+  Conversation context stays in the conversation.
+- The control-plane permissions elsewhere in this protocol do not apply while
+  Navigator runs. It never initializes cycles, allocates IDs, records blockers,
+  selects or promotes cycle modes, signs off, cancels, or creates failure,
+  recovery, or other state-changing handoffs. It may explain these actions and
+  their owners, but performing them requires leaving Navigator.
+- Read relevant installed protocol, state, and owner artifacts when available.
+  Missing or invalid workflow metadata limits claims about workflow status; it
+  does not prevent ordinary explanation supported by project evidence. Do not
+  initialize, repair, or require an installed runtime or active cycle merely to
+  answer a project question.
+- Inspect commands and their relevant scripts, hooks, configuration, and side
+  effects before execution. Use only diagnostics whose non-mutating behavior is
+  established. Tests, builds, formatters, imports, and nominal dry runs may write
+  files or affect external systems; their names alone do not make them safe.
+  Prefer source inspection or existing evidence when safe execution cannot be
+  established. Do not run a mutating check and undo its effects afterward.
+- Explanations distinguish observed and intended behavior, hypotheses, and
+  unknowns. Suspected defects may be explained with evidence and likely owners,
+  but Navigator neither repairs them nor issues formal Reviewer verdicts,
+  certifies Tester evidence, or satisfies acceptance conditions.
+- For material conflicts, explain the conflicting evidence and the owner or
+  user resolution needed under **Instruction Layering and Conflicts**, without
+  applying its workflow routing. Continue explanations independent of the
+  unresolved conflict; do not silently settle it.
+
+Navigator has three local interaction modes: `EXPLAIN` (default), `INVESTIGATE`,
+and `GRILL_ME`. They share the same boundaries and do not change `WorkflowState`
+or `CycleMode`. Sufficient understanding in a quiz is bounded to the agreed
+subject and depth; it is neither workflow approval nor complete mastery.
 
 ## Project Modes
 
@@ -1213,8 +1255,9 @@ when a different model is unavailable.
 
 ## User Decisions and Intervention
 
-These are user-authorized control-plane transitions. An explicit, unambiguous
-user instruction may authorize the receiving agent to persist the coordination
+These are user-authorized control-plane transitions, subject to **Navigator
+Boundary**. An explicit, unambiguous user instruction may authorize the receiving
+agent to persist the coordination
 change regardless of current state ownership. That exception authorizes only
 the protocol transition itself. Resulting role-owned work may proceed only when
 that role was explicitly invoked and owns the resulting state; otherwise stop
@@ -1443,7 +1486,8 @@ An installed project should provide:
   the selected coding agent;
 - explicit-invocation controls: Codex adapters use
   `allow_implicit_invocation: false`; Claude Code project settings use
-  `skillOverrides.<skill>: "user-invocable-only"` for installed workflow skills.
+  `skillOverrides.<skill>: "user-invocable-only"` for installed role skills,
+  including Navigator despite its position outside the workflow state machine.
 
 `.standards/MODE.md` contains exactly one canonical `ProjectMode`; its
 greenfield-to-brownfield transition follows **Project Modes**.

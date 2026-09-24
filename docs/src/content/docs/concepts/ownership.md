@@ -32,9 +32,10 @@ Keep existing facts separate from planned changes.
 
 ## Coordination has its own rules
 
-Roles may update `MODE.md`, `STATE.md`, and `CYCLE_IDS.md` only as the protocol
-requires, such as to change state, save a file path, or record an unanswered
-question. They cannot edit the installed `PROTOCOL.md` to change those rules.
+Workflow roles other than Navigator may update `MODE.md`, `STATE.md`, and
+`CYCLE_IDS.md` only as the protocol requires, such as to change state, save a
+file path, or record an unanswered question. They cannot edit the installed
+`PROTOCOL.md` to change those rules.
 
 ## Artifact provenance
 
@@ -117,5 +118,10 @@ See the [role overview](../../roles/overview/) for all responsibilities.
 
 ## Navigator is different
 
-Navigator explains and investigates at any point in the workflow. It never
-changes project files or workflow state.
+Navigator explains, investigates, and checks understanding at any point, even
+without an active cycle. It never changes project files or workflow state,
+including control-plane actions requested during navigation. It may explain a
+suspected defect and its likely owner, but does not route a failure, certify
+tests, issue a formal review verdict, or save an artifact. Quiz feedback is not
+workflow approval. See [Navigator](../../roles/navigator/) and the canonical
+[boundary](../../reference/protocol/#navigator-boundary).

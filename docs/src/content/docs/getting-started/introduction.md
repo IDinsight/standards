@@ -12,9 +12,13 @@ A **role** is responsible for a kind of work. Scoper defines the requirements;
 Architect decides how to meet them. A **workflow state**, such as `SCOPING`,
 records which role may work now.
 
-Each role has checks it must pass before moving on. The protocol calls these a
-**completion gate**. A **handoff** records the next state and gives you a
-command to run the next role. You run that command yourself.
+Each workflow role has checks it must pass before moving on. The protocol calls
+these a **completion gate**. A **handoff** records the next state and gives you
+a command to run the next role. You run that command yourself.
+
+[Navigator](../../roles/navigator/) works outside this sequence. It explains,
+investigates, or checks your understanding without changing files or state. It
+has no completion gate and needs no active cycle.
 
 A **cycle** is one request, from its start to your sign-off or cancellation.
 [Cycle mode](../../concepts/project-modes/#choose-the-cycle-mode) selects the

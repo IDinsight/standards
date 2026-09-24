@@ -50,11 +50,11 @@ frames are ordered oldest first; the last frame is active.
 See [starting a cycle](../../guides/starting-a-cycle/) for selection and
 validation.
 
-Installation leaves the ID and request `UNSET`. No role-owned work can begin
-until a mode is validated and an ID reserved. Use `NONE` for artifact paths
-until their owners create the files. Expedited Scope and Architecture paths stay
-`NONE` unless promotion brings those roles into the cycle. Developer still
-creates a plan in expedited work.
+Installation leaves the ID and request `UNSET`. No role-owned workflow work can
+begin until a mode is validated and an ID reserved. Use `NONE` for artifact
+paths until their owners create the files. Expedited Scope and Architecture
+paths stay `NONE` unless promotion brings those roles into the cycle. Developer
+still creates a plan in expedited work.
 
 `PromotionReason` survives later handoffs. After sign-off or retained
 cancellation, `CycleMode` becomes `UNSET`, while `Active Work` keeps the last
@@ -169,3 +169,11 @@ checks, unresolved work, and resume context. Fixed-path collisions block
 dependent work. Ordinary documentation and project agent guidance outside
 managed blocks remain project assets. See the
 [documentation template](../templates/documenter/).
+
+## Navigator needs no record
+
+[Navigator](../../roles/navigator/) can explain project evidence without an
+active cycle or complete installed metadata. It reads relevant state when
+available, but never repairs it, allocates IDs, persists questions, or saves
+quiz results. Missing metadata limits workflow-status claims, not independent
+project explanation. See [Navigator Boundary](../protocol/#navigator-boundary).

@@ -6,8 +6,8 @@ description: Follow an example change from request to sign-off.
 This walkthrough explains the protocol using an example change: **add search by
 name and email to an existing user directory** using `CycleMode: STANDARD`. It
 assumes the framework has been installed according to the
-[installation requirements](../installation/). Roles marked WIP are still being
-implemented and do not yet have full usage instructions.
+[installation requirements](../installation/). All nine role packages are
+implemented; the installer remains unfinished.
 
 ## 1. Establish the request
 

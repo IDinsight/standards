@@ -26,8 +26,10 @@ skills define role-specific behavior.
   starts in a fresh chat separate from Developer and uses VERIFY or REVERIFY,
   preserving coverage and the active change's test budget.
 - **Architect** defines consequential technical decisions and contracts.
-- **Navigator** provides read-only explanation, tracing, diagnosis, and project
-  understanding outside the workflow state machine.
+- **Navigator** helps users understand the project through EXPLAIN (default),
+  INVESTIGATE, and adaptive GRILL_ME questions. It uses repository evidence,
+  stays strictly non-mutating, and works outside the workflow state machine
+  without requiring an active cycle.
 - **Developer** turns the active contract into an approved atomic development
   plan, then implements it within established constraints using Autonomous,
   Stepwise, or Code With Me collaboration.
@@ -57,9 +59,9 @@ skills define role-specific behavior.
    projects.
 5. Treat Navigator as strictly non-mutating and outside the workflow state
    machine.
-6. Invoke workflow roles explicitly by the user. Persisted state validates which
-   role may act; it does not auto-dispatch skills. Use `$skill-name` in Codex
-   and `/skill-name` in Claude Code.
+6. Invoke all roles, including Navigator, explicitly by the user. Persisted
+   state validates which workflow role may act; it does not auto-dispatch
+   skills. Use `$skill-name` in Codex and `/skill-name` in Claude Code.
 7. When a handoff moves work to a different role, give the user a concise
    copy/paste invocation for that role using the active client's syntax. The
    invocation points the next role back to persisted state rather than

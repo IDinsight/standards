@@ -159,4 +159,4 @@ execute; they do not manufacture Tester-owned formal evidence.
 
 The package includes authored evaluation scenarios. Parsing them, checking
 structure, and building this site do not execute model evaluations or establish
-model behavior. Navigator and the installer remain unfinished.
+model behavior. The installer remains unfinished.

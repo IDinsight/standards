@@ -17,6 +17,7 @@ standards/
 │   ├── tester/
 │   ├── reviewer/
 │   ├── documenter/
+│   ├── navigator/
 │   └── synchronizer/
 ├── templates/
 │   ├── common/
@@ -48,6 +49,9 @@ corrections, without mode files. Documenter has thin AUTONOMOUS/GUIDED
 collaboration modes, an independent target selection, documentation styles, and
 explicitly selected user profiles. Both modes share one procedure, record, and
 completion gate; there is no plan-approval gate or cycle-long style lock.
+Navigator has thin EXPLAIN/INVESTIGATE/GRILL_ME modes sharing one evidence
+procedure and non-mutation boundary. It has no template, persisted record,
+workflow gate, or additional style layer; output stays in the conversation.
 
 The implemented skill directories also include Codex adapter metadata in
 `agents/openai.yaml` and evaluation cases in `evals/evals.json`. These are

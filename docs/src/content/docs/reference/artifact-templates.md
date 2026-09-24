@@ -5,8 +5,10 @@ description:
   synchronization, and context templates.
 ---
 
-Each implemented role has a template defining the file it produces. The site
-copies these templates from the repository during development and builds.
+Each workflow role has a template defining the file it produces. The site copies
+these templates from the repository during development and builds.
+[Navigator](../../roles/navigator/) has no template or persisted artifact;
+explanations and quiz summaries stay in the conversation.
 
 - [Scope](../templates/scoper/): requirements, acceptance conditions,
   dependencies, and retired IDs.

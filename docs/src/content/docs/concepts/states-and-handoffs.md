@@ -4,10 +4,12 @@ description: Follow normal transitions and understand explicit invocation.
 ---
 
 `STATE.md` records one `WorkflowState` and one `CycleMode`. The state determines
-which role may do its work; cycle mode selects the required steps and checks.
-`CycleMode: UNSET` permits no role-owned work.
+which workflow role may act; cycle mode selects the required steps and checks.
+`CycleMode: UNSET` permits no role-owned workflow work.
 [Initialize the cycle](../../guides/starting-a-cycle/) first, then run each role
-explicitly.
+explicitly. [Navigator](../../roles/navigator/) is outside these rules: it may
+explain, investigate, or check understanding at any state or without a cycle,
+without changing files or workflow records.
 
 ## Standard forward paths
 

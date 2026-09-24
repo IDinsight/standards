@@ -49,14 +49,16 @@ roles have completed their work.
 The managed block in `AGENTS.md` directs the agent to read the installed
 protocol and state. The Claude Code integration imports `AGENTS.md`.
 
-Users must explicitly run each workflow skill. Codex adapters preserve
-`allow_implicit_invocation: false`; Claude Code settings use
+Users must explicitly run each role skill, including Navigator. Codex adapters
+preserve `allow_implicit_invocation: false`; Claude Code settings use
 `skillOverrides.<skill>: "user-invocable-only"`. Installation records only
 client-setting changes it actually owns in `INSTALLATION.json`.
 
 Use `$scoper` in Codex and `/scoper` in Claude Code. The same naming convention
 applies to the other roles. The active state still determines whether the role
-may perform its work.
+may perform its workflow work. Navigator is outside that state machine and can
+explain available project evidence without an active cycle or complete runtime;
+this does not initialize or repair an installation.
 
 ## Preserve the host project
 
