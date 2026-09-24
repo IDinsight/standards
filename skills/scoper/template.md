@@ -16,6 +16,19 @@ invalidates.
 
 Omit empty sections. Add detail only when it materially reduces ambiguity.
 
+When Scoper creates a new STANDARDS-owned scope artifact, prepend this block and
+replace the placeholder with the exact active cycle ID:
+
+```markdown
+<!-- STANDARDS
+Artifact: SCOPE
+Cycle: <Active Work.Id>
+-->
+```
+
+Do not add this block solely because Scoper updates a pre-existing unmarked
+project-owned canonical scope document; that document remains project-owned.
+
 ---
 
 # Project or Change Name

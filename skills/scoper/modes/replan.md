@@ -38,9 +38,12 @@ Use the Scoper skill's shared inputs and invariants. Also:
    record each removed or replaced identifier as retired.
 5. If the revision exposes a blocking decision, persist it in
    `Active Work.BlockedOn` and stop until the user resolves it.
-6. Persist the revised scope at the same `Active Work.Scope` path unless there
-   is a substantive reason to relocate it; if relocated, update
-   `Active Work.Scope`.
+6. Before editing, verify the `Active Work.Scope` provenance under the shared
+   protocol rules. Continue at the same path when it is either an unmarked
+   project-owned document or a STANDARDS scope owned by the current cycle. Never
+   edit a STANDARDS scope owned by another cycle. If a substantive reason
+   requires relocation, give any newly created scope the current-cycle `SCOPE`
+   provenance block and update `Active Work.Scope`.
 7. Apply the Scoper completion gate and the protocol's recovery/invalidation
    rules. If the current acceptance-identifier set changed, treat any completed
    downstream artifact required to account for every current identifier as stale

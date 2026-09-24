@@ -25,10 +25,14 @@ tooling, systems software, infrastructure, or similar work.
 ## Ownership
 
 Own technical design and architecture decisions. The completed technical design
-must be persisted, even when it is brief. Use the repository's existing
-architecture or specification location; if none exists, use a feature- or
-change-specific file under `docs/specs/`. Record its repository-relative path in
-`STATE.md` as `Active Work.Architecture`.
+must be persisted under the protocol's **Workflow Artifact Provenance** rules,
+even when it is brief. An appropriate pre-existing unmarked project-owned
+architecture or specification document may remain the canonical design location.
+If Architect creates a new design artifact, use a feature- or change-specific
+file under `docs/specs/` and add the current-cycle `ARCHITECTURE` provenance
+block. Never overwrite, repurpose, or adopt a STANDARDS architecture artifact
+whose recorded cycle differs from `Active Work.Id`. Record the selected
+repository-relative path in `STATE.md` as `Active Work.Architecture`.
 
 Do not change scope intent, write production code, tests, audit/context files,
 reviews, or user documentation.
@@ -38,8 +42,9 @@ reviews, or user documentation.
 - Always: the persisted scope referenced by `Active Work.Scope`, established
   project constraints, the current persisted design when one exists, and
   `.standards/CONTEXT.md` when it exists and is relevant.
-- Initial greenfield Architecture before the first audit may proceed without
-  `CONTEXT.md`; its absence is intentional at that point.
+- Greenfield Architecture before the first audit, including recovery reruns, may
+  proceed without `CONTEXT.md`; its absence is intentional at that point unless
+  the design requires project facts that cannot otherwise be established.
 - Brownfield Architecture requires the Auditor's project context for the active
   cycle plus relevant existing design/code. When `Active Work.PromotionReason`
   is not `NONE`, the cycle was promoted from `EXPEDITED`; use that persisted
@@ -117,7 +122,8 @@ do not apply multiple mode files concurrently.
 Architecture is complete when:
 
 - the persisted technical design satisfies the artifact shape and authoring
-  contract in `template.md`;
+  contract in `template.md`, including matching current-cycle provenance when
+  Architect created the artifact;
 - every current scope-level acceptance identifier is accounted for without
   redefining its meaning, including an explicit no-architectural-impact
   disposition when no Architect-owned technical decision applies;

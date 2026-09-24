@@ -1,6 +1,7 @@
 # S.T.A.N.D.A.R.D.S. Workflow State
 
-`WorkflowState`: `AUDITING` `CycleMode`: `STANDARD`
+`WorkflowState`: `AUDITING` `CycleMode`: `UNSET` `PendingCycleMode`: `UNSET`
+`PendingCycleRequest`: `UNSET` `PendingCycleBlockedOn`: `NONE`
 
 ## Active Work
 
@@ -11,7 +12,7 @@
 ## Handoff
 
 `Kind`: `INITIAL` `From`: `NONE` `FailureType`: `NONE` `Reason`:
-`Initial standard brownfield workflow state.`
+`Initial brownfield workflow state; cycle mode not yet selected.`
 
 ## Recovery
 

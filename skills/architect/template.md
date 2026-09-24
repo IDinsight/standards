@@ -11,6 +11,20 @@ unresolved architecture while coding.
 Omit empty sections. Add detail only when it materially reduces implementation
 ambiguity.
 
+When Architect creates a new STANDARDS-owned technical-design artifact, prepend
+this block and replace the placeholder with the exact active cycle ID:
+
+```markdown
+<!-- STANDARDS
+Artifact: ARCHITECTURE
+Cycle: <Active Work.Id>
+-->
+```
+
+Do not add this block solely because Architect updates a pre-existing unmarked
+project-owned canonical architecture or specification document; that document
+remains project-owned.
+
 ---
 
 # Technical Design

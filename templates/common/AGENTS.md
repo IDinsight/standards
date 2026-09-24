@@ -10,11 +10,24 @@ Before performing workflow work:
    failure types, and shared terminology.
 2. Read `.standards/MODE.md` for the project's current `ProjectMode`.
 3. Read `.standards/STATE.md` for the branch's active `WorkflowState`,
-   `CycleMode`, `Active Work` (including any persisted `PromotionReason` or
-   `BaselineReconciliation`), handoff/recovery context, and the
-   `Outstanding Obligations` section. If this is the first real request and
-   `Active Work` is `UNSET`, persist the request and any legal initial
-   cycle-mode selection before substantive workflow work.
+   `CycleMode`, pending-cycle coordination fields, `Active Work` (including any
+   persisted `PromotionReason` or `BaselineReconciliation`), handoff/recovery
+   context, and the `Outstanding Obligations` section. Fresh installations begin
+   with `CycleMode: UNSET`. If this is the first real request and `Active Work`
+   is `UNSET`, allocate the cycle ID through `.standards/CYCLE_IDS.md` as
+   defined by the protocol, persist the request, and persist the legal
+   cycle-mode selection before substantive workflow work. If the installed
+   protocol requires the registry but `CYCLE_IDS.md` is unexpectedly missing,
+   stop and report the incomplete runtime rather than recreating it. Append the
+   new ID to the registry before writing it to `Active Work.Id`; never reuse or
+   remove a registered ID while the runtime remains installed. Consume a
+   persisted `PendingCycleMode` when present. If a pre-cycle request is blocked,
+   use `PendingCycleRequest` and `PendingCycleBlockedOn` rather than asking the
+   user to restate it. Clear all pending-cycle fields when the cycle starts; a
+   pending `STANDARD` preference prevents Developer from inferring `EXPEDITED`.
+   From `SIGNED_OFF` or retained `CANCELLED`, resolve any persisted pending
+   request through the protocol's `NEW_CYCLE` transition rather than directly
+   replacing terminal `Active Work`.
 4. Read `.standards/CONTEXT.md` when it exists and the active role depends on
    project context. Initial greenfield Scoping/Architecture may run before it
    exists, but later reruns must not ignore an existing context file merely
@@ -25,13 +38,14 @@ Before performing workflow work:
    Codex and `/skill-name` in Claude Code. A workflow role may perform
    role-owned work only when it owns the active state. Explicit user
    instructions may authorize the protocol's narrow control-plane transitions
-   (initial cycle-mode selection, user-authorized `PROMOTE`, `USER_REWORK`,
-   `NEW_CYCLE`, `SIGNOFF`, or `CANCEL`) even from another role's or a user-owned
-   state; after recording that transition, perform role work only if the invoked
-   skill owns the resulting state. An active role may also perform the
-   protocol-defined `PROMOTE` transition without a separate user instruction
-   when an expedited cycle requires a skipped standard guarantee. Navigator is
-   the exception and may be invoked from any state without mutation.
+   (pending/initial cycle-mode selection, user-authorized `PROMOTE`,
+   `USER_REWORK`, `NEW_CYCLE`, `SIGNOFF`, or `CANCEL`) even from another role's
+   or a user-owned state; after recording that transition, perform role work
+   only if the invoked skill owns the resulting state. An active role may also
+   perform the protocol-defined `PROMOTE` transition without a separate user
+   instruction when an expedited cycle requires a skipped standard guarantee.
+   Navigator is the exception and may be invoked from any state without
+   mutation.
 6. If the state is `AWAITING_USER_SIGNOFF`, do not advance until the user signs
    off, requests rework, cancels the cycle, or explicitly promotes an
    `EXPEDITED` cycle to `STANDARD`. If the state is `SIGNED_OFF` or `CANCELLED`,
@@ -43,9 +57,12 @@ Before performing workflow work:
    handoff. In `EXPEDITED`, a skipped role remains skipped rather than
    transferring its ownership; use **Expedited Promotion** if that role becomes
    necessary.
-8. Persist blocking user questions in `Active Work.BlockedOn`. Do not advance
-   past a role until its completion gate succeeds. Update all required
-   `.standards/STATE.md` fields on every legal state-changing handoff.
+8. During an active cycle, persist blocking user questions in
+   `Active Work.BlockedOn`. Pre-cycle control-plane questions must leave
+   `Active Work` unchanged and persist any blocked next-cycle request/question
+   in the protocol's pending-cycle fields. Do not advance past a role until its
+   completion gate succeeds. Update all required `.standards/STATE.md` fields on
+   every legal state-changing handoff.
 9. Follow `.standards/PROTOCOL.md` for role-completion output rules, including
    commit suggestions and next-role invocations.
 
@@ -53,7 +70,8 @@ Navigator is strictly non-mutating and may be used at any time without changing
 workflow state.
 
 Project-specific agent instructions may be added outside the S.T.A.N.D.A.R.D.S.
-integration block. If they conflict with `.standards/PROTOCOL.md` or the
-integration block, stop workflow work and require user resolution rather than
-silently choosing precedence.
+integration block. Apply `.standards/PROTOCOL.md` **Instruction Layering and
+Conflicts** whenever project instructions, workflow artifacts, repository
+constraints, or the installed runtime contract materially contradict one
+another.
 <!-- standards:end -->

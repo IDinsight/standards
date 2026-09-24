@@ -119,6 +119,42 @@
         "It may inspect tentative code as implementation evidence, but it reconciles that code against the new design rather than allowing the code to define the design",
         "Normal brownfield success hands off ARCHITECTING -> DEVELOPING and provides the next-role Developer invocation required by the protocol"
       ]
+    },
+    {
+      "id": 9,
+      "prompt": "Continue the active STANDARDS workflow as Architect after a pre-audit greenfield scoping recovery. ProjectMode is GREENFIELD, CycleMode is STANDARD, WorkflowState is ARCHITECTING, recovery is inactive because the SCOPING frame resumed here, Active Work.Scope points to the corrected completed scope, and .standards/CONTEXT.md still does not exist because the first scheduled Auditor pass has not occurred. The corrected scope and user request contain enough information for the required technical design without repository baseline facts.",
+      "expected_output": "Architect proceeds with the appropriate greenfield design instead of treating missing pre-audit CONTEXT.md as a defect, because the absence remains intentional until the first scheduled Auditor pass and the required design facts are otherwise established.",
+      "files": [],
+      "assertions": [
+        "Architect does not route to Auditor solely because this is a later pre-audit invocation and CONTEXT.md is still intentionally absent",
+        "Architect uses the corrected completed scope and established inputs as authoritative for the design",
+        "If the design later requires project facts that cannot safely be established without Auditor-owned context, Architect would route PROJECT_CONTEXT rather than guessing",
+        "On successful greenfield completion Architect follows the normal ARCHITECTING -> AUDITING handoff"
+      ]
+    },
+    {
+      "id": 10,
+      "prompt": "Continue the active STANDARDS workflow as Architect. ProjectMode is BROWNFIELD, CycleMode is STANDARD, WorkflowState is ARCHITECTING, recovery is inactive, Active Work.Id is improve-search-20260923-x9k2, Active Work.Scope points to the completed current-cycle scope, valid active-cycle project context exists, and Active Work.Architecture is NONE. The natural path docs/specs/user-search.md already exists and begins with a STANDARDS provenance block declaring Artifact: ARCHITECTURE and Cycle: user-search-v1-old. The current scope requires a new design. No appropriate unmarked project-owned canonical architecture document exists.",
+      "expected_output": "Architect preserves the prior-cycle STANDARDS design, creates a distinct current-cycle design artifact with matching ARCHITECTURE provenance, records the new path in Active Work.Architecture, and performs the normal handoff after its completion gate.",
+      "files": [],
+      "assertions": [
+        "The response recognizes docs/specs/user-search.md as a STANDARDS cycle-owned artifact belonging to user-search-v1-old",
+        "It does not overwrite, repurpose, or adopt that prior-cycle design as the current architecture artifact",
+        "It creates a distinct technical-design artifact whose provenance declares Artifact ARCHITECTURE and Cycle improve-search-20260923-x9k2",
+        "It records the new repository-relative path in Active Work.Architecture before completing Architect's gate"
+      ]
+    },
+    {
+      "id": 11,
+      "prompt": "Continue the active STANDARDS workflow as Architect. ProjectMode is BROWNFIELD, CycleMode is STANDARD, WorkflowState is ARCHITECTING, recovery is inactive, Active Work.Id is billing-copy-20260923-p4m7, Active Work.Scope points to the completed scope, valid active-cycle project context exists, Active Work.Architecture is NONE, and docs/architecture.md is an established unmarked project-owned canonical architecture document. The current design change belongs in that document. No STANDARDS provenance block is present.",
+      "expected_output": "Architect may update the established unmarked project-owned canonical architecture document, records that path in Active Work.Architecture, and does not convert it into a cycle-owned STANDARDS artifact merely because the active cycle uses it.",
+      "files": [],
+      "assertions": [
+        "The response recognizes docs/architecture.md as an unmarked project-owned canonical document rather than a STANDARDS cycle-owned artifact",
+        "It may update that canonical architecture document when appropriate and records docs/architecture.md in Active Work.Architecture",
+        "It does not add a STANDARDS ARCHITECTURE provenance block solely because the project-owned document is used by the active cycle",
+        "The normal Architect completion gate and handoff still apply"
+      ]
     }
   ]
 }

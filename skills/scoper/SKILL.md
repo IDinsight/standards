@@ -22,9 +22,13 @@ tooling, systems software, infrastructure, or similar work.
 
 ## Ownership
 
-Own the project scope. The completed scope must be persisted. Use the
-repository's existing scope location; if none exists, use a feature- or
-change-specific file under `docs/scope/`. Record its repository-relative path in
+Own the project scope. The completed scope must be persisted under the
+protocol's **Workflow Artifact Provenance** rules. An appropriate pre-existing
+unmarked project-owned scope document may remain the canonical scope location.
+If Scoper creates a new scope artifact, use a feature- or change-specific file
+under `docs/scope/` and add the current-cycle `SCOPE` provenance block. Never
+overwrite, repurpose, or adopt a STANDARDS scope artifact whose recorded cycle
+differs from `Active Work.Id`. Record the selected repository-relative path in
 `STATE.md` as `Active Work.Scope`.
 
 Own the wording and stable `AC-NNN` identifiers of scope-level acceptance
@@ -38,9 +42,9 @@ reviews, or user documentation.
 - Always: `Active Work.Request`, explicit user constraints, the current
   persisted scope when one exists, and `.standards/CONTEXT.md` when it exists
   and is relevant.
-- Initial greenfield Scoping before the first audit may proceed without
-  `CONTEXT.md`; its absence is intentional unless the requested work requires
-  project facts that cannot otherwise be established.
+- Greenfield Scoping before the first audit, including recovery reruns, may
+  proceed without `CONTEXT.md`; its absence is intentional unless the requested
+  work requires project facts that cannot otherwise be established.
 - Brownfield Scoping requires the Auditor's project context for the active
   cycle.
 - When `Active Work.PromotionReason` is not `NONE`, treat it as durable workflow
@@ -102,7 +106,8 @@ authoritative shape and authoring contract for the persisted scope artifact.
 Scoping is complete when:
 
 - the persisted scope satisfies the artifact shape and authoring contract in
-  `template.md`;
+  `template.md`, including matching current-cycle provenance when Scoper created
+  the artifact;
 - every verifiable in-scope obligation that must be proven at completion is
   represented by one or more current scope-level acceptance conditions;
 - separable obligations whose satisfaction or verification evidence is

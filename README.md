@@ -58,10 +58,12 @@ skills define role-specific behavior.
 8. In `STANDARD` cycles, give scope acceptance conditions stable identifiers and
    carry those identifiers through downstream design and verification evidence
    until every current condition is evidenced before user sign-off.
-9. Keep project baseline and per-change rigor separate. `ProjectMode` describes
-   whether the project is greenfield or brownfield; `CycleMode` selects either
-   the full `STANDARD` topology or, for bounded brownfield changes, the shorter
-   `EXPEDITED` Developer -> implementation Reviewer path.
+9. Keep project baseline, active-cycle rigor, and next-cycle preference
+   separate. `ProjectMode` describes whether the project is greenfield or
+   brownfield; `CycleMode` is `UNSET` when no cycle is active and records the
+   active cycle's `STANDARD` or `EXPEDITED` topology; pending-cycle fields store
+   an explicit next-cycle preference and, only when cycle creation is blocked,
+   the pending request plus the user decision required to resolve it.
 10. Shorten the workflow by omitting roles, never by merging their ownership
     into another role. If an expedited change needs a skipped guarantee, promote
     the active cycle to `STANDARD` and run the owning roles.
@@ -92,14 +94,18 @@ project/
 ├── .standards/
 │   ├── PROTOCOL.md
 │   ├── INSTALLATION.json
+│   ├── CYCLE_IDS.md
 │   ├── MODE.md
 │   └── STATE.md
 └── <agent-specific skill installation>
 ```
 
 `STATE.md` is the persisted coordination record for the active cycle, including
-its `WorkflowState` and `CycleMode`. Role ownership, standard and expedited
-forward transitions, promotion, recovery, user intervention, project-mode
-changes, cancellation/reset behavior, project context, installation ownership
-checks, and client-setting preservation are defined only in
-[`PROTOCOL.md`](PROTOCOL.md) and are intentionally not restated here.
+its `WorkflowState`, `CycleMode`, and pending-cycle coordination fields.
+`CYCLE_IDS.md` is the append-only reservation registry that prevents cycle-ID
+reuse for as long as the S.T.A.N.D.A.R.D.S. runtime remains installed. Role
+ownership, standard and expedited forward transitions, promotion, recovery, user
+intervention, project-mode changes, cancellation/reset behavior, project
+context, installation ownership checks, and client-setting preservation are
+defined only in [`PROTOCOL.md`](PROTOCOL.md) and are intentionally not restated
+here.

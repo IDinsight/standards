@@ -83,37 +83,70 @@ retains the runtime and enters terminal `CANCELLED`.
 
 ```text
 CycleMode
+- UNSET
 - STANDARD
 - EXPEDITED
 ```
 
 `ProjectMode` describes the persistent implementation baseline. `CycleMode`
-describes the assurance topology for one cycle and is persisted in
-`.standards/STATE.md`.
+records the assurance topology of the active cycle only. `PendingCycleMode`
+records an explicit user preference for the next cycle before that cycle exists.
+`PendingCycleRequest` and `PendingCycleBlockedOn` durably hold a next-cycle
+request only when a pre-cycle decision prevents that request from becoming an
+active cycle. All are persisted in `.standards/STATE.md`.
 
-- `STANDARD`: the full topology for the current `ProjectMode`.
-- `EXPEDITED`: a bounded brownfield path that intentionally omits Scoping,
-  Architecture, Auditing, Testing, Documentation, Final Review, and
-  Synchronization unless promoted.
+- `CycleMode: UNSET`: no cycle is active yet. It is a coordination value, not an
+  execution topology.
+- `CycleMode: STANDARD`: the active cycle uses the full topology for the current
+  `ProjectMode`.
+- `CycleMode: EXPEDITED`: the active cycle uses the bounded brownfield path that
+  intentionally omits Scoping, Architecture, Auditing, Testing, Documentation,
+  Final Review, and Synchronization unless promoted.
+- `PendingCycleMode: UNSET`: no explicit next-cycle preference is persisted.
+- `PendingCycleMode: STANDARD | EXPEDITED`: explicit user preference for the
+  next cycle. It is not an active topology and must be validated when consumed.
+- `PendingCycleRequest: UNSET | <request>`: normally `UNSET`; stores the actual
+  next-cycle request only while a pre-cycle decision blocks cycle creation.
+- `PendingCycleBlockedOn: NONE | <question>`: unresolved pre-cycle user decision
+  for `PendingCycleRequest`, otherwise `NONE`. `PendingCycleRequest` and
+  `PendingCycleBlockedOn` are paired: the request is `UNSET` exactly when the
+  blocker is `NONE`.
 
 Cycle-mode rules:
 
-1. Installation initializes `CycleMode: STANDARD`.
-2. `GREENFIELD` supports only `STANDARD`.
-3. `BROWNFIELD` supports both modes.
-4. A new brownfield cycle defaults to `STANDARD`. `EXPEDITED` is selected only
-   when the user explicitly requests it or, absent an explicit `STANDARD`
-   selection, explicitly invokes Developer as the entry role for a new bounded
-   implementation change. For the initialized cycle, Developer entry implies
-   `EXPEDITED` only while `Active Work.Id` and `Active Work.Request` are both
-   `UNSET`. If `STANDARD` was explicitly selected, Developer does not own the
-   entry state and must hand off to its owner. Post-`CANCELLED` restrictions in
-   **User Decisions and Intervention** still apply.
-5. `EXPEDITED` remains valid only while the request is a sufficiently bounded
+1. Installation initializes `CycleMode: UNSET`, `PendingCycleMode: UNSET`,
+   `PendingCycleRequest: UNSET`, and `PendingCycleBlockedOn: NONE`. Terminal
+   `SIGNED_OFF` and retained `CANCELLED` states reset `CycleMode` to `UNSET`
+   after the completed or cancelled cycle's mode-specific transition rules have
+   been applied; all pending-cycle fields must be clear at that point.
+2. No role-owned workflow work may proceed with `CycleMode: UNSET`. Before the
+   first substantive work of a cycle, consume and validate `PendingCycleMode`
+   when it is not `UNSET`; otherwise select the mode from the new request and
+   entry path. Persist the result in `CycleMode`, clear all pending-cycle fields
+   to their neutral values, and initialize the required active work before
+   role-owned work.
+3. `GREENFIELD` supports only `STANDARD`. A pending `EXPEDITED` preference is
+   invalid in `GREENFIELD` and must not be persisted.
+4. `BROWNFIELD` supports both execution modes. If no pending preference exists
+   for a new request, the standard topology is the default except that an
+   explicit Developer invocation for a sufficiently bounded brownfield
+   implementation change may select `EXPEDITED` as defined below.
+5. While no cycle is active and before a request has initialized the next cycle,
+   the user may set, replace, or clear `PendingCycleMode`. The latest explicit
+   preference survives across sessions but does not modify `Active Work` or
+   activate a cycle. If a blocked `PendingCycleRequest` already exists, changing
+   or clearing the mode triggers revalidation of that persisted request.
+6. A pending `EXPEDITED` preference does not bypass the expedited contract. When
+   the request arrives, validate eligibility before consuming it. If the request
+   is not eligible, do not silently reinterpret the preference as `STANDARD`;
+   persist the request in `PendingCycleRequest`, persist the required user
+   decision in `PendingCycleBlockedOn`, and require the user to choose
+   `STANDARD`, revise the request, or abandon the pending request.
+7. `EXPEDITED` remains valid only while the request is a sufficiently bounded
    implementation contract and no omitted role or guarantee is required.
-6. Skipping a role does not transfer its ownership, artifacts, or completion
+8. Skipping a role does not transfer its ownership, artifacts, or completion
    guarantees to Developer or Reviewer.
-7. Promotion to `STANDARD` follows **Expedited Promotion** and is one-way for
+9. Promotion to `STANDARD` follows **Expedited Promotion** and is one-way for
    the active cycle.
 
 ## Workflow States
@@ -134,10 +167,14 @@ WorkflowState
 - CANCELLED
 ```
 
-`.standards/STATE.md` records exactly one `WorkflowState` and one `CycleMode`.
-`SIGNED_OFF` and `CANCELLED` are terminal and mean there is no active cycle. In
-a terminal state, persisted cycle and active-work data describe the most recent
-cycle for traceability until `NEW_CYCLE` replaces them.
+`.standards/STATE.md` records exactly one `WorkflowState`, one `CycleMode`, and
+one set of pending-cycle coordination fields: `PendingCycleMode`,
+`PendingCycleRequest`, and `PendingCycleBlockedOn`. `SIGNED_OFF` and `CANCELLED`
+are terminal and mean there is no active cycle. In a terminal state, `CycleMode`
+is `UNSET`; persisted `Active Work` data describe the most recent cycle for
+traceability until `NEW_CYCLE` replaces them, while the pending-cycle fields may
+independently describe an explicit next-cycle preference or a blocked next-cycle
+request.
 
 The owning role for each state is:
 
@@ -173,12 +210,15 @@ artifact presence.
 
 `WorkflowState`: `ARCHITECTING`
 `CycleMode`: `STANDARD`
+`PendingCycleMode`: `UNSET`
+`PendingCycleRequest`: `UNSET`
+`PendingCycleBlockedOn`: `NONE`
 
 ## Active Work
 
-`Id`: `add-user-search` `Request`: `Add user search by name and email.` `Scope`:
+`Id`: `add-user-search-20260923T150000Z-a7f3` `Request`: `Add user search by name and email.` `Scope`:
 `docs/scope/add-user-search.md` `Architecture`: `docs/specs/add-user-search.md`
-`Development`: `docs/development/add-user-search.md` `PromotionReason`: `NONE`
+`Development`: `docs/development/add-user-search-20260923T150000Z-a7f3.md` `PromotionReason`: `NONE`
 `BaselineReconciliation`: `NONE` `AuditTarget`: `NONE` `BlockedOn`: `NONE`
 
 ## Handoff
@@ -203,11 +243,13 @@ artifact presence.
 
 ### Active Work
 
-- `Id`: stable, user-readable identifier for the cycle. Assign a fresh ID for
-  every new cycle. It must not match any prior cycle ID still referenced by
-  persisted workflow state or Auditor-owned cycle-scoped context, including
-  `BaselineReconciliation` and **Active-Cycle Non-Baseline Work**. Prefer a
-  concise request-derived slug plus a uniqueness suffix when needed.
+- `Id`: stable, user-readable identifier allocated through **Cycle ID
+  Registry**. While the current S.T.A.N.D.A.R.D.S. runtime remains installed,
+  every allocated cycle ID is reserved permanently and must never be reused by
+  another cycle. Generate every new ID with a request-derived slug plus a fresh
+  collision-resistant token (for example a ULID, UUID fragment, or
+  timestamp-plus-random suffix); never rely on a bare request slug. Never
+  overwrite or repurpose an artifact belonging to another cycle.
 - `Request`: persisted user request at enough fidelity for the entry role to
   understand the work.
 - `Scope`, `Architecture`, and `Development`: repository-relative paths to the
@@ -236,9 +278,113 @@ artifact presence.
 - `BlockedOn`: unresolved user question preventing completion, otherwise
   `NONE`.
 
-Installation may initialize `Id` and `Request` as `UNSET`. Before the first
-workflow role performs substantive work, persist the request and assign the
-cycle ID. Every later `NEW_CYCLE` does this as part of the transition.
+Installation initializes `Id` and `Request` as `UNSET`. Before the first
+workflow role performs substantive work, select and validate `CycleMode`
+according to **Cycle Modes**, consuming `PendingCycleMode` when present; then
+allocate the cycle ID through **Cycle ID Registry**. Only after the registry
+append succeeds may the reserved ID, request, and selected mode be persisted as
+the initialized cycle. Every later `NEW_CYCLE` follows the same allocation rule
+as part of the transition.
+
+### Cycle ID Registry
+
+`.standards/CYCLE_IDS.md` is the protocol-owned, append-only registry of every
+cycle ID allocated while the current S.T.A.N.D.A.R.D.S. runtime remains
+installed. It exists only to reserve cycle identifiers; it is not workflow
+history and must not duplicate requests, states, handoffs, or artifact metadata.
+Store one allocated ID per Markdown list entry:
+
+```markdown
+# S.T.A.N.D.A.R.D.S. Cycle ID Registry
+
+- <cycle-id>
+```
+
+Allocate a new cycle ID in this order:
+
+1. Generate a request-derived, collision-resistant candidate.
+2. Verify that the candidate does not already appear in `CYCLE_IDS.md`.
+3. As defense in depth, also verify that it does not collide with an existing
+   cycle-owned artifact path or STANDARDS provenance marker, including
+   `docs/development/<candidate>.md`.
+4. Append the candidate to `CYCLE_IDS.md` and persist that registry change.
+5. Only after the registry append succeeds may the candidate be written to
+   `Active Work.Id` and cycle initialization continue.
+
+Registry entries are immutable while the runtime remains installed: never edit,
+remove, reorder for deduplication, or reuse an existing entry. If cycle
+initialization fails after the append, leave the ID reserved; a burned ID is
+safe, while reuse is not. The registry is the authoritative no-reuse record;
+artifact-path and provenance checks are additional collision protection, not a
+replacement for the registry.
+
+Initialize `CYCLE_IDS.md` empty on first installation. Preserve it across normal
+reinstall, framework upgrade, and explicit workflow reinitialization. For an
+upgrade from a protocol version that did not require the registry,
+verify that fact from the currently installed pre-update protocol, then create
+and seed `CYCLE_IDS.md` before replacing that installed protocol or allocating
+any further cycle ID. Seed every cycle ID that can be discovered from current
+persisted state and existing STANDARDS cycle-owned artifacts/provenance. IDs
+that cannot be reconstructed from a pre-registry runtime cannot be retroactively
+guaranteed; the registry-backed no-reuse guarantee applies to every ID allocated
+after registry initialization.
+
+If `CYCLE_IDS.md` is unexpectedly missing from an installed runtime whose
+installed protocol already requires the registry, treat the runtime as
+incomplete: stop cycle allocation and workflow work that would require a new
+cycle ID, report the missing registry, and require restoration of the registry
+or intentional runtime removal followed by a fresh installation. Never recreate
+an empty registry or best-effort reconstruct one in place for a registry-aware
+runtime, because doing so would silently break the installed-runtime no-reuse
+guarantee. The only automatic creation-and-seeding exception is the verified
+upgrade path from a pre-registry protocol described above.
+
+Intentional removal of the S.T.A.N.D.A.R.D.S. runtime may remove the registry
+with `.standards/`; that removal ends the registry-backed lifetime guarantee. A
+later fresh installation starts a new registry, while existing artifact and
+provenance collision checks still apply.
+
+### Workflow Artifact Provenance
+
+Cycle ownership must be recoverable from the artifact itself whenever STANDARDS
+creates a Scope, Architecture, or Development artifact. Every such newly created
+artifact must begin with this provenance block, using exactly one concrete
+artifact type and the exact current cycle ID:
+
+```markdown
+<!-- STANDARDS
+Artifact: SCOPE | ARCHITECTURE | DEVELOPMENT
+Cycle: <Active Work.Id>
+-->
+```
+
+A valid provenance block makes the file a STANDARDS cycle-owned artifact even if
+it is later renamed or moved. A different cycle may read that artifact as prior
+evidence when a role contract permits, but it must never overwrite, repurpose,
+or adopt the file as its own cycle artifact.
+
+An existing unmarked project document remains project-owned merely because
+Scoper or Architect selects it as the active scope or architecture location.
+Those roles may update an appropriate unmarked canonical project document, and
+must not add STANDARDS provenance solely because the document is referenced by
+`Active Work.Scope` or `Active Work.Architecture`. If either role instead creates
+a new workflow artifact, it must add the current-cycle provenance block. If the
+natural target path already contains a STANDARDS artifact owned by another
+cycle, choose a distinct path rather than overwriting it.
+
+Developer's development plan is always a STANDARDS cycle-owned artifact. Its
+path must be unique to the active cycle and include `Active Work.Id`; use
+`docs/development/<Active Work.Id>.md` unless the repository requires another
+development-plan directory, in which case preserve the same cycle-specific
+filename. Its provenance block and the plan's visible `Cycle` field must both
+match `Active Work.Id`.
+
+Before editing an artifact referenced by `Active Work.Scope`,
+`Active Work.Architecture`, or `Active Work.Development`, the owning role must
+inspect any STANDARDS provenance block. If the block records a different cycle,
+do not overwrite or silently repair the artifact; the persisted reference is
+inconsistent with the active cycle and must be corrected without mutating the
+other cycle's artifact.
 
 ### Handoff
 
@@ -284,24 +430,33 @@ When one or more obligations exist, set `Active: true` and record each as a
 numbered `Obligation N` containing `Owner`, `FailureType`, and `Reason`. When the
 last obligation is removed, set `Active: false` and remove the numbered entries.
 
-An outstanding obligation remains until its owning state is reached, the owner
-corrects the defect, and the owner's normal completion gate passes. Remove only
-resolved obligations. A role may not take its normal forward handoff while an
-unresolved outstanding obligation owned by its current state remains. User
+An outstanding obligation remains until its owning state is reached and the
+owner corrects and verifies the specific defect recorded by the obligation.
+Remove a corrected obligation as soon as that corrective outcome is verified;
+removing it records only that the obligation itself is satisfied and does not
+imply that the owning role is otherwise complete. The owner must still pass its
+normal completion gate, including the requirement that no unresolved obligation
+owned by its current state remains, before any normal forward handoff. User
 sign-off is unavailable while any outstanding obligation remains.
 
 ### State-update rules
 
 1. Installation initializes from the selected mode template: `SCOPING` for
-   `GREENFIELD`, `AUDITING` for `BROWNFIELD`, `CycleMode: STANDARD`,
-   `Handoff.Kind: INITIAL`, unset active work, and inactive recovery.
-2. Before substantive work on an initialized brownfield cycle, expedited
-   selection follows **Cycle Modes** and **User Decisions and Intervention**.
+   `GREENFIELD`, `AUDITING` for `BROWNFIELD`, `CycleMode: UNSET`,
+   `PendingCycleMode: UNSET`, `PendingCycleRequest: UNSET`,
+   `PendingCycleBlockedOn: NONE`, `Handoff.Kind: INITIAL`, unset active work,
+   and inactive recovery.
+2. Before substantive work on an initialized cycle, select and persist the cycle
+   mode and initialize active work according to **Cycle Modes**, **Active Work**,
+   and **User Decisions and Intervention**.
 3. Every legal state-changing transition updates all applicable `CycleMode`,
-   `Active Work`, `Handoff`, `Recovery`, and `Outstanding Obligations` fields as
-   part of the transition.
-4. Blocking questions do not change workflow state. Set `BlockedOn` before
-   asking and clear it after incorporating the answer.
+   pending-cycle coordination fields, `Active Work`, `Handoff`, `Recovery`, and
+   `Outstanding Obligations` fields as part of the transition.
+4. Blocking questions during an active cycle do not change workflow state. Set
+   `Active Work.BlockedOn` before asking and clear it after incorporating the
+   answer. Pre-cycle control-plane questions must not modify
+   `Active Work.BlockedOn`; persist the blocked request and question in
+   `PendingCycleRequest` and `PendingCycleBlockedOn` instead.
 5. Failure/recovery, promotion, and user-control transitions follow their
    canonical sections below rather than redefining their mechanics here.
 6. During the initial greenfield cycle, Developer performs the permanent
@@ -331,12 +486,18 @@ version-control evidence, removing or reclassifying it rather than copying it
 forward. If baseline status cannot be established safely, Auditor blocks for
 user clarification.
 
-Greenfield status does not require context to be absent. Initial greenfield
-Scoping and Architecture may run before the first audit, but later reruns must
-use an existing relevant `CONTEXT.md`. After Developer observes and verifies the
-first successful creation or material modification of a project implementation
-artifact as part of the active cycle, `ProjectMode` remains `BROWNFIELD`
-permanently, regardless of who authored that implementation change.
+Greenfield status does not require context to be absent. Before the first
+scheduled greenfield audit, Scoping and Architecture may run or rerun without
+`CONTEXT.md` when the facts required for their owned work are otherwise
+established; absence of context by itself is not a defect. If either role needs
+project facts that cannot safely be established without Auditor-owned context,
+it routes a `PROJECT_CONTEXT` failure to Auditor. Once `CONTEXT.md` exists,
+later Scoping or Architecture work must use it when relevant and must not ignore
+it merely because `ProjectMode` remains `GREENFIELD`. After Developer observes
+and verifies the first successful creation or material modification of a project
+implementation artifact as part of the active cycle, `ProjectMode` remains
+`BROWNFIELD` permanently, regardless of who authored that implementation
+change.
 
 `.standards/MODE.md` and `.standards/STATE.md` are protocol-owned coordination
 artifacts. A role or user may change them only as required by a legal protocol
@@ -346,6 +507,29 @@ initializing `Active Work`, recording artifact paths, selecting or promoting
 `BaselineReconciliation`, `AuditTarget`, or `BlockedOn`.
 `.standards/PROTOCOL.md` is framework-owned and may be changed only by framework
 installation or upgrade.
+
+## Instruction Layering and Conflicts
+
+Role-specific precedence may order **compatible** guidance, such as applying a
+repository formatter before generic style preferences. Precedence must never be
+used to silently resolve a material conflict among the protocol or installed
+integration contract, explicit user constraints, completed role-owned workflow
+artifacts, project-specific instructions, or repository-enforced/toolchain
+constraints.
+
+When authorities materially conflict:
+
+1. If the conflict is a defect or changed requirement owned by a workflow role,
+   route it through the protocol's normal failure, recovery, or `USER_REWORK`
+   mechanics to that owner.
+2. If no workflow owner can resolve the contradiction without overriding another
+   authority, or project instructions conflict with the protocol/integration
+   contract, stop workflow work and require user resolution.
+3. Do not weaken an authority, invent an exception, or choose a winner merely
+   because one source appears earlier in a role-specific precedence list.
+
+Role skills should reference these rules rather than redefine conflict-resolution
+semantics locally.
 
 ## Acceptance Traceability
 
@@ -717,18 +901,61 @@ that role was explicitly invoked and owns the resulting state; otherwise stop
 after persisting the transition and provide the next-role invocation when the
 handoff rules require one.
 
+### Select a pending mode before a cycle begins
+
+While no cycle is active, or before the initialized first cycle has received its
+request, an explicit user instruction may set `PendingCycleMode` to a mode
+supported by the current `ProjectMode`, replace an earlier pending preference,
+or clear it to `UNSET`. Leave `CycleMode: UNSET` and leave `Active Work.Id` and
+`Active Work.Request` unchanged. The latest pending selection remains
+authoritative across sessions until consumed, replaced, or cleared.
+
+When the first real request arrives, determine the legal mode before creating
+the cycle. If the same instruction explicitly requests a mode that the current
+`ProjectMode` does not support, do not persist that mode; persist the request and
+required decision in the pending request/blocker fields and ask for a supported
+mode, revision, or abandonment. If `PendingCycleMode` is already set, validate
+it against the request and current `ProjectMode`. If it is invalid, leave `CycleMode`,
+`Active Work`, and `PendingCycleMode` unchanged; persist the request in
+`PendingCycleRequest`, set `PendingCycleBlockedOn` to the specific decision required,
+and ask the user to replace or clear the preference, revise the request, or abandon the
+pending request. Do not write `Active Work.BlockedOn`.
+
+While `PendingCycleRequest` is not `UNSET`, a later mode replacement/clear or a
+revised request must revalidate the persisted pending request before asking the
+user to repeat it. A revised request replaces `PendingCycleRequest`. If the
+pending request becomes legal from `SIGNED_OFF` or retained `CANCELLED`, do not
+initialize `Active Work` through this generic path; continue through **Start a
+new cycle** using `PendingCycleRequest` as the new request so terminal handoff
+and baseline-reconciliation requirements are preserved. Otherwise, for the
+initialized first cycle, allocate the ID through **Cycle ID Registry** first;
+after that registry append succeeds, persist the reserved `Active Work.Id`, that
+request, and the validated/defaulted mode in the cycle-state update; clear
+`PendingCycleMode` to `UNSET`, `PendingCycleRequest` to `UNSET`, and
+`PendingCycleBlockedOn` to `NONE`; then enter the legal workflow state. If the
+user abandons the blocked pre-cycle request, clear `PendingCycleRequest` and
+`PendingCycleBlockedOn` without modifying `Active Work` or starting a cycle.
+
+If no pending preference exists for a new request, invoking the standard entry
+role selects `STANDARD` by default. Use the standard entry state for the current
+`ProjectMode`: `SCOPING` for `GREENFIELD` and `AUDITING` for `BROWNFIELD`.
+
 ### Select expedited mode for the initialized cycle
 
 Before substantive work, while `Active Work.Id` and `Active Work.Request` are
-both `UNSET`, a brownfield user may explicitly request `EXPEDITED` or select it
-by invoking
-Developer with a new bounded implementation request unless `STANDARD` was
-explicitly selected.
+both `UNSET` and `CycleMode` is `UNSET`, a brownfield request may start an
+`EXPEDITED` cycle when either `PendingCycleMode: EXPEDITED` is valid for the
+request or Developer is explicitly invoked with a new sufficiently bounded
+implementation request while `PendingCycleMode: UNSET`. A pending
+`STANDARD` preference prevents Developer from inferring `EXPEDITED`.
 
-Set `CycleMode: EXPEDITED`, `WorkflowState: DEVELOPING`, initialize `Active Work`
-with the new ID/request plus `Scope: NONE`, `Architecture: NONE`,
-`Development: NONE`, `PromotionReason: NONE`, and `BaselineReconciliation: NONE`,
-keep `Handoff.Kind: INITIAL`, set `From: NONE`
+After expedited eligibility is validated, allocate the new ID through **Cycle
+ID Registry** before assigning it to `Active Work`. Then set `CycleMode:
+EXPEDITED`; clear `PendingCycleMode` to `UNSET`, `PendingCycleRequest` to `UNSET`,
+and `PendingCycleBlockedOn` to `NONE`; set `WorkflowState: DEVELOPING`;
+initialize `Active Work` with the reserved ID/request plus `Scope: NONE`,
+`Architecture: NONE`, `Development: NONE`, `PromotionReason: NONE`, and
+`BaselineReconciliation: NONE`; keep `Handoff.Kind: INITIAL`, set `From: NONE`
 and `FailureType: NONE`, record a concise expedited-entry reason, and keep
 recovery and outstanding obligations inactive. This is unavailable in
 `GREENFIELD`.
@@ -757,11 +984,12 @@ itself authorizes **Expedited Promotion** instead.
 ### Cancel an active cycle
 
 - If `ProjectMode: GREENFIELD`, follow **Greenfield Bootstrap Cancellation**.
-- If `ProjectMode: BROWNFIELD`, transition to `CANCELLED`, record
-  `Handoff.Kind: CANCEL`, set `From` to the interrupted state,
-  `FailureType: NONE`, preserve `Active Work`, and clear recovery plus outstanding
-  obligations. Residual project-change provenance is handled through
-  `BaselineReconciliation` when a later cycle starts.
+- If `ProjectMode: BROWNFIELD`, transition to `CANCELLED`, set
+  `CycleMode: UNSET`, leave all pending-cycle fields clear, record
+  `Handoff.Kind: CANCEL`, set `From` to the
+  interrupted state, `FailureType: NONE`, preserve `Active Work`, and clear
+  recovery plus outstanding obligations. Residual project-change provenance is
+  handled through `BaselineReconciliation` when a later cycle starts.
 
 Cancellation never reverts project artifacts and does not by itself establish
 cancelled-cycle project changes as baseline.
@@ -769,38 +997,60 @@ cancelled-cycle project changes as baseline.
 ### Sign off
 
 From `AWAITING_USER_SIGNOFF`, sign-off is legal only when the `Outstanding Obligations`
-section is inactive. Then transition to `SIGNED_OFF`, record
-`Handoff.Kind: SIGNOFF`, `From: AWAITING_USER_SIGNOFF`, `FailureType: NONE`, and
-clear recovery. The cycle is complete.
+section is inactive. Validate the completion contract using the current
+`STANDARD` or `EXPEDITED` mode, then transition to `SIGNED_OFF`, set
+`CycleMode: UNSET`, leave all pending-cycle fields clear, record
+`Handoff.Kind: SIGNOFF`,
+`From: AWAITING_USER_SIGNOFF`, `FailureType: NONE`, and clear recovery. The
+cycle is complete.
 
 For `STANDARD`, all standard gates and acceptance-traceability obligations must
-be satisfied. For `EXPEDITED`, sign-off covers only the narrower **Expedited
-Cycle Contract**; skipped standard phases must not be represented as completed.
+be satisfied before the reset. For `EXPEDITED`, sign-off covers only the
+narrower **Expedited Cycle Contract**; skipped standard phases must not be
+represented as completed.
 
 ### Start a new cycle
 
 From `SIGNED_OFF` or retained `CANCELLED`:
 
-1. Record `Handoff.Kind: NEW_CYCLE`, `Handoff.From` = prior terminal state,
-   `FailureType: NONE`, and a concise reason.
-2. Create a fresh non-colliding `Active Work.Id` and persist the new `Request`.
-   Reset `Scope`, `Architecture`, `Development`, `PromotionReason`,
-   `AuditTarget`, and `BlockedOn` to `NONE`; clear recovery and outstanding
-   obligations.
-3. From `SIGNED_OFF`, set `BaselineReconciliation: NONE`.
-4. From retained `CANCELLED`, carry any existing reconciliation obligation. If
-   the user does not explicitly confirm that the just-cancelled cycle left no
-   project changes because none were produced or they were reverted, append
-   that cycle's unique `Id` and request summary to `BaselineReconciliation`.
-5. `STANDARD` is the default. Brownfield `EXPEDITED` may be explicitly selected
-   or inferred from Developer entry as defined in **Cycle Modes**, but after
-   retained `CANCELLED` it is allowed only when `BaselineReconciliation: NONE`.
-6. Any unresolved reconciliation, or cancelled-cycle changes the user wants to
-   retain or adopt, requires `STANDARD` and `WorkflowState: AUDITING` so Auditor
-   can establish baseline status first. Mention the obligation concisely in
+1. Determine the reconciliation obligation that the new cycle would carry. From
+   `SIGNED_OFF`, it is `NONE`. From retained `CANCELLED`, preserve any existing
+   obligation and, unless the user explicitly confirms that the just-cancelled
+   cycle left no project changes because none were produced or they were
+   reverted, include that cycle's unique `Id` and request summary.
+2. Determine the legal mode before mutating terminal state. If
+   `PendingCycleRequest` is not `UNSET`, treat it as the new request for this
+   transition unless the user explicitly revises it; do not require the user to
+   restate it. When `PendingCycleMode` is set, validate it against that request,
+   current `ProjectMode`, and the reconciliation obligation. Otherwise `STANDARD` is the
+   default, except that a brownfield `EXPEDITED` cycle may be inferred from
+   Developer entry as defined in **Cycle Modes**. Any unresolved reconciliation
+   requires `STANDARD`. If a pending preference is invalid, leave the terminal
+   state, `Active Work`, `CycleMode`, and `PendingCycleMode` unchanged; persist
+   the new request in `PendingCycleRequest`, persist the required user decision
+   in `PendingCycleBlockedOn`, do not write `Active Work.BlockedOn`, and ask the
+   user to replace or clear the preference, revise the pending request, or
+   abandon it. A later resolution must use the persisted pending request rather
+   than requiring the user to restate it.
+3. After mode validation succeeds, allocate the new ID through **Cycle ID
+   Registry**. If the registry append cannot be persisted, leave terminal state
+   unchanged and do not start the cycle. Once appended, the ID is reserved even
+   if a later state write fails.
+4. Record `Handoff.Kind: NEW_CYCLE`, `Handoff.From` = prior terminal state,
+   `FailureType: NONE`, and a concise reason. Persist the reserved ID and new
+   `Request` into `Active Work`; reset `Scope`, `Architecture`, `Development`,
+   `PromotionReason`, `AuditTarget`, and `BlockedOn` to `NONE`; clear recovery
+   and outstanding obligations; persist the reconciliation obligation determined
+   in step 1.
+5. Persist the validated mode into `CycleMode`; clear `PendingCycleMode` to
+   `UNSET`, `PendingCycleRequest` to `UNSET`, and `PendingCycleBlockedOn` to
+   `NONE`. If reconciliation is unresolved or cancelled-cycle changes are being
+   retained or adopted, set `WorkflowState: AUDITING` so Auditor can establish
+   baseline status first and mention the obligation concisely in
    `Handoff.Reason` without duplicating its source-cycle provenance there.
-7. Otherwise initialize a standard cycle from `ProjectMode`, or an allowed
-   expedited brownfield cycle at `DEVELOPING`. The prior cycle is not reopened.
+6. Otherwise initialize a standard cycle from `ProjectMode`, or an allowed
+   expedited brownfield cycle at `DEVELOPING`. `CycleMode` must not remain
+   `UNSET` after this transition. The prior cycle is not reopened.
 
 A greenfield bootstrap cancellation removes the runtime, so future workflow work
 requires fresh installation and a fresh project-mode decision.
@@ -840,9 +1090,11 @@ Managed block boundaries define framework ownership; do not decide whether to
 delete `AGENTS.md` or `CLAUDE.md` based on who originally created the file. An
 existing unbounded `@AGENTS.md` import is user-owned and preserved.
 
-The reset removes `STATE.md`, so no persisted `CANCELLED` state remains. The next
-workflow attempt requires fresh installation, which re-evaluates project mode
-from then-current state. Do not carry the cancelled bootstrap's former
+The reset removes `STATE.md` and `CYCLE_IDS.md`, so no persisted `CANCELLED`
+state or runtime cycle-ID registry remains. Removal of the runtime ends the
+registry-backed no-reuse guarantee. The next workflow attempt requires fresh
+installation, which re-evaluates project mode from then-current state and starts
+a new cycle-ID registry. Do not carry the cancelled bootstrap's former
 `GREENFIELD` classification across reinstall.
 
 This exception ends permanently once Developer observes and verifies that the
@@ -860,6 +1112,8 @@ An installed project should provide:
 - `.standards/PROTOCOL.md`: installed canonical protocol;
 - `.standards/INSTALLATION.json`: installer-owned metadata for only the
   client-setting mutations S.T.A.N.D.A.R.D.S. actually created;
+- `.standards/CYCLE_IDS.md`: protocol-owned append-only registry of allocated
+  cycle IDs for the lifetime of the installed runtime;
 - `.standards/MODE.md`: current `ProjectMode`;
 - `.standards/STATE.md`: current workflow/cycle state and resumable coordination
   context;
@@ -876,7 +1130,9 @@ greenfield-to-brownfield transition follows **Project Modes**.
 `.standards/INSTALLATION.json` is installer metadata, not workflow state: create
 it on first installation, preserve/update it across normal reinstall or upgrade,
 and record only mutations the installer actually created. Never retroactively
-claim compatible pre-existing settings.
+claim compatible pre-existing settings. `.standards/CYCLE_IDS.md` is protocol
+coordination data, not installer metadata; preserve it for the entire lifetime
+of the installed runtime as defined by **Cycle ID Registry**.
 
 ### Installer File Preservation
 
@@ -904,10 +1160,20 @@ After ownership checks:
   user-owned unbounded `@AGENTS.md` import exists, preserve it and do not add a
   framework duplicate. Otherwise add or update a bounded integration block. If
   multiple unbounded imports exist, preserve them and report the conflict.
+- Before replacing `.standards/PROTOCOL.md` during an upgrade, inspect the
+  currently installed protocol. If it already requires **Cycle ID Registry**,
+  require the existing registry to be present and valid enough to preserve; if
+  it is unexpectedly missing, stop and report the incomplete runtime. If the
+  currently installed protocol predates the registry, create and seed
+  `.standards/CYCLE_IDS.md` as defined by **Cycle ID Registry** and persist that
+  migration before replacing `PROTOCOL.md`. This pre-update check is what
+  distinguishes a legitimate pre-registry migration from a damaged
+  registry-aware runtime.
 - Update `.standards/PROTOCOL.md` from the installed framework version only
-  after runtime ownership verification. Install or update each skill definition
-  only after that destination skill package passes its ownership check. Keep the
-  installed protocol aligned with the installed skills.
+  after runtime ownership verification and any required cycle-registry migration
+  above. Install or update each skill definition only after that destination
+  skill package passes its ownership check. Keep the installed protocol aligned
+  with the installed skills.
 - Preserve Codex `allow_implicit_invocation: false`.
 - For Claude Code, safely merge `.claude/settings.json` while preserving
   unrelated settings: add each missing required
@@ -926,10 +1192,18 @@ After ownership checks:
   introduced by the new protocol may be added with a semantically neutral default
   only when it is absent; do not reset, reinterpret, or discard existing workflow
   state.
+- Initialize `.standards/CYCLE_IDS.md` on first install. Thereafter preserve it
+  across reinstall, upgrade, and explicit workflow reinitialization; never clear
+  or rewrite existing entries while the runtime remains installed. If it is
+  unexpectedly missing from a verified runtime whose installed protocol already
+  requires the registry, stop and report the incomplete runtime; do not recreate
+  it empty or reconstruct it by inference. A verified pre-registry upgrade must
+  complete the pre-`PROTOCOL.md` migration described above before the new
+  protocol is installed or any new cycle is allocated.
 - Preserve `.standards/CONTEXT.md`; it is Auditor-owned, not installer-owned.
-- Preserve conflicting project-level instructions and report the conflict for
-  user resolution. Do not silently choose precedence, weaken the protocol, or
-  proceed with workflow work under unresolved contradictory instructions.
+- Preserve project-level instructions. When they materially conflict with the
+  protocol, integration contract, workflow artifacts, or other authoritative
+  constraints, follow **Instruction Layering and Conflicts**.
 - Reinstallation must not duplicate managed blocks/imports, reset workflow
   mode/state, or erase project instructions.
 
@@ -967,8 +1241,9 @@ Use these terms consistently across all skills:
 - **forward handoff**: advancing after the current completion gate succeeds.
 - **resume handoff**: completing a recovery frame by returning to `ResumeAt`, or
   another recovery-directed non-forward transition.
-- **cycle mode**: active cycle's assurance topology, `STANDARD` or `EXPEDITED`,
-  distinct from `ProjectMode`.
+- **cycle mode**: persisted cycle-topology selection, distinct from
+  `ProjectMode`; `UNSET` means no topology is currently selected, while
+  `STANDARD` and `EXPEDITED` are executable assurance topologies.
 - **expedited cycle**: bounded brownfield cycle consisting of Developer then
   implementation Reviewer, with possible sign-off without fabricated skipped
   standard roles or artifacts.

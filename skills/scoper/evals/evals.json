@@ -112,6 +112,43 @@
         "Because public versus authenticated/revocable access materially changes user-visible scope, it persists a blocking question and asks the user rather than silently choosing policy",
         "It creates acceptance conditions only after the material scope ambiguity is resolved"
       ]
+    },
+    {
+      "id": 9,
+      "prompt": "Continue the active recovery as Scoper. ProjectMode is GREENFIELD, CycleMode is STANDARD, WorkflowState is SCOPING, .standards/CONTEXT.md does not exist because the first scheduled Auditor pass has not occurred yet, Active Work.Scope points to the current scope, and the active recovery frame is Owner=SCOPING, FailureType=SCOPING, ResumeAt=ARCHITECTING, RerunThrough=NONE. Architect routed back because one acceptance condition is materially ambiguous, but the ambiguity can be resolved from the persisted user request and does not require repository baseline facts. Correct the scope and continue recovery.",
+      "expected_output": "A REPLAN-mode scope correction that does not treat intentionally absent pre-audit CONTEXT.md as a PROJECT_CONTEXT failure, resolves the Scoper-owned defect from established inputs, passes the Scoper gate, and resumes Architecting through the existing recovery mechanism.",
+      "files": [],
+      "assertions": [
+        "The response selects REPLAN because Active Work.Scope already points to the current-cycle scope",
+        "It does not route to Auditor merely because CONTEXT.md is absent before the first scheduled greenfield audit",
+        "It uses the active SCOPING recovery frame as the defect to correct and resolves the ambiguity without inventing architecture",
+        "Because no previously completed downstream state needs re-establishment before ResumeAt ARCHITECTING, the frame is popped after the Scoper gate and recovery resumes directly to ARCHITECTING",
+        "The response provides the next-role Architect invocation after persisting the RESUME transition"
+      ]
+    },
+    {
+      "id": 10,
+      "prompt": "Continue the active STANDARDS workflow as Scoper. ProjectMode is BROWNFIELD, CycleMode is STANDARD, WorkflowState is SCOPING, recovery is inactive, Active Work.Id is improve-search-20260923-x9k2, Active Work.Scope is NONE, and valid active-cycle project context exists. The natural path docs/scope/user-search.md already exists and begins with a STANDARDS provenance block declaring Artifact: SCOPE and Cycle: user-search-v1-old. The new request changes search behavior for the new active cycle. No appropriate unmarked project-owned canonical scope document exists.",
+      "expected_output": "Scoper does not overwrite or adopt the prior-cycle STANDARDS scope. It creates a distinct scope artifact for the active cycle, writes matching SCOPE provenance, records that new path in Active Work.Scope, and proceeds normally after the scope completion gate.",
+      "files": [],
+      "assertions": [
+        "The response recognizes docs/scope/user-search.md as a STANDARDS cycle-owned artifact belonging to user-search-v1-old rather than as a reusable canonical project document",
+        "It does not overwrite, repurpose, or adopt the prior-cycle scope as Active Work.Scope",
+        "It creates a distinct scope artifact and includes a provenance block with Artifact SCOPE and Cycle improve-search-20260923-x9k2",
+        "It records the new repository-relative path in Active Work.Scope before completing Scoper's gate"
+      ]
+    },
+    {
+      "id": 11,
+      "prompt": "Continue the active STANDARDS workflow as Scoper. ProjectMode is BROWNFIELD, CycleMode is STANDARD, WorkflowState is SCOPING, recovery is inactive, Active Work.Id is billing-copy-20260923-p4m7, Active Work.Scope is NONE, valid active-cycle project context exists, and docs/product/scope.md is an established unmarked project-owned canonical scope document. The requested billing-copy change belongs in that canonical scope. No STANDARDS provenance block is present in the file.",
+      "expected_output": "Scoper may update the established unmarked project-owned canonical scope, records that path in Active Work.Scope, and does not convert the document into a cycle-owned STANDARDS artifact merely because it is used for the active cycle.",
+      "files": [],
+      "assertions": [
+        "The response recognizes docs/product/scope.md as an unmarked project-owned canonical document rather than a STANDARDS cycle-owned artifact",
+        "It may update that canonical scope when appropriate and records docs/product/scope.md in Active Work.Scope",
+        "It does not add a STANDARDS SCOPE provenance block solely because the project-owned document is used by the active cycle",
+        "The normal Scoper completion gate and handoff still apply"
+      ]
     }
   ]
 }

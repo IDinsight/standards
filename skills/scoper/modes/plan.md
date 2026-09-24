@@ -15,8 +15,9 @@ Use the Scoper skill's shared inputs and invariants. In particular:
 - read `Active Work.Request` and explicit user constraints;
 - read `.standards/CONTEXT.md` when it exists and is relevant;
 - for brownfield work, require the active-cycle Auditor context;
-- do not treat scopes from completed prior cycles as the current scope unless
-  the active cycle explicitly adopts one as `Active Work.Scope`.
+- do not adopt a STANDARDS-marked scope owned by a completed prior cycle as the
+  current cycle's scope; an appropriate unmarked project-owned canonical scope
+  document may be selected under the shared provenance rules.
 
 ## Procedure
 
@@ -33,9 +34,12 @@ Use the Scoper skill's shared inputs and invariants. In particular:
    cycle.
 4. Keep implementation choices out of the scope unless they are already
    established project constraints or requirements.
-5. Persist the completed scope using the repository's existing scope location
-   when appropriate; otherwise use a feature- or change-specific file under
-   `docs/scope/`.
+5. Select the artifact path under the shared provenance rules. Reuse an
+   appropriate unmarked project-owned canonical scope document when applicable;
+   otherwise create a feature- or change-specific file under `docs/scope/` with
+   a `SCOPE` provenance block whose `Cycle` matches `Active Work.Id`. If the
+   natural target path is a STANDARDS artifact owned by another cycle, choose a
+   distinct path instead of overwriting it.
 6. Record the repository-relative artifact path in `Active Work.Scope`.
 7. Apply the Scoper completion gate and protocol-defined handoff behavior.
 

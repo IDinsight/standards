@@ -86,10 +86,10 @@ transition or protocol-required coordination update.
    When planned design differs from current repository reality, note that
    distinction and defer to the Architecture artifact for the contents of the
    planned design.
-6. Treat existing project-specific agent instructions as constraints when they
-   do not conflict with the protocol. If they conflict with
-   `.standards/PROTOCOL.md` or the S.T.A.N.D.A.R.D.S. integration block, stop
-   and require user resolution as the installed runtime contract requires.
+6. Treat existing project-specific agent instructions as constraints and follow
+   `.standards/PROTOCOL.md` **Instruction Layering and Conflicts** for any
+   material contradiction. Do not define a local precedence rule for resolving
+   it.
 7. Never record secrets, credentials, tokens, private keys, environment values,
    or sensitive local-machine data. Environment-variable names and configuration
    locations may be recorded when useful; values must not be.

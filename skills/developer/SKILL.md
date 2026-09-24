@@ -27,10 +27,15 @@ tooling, systems software, infrastructure, or similar work.
 Own implementation changes for the active cycle and the Developer-owned
 development plan.
 
-Persist the development plan. Use the repository's existing development-plan
-location when one is established; otherwise use
-`docs/development/<Active Work.Id>.md`. Record its repository-relative path in
-`STATE.md` as `Active Work.Development`.
+Persist the development plan as a STANDARDS cycle-owned artifact under the
+protocol's **Workflow Artifact Provenance** rules. Use
+`docs/development/<Active Work.Id>.md` unless the repository requires another
+development-plan directory; any alternative must still use the current
+`Active Work.Id` as its cycle-specific filename. Add the current-cycle
+`DEVELOPMENT` provenance block and keep the plan's visible `Cycle` field equal
+to `Active Work.Id`. Never reuse a shared project-owned plan or a STANDARDS
+development artifact owned by another cycle. Record its repository-relative path
+in `STATE.md` as `Active Work.Development`.
 
 Do not change Scoper-owned requirements or acceptance identifiers,
 Architect-owned technical design, Auditor-owned project context, Tester-owned
@@ -74,19 +79,44 @@ When `Outstanding Obligations` contains an unresolved entry owned by
 the active cycle. Reconcile it into the existing development plan under the same
 approval rules as recovery: reopen an existing `DEV-NNN` when it still
 represents the required outcome, or revise the plan when the obligation
-materially changes approved implementation intent. Do not forward from
+materially changes approved implementation intent. After correcting the specific
+defect and verifying that corrective outcome with appropriate
+implementation-level evidence, remove that Developer-owned obligation from
+`STATE.md`. Removing the obligation records only that the corrective requirement
+is satisfied; it does not make Developer complete. Do not forward from
 `DEVELOPING` until every Developer-owned outstanding obligation is resolved and
-removed.
+removed and the normal Developer completion gate passes.
 
 ## Entry and State Validation
 
 Perform role-owned implementation only while `WorkflowState` is `DEVELOPING`.
 
-For an initialized brownfield cycle whose `Active Work.Id` and
-`Active Work.Request` are both `UNSET`, an explicit Developer invocation with a
-new bounded implementation request may select `EXPEDITED` exactly as allowed by
-`.standards/PROTOCOL.md` **Cycle Modes** and **Select expedited mode for the
-initialized cycle**. Persist that control-plane transition before planning.
+For an initialized project with no active request, apply
+`.standards/PROTOCOL.md` **Cycle Modes** before planning. In `BROWNFIELD`, an
+explicit Developer invocation with a new sufficiently bounded implementation
+request may select `EXPEDITED` only when `CycleMode` is `UNSET`. First honor
+`PendingCycleMode` when it is set: a pending `STANDARD` preference prevents
+Developer from inferring `EXPEDITED`, while a pending `EXPEDITED` preference
+still requires the request to satisfy the expedited contract. If
+`PendingCycleRequest` is not `UNSET`, use that persisted request when resolving
+the pre-cycle decision rather than requiring the user to repeat it. If the
+current state is `SIGNED_OFF` or retained `CANCELLED`, a successful pending
+request/preference resolution must continue through the protocol's **Start a new
+cycle** transition; do not directly replace terminal `Active Work` or bypass its
+handoff and baseline-reconciliation steps. Otherwise, when a pending
+request/preference is successfully consumed for the initialized first cycle,
+persist the selected mode into `CycleMode` and clear `PendingCycleMode`,
+`PendingCycleRequest`, and `PendingCycleBlockedOn` to their neutral values. If
+no pending preference exists, Developer may infer `EXPEDITED` only for a
+sufficiently bounded brownfield request. If the request cannot use the selected
+expedited contract, do not silently reinterpret it as `STANDARD`; follow the
+protocol's user-decision rule. For a selected or defaulted `STANDARD` request,
+allocate its cycle ID through the protocol's **Cycle ID Registry** first. If the
+installed protocol requires the registry but `CYCLE_IDS.md` is unexpectedly
+missing, stop and report the incomplete runtime; do not recreate or infer the
+registry. After a valid registry append succeeds, persist the reserved ID and
+initial request, then stop Developer work because the standard entry state
+remains owned by Scoper or Auditor.
 
 If another role owns the active state and no protocol-authorized control-plane
 transition applies, do not perform Developer work. Leave role-owned artifacts
@@ -136,7 +166,7 @@ materially create or modify:
 Load multiple applicable files when the change spans those technologies. Do not
 load unrelated style files.
 
-Apply constraints in this order:
+Layer compatible implementation guidance in this order:
 
 1. `.standards/PROTOCOL.md` and role ownership;
 2. completed scope and Architect-owned technical design for `STANDARD` cycles,
@@ -144,12 +174,12 @@ Apply constraints in this order:
 3. repository-enforced configuration, project instructions, compatibility
    requirements, generated-code rules, and toolchain constraints;
 4. applicable files under `styles/`;
-5. established local implementation conventions that do not conflict above;
+5. established local implementation conventions;
 6. Developer judgment for reversible local implementation details.
 
-If established scope/design conflicts with an enforced repository or toolchain
-constraint, do not silently choose one by precedence. Route the owning upstream
-defect or blocker.
+This ordering does not resolve material contradictions. Follow
+`.standards/PROTOCOL.md` **Instruction Layering and Conflicts** whenever two
+applicable authorities conflict.
 
 Do not refactor unrelated code solely to normalize style.
 
@@ -242,7 +272,9 @@ remains valid. Reconcile the persisted plan before coding:
 
 A plan that was `COMPLETE` may return to `IN_PROGRESS` during implementation
 recovery. Mark it `COMPLETE` again only after every current approved step is
-`DONE` and the completion gate passes.
+`DONE`, every Developer-owned outstanding obligation has been corrected,
+verified, and removed, and every completion-gate condition other than the plan's
+own `Status: COMPLETE` requirement passes.
 
 ### Promotion Reconciliation
 
@@ -293,6 +325,12 @@ and current repository evidence.
    applicable transition before stopping. Do not keep coding around it.
 9. Continue according to the active collaboration mode until all approved steps
    are complete or a blocker occurs.
+10. When every current approved step is `DONE`, every Developer-owned
+    outstanding obligation has been corrected, verified, and removed, and every
+    completion-gate condition other than the plan's own `Status: COMPLETE`
+    requirement passes, set the development plan to `Status: COMPLETE`. Then
+    apply the full completion gate and perform the applicable normal or recovery
+    handoff.
 
 While `ProjectMode` is `GREENFIELD`, immediately change `.standards/MODE.md`
 permanently to `BROWNFIELD` as soon as Developer observes and verifies that the
@@ -307,8 +345,12 @@ implementation change exists, not when the plan is created or approved.
 1. Never modify project implementation before the current material development
    plan has explicit user approval. A recovery correction within unchanged
    previously approved intent does not require duplicate approval.
-2. Persist blocking user questions in `Active Work.BlockedOn` before asking and
-   clear the field after incorporating the answer.
+2. During an active cycle, persist blocking user questions in
+   `Active Work.BlockedOn` before asking and clear the field after incorporating
+   the answer. For pre-cycle control-plane questions, including rejection of an
+   invalid pending mode preference, leave `Active Work` unchanged and persist
+   the blocked request/question in `PendingCycleRequest` and
+   `PendingCycleBlockedOn` as defined by the protocol.
 3. Preserve Scoper-owned `AC-NNN` identity. Developer may reference acceptance
    identifiers but must not rewrite, renumber, retire, or invent replacements.
 4. Follow Architect-owned decisions in `STANDARD` work. Developer may choose
@@ -331,8 +373,8 @@ implementation change exists, not when the plan is created or approved.
 Developer is complete when:
 
 - every current approved `DEV-NNN` step is `DONE`;
-- the development plan is `Status: COMPLETE` and `Active Work.Development`
-  points to it;
+- the development plan is `Status: COMPLETE`, carries matching current-cycle
+  `DEVELOPMENT` provenance, and `Active Work.Development` points to it;
 - implemented behavior conforms to the active contract and established technical
   constraints;
 - applicable development styles were followed for materially changed code;
