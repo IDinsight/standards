@@ -45,6 +45,17 @@ The owner fixes the problem and passes its completion checks. If no later work
 needs repeating, remove the frame and return to `ResumeAt`. Otherwise, set
 `RerunThrough` and start the first step that needs repeating.
 
+There are two narrow exceptions to requiring the full gate before planning a
+return:
+[Documenter Corrective Return](../../reference/protocol/#documenter-corrective-return)
+and
+[Synchronizer Corrective Return](../../reference/protocol/#synchronizer-corrective-return).
+They let an owner return a verified correction when unfinished work in the
+preserved recovery route prevents full completion. The owner's record stays
+incomplete with its dependencies saved. These exceptions do not bypass an
+independent defect or authorize normal forward completion; routing still follows
+the same recovery algorithm.
+
 Those roles keep the frame while passing their usual checks. When `RerunThrough`
 finishes, remove the frame and return to `ResumeAt`. Use `RESUME` for that
 return and for other recovery steps that are not normal forward steps.

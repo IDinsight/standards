@@ -28,12 +28,13 @@ transition, if any. Do not infer entry from chat or the existence of reports.
 **Expedited Promotion**, not an invented expedited synchronization path.
 
 Read the active request, scope, architecture, Auditor context, development plan,
-verification report, both review reports, relevant project documentation and
-agent instructions, and any existing synchronization record. Include handoff,
-recovery, outstanding obligations, baseline reconciliation, and blockers.
-Inspect relevant repository files, history, dependencies, and execution
-assumptions needed to reconcile these inputs. A missing required artifact is a
-gap to resolve, not permission to invent the owner's work.
+verification report, both review reports, Documenter's documentation record,
+relevant project documentation and agent instructions, and any existing
+synchronization record. Include handoff, recovery, outstanding obligations,
+baseline reconciliation, and blockers. Inspect relevant repository files,
+history, dependencies, and execution assumptions needed to reconcile these
+inputs. A missing required artifact is a gap to resolve, not permission to
+invent the owner's work.
 
 ## Ownership
 

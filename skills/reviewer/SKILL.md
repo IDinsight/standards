@@ -35,9 +35,12 @@ outstanding obligations, and blockers. In `STANDARD`, read the current scope,
 architecture, Auditor context, development plan, and Tester verification report.
 In `EXPEDITED`, read the bounded request and development plan; any existing
 context is prior evidence, not an assumed refreshed baseline. Read the current
-cycle's review reports when present and relevant user/project documentation.
-Inspect relevant source, tests, fixtures, configuration, established commands,
-dependencies, and version-control evidence directly.
+cycle's review reports when present and relevant user/project documentation. For
+final review or documentation corrections, read Documenter's documentation
+record and inspect its evidence against the saved documents and actual behavior;
+a record's completion label alone is not sufficient. Inspect relevant source,
+tests, fixtures, configuration, established commands, dependencies, and
+version-control evidence directly.
 
 ## Modes
 

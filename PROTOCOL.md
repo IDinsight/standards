@@ -343,7 +343,8 @@ Allocate a new cycle ID in this order:
 3. As defense in depth, also verify that it does not collide with an existing
    cycle-owned artifact path or STANDARDS provenance marker, including
    `docs/development/<candidate>.md`, `docs/verification/<candidate>.md`,
-   `docs/reviews/<candidate>/`, and `docs/synchronization/<candidate>.md`.
+   `docs/reviews/<candidate>/`, `docs/documentation/<candidate>.md`, and
+   `docs/synchronization/<candidate>.md`.
 4. Append the candidate to `CYCLE_IDS.md` and persist that registry change.
 5. Only after the registry append succeeds may the candidate be written to
    `Active Work.Id` and cycle initialization continue.
@@ -373,15 +374,15 @@ provenance collision checks still apply.
 ### Workflow Artifact Provenance
 
 Cycle ownership must be recoverable from the artifact itself whenever STANDARDS
-creates a Scope, Architecture, Development, Verification, Review, or
-Synchronization artifact.
+creates a Scope, Architecture, Development, Verification, Review, Documentation,
+or Synchronization artifact.
 Every such newly created artifact must begin with this provenance block, using
 exactly one concrete artifact type and the exact current cycle ID. Review reports
 also require the `ReviewKind` extension defined below:
 
 ```markdown
 <!-- STANDARDS
-Artifact: SCOPE | ARCHITECTURE | DEVELOPMENT | VERIFICATION | REVIEW | SYNCHRONIZATION
+Artifact: SCOPE | ARCHITECTURE | DEVELOPMENT | VERIFICATION | REVIEW | DOCUMENTATION | SYNCHRONIZATION
 Cycle: <Active Work.Id>
 -->
 ```
@@ -440,6 +441,20 @@ incorrectly marked, or different-cycle/kind file at the required path is a
 collision: report it and block dependent work until resolved without overwriting,
 relabeling, adopting it, or silently choosing an alternate path. The same applies
 when a non-directory or unsafe path prevents the required report location.
+
+Documenter owns the fixed cycle-specific record at
+`docs/documentation/<Active Work.Id>.md`. Its `DOCUMENTATION` provenance block
+and visible `Cycle` field must match `Active Work.Id`. Derive the path from the
+cycle ID; do not add a documentation-path state field. Inspect the path and
+provenance before creating or editing the record. An unrelated, unmarked,
+incorrectly marked, or different-cycle file is a collision; a non-directory or
+unsafe path is also a blocker. Preserve existing content, report the collision,
+and block dependent work until resolved without relabeling, adopting,
+overwriting, or silently choosing another path. Preserve other cycles' records,
+including moved artifacts whose provenance still names their original cycle.
+Ordinary project documentation, comments, and docstrings remain reusable
+project assets and do not acquire cycle provenance merely because Documenter
+updates them.
 
 Synchronizer owns the fixed cycle-specific record at
 `docs/synchronization/<Active Work.Id>.md`. Its `SYNCHRONIZATION` provenance
@@ -758,9 +773,14 @@ Project-facing documentation and agent guidance are Documenter-owned, including
 project instructions outside managed framework blocks. Their completion evidence
 must identify the relevant documents and assessed content, checks performed and
 results or limits, and any current AC or technical criterion they satisfy.
-Existing artifacts may carry this evidence; no additional documentation report
-path or state field is prescribed here. Synchronizer references that evidence
-without manufacturing it or rewriting documentation. Managed framework blocks,
+Documenter persists this evidence and resumable progress in its documentation
+record under **Workflow Artifact Provenance**, referencing supporting evidence
+where it already exists rather than copying it. The record also preserves
+collaboration mode, target and editing boundary, explicitly selected user style
+(or `NONE`), remaining work, discrepancies, dependencies, and the completion
+conclusion. It is not an authoritative acceptance ledger and does not certify
+another role's work. Reviewer and Synchronizer consume it independently; neither
+manufactures its evidence or rewrites documentation. Managed framework blocks,
 installed protocol, and installation metadata retain installer/protocol ownership.
 Preserve user-authored instructions and apply **Instruction Layering and
 Conflicts** when necessary.
@@ -799,6 +819,49 @@ same-state correction, a downstream rerun that does not own the active frame,
 or a return to `AWAITING_USER_SIGNOFF` cannot use this exception. Once the
 interrupted work is complete, full synchronization must still pass before
 **Standard Cycle Completion** permits sign-off readiness.
+
+## Documenter Corrective Return
+
+An earlier role may need a documentation or project-guidance defect corrected
+before it can finish its work. Requiring documentation of that unfinished work
+before returning the correction would prevent either role from proceeding.
+This is a narrow recovery outcome in `STANDARD`, not another mode or a passing
+Documenter completion conclusion.
+
+Documenter may plan resumption without passing its full gate only when:
+
+- it owns the active recovery frame in `DOCUMENTING`, whose `RerunThrough` is
+  `NONE`, and `ResumeAt` is another workflow role's state, not a user-owned state;
+- its record has valid current-cycle provenance and the frame's specific
+  correction has been verified in saved content against current inputs with
+  sufficient actual evidence; no unverified corrective edit, unresolved
+  actionable documentation defect, Documenter-owned outstanding obligation, or
+  blocking user question remains;
+- every remaining full-gate gap is documentation work or assessment that cannot
+  yet be completed because necessary work already assigned to the interrupted
+  role or preserved recovery route is unfinished. Persist each remaining item,
+  its prerequisite and owner, the evidence still needed, and when documentation
+  must be revisited. Preserve current AC references where they exist; do not
+  fabricate future scope, design, implementation, verification, or review
+  artifacts, or acceptance identifiers;
+- missing evidence needed to verify the correction, independent defects or
+  gaps, and currently actionable documentation outside a selected editing
+  boundary are handled through normal failure/blocking rules rather than
+  deferred by this exception. A selected target or collaboration mode does not
+  waive those requirements.
+
+Persist correction evidence, applicability limits, remaining work, and resume
+context, leaving the documentation record `IN_PROGRESS` or `BLOCKED`. Then use
+**Recovery Mechanics** to determine necessary reruns and return, preserving
+older frames and outstanding obligations. Do not mark documentation `COMPLETE`,
+close another role's findings, or take a normal forward handoff on the strength
+of this correction. A same-state correction, a downstream rerun that does not
+own the active frame, or a return to `AWAITING_USER_SIGNOFF` cannot use this
+exception. GUIDED work must have an inspected saved correction; supplying a
+snippet is insufficient. On re-entry, reconcile current inputs and the retained
+work. The full Documenter gate still applies before normal forward handoff, and
+**Standard Cycle Completion** still requires completed documentation before
+sign-off readiness.
 
 ## Standard Cycle Completion
 
@@ -980,9 +1043,11 @@ routing.
    frame. Never overwrite older frames. The last frame is active.
 3. **Only the active frame owner plans resumption.** After correcting the defect
    and passing its normal gate, that owner decides whether previously completed
-   downstream states must be re-established before `ResumeAt`. The sole
-   exception here is **Synchronizer Corrective Return**, whose conditions allow
-   resumption planning without declaring the full synchronization gate passed.
+   downstream states must be re-established before `ResumeAt`. The only
+   exceptions are **Documenter Corrective Return** and **Synchronizer Corrective
+   Return**. Their conditions allow the respective owner to plan resumption
+   without declaring its full gate passed; the routing algorithm below remains
+   unchanged.
 4. **No rerun:** pop the frame and transition directly to `ResumeAt` with
    `Handoff.Kind: RESUME`.
 5. **Rerun required:** set `RerunThrough` to the last required state and
@@ -1484,6 +1549,13 @@ Use these terms consistently across all skills:
   `docs/reviews/<Active Work.Id>/implementation.md` or `final-deliverable.md`
   within that same directory. It records inspected inputs, checks, findings,
   limitations, dependencies, and resumable progress under **Review Gates**.
+- **documentation record**: Documenter-owned cycle-specific evidence and
+  progress at `docs/documentation/<Active Work.Id>.md`, identifying assessed
+  documents/content, actual checks and limits, current AC/technical criterion
+  references, collaboration mode, target, user style, remaining work, and
+  resumable completion context. It is distinct from reusable project
+  documentation and does not replace another role's evidence or an acceptance
+  authority.
 - **synchronization record**: Synchronizer-owned cycle-specific reconciliation
   at `docs/synchronization/<Active Work.Id>.md`, recording assessed identities,
   references to completion/evidence artifacts, discrepancies and their owners,

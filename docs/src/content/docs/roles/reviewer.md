@@ -108,7 +108,7 @@ later role with its owner, required evidence, and the same acceptance ID. It
 then normally hands off to Documenter. Final review checks current evidence for
 every condition, including resolved earlier dependencies, and normally hands off
 to Synchronizer. Recovery follows its saved route instead of these normal steps.
-Documenter, Navigator, and the installer remain unfinished. See
+Navigator and the installer remain unfinished. See
 [Synchronizer](../synchronizer/) for reconciliation before sign-off.
 
 Expedited review assesses the bounded request and Developer evidence without

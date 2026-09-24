@@ -121,9 +121,9 @@ See [allocation rules](../runtime-files/#cycle-identity).
 ## Artifact provenance
 
 A block inside a STANDARDS-created Scope, Architecture, Development,
-Verification, Review, or Synchronization file that identifies its type and
-owning cycle. Review blocks also identify the review kind. Renaming the file
-does not change its ownership. See
+Verification, Review, Documentation, or Synchronization file that identifies its
+type and owning cycle. Review blocks also identify the review kind. Renaming the
+file does not change its ownership. See
 [artifact provenance](../../concepts/ownership/#artifact-provenance).
 
 ## Development plan and step
@@ -145,3 +145,11 @@ Synchronizer's cycle-specific reconciliation of completed assessments, current
 files, and workflow records. It references evidence and records discrepancies,
 limits, and readiness; it does not establish user acceptance. See
 [Synchronizer](../../roles/synchronizer/).
+
+## Documentation record
+
+Documenter's cycle-specific evidence and progress at
+`docs/documentation/<Active Work.Id>.md`. It identifies assessed documents,
+actual checks, supported conditions, remaining work, and collaboration choices.
+It does not make ordinary documentation cycle-owned or certify other roles'
+work. See [Documenter](../../roles/documenter/).

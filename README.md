@@ -37,7 +37,10 @@ skills define role-specific behavior.
   fresh chat separate from their authors' conversations. It persists evidence,
   material findings, and limitations, then explains whether work can move
   forward in plain language.
-- **Documenter** owns user- and project-facing documentation updates.
+- **Documenter** maintains user- and project-facing documentation and project
+  agent guidance outside managed blocks. It works autonomously or guides one
+  saved edit at a time, recording evidence and remaining work before final
+  review.
 - **Synchronizer** reconciles completed assessments, the current deliverable,
   and workflow records before user sign-off. It records evidence applicability
   and discrepancies, routing corrections to their owners.

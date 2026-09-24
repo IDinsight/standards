@@ -17,6 +17,10 @@ does not give a role permission to fix another role's work.
   report records current evidence, gaps, and later-role dependencies.
 - **Review:** independent assessment, findings, and conclusions. Reviewer owns
   reports and corrections to its findings, while defects go to their owners.
+- **Documentation:** user/project documentation, comments and docstrings, and
+  project agent guidance outside managed blocks. Documenter owns this work and
+  its evidence record; executable logic and tooling directives keep their
+  owners.
 - **Synchronization:** applicability and consistency of completed assessments,
   the deliverable, and workflow records. Synchronizer owns its record and routes
   discrepancies to the owners of the affected work.
@@ -34,9 +38,9 @@ question. They cannot edit the installed `PROTOCOL.md` to change those rules.
 
 ## Artifact provenance
 
-New STANDARDS Scope, Architecture, Development, Verification, Review, and
-Synchronization files begin with a block identifying their type and owning
-cycle. For example:
+New STANDARDS Scope, Architecture, Development, Verification, Review,
+Documentation, and Synchronization files begin with a block identifying their
+type and owning cycle. For example:
 
 ```markdown
 <!-- STANDARDS
@@ -46,11 +50,11 @@ Cycle: add-user-search-20260924T150000Z-a7f3
 ```
 
 Use the actual active ID and exactly one type: `SCOPE`, `ARCHITECTURE`,
-`DEVELOPMENT`, `VERIFICATION`, `REVIEW`, or `SYNCHRONIZATION`. Review blocks
-also require the concrete `ReviewKind`. The marker keeps ownership visible even
-if the file is renamed or moved. Another cycle may read it as permitted prior
-evidence, but cannot overwrite, repurpose, or adopt it as its own artifact.
-Choose a different path for new work.
+`DEVELOPMENT`, `VERIFICATION`, `REVIEW`, `DOCUMENTATION`, or `SYNCHRONIZATION`.
+Review blocks also require the concrete `ReviewKind`. The marker keeps ownership
+visible even if the file is renamed or moved. Another cycle may read it as
+permitted prior evidence, but cannot overwrite, repurpose, or adopt it as its
+own artifact. Choose a different path for new work.
 
 Before editing any referenced artifact, inspect its marker. If it names another
 cycle, correct the active reference without changing the other cycle's file.
@@ -78,6 +82,12 @@ Synchronization records use the fixed path
 cycle ID. Collisions block dependent work without adopting existing content or
 choosing an alternative path. See
 [Synchronizer](../../roles/synchronizer/#inputs-and-output).
+
+Documentation records use `docs/documentation/<Active Work.Id>.md` with matching
+provenance and visible cycle ID, under the same fixed-path collision rules. The
+guides and docstrings Documenter updates remain reusable project assets. Managed
+framework blocks and installed runtime files retain their installer/protocol
+ownership. See [Documenter](../../roles/documenter/).
 
 ## Architect and Developer
 

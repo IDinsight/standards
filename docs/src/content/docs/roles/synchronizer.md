@@ -89,12 +89,12 @@ go to Documenter. Managed framework blocks, installed protocol, and installation
 metadata retain installer/protocol ownership. User-authored instructions are
 preserved and material conflicts follow the protocol.
 
-Documenter and the installer are still unfinished. The protocol defines the
-minimum documentation evidence interface needed here: relevant documents and
-content identities, checks/results or limits, and the conditions they support.
-It does not prescribe a new documentation report or implement Documenter.
-Missing required evidence blocks readiness; Synchronizer cannot supply another
-role's completion work. See [Documenter](../documenter/) and
+Documenter's record at `docs/documentation/<Active Work.Id>.md` provides
+relevant documents and content identities, checks/results or limits, and the
+conditions they support. Synchronizer checks that evidence against the current
+deliverable; a completion label alone is insufficient. Missing required evidence
+blocks readiness, and Synchronizer cannot supply another role's completion work.
+The installer remains unfinished. See [Documenter](../documenter/) and
 [installation requirements](../../getting-started/installation/).
 
 The package includes authored evaluation scenarios. Structural validation and a

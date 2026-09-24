@@ -1,8 +1,8 @@
 ---
 title: Artifact Templates
 description:
-  Find the scope, design, development, verification, review, synchronization,
-  and context templates.
+  Find the scope, design, development, verification, review, documentation,
+  synchronization, and context templates.
 ---
 
 Each implemented role has a template defining the file it produces. The site
@@ -19,6 +19,9 @@ copies these templates from the repository during development and builds.
 - [Review report](../templates/reviewer/): cycle and kind, independent
   assessment, findings, limitations, later dependencies, and resumable
   conclusions.
+- [Documentation record](../templates/documenter/): assessed documentation,
+  behavior evidence, actual checks and limits, collaboration/target/style
+  choices, remaining work, and resume context.
 - [Synchronization record](../templates/synchronizer/): assessed identities,
   completion/evidence references, discrepancies and owners, limits, and resume
   conclusion.
@@ -34,11 +37,17 @@ has the fixed path `.standards/CONTEXT.md`. Tester's fixed report path is
 document contents out of state. Review reports use the fixed
 `docs/reviews/<Active Work.Id>/implementation.md` and `final-deliverable.md`
 paths in that directory, also without a state field. New Scope, Architecture,
-Development, Verification, Review, and Synchronization files require cycle
-provenance. Development plans, verification reports, and review reports always
-belong to one cycle; review provenance also identifies its kind. See
-[artifact ownership](../../concepts/ownership/#artifact-provenance).
+Development, Verification, Review, Documentation, and Synchronization files
+require cycle provenance. Development plans, verification reports, and review
+reports always belong to one cycle; review provenance also identifies its kind.
+See [artifact ownership](../../concepts/ownership/#artifact-provenance).
 
 Synchronization records always belong to one cycle at the fixed path
 `docs/synchronization/<Active Work.Id>.md`, with no state field. They reference
 existing evidence rather than duplicate an acceptance ledger.
+
+Documentation records always belong to one cycle at
+`docs/documentation/<Active Work.Id>.md`, without a state field. Their
+`DOCUMENTATION` provenance does not extend to ordinary guides, comments, or
+docstrings, which remain reusable project assets. Fixed-path collisions block
+dependent work without overwriting or adopting existing content.

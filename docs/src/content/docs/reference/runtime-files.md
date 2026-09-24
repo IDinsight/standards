@@ -160,3 +160,12 @@ matching `SYNCHRONIZATION` provenance and visible cycle ID. No
 synchronization-path field is added to state. Fixed-path collisions block
 dependent work while preserving existing content. See the
 [synchronization template](../templates/synchronizer/).
+
+Documenter's evidence and progress use `docs/documentation/<Active Work.Id>.md`
+with matching `DOCUMENTATION` provenance and visible cycle ID. No
+documentation-path state field is added. It records collaboration mode, target,
+explicit user style (default `NONE`), inspected documentation identities, actual
+checks, unresolved work, and resume context. Fixed-path collisions block
+dependent work. Ordinary documentation and project agent guidance outside
+managed blocks remain project assets. See the
+[documentation template](../templates/documenter/).
