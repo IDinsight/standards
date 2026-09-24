@@ -45,7 +45,7 @@ Edit `PROTOCOL.md` or a skill's `template.md` when changing the rules or
 required output. Then run:
 
 ```sh
-pnpm --dir docs run sync-reference
+pnpm run docs:sync-reference
 ```
 
 When adding a role template, register it in `docs/scripts/sync-reference.mjs`

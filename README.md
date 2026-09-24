@@ -81,6 +81,20 @@ skills define role-specific behavior.
 
 See [`PROTOCOL.md`](PROTOCOL.md) for the authoritative workflow contract.
 
+## Repository Development
+
+The repository uses a root pnpm workspace. Use Node.js 22.12 or newer and pnpm
+10.34.5:
+
+```sh
+pnpm install --frozen-lockfile
+pnpm run docs:dev
+```
+
+Run `pnpm run docs:build` and `pnpm run docs:check-links` to validate the
+documentation. See [the documentation README](docs/README.md) for preview and
+reference-generation commands.
+
 ## Installation Model
 
 The repository is intended to be installable into either greenfield or

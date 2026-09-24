@@ -9,6 +9,9 @@ The repository separates framework behavior from explanatory documentation.
 standards/
 ├── PROTOCOL.md
 ├── README.md
+├── package.json
+├── pnpm-workspace.yaml
+├── pnpm-lock.yaml
 ├── skills/
 │   ├── scoper/
 │   ├── architect/
@@ -24,7 +27,9 @@ standards/
 │   ├── greenfield/
 │   └── brownfield/
 ├── docs/
+│   ├── package.json
 │   ├── astro.config.mjs
+│   ├── tsconfig.json
 │   ├── scripts/
 │   └── src/content/docs/
 ├── Makefile
@@ -60,6 +65,14 @@ building the documentation does not execute them or establish behavioral passes.
 
 `templates/common/` supplies agent integration blocks. Mode-specific template
 directories contain the initial runtime mode and state records.
+
+## Workspace tooling
+
+The root `package.json` is private and provides shared commands and the pinned
+pnpm version. `pnpm-workspace.yaml` registers `docs/`; `pnpm-lock.yaml` locks
+dependencies for both packages. The documentation package retains its Astro
+dependencies, scripts, and configuration. Installer implementation and
+publishing metadata will be added separately.
 
 ## Documentation sources
 

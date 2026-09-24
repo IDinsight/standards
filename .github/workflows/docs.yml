@@ -23,9 +23,11 @@ jobs:
       - name: Build, check, and upload documentation
         uses: withastro/action@v6
         with:
-          path: docs
+          path: .
           node-version: 24
-          build-cmd: pnpm run build && pnpm run check-links
+          cache-dir: docs/node_modules/.astro
+          out-dir: docs/dist
+          build-cmd: pnpm run docs:build && pnpm run docs:check-links
 
   deploy:
     name: Deploy to GitHub Pages
