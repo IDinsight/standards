@@ -69,8 +69,12 @@ Before performing workflow work:
    Tester Session** or **Independent Reviewer Session** as appropriate. Request
    the required fresh chat; Reviewer handoffs name the review kind and give the
    advisory model recommendation. Persist sufficient context in owned artifacts.
-   Verification and review reports are discoverable through **Workflow Artifact
-   Provenance**; their paths and contents do not add fields to state.
+   Verification, review, and synchronization records are discoverable through
+   **Workflow Artifact Provenance**; their paths and contents do not add fields
+   to state. Apply **Synchronization Gate** and **Standard Cycle Completion**
+   before standard sign-off readiness, after canonical recovery routing.
+   Synchronizer reconciles evidence and routes stale documentation or guidance;
+   it does not rewrite another owner's artifacts or managed framework blocks.
 
 Navigator is strictly non-mutating and may be used at any time without changing
 workflow state.

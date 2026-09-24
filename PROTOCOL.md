@@ -342,8 +342,8 @@ Allocate a new cycle ID in this order:
 2. Verify that the candidate does not already appear in `CYCLE_IDS.md`.
 3. As defense in depth, also verify that it does not collide with an existing
    cycle-owned artifact path or STANDARDS provenance marker, including
-   `docs/development/<candidate>.md`, `docs/verification/<candidate>.md`, and
-   `docs/reviews/<candidate>/`.
+   `docs/development/<candidate>.md`, `docs/verification/<candidate>.md`,
+   `docs/reviews/<candidate>/`, and `docs/synchronization/<candidate>.md`.
 4. Append the candidate to `CYCLE_IDS.md` and persist that registry change.
 5. Only after the registry append succeeds may the candidate be written to
    `Active Work.Id` and cycle initialization continue.
@@ -373,14 +373,15 @@ provenance collision checks still apply.
 ### Workflow Artifact Provenance
 
 Cycle ownership must be recoverable from the artifact itself whenever STANDARDS
-creates a Scope, Architecture, Development, Verification, or Review artifact.
+creates a Scope, Architecture, Development, Verification, Review, or
+Synchronization artifact.
 Every such newly created artifact must begin with this provenance block, using
 exactly one concrete artifact type and the exact current cycle ID. Review reports
 also require the `ReviewKind` extension defined below:
 
 ```markdown
 <!-- STANDARDS
-Artifact: SCOPE | ARCHITECTURE | DEVELOPMENT | VERIFICATION | REVIEW
+Artifact: SCOPE | ARCHITECTURE | DEVELOPMENT | VERIFICATION | REVIEW | SYNCHRONIZATION
 Cycle: <Active Work.Id>
 -->
 ```
@@ -439,6 +440,18 @@ incorrectly marked, or different-cycle/kind file at the required path is a
 collision: report it and block dependent work until resolved without overwriting,
 relabeling, adopting it, or silently choosing an alternate path. The same applies
 when a non-directory or unsafe path prevents the required report location.
+
+Synchronizer owns the fixed cycle-specific record at
+`docs/synchronization/<Active Work.Id>.md`. Its `SYNCHRONIZATION` provenance
+block and visible `Cycle` field must match `Active Work.Id`. Derive the path
+from the cycle ID; do not add a synchronization-path state field. Inspect the
+path and provenance before creating or editing the record. An unrelated,
+unmarked, incorrectly marked, or different-cycle file is a collision; a
+non-directory or unsafe path is also a blocker. Preserve the existing content,
+report the collision, and block dependent work until resolved without
+relabeling, adopting, overwriting, or silently choosing another path. Preserve
+other cycles' records, including moved artifacts whose provenance still names
+their original cycle.
 
 Before editing the verification report or an artifact referenced by
 `Active Work.Scope`, `Active Work.Architecture`, or `Active Work.Development`,
@@ -712,6 +725,98 @@ when active; otherwise follow **Forward Transitions**. Before entering
 `AWAITING_USER_SIGNOFF`, all applicable cycle completion requirements, including
 an empty recovery stack and inactive outstanding obligations, must hold.
 
+## Synchronization Gate
+
+Synchronizer reconciles completed assessments, the current deliverable, and
+workflow records in `SYNCHRONIZING` during `STANDARD` only. Reviewer owns the
+assessment of soundness; Synchronizer establishes whether that assessment and
+its supporting evidence still apply to the work being offered for sign-off.
+Initial work, resumption, and reconciliation after corrections share this full
+completion gate. A corrective return below does not declare this gate passed.
+
+Synchronization passes when:
+
+- the current-cycle synchronization record has matching provenance and current
+  assessed input identities, with references to the existing completion and
+  evidence artifacts;
+- cycle identities, artifact references, current files, and completion claims
+  agree, and implementation and final review conclusions remain applicable;
+- every current acceptance condition and relevant technical criterion has
+  sufficient current evidence under **Acceptance Traceability**, including
+  evidence resolving any earlier later-role dependencies under the same IDs;
+- no unresolved material discrepancy or reconciliation gap remains, and no
+  blocking user question or obligation owned by `SYNCHRONIZING` remains;
+- limitations, remaining work, and a concise conclusion with resume/handoff
+  context are persisted. A sufficiently assessed no-change result is valid.
+
+The record references evidence; it is not another authoritative acceptance
+ledger. File presence or a `COMPLETE` label alone proves neither completion nor
+continued applicability. Synchronizer owns its record and corrections to its
+reconciliation, not another role's evidence, findings, or completion markers.
+
+Project-facing documentation and agent guidance are Documenter-owned, including
+project instructions outside managed framework blocks. Their completion evidence
+must identify the relevant documents and assessed content, checks performed and
+results or limits, and any current AC or technical criterion they satisfy.
+Existing artifacts may carry this evidence; no additional documentation report
+path or state field is prescribed here. Synchronizer references that evidence
+without manufacturing it or rewriting documentation. Managed framework blocks,
+installed protocol, and installation metadata retain installer/protocol ownership.
+Preserve user-authored instructions and apply **Instruction Layering and
+Conflicts** when necessary.
+
+Passing this gate is not cycle completion or user acceptance. Apply **Recovery
+Mechanics** after owned correction and the gate: an active recovery stack does
+not by itself prevent the Synchronizer gate from passing. A correction or rerun
+may need to return to `ResumeAt` instead of advancing toward sign-off.
+
+### Synchronizer Corrective Return
+
+An interrupted role may need a Synchronizer-owned reconciliation error corrected
+before it can finish its assessment. Do not require that unfinished assessment
+as a prerequisite for returning its verified correction. This is a narrow
+recovery outcome, not another mode or a passing synchronization conclusion.
+
+Synchronizer may plan resumption without passing its full gate only when:
+
+- it owns the active recovery frame, whose `RerunThrough` is `NONE`, and
+  `ResumeAt` is another workflow role's state, not a user-owned state;
+- its record has valid current-cycle provenance, the frame's specific correction
+  has been verified against current inputs, and no unresolved Synchronizer-owned
+  defect, obligation, or blocking question prevents that corrective outcome;
+- the remaining full-gate gaps are exclusively unfinished assessments or work
+  already assigned to the interrupted role or preserved recovery route. Record
+  each dependency, its owner, and the evidence still required. An open Reviewer
+  finding awaiting reassessment of this correction remains Reviewer-owned;
+- any newly discovered independent defect or gap is handled through normal
+  failure/blocking rules instead of being deferred by this exception.
+
+Persist the correction evidence and remaining work, leaving the synchronization
+record `IN_PROGRESS` or `BLOCKED` while its full gate is unmet. Then use
+**Recovery Mechanics** to determine reruns and return; preserve older frames.
+Do not close another role's findings or claim synchronization complete. A
+same-state correction, a downstream rerun that does not own the active frame,
+or a return to `AWAITING_USER_SIGNOFF` cannot use this exception. Once the
+interrupted work is complete, full synchronization must still pass before
+**Standard Cycle Completion** permits sign-off readiness.
+
+## Standard Cycle Completion
+
+Before a `STANDARD` cycle enters `AWAITING_USER_SIGNOFF`, all applicable
+standard role gates must be satisfied for the current work, including final
+review and synchronization. Every current AC and relevant technical criterion
+must have sufficient current evidence, with no unresolved material findings,
+discrepancies, dependencies, or blocking user question. Required project context
+must be valid and `Active Work.BaselineReconciliation` must be `NONE`.
+Recovery must be complete (empty stack) and outstanding obligations inactive.
+Apply recovery routing first; neither a report label nor correction of one
+owned obligation bypasses these requirements.
+
+`AWAITING_USER_SIGNOFF` means ready for the user's decision, not accepted or
+`SIGNED_OFF`. User acceptance follows **User Decisions and Intervention**;
+revalidate these requirements at sign-off against current inputs. `EXPEDITED`
+uses **Expedited Cycle Contract** instead and never fabricates synchronization.
+
 ## Failure Types
 
 ```text
@@ -875,7 +980,9 @@ routing.
    frame. Never overwrite older frames. The last frame is active.
 3. **Only the active frame owner plans resumption.** After correcting the defect
    and passing its normal gate, that owner decides whether previously completed
-   downstream states must be re-established before `ResumeAt`.
+   downstream states must be re-established before `ResumeAt`. The sole
+   exception here is **Synchronizer Corrective Return**, whose conditions allow
+   resumption planning without declaring the full synchronization gate passed.
 4. **No rerun:** pop the frame and transition directly to `ResumeAt` with
    `Handoff.Kind: RESUME`.
 5. **Rerun required:** set `RerunThrough` to the last required state and
@@ -1377,6 +1484,11 @@ Use these terms consistently across all skills:
   `docs/reviews/<Active Work.Id>/implementation.md` or `final-deliverable.md`
   within that same directory. It records inspected inputs, checks, findings,
   limitations, dependencies, and resumable progress under **Review Gates**.
+- **synchronization record**: Synchronizer-owned cycle-specific reconciliation
+  at `docs/synchronization/<Active Work.Id>.md`, recording assessed identities,
+  references to completion/evidence artifacts, discrepancies and their owners,
+  limitations, and a resumable conclusion under **Synchronization Gate**. It is
+  not an acceptance ledger or user sign-off.
 - **project context**: Auditor-owned baseline stored at `.standards/CONTEXT.md`.
   It may persist as evidence across cycles, but cycle-scoped non-baseline entries
   follow the lifecycle in **Persisted Workflow State**. Planned implementation

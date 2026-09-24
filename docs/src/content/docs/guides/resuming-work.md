@@ -57,6 +57,13 @@ conditions, and outstanding findings before reusing conclusions. Reviewer can
 resume its own independent session; authoring conversations require a fresh
 chat. See [Reviewer resumption](../../roles/reviewer/#modes-and-resumption).
 
+In `SYNCHRONIZING`, read `docs/synchronization/<Active Work.Id>.md` when
+present. Compare current inputs with assessed identities before retaining any
+conclusion, including an interrupted assessment. Use the same procedure after
+corrections; unchanged inputs need no duplicate entries or cosmetic rewrites.
+See
+[Synchronizer resumption](../../roles/synchronizer/#one-procedure-for-initial-work-and-resumption).
+
 ## Resolve blockers without skipping gates
 
 If `BlockedOn` contains an unanswered question, use the answer before clearing

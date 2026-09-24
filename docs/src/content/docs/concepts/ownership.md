@@ -17,6 +17,9 @@ does not give a role permission to fix another role's work.
   report records current evidence, gaps, and later-role dependencies.
 - **Review:** independent assessment, findings, and conclusions. Reviewer owns
   reports and corrections to its findings, while defects go to their owners.
+- **Synchronization:** applicability and consistency of completed assessments,
+  the deliverable, and workflow records. Synchronizer owns its record and routes
+  discrepancies to the owners of the affected work.
 - **Project context:** what already exists and what the change must respect.
   Auditor owns it. These established facts are the project's **baseline**.
 
@@ -31,8 +34,9 @@ question. They cannot edit the installed `PROTOCOL.md` to change those rules.
 
 ## Artifact provenance
 
-New STANDARDS Scope, Architecture, Development, Verification, and Review files
-begin with a block identifying their type and owning cycle. For example:
+New STANDARDS Scope, Architecture, Development, Verification, Review, and
+Synchronization files begin with a block identifying their type and owning
+cycle. For example:
 
 ```markdown
 <!-- STANDARDS
@@ -42,11 +46,11 @@ Cycle: add-user-search-20260924T150000Z-a7f3
 ```
 
 Use the actual active ID and exactly one type: `SCOPE`, `ARCHITECTURE`,
-`DEVELOPMENT`, `VERIFICATION`, or `REVIEW`. Review blocks also require the
-concrete `ReviewKind`. The marker keeps ownership visible even if the file is
-renamed or moved. Another cycle may read it as permitted prior evidence, but
-cannot overwrite, repurpose, or adopt it as its own artifact. Choose a different
-path for new work.
+`DEVELOPMENT`, `VERIFICATION`, `REVIEW`, or `SYNCHRONIZATION`. Review blocks
+also require the concrete `ReviewKind`. The marker keeps ownership visible even
+if the file is renamed or moved. Another cycle may read it as permitted prior
+evidence, but cannot overwrite, repurpose, or adopt it as its own artifact.
+Choose a different path for new work.
 
 Before editing any referenced artifact, inspect its marker. If it names another
 cycle, correct the active reference without changing the other cycle's file.
@@ -68,6 +72,12 @@ Reviewer reports also belong to one cycle and kind, at the fixed paths under
 collision at a fixed verification or review path blocks dependent work until
 resolved; do not silently choose an alternative or relabel the existing file.
 See [Reviewer](../../roles/reviewer/#inputs-and-output).
+
+Synchronization records use the fixed path
+`docs/synchronization/<Active Work.Id>.md` with matching provenance and visible
+cycle ID. Collisions block dependent work without adopting existing content or
+choosing an alternative path. See
+[Synchronizer](../../roles/synchronizer/#inputs-and-output).
 
 ## Architect and Developer
 

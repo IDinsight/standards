@@ -38,7 +38,9 @@ skills define role-specific behavior.
   material findings, and limitations, then explains whether work can move
   forward in plain language.
 - **Documenter** owns user- and project-facing documentation updates.
-- **Synchronizer** reconciles completed work before user sign-off.
+- **Synchronizer** reconciles completed assessments, the current deliverable,
+  and workflow records before user sign-off. It records evidence applicability
+  and discrepancies, routing corrections to their owners.
 
 ## Design Principles
 

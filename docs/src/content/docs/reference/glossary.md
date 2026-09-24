@@ -121,9 +121,9 @@ See [allocation rules](../runtime-files/#cycle-identity).
 ## Artifact provenance
 
 A block inside a STANDARDS-created Scope, Architecture, Development,
-Verification, or Review file that identifies its type and owning cycle. Review
-blocks also identify the review kind. Renaming the file does not change its
-ownership. See
+Verification, Review, or Synchronization file that identifies its type and
+owning cycle. Review blocks also identify the review kind. Renaming the file
+does not change its ownership. See
 [artifact provenance](../../concepts/ownership/#artifact-provenance).
 
 ## Development plan and step
@@ -138,3 +138,10 @@ An unfinished correction kept when promotion replaces its recovery route. It
 records an owner, failure type, and reason. The owner removes it after verifying
 the specific fix, then still has to pass its completion checks. See
 [recovery obligations](../../concepts/recovery/#outstanding-obligations).
+
+## Synchronization record
+
+Synchronizer's cycle-specific reconciliation of completed assessments, current
+files, and workflow records. It references evidence and records discrepancies,
+limits, and readiness; it does not establish user acceptance. See
+[Synchronizer](../../roles/synchronizer/).

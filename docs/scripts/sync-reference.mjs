@@ -37,6 +37,12 @@ const sources = [
     "The Reviewer assessment, findings, and resumption format.",
   ],
   [
+    "skills/synchronizer/template.md",
+    "templates/synchronizer",
+    "Synchronization Record Template",
+    "The Synchronizer reconciliation, evidence references, and resume format.",
+  ],
+  [
     "skills/auditor/template.md",
     "templates/auditor",
     "Project Context Template",

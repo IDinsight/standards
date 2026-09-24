@@ -53,6 +53,11 @@ under the same ID. Final review checks current evidence resolving them after
 documentation; an earlier pass does not prove the assembled work remains
 correct. See [review gates](../../reference/protocol/#review-gates).
 
+Synchronizer then reconciles those assessments with the current deliverable and
+records. It checks that evidence still applies under the same acceptance IDs; it
+cannot close another role's findings or manufacture missing evidence. See
+[Synchronizer](../../roles/synchronizer/).
+
 ## Replanning preserves history
 
 Keep an ID when its condition still means the same thing. Use a new, unused ID

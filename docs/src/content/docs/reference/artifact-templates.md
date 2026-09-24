@@ -1,8 +1,8 @@
 ---
 title: Artifact Templates
 description:
-  Find the scope, design, development, verification, review, and context
-  templates.
+  Find the scope, design, development, verification, review, synchronization,
+  and context templates.
 ---
 
 Each implemented role has a template defining the file it produces. The site
@@ -19,6 +19,9 @@ copies these templates from the repository during development and builds.
 - [Review report](../templates/reviewer/): cycle and kind, independent
   assessment, findings, limitations, later dependencies, and resumable
   conclusions.
+- [Synchronization record](../templates/synchronizer/): assessed identities,
+  completion/evidence references, discrepancies and owners, limits, and resume
+  conclusion.
 - [Project context](../templates/auditor/): existing behavior, tools, commands,
   constraints, unknowns, and supporting evidence.
 
@@ -31,7 +34,11 @@ has the fixed path `.standards/CONTEXT.md`. Tester's fixed report path is
 document contents out of state. Review reports use the fixed
 `docs/reviews/<Active Work.Id>/implementation.md` and `final-deliverable.md`
 paths in that directory, also without a state field. New Scope, Architecture,
-Development, Verification, and Review files require cycle provenance.
-Development plans, verification reports, and review reports always belong to one
-cycle; review provenance also identifies its kind. See
+Development, Verification, Review, and Synchronization files require cycle
+provenance. Development plans, verification reports, and review reports always
+belong to one cycle; review provenance also identifies its kind. See
 [artifact ownership](../../concepts/ownership/#artifact-provenance).
+
+Synchronization records always belong to one cycle at the fixed path
+`docs/synchronization/<Active Work.Id>.md`, with no state field. They reference
+existing evidence rather than duplicate an acceptance ledger.

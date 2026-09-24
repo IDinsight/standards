@@ -154,3 +154,9 @@ includes cycle and kind, matching the visible fields and required path. No
 review-path state field is added. Preserve other cycles and block dependent work
 on provenance/path collisions. See the
 [review template](../templates/reviewer/).
+
+Synchronizer records use `docs/synchronization/<Active Work.Id>.md` with
+matching `SYNCHRONIZATION` provenance and visible cycle ID. No
+synchronization-path field is added to state. Fixed-path collisions block
+dependent work while preserving existing content. See the
+[synchronization template](../templates/synchronizer/).

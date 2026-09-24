@@ -92,8 +92,9 @@ report under `docs/reviews/<Active Work.Id>/`.
 The protocol then continues through documentation, final review, and
 synchronization. Final review uses the same independent-session rules after
 documentation. Invoke each role after its handoff. If it finds a problem in an
-earlier role's work, it sends the problem back to that role. Documenter and
-Synchronizer remain unfinished.
+earlier role's work, it sends the problem back to that role.
+[Synchronizer](../../roles/synchronizer/) reconciles current assessments and
+records before sign-off readiness. Documenter remains unfinished.
 
 At `AWAITING_USER_SIGNOFF`, review the deliverables and evidence. You can sign
 off, request rework, or cancel. Completion is not inferred from a successful
