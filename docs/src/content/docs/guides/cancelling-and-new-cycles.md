@@ -42,8 +42,11 @@ replacing the previous cycle's records:
 
 1. Determine baseline reconciliation. After sign-off it is `NONE`. After
    cancellation, keep older unresolved source cycles and include the
-   just-cancelled cycle's ID and request unless the user confirms it produced no
-   project changes or those changes were reverted.
+   just-cancelled cycle as a `SourceCycle`/`Request` list entry unless the user
+   confirms it produced no project changes or those changes were reverted.
+   Append only if that source ID is absent; never overwrite older entries. Use
+   the
+   [canonical list format](../../reference/runtime-files/#outstanding-baseline-reconciliation).
 2. Validate the next mode against the request, project mode, and reconciliation
    needs. Reuse `PendingCycleRequest` if one is saved. Any unresolved
    reconciliation requires `STANDARD`; retained or adopted cancelled changes

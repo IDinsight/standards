@@ -22,6 +22,16 @@ its `DEV-NNN` steps, dependencies, outcomes, and self-checks before approving
 it. The [Developer page](../../roles/developer/#approval-before-implementation)
 explains when approval is required.
 
+## Choose a personal coding style
+
+Before approving the initial plan, explicitly select an available profile, such
+as `tony` or `tony.md`, or clear the selection to `NONE`. Review the saved
+`User Style` along with the build steps. First approval locks that selection for
+the entire cycle, even if later revisions need approval again. To use a
+different style afterward, finish or cancel the current cycle under the protocol
+and start a new cycle with its own plan. A style-change request alone does not
+authorize cancellation or a new cycle.
+
 ## Choose how to work together
 
 - Use **AUTONOMOUS** to delegate the approved implementation. Developer
@@ -34,7 +44,8 @@ explains when approval is required.
   records a question and waits.
 
 You can switch modes during implementation. The plan keeps the new choice;
-changing collaboration style alone does not require another plan approval.
+changing collaboration mode alone does not require another plan approval or
+change the locked coding style.
 
 ## Resume or correct implementation
 

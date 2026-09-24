@@ -130,10 +130,12 @@ transition or protocol-required coordination update.
     longer present or relevant, and ask the user when their baseline status
     remains materially ambiguous. Never relabel a prior-cycle exclusion as
     current-cycle non-baseline work without current-cycle evidence.
-16. When `Active Work.BaselineReconciliation` is not `NONE`, use every persisted
-    source cycle ID and request summary in that field to anchor provenance; do
-    not assume repository changes left by those cancelled cycles are either
-    accepted baseline or current-cycle work. Establish their status from
+16. When `Active Work.BaselineReconciliation` is not `NONE`, read every
+    `SourceCycle`/`Request` entry under the protocol's **Baseline Reconciliation
+    Format** to anchor provenance. Normalize older free-text values only when
+    every pairing is unambiguous; otherwise preserve them and block for
+    clarification. Do not assume changes left by those cancelled cycles are
+    either accepted baseline or current-cycle work. Establish their status from
     version-control evidence and explicit user input. If they were deliberately
     adopted, record their resulting established facts in the ordinary baseline;
     if reverted, omit them; if their status materially affects downstream work

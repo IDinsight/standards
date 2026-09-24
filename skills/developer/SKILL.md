@@ -149,8 +149,28 @@ Load only the selected mode file.
 
 Always read and follow [`styles/universal.md`](styles/universal.md).
 
-Then load only the style files relevant to implementation Developer will
-materially create or modify:
+Before first plan approval, if the user explicitly selects an available personal
+development style, load only the corresponding direct child Markdown file under
+`user-styles/` and persist its style identifier in the development plan. The
+identifier is the filename stem: `tony` and `tony.md` both select
+`user-styles/tony.md`, while the plan stores `tony`. `NONE` is the reserved
+sentinel for no selected user style. Do not treat path separators, relative
+paths, or nested paths as style identifiers.
+
+When resuming an existing plan, reload the persisted user style without
+requiring the user to restate it. Do not infer a user style from the user's
+identity, repository ownership, prior usage, filename, or the mere presence of a
+matching file.
+
+Before first approval, if an explicitly selected style does not resolve to
+exactly one available direct child `user-styles/<identifier>.md`, stop and ask
+the user to select an available style or clear the selection. If a locked style
+file is missing on resume, stop and report the inconsistency. Restore the
+selected file before continuing this cycle; do not clear or substitute the
+locked selection.
+
+Then load only the technology style files relevant to implementation Developer
+will materially create or modify:
 
 - Python -> [`styles/python.md`](styles/python.md)
 - TypeScript -> [`styles/typescript.md`](styles/typescript.md)
@@ -163,23 +183,62 @@ materially create or modify:
 - CSS -> [`styles/css.md`](styles/css.md)
 - SQL -> [`styles/sql.md`](styles/sql.md)
 
-Load multiple applicable files when the change spans those technologies. Do not
-load unrelated style files.
+Load multiple applicable technology files when the change spans those
+technologies. Do not load unrelated style files or unselected user styles.
 
-Layer compatible implementation guidance in this order:
+Within the Developer style layer, use this precedence for style guidance:
+
+1. `styles/universal.md`;
+2. the explicitly selected `user-styles/<style>.md`, when any;
+3. applicable technology files under `styles/`.
+
+When two Developer style files disagree only about a discretionary coding
+preference, apply the higher-precedence style. Therefore `universal.md` always
+wins within the style layer, and an explicitly selected user style overrides a
+conflicting preference from an applicable technology style.
+
+This precedence applies only to discretionary style guidance. A selected user
+style does not override protocol ownership, the active implementation contract,
+repository-enforced constraints, project instructions, correctness requirements,
+or technology/framework semantics required for correct behavior.
+
+Layer the Developer style system with other compatible implementation guidance
+in this order:
 
 1. `.standards/PROTOCOL.md` and role ownership;
 2. completed scope and Architect-owned technical design for `STANDARD` cycles,
    or the bounded `Active Work.Request` contract for `EXPEDITED` cycles;
 3. repository-enforced configuration, project instructions, compatibility
    requirements, generated-code rules, and toolchain constraints;
-4. applicable files under `styles/`;
+4. the Developer style layer above;
 5. established local implementation conventions;
 6. Developer judgment for reversible local implementation details.
 
-This ordering does not resolve material contradictions. Follow
-`.standards/PROTOCOL.md` **Instruction Layering and Conflicts** whenever two
-applicable authorities conflict.
+The style precedence above resolves only discretionary conflicts among Developer
+style files. It does not resolve material contradictions among workflow or
+project authorities. Follow `.standards/PROTOCOL.md` **Instruction Layering and
+Conflicts** whenever applicable authorities conflict.
+
+`User Style` is part of the approved development plan. A new plan starts with
+`User Style Locked: false`. The user may select, change, or clear the style only
+before first approval; keep the plan `PROPOSED` and present the updated
+selection for approval. First approval sets `User Style Locked: true`, locking
+the identifier, including `NONE`, for the remainder of the cycle.
+
+Preserve this lock through collaboration-mode switches, recovery, rework,
+material revisions that return the plan to `PROPOSED`, and expedited promotion.
+Do not replace or recreate the active cycle's plan to bypass the lock. Repeating
+the same normalized identifier is not a change. A different selection requires a
+new cycle and its own development plan under the protocol's terminal-state and
+**Start a new cycle** rules. Do not silently cancel, sign off, start a cycle, or
+restyle completed work; persist the blocking choice and ask whether to continue
+with the locked style or end this cycle through an allowed transition.
+
+For an older plan without `User Style Locked`, preserve its recorded selection
+and set the lock to `true` if prior approval is established. Set it to `false`
+only when the plan has never been approved. `PROPOSED` alone does not prove
+that: it may be a revision. If approval history is unclear, block and ask rather
+than infer an unlocked selection.
 
 Do not refactor unrelated code solely to normalize style.
 
@@ -239,8 +298,10 @@ Set a new or materially revised plan to `Status: PROPOSED`. Persist
 present the plan to the user. Stop before modifying project implementation.
 
 Implementation may begin only after the user explicitly approves the current
-`PROPOSED` plan. Then set `Status: APPROVED`, clear the matching
-`Active Work.BlockedOn`, and proceed according to the selected mode.
+`PROPOSED` plan, including its `User Style`. Then set `Status: APPROVED` and
+`User Style Locked: true`, clear the matching `Active Work.BlockedOn`, and
+proceed according to the selected mode. Later approvals preserve the locked
+selection.
 
 If user feedback changes only wording, file hints, or other bookkeeping without
 changing implementation intent, update the plan without requiring reapproval. If
@@ -377,7 +438,9 @@ Developer is complete when:
   `DEVELOPMENT` provenance, and `Active Work.Development` points to it;
 - implemented behavior conforms to the active contract and established technical
   constraints;
-- applicable development styles were followed for materially changed code;
+- `User Style Locked` is `true`, the selection is unchanged since first
+  approval, and applicable development styles were followed for materially
+  changed code;
 - relevant implementation-level self-checks completed satisfactorily or any
   limitation was routed as a blocker rather than ignored;
 - no unapproved material deviation from the development plan remains;

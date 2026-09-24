@@ -67,10 +67,20 @@ resuming work.
 
 ## Style and role boundaries
 
-Developer always uses `styles/universal.md`, plus the relevant Python,
-TypeScript, React, Next.js, HTML, CSS, or SQL guidance. Repository tooling and
-project constraints guide implementation; style guidance does not justify
-unrelated refactors. Material conflicts follow the
+Developer always uses `styles/universal.md`, any explicitly selected personal
+style, and the relevant Python, TypeScript, React, Next.js, HTML, CSS, or SQL
+guidance. Universal guidance takes precedence over personal styles, which take
+precedence over discretionary technology preferences.
+
+The plan records `User Style` as a profile's filename stem or `NONE`. You may
+select, change, or clear it before first approval. That approval sets
+`User Style Locked: true` for the rest of the cycle, including recovery,
+revisions, and promotion. A different style requires a new cycle and plan.
+Resuming reloads the saved selection; a missing locked profile blocks work until
+restored. A revised `PROPOSED` plan does not unlock it.
+
+Repository tooling and project constraints guide implementation; style guidance
+does not justify unrelated refactors. Material conflicts follow the
 [protocol's conflict rules](../../reference/protocol/#instruction-layering-and-conflicts).
 
 Developer can research how to use an already chosen API or technology. Choosing

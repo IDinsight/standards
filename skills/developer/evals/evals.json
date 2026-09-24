@@ -22,7 +22,7 @@
       "files": [],
       "assertions": [
         "The user's approval is applied to the current persisted material plan rather than causing a new plan",
-        "Active Work.BlockedOn is cleared before implementation continues",
+        "First approval sets User Style Locked true for the recorded selection, including NONE, and clears Active Work.BlockedOn before implementation continues",
         "AUTONOMOUS mode does not request confirmation between DEV-001, DEV-002, and DEV-003",
         "Developer follows the relevant style files for the technologies it materially changes",
         "Existing checks may be run as self-checks but are not represented as formal Tester verification",
@@ -320,7 +320,7 @@
         "The new cycle ID is appended and persisted in CYCLE_IDS.md before it is written to Active Work.Id",
         "It follows the terminal NEW_CYCLE transition rather than directly overwriting terminal Active Work through the generic pending-request path",
         "Handoff.Kind becomes NEW_CYCLE and Handoff.From records CANCELLED",
-        "The new Active Work uses a registry-reserved unique ID and preserves the required BaselineReconciliation provenance for the cancelled cycle",
+        "The new Active Work uses a registry-reserved unique ID and stores BaselineReconciliation as a list containing SourceCycle auth-v1-old and that source's Request summary",
         "CycleMode becomes STANDARD, all pending-cycle fields are cleared, and WorkflowState becomes AUDITING because reconciliation is required",
         "Developer performs no role-owned implementation work while Auditor owns the resulting state"
       ]
@@ -360,6 +360,173 @@
         "It treats the missing registry as an incomplete registry-aware runtime rather than a first installation",
         "It does not recreate CYCLE_IDS.md empty or reconstruct it from best-effort artifact/state evidence",
         "It leaves cycle state unchanged and requires registry restoration or intentional runtime removal followed by fresh installation before cycle allocation"
+      ]
+    },
+    {
+      "id": 28,
+      "prompt": "Continue as Developer in a STANDARD cycle. WorkflowState is DEVELOPING, Active Work.Development is NONE, and the implementation will modify Python. The user explicitly says: use the tony development style. Create the development plan; the user has not approved it yet.",
+      "expected_output": "Developer creates the PROPOSED development plan with User Style set to tony, loads universal guidance plus user-styles/tony.md and the applicable Python technology style, does not load other user profiles or unrelated technology styles, and waits for plan approval before implementation.",
+      "files": [],
+      "assertions": [
+        "The development plan persists User Style as tony and User Style Locked false until first approval, rather than relying on chat history",
+        "styles/universal.md is always applied before the selected user style",
+        "user-styles/tony.md is loaded because the user explicitly selected it",
+        "styles/python.md is loaded because Python implementation is materially affected",
+        "Unselected user styles and unrelated technology styles are not loaded",
+        "Developer still requires explicit approval of the PROPOSED development plan before implementation"
+      ]
+    },
+    {
+      "id": 29,
+      "prompt": "Resume Developer in a new session. WorkflowState is DEVELOPING and the persisted approved development plan records User Style as tony. The next approved step modifies Python and the user does not repeat the style selection. Continue implementation.",
+      "expected_output": "Developer reloads the persisted tony user style without asking the user to restate it, applies universal guidance first and the applicable Python technology style as well, then continues under the approved plan.",
+      "files": [],
+      "assertions": [
+        "The persisted User Style field is sufficient to reload user-styles/tony.md across sessions",
+        "Developer does not require the user to repeat the style choice on resume",
+        "styles/universal.md, user-styles/tony.md, and styles/python.md are applied together",
+        "Tony's Python preference is treated as a discretionary coding preference and cannot weaken higher-authority constraints or required Python semantics"
+      ]
+    },
+    {
+      "id": 30,
+      "prompt": "Continue as Developer. WorkflowState is DEVELOPING, the user is named Tony and user-styles/tony.md exists, but the persisted development plan records User Style as NONE and the user has never selected a personal development style. The approved step modifies Python.",
+      "expected_output": "Developer does not infer or load the Tony profile. It applies universal and Python technology styles only, preserving the approved User Style as NONE for the remainder of the cycle.",
+      "files": [],
+      "assertions": [
+        "Developer does not infer a user style from the user's identity or a matching filename",
+        "user-styles/tony.md is not loaded merely because it exists",
+        "styles/universal.md and styles/python.md still apply",
+        "The approved plan keeps User Style as NONE with User Style Locked true; a later selection requires a new cycle and plan"
+      ]
+    },
+    {
+      "id": 31,
+      "prompt": "Continue as Developer while DEVELOPING. The user explicitly selected the tony user style. An applicable technology style expresses a different preference for a discretionary coding choice, but neither rule is required for correctness, repository tooling, project instructions, or framework semantics. Which style controls that coding choice?",
+      "expected_output": "Developer applies the style-layer precedence: universal first, then the explicitly selected tony user style, then applicable technology styles. For a purely discretionary conflict between tony and a technology-style preference, tony controls. Higher workflow/project authorities and required correctness or technology semantics remain unaffected.",
+      "files": [],
+      "assertions": [
+        "styles/universal.md remains the highest-precedence Developer style",
+        "The explicitly selected tony user style overrides a conflicting lower-precedence technology-style preference when the conflict is purely discretionary",
+        "The user style does not override repository-enforced constraints, project instructions, correctness requirements, or required technology/framework semantics",
+        "Material conflicts outside the Developer style layer still follow PROTOCOL.md Instruction Layering and Conflicts"
+      ]
+    },
+    {
+      "id": 32,
+      "prompt": "Continue as Developer in DEVELOPING with a PROPOSED plan that has never been approved and User Style Locked false. The user explicitly says: use tony.md as my development style. user-styles/tony.md exists and the implementation will modify Python. Create or update the development plan safely.",
+      "expected_output": "Developer resolves the explicit selection only to the direct child user-styles/tony.md, persists the canonical User Style identifier as tony rather than tony.md or a path, loads universal, tony, and Python styles, and follows the normal approval rules.",
+      "files": [],
+      "assertions": [
+        "Both tony and tony.md normalize to the direct child user-styles/tony.md",
+        "The development plan persists User Style as tony, the filename stem",
+        "Developer does not persist a path or tony.md as the style identifier",
+        "Universal, selected user, and applicable Python styles are applied with the defined style-layer precedence"
+      ]
+    },
+    {
+      "id": 33,
+      "prompt": "Resume Developer in DEVELOPING. The approved persisted development plan records User Style as tony and User Style Locked: true, but user-styles/tony.md is unexpectedly missing. Continue safely.",
+      "expected_output": "Developer stops before implementation and reports the missing persisted user-style file. It does not clear User Style to NONE, substitute another profile, infer a replacement, or continue implementation without the selected style.",
+      "files": [],
+      "assertions": [
+        "A missing persisted user-style file is treated as an inconsistency that blocks implementation",
+        "Developer does not silently clear the persisted selection to NONE",
+        "Developer does not substitute or infer another user style",
+        "Developer requires restoration of the selected profile before implementation can continue in this cycle. It preserves the selection and lock and does not offer replacement or clearing within the current cycle."
+      ]
+    },
+    {
+      "id": 34,
+      "prompt": "Developer is in DEVELOPING. The initial plan is PROPOSED, User Style is tony, User Style Locked is false, and it has never been approved. The user says: clear my personal style for this plan; I will review it afterward.",
+      "expected_output": "Developer updates User Style to NONE, keeps the plan PROPOSED and unlocked, presents the revised selection for approval, and does not implement.",
+      "files": [],
+      "assertions": [
+        "The explicit pre-approval clearing is allowed without starting a new cycle",
+        "User Style becomes NONE and User Style Locked remains false",
+        "The user has not approved the revised plan, so Developer keeps the approval blocker and does not code"
+      ]
+    },
+    {
+      "id": 35,
+      "prompt": "Developer is in DEVELOPING. The plan is APPROVED with User Style tony and User Style Locked true, but no implementation step has started. The user says: clear the style and start coding.",
+      "expected_output": "Developer preserves the approved style and lock, blocks the conflicting request, and explains that a different selection requires a new cycle and plan.",
+      "files": [],
+      "assertions": [
+        "The lock begins at first approval, not at the first code change",
+        "Developer does not change User Style, reset the lock, replace the active plan, or implement under NONE",
+        "It persists a blocker asking whether to continue with the locked style or end the cycle through a permitted transition",
+        "It does not treat the style request as authorization to cancel, sign off, or start a new cycle"
+      ]
+    },
+    {
+      "id": 36,
+      "prompt": "Resume Developer in STEPWISE mode. User Style is NONE, User Style Locked is true, DEV-001 is DONE, and DEV-002 is pending. The user says: use tony from now on for DEV-002, leaving DEV-001 as it is.",
+      "expected_output": "Developer preserves the cycle's locked NONE selection and completed step, blocks the requested style switch, and requires a new cycle and plan for tony.",
+      "files": [],
+      "assertions": [
+        "The lock applies to NONE as well as named profiles",
+        "Developer does not apply tony only to future steps or retroactively restyle DEV-001",
+        "The existing step identities, statuses, and style remain intact",
+        "The request does not create a second plan within the active cycle or authorize a new cycle"
+      ]
+    },
+    {
+      "id": 37,
+      "prompt": "Developer is reconciling an approved expedited plan after promotion to STANDARD. User Style is tony and User Style Locked is true. Revised architecture materially changes DEV-002, so the plan has returned to PROPOSED. The user says: while revising it, clear the user style too.",
+      "expected_output": "Developer may revise the implementation intent for renewed approval but preserves tony and its lock; returning to PROPOSED and promotion do not create a new style-selection window.",
+      "files": [],
+      "assertions": [
+        "User Style Locked remains true through promotion and material reapproval",
+        "The style change is blocked and a new cycle and plan are required for a different selection",
+        "Developer can preserve the legitimate implementation revision without silently adopting the style change",
+        "No implementation proceeds under the unapproved revised plan"
+      ]
+    },
+    {
+      "id": 38,
+      "prompt": "Resume Developer in DEVELOPING. The approved plan has User Style tony and User Style Locked true. The user says: continue in STEPWISE using tony.md. The profile exists.",
+      "expected_output": "Developer normalizes tony.md to the already locked tony identifier, persists the collaboration-mode change, and continues under STEPWISE without treating either request as a new style selection.",
+      "files": [],
+      "assertions": [
+        "The identifier remains tony and User Style Locked remains true",
+        "The equivalent spelling does not cause a blocker, new plan, or new cycle",
+        "Changing collaboration mode remains allowed under the existing approval"
+      ]
+    },
+    {
+      "id": 39,
+      "prompt": "Resume Developer with a legacy plan missing User Style Locked. Status is PROPOSED and User Style is tony. It is unclear whether this is the initial proposal or a material revision of a previously approved plan. The user asks to clear the profile and continue.",
+      "expected_output": "Developer preserves the saved style and implementation, persists an approval-history question, and does not infer that PROPOSED means unlocked.",
+      "files": [],
+      "assertions": [
+        "The missing lock field is not silently defaulted to false",
+        "Developer asks for the missing approval history before changing the selection",
+        "Established prior approval would lock the existing selection; confirmed never-approved status would allow pre-approval changes",
+        "No implementation or cycle reset occurs while approval history is unresolved"
+      ]
+    },
+    {
+      "id": 40,
+      "prompt": "Invoke Developer to start a new cycle from retained CANCELLED in BROWNFIELD. The cancelled cycle is admin-notes-b, Request add internal admin notes. Its BaselineReconciliation already lists SourceCycle cache-a, Request fix cache invalidation. No confirmation says admin-notes-b left no changes. The user explicitly requests a new STANDARD cycle for an unrelated change.",
+      "expected_output": "Developer starts the new cycle through the protocol, preserving cache-a and appending admin-notes-b as distinct SourceCycle/Request list entries, then hands off to Auditor.",
+      "files": [],
+      "assertions": [
+        "The existing cache-a entry and summary are preserved",
+        "Exactly one admin-notes-b entry is appended with its own request summary",
+        "BaselineReconciliation is a nonempty structured Markdown list, not a combined scalar or the new active cycle's ID",
+        "A registry-reserved new cycle ID is used, WorkflowState becomes AUDITING, and Developer does not code"
+      ]
+    },
+    {
+      "id": 41,
+      "prompt": "Invoke Developer to start a new STANDARD cycle from retained CANCELLED. Cycle admin-notes-b carries BaselineReconciliation entries cache-a (fix cache invalidation) and import-c (adjust import behavior). The user confirms admin-notes-b made no changes and requests the new cycle.",
+      "expected_output": "Developer preserves both older list entries without appending admin-notes-b or clearing reconciliation, then routes the new cycle to Auditor.",
+      "files": [],
+      "assertions": [
+        "Confirmation about admin-notes-b does not resolve cache-a or import-c",
+        "The two SourceCycle/Request entries remain distinct and unchanged",
+        "The new cycle still requires STANDARD and AUDITING"
       ]
     }
   ]

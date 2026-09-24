@@ -100,11 +100,24 @@ paths and provenance for collisions. See the
 
 ### Outstanding baseline reconciliation
 
-`Active Work.BaselineReconciliation` lists cancelled cycles whose leftover
-changes Auditor still needs to check. Keep each cycle's ID and brief request
-summary through handoffs, recovery, rework, and cancellation. Only Auditor
-clears the list after resolving every source. `Handoff.Reason` cannot replace
-it.
+`Active Work.BaselineReconciliation` is `NONE` or a nonempty Markdown list:
+
+```markdown
+`BaselineReconciliation`:
+
+- `SourceCycle`: `invoice-cache-hotfix-20260923-a7f3` `Request`:
+  `Change invoice-cache invalidation behavior.`
+- `SourceCycle`: `admin-notes-20260924-b8e4` `Request`:
+  `Add internal notes to admin records.`
+```
+
+Each source cycle ID appears once, with its own request summary. Append new
+sources while preserving existing entries through handoffs, recovery, rework,
+and cancellation. Keep the whole list until Auditor resolves every source, then
+set it to `NONE`. `Handoff.Reason` cannot replace it. Older free-text values may
+be normalized only when every ID and summary can be paired without guessing;
+otherwise preserve the value and block for clarification. See the
+[canonical format](../protocol/#baseline-reconciliation-format).
 
 This is separate from `Outstanding Obligations`, which tracks defects to fix.
 See [cancellation and new cycles](../../guides/cancelling-and-new-cycles/) for

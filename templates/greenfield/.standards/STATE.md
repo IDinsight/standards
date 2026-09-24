@@ -6,8 +6,16 @@
 ## Active Work
 
 `Id`: `UNSET` `Request`: `UNSET` `Scope`: `NONE` `Architecture`: `NONE`
-`Development`: `NONE` `PromotionReason`: `NONE` `BaselineReconciliation`: `NONE`
-`AuditTarget`: `NONE` `BlockedOn`: `NONE`
+`Development`: `NONE` `PromotionReason`: `NONE` `AuditTarget`: `NONE`
+`BlockedOn`: `NONE`
+
+`BaselineReconciliation`: `NONE`
+
+<!-- When non-NONE, use one Markdown list entry per source cycle:
+- `SourceCycle`: `<cancelled-cycle-id>`
+  `Request`: `<source-cycle request summary>`
+Preserve existing entries; see PROTOCOL.md, Baseline Reconciliation Format.
+-->
 
 ## Handoff
 

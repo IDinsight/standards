@@ -26,6 +26,7 @@ Cycle: <Active Work.Id>
 # Development Plan
 
 `Cycle`: `<Active Work.Id>` `Mode`: `AUTONOMOUS | STEPWISE | CODE_WITH_ME`
+`User Style`: `<style-name | NONE>` `User Style Locked`: `false | true`
 `Status`: `PROPOSED | APPROVED | IN_PROGRESS | COMPLETE`
 
 ## Implementation Contract
@@ -81,6 +82,24 @@ on an individual step.
 
 - Create steps from the active request, completed scope/design when present, and
   relevant repository evidence; do not invent new requirements or architecture.
+- Set `User Style` only from an explicit user selection or a previously
+  persisted selection for this development plan. Store the direct-child
+  `user-styles/<identifier>.md` filename stem only: for example, both `tony` and
+  `tony.md` persist as `tony`. Use `NONE` otherwise; `NONE` is reserved for no
+  selected user style. Never infer a profile from identity, repository
+  ownership, prior usage, or filename, and never store a path as the identifier.
+- Start a new plan with `User Style Locked: false`. Allow selecting, changing,
+  or clearing `User Style` only before first approval, while the plan remains
+  `PROPOSED`. First approval covers the selection, including `NONE`, and sets
+  `User Style Locked: true` for the rest of the cycle. Never reset the lock on
+  revision, recovery, promotion, or a collaboration-mode switch, even if the
+  plan returns to `PROPOSED`. A different style requires a new cycle and plan;
+  replacing the current cycle's plan does not unlock it.
+- On resume, reload the persisted user style before implementation. If the
+  locked file is unavailable, stop until it is restored rather than clearing or
+  substituting the style. For older plans missing the lock field, apply
+  Developer's approval-history check; do not infer first approval from
+  `PROPOSED` alone.
 - In `STANDARD`, reference the current Scoper-owned `AC-NNN` identifiers covered
   by each implementation step. Do not redefine their wording or use `DEV-NNN` as
   substitute requirement identity.

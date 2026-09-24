@@ -219,7 +219,9 @@ artifact presence.
 `Id`: `add-user-search-20260923T150000Z-a7f3` `Request`: `Add user search by name and email.` `Scope`:
 `docs/scope/add-user-search.md` `Architecture`: `docs/specs/add-user-search.md`
 `Development`: `docs/development/add-user-search-20260923T150000Z-a7f3.md` `PromotionReason`: `NONE`
-`BaselineReconciliation`: `NONE` `AuditTarget`: `NONE` `BlockedOn`: `NONE`
+`AuditTarget`: `NONE` `BlockedOn`: `NONE`
+
+`BaselineReconciliation`: `NONE`
 
 ## Handoff
 
@@ -265,10 +267,10 @@ artifact presence.
 - `BaselineReconciliation`: durable provenance for unresolved project changes
   retained from cancelled cycles, otherwise `NONE`. It must be resolved before
   the current cycle may rely on the affected repository state as established
-  baseline. Preserve each source cycle distinctly by unique `Id` plus brief
-  request summary. Carry it across handoffs, failures, rework, recovery, and
-  cancellation until Auditor resolves the baseline and clears it.
-  `Handoff.Reason` is not a substitute.
+  baseline. Use the **Baseline Reconciliation Format** below, with one entry
+  per unique `SourceCycle` and its `Request` summary. Carry the list across
+  handoffs, failures, rework, recovery, and cancellation until Auditor resolves
+  every source and clears it. `Handoff.Reason` is not a substitute.
 - `AuditTarget`: transient repository-relative path or area label for an
   in-progress targeted audit when that focus cannot otherwise be recovered from
   persisted active work, owned artifacts, or recovery context; otherwise
@@ -285,6 +287,43 @@ allocate the cycle ID through **Cycle ID Registry**. Only after the registry
 append succeeds may the reserved ID, request, and selected mode be persisted as
 the initialized cycle. Every later `NEW_CYCLE` follows the same allocation rule
 as part of the transition.
+
+### Baseline Reconciliation Format
+
+Within `Active Work`, store `BaselineReconciliation` on its own line. When no
+obligation exists, use exactly:
+
+```markdown
+`BaselineReconciliation`: `NONE`
+```
+
+Otherwise use a nonempty Markdown list with both required fields in each entry:
+
+```markdown
+`BaselineReconciliation`:
+
+- `SourceCycle`: `invoice-cache-hotfix-20260923-a7f3`
+  `Request`: `Change invoice-cache invalidation behavior.`
+- `SourceCycle`: `admin-notes-20260924-b8e4`
+  `Request`: `Add internal notes to admin records.`
+```
+
+`SourceCycle` is the cancelled source's exact cycle `Id`, not the new cycle's
+ID. It is the unique key; `Request` is that source's brief persisted request
+summary. Preserve entry order and existing entries when carrying the list into
+another cycle. Append a newly obligated source only if its ID is absent; never
+replace older sources with the latest cancellation or duplicate an existing ID.
+Confirmation that the latest cycle left no changes does not clear older entries.
+Keep the complete list while any source remains unresolved; only Auditor clears
+it to `NONE` after reconciling every listed source. An empty list is represented
+as `NONE`, not an empty string or `[]`.
+
+When reading an older free-text value, normalize it to this shape only if every
+source ID and its associated request summary are explicit and unambiguous.
+Preserve all sources and summaries. If the pairing is unclear, retain the value,
+persist a blocker, and ask for clarification before using the affected baseline
+or starting a cycle dependent on it. Upgrade must not replace existing
+obligations with `NONE` merely to fit the new format.
 
 ### Cycle ID Registry
 
@@ -1017,7 +1056,9 @@ From `SIGNED_OFF` or retained `CANCELLED`:
    `SIGNED_OFF`, it is `NONE`. From retained `CANCELLED`, preserve any existing
    obligation and, unless the user explicitly confirms that the just-cancelled
    cycle left no project changes because none were produced or they were
-   reverted, include that cycle's unique `Id` and request summary.
+   reverted, append a `SourceCycle`/`Request` entry for that cycle under
+   **Baseline Reconciliation Format**. Preserve older entries; add the source
+   only if its exact cycle ID is not already listed.
 2. Determine the legal mode before mutating terminal state. If
    `PendingCycleRequest` is not `UNSET`, treat it as the new request for this
    transition unless the user explicitly revises it; do not require the user to
@@ -1191,7 +1232,9 @@ After ownership checks:
   On framework upgrade, a required protocol-owned coordination field or section
   introduced by the new protocol may be added with a semantically neutral default
   only when it is absent; do not reset, reinterpret, or discard existing workflow
-  state.
+  state. Normalize older `BaselineReconciliation` values only under
+  **Baseline Reconciliation Format**; retain ambiguous values for clarification
+  rather than discarding their obligations.
 - Initialize `.standards/CYCLE_IDS.md` on first install. Thereafter preserve it
   across reinstall, upgrade, and explicit workflow reinitialization; never clear
   or rewrite existing entries while the runtime remains installed. If it is

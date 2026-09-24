@@ -43,7 +43,7 @@ it as baseline, or keep it separate. Ask the user if its status is unclear; do
 not carry the old label into a new cycle unchecked.
 
 Whenever `Active Work.BaselineReconciliation` is not `NONE`, read every source
-cycle's identifier and request summary from that field, even after intervening
+cycle's `SourceCycle` and `Request` fields from the list, even after intervening
 handoffs or recovery. Use version-control evidence and explicit user input to
 determine whether each source's leftover changes are accepted baseline,
 reverted, or unresolved. Record accepted facts as baseline, omit reverted
