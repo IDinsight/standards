@@ -108,6 +108,13 @@ freshness without client support. This applies to recovery handoffs too. See
 [Tester](../../roles/tester/) and the
 [canonical session rule](../../reference/protocol/#independent-tester-session).
 
+Handoffs into either review state request a fresh Reviewer chat separate from
+all artifact-authoring conversations, identify the review kind, and recommend a
+different model of equal or higher capability where known. The model advice is
+optional; the client must not guess identities, switch automatically, or require
+routine confirmation. See the
+[Reviewer session rule](../../reference/protocol/#independent-reviewer-session).
+
 ## Blocking questions and recovery
 
 An unresolved blocking question is recorded in `Active Work.BlockedOn`. Asking

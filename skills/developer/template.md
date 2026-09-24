@@ -66,7 +66,7 @@ established mechanism. Record the actual command and working directory, result,
 relevant assessed revision or dirty-tree content, and any limitation when the
 self-check runs. This is implementation feedback, not formal Tester
 verification. Keep the evidence sufficient for the protocol's fresh-session
-Tester handoff.
+Tester or Reviewer handoff.
 
 **Implementation Notes**
 

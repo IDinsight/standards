@@ -51,6 +51,12 @@ coverage and budget allocations; replace invalid execution evidence. Tester must
 remain separate from Developer's implementation conversation. See
 [Tester modes](../../roles/tester/#modes).
 
+In either review state, read the corresponding report under
+`docs/reviews/<Active Work.Id>/`. Reconcile changed inputs, current acceptance
+conditions, and outstanding findings before reusing conclusions. Reviewer can
+resume its own independent session; authoring conversations require a fresh
+chat. See [Reviewer resumption](../../roles/reviewer/#modes-and-resumption).
+
 ## Resolve blockers without skipping gates
 
 If `BlockedOn` contains an unanswered question, use the answer before clearing

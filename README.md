@@ -33,8 +33,10 @@ skills define role-specific behavior.
   Stepwise, or Code With Me collaboration.
 - **Auditor** establishes and refreshes project context for the active workflow
   cycle.
-- **Reviewer** evaluates implementation and final deliverables at defined review
-  gates.
+- **Reviewer** independently assesses implementation and final deliverables in a
+  fresh chat separate from their authors' conversations. It persists evidence,
+  material findings, and limitations, then explains whether work can move
+  forward in plain language.
 - **Documenter** owns user- and project-facing documentation updates.
 - **Synchronizer** reconciles completed work before user sign-off.
 

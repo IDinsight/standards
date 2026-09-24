@@ -52,6 +52,14 @@ coverage, scenario allocations, actual results, gaps, and later dependencies. It
 is cycle-owned evidence, separate from reusable tests and workflow state. See
 the [verification template](../templates/tester/).
 
+## Review report
+
+Reviewer's independent assessment for a cycle and review kind, including inputs,
+checks, findings, limitations, and resumable progress. Reports live under
+`docs/reviews/<Active Work.Id>/`; see the
+[review template](../templates/reviewer/). Passing a review gate does not
+complete the cycle.
+
 ## Project context
 
 Auditor's record of the existing project in `.standards/CONTEXT.md`. Its
@@ -112,8 +120,9 @@ See [allocation rules](../runtime-files/#cycle-identity).
 
 ## Artifact provenance
 
-A block inside a STANDARDS-created Scope, Architecture, or Development file that
-identifies its type and owning cycle. Renaming the file does not change its
+A block inside a STANDARDS-created Scope, Architecture, Development,
+Verification, or Review file that identifies its type and owning cycle. Review
+blocks also identify the review kind. Renaming the file does not change its
 ownership. See
 [artifact provenance](../../concepts/ownership/#artifact-provenance).
 

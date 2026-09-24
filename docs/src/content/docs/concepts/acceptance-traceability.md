@@ -47,6 +47,12 @@ proof. Tester records this in the cycle's
 technical criteria, actual commands/results, and uncovered obligations. Unrun
 tests and Developer self-checks do not substitute for Tester evidence.
 
+Reviewer independently assesses this evidence against the current contract.
+Implementation review may retain explicitly permitted later-role dependencies
+under the same ID. Final review checks current evidence resolving them after
+documentation; an earlier pass does not prove the assembled work remains
+correct. See [review gates](../../reference/protocol/#review-gates).
+
 ## Replanning preserves history
 
 Keep an ID when its condition still means the same thing. Use a new, unused ID

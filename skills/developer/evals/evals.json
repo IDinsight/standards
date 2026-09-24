@@ -544,6 +544,28 @@
         "Persisted artifacts and repository evidence carry the context needed to assess implementation.",
         "Developer does not pretend to erase history or certify freshness."
       ]
+    },
+    {
+      "id": 43,
+      "prompt": "Developer completed an EXPEDITED brownfield change in DEVELOPING. All approved steps and self-checks pass, no recovery or blockers remain, and the user explicitly invoked Reviewer too in this implementation conversation.",
+      "expected_output": "Persist the plan/evidence and transition to REVIEWING_IMPLEMENTATION, then request a fresh Reviewer chat.",
+      "files": [],
+      "assertions": [
+        "The handoff names IMPLEMENTATION and points to persisted active work and artifacts.",
+        "The already-invoked-role exception does not allow review in the authoring conversation.",
+        "A different equal-or-higher-capability model is advisory; no automatic switch, guessed identity/ranking or confirmation gate is introduced."
+      ]
+    },
+    {
+      "id": 44,
+      "prompt": "Developer corrected an EXPEDITED IMPLEMENTATION recovery. Frame Owner=DEVELOPING, ResumeAt=REVIEWING_IMPLEMENTATION, RerunThrough=NONE; unchanged approved intent is restored and self-checks pass. No downstream rerun is needed before review.",
+      "expected_output": "Persist evidence, pop the frame and RESUME implementation review with the independent-session handoff.",
+      "files": [],
+      "assertions": [
+        "No skipped Tester work is fabricated.",
+        "Reviewer findings are not rewritten or marked resolved by Developer.",
+        "The recovery invocation requests a fresh Reviewer chat, names IMPLEMENTATION, and gives advisory model guidance."
+      ]
     }
   ]
 }

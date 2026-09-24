@@ -1,7 +1,8 @@
 ---
 title: Artifact Templates
 description:
-  Find the scope, design, development, verification, and context templates.
+  Find the scope, design, development, verification, review, and context
+  templates.
 ---
 
 Each implemented role has a template defining the file it produces. The site
@@ -15,6 +16,9 @@ copies these templates from the repository during development and builds.
   mode, approval status, `DEV-NNN` steps, acceptance mapping, and self-checks.
 - [Verification report](../templates/tester/): assessed inputs, acceptance
   evidence, scenario budget, actual execution, gaps, and resume or handoff.
+- [Review report](../templates/reviewer/): cycle and kind, independent
+  assessment, findings, limitations, later dependencies, and resumable
+  conclusions.
 - [Project context](../templates/auditor/): existing behavior, tools, commands,
   constraints, unknowns, and supporting evidence.
 
@@ -24,7 +28,10 @@ resolve important questions; a small change can have a short document.
 Record Scope, Architecture, and Development paths in `STATE.md`; Auditor context
 has the fixed path `.standards/CONTEXT.md`. Tester's fixed report path is
 `docs/verification/<Active Work.Id>.md`, with no extra state field. Keep
-document contents out of state. New Scope, Architecture, Development, and
-Verification files require cycle provenance. Development plans and verification
-reports always belong to one cycle. See
+document contents out of state. Review reports use the fixed
+`docs/reviews/<Active Work.Id>/implementation.md` and `final-deliverable.md`
+paths in that directory, also without a state field. New Scope, Architecture,
+Development, Verification, and Review files require cycle provenance.
+Development plans, verification reports, and review reports always belong to one
+cycle; review provenance also identifies its kind. See
 [artifact ownership](../../concepts/ownership/#artifact-provenance).

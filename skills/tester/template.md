@@ -83,8 +83,9 @@ copying terminal transcripts. Never record credentials or sensitive values.
 
 Record the next concrete action on interruption, or the completion conclusion
 and evidence locations for the receiving role. State which acceptance evidence
-remains pending downstream. Workflow state and recovery routing remain canonical
-in `STATE.md`, not in this report.
+remains pending downstream. Supply enough context for the protocol's independent
+Reviewer session and identify the requested review kind. Workflow state and
+recovery routing remain canonical in `STATE.md`, not in this report.
 
 ---
 

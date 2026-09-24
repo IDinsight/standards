@@ -147,3 +147,10 @@ Tester's report is always `docs/verification/<Active Work.Id>.md` with matching
 `VERIFICATION` provenance. Its location is derived from the active cycle ID,
 without a separate state field. Tests stay in established repository locations.
 See the [verification template](../templates/tester/).
+
+Reviewer reports use `docs/reviews/<Active Work.Id>/implementation.md` and
+`docs/reviews/<Active Work.Id>/final-deliverable.md`. Their `REVIEW` provenance
+includes cycle and kind, matching the visible fields and required path. No
+review-path state field is added. Preserve other cycles and block dependent work
+on provenance/path collisions. See the
+[review template](../templates/reviewer/).

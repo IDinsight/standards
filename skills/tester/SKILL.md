@@ -253,4 +253,8 @@ the active frame does it determine which completed downstream work its
 correction invalidates, such as reviews or documentation relying on corrected
 evidence. As a downstream rerun, preserve the frame and honor its rerun
 boundary. Persist the report before the state transition and follow protocol
-completion-output rules; do not perform the next role's work.
+completion-output rules. For any handoff entering either review state, follow
+**Independent Reviewer Session**, name the review kind, and persist evidence,
+limits, findings, later dependencies, and resume context before requesting the
+fresh Reviewer chat and giving the advisory model recommendation. Do not perform
+the next role's work.

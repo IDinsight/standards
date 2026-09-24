@@ -342,7 +342,8 @@ Allocate a new cycle ID in this order:
 2. Verify that the candidate does not already appear in `CYCLE_IDS.md`.
 3. As defense in depth, also verify that it does not collide with an existing
    cycle-owned artifact path or STANDARDS provenance marker, including
-   `docs/development/<candidate>.md` and `docs/verification/<candidate>.md`.
+   `docs/development/<candidate>.md`, `docs/verification/<candidate>.md`, and
+   `docs/reviews/<candidate>/`.
 4. Append the candidate to `CYCLE_IDS.md` and persist that registry change.
 5. Only after the registry append succeeds may the candidate be written to
    `Active Work.Id` and cycle initialization continue.
@@ -372,13 +373,14 @@ provenance collision checks still apply.
 ### Workflow Artifact Provenance
 
 Cycle ownership must be recoverable from the artifact itself whenever STANDARDS
-creates a Scope, Architecture, Development, or Verification artifact. Every such
-newly created artifact must begin with this provenance block, using exactly one concrete
-artifact type and the exact current cycle ID:
+creates a Scope, Architecture, Development, Verification, or Review artifact.
+Every such newly created artifact must begin with this provenance block, using
+exactly one concrete artifact type and the exact current cycle ID. Review reports
+also require the `ReviewKind` extension defined below:
 
 ```markdown
 <!-- STANDARDS
-Artifact: SCOPE | ARCHITECTURE | DEVELOPMENT | VERIFICATION
+Artifact: SCOPE | ARCHITECTURE | DEVELOPMENT | VERIFICATION | REVIEW
 Cycle: <Active Work.Id>
 -->
 ```
@@ -412,6 +414,31 @@ recoverable from the cycle ID; do not add a verification-path field to
 an unrelated or incorrectly marked file, report the collision and block
 dependent work until it is resolved; do not overwrite or adopt it. Test suites
 and fixtures remain reusable project assets and do not require report provenance.
+
+Reviewer owns two fixed cycle-specific report paths:
+
+- `docs/reviews/<Active Work.Id>/implementation.md` for `IMPLEMENTATION`;
+- `docs/reviews/<Active Work.Id>/final-deliverable.md` for `FINAL_DELIVERABLE`.
+
+Every review report begins with this specialized provenance block:
+
+```markdown
+<!-- STANDARDS
+Artifact: REVIEW
+Cycle: <Active Work.Id>
+ReviewKind: IMPLEMENTATION | FINAL_DELIVERABLE
+-->
+```
+
+Use exactly one concrete `ReviewKind` matching the path and current review
+state. The visible `Cycle` and `ReviewKind` fields must match the block. These
+paths are derived from cycle ID and kind; do not add a review-path state field.
+Preserve reports from other cycles and the other review kind. Before creating
+or editing a report, inspect its path and provenance. An unrelated, unmarked,
+incorrectly marked, or different-cycle/kind file at the required path is a
+collision: report it and block dependent work until resolved without overwriting,
+relabeling, adopting it, or silently choosing an alternate path. The same applies
+when a non-directory or unsafe path prevents the required report location.
 
 Before editing the verification report or an artifact referenced by
 `Active Work.Scope`, `Active Work.Architecture`, or `Active Work.Development`,
@@ -646,6 +673,44 @@ ReviewKind
 `IMPLEMENTATION` corresponds to `REVIEWING_IMPLEMENTATION`.
 `FINAL_DELIVERABLE` corresponds to `REVIEWING_FINAL`. A review handoff must
 identify the requested kind.
+
+### Review Gates
+
+Critical, independent assessment is required in both review kinds. Scope and
+architecture are authoritative statements of intended behavior, not proof that
+those statements are consistent or complete. Reviewer examines relevant claims
+from all roles and repository evidence without inheriting completion conclusions
+or silently replacing owned decisions.
+
+`IMPLEMENTATION` assesses implementation against the active contract, upstream
+consistency, Developer claims, and, in `STANDARD`, Tester coverage and evidence.
+Account for every current `AC-NNN` and relevant technical criterion. Explicit
+later-phase dependencies may remain only when satisfaction belongs to that later
+role; record the owner, required evidence, and the same AC ID. Pending is not
+evidence and cannot defer a present-phase defect or verification gap.
+
+`FINAL_DELIVERABLE` is available only in `STANDARD`. It assesses the assembled
+work after documentation: current acceptance evidence, documentation accuracy,
+unresolved findings, and consistency across artifacts. Every current acceptance
+condition and relevant technical criterion must have sufficient current evidence;
+unresolved dependencies or material evidence gaps cannot pass this gate.
+
+In `EXPEDITED`, implementation review assesses the bounded `Active Work.Request`
+and Developer evidence under **Expedited Cycle Contract**. Do not demand
+intentionally skipped artifacts, fabricate acceptance IDs, perform final review,
+or claim skipped guarantees. Promote when an omitted guarantee becomes necessary.
+
+A review passes only when no unresolved material finding or material assessment
+gap remains, no blocking user question or obligation owned by the current review
+state remains, and the applicable gate above is satisfied. No material findings
+is a valid outcome; there is no finding quota. A report with no established
+defects but insufficient material evidence is still incomplete. Reviewer defines
+severity and evidence details in its shared procedure and report template.
+
+Passing a review gate does not complete the cycle. Apply **Recovery Mechanics**
+when active; otherwise follow **Forward Transitions**. Before entering
+`AWAITING_USER_SIGNOFF`, all applicable cycle completion requirements, including
+an empty recovery stack and inactive outstanding obligations, must hold.
 
 ## Failure Types
 
@@ -926,31 +991,53 @@ active recovery frame.
 At `AWAITING_USER_SIGNOFF`, present the applicable user actions rather than a
 next-role invocation.
 
-### Independent Tester Session
+### Independent Assessment Sessions
 
-Whenever a handoff enters `TESTING`, explicitly request that the user invoke
-Tester in a fresh chat separate from Developer's implementation conversation.
-This also applies to recovery and re-verification. Persist the applicable state,
-owned artifacts, implementation/completion claims, actual self-check commands
-and results, limitations, and resume context before presenting the invocation.
-The scope, architecture, project context, development plan, repository, tests,
-and any current-cycle verification report must be sufficient to reconstruct the
-assessment without Developer's conversation. Record information in the owning
-artifact rather than duplicating it in `Handoff.Reason`.
+Tester and Reviewer reconstruct assessments from persisted artifacts and
+repository evidence. Before a handoff to either role, persist the applicable
+state, owned artifacts, claims, assessed content identities, actual commands and
+results, limitations, unresolved findings/dependencies, and resume context.
+Record detail in the owning artifact, not in `Handoff.Reason`. The receiving
+role must be able to work without the authoring conversation.
 
-For Tester, prefix the normal active-client invocation with “Open a fresh chat
-separate from Developer's implementation conversation, then run:”. Keep the
-normal persisted-input and active-recovery directions. Do not use the
-immediate-continuation exception to run Tester in Developer's conversation,
+Every handoff entering `TESTING`, `REVIEWING_IMPLEMENTATION`, or
+`REVIEWING_FINAL`, including recovery and corrections, explicitly requests the
+independent session described below. Keep the normal active-client invocation,
+persisted-input directions, and active-recovery-frame directions. Name the review
+kind when entering Reviewer. The immediate-continuation exception must not run
+an assessment in a conversation containing the prohibited authoring history,
 even when the user invoked both roles together.
 
-A skill cannot erase chat history or prove session freshness without client
-support. If the conversation is known to contain Developer's implementation
-work, stop before formal verification and request the fresh session. If that
-history or client metadata is unavailable, state the visibility limitation and
-reconstruct the assessment from persisted evidence; do not invent a freshness
-attestation or require a routine user confirmation. Resuming Tester's own
-interrupted session is allowed when it is separate from Developer's work.
+A skill cannot erase chat history or certify session freshness without client
+support. Known prohibited authoring history requires stopping before the formal
+assessment and requesting a fresh session after persisting missing context
+within existing ownership. If history or client metadata is unavailable, state
+that visibility limitation and proceed from persisted evidence; do not invent an
+attestation or an automatic blocker or require routine user confirmation.
+Resuming the assessing role's own interrupted assessment is allowed when its
+conversation is separate from the prohibited authoring work.
+
+### Independent Tester Session
+
+Apply **Independent Assessment Sessions**. Prefix a Tester invocation with
+“Open a fresh chat separate from Developer's implementation conversation, then
+run:”. Developer implementation history is prohibited for formal Tester work.
+
+### Independent Reviewer Session
+
+Apply **Independent Assessment Sessions**. Prefix a Reviewer invocation with
+“Open a fresh chat separate from the conversations that produced the artifacts
+under review, then run:”. This separation covers requirements, design, context,
+implementation, tests/evidence, and documentation authoring, not just Developer.
+Reviewer may resume its own assessment and correct its own findings; that review
+history alone does not constitute prohibited authoring history.
+
+Recommend that the user ideally select a different model of equal or higher
+capability than the model that produced the work, where known. This is advisory:
+do not switch models automatically, guess model identities or capability
+rankings, or add a routine author-model confirmation gate. Unknown model metadata
+is a stated limitation, not a blocker. Session separation remains required even
+when a different model is unavailable.
 
 ## User Decisions and Intervention
 
@@ -1286,6 +1373,10 @@ Use these terms consistently across all skills:
   `docs/verification/<Active Work.Id>.md`, recording acceptance coverage, scenario
   allocations, actual execution evidence, gaps, and later-phase dependencies.
   It does not replace scope, design, or workflow coordination state.
+- **review report**: Reviewer-owned cycle- and kind-specific assessment at
+  `docs/reviews/<Active Work.Id>/implementation.md` or `final-deliverable.md`
+  within that same directory. It records inspected inputs, checks, findings,
+  limitations, dependencies, and resumable progress under **Review Gates**.
 - **project context**: Auditor-owned baseline stored at `.standards/CONTEXT.md`.
   It may persist as evidence across cycles, but cycle-scoped non-baseline entries
   follow the lifecycle in **Persisted Workflow State**. Planned implementation

@@ -83,10 +83,17 @@ re-verification, and unavailable execution.
 
 ## 6. Follow the remaining gates
 
-The protocol continues through implementation review, documentation, final
-review, and synchronization. Invoke each role after its handoff. Each role reads
-the saved records and produces its own work. If it finds a problem in an earlier
-role's work, it sends the problem back to that role.
+At `REVIEWING_IMPLEMENTATION`, open a fresh chat separate from the conversations
+that authored the artifacts and invoke [Reviewer](../../roles/reviewer/). The
+handoff recommends a different model of equal or higher capability where known;
+that advice is optional. Reviewer independently checks the work and saves its
+report under `docs/reviews/<Active Work.Id>/`.
+
+The protocol then continues through documentation, final review, and
+synchronization. Final review uses the same independent-session rules after
+documentation. Invoke each role after its handoff. If it finds a problem in an
+earlier role's work, it sends the problem back to that role. Documenter and
+Synchronizer remain unfinished.
 
 At `AWAITING_USER_SIGNOFF`, review the deliverables and evidence. You can sign
 off, request rework, or cancel. Completion is not inferred from a successful

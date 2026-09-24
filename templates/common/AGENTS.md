@@ -64,10 +64,13 @@ Before performing workflow work:
    completion gate succeeds. Update all required `.standards/STATE.md` fields on
    every legal state-changing handoff.
 9. Follow `.standards/PROTOCOL.md` for role-completion output rules, including
-   commit suggestions and next-role invocations. When entering `TESTING`, apply
-   its **Independent Tester Session** rule and direct the user to a fresh Tester
-   chat. The cycle's report is discoverable through the protocol's **Workflow
-   Artifact Provenance** rules; verification content does not belong in state.
+   commit suggestions and next-role invocations. Apply **Independent Assessment
+   Sessions** when entering `TESTING` or either review state, plus **Independent
+   Tester Session** or **Independent Reviewer Session** as appropriate. Request
+   the required fresh chat; Reviewer handoffs name the review kind and give the
+   advisory model recommendation. Persist sufficient context in owned artifacts.
+   Verification and review reports are discoverable through **Workflow Artifact
+   Provenance**; their paths and contents do not add fields to state.
 
 Navigator is strictly non-mutating and may be used at any time without changing
 workflow state.

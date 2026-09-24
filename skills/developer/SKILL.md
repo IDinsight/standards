@@ -455,6 +455,12 @@ Session** rule. Persist enough implementation and self-check evidence in the
 development plan for Tester to assess the claims from files, then explicitly
 request a fresh Tester chat in the handoff.
 
+For any handoff entering either review state, including expedited completion and
+recovery returns, follow **Independent Reviewer Session**. Persist the
+implementation claims, actual self-check evidence, limitations, and resume
+context in the development plan; name the review kind and request the fresh
+Reviewer chat with the advisory model recommendation.
+
 When recovery is active, apply `.standards/PROTOCOL.md` **Recovery Mechanics**
 after the completion gate succeeds. If Developer owns the active frame, decide
 which previously completed downstream states must be re-established because of

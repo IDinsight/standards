@@ -31,6 +31,12 @@ const sources = [
     "The Tester evidence format and authoring rules.",
   ],
   [
+    "skills/reviewer/template.md",
+    "templates/reviewer",
+    "Review Report Template",
+    "The Reviewer assessment, findings, and resumption format.",
+  ],
+  [
     "skills/auditor/template.md",
     "templates/auditor",
     "Project Context Template",

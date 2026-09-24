@@ -104,8 +104,10 @@ Normal standard completion hands off to Tester in a fresh chat separate from
 Developer's implementation conversation. The persisted plan must include actual
 self-check results and enough context to assess implementation claims without
 that conversation. Expedited completion hands off to Reviewer for implementation
-review. Active recovery follows its saved frame and the same fresh-session rule
-when it enters `TESTING`.
+review in a fresh chat separate from authoring conversations, with the
+protocol's advisory model recommendation. Active recovery follows its saved
+frame and the applicable independent-session rule when it enters `TESTING` or
+either review state. See [Reviewer](../reviewer/).
 
 While still greenfield, Developer records the permanent change to `BROWNFIELD`
 as soon as it verifies that active-cycle implementation has been created or

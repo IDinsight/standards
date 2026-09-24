@@ -117,8 +117,9 @@ its owner and required evidence under the same ID. This may permit the Testing
 gate to pass, but it is not a verified condition and cannot permit sign-off.
 Tester does not edit scope/spec completion markers or do the later role's work.
 
-Normal completion hands off to Reviewer for `IMPLEMENTATION` review. Recovery
-and outstanding obligations follow the
-[canonical recovery rules](../../concepts/recovery/). Reviewer and later
-unfinished roles retain their existing WIP status; this skill does not supply
-their gates.
+Normal completion hands off to Reviewer for `IMPLEMENTATION` review in a fresh
+chat separate from the conversations that produced the assessed artifacts. The
+handoff persists findings, evidence, limitations, and later dependencies, and
+includes the protocol's advisory model recommendation. Recovery returns to
+either review state follow the same session rules. See [Reviewer](../reviewer/)
+and the [canonical recovery rules](../../concepts/recovery/).
