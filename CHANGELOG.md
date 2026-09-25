@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/IDinsight/standards/compare/v0.2.0...v0.3.0) (2026-09-25)
+
+
+### Features
+
+* **installer:** add interactive install and uninstall prompts ([f257ab7](https://github.com/IDinsight/standards/commit/f257ab7374e13f97d71d5f90565cd3a3eb4b558a))
+
 ## [0.2.0](https://github.com/IDinsight/standards/compare/v0.1.1...v0.2.0) (2026-09-25)
 
 
