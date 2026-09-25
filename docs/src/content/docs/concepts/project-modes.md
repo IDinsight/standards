@@ -1,73 +1,83 @@
 ---
-title: Greenfield and Brownfield Projects
+title: Project and Cycle Modes
 description:
-  Choose the correct starting mode and understand the permanent transition.
+  Understand the project starting point and the workflow for a change.
 ---
 
-Project mode describes whether the project has an existing implementation to
-build on. Cycle mode selects the workflow for one change.
+STANDARDS uses three kinds of mode:
+
+| Mode         | What it describes                      | Examples                  |
+| ------------ | -------------------------------------- | ------------------------- |
+| Project mode | Whether implementation already exists. | Greenfield, brownfield    |
+| Cycle mode   | Which workflow one change follows.     | Standard, expedited       |
+| Role mode    | How an individual role works.          | Developer's STEPWISE mode |
+
+A **cycle** is one piece of work, from its saved request to sign-off or
+cancellation. Project mode can span many cycles; choosing a role mode does not
+change the workflow.
 
 ## Greenfield
 
-`GREENFIELD` applies when there is no substantial existing implementation to
-preserve. Standard work starts with Scoper, then Architect, then Auditor.
+A greenfield project has no meaningful existing implementation to preserve. Its
+standard workflow starts with Scoper, then Architect, then Auditor: decide what
+to build, design it, and check the project context before coding.
 
-Before the first scheduled audit, Scoper and Architect can run or rerun during
-recovery without `CONTEXT.md` when the needed facts are already established.
-Missing context alone is not a failure. If the work needs project facts they
-cannot safely establish without Auditor, route a `PROJECT_CONTEXT` failure. Once
-relevant context exists, they must use it even while still greenfield.
+Before that first audit, Scoper and Architect can work from known constraints
+and completed earlier documents. The absence of Auditor's context file alone
+does not block them. If they need facts they cannot safely establish, the work
+returns to Auditor. Once relevant context exists, they must use it.
+
+Greenfield projects use standard work only.
 
 ## Brownfield
 
-`BROWNFIELD` applies when substantial implementation already exists. A standard
-cycle starts with Auditor; an eligible expedited cycle starts with Developer. A
-new feature in an existing codebase is brownfield work.
+A brownfield project already has meaningful implementation to understand,
+preserve, extend, or fix. Adding a new feature to an existing codebase is
+brownfield work.
+
+Standard work starts with Auditor so the requirements and design can build on
+reliable project facts. A sufficiently bounded implementation change may use the
+expedited workflow instead.
 
 ## Choose the cycle mode
 
-`ProjectMode` in `MODE.md` applies across cycles. `CycleMode` in `STATE.md`
-describes the active cycle:
+**STANDARD** is the default. It uses the full workflow, including separate
+testing, documentation, final review, and synchronization.
 
-- **UNSET:** no active cycle. No role-owned work may begin yet.
-- **STANDARD:** the full workflow; the default for a new request and the only
-  execution mode available in greenfield projects.
-- **EXPEDITED:** Developer and implementation Reviewer handle a small, clearly
-  defined brownfield change before user sign-off. They do not take over skipped
-  roles. Developer's plan and approval are still required.
+**EXPEDITED** uses Developer and implementation Reviewer before your sign-off
+decision. Developer still needs an approved plan. Use it only for a bounded
+brownfield change that can be completed safely without the skipped roles;
+skipping them does not transfer their responsibilities to Developer.
 
-Installation and terminal states use `UNSET`. A user can save an explicit
-next-cycle preference in `PendingCycleMode` without activating a cycle. The
-request must be checked against that preference before work begins. Without a
-pending preference, explicitly invoking Developer for a suitable brownfield
-request can select expedited work. A pending standard preference prevents that
-inference.
+**UNSET** means no cycle is active. It is the saved value before work starts and
+after a retained cycle ends, not a way to run work without checks.
 
-[Starting a Cycle](../../guides/starting-a-cycle/) explains pending requests and
-validation. After cancellation,
-[additional restrictions apply](../../guides/cancelling-and-new-cycles/#start-the-next-cycle).
+You can save a next-cycle preference before making a request. The agent checks
+that preference when the request arrives. Without a saved preference, explicitly
+invoking Developer for an eligible brownfield change can select expedited work.
+A saved standard preference prevents that inference.
 
-An active standard cycle cannot switch to expedited work. If an expedited cycle
-needs a skipped role or its checks,
-[promote it](../states-and-handoffs/#promote-an-expedited-cycle) to standard
-work through Auditor. That change is one-way for the cycle.
+See [Starting a Cycle](../../guides/starting-a-cycle/) for choosing a mode and
+resolving an incompatible request. Leftover changes from a cancelled cycle may
+require Auditor and standard work; see
+[starting the next cycle](../../guides/cancelling-and-new-cycles/#start-the-next-cycle).
+
+If expedited work comes to need a skipped role, it
+[moves to standard work](../states-and-handoffs/#promote-an-expedited-cycle).
+That change is one-way: an active standard cycle cannot become expedited.
 
 ## The project mode changes once
 
-During the first greenfield cycle, Developer permanently changes `MODE.md` to
-`BROWNFIELD` as soon as it verifies that the cycle has created or materially
-changed project implementation. The trigger is the implementation, regardless of
-whether Developer or the user wrote it. Planning, context, tests, reviews, and
-documentation alone do not trigger the change.
+During the first greenfield cycle, Developer changes the project permanently to
+brownfield as soon as it verifies that implementation has been created or
+materially changed. Code written by you during collaboration counts too.
+Approving a plan or creating tests, reviews, or documentation alone does not.
 
-Recovery may return to Scoper or Architect, but the project stays brownfield.
-Cancellation must check for implementation even if `MODE.md` still says
-`GREENFIELD`; existing active-cycle implementation requires the brownfield
-transition and retained cancellation. See
-[cancellation rules](../../guides/cancelling-and-new-cycles/).
+Returning to an earlier role does not make the project greenfield again.
+Cancellation must also check for implementation, even if the saved mode has not
+yet been updated. If implementation exists, cancellation retains the framework
+and the cycle record. See
+[the cancellation rules](../../guides/cancelling-and-new-cycles/).
 
-## Do not confuse project mode with skill mode
-
-A skill's internal mode selects how it works. Scoper uses `PLAN` or `REPLAN`;
-Developer uses `AUTONOMOUS`, `STEPWISE`, or `CODE_WITH_ME`. These do not change
-project mode, cycle mode, or the rules for ownership and handoffs.
+The installed `.standards/MODE.md` saves project mode; `.standards/STATE.md`
+saves cycle mode and any next-cycle preference.

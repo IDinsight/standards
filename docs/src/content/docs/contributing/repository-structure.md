@@ -1,91 +1,83 @@
 ---
 title: Repository Structure
-description: Find the workflow rules, skills, templates, and website sources.
+description:
+  Find the framework rules, role packages, templates, and website sources.
 ---
 
-The repository separates framework behavior from explanatory documentation.
+This repository contains both the framework and its documentation website. Start
+with the source that owns the change you want to make.
 
-```text
-standards/
-├── PROTOCOL.md
-├── README.md
-├── package.json
-├── pnpm-workspace.yaml
-├── pnpm-lock.yaml
-├── skills/
-│   ├── scoper/
-│   ├── architect/
-│   ├── auditor/
-│   ├── developer/
-│   ├── tester/
-│   ├── reviewer/
-│   ├── documenter/
-│   ├── navigator/
-│   └── synchronizer/
-├── templates/
-│   ├── common/
-│   ├── greenfield/
-│   └── brownfield/
-├── docs/
-│   ├── package.json
-│   ├── astro.config.mjs
-│   ├── tsconfig.json
-│   ├── scripts/
-│   └── src/content/docs/
-├── Makefile
-└── .github/workflows/
-```
+## Main locations
 
-## Framework sources
+| Path                     | What belongs here                                                     |
+| ------------------------ | --------------------------------------------------------------------- |
+| `PROTOCOL.md`            | Shared rules for roles, states, handoffs, recovery, and installation. |
+| `README.md`              | A high-level introduction and development entry points.               |
+| `skills/`                | The nine role packages.                                               |
+| `templates/`             | Initial runtime files and client integration templates.               |
+| `docs/src/content/docs/` | Website content, including generated references.                      |
+| `docs/astro.config.mjs`  | Sidebar navigation, site URL, and base path.                          |
+| `docs/scripts/`          | Reference generation and local link checking.                         |
+| `.github/workflows/`     | Documentation, Markdown, secret-scan, and release workflows.          |
 
-`PROTOCOL.md` defines shared states, ownership, transitions, and vocabulary.
-Each skill's `SKILL.md` defines role behavior. When needed, its `modes/`
-directory contains procedures for each mode, and `template.md` defines the
-role's required output.
+## Inside a role package
 
-Developer also has a `styles/` directory for universal and technology-specific
-implementation guidance. Its modes describe collaboration after plan approval.
-Tester has test-specific `styles/` guidance and thin VERIFY/REVERIFY modes that
-share one verification procedure and completion gate. Reviewer has thin
-IMPLEMENTATION/FINAL_DELIVERABLE modes sharing assessment, findings, ownership,
-and completion rules; corrections use the same procedure. Synchronizer uses one
-procedure and template for initial work, interruption, and reconciliation after
-corrections, without mode files. Documenter has thin AUTONOMOUS/GUIDED
-collaboration modes, an independent target selection, documentation styles, and
-explicitly selected user profiles. Both modes share one procedure, record, and
-completion gate; there is no plan-approval gate or cycle-long style lock.
-Navigator has thin EXPLAIN/INVESTIGATE/GRILL_ME modes sharing one evidence
-procedure and non-mutation boundary. It has no template, persisted record,
-workflow gate, or additional style layer; output stays in the conversation.
+Each directory under `skills/` contains a `SKILL.md` with the role's
+instructions, a Codex adapter in `agents/openai.yaml`, and authored evaluation
+scenarios in `evals/evals.json`.
 
-The implemented skill directories also include Codex adapter metadata in
-`agents/openai.yaml` and evaluation cases in `evals/evals.json`. These are
-authored model scenarios, not executable structural tests. Parsing their JSON or
-building the documentation does not execute them or establish behavioral passes.
+Other files depend on the role:
 
-`templates/common/` supplies agent integration blocks. Mode-specific template
-directories contain the initial runtime mode and state records.
+| File or directory | Purpose                                                                                   |
+| ----------------- | ----------------------------------------------------------------------------------------- |
+| `modes/`          | Instructions for a selected mode; Synchronizer uses one procedure without separate modes. |
+| `template.md`     | The required output format; Navigator has no saved output or template.                    |
+| `styles/`         | Shared and topic-specific guidance for Developer, Tester, and Documenter.                 |
+| `user-styles/`    | Optional, explicitly selected profiles for Developer and Documenter.                      |
 
-## Workspace tooling
+Evaluation scenarios describe intended behavior. Parsing their JSON, linting
+Markdown, or building the site does not run model evaluations or establish that
+the roles passed them.
 
-The root `package.json` is private and provides shared commands and the pinned
-pnpm version. `pnpm-workspace.yaml` registers `docs/`; `pnpm-lock.yaml` locks
-dependencies for both packages. The documentation package retains its Astro
-dependencies, scripts, and configuration. Installer implementation and
-publishing metadata will be added separately.
+See [Roles](../../roles/overview/) for behavior and
+[Artifact Templates](../../reference/artifact-templates/) for output formats.
 
-## Documentation sources
+## Runtime and client templates
 
-Handwritten pages live under `docs/src/content/docs/`. Sidebar order is explicit
-in `docs/astro.config.mjs`, so adding a file does not automatically add it to
-the main navigation.
+`templates/common/` contains the managed `AGENTS.md` and `CLAUDE.md` integration
+blocks, plus initial `.standards/CYCLE_IDS.md` and
+`.standards/INSTALLATION.json` files.
 
-The protocol and eight artifact-template pages are generated by
-`docs/scripts/sync-reference.mjs`. It also provides downloadable source files.
-Edit the repository originals, not the generated copies.
+`templates/greenfield/` and `templates/brownfield/` contain initial
+`.standards/MODE.md` and `.standards/STATE.md` files.
+`templates/claude/.claude/settings.json` supplies the Claude Code role
+invocation settings.
 
-## Keep changes at the right layer
+These are templates, not an installer command. Installation and preservation
+requirements are defined in the
+[protocol](../../reference/protocol/#installed-runtime-contract).
 
-Change shared behavior in the protocol before teaching a different rule in a
-role or guide. Update affected role instructions and examples together. A
-website page should not introduce a new state or redefine a completion gate.
+## Website sources and generated files
+
+Handwritten pages live under `docs/src/content/docs/`. The sidebar is listed
+explicitly in `docs/astro.config.mjs`; adding a file alone does not add a
+navigation entry.
+
+`docs/scripts/sync-reference.mjs` generates the Protocol page and eight role
+template pages from their repository originals. It also copies downloadable
+originals into `docs/public/reference/`. Edit the source files rather than these
+generated copies.
+
+The built website goes to `docs/dist/`. `docs/scripts/check-links.mjs` checks
+local links and anchors in that output.
+
+## Workspace commands and dependencies
+
+The root `package.json` provides the `docs:*` commands and pins pnpm.
+`pnpm-workspace.yaml` includes the docs package, and `pnpm-lock.yaml` records
+dependencies for the workspace. Website dependencies and package scripts stay in
+`docs/package.json`.
+
+The `Makefile` includes a Markdown formatter and cleanup commands. See
+[Local Development](../local-development/) for setup and validation, and
+[Writing Documentation](../documentation/) for page conventions.

@@ -11,6 +11,15 @@ export default defineConfig({
         "A framework for coding with agents: explicit roles, persisted work, and verifiable handoffs.",
       favicon: "/favicon.svg",
       customCss: ["./src/styles/custom.css"],
+      components: {
+        SiteTitle: "./src/components/SiteTitle.astro",
+      },
+      expressiveCode: {
+        styleOverrides: {
+          codeBackground: "var(--standards-code-bg)",
+          codeForeground: "var(--sl-color-text)",
+        },
+      },
       sidebar: [
         {
           label: "Overview",
@@ -28,30 +37,6 @@ export default defineConfig({
             },
             {
               slug: "getting-started/first-workflow",
-            },
-          ],
-        },
-        {
-          label: "Concepts",
-          collapsed: true,
-          items: [
-            {
-              slug: "concepts/ownership",
-            },
-            {
-              slug: "concepts/project-modes",
-            },
-            {
-              slug: "concepts/states-and-handoffs",
-            },
-            {
-              slug: "concepts/acceptance-traceability",
-            },
-            {
-              slug: "concepts/recovery",
-            },
-            {
-              slug: "concepts/human-decisions",
             },
           ],
         },
@@ -118,6 +103,30 @@ export default defineConfig({
             },
             {
               slug: "guides/cancelling-and-new-cycles",
+            },
+          ],
+        },
+        {
+          label: "Concepts",
+          collapsed: true,
+          items: [
+            {
+              slug: "concepts/ownership",
+            },
+            {
+              slug: "concepts/project-modes",
+            },
+            {
+              slug: "concepts/states-and-handoffs",
+            },
+            {
+              slug: "concepts/acceptance-traceability",
+            },
+            {
+              slug: "concepts/recovery",
+            },
+            {
+              slug: "concepts/human-decisions",
             },
           ],
         },

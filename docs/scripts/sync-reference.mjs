@@ -5,54 +5,59 @@ import { fileURLToPath } from "node:url";
 const docsRoot = fileURLToPath(new URL("../", import.meta.url));
 const repoRoot = resolve(docsRoot, "..");
 const sources = [
-  ["PROTOCOL.md", "protocol", "Protocol", "The canonical workflow contract."],
+  [
+    "PROTOCOL.md",
+    "protocol",
+    "Protocol",
+    "The shared rules for roles, workflow steps, recovery, and installation.",
+  ],
   [
     "skills/scoper/template.md",
     "templates/scoper",
     "Scope Template",
-    "The Scoper artifact contract.",
+    "Scoper's format for goals, boundaries, and acceptance conditions.",
   ],
   [
     "skills/architect/template.md",
     "templates/architect",
     "Architecture Template",
-    "The Architect artifact contract.",
+    "Architect's format for design decisions and requirement coverage.",
   ],
   [
     "skills/developer/template.md",
     "templates/developer",
     "Development Plan Template",
-    "The Developer plan format and authoring rules.",
+    "Developer's format for implementation steps, approval, and progress.",
   ],
   [
     "skills/tester/template.md",
     "templates/tester",
     "Verification Report Template",
-    "The Tester evidence format and authoring rules.",
+    "Tester's format for coverage, test results, and remaining gaps.",
   ],
   [
     "skills/reviewer/template.md",
     "templates/reviewer",
     "Review Report Template",
-    "The Reviewer assessment, findings, and resumption format.",
+    "Reviewer's format for independent assessments, findings, and conclusions.",
   ],
   [
     "skills/documenter/template.md",
     "templates/documenter",
     "Documentation Record Template",
-    "The Documenter evidence, collaboration, target, and resume format.",
+    "Documenter's format for documentation work, checks, and remaining tasks.",
   ],
   [
     "skills/synchronizer/template.md",
     "templates/synchronizer",
     "Synchronization Record Template",
-    "The Synchronizer reconciliation, evidence references, and resume format.",
+    "Synchronizer's format for checking that current work and earlier assessments agree.",
   ],
   [
     "skills/auditor/template.md",
     "templates/auditor",
     "Project Context Template",
-    "The Auditor artifact contract.",
+    "Auditor's format for facts about the existing project.",
   ],
 ];
 
@@ -79,9 +84,14 @@ for (const [source, slug, title, description] of sources) {
   }
   const prefix = slug.startsWith("templates/") ? "../../../" : "../../";
   const header = `---\ntitle: ${title}\ndescription: ${description}\n---\n\n`;
+  const readingGuide =
+    slug === "protocol"
+      ? `For a plain-language introduction, see [Concepts](${prefix}concepts/states-and-handoffs/).`
+      : `For usage and examples, see [the role guide](${prefix}roles/${slug.split("/")[1]}/).`;
   const note =
-    `:::note[Authoritative source]\nGenerated from \`${source}\` during docs setup and builds. ` +
-    `Edit the repository source, not this page.\n\n` +
+    `:::note[About this reference]\n${description} ${readingGuide}\n\n` +
+    `The text below is copied from \`${source}\` during docs setup and builds. ` +
+    `To change it, edit that source file and rebuild the docs.\n\n` +
     `[Download the original Markdown](${prefix}reference/${source}).\n:::\n\n`;
   await mkdir(dirname(output), { recursive: true });
   await mkdir(dirname(download), { recursive: true });

@@ -1,47 +1,63 @@
 ---
-title: Roles and Artifact Ownership
-description: Understand which role may change each decision or file.
+title: Roles and Ownership
+description: Know who makes each decision and who fixes a problem.
 ---
 
-Each role is responsible for specific decisions and files. Finding a problem
-does not give a role permission to fix another role's work.
+Each role is responsible for particular decisions and files. Finding a problem
+does not give it permission to change another role's work.
 
-## Separate records for separate decisions
+## Who owns what
 
-- **Scope:** what to build and what counts as done. Scoper owns it.
-- **Technical design:** the important design choices, interfaces, and contracts.
-  Architect owns it.
-- **Development plan:** concrete implementation steps, progress, and
-  self-checks. Developer owns it and asks for approval before implementation.
-- **Verification:** tests and formal evidence of behavior. Tester owns them. Its
-  report records current evidence, gaps, and later-role dependencies.
-- **Review:** independent assessment, findings, and conclusions. Reviewer owns
-  reports and corrections to its findings, while defects go to their owners.
-- **Documentation:** user/project documentation, comments and docstrings, and
-  project agent guidance outside managed blocks. Documenter owns this work and
-  its evidence record; executable logic and tooling directives keep their
-  owners.
-- **Synchronization:** applicability and consistency of completed assessments,
-  the deliverable, and workflow records. Synchronizer owns its record and routes
-  discrepancies to the owners of the affected work.
-- **Project context:** what already exists and what the change must respect.
-  Auditor owns it. These established facts are the project's **baseline**.
+| Role         | Responsibility                                                        |
+| ------------ | --------------------------------------------------------------------- |
+| Scoper       | Requirements and what counts as done.                                 |
+| Architect    | Technical design and important decisions across components.           |
+| Developer    | The implementation, its plan, and implementation self-checks.         |
+| Auditor      | Verified facts about the existing project, called its baseline.       |
+| Tester       | Tests and independent verification results.                           |
+| Reviewer     | Independent assessments, review findings, and review conclusions.     |
+| Documenter   | Project documentation, comments, docstrings, and its work record.     |
+| Synchronizer | Checking that current files, assessments, and workflow records agree. |
 
-A proposed design is still a proposal, even if it appears in the context file.
-Keep existing facts separate from planned changes.
+Project instructions outside managed framework sections are part of Documenter's
+work. Executable code, tooling directives, and managed framework files retain
+their own owners.
 
-## Coordination has its own rules
+Reviewer owns its findings, but the role responsible for a defect makes the fix.
+Only Reviewer can resolve or withdraw its finding. Likewise, Synchronizer can
+correct its own assessment but cannot supply another role's missing evidence.
 
-Workflow roles other than Navigator may update `MODE.md`, `STATE.md`, and
-`CYCLE_IDS.md` only as the protocol requires, such as to change state, save a
-file path, or record an unanswered question. They cannot edit the installed
-`PROTOCOL.md` to change those rules.
+See the [role pages](../../roles/overview/) for each role's inputs, outputs, and
+completion rules.
+
+## Design and implementation are separate
+
+Architect decides how the important parts of the system should work together.
+Developer turns that design into detailed implementation steps and makes local,
+easily reversible coding choices. Approving Developer's plan does not authorize
+it to change Scoper's requirements or Architect's design.
+
+Auditor records what already exists. A proposed design remains a proposal, even
+if it is mentioned in the context document.
+
+## Send problems to their owners
+
+Suppose Tester needs to check retries, but the design never decided when a
+request should be retried. Architect must resolve that decision. Tester cannot
+decide the behavior by writing a test.
+
+If the design already specifies the behavior and the test expects something
+else, Tester fixes the test. If the code violates the design, Developer fixes
+the implementation.
+
+[Recovery](../recovery/) records the correction and the route back to the
+interrupted work.
 
 ## Artifact provenance
 
-New STANDARDS Scope, Architecture, Development, Verification, Review,
-Documentation, and Synchronization files begin with a block identifying their
-type and owning cycle. For example:
+A workflow document created for one cycle carries a marker identifying its type
+and cycle. The protocol calls this **artifact provenance**. For example, a new
+scope document begins with a block like this:
 
 ```markdown
 <!-- STANDARDS
@@ -50,78 +66,44 @@ Cycle: add-user-search-20260924T150000Z-a7f3
 -->
 ```
 
-Use the actual active ID and exactly one type: `SCOPE`, `ARCHITECTURE`,
-`DEVELOPMENT`, `VERIFICATION`, `REVIEW`, `DOCUMENTATION`, or `SYNCHRONIZATION`.
-Review blocks also require the concrete `ReviewKind`. The marker keeps ownership
-visible even if the file is renamed or moved. Another cycle may read it as
-permitted prior evidence, but cannot overwrite, repurpose, or adopt it as its
-own artifact. Choose a different path for new work.
+The marker protects the file even if it is moved or renamed. Another cycle may
+read it as permitted prior evidence, but cannot overwrite it or claim it as its
+own.
 
-Before editing any referenced artifact, inspect its marker. If it names another
-cycle, correct the active reference without changing the other cycle's file.
+There are two important distinctions:
 
-An existing unmarked project-owned scope or architecture document can still be
-updated as the project's canonical document. Merely referencing it in state does
-not make it cycle-owned; do not add provenance just because it was selected.
-Newly created workflow artifacts must have the marker.
+- An existing, unmarked project scope or design document can be updated as the
+  project's shared document. Referencing it in workflow state does not turn it
+  into a cycle-owned file.
+- Tests, guides, and docstrings remain reusable project files. The reports
+  describing their verification or documentation work belong to a cycle.
 
-Development plans always belong to one cycle. Their filename includes the active
-ID, and both their marker and visible `Cycle` field must match it. See
-[Developer](../../roles/developer/#inputs-and-output) for the required location.
-Verification reports follow the same cycle-ownership rule at the fixed path
-`docs/verification/<Active Work.Id>.md`; test suites remain reusable project
-assets. See [Tester](../../roles/tester/#inputs-and-output).
+Development plans always belong to one cycle and include its ID in the filename.
+Verification, review, documentation, and synchronization records have fixed
+paths derived from that ID. If a required path contains an unrelated or
+incorrectly marked file, dependent work stops until the conflict is resolved.
+The role cannot overwrite the file or quietly choose another path.
 
-Reviewer reports also belong to one cycle and kind, at the fixed paths under
-`docs/reviews/<Active Work.Id>/`. Unlike new scope/design path selection, a
-collision at a fixed verification or review path blocks dependent work until
-resolved; do not silently choose an alternative or relabel the existing file.
-See [Reviewer](../../roles/reviewer/#inputs-and-output).
+See [output paths](../../reference/artifact-templates/) and the
+[exact marker and preservation rules](../../reference/protocol/#workflow-artifact-provenance).
 
-Synchronization records use the fixed path
-`docs/synchronization/<Active Work.Id>.md` with matching provenance and visible
-cycle ID. Collisions block dependent work without adopting existing content or
-choosing an alternative path. See
-[Synchronizer](../../roles/synchronizer/#inputs-and-output).
+## Shared workflow records
 
-Documentation records use `docs/documentation/<Active Work.Id>.md` with matching
-provenance and visible cycle ID, under the same fixed-path collision rules. The
-guides and docstrings Documenter updates remain reusable project assets. Managed
-framework blocks and installed runtime files retain their installer/protocol
-ownership. See [Documenter](../../roles/documenter/).
+Workflow roles can update the installed state, mode, and cycle-ID records when
+the protocol requires it, such as when saving a handoff or unanswered question.
+They cannot rewrite the installed protocol to change the rules.
 
-## Architect and Developer
+Compatible guidance can be applied together, such as a project formatter and
+general coding style. If instructions materially conflict, the responsible role
+must resolve the problem, or ask you when no role has authority to settle it. A
+priority list does not authorize silently ignoring the conflict. See
+[instruction conflicts](../../reference/protocol/#instruction-layering-and-conflicts).
 
-Architect decides technical intent and contracts, including important behavior
-across system boundaries. Its Build Plan gives coarse ordering guidance.
-Developer owns the detailed `DEV-NNN` plan, execution, and reversible local
-choices. Approval of that plan does not authorize changing another role's work.
+## Navigator explains without changing anything
 
-Compatible style guidance can be applied together, such as using the
-repository's formatter before generic style preferences. A material
-contradiction must go to the responsible workflow role, or to the user if no
-role can resolve it without overriding another authority. A precedence list
-alone cannot settle the conflict. See
-[Instruction Layering and Conflicts](../../reference/protocol/#instruction-layering-and-conflicts).
+Navigator has no workflow state or saved report. It can explain a problem and
+its likely owner, but cannot fix it, change workflow records, run another role,
+or approve work. Quiz feedback is about your understanding of the chosen topic.
+It is not a test result or review verdict.
 
-## Finding a problem outside your role
-
-Suppose Tester finds that the design never specified retry behavior. That is an
-`ARCHITECTURE` failure: Architect must decide the behavior. Tester must not
-choose it by writing a test.
-
-If the design already specifies retries and the test checks the wrong behavior,
-that is a `VERIFICATION` failure for Tester to fix.
-
-[Failure Recovery](../recovery/) explains how to return work to the right role.
-See the [role overview](../../roles/overview/) for all responsibilities.
-
-## Navigator is different
-
-Navigator explains, investigates, and checks understanding at any point, even
-without an active cycle. It never changes project files or workflow state,
-including control-plane actions requested during navigation. It may explain a
-suspected defect and its likely owner, but does not route a failure, certify
-tests, issue a formal review verdict, or save an artifact. Quiz feedback is not
-workflow approval. See [Navigator](../../roles/navigator/) and the canonical
-[boundary](../../reference/protocol/#navigator-boundary).
+See [Navigator](../../roles/navigator/) for its modes and boundaries.

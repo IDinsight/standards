@@ -1,67 +1,83 @@
 ---
 title: Introduction
-description: Understand the purpose and boundaries of the framework.
+description:
+  Understand how roles, saved work, and independent checks fit together.
 ---
 
-S.T.A.N.D.A.R.D.S. separates the main jobs in a software change: deciding what
-to build, designing it, writing code, and checking the result.
+STANDARDS gives coding agents separate responsibilities for a software change.
+One role defines what you want, another designs it, and another implements it.
+Testing and review check the work independently before you decide whether to
+accept it.
 
-## How work is organized
+## Work through a cycle
 
-A **role** is responsible for a kind of work. Scoper defines the requirements;
-Architect decides how to meet them. A **workflow state**, such as `SCOPING`,
-records which role may work now.
+A **cycle** is one piece of work, from its saved request to your sign-off or
+cancellation. It can span several chats.
 
-Each workflow role has checks it must pass before moving on. The protocol calls
-these a **completion gate**. A **handoff** records the next state and gives you
-a command to run the next role. You run that command yourself.
+At each step, a role reads the relevant project files, does its work, and checks
+the result. When it is ready to move on, it saves progress and gives you a
+command to run the next role. This is a **handoff**. You invoke each role
+explicitly; the saved workflow state determines which role can act.
 
-[Navigator](../../roles/navigator/) works outside this sequence. It explains,
-investigates, or checks your understanding without changing files or state. It
-has no completion gate and needs no active cycle.
+For example, Scoper defines the requirements and Architect decides how to meet
+them. If Tester later finds a missing design decision, Architect resolves it.
+The role that finds a problem does not automatically own the fix.
 
-A **cycle** is one request, from its start to your sign-off or cancellation.
-[Cycle mode](../../concepts/project-modes/#choose-the-cycle-mode) selects the
-full `STANDARD` workflow or the shorter `EXPEDITED` workflow for that request.
-Before the request starts, `CycleMode` is `UNSET`; mode preferences and blocked
-requests are saved separately.
+## Use the workflow the change needs
 
-## What the project saves
+**Standard work** is the default. It covers requirements, design, project
+context, implementation, testing, review, documentation, and a final check that
+the completed assessments still apply.
 
-The `.standards/` directory stores the protocol, current mode and state,
-installation records, a registry of reserved cycle IDs, and Auditor's notes on
-the existing project. Other files hold the scope, design, development plan, and
-results. The protocol calls these saved outputs **artifacts**.
+The starting point depends on the project:
 
-`STATE.md` records those three planning paths, pending decisions, recovery,
-outstanding corrections, and what should happen next. To continue in a new
-session, [read those records](../../guides/resuming-work/) rather than relying
-on chat history.
+- An existing project starts with Auditor to establish the facts the change
+  depends on.
+- A new project starts with Scoper, then Architect, before its first audit.
 
-## Plan before coding
+**Expedited work** is available for a bounded change to an existing project. It
+uses Developer and implementation Reviewer before your sign-off decision. It
+provides fewer checks and must move to standard work if a skipped role becomes
+necessary.
 
-Developer saves a plan of implementation steps and asks you to approve it before
-changing implementation. You can delegate the approved steps, proceed one at a
-time, or code together. See
+See [project and cycle modes](../../concepts/project-modes/) for the choices and
+[workflow paths](../../concepts/states-and-handoffs/) for the full sequence.
+
+## Stay involved at the important decisions
+
+Developer saves an implementation plan and waits for your approval before
+coding. You can let it work through approved steps, pause after each step, or
+code together. See
 [Working with Developer](../../guides/working-with-developer/).
 
-## What completion means
+Tester uses a chat separate from the implementation conversation. Reviewer uses
+a chat separate from all conversations that authored the work being reviewed.
+Both assess the saved work and evidence rather than inherit the author's
+conclusions.
 
-Standard work must pass all required role checks and provide evidence that each
-requirement is met. Expedited work has fewer steps and checks. It moves to the
-full workflow if it needs a skipped role.
+Once the required checks are complete, you can accept the work, request changes,
+or cancel. A passing test or a role's completion does not make that decision for
+you.
 
-[Workflow States and Handoffs](../../concepts/states-and-handoffs/) lists both
-paths and their completion rules. Passing a role's checks does not finish the
-cycle: you make the final [sign-off decision](../../concepts/human-decisions/).
+## Continue from saved work
 
-## Choose your starting point
+The installed `.standards/STATE.md` records the request, current step, document
+references, and unfinished corrections. Scope, design, plans, and assessment
+results stay in their own files.
 
-- [Installation and setup](../installation/): prepare the project files and
-  skills.
-- [Starting a cycle](../../guides/starting-a-cycle/): choose a mode and save a
-  new request.
-- [New project](../../guides/new-project/): plan and design before writing code.
-- [Existing project](../../guides/existing-project/): choose standard or
-  expedited work.
-- [Role overview](../../roles/overview/): find who handles each kind of work.
+These records let another session pick up where you left off. They also show
+what was checked and what remains unresolved. See
+[Resuming Interrupted Work](../../guides/resuming-work/).
+
+## Ask questions at any time
+
+[Navigator](../../roles/navigator/) works outside the workflow. It can explain
+the project, investigate a question, or quiz you on a topic, even without an
+active cycle. It never edits files or changes workflow state.
+
+## Try a complete example
+
+[Your First Workflow](../first-workflow/) follows a search feature through the
+standard workflow. It assumes the project has been set up for STANDARDS. The
+[installation page](../installation/) describes the requirements; the repository
+does not yet provide an installer command.

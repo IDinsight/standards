@@ -1,24 +1,27 @@
 ---
 title: S.T.A.N.D.A.R.D.S.
 description:
-  A workflow for building software with coding agents, clear roles, and saved
-  progress.
+  Build software with coding agents, clear responsibilities, and saved progress.
 ---
 
-S.T.A.N.D.A.R.D.S. is a workflow for building software with coding agents. It
-assigns each role a clear job and saves progress in project files so work can
-continue across sessions.
+S.T.A.N.D.A.R.D.S. helps you take a software change from an idea to checked,
+documented work. Its nine roles cover planning, design, coding, assessment,
+documentation, and understanding the project.
 
-Use the full workflow for changes that need planning, design, and verification.
-For small, clearly defined changes to existing projects, the expedited workflow
-runs Developer and Reviewer before your sign-off.
+You choose which role to run, approve the implementation plan, and decide
+whether to accept the finished work. Progress stays in project files so you can
+continue in another chat.
 
-## Start here
+## Find your next step
 
-- [Understand the framework](./getting-started/introduction/).
-- [Follow your first workflow](./getting-started/first-workflow/).
-- [Explore the nine roles](./roles/overview/).
-- [Look up the protocol](./reference/protocol/).
+- [Introduction](./getting-started/introduction/): understand how the framework
+  works and when to use it.
+- [Your First Workflow](./getting-started/first-workflow/): follow an example
+  from request to sign-off.
+- [Roles](./roles/overview/): find the right role for a task.
+- [Guides](./guides/starting-a-cycle/): start, resume, or change ongoing work.
+- [Reference](./reference/protocol/): look up exact rules and document formats.
 
-You choose when to run each role and whether to accept the finished work. These
-docs explain the process; the protocol and skill files define its rules.
+For a project question, use [Navigator](./roles/navigator/). It can explain the
+code, investigate behavior, or quiz you without changing files or starting a
+workflow.

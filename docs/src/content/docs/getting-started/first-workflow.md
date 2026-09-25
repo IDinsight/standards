@@ -1,111 +1,160 @@
 ---
 title: Your First Workflow
-description: Follow an example change from request to sign-off.
+description: Follow a search feature from its request to your sign-off decision.
 ---
 
-This walkthrough explains the protocol using an example change: **add search by
-name and email to an existing user directory** using `CycleMode: STANDARD`. It
-assumes the framework has been installed according to the
-[installation requirements](../installation/). All nine role packages are
-implemented; the installer remains unfinished.
+This example adds **search by name and email to an existing user directory** and
+updates its user guide. It uses the standard workflow.
 
-## 1. Establish the request
+It assumes an existing project set up for STANDARDS, with no active cycle. The
+[installation requirements](../installation/) are defined, but an installer
+command is not yet provided.
 
-Start with [cycle initialization](../../guides/starting-a-cycle/): select
-`STANDARD`, reserve a new ID in `CYCLE_IDS.md`, then save that ID and request in
-`STATE.md`. An example ID is `add-user-search-20260924T150000Z-a7f3`; generate a
-fresh token rather than reuse this example. Scope, Architecture, and Development
-paths start as `NONE`.
+Use each role's handoff to invoke the next one when it is ready. The examples
+below use Codex's `$role` syntax; in Claude Code, use `/role` instead.
 
-Because this is standard brownfield work, the cycle starts in `AUDITING`. Invoke
-the installed Auditor skill explicitly:
+## 1. Start with Auditor
+
+Give Auditor the request and choose standard work:
 
 ```text
-Codex:       $auditor Add user search by name and email.
-Claude Code: /auditor Add user search by name and email.
+$auditor Start a STANDARD cycle.
+Add search by name and email to the existing user directory,
+and update the user guide to explain how to use it.
 ```
 
-Use the line for your client. Auditor checks existing behavior, conventions, and
-commands, then records the findings in `.standards/CONTEXT.md`.
+The agent validates the mode, reserves a fresh cycle ID, and saves the request
+before Auditor begins. Auditor then checks the relevant code, behavior,
+conventions, and commands, saving its findings in `.standards/CONTEXT.md`.
 
-## 2. Define the outcome
+This is the starting role for an existing project. For a new project, follow
+[Starting a New Project](../../guides/new-project/).
 
-After Auditor hands off to `SCOPING`, invoke Scoper using the handoff message.
-Scoper saves the scope and records its path in `Active Work.Scope`.
+## 2. Define the outcome with Scoper
 
-Illustrative acceptance conditions might be:
+After Auditor finishes, use its handoff to run Scoper. Explain what users should
+be able to do and answer questions that would change the result.
+
+The scope might include these acceptance conditions, if you agree to them:
 
 - `AC-001`: Users can find directory entries by name.
 - `AC-002`: Users can find directory entries by email.
-- `AC-003`: An empty result set displays a clear no-results message.
+- `AC-003`: An empty result displays a clear no-results message.
+- `AC-004`: The user guide explains how to search the directory.
 
-These examples assume those outcomes were agreed for the change. Scoper asks
-about unclear requirements that would affect the result.
+The IDs connect each outcome to its design and later evidence. Scoper saves the
+scope and its location in the workflow record.
 
-## 3. Define the technical design
+## 3. Design the change with Architect
 
-At `ARCHITECTING`, invoke Architect. The design accounts for every current
-acceptance ID, defines the important interfaces and behavior, and records
-technical acceptance criteria where needed.
+Run Architect after Scoper's handoff. It decides how the search should fit the
+existing application: which components handle the request, what they exchange,
+and how errors are handled.
 
-Save the design path in `Active Work.Architecture`. Choosing a database, search
-method, or how components communicate belongs here unless existing constraints
-already settle those choices.
+Architect accounts for each acceptance condition. The user-guide condition may
+need no technical design; it still remains work for Documenter. Local coding
+choices stay with Developer.
 
-## 4. Approve and carry out the development plan
+## 4. Approve the plan and work with Developer
 
-At `DEVELOPING`, invoke Developer. It turns the design into `DEV-NNN` steps,
-saves the plan at `Active Work.Development`, and asks for approval before
-coding. For example, a step might implement the agreed name filter and map it to
-`AC-001`. Its self-check should use the project's established commands.
+Developer turns the design into implementation steps and presents a saved plan
+for your approval. A step might add the agreed name filter and link it to
+`AC-001`.
 
-Review the proposed plan and approve it or request changes. Choose autonomous,
-stepwise, or Code With Me collaboration. Developer saves progress and performs
-implementation self-checks; these do not replace Tester verification. See
-[Working with Developer](../../guides/working-with-developer/).
+Read the plan, request changes if needed, and approve it before coding starts.
+Choose how to work:
 
-## 5. Independently verify the change
+- **AUTONOMOUS:** the default; work through approved steps.
+- **STEPWISE:** complete and check one step, then wait for you to continue.
+- **CODE_WITH_ME:** explain the next step and help with code you write.
 
-After Developer persists `TESTING`, open a fresh chat separate from the
-implementation conversation and invoke Tester:
+Developer saves progress and runs implementation checks. Important changes to
+the plan require approval again. See
+[Working with Developer](../../guides/working-with-developer/) for the details.
+
+## 5. Test in a separate chat
+
+When Developer hands off to Tester, open a fresh chat separate from the
+implementation conversation and run:
 
 ```text
-Codex:       $tester Continue from `.standards/STATE.md`.
-Claude Code: /tester Continue from `.standards/STATE.md`.
+$tester Continue from .standards/STATE.md.
 ```
 
-Tester reconstructs intent from the saved artifacts and repository, extends
-existing coverage where needed, executes appropriate checks, and records actual
-results in `docs/verification/<Active Work.Id>.md`. The default ceiling is five
-added or materially expanded scenarios per source file for the active change;
-existing coverage is preserved. See [Tester](../../roles/tester/) for counting,
-re-verification, and unavailable execution.
+Tester reads the saved requirements, design, implementation, and existing tests.
+It adds or updates coverage where needed, runs appropriate checks, and records
+the actual results and any gaps.
 
-## 6. Follow the remaining gates
+For this example, Tester checks the search behavior. The guide can remain
+pending until Documenter supplies its evidence. That does not excuse an untested
+or failing search condition.
 
-At `REVIEWING_IMPLEMENTATION`, open a fresh chat separate from the conversations
-that authored the artifacts and invoke [Reviewer](../../roles/reviewer/). The
-handoff recommends a different model of equal or higher capability where known;
-that advice is optional. Reviewer independently checks the work and saves its
-report under `docs/reviews/<Active Work.Id>/`.
+See [Tester](../../roles/tester/) for the test budget and what happens when a
+check cannot run.
 
-The protocol then continues through documentation, final review, and
-synchronization. Final review uses the same independent-session rules after
-documentation. Invoke each role after its handoff. If it finds a problem in an
-earlier role's work, it sends the problem back to that role.
-[Synchronizer](../../roles/synchronizer/) reconciles current assessments and
-records before sign-off readiness. [Documenter](../../roles/documenter/) updates
-required documentation and records its evidence before independent final review.
+## 6. Review the implementation independently
 
-At `AWAITING_USER_SIGNOFF`, review the deliverables and evidence. You can sign
-off, request rework, or cancel. Completion is not inferred from a successful
-test run alone.
+After Tester's handoff, open a fresh chat separate from the conversations that
+produced the requirements, design, project context, code, and tests. Run:
 
-## What to check at each handoff
+```text
+$reviewer Continue IMPLEMENTATION review from .standards/STATE.md.
+```
 
-Check that the role saved its work, passed its completion checks, and updated
-`STATE.md` with the next state and any unfinished corrections. If a blocking
-question remains, the role stays in its current state.
+Reviewer checks the implementation against the requirements, design, and test
+evidence. It records concrete problems and who must fix them. A different model
+of equal or higher capability is recommended when known, but optional.
 
-For the complete sequence, see
-[Workflow States and Handoffs](../../concepts/states-and-handoffs/).
+If a correction is needed, follow the saved return instructions before
+continuing. Reviewer reassesses its findings after the responsible role fixes
+the work.
+
+## 7. Document the change
+
+After implementation review passes, invoke Documenter from the handoff. It
+checks how search actually works and updates the user guide and any other
+required documentation.
+
+Documenter saves what it checked, what changed, and the supporting evidence. The
+guide's completion is linked to `AC-004`.
+
+## 8. Check the finished work
+
+Documenter hands off to final Reviewer. Use a fresh chat separate from the
+conversations that authored the work, including documentation:
+
+```text
+$reviewer Continue FINAL_DELIVERABLE review from .standards/STATE.md.
+```
+
+Final review checks the assembled result, including the user guide and current
+evidence for every acceptance condition. Earlier pending work must now be
+resolved.
+
+After it passes, invoke Synchronizer. Synchronizer checks that the current
+files, completed assessments, and workflow records agree. If code changed after
+testing or review, the affected results must still be shown to apply.
+
+## 9. Decide whether to accept it
+
+When the workflow reaches `AWAITING_USER_SIGNOFF`, read the summary and review
+the work. You can:
+
+- **Sign off** to accept it and finish the cycle.
+- **Request changes** to return work to the responsible role.
+- **Cancel** to end the cycle without accepting it.
+
+Sign-off requires the checks to remain valid for the current files, with no
+unfinished corrections or blocking questions. Cancellation does not undo project
+changes. See [Human Decisions](../../concepts/human-decisions/).
+
+## If work stops along the way
+
+Answer a blocking question when a role needs your decision. If another role must
+fix a problem, follow the recovery handoff; it records where to return after the
+correction.
+
+You can continue in another chat from the saved records. Follow the
+[independent-chat requirements](../../concepts/states-and-handoffs/#independent-assessment-chats)
+when returning to Tester or Reviewer. See
+[Resuming Interrupted Work](../../guides/resuming-work/) for a walkthrough.

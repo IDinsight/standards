@@ -1,71 +1,77 @@
 ---
 title: Acceptance Criteria and Traceability
-description:
-  Carry stable acceptance identifiers from scope to verification evidence.
+description: Connect each requirement to the evidence that shows it is met.
 ---
 
-In a `STANDARD` cycle, each requirement has an ID such as `AC-001`. Scope,
-design, and test results use the same ID so you can follow the requirement from
-request to proof that it works. This is **acceptance traceability**.
+How do you know the finished work meets the request? In a standard cycle, Scoper
+gives each checkable outcome an ID, such as `AC-001`. Later roles use that same
+ID in the design, implementation plan, and assessment reports. This connection
+between requirements and evidence is called **acceptance traceability**.
 
-These rules also apply after promotion to standard work. Expedited work follows
-its [own completion rules](../states-and-handoffs/#expedited-forward-path).
+Expedited work is checked against the saved request instead. If it
+[becomes standard work](../states-and-handoffs/#promote-an-expedited-cycle),
+Scoper creates the acceptance conditions when the workflow reaches Scoping.
 
-## Scoper assigns identity
+## Give each outcome an ID
 
-Scoper writes an acceptance condition for each outcome that must be checked and
-gives it a unique `AC-NNN` ID within the cycle.
+Scoper writes the acceptance conditions: statements of what must be true for the
+work to count as done. Each gets an ID that is unique within the cycle.
 
-Keep independently checked outcomes separate. For example, a feature working
-correctly and its user guide being complete need separate conditions because
-different roles check them.
+Outcomes checked at different steps need separate conditions. For example:
 
-## Architect records coverage
+| ID       | Acceptance condition                                  |
+| -------- | ----------------------------------------------------- |
+| `AC-001` | A user can export the selected records as a CSV file. |
+| `AC-002` | The user guide explains how to export records.        |
 
-For each current ID, Architect records the design decisions or existing
-technical behavior that meet the condition. Existing behavior still needs
-coverage even when no design change is required.
+Tester can check the export behavior before Documenter finishes the guide.
+Combining both outcomes under one ID would make their progress harder to judge.
 
-Use **No architectural impact** only when the condition depends entirely on
-established nontechnical behavior or another workflow phase's work. State which
-behavior or phase satisfies it.
+Scoper owns what each condition means. Other roles refer to it; they send
+unclear or incorrect requirements back to Scoper.
 
-Technical acceptance criteria use the same IDs without changing the
-requirements.
+## Connect the design and implementation
 
-## Evidence follows the same identifiers
+Architect accounts for every current acceptance ID, explaining how the design or
+existing technical behavior supports it. Developer uses the same IDs to connect
+implementation steps to the requirements.
 
-Tester accounts for every current ID with evidence, a blocker, or a pending
-dependency on a later role. If a test cannot be completed, record what prevents
-it. Conditions that depend on later steps, such as documentation, stay pending
-until those steps provide evidence under the same ID.
+Some conditions need no technical design. For `AC-002` above, Architect can
+record **No architectural impact** and identify the documentation work it
+depends on. That label cannot excuse missing design for a technical requirement.
 
-Before `AWAITING_USER_SIGNOFF`, every current condition must have enough
-evidence to show it is met, with no unresolved blocker. Pending work is not
-proof. Tester records this in the cycle's
-[verification report](../../reference/templates/tester/), including relevant
-technical criteria, actual commands/results, and uncovered obligations. Unrun
-tests and Developer self-checks do not substitute for Tester evidence.
+## Follow the evidence
 
-Reviewer independently assesses this evidence against the current contract.
-Implementation review may retain explicitly permitted later-role dependencies
-under the same ID. Final review checks current evidence resolving them after
-documentation; an earlier pass does not prove the assembled work remains
-correct. See [review gates](../../reference/protocol/#review-gates).
+Tester accounts for every current condition with results, a reason it cannot yet
+be verified, or a dependency on a later role. Tests that were not run and
+Developer's own checks do not replace Tester's independent verification.
 
-Synchronizer then reconciles those assessments with the current deliverable and
-records. It checks that evidence still applies under the same acceptance IDs; it
-cannot close another role's findings or manufacture missing evidence. See
-[Synchronizer](../../roles/synchronizer/).
+A later dependency may remain open during implementation review only when the
+condition actually depends on that later work. For example, `AC-002` can wait
+for Documenter. A failing export test cannot be deferred that way.
+
+After documentation, final Reviewer checks that every current condition has
+sufficient evidence. Synchronizer checks that those assessments still apply to
+the files being offered for sign-off. Neither role invents missing evidence or
+closes another role's findings.
+
+The evidence stays in the responsible roles' records, linked by the same IDs.
+There is no separate master checklist to maintain. A condition marked pending is
+still unfinished; all current conditions need sufficient evidence before the
+cycle can be ready for your decision.
 
 ## Replanning preserves history
 
-Keep an ID when its condition still means the same thing. Use a new, unused ID
-for a new condition or a changed meaning. Mark removed and replaced IDs as
-retired; do not reuse or renumber them within the cycle.
+When a condition keeps its meaning, it keeps its ID. A new condition or a
+changed meaning gets a previously unused ID. Removed and replaced IDs are
+retired, never reused or renumbered within the cycle.
 
-When the set of current IDs changes, update completed documents and results that
-must cover the full set. Do this even if the code or design itself still works.
+For example, changing “export as CSV” to “export as JSON” replaces the
+condition; correcting a typo does not.
 
-See the [scope template](../../reference/templates/scoper/) and
-[protocol rules](../../reference/protocol/#acceptance-traceability).
+When requirements change, later roles must revisit any completed work that needs
+to cover the full set of conditions, even if the code is unchanged.
+
+See the [scope template](../../reference/templates/scoper/) for the record
+format and the [protocol](../../reference/protocol/#acceptance-traceability) for
+the full rules.

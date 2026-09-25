@@ -1,0 +1,51 @@
+---
+const { siteTitle, siteTitleHref } = Astro.locals.starlightRoute;
+---
+
+<a
+  class="standards-title"
+  href={siteTitleHref}
+  aria-label={`${siteTitle} - Built by IDinsight`}
+  translate="no"
+>
+  <span class="brand">{siteTitle}</span>
+  <span class="credit">
+    <span class="separator" aria-hidden="true">- </span>Built by <strong>IDinsight</strong>
+  </span>
+</a>
+
+<style>
+  .standards-title {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    min-width: 0;
+    color: var(--sl-color-text-accent);
+    text-decoration: none;
+    line-height: 1.25;
+  }
+
+  .brand {
+    font-size: 1.125rem;
+    font-weight: 800;
+    letter-spacing: 0.025em;
+    white-space: nowrap;
+  }
+
+  .credit {
+    color: var(--standards-credit);
+    font-size: 0.8125rem;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 63.99rem) {
+    .standards-title {
+      flex-direction: column;
+      gap: 0.125rem;
+    }
+
+    .separator {
+      display: none;
+    }
+  }
+</style>

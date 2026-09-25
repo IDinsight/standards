@@ -1,162 +1,104 @@
 ---
 title: Documenter
-description:
-  Maintain accurate documentation and project guidance with resumable evidence.
+description: Keep documentation accurate, useful, and easy to follow.
 ---
 
-Documenter makes the current change understandable and usable. It owns user- and
-project-facing documentation, documentation-only comments and docstrings, and
-project agent guidance outside managed framework blocks.
+Documenter helps people understand and use the change. It updates user guides,
+project documentation, comments, docstrings, and project-specific agent
+instructions outside the framework's managed sections.
 
 ## When to use it
 
-Invoke Documenter in `DOCUMENTING` during a `STANDARD` cycle, normally after
-implementation review or when recovery returns for documentation corrections.
-`EXPEDITED` omits it; a required documentation guarantee uses
-[promotion](../../concepts/states-and-handoffs/#promote-an-expedited-cycle).
-Invoking the skill with a file does not bypass workflow ownership.
+Run Documenter in `DOCUMENTING` during a standard cycle, normally after
+implementation review or when documentation needs correction. Expedited cycles
+skip this role; requiring its work means moving to the standard workflow.
+
+```text
+Codex:       $documenter Continue from .standards/STATE.md.
+Claude Code: /documenter Continue from .standards/STATE.md.
+```
 
 ## Inputs and output
 
-Documenter reads persisted state, scope, design, relevant project context,
-development, verification and review evidence, existing documentation, and
-actual behavior. It reconstructs committed and uncommitted work, including
-moved/deleted files and affected unchanged content. A clean diff does not mean
-there is no documentation assignment.
+Documenter reads the requirements, design, relevant project context, code,
+verification and review results, and existing documentation. It checks what the
+project actually does before describing it.
 
-Its evidence and progress live at `docs/documentation/<Active Work.Id>.md`, with
-matching `DOCUMENTATION` provenance and visible cycle ID. The path is derived
-from the ID, without a new state field. Unrelated, incorrectly marked, or unsafe
-content at that location blocks dependent work and is preserved. Ordinary guides
-and docstrings remain reusable project files.
+Alongside the updated documentation, it saves a
+[documentation record](../../reference/templates/documenter/) at
+`docs/documentation/<Active Work.Id>.md`. This records what was inspected and
+changed, checks performed, limitations, remaining work, and your collaboration
+choices. Reviewer and Synchronizer use it to assess the documentation later.
 
-The [record template](../../reference/templates/documenter/) saves assessed
-content identities, audience and purpose, current acceptance references, actual
-checks and limits, remaining work, discrepancies and owners, and resume context.
-Reviewer and Synchronizer use this evidence independently. It does not replace
-Tester evidence or become another authority for acceptance requirements.
+## Modes
 
-## Collaboration and target
+You can switch modes or resume later without losing those choices.
 
-Collaboration selects who applies documentation edits:
+### AUTONOMOUS
 
-- **AUTONOMOUS** is the default. Documenter applies changes and runs appropriate
-  checks without a routine plan-approval gate.
-- **GUIDED** provides one copy/paste step at a time. You apply it, then
-  Documenter inspects the actual saved file before continuing. A snippet or a
-  report that you applied it is not evidence of a saved update. Documenter still
-  saves its own progress record and required workflow state normally.
+The default. Documenter edits and checks the documentation without a separate
+plan-approval step.
 
-The target is selected separately:
+### GUIDED
 
-| Target           | Documentation selected                                |
-| ---------------- | ----------------------------------------------------- |
-| `FILE`           | A specified file.                                     |
-| `FOLDER`         | Relevant documentation in a specified directory.      |
-| `VERTICAL_SLICE` | One capability across related documentation surfaces. |
-| `ACTIVE_CHANGE`  | Documentation affected by the current cycle.          |
+Documenter gives you one edit to copy and paste at a time. After you apply it,
+Documenter inspects the saved result before continuing. It still saves its own
+progress and workflow records.
 
-A supplied file defaults new work to FILE/AUTONOMOUS. Without an explicit
-target, Documenter derives required documentation from the active cycle.
-Continuing interrupted work preserves the saved choices unless you change them.
+## Choose what to document
 
-A target limits editing, not the cycle's completion requirements. If other
-required documentation remains, Documenter saves that work and asks for the
-specific direction needed to proceed. It does not silently edit outside your
-boundary or claim the whole role complete after finishing one file.
+You can select a file, a folder, one feature across its related documents, or
+all documentation affected by the current change. These are called `FILE`,
+`FOLDER`, `VERTICAL_SLICE`, and `ACTIVE_CHANGE`; the last is the default.
 
-## Styles
-
-Universal guidance always applies: plain, natural language, necessary technical
-terms explained for the audience, accurate instructions, useful examples,
-consistent terminology, valid references, minimal duplication, and established
-conventions. Only relevant Python, TypeScript, HTML, and CSS documentation
-styles are loaded.
-
-User style defaults to `NONE`. Explicitly select `tony` or `tony.md` to load the
-Tony profile; Documenter never infers it from your identity, the file's
-existence, or Developer's profile. The persisted value is `tony`. Identifiers
-must name one direct child of the package's `user-styles/` directory; paths and
-traversal are rejected.
-
-Tony's profile uses NumPy-style Python docstrings. Function and method
-docstrings created or materially updated include an `Examples` section with one
-simple happy-path usage example grounded in actual behavior. Examples do not
-invent outputs or claim unperformed execution.
-
-For discretionary guidance, universal style takes precedence over the selected
-user style, then applicable technology styles. Correctness, ownership,
-authoritative project constraints, and protocol conflict handling still apply.
-You can change or clear your selection during the cycle; there is no cycle-long
-style lock or Developer plan-approval mechanism here.
-
-## Invoke it
-
-After the workflow has entered `DOCUMENTING`, use the command for your client:
-
-```text
-Codex: $documenter Continue the active workflow from .standards/STATE.md.
-Claude Code: /documenter Continue the active workflow from .standards/STATE.md.
-```
-
-Examples for Codex in that same state:
+For example, while the workflow is in `DOCUMENTING`:
 
 ```text
 $documenter Update docs/usage.md.
 $documenter Use GUIDED mode for docs/usage.md.
-$documenter Document the export capability as a VERTICAL_SLICE.
-$documenter Use user style tony for the active change's Python docstrings.
+$documenter Document the export feature as a VERTICAL_SLICE.
 ```
 
-Use `/documenter` for Claude Code. Mode and target changes do not themselves
-change the workflow contract or authorize another role's work.
+Use `/documenter` in Claude Code. A file request defaults to autonomous editing
+unless you choose guided work.
+
+Documenter respects your editing boundary. If other required documentation
+remains outside it, it records that work and asks how to proceed. Finishing one
+selected file does not automatically complete the cycle's documentation.
+
+## Writing styles
+
+Documenter follows shared guidance for plain language, accurate examples, and
+consistent terms, plus relevant language-specific documentation conventions. You
+can explicitly select an available personal style; none is selected by default.
+
+For example, `Use user style tony` selects NumPy-style Python docstrings with a
+simple usage example for functions and methods being written or substantially
+updated. It does not apply that format to unrelated guides.
+
+You may change or clear Documenter's personal style during the cycle. The choice
+is separate from Developer's locked coding style and cannot override correctness
+or project requirements.
 
 ## Completion and recovery
 
-Both collaboration modes and all targets share one completion gate. Required
-documentation across the active cycle must be assessed, saved, and supported by
-appropriate actual checks or justified current evidence. A sufficiently assessed
-no-change outcome is valid. Missing material evidence, required work beyond the
-target, pending guided edits, or Documenter-owned obligations prevent
+Documenter finishes when all required documentation for the change has been
+assessed, saved where changes are needed, and checked with sufficient evidence.
+It can also conclude that no changes are needed after checking the existing
+documentation. Pending guided edits or missing important evidence prevent
 completion.
 
-On resume, Documenter compares current inputs with recorded identities,
-invalidates unsupported conclusions, and explains why retained evidence still
-applies. It preserves all unresolved discrepancies before routing one to its
-owner. Correcting one obligation is progress; it does not by itself pass the
-full gate or finish the cycle.
+Sometimes an earlier role needs a documentation fix before it can continue. The
+protocol allows a
+[limited corrective return](../../reference/protocol/#documenter-corrective-return):
+Documenter verifies that fix and returns while recording documentation that must
+wait for the unfinished work. Its record stays incomplete. This cannot excuse
+unrelated defects or work that is already possible.
 
-An earlier role can need a small documentation correction before the feature is
-ready to document fully. The protocol's
-[Documenter Corrective Return](../../reference/protocol/#documenter-corrective-return)
-allows a verified correction to return to that role while the documentation
-record remains incomplete. Remaining work must genuinely depend on unfinished
-work in the saved recovery route; missing proof of the fix, unrelated defects,
-and actionable work outside the selected target cannot use this exception.
-GUIDED edits still require inspection of the saved result. The record preserves
-what remains, who must supply its prerequisites, and when to revisit it. Full
-documentation completion is still required before normal forward handoff.
+Normal completion goes to final Reviewer in a fresh chat separate from the
+authoring conversations. Corrections follow the saved recovery route.
 
-[Recovery](../../concepts/recovery/) takes priority over the normal next phase.
-Otherwise, full completion proceeds to `REVIEWING_FINAL`, Reviewer kind
-`FINAL_DELIVERABLE`. The handoff requests a fresh chat separate from authoring
-conversations, with the protocol's advisory model recommendation. Documenter
-persists enough evidence for that independent assessment and does not review its
-own authored documentation in the same conversation.
-
-## Boundaries and validation limits
-
-Documenter verifies the behavior it describes and routes defects rather than
-presenting defective behavior as fulfilling the contract. Code, tests, scope,
-design, context, review findings, and synchronization records keep their owners.
-Managed framework blocks, installed protocol, and installation metadata retain
-installer/protocol ownership. User-authored instructions are preserved, and
-material conflicts follow the protocol.
-
-Generated documentation follows the project's existing source and build
-workflow. Documentation checks establish only what they actually inspect or
-execute; they do not manufacture Tester-owned formal evidence.
-
-The package includes authored evaluation scenarios. Parsing them, checking
-structure, and building this site do not execute model evaluations or establish
-model behavior. The installer remains unfinished.
+Documenter sends code, test, design, and other problems to their owners. It
+updates the source of generated documentation rather than patching generated
+copies, and leaves managed framework instructions and installation files to
+their owners.

@@ -1,125 +1,98 @@
 ---
 title: Reviewer
-description: Independently assess implementation and final deliverables.
+description: Get an independent assessment of the implementation and final work.
 ---
 
-Reviewer checks whether the work can move forward. It examines relevant claims
-from all roles, including requirements, design, project context, implementation,
-tests, results, and documentation. Completed artifacts guide the assessment but
-do not prove their own correctness.
+Reviewer assesses whether work can move forward. It checks the requirements,
+design, implementation, tests, and other relevant evidence for errors or gaps.
+It explains concrete problems and who needs to fix them.
 
 ## Start in an independent session
 
-When the workflow enters either review state, open a fresh chat separate from
-the conversations that produced the artifacts under review. Ideally choose a
-different model of equal or higher capability than the authoring model, where
-known. This is advice, not a prerequisite or an automatic model switch.
+When the workflow reaches a review state, open a fresh chat separate from the
+conversations that created the work under review. This includes requirements,
+design, context, tests, and documentation, as well as code.
 
-Use the line for your client, with the kind matching the saved state:
+For implementation review:
 
 ```text
-Codex:       $reviewer Continue IMPLEMENTATION review from `.standards/STATE.md`.
-Claude Code: /reviewer Continue IMPLEMENTATION review from `.standards/STATE.md`.
+Codex:       $reviewer Continue IMPLEMENTATION review from .standards/STATE.md.
+Claude Code: /reviewer Continue IMPLEMENTATION review from .standards/STATE.md.
 ```
 
-For final review, replace `IMPLEMENTATION` with `FINAL_DELIVERABLE`. Read the
-persisted active work, relevant context and owned artifacts, and recovery
-context; for recovery, explicitly ask Reviewer to read the active frame.
+For final review, use `FINAL_DELIVERABLE` instead. During recovery, also ask
+Reviewer to read the active recovery frame.
 
-The
-[canonical session rules](../../reference/protocol/#independent-reviewer-session)
-apply on normal and recovery handoffs. Known authoring history requires a fresh
-session before formal review. Unavailable metadata is disclosed, without an
-invented freshness claim or routine confirmation gate. Reviewer can resume its
-own interrupted assessment.
+Ideally, choose a different model of equal or higher capability when those
+details are known. This is advice, not a requirement. Reviewer can resume its
+own assessment conversation. Unknown session or model details are disclosed
+rather than guessed; see the
+[independent-session rules](../../reference/protocol/#independent-reviewer-session).
 
 ## Inputs and output
 
-Reviewer reconstructs the active change from the saved request, role artifacts,
-repository history, and current files. That includes committed work, staged and
-unstaged changes, untracked files, deletions, and affected unchanged callers or
-dependencies. A clean working tree does not mean there is nothing to review.
-Inspection stays relevant to the active contract and affected boundaries.
+Reviewer checks saved requirements and role reports against the actual files,
+history, and results. A completion label or a passing command does not prove
+that all required behavior is correct.
 
-Two [review reports](../../reference/templates/reviewer/) belong to each cycle:
+The [review reports](../../reference/templates/reviewer/) are saved under
+`docs/reviews/<Active Work.Id>/`:
 
-- `docs/reviews/<Active Work.Id>/implementation.md`
-- `docs/reviews/<Active Work.Id>/final-deliverable.md`
+- `implementation.md` assesses the implementation in both cycle modes.
+- `final-deliverable.md` assesses the assembled work in standard cycles only.
 
-Each report records `REVIEW` provenance with the exact cycle and review kind,
-assessed content identities, checks and results, findings, limitations,
-dependencies, and progress. No review-path state field is needed. A conflicting
-file at a required path must be resolved without overwriting or adopting it.
+Each report records the work inspected, evidence, findings, unanswered
+questions, and whether this review can pass.
 
-## Modes and resumption
+## Modes
 
-The persisted state selects the kind:
+The saved state determines which review runs. Re-review uses the same mode:
+Reviewer checks fixes and changed inputs before reusing earlier conclusions.
+Only Reviewer resolves or withdraws its findings; an author's statement that a
+problem is fixed is not enough.
 
-| State                      | Kind                | Assessment                                                                                              |
-| -------------------------- | ------------------- | ------------------------------------------------------------------------------------------------------- |
-| `REVIEWING_IMPLEMENTATION` | `IMPLEMENTATION`    | Implementation, upstream consistency, Developer claims, and standard-cycle Tester evidence.             |
-| `REVIEWING_FINAL`          | `FINAL_DELIVERABLE` | Assembled work after documentation, current acceptance evidence, outstanding findings, and consistency. |
+### IMPLEMENTATION
 
-Both use one procedure and completion contract. Critical assessment always
-applies. Re-review after corrections is part of either mode, not a third mode.
+In `REVIEWING_IMPLEMENTATION`, Reviewer checks the implementation against the
+requirements and design, including Tester evidence in standard work. Expedited
+review checks the bounded request and Developer's evidence.
 
-On resumption, Reviewer compares current content with the report's assessed
-inputs, invalidates unsupported conclusions, and explains why retained evidence
-still applies. Changes to acceptance conditions require reconciliation even when
-code is unchanged. Reviewer checks fixes and affected boundaries independently;
-an author's claim that a finding is resolved is not enough.
+### FINAL_DELIVERABLE
 
-## Findings and role boundaries
+In `REVIEWING_FINAL`, Reviewer checks the assembled standard deliverable after
+documentation, including whether earlier evidence still applies and all required
+outcomes are supported.
 
-Reviewer prioritizes correctness, security, failure handling, resource use,
-compatibility, and material maintainability problems. Findings identify exact
-evidence, a concrete failure case and impact, severity, owner, and the smallest
-necessary correction. Cosmetic preferences, speculative improvements, and minor
-repetition are excluded. **No material findings** is a valid result.
+## Understanding findings
 
-P0 means a critical defect with immediate severe consequences; P1 means a
-serious failure; P2 means a bounded but material defect. All three block passing
-review until corrected or withdrawn on evidence. Questions and assessment
-limitations are recorded separately; a material evidence gap also blocks
-completion.
+A finding describes a concrete failure, its impact, supporting evidence, the
+responsible role, and the correction needed. Severity indicates urgency:
 
-Reviewer owns reports and corrections to its findings. It routes code problems
-to Developer, test/evidence problems to Tester, scope problems to Scoper, design
-problems to Architect, context problems to Auditor, and documentation problems
-to Documenter. It does not edit their artifacts to resolve findings. See
-[handling findings](../../guides/review-findings/).
+- **P0:** immediate, severe consequences.
+- **P1:** a serious failure in a core requirement or important protection.
+- **P2:** a narrower but still significant defect that needs correction.
 
-Reviewer may run established diagnostic checks without a routine confirmation
-question, subject to actual permissions. Those results support the review and do
-not replace Tester-owned formal acceptance evidence. New tests are not required
-for every change; evidence must fit the contract and project conventions.
-Typechecking alone cannot prove runtime behavior. Unavailable checks are
-recorded honestly, and required missing evidence prevents a pass.
+All unresolved findings at these levels prevent a pass. Cosmetic preferences and
+speculative improvements are not findings. **No material findings** is a valid
+outcome after sufficient assessment, but missing important evidence can still
+prevent completion.
+
+Reviewer assesses and reports; the responsible role makes the fix. See
+[Handling Review Findings](../../guides/review-findings/).
 
 ## Completion and handoff
 
-Reviewer completes only when the applicable
-[review gate](../../reference/protocol/#review-gates) passes with no unresolved
-material finding or assessment gap, blocking question, or obligation owned by
-that review state. Passing the gate does not finish the entire cycle.
+Reviewer explains whether work can move forward, what was checked, and what
+remains unverified. A pass requires sufficient current evidence and no
+unresolved material findings, assessment gaps, or blocking questions.
 
-Standard implementation review may retain a condition explicitly dependent on a
-later role with its owner, required evidence, and the same acceptance ID. It
-then normally hands off to Documenter. Final review checks current evidence for
-every condition, including resolved earlier dependencies, and normally hands off
-to Synchronizer. Recovery follows its saved route instead of these normal steps.
-The installer remains unfinished. See [Synchronizer](../synchronizer/) for
-reconciliation before sign-off.
+Standard implementation review normally goes to Documenter. A requirement that
+depends on that later work can remain explicitly pending at this point. Final
+review must have evidence for every current requirement and normally goes to
+Synchronizer.
 
-Expedited review assesses the bounded request and Developer evidence without
-demanding skipped artifacts. It can reach user sign-off after the expedited gate
-passes; it never fabricates final review. If an omitted guarantee becomes
-necessary, Reviewer promotes through the protocol.
-
-## A plain-language result
-
-The concise summary leads with whether work can move forward. It explains what
-is wrong, what could happen, and who needs to fix it without hiding uncertainty
-or severity. Technical terms are explained briefly; exact evidence stays in the
-report. With no material findings, Reviewer says so and briefly describes what
-was checked and what remains unvalidated.
+Expedited implementation review can go directly to your sign-off decision once
+its narrower completion requirements are met. It does not claim the skipped
+standard checks passed. If one becomes necessary, the cycle moves to standard
+work. During corrections, [recovery](../../concepts/recovery/) determines the
+next step instead.

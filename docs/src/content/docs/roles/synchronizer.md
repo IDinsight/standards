@@ -1,101 +1,67 @@
 ---
 title: Synchronizer
-description:
-  Reconcile completed assessments, the deliverable, and workflow records before
-  user sign-off.
+description: Check that the work offered for sign-off matches what was assessed.
 ---
 
-Synchronizer establishes whether completed assessments and records still apply
-to the current deliverable. Reviewer assesses whether the work is sound;
-Synchronizer checks that the work offered for sign-off is the work assessed.
+Synchronizer checks that the current files, completed assessments, and workflow
+records agree. For example, if code changed after testing and review, it checks
+whether those earlier results still support the work you are about to accept.
 
 ## When to use it
 
-Invoke Synchronizer in `SYNCHRONIZING` during a `STANDARD` cycle, normally after
-final review or when recovery returns to synchronization. `EXPEDITED` omits it;
-a required synchronization guarantee uses
-[promotion](../../concepts/states-and-handoffs/#promote-an-expedited-cycle).
+Run Synchronizer in `SYNCHRONIZING` during a standard cycle, normally after
+final review or when its own assessment needs correction. Expedited cycles skip
+this role.
+
+```text
+Codex:       $synchronizer Continue from .standards/STATE.md.
+Claude Code: /synchronizer Continue from .standards/STATE.md.
+```
 
 ## Inputs and output
 
-Synchronizer reads persisted state, scope, design, context, development plan,
-verification and review reports, relevant documentation and agent guidance,
-recovery, obligations, and blockers. It reconstructs committed and uncommitted
-work, including moved/deleted files and affected unchanged content. A clean diff
-or a documentation-only change still needs assessment.
+Synchronizer reads the scope, design, Auditor context, development plan,
+verification and review reports, Documenter's record, and the relevant project
+files. It compares the versions assessed with the current work and checks that
+every required outcome has sufficient evidence.
 
-The output is `docs/synchronization/<Active Work.Id>.md`, with matching
-`SYNCHRONIZATION` provenance and visible cycle ID. Its location is derived from
-the ID, without an extra state field. Existing unrelated or incorrectly marked
-content at that fixed path blocks dependent work and is preserved.
+Its [synchronization record](../../reference/templates/synchronizer/) is saved
+at `docs/synchronization/<Active Work.Id>.md`. It links to the supporting
+evidence, explains disagreements or missing information, and records whether
+work is ready for your decision.
 
-The [record template](../../reference/templates/synchronizer/) captures assessed
-identities, references to existing evidence, concrete discrepancies and owners,
-limits, and resume context. It does not duplicate reports or replace the
-acceptance records maintained by other roles.
+## Modes
 
-## One procedure for initial work and resumption
+Synchronizer has no separate modes. When you resume it, it checks what changed
+before reusing earlier conclusions. If requirements changed, it checks the full
+current set, even where the code stayed the same.
 
-There are no separate modes. On resumption, Synchronizer compares current inputs
-with recorded identities, invalidates unsupported conclusions, and explains why
-retained evidence still applies. Changed acceptance conditions require checking
-the entire current inventory under the same IDs.
-
-Repeated runs against unchanged inputs reuse sufficient assessment without
-unnecessary rewrites or duplicate discrepancies. “Everything is already
-consistent” is a valid outcome after checking the evidence.
-
-## Invoke it
-
-After the workflow has entered `SYNCHRONIZING`:
-
-```text
-Codex: $synchronizer Continue the active workflow from .standards/STATE.md.
-Claude Code: /synchronizer Continue the active workflow from .standards/STATE.md.
-```
-
-Use the command for your client. A skill invocation does not authorize work in a
-different role's state or automatically switch roles or models.
+A result of “everything is already consistent” is valid after sufficient
+inspection. There is no need to manufacture edits or duplicate earlier notes.
 
 ## Completion and handoff
 
-The [Synchronization Gate](../../reference/protocol/#synchronization-gate)
-requires current, applicable evidence for every acceptance condition and
-relevant technical criterion, consistent records, and no unresolved material
-discrepancy or reconciliation gap. Existing files and `COMPLETE` labels alone do
-not pass it.
+Work is ready for sign-off only when the required assessments still apply,
+records agree, all current requirements have sufficient evidence, and required
+corrections and recovery are finished. A file's existence or a `COMPLETE` label
+does not establish this by itself.
 
-Recovery normally follows the role's full gate. If an interrupted assessment is
-waiting for a Synchronizer-owned correction, the protocol's narrow
-[corrective-return rule](../../reference/protocol/#synchronizer-corrective-return)
-lets Synchronizer verify that correction and return while leaving its record
-incomplete. It preserves pending owner work and cannot bypass unrelated gaps or
-permit sign-off. Full synchronization must still pass before the cycle may enter
-`AWAITING_USER_SIGNOFF`, along with the other
-[Standard Cycle Completion](../../reference/protocol/#standard-cycle-completion)
-requirements, including completed recovery and resolved obligations.
+Synchronizer then moves the workflow to `AWAITING_USER_SIGNOFF` and explains
+what was checked and any remaining limitations. You can accept the work, request
+rework, or cancel. Synchronizer does not accept it for you.
 
-The summary leads with whether work can proceed to sign-off, explains blockers
-and their owners, and discloses what remains unvalidated. Readiness is not user
-acceptance. The user can sign off, request rework, or cancel.
+During recovery, a verified correction to Synchronizer's own record can
+sometimes return to an interrupted role before the full assessment is finished.
+That [limited return](../../reference/protocol/#synchronizer-corrective-return)
+keeps the record incomplete and cannot bypass the requirements for sign-off.
 
-## Boundaries and remaining dependencies
+## Who fixes disagreements
 
-Synchronizer corrects its own reconciliation record. Code and plan defects go to
-Developer; tests and formal evidence to Tester; acceptance meaning to Scoper;
-design to Architect; context to Auditor; and review findings or conclusions to
-Reviewer in the affected review kind. Project documentation and agent guidance
-go to Documenter. Managed framework blocks, installed protocol, and installation
-metadata retain installer/protocol ownership. User-authored instructions are
-preserved and material conflicts follow the protocol.
+Synchronizer corrects its own reasoning and record. It sends other problems to
+their owners: stale documentation to Documenter, invalid test evidence to
+Tester, and outdated review conclusions to the relevant Reviewer.
 
-Documenter's record at `docs/documentation/<Active Work.Id>.md` provides
-relevant documents and content identities, checks/results or limits, and the
-conditions they support. Synchronizer checks that evidence against the current
-deliverable; a completion label alone is insufficient. Missing required evidence
-blocks readiness, and Synchronizer cannot supply another role's completion work.
-The installer remains unfinished. See [Documenter](../documenter/) and
-[installation requirements](../../getting-started/installation/).
-
-The package includes authored evaluation scenarios. Structural validation and a
-documentation build do not execute those scenarios or validate model behavior.
+It does not supply another role's missing evidence or close that role's
+findings. If a disagreement prevents a reliable conclusion, it remains a blocker
+until resolved. See the
+[complete synchronization requirements](../../reference/protocol/#synchronization-gate).

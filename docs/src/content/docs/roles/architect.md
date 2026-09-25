@@ -1,77 +1,70 @@
 ---
 title: Architect
-description: Turn completed scope into a buildable technical design.
+description: Resolve the technical design before implementation.
 ---
 
-Architect makes the important technical decisions needed to build the completed
-scope. The design should tell Developer what is decided and which local
-implementation choices remain open.
+Architect turns the completed scope into a design Developer can build. It
+decides important questions such as how components communicate, where data
+lives, and how failures are handled. Local, easily reversible coding choices
+remain with Developer.
 
 ## When to use Architect
 
-Architect acts in `ARCHITECTING`, normally after Scoper or when recovery
-requires an architecture correction. It does not reopen settled scope decisions.
+Run Architect in `ARCHITECTING`, usually after Scoper or when the design needs
+correction. Expedited cycles skip this role; needing a consequential design
+decision is a reason to move to the standard workflow.
+
+```text
+Codex:       $architect Continue from .standards/STATE.md.
+Claude Code: /architect Continue from .standards/STATE.md.
+```
 
 ## Inputs and output
 
-Read the scope at `Active Work.Scope`, established constraints, current design
-when present, and relevant project context. In brownfield work, Auditor must
-have checked the context for the current cycle. Greenfield design and recovery
-reruns can proceed before the first scheduled audit without context when the
-needed facts are otherwise established.
+Architect reads the scope, established project constraints, existing design, and
+relevant Auditor context. Existing projects need valid context for this cycle. A
+new project's initial design can proceed before the first audit when the
+necessary facts are known.
 
-An appropriate unmarked project-owned design document can remain the canonical
-location. New files under `docs/specs/` must carry current-cycle `ARCHITECTURE`
-provenance. Never overwrite or adopt another cycle's STANDARDS artifact. Inspect
-ownership before editing and record the selected path in
-`Active Work.Architecture`. See
-[artifact provenance](../../concepts/ownership/#artifact-provenance).
+The [design document](../../reference/templates/architect/) explains the
+decisions, interfaces, data flow, technical checks needed to satisfy the
+requirements, and a rough build order. It covers every current acceptance ID
+from the scope. Where a condition needs no technical design, such as completing
+a user guide, the design explains which other work it depends on.
 
-The [architecture template](../../reference/templates/architect/) covers
-decisions, acceptance coverage, components, contracts, data and control flow,
-technical acceptance criteria, coarse build order, and important risks or
-alternatives. Developer owns the detailed `DEV-NNN` steps, progress, and
-execution; Architect's Build Plan is ordering guidance, not an approved
-development plan.
+Architect may update an appropriate existing project design document or create
+one under `docs/specs/`. The path is saved in `Active Work.Architecture`.
+Developer later writes the detailed implementation plan.
 
 ## Modes
 
-- **Foundation:** make or substantially change the system's basic design choices
-  and boundaries.
-- **Feature:** design a specific new feature whose own behavior is the main
-  risk.
-- **Evolution:** change an existing design where migration or compatibility is
-  the main concern.
-- **Cross-cutting:** define shared behavior or rules across multiple components.
+Architect chooses one mode based on the main design problem.
 
-Choose one mode by the primary design risk. If evidence changes that assessment,
-replace the mode rather than combining procedures. Modes do not alter ownership
-or completion requirements.
+### FOUNDATION
 
-## Example invocation
+Establish or substantially change the system's structure.
 
-After the workflow enters `ARCHITECTING`:
+### FEATURE
 
-```text
-Codex:       $architect Continue from `.standards/STATE.md`.
-Claude Code: /architect Continue from `.standards/STATE.md`.
-```
+Design a bounded capability within the existing structure.
+
+### EVOLUTION
+
+Change an existing design, with attention to migration and compatibility. For
+example, moving from one authentication system to another is an evolution
+problem when existing clients must keep working during the transition.
+
+### CROSS-CUTTING
+
+Define a shared technical rule across several components.
 
 ## Completion and handoff
 
-Every current scope acceptance identifier must have design coverage or an
-explicit **No architectural impact** entry with a reason. Technical acceptance
-criteria reference those same identifiers without changing their meaning.
+Architect finishes when the saved design covers the current requirements and
+resolves the important technical decisions. Initial greenfield design normally
+goes to Auditor; brownfield design with valid context goes to Developer.
+Corrections follow the saved recovery route.
 
-Meet the design template's requirements, resolve questions preventing
-completion, and save the design path in state. Normal initial greenfield
-completion hands off to Auditor; brownfield completion with valid context hands
-off to Developer. During recovery, follow the saved recovery frame.
-
-## Boundaries
-
-Do not write implementation, tests, audit findings, or reviews. Route changes to
-scope intent or defective acceptance identifiers to Scoper. Send missing or
-incorrect project facts that affect the design to Auditor. For important values
-passed between systems, specify their source or the rules that define them so
-Developer can implement the agreed design.
+Architect does not change what you asked for or write the implementation. If
+requirements are unclear, it returns them to Scoper. If required project facts
+are missing or wrong, it returns them to Auditor.

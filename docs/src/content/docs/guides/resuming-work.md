@@ -55,14 +55,13 @@ In either review state, read the corresponding report under
 `docs/reviews/<Active Work.Id>/`. Reconcile changed inputs, current acceptance
 conditions, and outstanding findings before reusing conclusions. Reviewer can
 resume its own independent session; authoring conversations require a fresh
-chat. See [Reviewer resumption](../../roles/reviewer/#modes-and-resumption).
+chat. See [Reviewer resumption](../../roles/reviewer/#modes).
 
 In `SYNCHRONIZING`, read `docs/synchronization/<Active Work.Id>.md` when
 present. Compare current inputs with assessed identities before retaining any
 conclusion, including an interrupted assessment. Use the same procedure after
 corrections; unchanged inputs need no duplicate entries or cosmetic rewrites.
-See
-[Synchronizer resumption](../../roles/synchronizer/#one-procedure-for-initial-work-and-resumption).
+See [Synchronizer resumption](../../roles/synchronizer/#modes).
 
 ## Resolve blockers without skipping gates
 

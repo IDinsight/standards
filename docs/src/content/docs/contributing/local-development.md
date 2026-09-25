@@ -1,78 +1,94 @@
 ---
 title: Local Development
-description: Run the documentation website and repository Markdown checks.
+description:
+  Preview the website, run checks, and understand documentation deployment.
 ---
 
-The documentation website is the `standards-docs` package under `docs/` in the
-root pnpm workspace. Use Node.js 22.12 or newer and pnpm 10.34.5, pinned in the
-root `package.json`. Root `docs:*` scripts delegate to the documentation
-package.
+Run the commands on this page from the repository root. The website lives in
+`docs/`; the root `docs:*` commands run its package scripts for you.
+
+Use Node.js 22.12 or newer and pnpm 10.34.5, as specified in the root
+`package.json`. Markdown checks also need `pre-commit`; CI uses version 4.2.0.
 
 ## Install and preview
-
-From the repository root:
 
 ```sh
 pnpm install --frozen-lockfile
 pnpm run docs:dev
 ```
 
-Open the local URL printed by Astro, including its `/standards/` prefix. The
-development command first synchronizes the protocol and template references,
-then starts the server.
+Open the URL printed by Astro with the `/standards/` prefix. The development
+command generates the protocol and template reference pages before starting the
+server.
 
-## Build and check links
+If the browser still shows old wording, reload it. If that does not help,
+restart the development server from this checkout. Changes to protocol or
+template sources also need `pnpm run docs:sync-reference` while the server is
+running.
+
+## Validate the site
 
 ```sh
 pnpm run docs:build
 pnpm run docs:check-links
+```
+
+Build first: the link checker reads the generated files in `docs/dist/`. It
+checks local pages, downloads, and heading anchors, including the site's
+`/standards/` prefix. It does not check external websites.
+
+To inspect the built site and search index:
+
+```sh
 pnpm run docs:preview
 ```
 
-The build writes the static site to `docs/dist/`. The link check validates local
-links and fragment targets in that output. It does not request external sites.
-The production preview is useful for checking the generated search index.
+Rebuild after further edits so the production preview includes them.
 
-## Markdown checks
+## Check Markdown
 
-The repository's pre-commit hook checks Markdown style:
+Run the same Markdown check as CI:
 
 ```sh
 pre-commit run markdownlint-cli2 --all-files
 ```
 
-To include a newly created page before it is tracked, pass its path explicitly:
+For selected files, including a new page not yet tracked by Git, pass their
+paths explicitly:
 
 ```sh
 pre-commit run markdownlint-cli2 --files docs/src/content/docs/index.md
 ```
 
-The root `make lint` target runs Prettier in write mode. It formats Markdown; it
-does not replace markdownlint's checks. Review its changes before committing.
+The root `make lint` command runs Prettier in write mode across Markdown,
+excluding `PROTOCOL.md`. It can change files beyond the page you are editing and
+does not replace the Markdown check above.
 
 ## Dependencies and generated files
 
-Commit the root `pnpm-lock.yaml` when dependencies change. It covers the root
-package and `docs/`; there is no separate docs lockfile. Keep Astro dependencies
-and scripts in `docs/package.json`, and Astro configuration and TypeScript
-settings in `docs/`.
+Use the root `pnpm-lock.yaml` for dependency changes; there is no separate docs
+lockfile. Website dependencies belong in `docs/package.json`, while
+`pnpm-workspace.yaml` registers the package and enables its generation hooks and
+permitted dependency build scripts.
 
-The root `pnpm-workspace.yaml` registers `docs/`, keeps reference-generation
-hooks enabled, and permits the existing native dependency install scripts.
-Install from the root so pnpm manages dependency locations and package links; do
-not move `node_modules/` manually. The root `.gitignore` excludes dependency
-directories throughout the repository. `docs/.gitignore` excludes `.astro/`,
-`dist/`, and generated reference copies.
+Keep generated output out of commits. Git ignores dependency directories, the
+docs cache and build output, generated reference pages, and their downloadable
+originals. See [Repository Structure](../repository-structure/) for the source
+locations.
 
-## GitHub Pages deployment
+## CI and deployment
 
-`.github/workflows/docs.yml` builds and checks pull requests and deploys pushes
-or manual runs on `main`. GitHub Pages must use **GitHub Actions** as its source
-in the repository settings. The workflow installs from the root using its pinned
-pnpm version and shared lockfile, runs the root documentation commands, and
-publishes `docs/dist/` without a `gh-pages` branch.
+The repository runs these checks for pull requests:
 
-`astro.config.mjs` sets the public site to
-<https://idinsight.github.io/standards/> using the `/standards/` base path.
-Local development and preview use that prefix too. The link checker reads this
-configuration to validate deployed URLs against the generated files.
+- **Documentation:** builds with Node.js 24 and runs the local link checker.
+- **Linting:** runs the Markdown check.
+- **Secret Scan:** checks pull requests targeting `main` for verified secrets.
+
+The documentation workflow also runs on pushes to `main` and manual runs. After
+a successful build, it deploys only non-PR runs on `main` to GitHub Pages. The
+repository's Pages source must be **GitHub Actions**.
+
+`docs/astro.config.mjs` sets the site to
+[the STANDARDS documentation](https://idinsight.github.io/standards/) and the
+base path to `/standards/`. The workflow publishes `docs/dist/`; it does not
+need a `gh-pages` branch. Workflow definitions are under `.github/workflows/`.

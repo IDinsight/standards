@@ -1,104 +1,81 @@
 ---
 title: Auditor
-description: Record the existing project facts needed for the current change.
+description: Establish the project facts a change depends on.
 ---
 
-Auditor records what already exists in the project and the constraints other
-roles must respect. It owns `.standards/CONTEXT.md`. Important claims need
-support from repository evidence or other established constraints.
+Auditor examines the existing project so later roles know what they are building
+on. It records relevant behavior, tools, commands, conventions, and constraints,
+with evidence for important claims. This account of the existing project is
+called its **baseline**.
 
 ## When to use Auditor
 
-Auditor acts in `AUDITING`: at the start of standard brownfield work, after
-expedited promotion, after initial greenfield Scope and Architecture, or during
-corrections to project context and any required repeat audits. Expedited cycles
-skip Auditor until promotion; their existing context may be out of date.
+Run Auditor in `AUDITING`: at the start of standard work in an existing project,
+after a new project's initial scope and design, or when project context needs
+correction. It also runs when expedited work moves to the standard workflow.
+
+```text
+Codex:       $auditor Continue from .standards/STATE.md.
+Claude Code: /auditor Continue from .standards/STATE.md.
+```
 
 ## Inputs and output
 
-Read the installed protocol, mode, state, and existing context first. Inspect
-the request, relevant outputs from earlier roles, project instructions, and
-repository areas needed for this cycle.
+Auditor uses the saved request, project instructions, repository files and
+history, previous context, and relevant work from other roles. It inspects
+without changing project code or inventing missing facts.
 
-The [context template](../../reference/templates/auditor/) records the baseline,
-stack, boundaries, commands, conventions, external systems, verification setup,
-relevant behavior, unknowns, and supporting evidence. Omit empty sections and
-avoid exhaustive inventories or an audit diary.
-
-## Promotion and cancellation audits
-
-After expedited promotion, read `Active Work.PromotionReason` even if the latest
-handoff has changed. Establish the pre-cycle baseline using context,
-version-control evidence, the active request, and other reliable evidence. Do
-not treat tentative implementation as an established constraint simply because
-it is already present. If uncertainty about that distinction would affect later
-work, record a blocking question and ask the user.
-
-Record significant tentative changes under **Active-Cycle Non-Baseline Work**,
-with each entry identifying the current `Active Work.Id`. Treat an entry as
-tentative only while its ID matches the active cycle. After `SIGNED_OFF` or
-`CANCELLED`, that label no longer applies, even if the ID has not changed. On
-later audits, use current evidence to decide whether to remove the entry, treat
-it as baseline, or keep it separate. Ask the user if its status is unclear; do
-not carry the old label into a new cycle unchecked.
-
-Whenever `Active Work.BaselineReconciliation` is not `NONE`, read every source
-cycle's `SourceCycle` and `Request` fields from the list, even after intervening
-handoffs or recovery. Use version-control evidence and explicit user input to
-determine whether each source's leftover changes are accepted baseline,
-reverted, or unresolved. Record accepted facts as baseline, omit reverted
-material, and block for unresolved status. Do not avoid this check by
-relabelling cancelled changes as tentative work from the new cycle.
-
-Keep every source cycle's ID and request until all listed changes have been
-checked and later roles can rely on the resulting baseline. Then set
-`BaselineReconciliation` to `NONE`. The latest `Handoff.Reason` cannot replace
-that list.
+Its output is `.standards/CONTEXT.md`, following the
+[context template](../../reference/templates/auditor/). The document gives later
+roles enough information to work without repeating the investigation. Planned
+design stays separate from facts about what already exists.
 
 ## Modes
 
-- **Greenfield:** the scheduled first audit after greenfield scope and design.
-- **Whole-repo:** no usable project-level baseline exists, or the baseline is
-  too unreliable to repair safely.
-- **Gapfill:** verify or refresh a usable baseline without a narrower target.
-- **Subtree:** inspect an explicit area more deeply while a usable project-level
-  baseline already exists.
+Auditor chooses the narrowest inspection that can establish reliable context. A
+focused inspection can broaden if it reveals wider problems. It cannot
+substitute for missing project-wide context.
 
-Choose the smallest audit that can answer the question. A subtree audit cannot
-substitute for a missing baseline. Escalate from subtree to gapfill when focus
-broadens, or to whole-repo when the baseline proves unusable. Gapfill can
-likewise escalate to whole-repo.
+### GREENFIELD
 
-When a subtree target exists only in direct user instruction, record it in
-`Active Work.AuditTarget` before relying on it. Clear it when completed,
-abandoned, or no longer describes the work being done.
+Inspect the starting repository after the initial scope and design, before
+implementation.
 
-## Example invocation
+### WHOLE-REPO
 
-After the workflow enters `AUDITING`:
+Establish a project-wide account when none is usable.
 
-```text
-Codex:       $auditor Continue from `.standards/STATE.md`.
-Claude Code: /auditor Continue from `.standards/STATE.md`.
-```
+### GAPFILL
+
+Check and refresh an otherwise useful account.
+
+### SUBTREE
+
+Examine a specified area more deeply while keeping valid project-wide context.
+
+## Promotion and cancellation audits
+
+When expedited work becomes standard work, Auditor separates what existed before
+the cycle from code written during it. That new code is still tentative: its
+presence does not decide the requirements or design.
+
+After cancellation, leftover changes are not automatically accepted as part of
+the project. Auditor checks every unresolved source cycle and asks you when
+their status is unclear. It clears the saved reconciliation list only after all
+listed sources are resolved. Old notes excluding a previous cycle's changes also
+need reassessment.
+
+See [cancellation and new cycles](../../guides/cancelling-and-new-cycles/) and
+[the saved reconciliation record](../../reference/runtime-files/#outstanding-baseline-reconciliation)
+for the detailed rules.
 
 ## Completion and handoff
 
-Context must describe the relevant existing project, support important claims,
-and state what is unknown. Resolve questions that prevent later work and
-complete any promotion or cancellation checks described above. Later roles
-should be able to find the important boundaries and commands without repeating
-the audit.
+Auditor finishes when the context is reliable enough for later work, important
+unknowns are resolved, and required checks of earlier changes are complete. A
+standard brownfield audit normally goes to Scoper; the initial greenfield audit
+goes to Developer. Corrections follow the saved recovery route.
 
-Without active recovery, a standard brownfield audit hands off to Scoper; the
-initial greenfield audit hands off to Developer. If corrected context reveals a
-problem in earlier work, follow the [recovery rules](../../concepts/recovery/).
-
-## Boundaries
-
-Auditor does not make scope, architecture, or implementation decisions. Planned
-design stays in the design document. Planned implementation changes do not
-automatically make the baseline stale.
-
-Inspect the project without changing it. Record configuration names when useful,
-but never secret values, credentials, or sensitive local-machine data.
+Auditor records facts. It leaves requirements to Scoper, design to Architect,
+and implementation to Developer. Expected implementation changes do not, by
+themselves, make otherwise valid context wrong.
