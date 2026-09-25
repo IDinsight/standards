@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.1](https://github.com/IDinsight/standards/compare/v0.1.0...v0.1.1) (2026-09-25)
+
+
+### Bug Fixes
+
+* **docs:** correct published installer guidance ([70aef89](https://github.com/IDinsight/standards/commit/70aef8992dd11d740c0cf64a0e230dcc4d6d5f8e))
+
 ## 0.1.0 (2026-09-25)
 
 
