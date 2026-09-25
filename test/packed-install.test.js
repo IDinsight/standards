@@ -40,12 +40,18 @@ try {
   const packageJson = JSON.parse(await readFile(path.join(packedRoot, 'package.json'), 'utf8'));
   assert.equal(packageJson.name, '@idinsight/standards');
   assert.equal(packageJson.bin.standards, './bin/standards.js');
+  assert.ok(packageJson.dependencies['@clack/prompts']);
   assert.ok((await stat(path.join(packedRoot, 'bin/standards.js'))).mode & 0o111);
   for (const asset of ['PROTOCOL.md', 'skills', 'templates', 'lib', 'bin']) {
     await compareTree(path.join(sourceRoot, asset), path.join(packedRoot, asset));
   }
 
-  const executable = path.join(packedRoot, 'bin/standards.js');
+  const consumer = path.join(temporary, 'consumer');
+  await mkdir(consumer);
+  await writeFile(path.join(consumer, 'package.json'), '{"private":true}\n');
+  await run('pnpm', ['add', '--save-exact', path.join(temporary, archives[0])], { cwd: consumer });
+  const installedRoot = path.join(consumer, 'node_modules/@idinsight/standards');
+  const executable = path.join(installedRoot, 'bin/standards.js');
   const version = await run(process.execPath, [executable, '--version']);
   assert.equal(version.stdout.trim(), packageJson.version);
 
@@ -66,7 +72,7 @@ try {
   // Simulate the next compatible package release without changing the source checkout.
   const [major, minor] = packageJson.version.split('.').map(Number);
   const nextVersion = `${major}.${minor + 1}.0`;
-  await writeFile(path.join(packedRoot, 'package.json'), `${JSON.stringify({
+  await writeFile(path.join(installedRoot, 'package.json'), `${JSON.stringify({
     ...packageJson, version: nextVersion,
   }, null, 2)}\n`);
   const upgraded = await run(process.execPath, [executable, 'install', '--project', project]);

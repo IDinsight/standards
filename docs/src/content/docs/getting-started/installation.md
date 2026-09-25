@@ -17,16 +17,20 @@ Or point it at a project from somewhere else:
 npx @idinsight/standards@latest install --project /absolute/path/to/project
 ```
 
-The command installs framework files into the project; it does not add a package
-dependency or start a workflow cycle. It prints the installed version, project
-mode, selected coding agents, number of changed paths, and any warnings.
+In a terminal, the command asks for an existing project directory (default: the
+current directory), project mode, and coding agents. It previews the exact paths
+it plans to change and asks for confirmation before writing. The command
+installs framework files into the project; it does not add a package dependency
+or start a workflow cycle. It prints the installed version, project mode,
+selected coding agents, number of changed paths, and any warnings.
 
 ## Choose a project mode and coding agent
 
-On a first install, the installer treats an empty or metadata-only directory as
-**greenfield** and a directory with other content as **brownfield**. Greenfield
-means there is no meaningful implementation to preserve; brownfield means there
-is. If the inferred mode is wrong, set it explicitly on the first run:
+On a first install, the installer suggests **greenfield** for an empty or
+metadata-only directory and **brownfield** for a directory with other content.
+Greenfield means there is no meaningful implementation to preserve; brownfield
+means there is. Choose the other mode in the prompt if needed, or set it with a
+flag:
 
 ```sh
 npx @idinsight/standards@latest install --mode brownfield
@@ -37,10 +41,15 @@ saved project mode; rerunning the installer cannot change it. See
 [Project and Cycle Modes](../../concepts/project-modes/) for how project mode
 affects the workflow.
 
-By default, the installer sets up skills for both Codex and Claude Code. Use
-`--client codex` or `--client claude` to install one. You can add the other on a
-later run. Invoke roles explicitly with `$scoper` in Codex or `/scoper` in
-Claude Code; the same pattern applies to the other roles.
+The coding-agent prompt initially selects both Codex and Claude Code. Use
+`--client codex` or `--client claude` to select one without that prompt. You can
+add the other on a later run. Invoke roles explicitly with `$scoper` in Codex or
+`/scoper` in Claude Code; the same pattern applies to the other roles.
+
+For scripts, pass `--yes` to skip prompts and confirmation. Omitted options then
+use the current directory, inferred first-install mode, and both clients. Runs
+without an interactive terminal also use those defaults automatically. A
+cancelled prompt or declined confirmation changes no project files.
 
 ## What the installer adds
 
@@ -102,7 +111,10 @@ not cancel the cycle or undo changes to your project. Stop active coding-agent
 work first, and save anything you want to keep from `.standards/` or the
 installed role directories.
 
-Preview the changes:
+Run `npx @idinsight/standards@latest uninstall` in a terminal to choose a
+project, see the removal preview, and confirm. It always removes the complete
+STANDARDS installation, including every installed client. To preview without
+prompts or changes, run:
 
 ```sh
 npx @idinsight/standards@latest uninstall --project /absolute/path/to/project --dry-run
@@ -110,10 +122,10 @@ npx @idinsight/standards@latest uninstall --project /absolute/path/to/project --
 
 The preview lists each path it will remove or update without changing files. A
 directory entry covers everything inside it; the preview does not list each
-nested file. After checking the paths, run:
+nested file. For a non-interactive removal after checking the paths, run:
 
 ```sh
-npx @idinsight/standards@latest uninstall --project /absolute/path/to/project
+npx @idinsight/standards@latest uninstall --project /absolute/path/to/project --yes
 ```
 
 It removes:

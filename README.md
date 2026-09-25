@@ -99,30 +99,36 @@ reference-generation commands.
 
 ## Install and Uninstall
 
-Install the latest public release into an existing project directory with
-Node.js 22.12 or newer:
+Install the latest public release with Node.js 22.12 or newer:
 
 ```sh
-npx @idinsight/standards@latest install --project /absolute/path/to/project
+npx @idinsight/standards@latest install
 ```
 
-Run the command from inside the project to omit `--project`. The installer does
-not add a package dependency or start a workflow cycle. See
+In a terminal, the installer asks for the project directory (default: the
+current directory), project mode, and coding agents, then previews its changes
+for confirmation. You can pass `--project`, `--mode`, and `--client` to supply
+answers; `--yes` skips all questions and uses the defaults for omitted options.
+Piped or automated runs also use those defaults without prompting. The installer
+does not add a package dependency or start a workflow cycle. See
 [Installation and Setup](docs/src/content/docs/getting-started/installation.md)
 for options, upgrades, and uninstall instructions.
 
-To preview removal from a project, run:
+Run `npx @idinsight/standards@latest uninstall` in a terminal to select a
+project, preview everything it will remove, and confirm. To preview removal
+without prompts or changes, run:
 
 ```sh
 npx @idinsight/standards@latest uninstall --project /absolute/path/to/project --dry-run
 ```
 
-Remove `--dry-run` to uninstall. This deletes the installed skills and the
-entire `.standards/` directory, including saved workflow history, context, and
-any files you added there. It also removes managed instruction blocks and
-matching installer-added settings. Project work outside the removed directories
-is preserved. Installer-created client directories are also removed when empty;
-existing files and directories stay. A globally installed CLI stays installed.
+Use `--yes` with `uninstall` to skip confirmation in scripts. Uninstall deletes
+the installed skills and the entire `.standards/` directory, including saved
+workflow history, context, and any files you added there. It also removes
+managed instruction blocks and matching installer-added settings. Project work
+outside the removed directories is preserved. Installer-created client
+directories are removed when empty. Existing files and directories stay. A
+globally installed CLI stays installed.
 
 The installer supports greenfield and brownfield projects. The authoritative
 installer and runtime requirements live in [`PROTOCOL.md`](PROTOCOL.md),
