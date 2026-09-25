@@ -9,6 +9,9 @@ import { applyOperations } from '../lib/install-files.js';
 import { checkUpgrade } from '../lib/installer.js';
 import { runCli } from '../lib/cli.js';
 
+const packageVersion = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8')).version;
+const incompatibleVersion = `${Number(packageVersion.split('.')[0]) + 1}.0.0`;
+
 async function fixture(run) {
   const root = await mkdtemp(path.join(os.tmpdir(), 'standards-installer-test-'));
   try { await run(root); } finally { await rm(root, { recursive: true, force: true }); }
@@ -23,7 +26,7 @@ test('first install creates both client skills and a greenfield runtime', () => 
   assert.equal(result.mode, 'GREENFIELD');
   assert.deepEqual(result.clients, ['codex', 'claude']);
   assert.match(await read(root, '.standards/PROTOCOL.md'), /standards:framework-owned/);
-  assert.equal(JSON.parse(await read(root, '.standards/VERSION.json')).version, '0.0.0');
+  assert.equal(JSON.parse(await read(root, '.standards/VERSION.json')).version, packageVersion);
   assert.match(await read(root, '.standards/MODE.md'), /`GREENFIELD`/);
   assert.match(await read(root, '.standards/STATE.md'), /`WorkflowState`: `SCOPING`/);
   assert.match(await read(root, '.agents/skills/scoper/agents/openai.yaml'), /allow_implicit_invocation: false/);
@@ -199,7 +202,7 @@ test('missing or incompatible version record blocks writes to an installed runti
   await assert.rejects(installProject({ projectRoot: root }), /missing \.standards\/VERSION\.json/);
   assert.equal(await read(root, '.standards/PROTOCOL.md'), protocol);
   await write(root, '.standards/VERSION.json', JSON.stringify({
-    framework: 'S.T.A.N.D.A.R.D.S.', version: '1.0.0',
+    framework: 'S.T.A.N.D.A.R.D.S.', version: incompatibleVersion,
   }));
   await assert.rejects(installProject({ projectRoot: root }), /Cross-major upgrade/);
   assert.equal(await read(root, '.standards/PROTOCOL.md'), protocol);

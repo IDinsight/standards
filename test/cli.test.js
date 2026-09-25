@@ -1,11 +1,13 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 
 import { parseArguments, runCli } from '../lib/cli.js';
 
 const projectRoot = fileURLToPath(new URL('../', import.meta.url));
+const packageVersion = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')).version;
 
 function output() {
   let text = '';
@@ -63,5 +65,5 @@ test('executable reports the package version', () => {
   const version = execFileSync(process.execPath, [fileURLToPath(new URL('../bin/standards.js', import.meta.url)), '--version'], {
     encoding: 'utf8',
   });
-  assert.equal(version, '0.0.0\n');
+  assert.equal(version, `${packageVersion}\n`);
 });
