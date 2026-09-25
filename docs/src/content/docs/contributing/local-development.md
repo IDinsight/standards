@@ -54,9 +54,9 @@ pnpm run test:package
 ```
 
 The package test creates a pnpm tarball in a temporary directory, checks the
-packed framework assets, and installs and reinstalls from that archive into a
-temporary project. It does not publish the package or install STANDARDS into
-this repository.
+packed framework assets, and tests installation, reinstallation, and a
+compatible upgrade in a temporary project. It does not publish the package or
+install STANDARDS into this repository.
 
 ## Check Markdown
 

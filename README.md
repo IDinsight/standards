@@ -99,11 +99,17 @@ reference-generation commands.
 
 ## Installation Model
 
-Use a published version of the project-level installer with pnpm:
+Install the latest public release into an existing project directory with
+Node.js 22.12 or newer:
 
 ```sh
-pnpm dlx @idinsight/standards@0.1.0 install --project /absolute/path/to/project
+npx @idinsight/standards@latest install --project /absolute/path/to/project
 ```
+
+Run the command from inside the project to omit `--project`. The installer does
+not add a package dependency or start a workflow cycle. See
+[Installation and Setup](docs/src/content/docs/getting-started/installation.md)
+for options and reinstall instructions.
 
 The installer supports greenfield and brownfield projects. The authoritative
 installer and runtime requirements live in [`PROTOCOL.md`](PROTOCOL.md),

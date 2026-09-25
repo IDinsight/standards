@@ -18,7 +18,7 @@ with the source that owns the change you want to make.
 | `docs/src/content/docs/` | Website content, including generated references.                      |
 | `docs/astro.config.mjs`  | Sidebar navigation, site URL, and base path.                          |
 | `docs/scripts/`          | Reference generation and local link checking.                         |
-| `.github/workflows/`     | Documentation, Markdown, secret-scan, and release workflows.          |
+| `.github/workflows/`     | Documentation, installer, Markdown, secrets, and release checks.      |
 
 ## Inside a role package
 
@@ -53,8 +53,8 @@ blocks, plus initial `.standards/CYCLE_IDS.md` and
 `templates/claude/.claude/settings.json` supplies the Claude Code role
 invocation settings.
 
-The CLI in `bin/` and `lib/` installs these templates and the role packages.
-Installation and preservation requirements are defined in the
+The published CLI in `bin/` and `lib/` installs these templates and the role
+packages. Installation and preservation requirements are defined in the
 [protocol](../../reference/protocol/#installed-runtime-contract).
 
 ## Website sources and generated files
