@@ -97,7 +97,7 @@ Run `pnpm run docs:build` and `pnpm run docs:check-links` to validate the
 documentation. See [the documentation README](docs/README.md) for preview and
 reference-generation commands.
 
-## Installation Model
+## Install and Uninstall
 
 Install the latest public release into an existing project directory with
 Node.js 22.12 or newer:
@@ -109,7 +109,20 @@ npx @idinsight/standards@latest install --project /absolute/path/to/project
 Run the command from inside the project to omit `--project`. The installer does
 not add a package dependency or start a workflow cycle. See
 [Installation and Setup](docs/src/content/docs/getting-started/installation.md)
-for options and reinstall instructions.
+for options, upgrades, and uninstall instructions.
+
+To preview removal from a project, run:
+
+```sh
+npx @idinsight/standards@latest uninstall --project /absolute/path/to/project --dry-run
+```
+
+Remove `--dry-run` to uninstall. This deletes the installed skills and the
+entire `.standards/` directory, including saved workflow history, context, and
+any files you added there. It also removes managed instruction blocks and
+matching installer-added settings. Project work outside the removed directories
+is preserved. Installer-created client directories are also removed when empty;
+existing files and directories stay. A globally installed CLI stays installed.
 
 The installer supports greenfield and brownfield projects. The authoritative
 installer and runtime requirements live in [`PROTOCOL.md`](PROTOCOL.md),

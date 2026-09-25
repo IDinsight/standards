@@ -67,3 +67,42 @@ test('executable reports the package version', () => {
   });
   assert.equal(version, `${packageVersion}\n`);
 });
+
+test('CLI parses uninstall separately from install and rejects unsafe or ambiguous options', () => {
+  assert.deepEqual(parseArguments(['uninstall']), {
+    command: 'uninstall', project: '.', dryRun: false,
+  });
+  assert.deepEqual(parseArguments(['uninstall', '--project=./example', '--dry-run']), {
+    command: 'uninstall', project: './example', dryRun: true,
+  });
+  for (const option of ['--force', '--client=codex', '--mode=greenfield', '--global']) {
+    assert.throws(() => parseArguments(['uninstall', option]), /Unknown uninstall option/);
+  }
+  assert.throws(() => parseArguments(['uninstall', '--dry-run=true']), /does not take a value/);
+  assert.throws(() => parseArguments(['uninstall', '--dry-run', '--dry-run']), /more than once/);
+  assert.throws(() => parseArguments(['uninstall', '--project']), /requires a value/);
+  assert.throws(() => parseArguments(['install', '--dry-run']), /Unknown install option/);
+});
+
+test('uninstall help explains deletion before resolving any project', async () => {
+  const stdout = output();
+  const stderr = output();
+  assert.equal(await runCli(['uninstall', '--help'], {
+    cwd: '/does-not-exist', stdout: stdout.stream, stderr: stderr.stream,
+  }), 0);
+  assert.match(stdout.read(), /entire .standards/);
+  assert.match(stdout.read(), /cycle-ID history/);
+  assert.match(stdout.read(), /global CLI stays installed/);
+  assert.equal(stderr.read(), '');
+});
+
+test('uninstall rejects missing and file targets before touching project files', async () => {
+  for (const project of ['./does-not-exist', './package.json']) {
+    const stdout = output();
+    const stderr = output();
+    assert.equal(await runCli(['uninstall', '--project', project], {
+      cwd: projectRoot, stdout: stdout.stream, stderr: stderr.stream,
+    }), 1);
+    assert.match(stderr.read(), /Project (directory does not exist|path is not a directory)/);
+  }
+});

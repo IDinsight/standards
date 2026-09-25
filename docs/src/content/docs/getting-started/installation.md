@@ -1,7 +1,6 @@
 ---
 title: Installation and Setup
-description:
-  Install STANDARDS in a project and connect its roles to your coding agent.
+description: Install, update, or remove STANDARDS from a project.
 ---
 
 STANDARDS is available as a public npm package. You need Node.js 22.12 or newer
@@ -95,3 +94,54 @@ fill in missing workflow history by guessing.
 
 The exact preservation and upgrade rules are in the
 [Installed Runtime Contract](../../reference/protocol/#installed-runtime-contract).
+
+## Uninstall from a project
+
+Uninstall removes STANDARDS from a project even if a cycle is active. It does
+not cancel the cycle or undo changes to your project. Stop active coding-agent
+work first, and save anything you want to keep from `.standards/` or the
+installed role directories.
+
+Preview the changes:
+
+```sh
+npx @idinsight/standards@latest uninstall --project /absolute/path/to/project --dry-run
+```
+
+The preview lists each path it will remove or update without changing files. A
+directory entry covers everything inside it; the preview does not list each
+nested file. After checking the paths, run:
+
+```sh
+npx @idinsight/standards@latest uninstall --project /absolute/path/to/project
+```
+
+It removes:
+
+- The entire `.standards/` directory, including saved workflow state, Auditor
+  context, cycle-ID history, and any files you added there.
+- Verified STANDARDS role directories for Codex and Claude Code, including local
+  edits inside them. If both clients are installed, both are removed.
+- The marked STANDARDS sections of `AGENTS.md` and `CLAUDE.md`. Your other text
+  and existing Claude imports remain; an empty file is removed.
+- Claude Code settings that the installer added, but only when their current
+  values still match. Changed settings and compatible settings that were already
+  there remain.
+
+Your implementation, plans, reports, tests, documentation, and unrelated skills
+outside the removed directories remain. The uninstaller removes a generated
+Claude settings file when only its defaults remain, then removes client
+directories it created if they are empty. It preserves files and directories it
+cannot verify as installer-created. If a client directory remains, inspect its
+contents before deleting anything manually. The global CLI is unaffected. You
+can omit `--project` when you run the command inside the project; there is no
+`--client` or `--force` option for uninstall.
+
+The uninstaller stops before removal if it cannot establish ownership or safely
+read an affected file. Missing workflow records do not prevent removal when
+ownership is clear. If a removal fails, it attempts to restore the files. If it
+reports an interrupted operation or incomplete recovery, keep the reported
+backup directory and resolve it before retrying. See the
+[uninstallation contract](../../reference/protocol/#project-uninstallation) for
+the recovery rules. A later install starts a fresh runtime and cycle-ID
+registry; it does not erase your remaining project work.

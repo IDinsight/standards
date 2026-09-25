@@ -74,7 +74,19 @@ try {
   assert.equal(JSON.parse(await readFile(path.join(project, '.standards/VERSION.json'), 'utf8')).version,
     nextVersion);
   assert.equal(await readFile(registryPath, 'utf8'), registry);
-  process.stdout.write(`Packed @idinsight/standards@${packageJson.version}: assets, install, reinstall, and compatible upgrade verified\n`);
+  const preview = await run(process.execPath, [executable, 'uninstall', '--project', project, '--dry-run']);
+  assert.match(preview.stdout, /Would uninstall STANDARDS/);
+  assert.equal(await readFile(registryPath, 'utf8'), registry);
+  const removed = await run(process.execPath, [executable, 'uninstall', '--project', project]);
+  assert.match(removed.stdout, /Uninstalled STANDARDS/);
+  assert.equal((await readdir(project)).includes('.standards'), false);
+  assert.equal((await readdir(project)).includes('.agents'), false);
+  assert.equal((await readdir(project)).includes('.claude'), false);
+  const repeated = await run(process.execPath, [executable, 'uninstall', '--project', project]);
+  assert.match(repeated.stdout, /No STANDARDS installation found/);
+  const fresh = await run(process.execPath, [executable, 'install', '--project', project]);
+  assert.match(fresh.stdout, /Installed STANDARDS/);
+  process.stdout.write(`Packed @idinsight/standards@${packageJson.version}: assets, install, reinstall, compatible upgrade, and uninstall verified\n`);
 } finally {
   await rm(temporary, { recursive: true, force: true });
 }

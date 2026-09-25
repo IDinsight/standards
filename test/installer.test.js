@@ -34,6 +34,9 @@ test('first install creates both client skills and a greenfield runtime', () => 
   assert.match(await read(root, 'CLAUDE.md'), /@AGENTS.md/);
   const manifest = JSON.parse(await read(root, '.standards/INSTALLATION.json'));
   const settings = JSON.parse(await read(root, '.claude/settings.json'));
+  assert.deepEqual(manifest.createdPaths, [
+    '.agents', '.agents/skills', '.claude', '.claude/skills', '.claude/settings.json',
+  ]);
   assert.equal(Object.keys(manifest.managedClientSettings['.claude/settings.json'].skillOverrides).length, 9);
   assert.equal(Object.keys(settings.skillOverrides).length, 9);
   assert.deepEqual((await readdir(root)).filter((name) => name.startsWith('.standards-install-')), []);
@@ -71,6 +74,8 @@ test('brownfield install preserves project instructions and compatible unowned s
     .managedClientSettings['.claude/settings.json'].skillOverrides;
   assert.equal(owned.scoper, undefined);
   assert.equal(Object.keys(owned).length, 8);
+  assert.deepEqual(JSON.parse(await read(root, '.standards/INSTALLATION.json')).createdPaths,
+    ['.agents', '.agents/skills', '.claude/skills']);
   assert.equal(await read(root, 'src/app.js'), 'export const app = true;\n');
 }));
 

@@ -17,7 +17,7 @@ This page describes the required layout installed by the CLI. See
 | ------------------------------ | --------------------------------------------------------------------- |
 | `.standards/CONTEXT.md`        | Auditor's record of the existing project, created when an audit runs. |
 | `.standards/CYCLE_IDS.md`      | Reserved cycle IDs; entries cannot be reused.                         |
-| `.standards/INSTALLATION.json` | Client-setting changes actually made by the installer.                |
+| `.standards/INSTALLATION.json` | Client settings and paths created by the installer.                   |
 | `.standards/MODE.md`           | The project's greenfield or brownfield mode.                          |
 | `.standards/PROTOCOL.md`       | Shared workflow rules, aligned with the installed skills.             |
 | `.standards/STATE.md`          | Current workflow step, request, handoff, and recovery.                |
@@ -126,10 +126,11 @@ the cycle from the project as it existed beforehand. See
 project instructions. `CLAUDE.md` provides the Claude Code import. The installer
 must preserve project-owned text and compatible existing settings.
 
-`INSTALLATION.json` records only client-setting changes the installer actually
-made. Reinstall, upgrade, and removal use it to avoid claiming or undoing your
-own settings. A compatible setting that already existed remains yours. A missing
-installation record must not be reconstructed by guessing.
+`INSTALLATION.json` records only client-setting changes and client paths the
+installer actually created. Reinstall, upgrade, and removal use it to avoid
+claiming or undoing your own settings or paths. A compatible setting that
+already existed remains yours. A missing installation record must not be
+reconstructed by guessing.
 
 Normal reinstall must preserve project mode, workflow state, and the cycle-ID
 registry. Upgrades must keep the protocol and skills aligned without resetting
@@ -138,6 +139,15 @@ upgrades within the same major line; downgrades and cross-major upgrades are
 rejected. Missing required fields and conflicting settings require resolution,
 not inferred defaults. See
 [the installation contract](../protocol/#installed-runtime-contract).
+
+Explicit project uninstall ends the runtime's lifetime and deletes all of
+`.standards/`, including context and cycle-ID history. It preserves project work
+outside the runtime and installed skills, removes only managed instruction
+blocks, and reverses only matching recorded settings. It removes recorded client
+directories when they become empty and a recorded Claude settings file when only
+its generated defaults remain. Unverified files or directories remain. See
+[Uninstall from a project](../../getting-started/installation/#uninstall-from-a-project)
+to preview removal before making changes.
 
 ## Plans, reports, and Navigator
 

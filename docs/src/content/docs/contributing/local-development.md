@@ -54,9 +54,22 @@ pnpm run test:package
 ```
 
 The package test creates a pnpm tarball in a temporary directory, checks the
-packed framework assets, and tests installation, reinstallation, and a
-compatible upgrade in a temporary project. It does not publish the package or
-install STANDARDS into this repository.
+packed framework assets, and tests installation, reinstallation, a compatible
+upgrade, uninstall preview, removal, and fresh installation in a temporary
+project. The installer tests also cover preservation of project files and
+settings, ownership failures, and rollback of removals. These checks do not
+publish the package or install STANDARDS into this repository.
+
+To preview the local uninstaller against a project before publishing a release:
+
+```sh
+node bin/standards.js uninstall --project /absolute/path/to/project --dry-run
+```
+
+Remove `--dry-run` only when you intend to remove its installed framework and
+saved workflow history. This runs the code in your checkout;
+`npx @idinsight/standards@latest` uses the published release, while an existing
+global command uses its installed version.
 
 ## Check Markdown
 

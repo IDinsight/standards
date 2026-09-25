@@ -1463,8 +1463,8 @@ An installed project should provide:
 - `.standards/PROTOCOL.md`: installed canonical protocol;
 - `.standards/VERSION.json`: installed framework version used to check upgrade
   eligibility;
-- `.standards/INSTALLATION.json`: installer-owned metadata for only the
-  client-setting mutations S.T.A.N.D.A.R.D.S. actually created;
+- `.standards/INSTALLATION.json`: installer-owned metadata for the client-setting
+  mutations and client paths S.T.A.N.D.A.R.D.S. actually created;
 - `.standards/CYCLE_IDS.md`: protocol-owned append-only registry of allocated
   cycle IDs for the lifetime of the installed runtime;
 - `.standards/MODE.md`: current `ProjectMode`;
@@ -1487,6 +1487,11 @@ and record only mutations the installer actually created. Never retroactively
 claim compatible pre-existing settings. `.standards/CYCLE_IDS.md` is protocol
 coordination data, not installer metadata; preserve it for the entire lifetime
 of the installed runtime as defined by **Cycle ID Registry**.
+
+Record a client directory or settings file in `createdPaths` only if that exact
+path was absent before installation created it. Supported paths are `.agents`,
+`.agents/skills`, `.claude`, `.claude/skills`, and `.claude/settings.json`.
+Preserve this record across reinstall and upgrade.
 
 `.standards/VERSION.json` records the installed framework release separately
 from settings ownership and workflow state. Reinstallation with the same version
@@ -1541,6 +1546,10 @@ After ownership checks:
   unowned value without claiming it; report conflicting values rather than
   overriding them. Existing manifest ownership remains valid only for the exact
   path and installed value recorded.
+- Record ownership of newly created client directories and the Claude settings
+  file separately from individual setting keys. Never record a pre-existing
+  file or directory as created by the installer, even when it is empty or has
+  only compatible values.
 - Preserve an existing verified `.standards/INSTALLATION.json` and update only
   installer-owned metadata. If it is unexpectedly missing from an otherwise
   verified runtime, stop and report the incomplete runtime; never reconstruct
@@ -1567,6 +1576,63 @@ After ownership checks:
 
 Installation does not fabricate completed workflow artifacts such as scope,
 technical design, project context, tests, reviews, or documentation.
+
+### Project Uninstallation
+
+An explicit `standards uninstall` removes the project's installed runtime and
+all verified STANDARDS skill packages for Codex and Claude Code. It is allowed
+in either project mode, with or without an active cycle. Removal ends the
+runtime's lifetime; it does not complete, sign off, cancel, or revert project
+work. The globally installed CLI is unaffected.
+
+- Default to the current directory; accept `--project <path>` for an existing
+  project directory. Offer `--dry-run` to report every planned path removal or
+  shared-file update without writing files. Help and preview output must explain
+  that removing `.standards/` deletes saved workflow state, Auditor context,
+  cycle-ID history, and any other content in that directory.
+- Require the runtime ownership marker and a valid, supported
+  `.standards/INSTALLATION.json` before removal. Do not infer settings ownership
+  from current values. Unknown ownership records require an uninstaller that
+  understands them. Missing or invalid workflow metadata does not prevent
+  explicit removal when ownership is established; uninstall does not need a
+  valid version, mode, state, or cycle-ID registry and is not an upgrade.
+- Discover marked skill packages under `.agents/skills/` and `.claude/skills/`,
+  including marked roles absent from the current distribution. Remove their
+  entire verified directories. Remove a recorded client parent directory only
+  if it is empty after planned removals. Preserve unrecorded or nonempty client
+  directories and unrelated skills; stop on a collision at a known framework
+  role rather than adopting it.
+- Remove only the bounded STANDARDS block from `AGENTS.md` and `CLAUDE.md`.
+  Preserve all text outside it, including unbounded `@AGENTS.md` imports. Delete
+  either file only when its remaining content is whitespace. Malformed or
+  duplicate boundaries must stop removal before mutation.
+- Remove each recorded client setting only if its current value exactly matches
+  the recorded installed value. Preserve changed values and report them; leave
+  absent settings absent. Preserve compatible settings not recorded as owned,
+  unrelated settings, and files or containers whose creation was not recorded.
+  Remove `.claude/settings.json` only if its creation was recorded and, after
+  reverting owned settings, it contains exactly the installer-created `$schema`
+  and an empty `skillOverrides` object. Otherwise retain the file and preserve
+  unrelated or changed content. If `createdPaths` is absent, retain the file and
+  parent directories even if they look like installer output.
+- Validate all affected paths and settings before making changes. Refuse symlinks
+  in affected paths or within directories to be removed. Do not follow unrelated
+  skill symlinks. A missing runtime with remaining marked skills or integration
+  blocks is an incomplete installation requiring ownership recovery, not
+  permission to guess. With no runtime or identifiable remnants, report a no-op.
+- Apply shared-file changes and skill removals before removing `.standards/`.
+  Retain backups during the operation and restore prior files on an ordinary
+  failure. If recovery fails, retain backups and report their location. An
+  interrupted process may leave a partial operation; retain a mapping from
+  backups to original paths and block both install and uninstall until it is
+  resolved. Do not claim atomicity across process interruption.
+- Preserve implementation, plans, reports, tests, and documentation outside the
+  removed runtime and verified skill directories. A later fresh installation
+  starts a new runtime and registry; existing artifacts and cycle markers still
+  require collision checks when allocating new cycle IDs.
+
+There is no force removal or client-only uninstall. Removing one client while
+retaining shared runtime ownership requires a separate contract.
 
 ## Canonical Terms
 
