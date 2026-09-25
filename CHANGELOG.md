@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/IDinsight/standards/compare/v0.1.1...v0.2.0) (2026-09-25)
+
+
+### Features
+
+* **installer:** add project uninstall with owned-file cleanup ([a141daf](https://github.com/IDinsight/standards/commit/a141dafca9482e846762aa4a460854d675ea83ee))
+
 ## [0.1.1](https://github.com/IDinsight/standards/compare/v0.1.0...v0.1.1) (2026-09-25)
 
 
