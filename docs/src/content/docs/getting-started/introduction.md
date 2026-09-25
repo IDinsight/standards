@@ -79,5 +79,5 @@ active cycle. It never edits files or changes workflow state.
 
 [Your First Workflow](../first-workflow/) follows a search feature through the
 standard workflow. It assumes the project has been set up for STANDARDS. The
-[installation page](../installation/) describes the requirements; the repository
-does not yet provide an installer command.
+[installation page](../installation/) gives the installer command and explains
+the runtime files it creates.

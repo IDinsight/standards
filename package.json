@@ -1,16 +1,38 @@
 {
-  "name": "standards",
-  "private": true,
-  "type": "module",
-  "engines": {
-    "node": ">=22.12.0"
-  },
-  "packageManager": "pnpm@10.34.5",
-  "scripts": {
-    "docs:dev": "pnpm --filter standards-docs run dev",
-    "docs:build": "pnpm --filter standards-docs run build",
-    "docs:preview": "pnpm --filter standards-docs run preview",
-    "docs:check-links": "pnpm --filter standards-docs run check-links",
-    "docs:sync-reference": "pnpm --filter standards-docs run sync-reference"
-  }
+	"bin": {
+		"standards": "./bin/standards.js"
+	},
+	"description": "S.T.A.N.D.A.R.D.S. framework installer for coding agents",
+	"engines": {
+		"node": ">=22.12.0"
+	},
+	"files": [
+		"bin/",
+		"lib/",
+		"PROTOCOL.md",
+		"skills/",
+		"templates/"
+	],
+	"license": "MIT",
+	"name": "@idinsight/standards",
+	"packageManager": "pnpm@10.34.5",
+	"publishConfig": {
+		"access": "public"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/IDinsight/standards.git"
+	},
+	"scripts": {
+		"docs:dev": "pnpm --filter standards-docs run dev",
+		"docs:build": "pnpm --filter standards-docs run build",
+		"docs:preview": "pnpm --filter standards-docs run preview",
+		"docs:check-links": "pnpm --filter standards-docs run check-links",
+		"docs:sync-reference": "pnpm --filter standards-docs run sync-reference",
+		"test:cli": "node --test test/cli.test.js",
+		"test:installer": "node --test test/installer.test.js",
+		"test:package": "node test/packed-install.test.js"
+	},
+	"type": "module",
+	"version": "0.0.0"
 }

@@ -1,5 +1,7 @@
 # S.T.A.N.D.A.R.D.S. — A Framework for Coding with Agents
 
+[Check out our official documentation here!](https://idinsight.github.io/standards/)
+
 - **S**coper
 - **T**ester
 - **A**rchitect
@@ -97,10 +99,15 @@ reference-generation commands.
 
 ## Installation Model
 
-The repository is intended to be installable into either greenfield or
-brownfield projects. The authoritative installer and runtime requirements live
-in [`PROTOCOL.md`](PROTOCOL.md), especially **Installed Runtime Contract** and
-**Installer File Preservation**.
+Use a published version of the project-level installer with pnpm:
+
+```sh
+pnpm dlx @idinsight/standards@0.1.0 install --project /absolute/path/to/project
+```
+
+The installer supports greenfield and brownfield projects. The authoritative
+installer and runtime requirements live in [`PROTOCOL.md`](PROTOCOL.md),
+especially **Installed Runtime Contract** and **Installer File Preservation**.
 
 At a high level, installation selects the initial project mode, installs the
 protocol and workflow skills for the chosen coding agent, applies explicit-only
@@ -117,11 +124,12 @@ project/
 ├── AGENTS.md
 ├── CLAUDE.md
 ├── .standards/
-│   ├── PROTOCOL.md
-│   ├── INSTALLATION.json
 │   ├── CYCLE_IDS.md
+│   ├── INSTALLATION.json
 │   ├── MODE.md
-│   └── STATE.md
+│   ├── PROTOCOL.md
+│   ├── STATE.md
+│   └── VERSION.json
 └── <agent-specific skill installation>
 ```
 

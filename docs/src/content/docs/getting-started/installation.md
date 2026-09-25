@@ -4,14 +4,35 @@ description:
   Prepare the workflow files and connect the skills to your coding agent.
 ---
 
-This page describes what installation must set up. The repository does not yet
-provide an installer command. Copying one skill file is not enough: the workflow
-files, client settings, and record of installer changes must work together.
+The installer is a project-level setup command distributed as the
+`@idinsight/standards` package. It does not add a dependency to your project.
+Use a published version of the package.
+
+```sh
+pnpm dlx @idinsight/standards@0.1.0 install --project /absolute/path/to/project
+```
+
+The project directory must already exist. Without `--project`, the installer
+targets the current directory. It installs both Codex and Claude Code skills by
+default. Use `--client codex` or `--client claude` to install one client; a
+later run can add the other client without removing the first. For an
+unpublished checkout, use
+`node bin/standards.js install --project /absolute/path/to/project` from the
+repository root instead.
+
+The command installs files but does not start a workflow cycle. It reports the
+target, installed framework version, mode, clients, changed path count, and any
+warnings. [pnpm dlx](https://pnpm.io/motivation) runs a package executable
+without adding it as a project dependency.
 
 ## Choose the initial project mode
 
 Use `GREENFIELD` when there is no substantial existing implementation to
-preserve. Otherwise use `BROWNFIELD`.
+preserve. Otherwise use `BROWNFIELD`. The installer infers a first-install mode
+from the target directory: an empty or metadata-only directory is greenfield;
+other content is treated as brownfield. If that conservative inference is wrong,
+specify `--mode greenfield` or `--mode brownfield` on the first install. An
+existing runtime keeps its saved mode; the installer does not change it.
 
 Installation sets `CycleMode: UNSET`, `PendingCycleMode: UNSET`,
 `PendingCycleRequest: UNSET`, and `PendingCycleBlockedOn: NONE`. The project
@@ -32,17 +53,22 @@ project/
 ├── AGENTS.md
 ├── CLAUDE.md
 ├── .standards/
-│   ├── PROTOCOL.md
-│   ├── INSTALLATION.json
 │   ├── CYCLE_IDS.md
+│   ├── INSTALLATION.json
 │   ├── MODE.md
-│   └── STATE.md
-└── <client-specific skill installation>
+│   ├── PROTOCOL.md
+│   ├── STATE.md
+│   └── VERSION.json
+├── .agents/skills/<role>/    # Codex, when selected
+└── .claude/skills/<role>/    # Claude Code, when selected
 ```
 
 `CONTEXT.md` is created by Auditor when an audit runs. Installation must not
 create context, scope, design, or development-plan files that pretend those
 roles have completed their work.
+
+`VERSION.json` records the installed framework release. `INSTALLATION.json`
+records only client-setting values that the installer itself added.
 
 ## Client integration
 
@@ -69,6 +95,19 @@ instructions or settings require user resolution.
 
 Reinstallation must not reset an active cycle, duplicate integration blocks, or
 claim ownership of settings that already existed.
+
+To reinstall or upgrade, run the same command with the desired published
+version. A newer minor or patch version within the installed major line can
+update the protocol and skills together while preserving mode, state, cycle IDs,
+and Auditor context. The installer rejects downgrades and cross-major upgrades.
+A major release needs a separately designed migration process for an existing
+runtime; it can still be installed into a fresh project. Pin an exact version
+when you need repeatable installation.
+
+If the installer reports an unowned file collision, conflicting Claude setting,
+missing runtime file, invalid workflow state, or interrupted transaction,
+inspect that condition before retrying. It does not infer missing workflow
+history or discard existing project files to complete an upgrade.
 
 Preserve existing workflow data during upgrades. Missing required fields or
 invalid formats must be corrected, not filled with inferred defaults. Preserve

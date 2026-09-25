@@ -45,6 +45,19 @@ pnpm run docs:preview
 
 Rebuild after further edits so the production preview includes them.
 
+## Validate the installer
+
+```sh
+pnpm run test:cli
+pnpm run test:installer
+pnpm run test:package
+```
+
+The package test creates a pnpm tarball in a temporary directory, checks the
+packed framework assets, and installs and reinstalls from that archive into a
+temporary project. It does not publish the package or install STANDARDS into
+this repository.
+
 ## Check Markdown
 
 Run the same Markdown check as CI:
@@ -81,6 +94,7 @@ locations.
 The repository runs these checks for pull requests:
 
 - **Documentation:** builds with Node.js 24 and runs the local link checker.
+- **Installer:** runs the CLI and installer tests and checks the pnpm tarball.
 - **Linting:** runs the Markdown check.
 - **Secret Scan:** checks pull requests targeting `main` for verified secrets.
 

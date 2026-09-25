@@ -8,20 +8,20 @@ The **runtime** is the installed framework's files and settings in a project.
 The files under `.standards/` hold rules and saved progress; plans, reports,
 tests, and project documentation live separately.
 
-This page describes the required layout. The repository provides templates and
-client configuration, but does not yet provide an installer command. See
+This page describes the required layout installed by the CLI. See
 [Installation and Setup](../../getting-started/installation/).
 
 ## Files at a glance
 
 | File                           | Purpose                                                               |
 | ------------------------------ | --------------------------------------------------------------------- |
-| `.standards/PROTOCOL.md`       | Shared workflow rules, aligned with the installed skills.             |
+| `.standards/CONTEXT.md`        | Auditor's record of the existing project, created when an audit runs. |
+| `.standards/CYCLE_IDS.md`      | Reserved cycle IDs; entries cannot be reused.                         |
 | `.standards/INSTALLATION.json` | Client-setting changes actually made by the installer.                |
 | `.standards/MODE.md`           | The project's greenfield or brownfield mode.                          |
+| `.standards/PROTOCOL.md`       | Shared workflow rules, aligned with the installed skills.             |
 | `.standards/STATE.md`          | Current workflow step, request, handoff, and recovery.                |
-| `.standards/CYCLE_IDS.md`      | Reserved cycle IDs; entries cannot be reused.                         |
-| `.standards/CONTEXT.md`        | Auditor's record of the existing project, created when an audit runs. |
+| `.standards/VERSION.json`      | Installed framework version and upgrade compatibility check.          |
 
 ## Workflow state
 
@@ -133,7 +133,9 @@ installation record must not be reconstructed by guessing.
 
 Normal reinstall must preserve project mode, workflow state, and the cycle-ID
 registry. Upgrades must keep the protocol and skills aligned without resetting
-progress. Missing required fields and conflicting settings require resolution,
+progress. The recorded framework version allows compatible minor and patch
+upgrades within the same major line; downgrades and cross-major upgrades are
+rejected. Missing required fields and conflicting settings require resolution,
 not inferred defaults. See
 [the installation contract](../protocol/#installed-runtime-contract).
 

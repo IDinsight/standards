@@ -1461,6 +1461,8 @@ An installed project should provide:
 - `AGENTS.md`: project-facing entrypoint to the protocol and role skills;
 - `CLAUDE.md`: Claude Code compatibility entrypoint importing `AGENTS.md`;
 - `.standards/PROTOCOL.md`: installed canonical protocol;
+- `.standards/VERSION.json`: installed framework version used to check upgrade
+  eligibility;
 - `.standards/INSTALLATION.json`: installer-owned metadata for only the
   client-setting mutations S.T.A.N.D.A.R.D.S. actually created;
 - `.standards/CYCLE_IDS.md`: protocol-owned append-only registry of allocated
@@ -1485,6 +1487,17 @@ and record only mutations the installer actually created. Never retroactively
 claim compatible pre-existing settings. `.standards/CYCLE_IDS.md` is protocol
 coordination data, not installer metadata; preserve it for the entire lifetime
 of the installed runtime as defined by **Cycle ID Registry**.
+
+`.standards/VERSION.json` records the installed framework release separately
+from settings ownership and workflow state. Reinstallation with the same version
+is allowed. An installer may upgrade to a newer minor or patch release within
+the same major version after verifying the existing runtime; it must preserve
+workflow data and update the recorded version with the framework assets. Reject
+older versions and cross-major upgrades. A major release may be installed into
+a fresh project, but moving an existing runtime to another major version needs
+an explicit migration process; ordinary installation must not attempt one. The
+framework maintainer is responsible for choosing the release version based on
+whether changes are backward compatible.
 
 ### Installer File Preservation
 
@@ -1532,6 +1545,9 @@ After ownership checks:
   installer-owned metadata. If it is unexpectedly missing from an otherwise
   verified runtime, stop and report the incomplete runtime; never reconstruct
   ownership by inference.
+- Require a valid `.standards/VERSION.json` in an existing verified runtime
+  before replacing framework assets. If it is missing or invalid, stop and
+  report the incomplete runtime; do not infer a version from file contents.
 - Preserve existing `.standards/MODE.md` and `.standards/STATE.md` on normal
   reinstall; initialize them only on first install or explicit reinitialization.
   Do not reset, reinterpret, or discard existing workflow state during upgrades.

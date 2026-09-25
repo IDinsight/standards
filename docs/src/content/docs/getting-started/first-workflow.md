@@ -6,9 +6,9 @@ description: Follow a search feature from its request to your sign-off decision.
 This example adds **search by name and email to an existing user directory** and
 updates its user guide. It uses the standard workflow.
 
-It assumes an existing project set up for STANDARDS, with no active cycle. The
-[installation requirements](../installation/) are defined, but an installer
-command is not yet provided.
+It assumes an existing project set up for STANDARDS, with no active cycle. See
+[Installation and Setup](../installation/) to install the runtime and role
+skills.
 
 Use each role's handoff to invoke the next one when it is ready. The examples
 below use Codex's `$role` syntax; in Claude Code, use `/role` instead.

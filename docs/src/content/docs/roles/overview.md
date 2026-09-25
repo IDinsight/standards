@@ -56,7 +56,6 @@ The role pages explain what each role produces. The
 from other cycles. In the paths shown here, `<Active Work.Id>` means the current
 cycle's saved identifier.
 
-All nine role packages are present. The installer is unfinished; see
-[installation requirements](../../getting-started/installation/). The packages'
-evaluation scenarios describe intended behavior, not proof of successful model
-runs.
+See [Installation and Setup](../../getting-started/installation/) for the
+installer command. The packages' evaluation scenarios describe intended
+behavior, not proof of successful model runs.

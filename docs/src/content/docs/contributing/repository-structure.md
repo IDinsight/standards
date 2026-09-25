@@ -53,8 +53,8 @@ blocks, plus initial `.standards/CYCLE_IDS.md` and
 `templates/claude/.claude/settings.json` supplies the Claude Code role
 invocation settings.
 
-These are templates, not an installer command. Installation and preservation
-requirements are defined in the
+The CLI in `bin/` and `lib/` installs these templates and the role packages.
+Installation and preservation requirements are defined in the
 [protocol](../../reference/protocol/#installed-runtime-contract).
 
 ## Website sources and generated files
