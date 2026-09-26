@@ -1,0 +1,127 @@
+---
+import DefaultPageTitle from "@astrojs/starlight/components/PageTitle.astro";
+
+const isOverview = Astro.locals.starlightRoute.id === "";
+---
+
+{
+  isOverview ? (
+    <div class="overview-heading">
+      <span class="code-with-sticker">
+        <span class="sticker-label">Code with</span>
+        <span class="sticker-sparkle sticker-sparkle-top" aria-hidden="true" />
+        <span class="sticker-sparkle sticker-sparkle-bottom" aria-hidden="true" />
+      </span>
+      <DefaultPageTitle />
+    </div>
+  ) : (
+    <DefaultPageTitle />
+  )
+}
+
+<style>
+  .overview-heading {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    column-gap: clamp(1.25rem, 2.5vw, 2.25rem);
+    row-gap: 0.75rem;
+    margin-top: 1rem;
+  }
+
+  .overview-heading :global(h1) {
+    margin-top: 0;
+    margin-inline-start: 0.35rem;
+    font-size: clamp(1.75rem, 3.25vw, var(--sl-text-h1));
+  }
+
+  .code-with-sticker {
+    --sticker-outline: polygon(0 17%, 12% 13%, 7% 0, 26% 7%, 34% 0, 49% 8%, 64% 0, 74% 8%, 94% 0, 91% 16%, 100% 22%, 94% 42%, 100% 54%, 93% 69%, 100% 92%, 81% 86%, 74% 100%, 58% 90%, 44% 100%, 30% 91%, 11% 100%, 8% 84%, 0 89%, 6% 68%, 0 53%, 6% 36%);
+    position: relative;
+    flex: none;
+    display: inline-grid;
+    place-items: center;
+    padding: 0.7em 1.1em 0.75em;
+    transform: rotate(-7deg);
+    filter:
+      drop-shadow(0.35rem 0.35rem 0 #ee5c98)
+      drop-shadow(0.65rem 0.65rem 0 #221825);
+    color: #281b2b;
+    font-family: Impact, "Arial Black", system-ui, sans-serif;
+    font-size: 1.5rem;
+    font-weight: 900;
+    letter-spacing: 0.055em;
+    line-height: 1.1;
+    text-shadow: 1px 1px 0 #fff5c6;
+    text-transform: uppercase;
+    white-space: nowrap;
+    transition: transform 180ms ease;
+  }
+
+  .code-with-sticker::before,
+  .code-with-sticker::after {
+    position: absolute;
+    clip-path: var(--sticker-outline);
+    content: "";
+  }
+
+  .code-with-sticker::before {
+    inset: 0;
+    background: #281b2b;
+  }
+
+  .code-with-sticker::after {
+    inset: 4px;
+    background:
+      radial-gradient(circle, #6e315f55 1.4px, transparent 1.5px),
+      linear-gradient(120deg, #fff18a, #ffbd56 55%, #ff708f);
+    background-size: 0.5rem 0.5rem, auto;
+  }
+
+  .sticker-label {
+    position: relative;
+    z-index: 1;
+  }
+
+  .code-with-sticker:hover {
+    transform: rotate(-3deg) scale(1.06);
+  }
+
+  .sticker-sparkle {
+    position: absolute;
+    z-index: 2;
+    width: 1.3rem;
+    height: 1.3rem;
+    background: #ffe878;
+    clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+    animation: sticker-sparkle 2.4s ease-in-out infinite alternate;
+  }
+
+  .sticker-sparkle-top {
+    top: -0.8rem;
+    right: -0.9rem;
+  }
+
+  .sticker-sparkle-bottom {
+    bottom: -0.65rem;
+    left: -0.75rem;
+    width: 0.8rem;
+    height: 0.8rem;
+    animation-delay: 1.2s;
+  }
+
+  @keyframes sticker-sparkle {
+    from { transform: scale(0.75) rotate(-15deg); opacity: 0.6; }
+    to { transform: scale(1.15) rotate(15deg); opacity: 1; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .code-with-sticker {
+      transition: none;
+    }
+
+    .sticker-sparkle {
+      animation: none;
+    }
+  }
+</style>

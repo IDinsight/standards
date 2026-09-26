@@ -60,6 +60,21 @@ header.header {
   border-top: 3px solid var(--standards-pop);
 }
 
+/* Keep search centered in the viewport once the title fits beside it. */
+@media (min-width: 72rem) {
+  header.header > .header {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 22rem) minmax(0, 1fr);
+  }
+
+  header.header > .header > :nth-child(2) {
+    justify-self: stretch;
+  }
+
+  header.header > .header > .right-group {
+    justify-self: end;
+  }
+}
+
 .sidebar-content a {
   border-radius: 0.5rem;
 }

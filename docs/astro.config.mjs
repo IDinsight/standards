@@ -10,8 +10,16 @@ export default defineConfig({
       description:
         "A framework for coding with agents: explicit roles, persisted work, and verifiable handoffs.",
       favicon: "/favicon.svg",
+      social: [
+        {
+          icon: "github",
+          label: "GitHub repository",
+          href: "https://github.com/IDinsight/standards",
+        },
+      ],
       customCss: ["./src/styles/custom.css"],
       components: {
+        PageTitle: "./src/components/PageTitle.astro",
         SiteTitle: "./src/components/SiteTitle.astro",
       },
       expressiveCode: {
