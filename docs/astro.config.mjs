@@ -124,22 +124,22 @@ export default defineConfig({
           collapsed: true,
           items: [
             {
-              slug: "concepts/ownership",
-            },
-            {
               slug: "concepts/project-modes",
             },
             {
+              slug: "concepts/ownership",
+            },
+            {
               slug: "concepts/states-and-handoffs",
+            },
+            {
+              slug: "concepts/human-decisions",
             },
             {
               slug: "concepts/acceptance-traceability",
             },
             {
               slug: "concepts/recovery",
-            },
-            {
-              slug: "concepts/human-decisions",
             },
           ],
         },

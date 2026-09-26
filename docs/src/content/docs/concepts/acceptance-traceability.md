@@ -12,7 +12,7 @@ Expedited work is checked against the saved request instead. If it
 [becomes standard work](../states-and-handoffs/#promote-an-expedited-cycle),
 Scoper creates the acceptance conditions when the workflow reaches Scoping.
 
-## Give each outcome an ID
+## How Scoper assigns IDs
 
 Scoper writes the acceptance conditions: statements of what must be true for the
 work to count as done. Each gets an ID that is unique within the cycle.

@@ -40,5 +40,5 @@ lint: lint-markdown ## Run all linters and formatters
 
 lint-markdown: ## Format Markdown with Prettier (write), excluding PROTOCOL.md
 	@echo "$(BLUE)Running prettier...$(RESET)"
-	@npx prettier --write --prose-wrap always --print-width 80 --ignore-path .gitignore "**/*.md" "!PROTOCOL.md"
+	@npx prettier --write --prose-wrap always --print-width 80 --ignore-path .gitignore "**/*.md" "!PROTOCOL.md" "!CHANGELOG.md"
 	@echo "$(GREEN)Markdown formatting complete.$(RESET)"

@@ -9,11 +9,12 @@ afterward.
 
 Recovery stays within the same cycle.
 
-## Send the problem to its owner
+## How the agent routes a problem
 
-The role that discovers a problem identifies which decision or file is wrong.
-That determines who fixes it: requirements go to Scoper, design to Architect,
-project facts to Auditor, and so on. See
+The role that discovers a problem identifies which decision or file is wrong,
+records a handoff to its owner, and gives you the next role to invoke. You do
+not need to choose the owner or update the workflow state yourself. Requirements
+go to Scoper, design to Architect, project facts to Auditor, and so on. See
 [ownership](../ownership/#send-problems-to-their-owners).
 
 In expedited work, corrections can go directly only to Developer or
@@ -25,7 +26,7 @@ rather than as an agent-discovered failure.
 
 ## Remember where to return
 
-When a correction moves work to another state, the workflow saves a **recovery
+When a correction moves work to another state, the agent saves a **recovery
 frame**: one correction and its return instructions. A correction within the
 current state needs no new frame.
 
@@ -38,9 +39,9 @@ The frame records:
 | `ResumeAt`     | Where the interrupted work should continue.          |
 | `RerunThrough` | The last step to repeat before returning, or `NONE`. |
 
-If another problem needs a different state during recovery, it gets a new frame.
-Finish the newest correction first, then return to the earlier one. This
-preserves both pieces of unfinished work.
+If another problem needs a different state during recovery, the agent saves a
+new frame. The agents address the newest correction first, then return to the
+earlier one. This preserves both pieces of unfinished work.
 
 ## Correct, then decide what to repeat
 
@@ -76,6 +77,20 @@ remaining dependencies, and return while their own record stays incomplete. This
 cannot defer an unrelated defect or work that can already be completed, and it
 cannot make the cycle ready for sign-off.
 
+**Documenter example:** During an early audit, Auditor finds that the project's
+setup guide gives an obsolete command. Documenter corrects the command and
+checks it against the actual tooling. The guide for the new feature cannot be
+finished because the feature has not been built. Documenter records that
+remaining dependency, returns to Auditor with its record still incomplete, and
+finishes the feature guide when the workflow later reaches documentation.
+
+**Synchronizer example:** Final Reviewer finds that the synchronization record
+points to an outdated test result and cannot finish its review. Synchronizer
+corrects the reference and checks it against the current result, then returns to
+Reviewer with its own record still incomplete. Reviewer reassesses its finding;
+Synchronizer later checks the completed review before the cycle can be offered
+for sign-off.
+
 The exact conditions are in the
 [Documenter](../../reference/protocol/#documenter-corrective-return) and
 [Synchronizer](../../reference/protocol/#synchronizer-corrective-return)
@@ -95,6 +110,20 @@ When the standard workflow reaches the responsible role, it fixes and checks
 each saved problem. The verified correction removes that obligation; it does not
 by itself complete the role's other work. A role cannot hand off normally with
 its own obligations unresolved, and no obligation may remain at sign-off.
+
+**Unfinished correction example:** In expedited work, Reviewer finds that an
+error response leaks an internal exception. While Developer is correcting it,
+the agent discovers that safe completion also needs an authentication-error
+design decision from Architect, a role the expedited path skips. The agent
+promotes the cycle and saves the still-unfixed leak as a Developer obligation.
+When standard work reaches Developer, it fixes and checks the leak before its
+normal handoff.
+
+**Correction already finished example:** Suppose Developer has fixed and checked
+an expedited defect, and its recovery frame remains only to repeat a later
+assessment. If the cycle is promoted for a separate reason, that frame does not
+create a new obligation for the defect Developer already fixed. The standard
+roles still assess the current work before sign-off.
 
 Ordinary recovery already tracks its correction in a frame and does not need a
 duplicate obligation. See the

@@ -42,6 +42,10 @@ if it is mentioned in the context document.
 
 ## Send problems to their owners
 
+The agent identifies the responsible role, records the correction in the
+workflow state, and gives you a handoff to invoke that role. You do not need to
+classify the problem or edit the workflow records yourself.
+
 Suppose Tester needs to check retries, but the design never decided when a
 request should be retried. Architect must resolve that decision. Tester cannot
 decide the behavior by writing a test.
@@ -55,8 +59,9 @@ interrupted work.
 
 ## Artifact provenance
 
-A workflow document created for one cycle carries a marker identifying its type
-and cycle. The protocol calls this **artifact provenance**. For example, a new
+When a role creates a workflow document for one cycle, it adds a marker
+identifying the document's type and cycle. The protocol calls this **artifact
+provenance**. You do not need to add the marker yourself. For example, a new
 scope document begins with a block like this:
 
 ```markdown

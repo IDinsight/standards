@@ -3,9 +3,9 @@ title: Human Decisions and Sign-off
 description: Know when to invoke a role, approve a plan, or accept the work.
 ---
 
-You decide which roles to run and whether to accept the finished work.
-Completing a role's checks can make the next step available; it does not
-automatically run that step or accept the result for you.
+You invoke the role named by each handoff and decide whether to accept the
+finished work. Completing a role's checks can make the next step available; it
+does not automatically run that step or accept the result for you.
 
 ## Run each role explicitly
 
@@ -54,14 +54,15 @@ requires one.
 ## Decide at sign-off
 
 `AWAITING_USER_SIGNOFF` means the required checks are complete and the work is
-ready for your decision. You can:
+ready for your decision. Tell the agent what you want to do; it handles the
+workflow update and any handoff. You can:
 
-- **Accept it:** sign off and finish the cycle.
-- **Request changes:** describe what needs to change and return work to the
-  responsible role.
-- **Cancel:** end the cycle without accepting it.
-- **Promote expedited work:** request the full standard workflow, starting with
-  Auditor.
+- **Accept it:** ask the agent to sign off and finish the cycle.
+- **Request changes:** describe what needs to change. The agent records the
+  rework and names the responsible role for you to invoke.
+- **Cancel:** ask the agent to end the cycle without accepting it.
+- **Promote expedited work:** request the full standard workflow. The agent
+  records the promotion and hands off to Auditor, which you invoke.
 
 Before recording sign-off, the agent checks that the completion requirements
 still hold for the current files. No unresolved correction or blocking question

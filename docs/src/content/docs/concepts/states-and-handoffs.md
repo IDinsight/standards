@@ -9,9 +9,10 @@ work should go and why, then tells you how to invoke the next role. Changing the
 state does not run a role automatically.
 
 The installed `.standards/STATE.md` records the current step, cycle mode, active
-request, and recovery information. A cycle must be initialized before workflow
-work begins. [Navigator](../../roles/navigator/) can explain the project at any
-time without changing that state.
+request, and recovery information. When you give the first role a request, the
+agent initializes the cycle before doing that role's work; you do not edit the
+state file yourself. [Navigator](../../roles/navigator/) can explain the project
+at any time without changing that state.
 
 ## The paths at a glance
 
@@ -160,10 +161,11 @@ be disclosed rather than guessed. See the
 
 `AWAITING_USER_SIGNOFF` means ready for your decision, not accepted.
 
-In standard work, all required role checks must still hold for the current
-files, including final review and synchronization. Every current requirement
-needs sufficient evidence. Required project context must be valid, including any
-checks of changes left by cancelled cycles.
+Before presenting standard work for sign-off, the agent checks that all required
+role results still apply to the current files, including final review and
+synchronization. Every current requirement needs sufficient evidence. Required
+project context must be valid, including any checks of changes left by cancelled
+cycles.
 
 Expedited work needs Developer and implementation Reviewer to complete its
 narrower checks. In either mode, recovery must be finished, no outstanding

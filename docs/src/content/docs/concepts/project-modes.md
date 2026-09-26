@@ -19,13 +19,15 @@ change the workflow.
 ## Greenfield
 
 A greenfield project has no meaningful existing implementation to preserve. Its
-standard workflow starts with Scoper, then Architect, then Auditor: decide what
-to build, design it, and check the project context before coding.
+standard workflow starts with Scoper, which defines what to build. Architect
+designs it, then Auditor checks the project context before coding begins. You
+invoke each role from the handoff when it is next.
 
 Before that first audit, Scoper and Architect can work from known constraints
 and completed earlier documents. The absence of Auditor's context file alone
-does not block them. If they need facts they cannot safely establish, the work
-returns to Auditor. Once relevant context exists, they must use it.
+does not block them. If they need facts they cannot safely establish, the agent
+records a handoff for you to invoke Auditor. Once relevant context exists,
+Scoper and Architect must use it.
 
 Greenfield projects use standard work only.
 
@@ -62,9 +64,11 @@ resolving an incompatible request. Leftover changes from a cancelled cycle may
 require Auditor and standard work; see
 [starting the next cycle](../../guides/cancelling-and-new-cycles/#start-the-next-cycle).
 
-If expedited work comes to need a skipped role, it
-[moves to standard work](../states-and-handoffs/#promote-an-expedited-cycle).
-That change is one-way: an active standard cycle cannot become expedited.
+If an active role finds that expedited work needs a skipped role, the agent
+[promotes the cycle to standard work](../states-and-handoffs/#promote-an-expedited-cycle)
+and gives you the next role to invoke. At sign-off, your request for a change
+that needs a skipped role authorizes the same promotion. The change is one-way:
+an active standard cycle cannot become expedited.
 
 ## The project mode changes once
 
