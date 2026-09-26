@@ -41,7 +41,9 @@ provides fewer checks and must move to standard work if a skipped role becomes
 necessary.
 
 See [project and cycle modes](../../concepts/project-modes/) for the choices and
-[workflow paths](../../concepts/states-and-handoffs/) for the full sequence.
+the
+[visual workflow map](../../concepts/states-and-handoffs/#the-paths-at-a-glance)
+for the full sequence.
 
 ## Stay involved at the important decisions
 

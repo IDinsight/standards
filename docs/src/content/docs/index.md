@@ -18,6 +18,8 @@ continue in another chat.
   works and when to use it.
 - [Your First Workflow](./getting-started/first-workflow/): follow an example
   from request to sign-off.
+- [Workflow map](./concepts/states-and-handoffs/#the-paths-at-a-glance): see the
+  standard and expedited paths at a glance.
 - [Roles](./roles/overview/): find the right role for a task.
 - [Guides](./guides/starting-a-cycle/): start, resume, or change ongoing work.
 - [Reference](./reference/protocol/): look up exact rules and document formats.

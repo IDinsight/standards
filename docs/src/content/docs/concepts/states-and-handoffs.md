@@ -13,26 +13,65 @@ request, and recovery information. A cycle must be initialized before workflow
 work begins. [Navigator](../../roles/navigator/) can explain the project at any
 time without changing that state.
 
+## The paths at a glance
+
+<!-- markdownlint-disable MD033 -->
+<div class="workflow-map" aria-label="STANDARDS workflow paths">
+  <section class="workflow-map__panel workflow-map__panel--standard" aria-labelledby="standard-map-title">
+    <div class="workflow-map__heading">
+      <span class="workflow-map__eyebrow">Full workflow</span>
+      <h3 id="standard-map-title">Standard</h3>
+    </div>
+    <p>Choose the entry that matches your project:</p>
+    <div class="workflow-map__entries">
+      <div class="workflow-map__entry">
+        <strong>New project</strong>
+        <ol class="workflow-map__steps">
+          <li>Scoper</li><li>Architect</li><li>Auditor</li>
+        </ol>
+      </div>
+      <div class="workflow-map__entry">
+        <strong>Existing project</strong>
+        <ol class="workflow-map__steps">
+          <li>Auditor</li><li>Scoper</li><li>Architect</li>
+        </ol>
+      </div>
+    </div>
+    <div class="workflow-map__join" aria-hidden="true">↓ both continue ↓</div>
+    <div class="workflow-map__shared">
+      <ol class="workflow-map__steps">
+        <li>Developer</li><li>Tester</li><li>Implementation Reviewer</li>
+      </ol>
+      <div class="workflow-map__down" aria-hidden="true">↓</div>
+      <ol class="workflow-map__steps">
+        <li>Documenter</li><li>Final Reviewer</li><li>Synchronizer</li>
+      </ol>
+      <div class="workflow-map__down" aria-hidden="true">↓</div>
+      <div class="workflow-map__decision">Your sign-off decision</div>
+    </div>
+  </section>
+  <section class="workflow-map__panel workflow-map__panel--expedited" aria-labelledby="expedited-map-title">
+    <div class="workflow-map__heading">
+      <span class="workflow-map__eyebrow">Eligible existing projects</span>
+      <h3 id="expedited-map-title">Expedited</h3>
+    </div>
+    <ol class="workflow-map__steps">
+      <li>Developer</li><li>Implementation Reviewer</li><li>Your sign-off decision</li>
+    </ol>
+  </section>
+</div>
+<!-- markdownlint-enable MD033 -->
+
+The arrows show normal forward handoffs. Each role must finish its required
+checks, and you explicitly invoke the next role. Corrections may follow a
+[recovery route](../recovery/) instead.
+
 ## Standard forward paths
 
-A new, greenfield project starts with:
-
-```text
-Scoper → Architect → Auditor → Developer
-```
-
-An existing, brownfield project starts with:
-
-```text
-Auditor → Scoper → Architect → Developer
-```
-
-After Developer, both continue through:
-
-```text
-Tester → Implementation Reviewer → Documenter
-→ Final Reviewer → Synchronizer → Your sign-off decision
-```
+A new, greenfield project starts with Scoper, Architect, and Auditor. An
+existing, brownfield project starts with Auditor, Scoper, and Architect. Both
+then follow the shared path through Developer, the independent assessments,
+documentation, synchronization, and your sign-off decision.
 
 Each role must finish its required checks before a normal handoff. If a problem
 needs an earlier role, [recovery](../recovery/) determines the route instead.
@@ -44,11 +83,7 @@ saved names such as `DEVELOPING` and `REVIEWING_IMPLEMENTATION`.
 
 ## Expedited forward path
 
-Eligible brownfield work follows a shorter path:
-
-```text
-Developer → Implementation Reviewer → Your sign-off decision
-```
+Eligible brownfield work follows the shorter path shown above.
 
 The saved request defines the change. Developer still saves a plan and gets your
 approval before coding. Reviewer checks the implementation against that request

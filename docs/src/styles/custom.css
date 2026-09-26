@@ -88,3 +88,155 @@ header.header {
   background-color: var(--standards-selected-bg);
   color: var(--standards-selected-text);
 }
+
+/* Workflow paths use text and CSS so they remain readable at every width. */
+.workflow-map {
+  display: grid;
+  gap: 1rem;
+  margin-block: 1.5rem;
+}
+
+.workflow-map__panel {
+  padding: 1.25rem;
+  border: 1px solid var(--sl-color-hairline);
+  border-radius: 0.8rem;
+  background: var(--sl-color-bg-sidebar);
+}
+
+.workflow-map__panel--standard {
+  border-top: 4px solid var(--sl-color-accent);
+}
+
+.workflow-map__panel--expedited {
+  border-top: 4px solid var(--standards-pop);
+}
+
+.workflow-map__heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.workflow-map__heading h3,
+.workflow-map__panel p {
+  margin: 0;
+}
+
+.workflow-map__heading h3 {
+  font-size: 1.15rem;
+}
+
+.workflow-map__eyebrow {
+  color: var(--sl-color-text-accent);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.workflow-map__panel--expedited .workflow-map__eyebrow {
+  color: var(--standards-pop);
+}
+
+.workflow-map__entries {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+  margin-top: 0.85rem;
+}
+
+.workflow-map__entry {
+  min-width: 0;
+  padding: 0.8rem;
+  border: 1px solid var(--sl-color-hairline);
+  border-radius: 0.6rem;
+  background: var(--sl-color-bg);
+}
+
+.workflow-map__entry strong {
+  display: block;
+  margin-bottom: 0.65rem;
+  font-size: 0.85rem;
+}
+
+.workflow-map .workflow-map__steps {
+  display: flex;
+  align-items: stretch;
+  gap: 1.2rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.workflow-map__steps li {
+  position: relative;
+  display: grid;
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 3.2rem;
+  place-items: center;
+  padding: 0.45rem;
+  border: 1px solid var(--sl-color-accent);
+  border-radius: 0.45rem;
+  background: var(--sl-color-accent-low);
+  color: var(--sl-color-text);
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1.25;
+  text-align: center;
+  overflow-wrap: normal;
+}
+
+.workflow-map__steps li:not(:last-child)::after {
+  position: absolute;
+  inset-inline-end: -0.95rem;
+  color: var(--sl-color-text-accent);
+  content: "→";
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.workflow-map__panel--expedited .workflow-map__steps li {
+  border-color: var(--standards-pop);
+  background: var(--sl-color-bg-inline-code);
+}
+
+.workflow-map__panel--expedited .workflow-map__steps li:not(:last-child)::after {
+  color: var(--standards-pop);
+}
+
+.workflow-map__join,
+.workflow-map__down {
+  margin-block: 0.55rem;
+  color: var(--sl-color-text-accent);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.workflow-map__decision {
+  width: fit-content;
+  margin-inline: auto;
+  padding: 0.65rem 1rem;
+  border: 1px solid var(--standards-pop);
+  border-radius: 0.45rem;
+  background: var(--sl-color-bg-inline-code);
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+@media (max-width: 28rem) {
+  .workflow-map .workflow-map__steps {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .workflow-map__steps li:not(:last-child)::after {
+    inset-block-end: -1.08rem;
+    inset-inline-end: auto;
+    content: "↓";
+  }
+}
