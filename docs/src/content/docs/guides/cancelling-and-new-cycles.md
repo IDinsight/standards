@@ -1,89 +1,73 @@
 ---
 title: Cancelling or Starting a New Cycle
-description: Understand terminal cycles and the greenfield bootstrap reset.
+description:
+  End the current cycle or start another without losing track of earlier work.
 ---
 
-Cancellation ends the current cycle. It does not revert project changes or make
-leftover implementation part of the accepted project baseline.
+To stop an active cycle, tell the current workflow agent to cancel it. The agent
+checks the project mode and records the appropriate transition. You do not need
+to edit `.standards/STATE.md` or remove workflow files yourself. Cancellation
+ends the cycle; it does not undo project changes.
 
-## Cancel brownfield work
+## What happens when you cancel
 
-Set `WorkflowState: CANCELLED` and `CycleMode: UNSET`. Leave all pending-cycle
-fields clear, retain `Active Work`, and clear recovery and outstanding
-obligations. Record `Handoff.Kind: CANCEL`, the interrupted state in `From`, and
-`FailureType: NONE`. The workflow files and project work remain.
+For an existing project, or a new project that has already gained
+implementation, the agent records the cycle as `CANCELLED`. The STANDARDS
+installation, saved cycle record, and project files remain. Unfinished
+corrections end with the cancelled cycle, but project changes left behind are
+not automatically accepted as the baseline for future work.
 
-Unfinished corrections end with the cycle. Changes left behind still need to be
-checked before another cycle can rely on them.
+If the project was still **greenfield**, the agent first checks whether this
+cycle created or materially changed any implementation, including code you
+wrote. If it did, the project becomes brownfield and uses the retained
+`CANCELLED` path above.
 
-## Cancel greenfield bootstrap
+If there is no implementation, cancellation performs a **bootstrap reset**: the
+agent removes the STANDARDS runtime, installed role skills, and marked
+integration sections it can verify as framework owned. Project-owned files and
+role outputs outside `.standards/` remain. The agent reverts a client setting
+only when it can verify that the installer added it and it has not changed. This
+reset removes the saved runtime state and cycle-ID registry. See the
+[bootstrap reset rules](../../reference/protocol/#greenfield-bootstrap-cancellation)
+for the exact boundaries.
 
-First check for implementation created or materially changed during the active
-cycle, including code the user wrote. If it exists, record the permanent change
-to `BROWNFIELD` and use the retained cancellation above, even if the mode file
-had not yet been updated.
-
-Only when no such implementation exists does greenfield cancellation remove the
-framework installation. This is a **bootstrap reset**.
-
-The reset removes framework-owned runtime and installed skills, including the
-cycle-ID registry, and removes marked integration sections. Preserve
-project-owned content. Revert a client setting only when the installer owns the
-change and the current value exactly matches its recorded installed value.
-
-Project files and role outputs outside `.standards/` remain. Reverting those is
-a separate user decision. See the exact
-[bootstrap reset rules](../../reference/protocol/#greenfield-bootstrap-cancellation).
+Reverting project changes is a separate decision. Ask the agent to help with
+that work if you want it; cancellation itself does not restore the working tree.
 
 ## Start the next cycle
 
-From `SIGNED_OFF` or retained `CANCELLED`, validate the next request before
-replacing the previous cycle's records:
+After sign-off or a retained cancellation, give the next request to the
+appropriate entry role. For standard work, that is Scoper for a new project or
+Auditor for an existing project. An eligible bounded change in an existing
+project may start with Developer for expedited work. See
+[Starting a Cycle](../starting-a-cycle/) for examples. The agent initializes a
+new cycle; you do not reserve an ID or reset fields yourself. The earlier cycle
+is not reopened.
 
-1. Determine baseline reconciliation. After sign-off it is `NONE`. After
-   cancellation, keep older unresolved source cycles and include the
-   just-cancelled cycle as a `SourceCycle`/`Request` list entry unless the user
-   confirms it produced no project changes or those changes were reverted.
-   Append only if that source ID is absent; never overwrite older entries. Use
-   the
-   [canonical list format](../../reference/runtime-files/#outstanding-baseline-reconciliation).
-2. Validate the next mode against the request, project mode, and reconciliation
-   needs. Reuse `PendingCycleRequest` if one is saved. Any unresolved
-   reconciliation requires `STANDARD`; retained or adopted cancelled changes
-   must go through Auditor.
-3. If a pending preference is invalid, keep the terminal state and active-work
-   record unchanged. Save the request and decision in the pending fields and ask
-   the user to resolve them. Follow
-   [pending-request rules](../starting-a-cycle/#resolve-a-blocked-request).
-4. Once validation succeeds,
-   [reserve a new cycle ID](../../reference/runtime-files/#cycle-identity). If
-   the registry append fails, do not start the cycle. If a later state write
-   fails, keep the ID reserved.
-5. Save the new ID and request; reset `Scope`, `Architecture`, `Development`,
-   `PromotionReason`, `AuditTarget`, and `BlockedOn` to `NONE`. Clear recovery
-   and outstanding obligations, and save the reconciliation list from step 1.
-6. Record `Handoff.Kind: NEW_CYCLE`, `From` as the prior terminal state,
-   `FailureType: NONE`, and a brief reason. Save the validated `CycleMode` and
-   clear all pending fields.
-7. Enter `AUDITING` when reconciliation is required. Otherwise use the standard
-   entry state for the project, or `DEVELOPING` for eligible expedited work. The
-   new cycle must have a mode other than `UNSET`.
+After cancellation, the agent checks whether any project changes from that cycle
+remain. It may ask you to confirm that no changes were made or that they were
+reverted. If changes remain or their status is unresolved, the next cycle uses
+standard work and starts with Auditor so it can establish the baseline. An
+earlier cancelled cycle's unresolved changes still need checking even if the
+most recent cancellation changed nothing. Auditor uses the saved cycle records,
+repository evidence, and your answers to decide what is established baseline,
+what was reverted, and what remains uncertain.
 
-Confirmation that the latest cancelled cycle left no changes cannot clear older
-unresolved sources. For example, if A left changes and B was cancelled before
-checking them, C must still carry A's ID and request even if B changed nothing.
+The agent handles cycle mode validation, pending requests, ID reservation, and
+state updates. If a saved mode preference cannot support the new request or
+unresolved cancelled work, it asks you to choose another mode, revise the
+request, or abandon it. You do not need to repeat a request it already saved.
+See the [pending-request rules](../starting-a-cycle/#resolve-a-blocked-request)
+and
+[Auditor's procedure](../../roles/auditor/#promotion-and-cancellation-audits)
+for details.
 
-Auditor checks each source against version-control evidence and user input:
-accepted baseline, reverted changes, or unresolved work. It blocks on
-uncertainty that prevents safe use of the baseline and clears
-`BaselineReconciliation` only after resolving all listed sources. Old
-**Active-Cycle Non-Baseline Work** entries also need checking; they do not
-automatically become exclusions for the new cycle. See
-[Auditor's procedure](../../roles/auditor/#promotion-and-cancellation-audits).
-
-After a bootstrap reset, reinstall and choose project mode from the current
-project. The new runtime has a new ID registry, but existing cycle-owned files
-and provenance still protect old artifacts from reuse.
+After a bootstrap reset, STANDARDS must be
+[installed again](../../getting-started/installation/) before another cycle. The
+installer checks the project's current contents and asks you to choose its mode,
+then creates a new runtime and cycle-ID registry. Existing project files and
+role outputs remain, including cycle-owned files that cannot be reused as new
+work.
 
 At sign-off, requesting changes is rework of the active cycle. It is not a new
 cycle. See [Human Decisions and Sign-off](../../concepts/human-decisions/).

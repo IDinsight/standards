@@ -1,73 +1,75 @@
 ---
 title: Resuming Interrupted Work
-description: Continue work in a new session using the saved workflow records.
+description: Continue an interrupted cycle from its saved work and handoff.
 ---
 
-Start with the project files saved in version control. Make sure the current
-state and work are available in the checkout you or the next agent will use.
+To continue after a pause or in a new chat, use the project checkout that
+contains the saved STANDARDS files and the work done so far. If you changed
+branches or computers, make sure those changes are available first. You do not
+need to reconstruct the workflow from chat history or edit its state files.
 
-## Read the coordination record
+## Invoke the role named by the handoff
 
-Read `.standards/PROTOCOL.md`, `.standards/MODE.md`, and `.standards/STATE.md`,
-then the relevant project context and work files. Check:
-
-- The current state, cycle mode, request, and file paths.
-- Pending mode, request, and blocker fields if no cycle is active.
-- `Active Work.Development`, including plan approval, mode, and step statuses.
-- `PromotionReason`, if the cycle moved from expedited to standard work.
-- `BaselineReconciliation`, for cancelled changes Auditor still needs to check.
-- `BlockedOn`, for a question awaiting an answer.
-- `Recovery`, for unfinished corrections and where work should return.
-- `Outstanding Obligations`, for corrections retained after promotion.
-
-The latest handoff describes only the last step. It does not replace these saved
-records. [Runtime Files](../../reference/runtime-files/) explains each one.
-
-If `CycleMode` is `UNSET`, resolve any pending request through
-[cycle initialization](../starting-a-cycle/) before role-owned work. Do not
-replace a terminal cycle directly or ask the user to repeat a saved request.
-
-## Resume the owning role
-
-If the state is `ARCHITECTING`, run Architect:
+Use the most recent handoff to invoke the role assigned to the current step. For
+example, if Architect is next, in Codex run:
 
 ```text
-$architect Continue the active workflow from `.standards/STATE.md`.
+$architect Continue the active workflow from .standards/STATE.md.
 ```
 
-Use `/architect` in Claude Code. During recovery, ask the role to read the
-active recovery frame and continue from it. A file that looks finished does not
-prove that the workflow has advanced.
+Use `/architect` in Claude Code. Replace the role name with the one in your
+handoff. If you are unsure which role owns the next step, ask the agent to
+explain the current state before invoking a role. The handoff is a prompt to
+continue; it does not start the next role automatically.
 
-In `DEVELOPING`, read the saved plan and verify its cycle ownership before
-editing it. Continue from the first incomplete approved step, respecting the
-selected collaboration mode. A proposed plan must wait for approval. See
-[Developer resumption and recovery](../working-with-developer/#resume-or-correct-implementation).
+The invoked role reads `.standards/PROTOCOL.md`, `.standards/MODE.md`, and
+`.standards/STATE.md`, then the relevant project files and role reports. It
+checks the saved request, plan approval, unfinished work, blockers, and any
+correction or promotion history before proceeding. The agent handles a saved
+pending request or new-cycle setup when applicable. You do not need to inspect
+these fields or repeat a request already saved in the state. See
+[Runtime Files](../../reference/runtime-files/) for what the files contain.
 
-In `TESTING`, read `docs/verification/<Active Work.Id>.md` when present. Resume
-VERIFY if the initial pass was merely interrupted with unchanged inputs. Use
-REVERIFY when the assessment needs reconciliation after changes. Preserve valid
-coverage and budget allocations; replace invalid execution evidence. Tester must
-remain separate from Developer's implementation conversation. See
-[Tester modes](../../roles/tester/#modes).
+## What each role does when it resumes
 
-In either review state, read the corresponding report under
-`docs/reviews/<Active Work.Id>/`. Reconcile changed inputs, current acceptance
-conditions, and outstanding findings before reusing conclusions. Reviewer can
-resume its own independent session; authoring conversations require a fresh
-chat. See [Reviewer resumption](../../roles/reviewer/#modes).
+The role decides how to continue from its own saved work:
 
-In `SYNCHRONIZING`, read `docs/synchronization/<Active Work.Id>.md` when
-present. Compare current inputs with assessed identities before retaining any
-conclusion, including an interrupted assessment. Use the same procedure after
-corrections; unchanged inputs need no duplicate entries or cosmetic rewrites.
-See [Synchronizer resumption](../../roles/synchronizer/#modes).
+- **Developer** checks the saved plan and current code, then continues from the
+  first incomplete approved step. If the plan needs a material revision, it asks
+  for your approval before coding. See
+  [Working with Developer](../working-with-developer/#resume-or-correct-implementation).
+- **Tester** checks its earlier verification report and current files. It
+  decides whether it can continue an interrupted check or needs to reassess
+  changes. See [Tester modes](../../roles/tester/#modes).
+- **Reviewer** checks earlier findings, current inputs, and whether prior
+  conclusions still apply. It independently rechecks fixes before resolving
+  findings. See [Reviewer resumption](../../roles/reviewer/#modes).
+- **Synchronizer** compares the current work with the versions that were
+  assessed and updates its record when needed. See
+  [Synchronizer resumption](../../roles/synchronizer/#modes).
 
-## Resolve blockers without skipping gates
+Other roles likewise read their saved work and any active recovery instructions.
+You do not choose a verification mode, reopen plan steps, or decide which
+evidence remains valid for them.
 
-If `BlockedOn` contains an unanswered question, use the answer before clearing
-it and completing the role.
+## Keep independent assessments separate
 
-At `AWAITING_USER_SIGNOFF`, the next action belongs to you. From `SIGNED_OFF` or
-`CANCELLED`, follow the [new-cycle rules](../cancelling-and-new-cycles/).
-Navigator can explain the current state, but does not advance it.
+Tester must run in a chat separate from Developer’s implementation chat.
+Reviewer must run in a chat separate from the conversations that authored the
+work it assesses. Each may resume its own eligible assessment chat. If you are
+starting a different chat for either role, follow the handoff’s independent-chat
+instructions. The agent checks the saved report and prior evidence; you only
+need to start the appropriate chat and invoke the role. See
+[independent assessment chats](../../concepts/states-and-handoffs/#independent-assessment-chats).
+
+## Answer decisions that are waiting on you
+
+If the role paused for a question, answer it in that role’s chat. The agent
+saves your answer and clears the blocker when it can continue. A proposed
+Developer plan still needs your explicit approval before implementation. At
+`AWAITING_USER_SIGNOFF`, review the finished work and decide whether to accept
+it, request changes, or cancel.
+
+After sign-off or cancellation, a new request starts a
+[new cycle](../cancelling-and-new-cycles/#start-the-next-cycle). Navigator can
+explain the saved state at any time, but cannot advance the workflow.
