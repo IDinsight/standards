@@ -1,0 +1,196 @@
+---
+import DefaultSidebar from "@astrojs/starlight/components/Sidebar.astro";
+---
+
+<DefaultSidebar />
+
+<div
+  class="sidebar-resize-handle"
+  data-sidebar-resize-handle
+  role="separator"
+  aria-label="Resize navigation sidebar"
+  aria-controls="starlight__sidebar"
+  aria-orientation="vertical"
+  aria-valuemin="224"
+  aria-valuemax="480"
+  aria-valuenow="300"
+  tabindex="0"
+  title="Drag to resize; use arrow keys; double-click to reset"
+></div>
+
+<script>
+  const handle = document.querySelector<HTMLElement>("[data-sidebar-resize-handle]");
+  const sidebar = document.querySelector<HTMLElement>("#starlight__sidebar");
+
+  if (handle && sidebar) {
+    const root = document.documentElement;
+    const storageKey = "standards-sidebar-width";
+    const defaultWidth = 300;
+    const minWidth = 224;
+    const direction = root.dir === "rtl" ? -1 : 1;
+    let preferredWidth = defaultWidth;
+    let dragStartX = 0;
+    let dragStartWidth = defaultWidth;
+    let dragging = false;
+
+    try {
+      const savedWidth = Number(localStorage.getItem(storageKey));
+      if (Number.isFinite(savedWidth) && savedWidth >= minWidth) {
+        preferredWidth = savedWidth;
+      }
+    } catch {
+      // Resizing still works when browser storage is unavailable.
+    }
+
+    const maxWidth = () =>
+      Math.max(
+        minWidth,
+        Math.min(480, window.innerWidth - (window.innerWidth >= 1152 ? 720 : 448)),
+      );
+
+    const applyWidth = (width: number) => {
+      const clampedWidth = Math.round(Math.max(minWidth, Math.min(maxWidth(), width)));
+      root.style.setProperty("--sl-sidebar-width", `${clampedWidth}px`);
+      handle.setAttribute("aria-valuemax", String(maxWidth()));
+      handle.setAttribute("aria-valuenow", String(clampedWidth));
+      handle.setAttribute("aria-valuetext", `${clampedWidth} pixels`);
+    };
+
+    const saveWidth = () => {
+      try {
+        localStorage.setItem(storageKey, String(preferredWidth));
+      } catch {
+        // Keep the current width for this page when storage is unavailable.
+      }
+    };
+
+    applyWidth(preferredWidth);
+
+    handle.addEventListener("pointerdown", (event) => {
+      if (event.button !== 0 || window.innerWidth < 800) return;
+      dragging = true;
+      dragStartX = event.clientX;
+      dragStartWidth = sidebar.getBoundingClientRect().width;
+      handle.setPointerCapture(event.pointerId);
+      root.classList.add("sidebar-is-resizing");
+      event.preventDefault();
+    });
+
+    handle.addEventListener("pointermove", (event) => {
+      if (!dragging) return;
+      preferredWidth = Math.round(dragStartWidth + direction * (event.clientX - dragStartX));
+      applyWidth(preferredWidth);
+    });
+
+    const finishDrag = () => {
+      if (!dragging) return;
+      dragging = false;
+      preferredWidth = Number(handle.getAttribute("aria-valuenow"));
+      root.classList.remove("sidebar-is-resizing");
+      saveWidth();
+    };
+
+    handle.addEventListener("pointerup", finishDrag);
+    handle.addEventListener("pointercancel", finishDrag);
+
+    handle.addEventListener("keydown", (event) => {
+      const currentWidth = Number(handle.getAttribute("aria-valuenow"));
+      let nextWidth: number;
+
+      switch (event.key) {
+        case "ArrowLeft":
+          nextWidth = currentWidth - direction * 16;
+          break;
+        case "ArrowRight":
+          nextWidth = currentWidth + direction * 16;
+          break;
+        case "Home":
+          nextWidth = minWidth;
+          break;
+        case "End":
+          nextWidth = maxWidth();
+          break;
+        default:
+          return;
+      }
+
+      event.preventDefault();
+      preferredWidth = nextWidth;
+      applyWidth(preferredWidth);
+      saveWidth();
+    });
+
+    handle.addEventListener("dblclick", () => {
+      preferredWidth = defaultWidth;
+      applyWidth(preferredWidth);
+      saveWidth();
+    });
+
+    window.addEventListener("resize", () => applyWidth(preferredWidth));
+  }
+</script>
+
+<style>
+  .sidebar-resize-handle {
+    display: none;
+  }
+
+  @media (min-width: 50rem) {
+    .sidebar-resize-handle {
+      display: block;
+      position: fixed;
+      z-index: 6;
+      inset-block: var(--sl-nav-height) 0;
+      inset-inline-start: calc(var(--sl-sidebar-width) - 0.75rem);
+      width: 0.75rem;
+      cursor: col-resize;
+      touch-action: none;
+    }
+
+    .sidebar-resize-handle::before {
+      position: absolute;
+      inset-block: 0;
+      inset-inline-end: 0;
+      width: 2px;
+      background: var(--sl-color-hairline-shade);
+      content: "";
+    }
+
+    .sidebar-resize-handle::after {
+      position: absolute;
+      inset-block-start: 50%;
+      inset-inline-end: 1px;
+      width: 0.4rem;
+      height: 2.5rem;
+      transform: translateY(-50%);
+      border-radius: 0.3rem;
+      background: var(--sl-color-gray-3);
+      box-shadow: 0 0 0 2px var(--sl-color-bg-sidebar);
+      content: "";
+    }
+
+    .sidebar-resize-handle:hover::before,
+    .sidebar-resize-handle:focus-visible::before,
+    :global(html.sidebar-is-resizing) .sidebar-resize-handle::before {
+      width: 3px;
+      background: var(--sl-color-accent);
+    }
+
+    .sidebar-resize-handle:hover::after,
+    .sidebar-resize-handle:focus-visible::after,
+    :global(html.sidebar-is-resizing) .sidebar-resize-handle::after {
+      background: var(--sl-color-accent);
+    }
+
+    .sidebar-resize-handle:focus-visible {
+      outline: 2px solid var(--sl-color-accent);
+      outline-offset: -2px;
+    }
+
+    :global(html.sidebar-is-resizing),
+    :global(html.sidebar-is-resizing *) {
+      cursor: col-resize !important;
+      user-select: none !important;
+    }
+  }
+</style>
