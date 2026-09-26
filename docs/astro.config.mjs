@@ -94,13 +94,13 @@ export default defineConfig({
           collapsed: true,
           items: [
             {
-              slug: "guides/starting-a-cycle",
-            },
-            {
               slug: "guides/new-project",
             },
             {
               slug: "guides/existing-project",
+            },
+            {
+              slug: "guides/starting-a-cycle",
             },
             {
               slug: "guides/working-with-developer",
@@ -109,10 +109,10 @@ export default defineConfig({
               slug: "guides/revising-scope-or-design",
             },
             {
-              slug: "guides/resuming-work",
+              slug: "guides/review-findings",
             },
             {
-              slug: "guides/review-findings",
+              slug: "guides/resuming-work",
             },
             {
               slug: "guides/cancelling-and-new-cycles",

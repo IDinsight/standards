@@ -1,74 +1,80 @@
 ---
 title: Starting a Cycle
 description:
-  Select a mode, resolve pending decisions, and reserve a new cycle ID.
+  Give the first role a request; the agent handles cycle setup and saves its
+  state.
 ---
 
-Installation prepares the workflow files; it does not start a request.
-`CycleMode: UNSET` means no cycle is active. Before a workflow role does its
-work, the agent must validate the mode, reserve an ID, and save the request.
+Installation prepares the workflow files, but it does not start a cycle. To
+start one, give your request to the first role for your project. There is no
+separate setup command, and you do not need to create a cycle ID or edit
+`.standards/STATE.md` yourself.
 
-## Choose a mode and give the request
+## Give the first role your request
 
-You can choose a mode before describing the work, for example:
+For a **new project** with no implementation to preserve, start standard work
+with Scoper. In Codex, for example:
 
 ```text
-Use STANDARD for my next cycle.
+$scoper Build a website where volunteers can sign up for local events.
 ```
 
-The agent saves this as `PendingCycleMode`. It leaves the previous active-work
-record unchanged. You can replace or clear this preference before the next cycle
-starts.
+For an **existing project**, start standard work with Auditor:
 
-When the request arrives, the saved preference takes priority. Without one,
-`STANDARD` is the default. Explicitly invoking Developer for a small, clearly
-defined brownfield change can select `EXPEDITED`. A pending `STANDARD`
-preference prevents that inference. See
-[project and cycle modes](../../concepts/project-modes/).
+```text
+$auditor Add search by name and email to the existing user directory.
+```
 
-For example, in an installed brownfield project with no active cycle or pending
-preference, a request might be:
+In Claude Code, use `/scoper` or `/auditor` instead. The agent initializes the
+cycle before doing that role's work. Follow
+[Starting a New Project](../new-project/) or
+[Working on an Existing Project](../existing-project/) for the rest of each
+path.
+
+## Choose a cycle mode only when needed
+
+`STANDARD` is the default. You do not need to select it or set any state fields
+before giving the first role a request.
+
+For a small, clearly defined change in an existing project, you can invoke
+Developer directly to request the shorter `EXPEDITED` path:
 
 ```text
 $developer Fix the typo in the CLI's existing error message.
 ```
 
-Use `/developer` in Claude Code. The agent must still check that the request
-needs no skipped role and that cancelled work does not require an audit.
-Developer then prepares a plan for approval; invocation does not approve a plan
-that has not been written yet.
+Use `/developer` in Claude Code. The agent checks whether the request is
+eligible before starting expedited work. See
+[project and cycle modes](../../concepts/project-modes/#choose-the-cycle-mode)
+for the conditions.
+
+You can also state a preference in advance, such as “Use STANDARD for my next
+cycle.” The agent saves that preference, but it does not start a cycle until you
+give a request.
 
 ## Resolve a blocked request
 
-If the selected mode cannot handle the request, the agent must not silently
-switch it to standard work. It saves the request in `PendingCycleRequest` and
-the required decision in `PendingCycleBlockedOn`. No new cycle starts, and
-`Active Work.BlockedOn` remains untouched.
+If your chosen mode cannot handle the request, the agent keeps the request and
+asks you to choose a supported mode, revise it, or abandon it. You do not need
+to repeat a saved request after making that decision.
 
-Choose a supported mode, revise the request, or abandon it. Replacing or
-clearing the pending mode rechecks the saved request, so you do not need to
-repeat it. Abandoning the request clears its request and blocker fields; a mode
-preference can remain for later work. Greenfield projects cannot save an
-expedited preference.
+## What the agent does automatically
 
-## Reserve the ID before starting work
+Before the first role begins its work, the agent:
 
-After mode validation, the agent follows the
-[cycle ID allocation rules](../../reference/runtime-files/#cycle-identity):
-create an ID with a request name and a fresh token, check for collisions, and
-save it in `.standards/CYCLE_IDS.md` before assigning it to `Active Work.Id`. A
-failed initialization never makes a reserved ID reusable.
+1. Checks the installed project mode, any saved preference, and whether the
+   request can use the selected cycle mode.
+2. Reserves a unique cycle ID in `.standards/CYCLE_IDS.md`.
+3. Saves the request, mode, ID, and initial workflow state in
+   `.standards/STATE.md`.
 
-For the first cycle, save the request and validated `CycleMode`, clear all
-pending fields, and keep the `INITIAL` handoff. Scope, Architecture, and
-Development start at `NONE`; recovery and outstanding obligations are inactive.
-Standard work enters `SCOPING` in greenfield or `AUDITING` in brownfield.
-Eligible expedited work enters `DEVELOPING`.
+Those are agent responsibilities, not manual steps for you. The agent asks when
+it needs a decision it cannot make from your request. Once a role finishes, you
+still invoke the next role from its handoff; changing the saved state does not
+run another role automatically.
 
-From `SIGNED_OFF` or retained `CANCELLED`, use the
-[new-cycle procedure](../cancelling-and-new-cycles/#start-the-next-cycle)
-instead. It preserves any required checks of cancelled changes and records
-`NEW_CYCLE`. Resolving a pending request must still follow that procedure.
-
-The selected entry role must be explicitly invoked before doing its work. Saving
-a mode or a request alone does not run a skill.
+If you are starting work after sign-off or cancellation, the agent also follows
+the [new-cycle procedure](../cancelling-and-new-cycles/#start-the-next-cycle) to
+preserve the previous cycle and check any work left by cancellation. The
+[protocol](../../reference/protocol/#cycle-modes) has the exact state and ID
+rules.

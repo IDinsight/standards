@@ -8,9 +8,10 @@ Use this guide when there is no existing implementation to preserve. Complete
 
 ## Establish scope first
 
-Follow [cycle initialization](../starting-a-cycle/) to reserve an ID and start
-`STANDARD` work in `SCOPING`. Then run Scoper to define what to build and how to
-check the result.
+Give Scoper your request. The agent handles
+[cycle initialization](../starting-a-cycle/), including reserving an ID and
+starting `STANDARD` work in `SCOPING`. Scoper then defines what to build and how
+to check the result.
 
 ## Define the design
 

@@ -18,9 +18,10 @@ especially after cancellation. Expedited work follows its own shorter sequence.
 
 ## Give Auditor a concrete request
 
-Follow [cycle initialization](../starting-a-cycle/) to validate the request and
-reserve its ID before saving active work. Run Auditor in `AUDITING`. It checks
-the existing code, behavior, and project rules needed to understand the change.
+Give Auditor your request. The agent handles
+[cycle initialization](../starting-a-cycle/), including validating the request
+and reserving its ID. Auditor then checks the existing code, behavior, and
+project rules needed to understand the change.
 
 Auditor chooses an [inspection mode](../../roles/auditor/#modes) based on how
 much reliable project context already exists.
