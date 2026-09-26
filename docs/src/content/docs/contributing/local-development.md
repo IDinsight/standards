@@ -4,8 +4,10 @@ description:
   Preview the website, run checks, and understand documentation deployment.
 ---
 
-Run the commands on this page from the repository root. The website lives in
-`docs/`; the root `docs:*` commands run its package scripts for you.
+These commands are for contributors working on this repository. Run them from
+the repository root. If an agent is making the change for you, it can run the
+checks and report the results. The website lives in `docs/`; the root `docs:*`
+commands run its package scripts.
 
 Use Node.js 22.12 or newer and pnpm 10.34.5, as specified in the root
 `package.json`. Markdown checks also need `pre-commit`; CI uses version 4.2.0.
@@ -87,15 +89,15 @@ pre-commit run markdownlint-cli2 --files docs/src/content/docs/index.md
 ```
 
 The root `make lint` command runs Prettier in write mode across Markdown,
-excluding `PROTOCOL.md`. It can change files beyond the page you are editing and
-does not replace the Markdown check above.
+excluding `PROTOCOL.md` and `CHANGELOG.md`. It can change files beyond the page
+you are editing and does not replace the Markdown check above.
 
 ## Dependencies and generated files
 
 Use the root `pnpm-lock.yaml` for dependency changes; there is no separate docs
-lockfile. Website dependencies belong in `docs/package.json`, while
-`pnpm-workspace.yaml` registers the package and enables its generation hooks and
-permitted dependency build scripts.
+lockfile. Website dependencies belong in `docs/package.json`.
+`pnpm-workspace.yaml` lists `docs/` as a workspace package and allows the
+scripts needed to generate reference pages and build dependencies.
 
 Keep generated output out of commits. Git ignores dependency directories, the
 docs cache and build output, generated reference pages, and their downloadable

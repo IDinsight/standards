@@ -5,7 +5,7 @@ description:
 ---
 
 This repository contains both the framework and its documentation website. Start
-with the source that owns the change you want to make.
+with the file responsible for the part you want to change.
 
 ## Main locations
 
@@ -18,7 +18,7 @@ with the source that owns the change you want to make.
 | `docs/src/content/docs/` | Website content, including generated references.                      |
 | `docs/astro.config.mjs`  | Sidebar navigation, site URL, and base path.                          |
 | `docs/scripts/`          | Reference generation and local link checking.                         |
-| `.github/workflows/`     | Documentation, installer, Markdown, secrets, and release checks.      |
+| `.github/workflows/`     | Documentation, installer, Markdown, secret scanning, and releases.    |
 
 ## Inside a role package
 
@@ -35,17 +35,17 @@ Other files depend on the role:
 | `styles/`         | Shared and topic-specific guidance for Developer, Tester, and Documenter.                 |
 | `user-styles/`    | Optional, explicitly selected profiles for Developer and Documenter.                      |
 
-Evaluation scenarios describe intended behavior. Parsing their JSON, linting
-Markdown, or building the site does not run model evaluations or establish that
-the roles passed them.
+Evaluation scenarios describe intended role behavior. Checking their JSON,
+linting Markdown, or building the site does not run those evaluations or show
+that the roles passed them.
 
 See [Roles](../../roles/overview/) for behavior and
 [Artifact Templates](../../reference/artifact-templates/) for output formats.
 
-## Runtime and client templates
+## Installation templates
 
-`templates/common/` contains the managed `AGENTS.md` and `CLAUDE.md` integration
-blocks, plus initial `.standards/CYCLE_IDS.md` and
+`templates/common/` contains the STANDARDS sections added to `AGENTS.md` and
+`CLAUDE.md`, plus initial `.standards/CYCLE_IDS.md` and
 `.standards/INSTALLATION.json` files.
 
 `templates/greenfield/` and `templates/brownfield/` contain initial

@@ -59,20 +59,21 @@ the glossary for every paragraph.
 ## Edit the source of generated pages
 
 The Protocol page and eight template pages are generated from `PROTOCOL.md` and
-`skills/<role>/template.md`. Their wording comes from those files. Update the
-original when changing a rule or required format, then run:
+`skills/<role>/template.md`. Their rules and required formats come from those
+files; the introductory text comes from `docs/scripts/sync-reference.mjs`. Make
+changes in the relevant source, then run:
 
 ```sh
 pnpm run docs:sync-reference
 ```
 
-The command also runs before development and production builds. Run it again if
-a source changes while the development server is already running.
+The command also runs automatically before development and production builds. If
+a source changes while the development server is already running, the
+contributor or agent editing it reruns the command.
 
-`docs/scripts/sync-reference.mjs` controls the generated introductions, titles,
-and guide links. Register a new template there and link it from the
-[template index](../../reference/artifact-templates/). Generated page copies and
-downloadable originals are ignored by Git.
+To add a new template page, register it in `docs/scripts/sync-reference.mjs` and
+link it from the [template index](../../reference/artifact-templates/).
+Generated page copies and downloadable originals are ignored by Git.
 
 A documentation-only rewrite should describe the current rules. A behavior
 change needs a coordinated update to the protocol, affected role packages,
