@@ -46,8 +46,9 @@ After the responsible role makes the correction, it decides which later checks
 need to run again. Scoper keeps valid requirements and acceptance IDs; Architect
 keeps valid design decisions. If Developer needs to revisit the implementation,
 it reopens only affected plan steps. It asks for your approval before coding
-when the revised plan materially changes the approved implementation approach.
-See [Working with Developer](../working-with-developer/).
+when the revised plan materially changes approved build steps, dependencies,
+behavior, or the technical approach. See
+[Working with Developer](../working-with-developer/).
 
 You still invoke each role when its handoff asks you to. The agent manages the
 state and return path; handoffs do not automatically start the next role. The

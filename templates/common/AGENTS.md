@@ -50,11 +50,14 @@ For workflow roles other than Navigator, before performing workflow work:
    (pending/initial cycle-mode selection, user-authorized `PROMOTE`,
    `USER_REWORK`, `NEW_CYCLE`, `SIGNOFF`, or `CANCEL`) even from another role's
    or a user-owned state; after recording that transition, perform role work
-   only if the invoked skill owns the resulting state. An active role may also
-   perform the protocol-defined `PROMOTE` transition without a separate user
-   instruction when an expedited cycle requires a skipped standard guarantee.
-   Navigator is the exception and may be invoked from any state without
-   mutation.
+   only if the invoked skill owns the resulting state. Greenfield bootstrap
+   cancellation requires the protocol's preview and explicit approval of the
+   uninstall command before removal; a cancellation request alone is not removal
+   approval. Use the CLI and stop on refusal or failure; do not perform manual
+   cleanup as a fallback. An active role may also perform the protocol-defined
+   `PROMOTE` transition without a separate user instruction when an expedited
+   cycle requires a skipped standard guarantee. Navigator is the exception and
+   may be invoked from any state without mutation.
 6. If the state is `AWAITING_USER_SIGNOFF`, do not advance until the user signs
    off, requests rework, cancels the cycle, or explicitly promotes an
    `EXPEDITED` cycle to `STANDARD`. If the state is `SIGNED_OFF` or `CANCELLED`,

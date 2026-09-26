@@ -566,6 +566,18 @@
         "Reviewer findings are not rewritten or marked resolved by Developer.",
         "The recovery invocation requests a fresh Reviewer chat, names IMPLEMENTATION, and gives advisory model guidance."
       ]
+    },
+    {
+      "id": 45,
+      "prompt": "Invoke Developer to cancel the active cycle. Saved ProjectMode is still GREENFIELD, CycleMode=STANDARD, WorkflowState=DEVELOPING. Before any removal, repository evidence shows that the active cycle created a working implementation, including code written by the user during collaboration. A bootstrap removal preview was approved earlier, before that implementation appeared. The runtime, active work, recovery, and outstanding obligations still exist.",
+      "expected_output": "Developer recognizes that bootstrap cancellation is no longer eligible, persists the permanent BROWNFIELD transition, and uses retained CANCELLED semantics without uninstalling.",
+      "files": [],
+      "assertions": [
+        "It checks current implementation evidence despite the stale GREENFIELD mode and earlier removal approval.",
+        "It counts user-authored implementation and persists the permanent BROWNFIELD transition.",
+        "It records retained CANCELLED with CycleMode UNSET and a CANCEL handoff from DEVELOPING, preserves Active Work, clears pending-cycle fields, recovery, and outstanding obligations according to the protocol.",
+        "It preserves the installed runtime, cycle-ID registry, skills, project implementation, and project artifacts; no uninstall command or manual removal is executed."
+      ]
     }
   ]
 }

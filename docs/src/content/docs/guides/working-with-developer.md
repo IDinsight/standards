@@ -20,13 +20,16 @@ Codex:       $developer Continue from `.standards/STATE.md` in STEPWISE mode.
 Claude Code: /developer Continue from `.standards/STATE.md` in STEPWISE mode.
 ```
 
-Use the line for your client. If you do not specify a mode, Developer uses
-`AUTONOMOUS`. It reads the saved request and relevant inputs, checks that it can
-proceed, and writes a proposed plan. Review the proposed steps, expected
-outcomes, and checks. Ask for changes or explicitly approve the plan before
-implementation begins. Developer saves your decision and tracks step progress.
-The [Developer page](../../roles/developer/#approval-before-implementation)
-explains when another approval is required.
+Use the line for your client. For a new plan, Developer defaults to `AUTONOMOUS`
+unless you choose another mode. When resuming, it uses the mode saved in the
+plan unless you ask to switch. It reads the saved request and relevant inputs,
+checks that it can proceed, and creates or resumes the plan. For a proposed
+plan, review the steps, expected outcomes, and checks. Ask for changes or
+explicitly approve it before implementation begins. Developer saves your
+decision and tracks step progress. Resuming an unchanged approved plan does not
+require another approval. The
+[Developer page](../../roles/developer/#approval-before-implementation) explains
+when another approval is required.
 
 ## Choose a personal coding style
 
@@ -61,8 +64,9 @@ update step statuses or choose a step yourself.
 
 If you report a defect in previously approved work, Developer reopens the
 affected steps and keeps valid completed work. It can move a completed plan back
-into progress. If the fix changes the approved implementation approach,
-Developer presents a revised plan and waits for your approval before coding.
+into progress. If the fix materially changes approved build steps, dependencies,
+behavior, or the technical approach, Developer presents a revised plan and waits
+for your approval before coding.
 
 Self-checks provide implementation feedback. Standard work still goes through
 Tester for formal verification and Reviewer for review.
@@ -76,6 +80,6 @@ steps that no longer meet the requirements, and carries forward unresolved
 implementation defects. You do not need to edit the plan or workflow records.
 
 Reference updates alone do not need another approval. If the new requirements
-change the implementation approach, Developer presents a revised plan for your
-approval before continuing. It fixes and checks its outstanding defects before
-marking the plan complete.
+materially change approved build steps, dependencies, behavior, or the technical
+approach, Developer presents a revised plan for your approval before continuing.
+It fixes and checks its outstanding defects before marking the plan complete.

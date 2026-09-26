@@ -5,9 +5,10 @@ description:
 ---
 
 To stop an active cycle, tell the current workflow agent to cancel it. The agent
-checks the project mode and records the appropriate transition. You do not need
-to edit `.standards/STATE.md` or remove workflow files yourself. Cancellation
-ends the cycle; it does not undo project changes.
+checks the project mode and follows the appropriate cancellation path. A
+bootstrap reset requires your approval before STANDARDS is removed. You do not
+need to edit `.standards/STATE.md` or remove workflow files yourself.
+Cancellation ends the cycle; it does not undo project changes.
 
 ## What happens when you cancel
 
@@ -22,14 +23,32 @@ cycle created or materially changed any implementation, including code you
 wrote. If it did, the project becomes brownfield and uses the retained
 `CANCELLED` path above.
 
-If there is no implementation, cancellation performs a **bootstrap reset**: the
-agent removes the STANDARDS runtime, installed role skills, and marked
-integration sections it can verify as framework owned. Project-owned files and
-role outputs outside `.standards/` remain. The agent reverts a client setting
-only when it can verify that the installer added it and it has not changed. This
-reset removes the saved runtime state and cycle-ID registry. See the
+If there is no implementation, cancellation requires a **bootstrap reset**. The
+agent previews removal with `standards uninstall` if a suitable CLI is installed
+globally, or `npx @idinsight/standards@latest uninstall` otherwise. It shows you
+the project path, what will be removed or updated, and the exact command, then
+asks for your explicit approval. Saying "cancel this cycle" alone does not
+approve uninstalling STANDARDS.
+
+Once you approve, the agent runs the command with `--yes` to avoid a second
+terminal prompt. The uninstaller removes the entire `.standards/` runtime and
+verified STANDARDS role directories for both clients, including local additions
+inside them. This deletes saved workflow state, context, and cycle-ID history.
+It also removes marked integration sections and unchanged settings that the
+installer added. Project work and role outputs outside the removed directories
+remain. See
+[Uninstall from a project](../../getting-started/installation/#uninstall-from-a-project)
+for the removal boundaries.
+
+While approval is pending, the agent pauses and keeps the installation and
+active cycle in place. If you decline, cancellation is not completed; tell the
+agent when you want to continue working. If the command is unavailable or fails,
+the agent reports the problem and follows the uninstaller's recovery
+instructions. It does not finish the reset by deleting files manually. If the
+preview changes before execution, the agent asks you to approve the updated
+removal. See the
 [bootstrap reset rules](../../reference/protocol/#greenfield-bootstrap-cancellation)
-for the exact boundaries.
+for the full procedure.
 
 Reverting project changes is a separate decision. Ask the agent to help with
 that work if you want it; cancellation itself does not restore the working tree.

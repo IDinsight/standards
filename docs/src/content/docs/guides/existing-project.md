@@ -18,7 +18,7 @@ especially after cancellation. Expedited work follows its own shorter sequence.
 
 ## Give Auditor a concrete request
 
-Give Auditor your request. The agent handles
+Invoke Auditor with your request. The agent handles
 [cycle initialization](../starting-a-cycle/), including validating the request
 and reserving its ID. Auditor then checks the existing code, behavior, and
 project rules needed to understand the change.
@@ -28,19 +28,21 @@ much reliable project context already exists.
 
 ## Scope the change against the baseline
 
-After the audit, run Scoper. Define what changes, what must keep working, and
-how to check the result. Existing design decisions can constrain the work; a
-proposed design does not become a requirement just because someone has written
-it down.
+After the audit, invoke Scoper from the handoff. Scoper defines what changes,
+what must keep working, and how to check the result, asking you when it needs a
+decision. Existing design decisions can constrain the work; a proposed design
+does not become a requirement just because someone has written it down.
 
 ## Design and implement
 
-Architect makes the design decisions needed to meet the requirements. With valid
-context for this cycle, it hands off directly to Developer. Planning code
-changes does not by itself require a second audit. Developer prepares its own
-implementation plan for approval; follow
+Invoke Architect when Scoper hands off. Architect makes the design decisions
+needed to meet the requirements. With valid context for this cycle, it hands off
+directly to Developer. Planning code changes does not by itself require a second
+audit. Invoke Developer from that handoff; it prepares its own implementation
+plan for your approval. Follow
 [Working with Developer](../working-with-developer/).
 
-If important project facts are missing or wrong, return to Auditor before using
-those facts in further work. Then follow the
+If important project facts are missing or wrong, the agent pauses work that
+depends on them and gives you a handoff to invoke Auditor. Follow the handoffs
+through any corrections and the
 [remaining standard steps](../../concepts/states-and-handoffs/#standard-forward-paths).

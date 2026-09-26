@@ -181,6 +181,8 @@ cycle mode to `UNSET`. New work starts a new cycle rather than reopening the old
 one.
 
 Greenfield cancellation can instead remove the framework installation if no
-implementation has been created. See
+implementation has been created. The agent previews the uninstall command and
+waits for your explicit removal approval; the active cycle remains in place
+until removal succeeds. See
 [cancellation and new cycles](../../guides/cancelling-and-new-cycles/) for the
 conditions, and [Human Decisions](../human-decisions/) for your choices.

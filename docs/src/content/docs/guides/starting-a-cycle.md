@@ -73,8 +73,10 @@ it needs a decision it cannot make from your request. Once a role finishes, you
 still invoke the next role from its handoff; changing the saved state does not
 run another role automatically.
 
-If you are starting work after sign-off or cancellation, the agent also follows
-the [new-cycle procedure](../cancelling-and-new-cycles/#start-the-next-cycle) to
-preserve the previous cycle and check any work left by cancellation. The
-[protocol](../../reference/protocol/#cycle-modes) has the exact state and ID
-rules.
+If you are starting work after sign-off or a cancellation that retained the
+installation, the agent follows the
+[new-cycle procedure](../cancelling-and-new-cycles/#start-the-next-cycle) to
+check any work left by cancellation and initialize the new cycle. After a
+bootstrap reset, [install STANDARDS again](../../getting-started/installation/)
+first. The [protocol](../../reference/protocol/#cycle-modes) has the exact state
+and ID rules.

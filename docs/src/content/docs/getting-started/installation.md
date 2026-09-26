@@ -106,15 +106,22 @@ The exact preservation and upgrade rules are in the
 
 ## Uninstall from a project
 
-Uninstall removes STANDARDS from a project even if a cycle is active. It does
-not cancel the cycle or undo changes to your project. Stop active coding-agent
-work first, and save anything you want to keep from `.standards/` or the
-installed role directories.
+Uninstall removes STANDARDS from a project even if a cycle is active. The
+command itself does not record a cancellation or undo changes to your project.
+For a [bootstrap reset](../../guides/cancelling-and-new-cycles/), the agent
+first checks eligibility, shows you a removal preview, and asks for explicit
+approval before running this command. A generic cancellation request does not
+approve removal, and `--yes` does not replace that approval.
+
+Stop active coding-agent work before removal, and save anything you want to keep
+from `.standards/` or the installed role directories. For an agent-managed
+bootstrap reset, the agent pauses workflow work while waiting for your approval.
 
 Run `npx @idinsight/standards@latest uninstall` in a terminal to choose a
 project, see the removal preview, and confirm. It always removes the complete
-STANDARDS installation, including every installed client. To preview without
-prompts or changes, run:
+STANDARDS installation, including every installed client. If you installed the
+CLI globally, you can use `standards uninstall` with the same options. To
+preview without prompts or changes, run:
 
 ```sh
 npx @idinsight/standards@latest uninstall --project /absolute/path/to/project --dry-run

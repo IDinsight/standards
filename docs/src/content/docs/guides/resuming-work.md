@@ -70,6 +70,9 @@ Developer plan still needs your explicit approval before implementation. At
 `AWAITING_USER_SIGNOFF`, review the finished work and decide whether to accept
 it, request changes, or cancel.
 
-After sign-off or cancellation, a new request starts a
-[new cycle](../cancelling-and-new-cycles/#start-the-next-cycle). Navigator can
-explain the saved state at any time, but cannot advance the workflow.
+After sign-off or a cancellation that retained the installation, a new request
+starts a [new cycle](../cancelling-and-new-cycles/#start-the-next-cycle). After
+a bootstrap reset,
+[install STANDARDS again](../../getting-started/installation/) before starting
+another cycle. Navigator can explain available project evidence at any time, but
+cannot advance the workflow.

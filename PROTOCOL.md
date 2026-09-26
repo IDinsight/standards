@@ -1332,7 +1332,8 @@ itself authorizes **Expedited Promotion** instead.
 
 ### Cancel an active cycle
 
-- If `ProjectMode: GREENFIELD`, follow **Greenfield Bootstrap Cancellation**.
+- If `ProjectMode: GREENFIELD`, follow **Greenfield Bootstrap Cancellation**,
+  including explicit approval of the uninstall operation before removal.
 - If `ProjectMode: BROWNFIELD`, transition to `CANCELLED`, set
   `CycleMode: UNSET`, leave all pending-cycle fields clear, record
   `Handoff.Kind: CANCEL`, set `From` to the
@@ -1421,25 +1422,53 @@ permanent `BROWNFIELD` transition and use retained brownfield `CANCELLED`
 semantics instead. Only when no such implementation exists should cancellation
 be treated as a S.T.A.N.D.A.R.D.S. reset rather than a reusable terminal cycle.
 
-The reset must:
+The agent must perform the reset through the CLI's **Project Uninstallation**
+operation after obtaining explicit user approval of the removal:
 
-- read `.standards/INSTALLATION.json` before removal and revert only
-  client-setting mutations recorded there as framework-created; remove a setting
-  only when its current value still exactly matches the recorded installed
-  value; preserve all others;
-- remove the `.standards/` runtime and project-local S.T.A.N.D.A.R.D.S. skill or
-  framework files injected by the installer;
-- remove only the bounded S.T.A.N.D.A.R.D.S. integration block from `AGENTS.md`
-  and `CLAUDE.md`; delete either file only if no non-whitespace content remains;
-- leave all project files and role-owned workflow artifacts outside the runtime
-  untouched.
+1. Select `standards uninstall` if a globally installed STANDARDS CLI supports
+   the required uninstall options and ownership records. Otherwise use
+   `npx @idinsight/standards@latest uninstall`. Pass `--project` with the
+   project's absolute path for both preview and execution.
+2. Run the selected command with `--dry-run`. This preview may run before
+   removal approval. Show the user the target project, planned removals and
+   shared-file updates, any warnings, and the exact removal command including
+   `--yes`. Explain that removal covers the entire `.standards/` runtime and
+   all verified role skill directories for both clients, including local edits
+   or added files inside them. Saved workflow state, context, and cycle-ID
+   history will be lost; another cycle will require fresh installation.
+3. Ask for explicit approval to execute that removal command for the previewed
+   project and scope. A generic cancellation request does not grant removal
+   approval. During the active cycle, record the target, command, and pending
+   approval in `Active Work.BlockedOn`, preserving any other unresolved
+   questions. Keep the workflow state, cycle mode, recovery, and outstanding
+   obligations intact while waiting. Do not remove files, record `CANCELLED`,
+   or continue role work while removal approval is pending. A resumed chat
+   must resolve the saved question; silence or a request to continue is not
+   approval to uninstall.
+4. After approval, recheck bootstrap eligibility and the removal preview. If
+   implementation now exists, persist `BROWNFIELD` and use retained cancellation
+   instead. If the target, command, planned removal scope, or warnings have
+   changed, present the updated preview and obtain fresh approval. Otherwise
+   run the approved command with `--yes`; this flag avoids a second CLI prompt
+   and never substitutes for user approval.
+5. Confirm successful removal before reporting the bootstrap reset complete.
+   Do not recreate runtime files to record completion.
 
+If approval is declined, clear only the reset approval question, preserve the
+installation and active cycle, and report that cancellation was not completed.
+Further role work requires a user instruction to continue. If a usable CLI is
+unavailable, the preview fails, or uninstall refuses or fails, stop and report
+that the reset did not complete. Follow **Project Uninstallation** recovery
+rules, preserving any reported backups. Do not bypass a refusal by switching
+commands or by manually deleting files, editing managed blocks, or reverting
+settings. A retry requires a valid preview and approval covering the retry.
+
+The uninstaller enforces ownership using `.standards/INSTALLATION.json`, skill
+markers, and managed integration boundaries. It removes only marked integration
+blocks and recorded client settings whose values still match; project work
+outside the removed runtime and verified skill directories is preserved.
 S.T.A.N.D.A.R.D.S. does not restore the project working tree. Reverting project
 changes is the user's responsibility.
-
-Managed block boundaries define framework ownership; do not decide whether to
-delete `AGENTS.md` or `CLAUDE.md` based on who originally created the file. An
-existing unbounded `@AGENTS.md` import is user-owned and preserved.
 
 The reset removes `STATE.md` and `CYCLE_IDS.md`, so no persisted `CANCELLED`
 state or runtime cycle-ID registry remains. Removal of the runtime ends the
@@ -1582,8 +1611,11 @@ technical design, project context, tests, reviews, or documentation.
 An explicit `standards uninstall` removes the project's installed runtime and
 all verified STANDARDS skill packages for Codex and Claude Code. It is allowed
 in either project mode, with or without an active cycle. Removal ends the
-runtime's lifetime; it does not complete, sign off, cancel, or revert project
-work. The globally installed CLI is unaffected.
+runtime's lifetime; the command itself does not complete, sign off, cancel,
+or revert project work. **Greenfield Bootstrap Cancellation** uses this same
+operation after the agent verifies eligibility and obtains explicit removal
+approval. The CLI does not determine cancellation eligibility or enforce that
+conversation-level approval. The globally installed CLI is unaffected.
 
 - Default to the current directory; accept `--project <path>` for an existing
   project directory. Offer `--dry-run` to report every planned path removal or

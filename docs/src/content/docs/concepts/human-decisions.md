@@ -27,8 +27,11 @@ resolve the choice. It does not silently switch modes or start the cycle. See
 
 During an active cycle, you can request changes, promotion to standard work, or
 cancellation. An explicit request can authorize the receiving agent to update
-the workflow record, even when another role owns the current step. Doing the
-next role's work still requires invoking that role.
+the workflow record, even when another role owns the current step. A greenfield
+bootstrap reset also requires your explicit approval of the uninstall command
+after the agent shows its removal preview. Until you approve and removal
+succeeds, that cancellation is not complete. Doing the next role's work still
+requires invoking that role.
 
 [Rework](../../guides/revising-scope-or-design/) stays within the current cycle.
 After sign-off or retained cancellation, a new request starts a
