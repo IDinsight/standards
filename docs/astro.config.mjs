@@ -35,6 +35,10 @@ export default defineConfig({
           slug: "index",
         },
         {
+          label: "Need Help?",
+          slug: "need-help",
+        },
+        {
           label: "Getting Started",
           collapsed: false,
           items: [
