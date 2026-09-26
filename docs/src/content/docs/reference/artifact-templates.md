@@ -3,11 +3,12 @@ title: Artifact Templates
 description: Find each role's document format and where its output belongs.
 ---
 
-These templates define the documents that workflow roles create. Each template
-page is generated from its source in `skills/<role>/template.md`, so it shows
-the format and rules used by that role.
+These templates show what each workflow role records. The agent uses the
+appropriate template when it creates or updates a document; you do not need to
+choose a template or fill one out yourself. Each template page comes from
+`skills/<role>/template.md`, the file that guides that role.
 
-## Choose a template
+## Templates by role
 
 | Role         | Document                                             | What it records                                                |
 | ------------ | ---------------------------------------------------- | -------------------------------------------------------------- |
@@ -23,10 +24,10 @@ the format and rules used by that role.
 Navigator has no template or saved report. Its explanations and quiz feedback
 stay in the conversation.
 
-## Use the template's own rules
+## How roles use the templates
 
-Keep the document as short as the work allows, but retain its required sections.
-The templates differ:
+The agent keeps each document as short as the work allows while retaining its
+required sections. The templates differ:
 
 - Scope, technical design, and project context allow empty sections to be
   omitted.
@@ -38,13 +39,14 @@ The templates differ:
 - Development plans keep the required plan and step fields. Optional
   implementation notes can be omitted.
 
-An empty finding list does not prove completion. Record the checks actually
-performed, what their results support, and what remains unresolved.
+An empty finding list does not prove completion. The responsible role records
+the checks it performed, what the results show, and what remains unresolved.
 
 ## Output locations
 
-Paths below are relative to the project using STANDARDS. `<cycle-id>` means the
-exact value of `Active Work.Id`.
+Paths below are relative to the project using STANDARDS. The agent creates or
+updates each document at the listed location. `<cycle-id>` is the ID saved in
+`Active Work.Id`.
 
 | Document               | Location                                                                                                                |
 | ---------------------- | ----------------------------------------------------------------------------------------------------------------------- |
@@ -65,16 +67,17 @@ other locations are fixed or derived from the cycle ID.
 
 New scope and design documents, and every development plan and assessment
 record, carry a marker identifying their cycle. Review reports also identify the
-review kind. Moving or renaming a file does not change its owner.
+review kind. Moving or renaming a file does not change which cycle owns it.
 
 An existing unmarked project scope or design document can remain shared across
 cycles. Tests, guides, and docstrings also remain reusable project files; their
 assessment records belong to a cycle.
 
-If a new scope or design would overwrite another cycle's file, choose a
-different path. If a required report path contains an unrelated or incorrectly
-marked file, preserve it and stop dependent work until the conflict is resolved.
-Do not silently overwrite, relabel, or choose another path.
+If a new scope or design would overwrite another cycle's file, the agent chooses
+a different path. If a required report path contains an unrelated or incorrectly
+marked file, the agent keeps it and stops work that depends on the report until
+the conflict is resolved. It does not overwrite or relabel that file or silently
+choose another report path.
 
 See [file ownership](../../concepts/ownership/#artifact-provenance) and the
 [exact path and marker rules](../protocol/#workflow-artifact-provenance).

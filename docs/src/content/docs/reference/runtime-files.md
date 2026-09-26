@@ -4,9 +4,10 @@ description:
   Look up the files that store workflow rules, progress, and cycle IDs.
 ---
 
-The **runtime** is the installed framework's files and settings in a project.
-The files under `.standards/` hold rules and saved progress; plans, reports,
-tests, and project documentation live separately.
+The installed STANDARDS files and settings are its **runtime**. Files under
+`.standards/` hold the workflow rules and saved progress. Plans, reports, tests,
+and project documentation live elsewhere. The agent updates workflow records as
+it works; you do not need to maintain them by hand.
 
 This page describes the required layout installed by the CLI. See
 [Installation and Setup](../../getting-started/installation/).
@@ -25,8 +26,8 @@ This page describes the required layout installed by the CLI. See
 
 ## Workflow state
 
-`STATE.md` is version-controlled so another session can resume from the saved
-work rather than infer progress from chat history.
+`STATE.md` is saved with the project so another chat can resume from the
+recorded work instead of relying on chat history.
 
 | Field or section          | What it stores                                                          |
 | ------------------------- | ----------------------------------------------------------------------- |
@@ -47,10 +48,10 @@ The pending request and question are a pair: the request is `UNSET` exactly when
 the question is `NONE`. A question about the next cycle belongs there, not in
 the current or previous cycle's `Active Work.BlockedOn`.
 
-Initial templates leave the ID and request `UNSET`. Workflow work begins only
-after the request's mode is validated and a cycle ID is reserved. Document paths
-use `NONE` until their owners create the files. Expedited scope and design paths
-stay `NONE` unless promotion brings those roles in.
+On installation, the ID and request are `UNSET`. Before workflow work begins,
+the agent checks the cycle mode and reserves an ID. Document paths use `NONE`
+until the responsible roles create the files. In expedited work, scope and
+design paths stay `NONE` unless the cycle moves to the standard workflow.
 
 After sign-off or retained cancellation, cycle mode returns to `UNSET` and
 `Active Work` keeps the last cycle's record. A new request starts a new cycle.
@@ -59,27 +60,28 @@ See the [full state format](../protocol/#persisted-workflow-state) and
 
 ## Cycle identity
 
-`CYCLE_IDS.md` reserves every allocated cycle ID for as long as the runtime
-remains installed. It is an append-only list, not a log of requests or workflow
-history.
+`CYCLE_IDS.md` reserves every cycle ID for as long as STANDARDS remains
+installed. It is a list of IDs, not a history of requests or completed work.
 
-To allocate an ID:
+When a cycle starts, the agent:
 
-1. Combine a request-based name with a fresh collision-resistant token, such as
-   a UUID or timestamp plus random suffix.
-2. Check the registry, existing output paths, and cycle markers for collisions.
-3. Append the ID and save the registry.
-4. Only then save that ID in `Active Work` and initialize the cycle.
+1. Combines a name based on the request with a fresh, hard-to-duplicate suffix,
+   such as a UUID or timestamp plus random characters.
+2. Checks the ID list, existing document paths, and cycle markers to make sure
+   the ID is unused.
+3. Adds the ID to the list and saves it.
+4. Only then saves that ID in `Active Work` and starts the cycle.
 
-If the registry write fails, the cycle cannot start. If a later initialization
-step fails, the ID stays reserved. Never edit, remove, reorder, or reuse
-entries.
+If saving the ID fails, the agent cannot start the cycle. If a later setup step
+fails, the ID stays reserved. The agent must not edit, remove, reorder, or reuse
+an existing entry.
 
-Reinstall, upgrade, and explicit workflow reinitialization must preserve the
-registry. If it is missing from an installed runtime, stop work that needs a new
-ID and restore it; do not guess its history or recreate it empty. Intentional
-runtime removal followed by fresh installation starts a new registry, but
-existing files and cycle markers still need collision checks.
+The installer preserves this list during reinstall or upgrade. A workflow reset
+within the same installation also keeps it. If the list is missing, the agent
+stops work that needs a new ID and reports the problem; it cannot safely guess
+the missing IDs or start an empty list. Removing STANDARDS and installing it
+again starts a new list, but the agent still checks existing files for ID
+collisions.
 
 See the [registry rules](../protocol/#cycle-id-registry).
 
@@ -89,8 +91,8 @@ See the [registry rules](../protocol/#cycle-id-registry).
 whose status Auditor still needs to establish. It is separate from
 `Outstanding Obligations`, which tracks specific defects to fix.
 
-Use `NONE` when no sources remain. Otherwise, each list entry records the
-cancelled cycle's exact ID and request:
+The agent records `NONE` when no cancelled cycles need checking. Otherwise, each
+entry records a cancelled cycle's exact ID and request:
 
 ```markdown
 `BaselineReconciliation`:
@@ -101,10 +103,10 @@ cancelled cycle's exact ID and request:
   `Add internal notes to admin records.`
 ```
 
-Preserve the ordered list through handoffs, recovery, rework, and cancellation.
-Append each new source once. Keep the full list until Auditor resolves every
-source, then set it to `NONE`. A summary in the handoff cannot replace it.
-Invalid entries block work that depends on the record.
+The agent keeps the list through handoffs, corrections, rework, and
+cancellation, adding each new cycle once. Auditor sets it to `NONE` after
+checking every listed cycle. A handoff summary cannot replace the list. Invalid
+entries block work that depends on it.
 
 See [when this check is needed](../../guides/cancelling-and-new-cycles/) and
 [the exact format](../protocol/#baseline-reconciliation-format).
@@ -112,8 +114,8 @@ See [when this check is needed](../../guides/cancelling-and-new-cycles/) and
 ## Project context
 
 Auditor writes `CONTEXT.md` with relevant existing behavior, tools, commands,
-constraints, and evidence. Installation must preserve existing context and must
-not invent audit results.
+constraints, and evidence. The installer preserves existing context and does not
+invent audit results.
 
 Expedited work can consult earlier context, but that does not make it current
 for the new cycle. After promotion, Auditor distinguishes changes made during
@@ -122,32 +124,32 @@ the cycle from the project as it existed beforehand. See
 
 ## Installation and client integration
 
-`AGENTS.md` contains the framework's marked integration section alongside
-project instructions. `CLAUDE.md` provides the Claude Code import. The installer
-must preserve project-owned text and compatible existing settings.
+`AGENTS.md` contains the framework's marked section alongside project
+instructions. `CLAUDE.md` lets Claude Code use those instructions. The installer
+preserves project-owned text and compatible existing settings.
 
 `INSTALLATION.json` records only client-setting changes and client paths the
 installer actually created. Reinstall, upgrade, and removal use it to avoid
 claiming or undoing your own settings or paths. A compatible setting that
-already existed remains yours. A missing installation record must not be
-reconstructed by guessing.
+already existed remains yours. If the record is missing, the installer does not
+guess what it once changed.
 
-Normal reinstall must preserve project mode, workflow state, and the cycle-ID
-registry. Upgrades must keep the protocol and skills aligned without resetting
-progress. The recorded framework version allows compatible minor and patch
-upgrades within the same major line; downgrades and cross-major upgrades are
-rejected. Missing required fields and conflicting settings require resolution,
-not inferred defaults. See
+The installer keeps project mode, workflow state, and the cycle-ID list during a
+reinstall. On upgrade, it updates the protocol and skills together without
+resetting progress. It accepts newer minor and patch versions within the same
+major version, but rejects downgrades and major-version changes. If required
+information is missing or settings conflict, it reports the problem instead of
+guessing. See
 [the installation contract](../protocol/#installed-runtime-contract).
 
-Explicit project uninstall ends the runtime's lifetime and deletes all of
-`.standards/`, including context and cycle-ID history. It preserves project work
-outside the runtime and installed skills, removes only managed instruction
-blocks, and reverses only matching recorded settings. It removes recorded client
-directories when they become empty and a recorded Claude settings file when only
-its generated defaults remain. Unverified files or directories remain. See
+Uninstalling STANDARDS from a project deletes all of `.standards/`, including
+context and cycle-ID history. It preserves project work outside the runtime and
+installed skills, removes only managed instruction blocks, and reverses only
+matching recorded settings. It removes recorded client directories when they
+become empty and a recorded Claude settings file when only its generated
+defaults remain. Unverified files or directories remain. See
 [Uninstall from a project](../../getting-started/installation/#uninstall-from-a-project)
-to preview removal before making changes.
+for the preview and approval steps.
 
 ## Plans, reports, and Navigator
 

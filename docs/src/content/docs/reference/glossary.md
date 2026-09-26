@@ -47,9 +47,9 @@ is needed only if the project requires it.
 
 ## Completion gate
 
-The checks a role must pass before a normal forward handoff. A verified
-correction can sometimes return to interrupted work before full completion,
-under the
+The checks a role must pass before moving to the next normal workflow step. In
+limited cases, a role fixing a problem may return work to the interrupted step
+before passing all its usual checks. See the
 [Documenter and Synchronizer exceptions](../../concepts/recovery/#when-a-correction-must-return-before-full-completion).
 
 ## Cycle
@@ -60,9 +60,10 @@ new ID and cycle.
 
 ## Cycle ID registry
 
-The append-only `.standards/CYCLE_IDS.md` list of reserved IDs. An ID cannot be
-reused while that runtime remains installed, even if initialization failed after
-it was reserved. See [cycle identity](../runtime-files/#cycle-identity).
+The `.standards/CYCLE_IDS.md` list of reserved IDs. The agent adds each new ID;
+you do not need to manage the list. An ID cannot be reused while STANDARDS
+remains installed, even if cycle setup failed after the ID was reserved. See
+[cycle identity](../runtime-files/#cycle-identity).
 
 ## Cycle mode
 
@@ -105,6 +106,13 @@ Discovering the problem does not give a role ownership of the fix.
 Moving to the next normal workflow step after the current role passes its
 completion checks.
 
+## Handoff
+
+A recorded move to another workflow step, with the reason for that move. When
+another role needs to take over, the agent tells you how to invoke it. Saving
+the handoff does not start that role automatically. See
+[workflow states and handoffs](../../concepts/states-and-handoffs/).
+
 ## Outstanding obligation
 
 An unfinished correction saved separately when promotion replaces its recovery
@@ -126,10 +134,10 @@ it is relied on as current. See [Auditor](../../roles/auditor/).
 
 ## Project mode
 
-Whether the project starts without meaningful implementation to preserve
-(`GREENFIELD`) or already has it (`BROWNFIELD`). Developer permanently changes
-greenfield to brownfield when it verifies implementation has been created or
-materially changed. See [project modes](../../concepts/project-modes/).
+Whether the project has meaningful implementation to account for (`BROWNFIELD`)
+or not yet (`GREENFIELD`). Developer permanently changes greenfield to
+brownfield when it verifies that implementation has been created or materially
+changed. See [project modes](../../concepts/project-modes/).
 
 ## Promotion
 
