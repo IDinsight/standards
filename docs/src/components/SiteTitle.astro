@@ -2,17 +2,12 @@
 const { siteTitle, siteTitleHref } = Astro.locals.starlightRoute;
 ---
 
-<a
-  class="standards-title"
-  href={siteTitleHref}
-  aria-label={`${siteTitle} - Built by IDinsight`}
-  translate="no"
->
-  <span class="brand">{siteTitle}</span>
-  <span class="credit">
+<div class="standards-title" translate="no">
+  <a class="brand" href={siteTitleHref}>{siteTitle}</a>
+  <a class="credit" href="https://www.idinsight.org/">
     <span class="separator" aria-hidden="true">- </span>Built by <strong>IDinsight</strong>
-  </span>
-</a>
+  </a>
+</div>
 
 <style>
   .standards-title {
@@ -20,22 +15,27 @@ const { siteTitle, siteTitleHref } = Astro.locals.starlightRoute;
     align-items: baseline;
     gap: 0.5rem;
     min-width: 0;
-    color: var(--sl-color-text-accent);
-    text-decoration: none;
     line-height: 1.25;
   }
 
   .brand {
+    color: var(--sl-color-text-accent);
     font-size: 1.125rem;
     font-weight: 800;
     letter-spacing: 0.025em;
+    text-decoration: none;
     white-space: nowrap;
   }
 
   .credit {
     color: var(--standards-credit);
     font-size: 0.8125rem;
+    text-decoration: none;
     white-space: nowrap;
+  }
+
+  .credit:hover {
+    text-decoration: underline;
   }
 
   @media (max-width: 63.99rem) {
