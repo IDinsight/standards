@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.1](https://github.com/IDinsight/standards/compare/v0.3.0...v0.3.1) (2026-09-26)
+
+
+### Bug Fixes
+
+* require approval for bootstrap resets and align workflow guides ([eee48f9](https://github.com/IDinsight/standards/commit/eee48f9cdb39708d5c014a7c3b16e8376e1883d5))
+
 ## [0.3.0](https://github.com/IDinsight/standards/compare/v0.2.0...v0.3.0) (2026-09-25)
 
 ### Features
