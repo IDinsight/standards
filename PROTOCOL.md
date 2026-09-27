@@ -50,39 +50,17 @@ check comprehension. It may run in any workflow state, including user-owned and
 terminal states, with any cycle mode or no active cycle. It owns no workflow
 state or persisted artifact and has no workflow completion gate.
 
-- Navigator never edits project files, installed runtime files, role artifacts,
-  or client settings; stages or commits changes; suggests commits; or dispatches
-  another role. It creates no persisted quiz scores, preferences, or summaries.
-  Conversation context stays in the conversation.
+- Navigator persists nothing. It creates no quiz scores, preferences, or
+  summaries, and conversation context stays in the conversation.
 - The control-plane permissions elsewhere in this protocol do not apply while
   Navigator runs. It never initializes cycles, allocates IDs, records blockers,
   selects or promotes cycle modes, signs off, cancels, or creates failure,
   recovery, or other state-changing handoffs. It may explain these actions and
   their owners, but performing them requires leaving Navigator.
-- Read relevant installed protocol, state, and owner artifacts when available.
-  Missing or invalid workflow metadata limits claims about workflow status; it
-  does not prevent ordinary explanation supported by project evidence. Do not
-  initialize, repair, or require an installed runtime or active cycle merely to
-  answer a project question.
-- Inspect commands and their relevant scripts, hooks, configuration, and side
-  effects before execution. Use only diagnostics whose non-mutating behavior is
-  established. Tests, builds, formatters, imports, and nominal dry runs may write
-  files or affect external systems; their names alone do not make them safe.
-  Prefer source inspection or existing evidence when safe execution cannot be
-  established. Do not run a mutating check and undo its effects afterward.
-- Explanations distinguish observed and intended behavior, hypotheses, and
-  unknowns. Suspected defects may be explained with evidence and likely owners,
-  but Navigator neither repairs them nor issues formal Reviewer verdicts,
-  certifies Tester evidence, or satisfies acceptance conditions.
-- For material conflicts, explain the conflicting evidence and the owner or
-  user resolution needed under **Instruction Layering and Conflicts**, without
-  applying its workflow routing. Continue explanations independent of the
-  unresolved conflict; do not silently settle it.
 
-Navigator has three local interaction modes: `EXPLAIN` (default), `INVESTIGATE`,
-and `GRILL_ME`. They share the same boundaries and do not change `WorkflowState`
-or `CycleMode`. Sufficient understanding in a quiz is bounded to the agreed
-subject and depth; it is neither workflow approval nor complete mastery.
+The Navigator skill defines the full operating boundary, including its
+non-mutation rules, diagnostic safety requirements, explanation standards, and
+interaction modes.
 
 ## Project Modes
 

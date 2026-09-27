@@ -78,8 +78,9 @@ safe. Where that cannot be established, Navigator uses existing evidence and
 explains what still needs checking.
 
 Navigator can explain a suspected defect and its likely owner. It does not make
-repairs, provide Tester's verification, or issue Reviewer's verdict. See the
-[full boundary](../../reference/protocol/#navigator-boundary).
+repairs, provide Tester's verification, or issue Reviewer's verdict. For where
+Navigator sits in the workflow and what it may never do to a cycle, see its
+[place in the protocol](../../reference/protocol/#navigator-boundary).
 
 The quiz format is inspired by
 [AI Hero's grill-me discussion](https://www.aihero.dev/skills-grill-me);

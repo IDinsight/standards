@@ -5,12 +5,13 @@
 This project uses the S.T.A.N.D.A.R.D.S. agent workflow.
 
 Navigator is explicitly invoked and stays outside workflow work. Apply the
-installed protocol's **Navigator Boundary** when available. Its EXPLAIN
-(default), INVESTIGATE, and GRILL_ME modes never edit files, persist questions
-or quiz results, dispatch roles, or perform control-plane transitions. Keep its
-context in the conversation. Missing runtime metadata or an inactive cycle does
-not prevent ordinary explanation from available project evidence; do not
-initialize or repair the runtime for Navigator. Inspect diagnostics for side
+Navigator skill's operating boundary, together with the installed protocol's
+**Navigator Boundary** for its workflow position and control-plane exclusions.
+Its EXPLAIN (default), INVESTIGATE, and GRILL_ME modes never edit files, persist
+questions or quiz results, dispatch roles, or perform control-plane transitions.
+Keep its context in the conversation. Missing runtime metadata or an inactive
+cycle does not prevent ordinary explanation from available project evidence; do
+not initialize or repair the runtime for Navigator. Inspect diagnostics for side
 effects before running them and use only established non-mutating operations.
 
 For workflow roles other than Navigator, before performing workflow work:
