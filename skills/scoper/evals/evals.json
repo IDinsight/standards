@@ -129,12 +129,12 @@
     {
       "id": 10,
       "prompt": "Continue the active STANDARDS workflow as Scoper. ProjectMode is BROWNFIELD, CycleMode is STANDARD, WorkflowState is SCOPING, recovery is inactive, Active Work.Id is improve-search-20260923-x9k2, Active Work.Scope is NONE, and valid active-cycle project context exists. The natural path docs/scope/user-search.md already exists and begins with a STANDARDS provenance block declaring Artifact: SCOPE and Cycle: user-search-v1-old. The new request changes search behavior for the new active cycle. No appropriate unmarked project-owned canonical scope document exists.",
-      "expected_output": "Scoper does not overwrite or adopt the prior-cycle STANDARDS scope. It creates a distinct scope artifact for the active cycle, writes matching SCOPE provenance, records that new path in Active Work.Scope, and proceeds normally after the scope completion gate.",
+      "expected_output": "Scoper preserves the prior-cycle STANDARDS scope, creates the current-cycle scope with `artifact.mjs init SCOPE` at docs/scope/improve-search-20260923-x9k2.md, records that path in Active Work.Scope, and performs the normal handoff after its completion gate.",
       "files": [],
       "assertions": [
         "The response recognizes docs/scope/user-search.md as a STANDARDS cycle-owned artifact belonging to user-search-v1-old rather than as a reusable canonical project document",
         "It does not overwrite, repurpose, or adopt the prior-cycle scope as Active Work.Scope",
-        "It creates a distinct scope artifact and includes a provenance block with Artifact SCOPE and Cycle improve-search-20260923-x9k2",
+        "It creates the new scope with `node .standards/bin/artifact.mjs init SCOPE`, which writes docs/scope/improve-search-20260923-x9k2.md with provenance Artifact SCOPE and Cycle improve-search-20260923-x9k2",
         "It records the new repository-relative path in Active Work.Scope before completing Scoper's gate"
       ]
     },
@@ -242,6 +242,18 @@
         "It rechecks the preview and recognizes that prior approval does not cover the changed scope and warning.",
         "It shows the updated preview and exact command and records the pending approval in Active Work.BlockedOn.",
         "It treats continue as insufficient removal approval and leaves the runtime and active cycle intact without executing uninstall."
+      ]
+    },
+    {
+      "id": 20,
+      "prompt": "Continue the active STANDARDS workflow as Scoper. ProjectMode is BROWNFIELD, CycleMode is STANDARD, WorkflowState is SCOPING, recovery is inactive, and Active Work.Id is search-filters-20260927T101500Z-9f8e7d6c. The project keeps one canonical, unmarked scope document, docs/product/search.md. It already lists AC-001 to AC-003 from an earlier signed-off cycle and retired AC-004. The new request adds date filters to search.",
+      "expected_output": "Scoper reuses the canonical document, moves the earlier cycle's conditions and retired identifier under `## Previous Cycles`, and numbers the new conditions from AC-005 using `node .standards/bin/id.mjs next AC`.",
+      "files": [],
+      "assertions": [
+        "The earlier AC-001 to AC-003 and retired AC-004 move under a `## Previous Cycles` heading and are not current obligations",
+        "The new conditions start at AC-005, from `id.mjs next AC`, so no earlier identifier changes meaning",
+        "Scoper does not add STANDARDS provenance to the unmarked canonical document",
+        "Active Work.Scope records docs/product/search.md"
       ]
     }
   ]

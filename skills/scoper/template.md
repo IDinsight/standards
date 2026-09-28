@@ -16,8 +16,9 @@ invalidates.
 
 Omit empty sections. Add detail only when it materially reduces ambiguity.
 
-When Scoper creates a new STANDARDS-owned scope artifact, prepend this block and
-replace the placeholder with the exact active cycle ID:
+When Scoper creates a new STANDARDS-owned scope artifact, create it with
+`node .standards/bin/artifact.mjs init SCOPE`, which writes this block with the
+active cycle ID:
 
 ```markdown
 <!-- STANDARDS
@@ -88,6 +89,13 @@ or `None`.
 - Do not record unresolved blocking decisions here; blocking questions belong in
   `Active Work.BlockedOn`.
 
+## Previous Cycles
+
+Only in a scope document reused across cycles, and always the last section: the
+earlier cycles' acceptance conditions and retired identifiers, moved here
+unchanged, including their headings. Everything below this heading is history,
+not current obligations.
+
 ---
 
 ## Authoring Rules
@@ -115,6 +123,11 @@ or `None`.
   replaced condition. Record removed or replaced identifiers under **Retired
   Acceptance Identifiers**. Do not renumber surviving identifiers or reuse
   retired identifiers within the active cycle.
+- Get each new identifier with `node .standards/bin/id.mjs next AC <scope>`.
+  When a cycle reuses a scope document that holds another cycle's conditions,
+  move them and their retired identifiers under a final **Previous Cycles**
+  section and continue numbering from the highest identifier ever used in the
+  document.
 - Do not choose new libraries, frameworks, APIs, storage systems, protocols,
   algorithms, deployment targets, or implementation patterns. Those decisions
   belong to Architect unless independently established by the user request or

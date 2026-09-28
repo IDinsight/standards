@@ -12,9 +12,9 @@ role-specific behavior. This protocol defines the rules those skills must share.
 
 The sections are grouped and ordered to be read in sequence:
 
-1. **Foundations** (`Roles` to `Instruction Layering and Conflicts`) — the
-   roles, the project and cycle modes, the workflow states, and the persisted
-   record that ties them together.
+1. **Foundations** (`Roles` to `Runtime Tools and Hooks`) — the roles, the
+   project and cycle modes, the workflow states, the persisted record that ties
+   them together, and the tools that keep that record consistent.
 2. **How work moves** (`Forward Transitions` to `Commit Message Guidance`) —
    the forward topologies and the rules governing every handoff.
 3. **Gates** (`Acceptance Traceability` to `Standard Cycle Completion`) — what
@@ -245,10 +245,11 @@ artifact presence.
 
 ## Active Work
 
-`Id`: `add-user-search-20260923T150000Z-a7f3` `Request`: `Add user search by name and email.` `Scope`:
-`docs/scope/add-user-search.md` `Architecture`: `docs/specs/add-user-search.md`
-`Development`: `docs/development/add-user-search-20260923T150000Z-a7f3.md` `PromotionReason`: `NONE`
-`AuditTarget`: `NONE` `BlockedOn`: `NONE`
+`Id`: `add-user-search-by-name-and-email-20260923T150000Z-a7f3c2e9`
+`Request`: `Add user search by name and email.` `Scope`: `docs/scope/add-user-search.md`
+`Architecture`: `docs/specs/add-user-search.md`
+`Development`: `docs/development/add-user-search-by-name-and-email-20260923T150000Z-a7f3c2e9.md`
+`PromotionReason`: `NONE` `AuditTarget`: `NONE` `BlockedOn`: `NONE`
 
 `BaselineReconciliation`: `NONE`
 
@@ -271,6 +272,32 @@ artifact presence.
 
 `Active`: `false`
 ```
+
+### Branches and merges
+
+`STATE.md` belongs to the branch it is committed on, and each branch carries at
+most one active cycle. Merging two branches whose `.standards/` files both
+changed usually produces a merge conflict in `STATE.md` and `CYCLE_IDS.md`.
+Resolving that conflict is the user's job:
+
+- keep every line from both sides of `CYCLE_IDS.md`;
+- keep exactly one cycle in `STATE.md`. The other cycle stops being tracked. Its
+  records under `docs/` stay in the repository, and deciding what to do with
+  them is also the user's responsibility.
+
+To avoid the conflict, sign off or cancel a cycle before merging its branch.
+
+When `.standards/` has unmerged files or conflict markers, a workflow role
+stops, tells the user which cycles are involved, and waits for the user to
+resolve the conflict. A role never resolves it by choosing a side.
+
+### Manual edits
+
+STANDARDS changes its runtime files and cycle records only through legal
+protocol transitions and the runtime tools. Editing them by hand is unsupported;
+the only exception is resolving a merge conflict as described above. A user who
+edits them otherwise is responsible for the result. `check` reports many, but
+not all, of the problems such edits cause.
 
 ## Navigator Boundary
 
@@ -313,6 +340,46 @@ When authorities materially conflict:
 
 Role skills should reference these rules rather than redefine conflict-resolution
 semantics locally.
+
+## Runtime Tools and Hooks
+
+Installation places these tools in `.standards/bin/`. They run with Node.js.
+Roles use them instead of doing these steps by hand:
+
+| Command                                                       | Purpose                                                                                                               |
+|---------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------|
+| `node .standards/bin/cycle.mjs new --request "<request>"`     | Reserve a new cycle ID (see **Cycle ID Registry**).                                                                   |
+| `node .standards/bin/artifact.mjs init <TYPE>`                | Create one of the active cycle's records with its provenance block and header (see **Workflow Artifact Provenance**). |
+| `node .standards/bin/id.mjs next <AC\|DEV\|F\|D\|DOC> <file>` | Print the next free identifier for a record.                                                                          |
+| `node .standards/bin/check.mjs`                               | Check the runtime files and the active cycle's records. It only reads files.                                          |
+
+A workflow role runs `check` before its first substantive work and again before
+every state-changing handoff. For each problem it reports:
+
+1. If the problem is in work the current role owns, fix it before continuing.
+2. If another role owns it, route it through **Failure Handoffs**.
+3. If no role can fix it, for example a merge conflict or a hand-edited file,
+   stop and report it to the user.
+
+A forward handoff requires that `check` reports no problem in files the current
+role owns. `check` finds mechanical errors such as unregistered IDs, broken
+provenance, or missing acceptance coverage; it does not replace a role's
+completion gate. If a tool is missing or fails, stop and report it; do not do
+its step by hand.
+
+Installation can also add hooks for Claude Code and Codex (see **Installed
+Runtime Contract**):
+
+- When an agent finishes a turn and workflow files have uncommitted changes,
+  the stop hook runs `check`. If it finds problems, it sends the agent back once
+  with the list, and the agent handles them as described above.
+- A pre-tool hook refuses agent edits to `.standards/CYCLE_IDS.md` made with
+  file-editing tools or common shell commands. `check` reports a malformed or
+  unregistered ID that gets through another way.
+
+Navigator may run `check`, because it changes nothing. When `check` or a hook
+reports problems during Navigator work, Navigator reports them and changes
+nothing.
 
 ## Forward Transitions
 
@@ -503,30 +570,42 @@ topology reaches `SCOPING`.
    active cycle. Do not combine separable obligations under one identifier when
    their satisfaction or verification evidence is established in different
    workflow phases. The identifier is a reference, not an ordering guarantee.
+   Get each new identifier with `node .standards/bin/id.mjs next AC <scope>`.
 2. During REPLAN, preserve an identifier when meaning is unchanged. New or
    materially replaced conditions receive previously unused identifiers.
    Removed or replaced identifiers remain in the scope's retired-identifier
    record. Never renumber surviving identifiers or reuse retired ones within
    the cycle.
-3. Scoper owns acceptance wording and meaning. Downstream roles reference IDs
+3. When a cycle reuses a canonical scope document that already holds another
+   cycle's acceptance conditions, numbering continues from the highest
+   identifier ever used in that document. Move the earlier cycle's conditions,
+   including its retired identifiers, under a `## Previous Cycles` heading that
+   stays the document's last section; the moved content may keep its own
+   headings. Everything under that heading is history, not current
+   obligations, and its identifiers are never used again in that document.
+4. Scoper owns acceptance wording and meaning. Downstream roles reference IDs
    but do not redefine intent; material defects route to Scoper.
-4. Architect accounts for every current ID with technical design coverage or an
+5. Architect accounts for every current ID with technical design coverage or an
    explicit no-architectural-impact disposition when satisfaction depends
    entirely on established nontechnical behavior or work owned by another
    workflow phase. Group IDs only when the same disposition applies; do not
    invent architecture or claim ownership of satisfaction that belongs to
-   another workflow phase.
-5. All downstream coverage, work, and evidence references the same current IDs;
+   another workflow phase. When a cycle reuses a canonical design document that
+   already holds another cycle's acceptance coverage or technical acceptance
+   criteria, move them under a `## Previous Cycles` heading that stays the
+   document's last section, as in rule 3, before adding the current coverage.
+   Everything under that heading is history, not current coverage or criteria.
+6. All downstream coverage, work, and evidence references the same current IDs;
    downstream roles do not invent substitute requirement IDs.
-6. Tester accounts for every current ID with verification evidence, a blocker,
+7. Tester accounts for every current ID with verification evidence, a blocker,
    or—when satisfaction explicitly depends on a later role—a pending dependency.
    Pending is not verification evidence and must be resolved downstream under
    the same ID.
-7. `AWAITING_USER_SIGNOFF` is forbidden while any current ID lacks sufficient
+8. `AWAITING_USER_SIGNOFF` is forbidden while any current ID lacks sufficient
    evidence or has an unresolved blocker. Route defects to their owning roles
    through normal failure and recovery rules; never treat an unevidenced
    condition as satisfied by assumption.
-8. Acceptance changes during recovery or rework invalidate any completed
+9. Acceptance changes during recovery or rework invalidate any completed
    downstream artifact whose completion contract requires accounting for every
    current ID. Include those states when computing downstream invalidation even
    if underlying behavior or technical decisions remain otherwise valid.
@@ -887,7 +966,8 @@ guarantee.
    `FailureType: NONE`, and record a concise reason identifying which omitted
    standard guarantee is now required. Persist the same reason in
    `Active Work.PromotionReason`.
-4. Preserve cycle `Id`, `Request`, and role-owned artifacts. Do not fabricate
+4. Preserve cycle `Id`, the current `Request` (including a change made by the
+   rework that authorized promotion), and role-owned artifacts. Do not fabricate
    `Scope` or `Architecture`. Existing expedited implementation remains
    tentative active-cycle work, not baseline.
 5. Auditor establishes or refreshes context without laundering tentative work
@@ -990,7 +1070,10 @@ changes are not agent-discovered failures.
 
 In `EXPEDITED`, bounded implementation rework routes to `DEVELOPING`. If the new
 contract requires a skipped standard role or guarantee, the rework request
-itself authorizes **Expedited Promotion** instead.
+itself authorizes promotion: update `Active Work.Request` to the changed
+contract, then apply **Expedited Promotion** instead of routing to
+`DEVELOPING`. Record `Handoff.Kind: PROMOTE`, not `USER_REWORK`, and push no
+rework frame.
 
 ### Sign off
 
@@ -1040,10 +1123,11 @@ operation after obtaining explicit user approval of the removal:
 2. Run the selected command with `--dry-run`. This preview may run before
    removal approval. Show the user the target project, planned removals and
    shared-file updates, any warnings, and the exact removal command including
-   `--yes`. Explain that removal covers the entire `.standards/` runtime and
-   all verified role skill directories for both clients, including local edits
-   or added files inside them. Saved workflow state, context, and cycle-ID
-   history will be lost; another cycle will require fresh installation.
+   `--yes`. Explain that removal covers the entire `.standards/` runtime, the
+   STANDARDS hooks, and all verified role skill directories for both clients,
+   including local edits or added files inside them. Saved workflow state,
+   context, and cycle-ID history will be lost; another cycle will require fresh
+   installation.
 3. Ask for explicit approval to execute that removal command for the previewed
    project and scope. A generic cancellation request does not grant removal
    approval. During the active cycle, record the target, command, and pending
@@ -1159,18 +1243,23 @@ Store one allocated ID per Markdown list entry:
 - <cycle-id>
 ```
 
-Allocate a new cycle ID in this order:
+Reserve a new cycle ID only with
+`node .standards/bin/cycle.mjs new --request "<request>"`. The tool:
 
-1. Generate a request-derived, collision-resistant candidate.
-2. Verify that the candidate does not already appear in `CYCLE_IDS.md`.
-3. As defense in depth, also verify that it does not collide with an existing
-   cycle-owned artifact path or STANDARDS provenance marker, including
-   `docs/development/<candidate>.md`, `docs/verification/<candidate>.md`,
-   `docs/reviews/<candidate>/`, `docs/documentation/<candidate>.md`, and
-   `docs/synchronization/<candidate>.md`.
-4. Append the candidate to `CYCLE_IDS.md` and persist that registry change.
-5. Only after the registry append succeeds may the candidate be written to
-   `Active Work.Id` and cycle initialization continue.
+1. builds an ID from the request, the UTC time, and a random suffix, for example
+   `add-user-search-20260927T190146Z-7bef0f04`, using only letters, digits, `.`,
+   `_`, and `-`;
+2. checks that the ID is not in `CYCLE_IDS.md` and is not used by any
+   cycle-owned artifact path or STANDARDS provenance block;
+3. appends the ID to `CYCLE_IDS.md` while holding a lock, so two agents cannot
+   reserve at the same time; and
+4. prints the ID.
+
+It refuses while a cycle is active (`Active Work.Id` is set and the state is not
+terminal), when the registry is missing or has a merge conflict, and when
+`STATE.md` is invalid. Only after the tool succeeds may the printed ID be
+written to `Active Work.Id` and cycle initialization continue. Never invent an
+ID or edit the registry by hand.
 
 Registry entries are immutable while the runtime remains installed: never edit,
 remove, reorder for deduplication, or reuse an existing entry. If cycle
@@ -1180,7 +1269,7 @@ artifact-path and provenance checks are additional collision protection, not a
 replacement for the registry.
 
 Initialize `CYCLE_IDS.md` empty on first installation. Preserve it across normal
-reinstall, framework upgrade, and explicit workflow reinitialization.
+reinstall and framework upgrade.
 
 If `CYCLE_IDS.md` is unexpectedly missing from an installed runtime, treat the
 runtime as incomplete: stop cycle allocation and workflow work that would
@@ -1203,13 +1292,11 @@ updating them. The subsections follow the order of the shape example in
 
 ### Active Work
 
-- `Id`: stable, user-readable identifier allocated through **Cycle ID
-  Registry**. While the current S.T.A.N.D.A.R.D.S. runtime remains installed,
-  every allocated cycle ID is reserved permanently and must never be reused by
-  another cycle. Generate every new ID with a request-derived slug plus a fresh
-  collision-resistant token (for example a ULID, UUID fragment, or
-  timestamp-plus-random suffix); never rely on a bare request slug. Never
-  overwrite or repurpose an artifact belonging to another cycle.
+- `Id`: stable, user-readable identifier reserved with `cycle.mjs new` through
+  **Cycle ID Registry**. While the current S.T.A.N.D.A.R.D.S. runtime remains
+  installed, every allocated cycle ID is reserved permanently and must never be
+  reused by another cycle. Never overwrite or repurpose an artifact belonging to
+  another cycle.
 - `Request`: persisted user request at enough fidelity for the entry role to
   understand the work.
 - `Scope`, `Architecture`, and `Development`: repository-relative paths to the
@@ -1260,9 +1347,9 @@ Otherwise use a nonempty Markdown list with both required fields in each entry:
 ```markdown
 `BaselineReconciliation`:
 
-- `SourceCycle`: `invoice-cache-hotfix-20260923-a7f3`
+- `SourceCycle`: `change-invoice-cache-invalidation-20260923T141500Z-5d2e8b17`
   `Request`: `Change invoice-cache invalidation behavior.`
-- `SourceCycle`: `admin-notes-20260924-b8e4`
+- `SourceCycle`: `add-internal-notes-to-admin-records-20260924T093000Z-c81f4a06`
   `Request`: `Add internal notes to admin records.`
 ```
 
@@ -1321,8 +1408,10 @@ order, keep each distinct defect separate, and do not collapse defects merely
 because they share an owner or failure type.
 
 When one or more obligations exist, set `Active: true` and record each as a
-numbered `Obligation N` containing `Owner`, `FailureType`, and `Reason`. When the
-last obligation is removed, set `Active: false` and remove the numbered entries.
+numbered `### Obligation N` entry containing `Owner`, `FailureType`, and
+`Reason`. When an obligation is removed, renumber the remaining entries 1, 2, 3,
+... in their existing order. When the last obligation is removed, set
+`Active: false` and remove the numbered entries.
 
 An outstanding obligation remains until its owning state is reached and the
 owner corrects and verifies the specific defect recorded by the obligation.
@@ -1375,6 +1464,15 @@ Cycle: <Active Work.Id>
 -->
 ```
 
+Create these artifacts with `node .standards/bin/artifact.mjs init <TYPE>`. It
+writes the block and the record header, and it never overwrites an existing
+file.
+
+A file that starts with a malformed STANDARDS provenance block (for example an
+unknown artifact type, an invalid cycle ID, a missing or extra `ReviewKind`, or
+an unclosed block) is a collision for every artifact type. Do not edit, adopt,
+or repair it; report it and block dependent work until the user resolves it.
+
 A valid provenance block makes the file a STANDARDS cycle-owned artifact even if
 it is later renamed or moved. A different cycle may read that artifact as prior
 evidence when a role contract permits, but it must never overwrite, repurpose,
@@ -1384,10 +1482,10 @@ An existing unmarked project document remains project-owned merely because
 Scoper or Architect selects it as the active scope or architecture location.
 Those roles may update an appropriate unmarked canonical project document, and
 must not add STANDARDS provenance solely because the document is referenced by
-`Active Work.Scope` or `Active Work.Architecture`. If either role instead creates
-a new workflow artifact, it must add the current-cycle provenance block. If the
-natural target path already contains a STANDARDS artifact owned by another
-cycle, choose a distinct path rather than overwriting it.
+`Active Work.Scope` or `Active Work.Architecture`. If either role instead
+creates a new workflow artifact, it creates it with `artifact init` at
+`docs/scope/<Active Work.Id>.md` or `docs/specs/<Active Work.Id>.md`. Because
+these paths include the cycle ID, they never belong to another cycle.
 
 Developer's development plan is always a STANDARDS cycle-owned artifact. Its
 path must be unique to the active cycle and include `Active Work.Id`; use
@@ -1452,6 +1550,16 @@ Ordinary project documentation, comments, and docstrings remain reusable
 project assets and do not acquire cycle provenance merely because Documenter
 updates them.
 
+Records number their own entries as headings: `### DEV-NNN` in the development
+plan, `### F-NNN` in review reports, `### D-NNN` in the synchronization record,
+and `### DOC-NNN` in the documentation record. Get each new number with
+`node .standards/bin/id.mjs next <prefix> <file>`. When a record refers to an
+entry in another record, it names that record's path with the identifier, for
+example `docs/reviews/<Active Work.Id>/implementation.md#F-003`. A path relative
+to the referring file, as in a Markdown link, also works. Acceptance identifiers
+(`AC-NNN`) and development steps (`DEV-NNN`) of the active cycle are referred to
+without a path.
+
 Before editing the verification report or an artifact referenced by
 `Active Work.Scope`, `Active Work.Architecture`, or `Active Work.Development`,
 the owning role must
@@ -1513,8 +1621,12 @@ An installed project should provide:
 - `.standards/MODE.md`: current `ProjectMode`;
 - `.standards/STATE.md`: current workflow/cycle state and resumable coordination
   context;
+- `.standards/bin/`: the runtime tools and hook script described in **Runtime
+  Tools and Hooks**, replaced as a whole on every install and upgrade;
 - the S.T.A.N.D.A.R.D.S. workflow skills installed in the location required by
   the selected coding agent;
+- unless the user declines them, STANDARDS hooks in `.claude/settings.json` for
+  Claude Code and in `.codex/hooks.json` for Codex;
 - explicit-invocation controls: Codex adapters use
   `allow_implicit_invocation: false`; Claude Code project settings use
   `skillOverrides.<skill>: "user-invocable-only"` for installed role skills,
@@ -1533,8 +1645,9 @@ of the installed runtime as defined by **Cycle ID Registry**.
 
 Record a client directory or settings file in `createdPaths` only if that exact
 path was absent before installation created it. Supported paths are `.agents`,
-`.agents/skills`, `.claude`, `.claude/skills`, and `.claude/settings.json`.
-Preserve this record across reinstall and upgrade.
+`.agents/skills`, `.claude`, `.claude/skills`, `.claude/settings.json`,
+`.codex`, and `.codex/hooks.json`. Preserve this record across reinstall and
+upgrade.
 
 `.standards/VERSION.json` records the installed framework release separately
 from settings ownership and workflow state. Reinstallation with the same version
@@ -1542,10 +1655,13 @@ is allowed. An installer may upgrade to a newer minor or patch release within
 the same major version after verifying the existing runtime; it must preserve
 workflow data and update the recorded version with the framework assets. Reject
 older versions and cross-major upgrades. A major release may be installed into
-a fresh project, but moving an existing runtime to another major version needs
-an explicit migration process; ordinary installation must not attempt one. The
-framework maintainer is responsible for choosing the release version based on
-whether changes are backward compatible.
+a fresh project. STANDARDS provides no migration between major versions: the
+only route for an existing project is `standards uninstall`, which deletes
+`.standards/` (including workflow state, Auditor context, and the cycle-ID
+registry), followed by a fresh installation. The framework maintainer chooses
+the release version. Adding, removing, or renaming a role is a major change, and
+so is any change to the runtime files or record formats that an existing
+installation's files would no longer pass.
 
 ### Installer File Preservation
 
@@ -1579,20 +1695,33 @@ After ownership checks:
 - Update `.standards/PROTOCOL.md` from the installed framework version only
   after runtime ownership verification and the registry check above. Install or
   update each skill definition only after that destination skill package passes
-  its ownership check. Keep the installed protocol aligned with the installed
-  skills.
+  its ownership check. Update skill packages file by file: write every file the
+  release ships and leave any other file in the folder unchanged. Keep the
+  installed protocol aligned with the installed skills.
+- A reinstall keeps the installed clients. The user may add a client; removing
+  one requires uninstalling.
 - Preserve Codex `allow_implicit_invocation: false`.
 - For Claude Code, safely merge `.claude/settings.json` while preserving
   unrelated settings: add each missing required
   `skillOverrides.<skill>: "user-invocable-only"` and record that exact created
   key/value in `.standards/INSTALLATION.json`; preserve an already-compatible
-  unowned value without claiming it; report conflicting values rather than
-  overriding them. Existing manifest ownership remains valid only for the exact
-  path and installed value recorded.
-- Record ownership of newly created client directories and the Claude settings
-  file separately from individual setting keys. Never record a pre-existing
-  file or directory as created by the installer, even when it is empty or has
-  only compatible values.
+  unowned value without claiming it; report conflicting unowned values rather
+  than overriding them. On reinstall, restore any recorded key that was changed
+  or removed, and show each restoration in the install preview.
+- Hooks: unless the user declines them, add the STANDARDS hook groups to
+  `.claude/settings.json` and `.codex/hooks.json` for the installed clients,
+  creating `.codex/hooks.json` if needed. A STANDARDS hook is a hook handler
+  whose command runs `.standards/bin/hook.mjs`; installation replaces or removes
+  only those handlers and leaves every other hook unchanged. Record in
+  `.standards/INSTALLATION.json` which files have STANDARDS hooks. A reinstall
+  keeps the current hook choice unless the user makes another one, restores
+  missing or edited STANDARDS hooks, and removes them when the user turns hooks
+  off. Codex runs new or changed hooks only after the user trusts them with
+  `/hooks`.
+- Record ownership of newly created client directories, the Claude settings
+  file, and the Codex hooks file separately from individual setting keys. Never
+  record a pre-existing file or directory as created by the installer, even when
+  it is empty or has only compatible values.
 - Preserve an existing verified `.standards/INSTALLATION.json` and update only
   installer-owned metadata. If it is unexpectedly missing from an otherwise
   verified runtime, stop and report the incomplete runtime; never reconstruct
@@ -1601,15 +1730,15 @@ After ownership checks:
   before replacing framework assets. If it is missing or invalid, stop and
   report the incomplete runtime; do not infer a version from file contents.
 - Preserve existing `.standards/MODE.md` and `.standards/STATE.md` on normal
-  reinstall; initialize them only on first install or explicit reinitialization.
+  reinstall; initialize them only on first install.
   Do not reset, reinterpret, or discard existing workflow state during upgrades.
   Missing required fields or invalid formats are runtime inconsistencies, not
   permission to add inferred defaults.
 - Initialize `.standards/CYCLE_IDS.md` on first install. Thereafter preserve it
-  across reinstall, upgrade, and explicit workflow reinitialization; never clear
-  or rewrite existing entries while the runtime remains installed. If it is
-  unexpectedly missing from a verified runtime, stop and report the incomplete
-  runtime; do not recreate it empty or reconstruct it by inference.
+  across reinstall and upgrade; never clear or rewrite existing entries while
+  the runtime remains installed. If it is unexpectedly missing from a verified
+  runtime, stop and report the incomplete runtime; do not recreate it empty or
+  reconstruct it by inference.
 - Preserve `.standards/CONTEXT.md`; it is Auditor-owned, not installer-owned.
 - Preserve project-level instructions. When they materially conflict with the
   protocol, integration contract, workflow artifacts, or other authoritative
@@ -1646,21 +1775,26 @@ conversation-level approval. The globally installed CLI is unaffected.
   including marked roles absent from the current distribution. Remove their
   entire verified directories. Remove a recorded client parent directory only
   if it is empty after planned removals. Preserve unrecorded or nonempty client
-  directories and unrelated skills; stop on a collision at a known framework
-  role rather than adopting it.
-- Remove only the bounded STANDARDS block from `AGENTS.md` and `CLAUDE.md`.
-  Preserve all text outside it, including unbounded `@AGENTS.md` imports. Delete
+  directories and unrelated skills; a folder whose `SKILL.md` is missing or a
+  symlink is not a STANDARDS package and is skipped. Stop on a collision at a
+  known framework role rather than adopting it.
+- Remove only the bounded STANDARDS block from `AGENTS.md` and `CLAUDE.md`,
+  together with the blank line and final newline that installation added around
+  it. Preserve all other text, including unbounded `@AGENTS.md` imports. Delete
   either file only when its remaining content is whitespace. Malformed or
   duplicate boundaries must stop removal before mutation.
 - Remove each recorded client setting only if its current value exactly matches
   the recorded installed value. Preserve changed values and report them; leave
   absent settings absent. Preserve compatible settings not recorded as owned,
   unrelated settings, and files or containers whose creation was not recorded.
-  Remove `.claude/settings.json` only if its creation was recorded and, after
-  reverting owned settings, it contains exactly the installer-created `$schema`
-  and an empty `skillOverrides` object. Otherwise retain the file and preserve
-  unrelated or changed content. If `createdPaths` is absent, retain the file and
-  parent directories even if they look like installer output.
+  Remove every STANDARDS hook handler from `.claude/settings.json` and
+  `.codex/hooks.json`, leaving other hooks in place. Remove
+  `.claude/settings.json` only if its creation was recorded and, after reverting
+  owned settings and hooks, it contains nothing but `$schema` and an empty
+  `skillOverrides` object. Remove `.codex/hooks.json` only if its creation was
+  recorded and nothing else remains in it. Otherwise retain the file and
+  preserve unrelated or changed content. If `createdPaths` is absent, retain the
+  file and parent directories even if they look like installer output.
 - Validate all affected paths and settings before making changes. Refuse symlinks
   in affected paths or within directories to be removed. Do not follow unrelated
   skill symlinks. A missing runtime with remaining marked skills or integration
@@ -1719,13 +1853,18 @@ Use these terms consistently across all skills:
   references to completion/evidence artifacts, discrepancies and their owners,
   limitations, and a resumable conclusion under **Synchronization Gate**. It is
   not an acceptance ledger or user sign-off.
-- **project context**: Auditor-owned baseline stored at `.standards/CONTEXT.md`.
-  It may persist as evidence across cycles, but cycle-scoped non-baseline entries
-  follow the lifecycle in **Persisted Workflow State**. Planned implementation
-  does not automatically stale the baseline. `PROJECT_CONTEXT` failure means
-  context is materially incomplete, incorrect, or unexpectedly invalidated.
+- **project context**: Auditor-owned baseline stored at
+  `.standards/CONTEXT.md`. It may persist as evidence across cycles, but
+  cycle-scoped non-baseline entries follow the lifecycle in **Project context
+  lifecycle**. Planned implementation does not automatically stale the baseline.
+  `PROJECT_CONTEXT` failure means context is materially incomplete, incorrect,
+  or unexpectedly invalidated.
 - **completion gate**: conditions required before a role may make a forward
   handoff.
+- **runtime tools**: the commands in `.standards/bin/` defined in **Runtime
+  Tools and Hooks**: `cycle.mjs`, `artifact.mjs`, `id.mjs`, and `check.mjs`.
+- **STANDARDS hook**: a Claude Code or Codex hook handler whose command runs
+  `.standards/bin/hook.mjs`.
 - **failure handoff**: routing a defect to the owner of the affected artifact or
   decision.
 - **forward handoff**: advancing after the current completion gate succeeds.

@@ -28,16 +28,26 @@ Own technical design and architecture decisions. The completed technical design
 must be persisted under the protocol's **Workflow Artifact Provenance** rules,
 even when it is brief. An appropriate pre-existing unmarked project-owned
 architecture or specification document may remain the canonical design location.
-If Architect creates a new design artifact, use a feature- or change-specific
-file under `docs/specs/` and add the current-cycle `ARCHITECTURE` provenance
-block. Never overwrite, repurpose, or adopt a STANDARDS architecture artifact
-whose recorded cycle differs from `Active Work.Id`. Record the selected
-repository-relative path in `STATE.md` as `Active Work.Architecture`.
+If it holds another cycle's acceptance coverage or technical acceptance
+criteria, move them under a final `## Previous Cycles` section first, as the
+protocol's **Acceptance Traceability** describes. If Architect creates a new
+design artifact, create it with
+`node .standards/bin/artifact.mjs init ARCHITECTURE`, which writes
+`docs/specs/<Active Work.Id>.md` with the current-cycle provenance block. Never
+overwrite, repurpose, or adopt a STANDARDS architecture artifact whose recorded
+cycle differs from `Active Work.Id`. Record the selected repository-relative
+path in `STATE.md` as `Active Work.Architecture`.
 
 Do not change scope intent, write production code, tests, audit/context files,
 reviews, or user documentation.
 
 ## Inputs
+
+Read `.standards/PROTOCOL.md`, `.standards/MODE.md`, and `.standards/STATE.md`
+first. Perform Architect-owned work only in `ARCHITECTING` with an initialized
+`STANDARD` cycle. Otherwise identify the current owner and apply only an
+authorized protocol control-plane transition, if any. `EXPEDITED` omits
+Architect; a required architecture guarantee uses **Expedited Promotion**.
 
 - Always: the persisted scope referenced by `Active Work.Scope`, established
   project constraints, the current persisted design when one exists, and
@@ -121,6 +131,8 @@ do not apply multiple mode files concurrently.
 
 Architecture is complete when:
 
+- `node .standards/bin/check.mjs` reports no problem in files Architect owns
+  (see the protocol's **Runtime Tools and Hooks**);
 - the persisted technical design satisfies the artifact shape and authoring
   contract in `template.md`, including matching current-cycle provenance when
   Architect created the artifact;

@@ -31,12 +31,12 @@ asks for your explicit approval. Saying "cancel this cycle" alone does not
 approve uninstalling STANDARDS.
 
 Once you approve, the agent runs the command with `--yes` to avoid a second
-terminal prompt. The uninstaller removes the entire `.standards/` runtime and
-verified STANDARDS role directories for both clients, including local additions
-inside them. This deletes saved workflow state, context, and cycle-ID history.
-It also removes marked integration sections and unchanged settings that the
-installer added. Project work and role outputs outside the removed directories
-remain. See
+terminal prompt. The uninstaller removes the entire `.standards/` runtime, the
+STANDARDS hooks, and verified STANDARDS role directories for both clients,
+including local additions inside them. This deletes saved workflow state,
+context, and cycle-ID history. It also removes marked integration sections and
+unchanged settings that the installer added. Project work and role outputs
+outside the removed directories remain. See
 [Uninstall from a project](../../getting-started/installation/#uninstall-from-a-project)
 for the removal boundaries.
 
@@ -90,3 +90,10 @@ work.
 
 At sign-off, requesting changes is rework of the active cycle. It is not a new
 cycle. See [Human Decisions and Sign-off](../../concepts/human-decisions/).
+
+## Before merging a branch
+
+Sign off or cancel a cycle before merging its branch into a branch with its own
+cycle. Otherwise the merge produces a conflict in `.standards/` that you must
+resolve yourself. See
+[Branches and merges](../../reference/runtime-files/#branches-and-merges).

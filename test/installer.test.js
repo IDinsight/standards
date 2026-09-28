@@ -35,8 +35,11 @@ test('first install creates both client skills and a greenfield runtime', () => 
   const manifest = JSON.parse(await read(root, '.standards/INSTALLATION.json'));
   const settings = JSON.parse(await read(root, '.claude/settings.json'));
   assert.deepEqual(manifest.createdPaths, [
-    '.agents', '.agents/skills', '.claude', '.claude/skills', '.claude/settings.json',
+    '.agents', '.agents/skills', '.claude', '.claude/skills', '.claude/settings.json', '.codex', '.codex/hooks.json',
   ]);
+  assert.deepEqual(manifest.hooks, ['.codex/hooks.json', '.claude/settings.json']);
+  assert.match(await read(root, '.codex/hooks.json'), /\.standards\/bin\/hook\.mjs\\" stop/);
+  assert.match(JSON.stringify(settings.hooks), /\.standards\/bin\/hook\.mjs/);
   assert.equal(Object.keys(manifest.managedClientSettings['.claude/settings.json'].skillOverrides).length, 9);
   assert.equal(Object.keys(settings.skillOverrides).length, 9);
   assert.deepEqual((await readdir(root)).filter((name) => name.startsWith('.standards-install-')), []);
@@ -75,7 +78,7 @@ test('brownfield install preserves project instructions and compatible unowned s
   assert.equal(owned.scoper, undefined);
   assert.equal(Object.keys(owned).length, 8);
   assert.deepEqual(JSON.parse(await read(root, '.standards/INSTALLATION.json')).createdPaths,
-    ['.agents', '.agents/skills', '.claude/skills']);
+    ['.agents', '.agents/skills', '.claude/skills', '.codex', '.codex/hooks.json']);
   assert.equal(await read(root, 'src/app.js'), 'export const app = true;\n');
 }));
 
@@ -119,18 +122,42 @@ test('unmarked runtime and skill collisions leave project files untouched', () =
   assert.equal((await readdir(root)).includes('.standards'), false);
 }));
 
-test('incomplete runtime and conflicting settings fail before mutation', () => fixture(async (root) => {
+test('an incomplete runtime fails before mutation', () => fixture(async (root) => {
   await installProject({ projectRoot: root });
   const agents = await read(root, 'AGENTS.md');
   await rm(path.join(root, '.standards/CYCLE_IDS.md'));
   await assert.rejects(installProject({ projectRoot: root }), /missing \.standards\/CYCLE_IDS\.md/);
   assert.equal(await read(root, 'AGENTS.md'), agents);
-  await write(root, '.standards/CYCLE_IDS.md', '# S.T.A.N.D.A.R.D.S. Cycle ID Registry\n');
-  const settings = JSON.parse(await read(root, '.claude/settings.json'));
+}));
+
+test('reinstall restores changed or removed owned settings and hooks and reports them', () => fixture(async (root) => {
+  await installProject({ projectRoot: root });
+  const installed = await read(root, '.claude/settings.json');
+  const settings = JSON.parse(installed);
   settings.skillOverrides.scoper = 'auto';
+  delete settings.skillOverrides.tester;
+  delete settings.hooks;
+  settings.theme = 'dark';
   await write(root, '.claude/settings.json', JSON.stringify(settings));
-  await assert.rejects(installProject({ projectRoot: root }), /owned \.claude\/settings\.json skillOverrides\.scoper changed/);
-  assert.equal(await read(root, 'AGENTS.md'), agents);
+  await rm(path.join(root, '.codex/hooks.json'));
+  const result = await installProject({ projectRoot: root });
+  assert.deepEqual(result.restored, [
+    '.claude/settings.json skillOverrides.scoper (was "auto")',
+    '.claude/settings.json skillOverrides.tester (missing)',
+    'STANDARDS hooks in .claude/settings.json',
+    'STANDARDS hooks in .codex/hooks.json',
+  ]);
+  const restored = JSON.parse(await read(root, '.claude/settings.json'));
+  assert.deepEqual(restored, { ...JSON.parse(installed), theme: 'dark' });
+  assert.match(await read(root, '.codex/hooks.json'), /hook\.mjs/);
+  assert.deepEqual((await installProject({ projectRoot: root })).restored, []);
+}));
+
+test('an unowned conflicting setting still fails before mutation', () => fixture(async (root) => {
+  await mkdir(path.join(root, '.claude'));
+  await write(root, '.claude/settings.json', JSON.stringify({ skillOverrides: { scoper: 'on' } }));
+  await assert.rejects(installProject({ projectRoot: root }), /Conflicting \.claude\/settings\.json skillOverrides\.scoper/);
+  assert.equal((await readdir(root)).includes('.standards'), false);
 }));
 
 test('adding Claude later records only settings newly created by the installer', () => fixture(async (root) => {
@@ -212,3 +239,66 @@ test('missing or incompatible version record blocks writes to an installed runti
   await assert.rejects(installProject({ projectRoot: root }), /Cross-major upgrade/);
   assert.equal(await read(root, '.standards/PROTOCOL.md'), protocol);
 }));
+
+test('reinstall keeps files a user added inside installed skill folders', () => fixture(async (root) => {
+  await installProject({ projectRoot: root });
+  await write(root, '.claude/skills/developer/user-styles/alex.md', '# Alex\n');
+  await write(root, '.claude/skills/developer/template.md', 'Edited\n');
+  const result = await installProject({ projectRoot: root });
+  assert.deepEqual(result.paths, [{ action: 'update skill', path: '.claude/skills/developer' }]);
+  assert.equal(await read(root, '.claude/skills/developer/user-styles/alex.md'), '# Alex\n');
+  assert.match(await read(root, '.claude/skills/developer/template.md'), /Developer Artifact Template/);
+}));
+
+test('reinstall keeps the installed clients unless another is added', () => fixture(async (root) => {
+  await installProject({ projectRoot: root, clients: ['codex'] });
+  const reinstall = await installProject({ projectRoot: root });
+  assert.deepEqual(reinstall.clients, ['codex']);
+  assert.equal(reinstall.changed, 0);
+  assert.equal((await readdir(root)).includes('.claude'), false);
+  assert.deepEqual((await installProject({ projectRoot: root, clients: ['claude'] })).clients, ['codex', 'claude']);
+}));
+
+test('hooks can be left out, kept off on reinstall, added later, and removed again', () => fixture(async (root) => {
+  const off = await installProject({ projectRoot: root, hooks: false });
+  assert.equal(off.hooks, false);
+  assert.equal((await readdir(root)).includes('.codex'), false);
+  assert.equal(JSON.parse(await read(root, '.claude/settings.json')).hooks, undefined);
+  assert.deepEqual(JSON.parse(await read(root, '.standards/INSTALLATION.json')).hooks, []);
+  assert.equal((await installProject({ projectRoot: root })).hooks, false);
+
+  const on = await installProject({ projectRoot: root, hooks: true });
+  assert.equal(on.hooks, true);
+  assert.deepEqual(on.notices, ['Codex runs new or changed hooks only after you trust them: open Codex in this project and run /hooks.']);
+  assert.match(await read(root, '.codex/hooks.json'), /hook\.mjs/);
+  assert.equal((await installProject({ projectRoot: root })).hooks, true);
+
+  await installProject({ projectRoot: root, hooks: false });
+  assert.doesNotMatch(await read(root, '.codex/hooks.json'), /hook\.mjs/);
+  assert.equal(JSON.parse(await read(root, '.claude/settings.json')).hooks, undefined);
+}));
+
+test('install and uninstall leave a project\'s own hooks alone', () => fixture(async (root) => {
+  const own = { type: 'command', command: 'npm run lint' };
+  await mkdir(path.join(root, '.claude'));
+  await write(root, '.claude/settings.json', JSON.stringify({ hooks: { Stop: [{ hooks: [own] }] } }));
+  await mkdir(path.join(root, '.codex'));
+  await write(root, '.codex/config.toml', 'model = "x"\n');
+  await write(root, '.codex/hooks.json', JSON.stringify({ hooks: { PreToolUse: [{ matcher: 'Bash', hooks: [own] }] } }));
+  await installProject({ projectRoot: root });
+  const claude = JSON.parse(await read(root, '.claude/settings.json'));
+  assert.deepEqual(claude.hooks.Stop[0], { hooks: [own] });
+  assert.equal(claude.hooks.Stop.length, 2);
+  const codex = JSON.parse(await read(root, '.codex/hooks.json'));
+  assert.deepEqual(codex.hooks.PreToolUse[0], { matcher: 'Bash', hooks: [own] });
+
+  const { uninstallProject } = await import('../lib/uninstaller.js');
+  await uninstallProject({ projectRoot: root });
+  assert.deepEqual(JSON.parse(await read(root, '.claude/settings.json')).hooks, { Stop: [{ hooks: [own] }] });
+  assert.deepEqual(JSON.parse(await read(root, '.codex/hooks.json')), { hooks: { PreToolUse: [{ matcher: 'Bash', hooks: [own] }] } });
+  assert.equal(await read(root, '.codex/config.toml'), 'model = "x"\n');
+}));
+
+test('the cross-major error explains that uninstall and reinstall is the only route', () => {
+  assert.throws(() => checkUpgrade('1.4.0', '2.0.0'), /no migration between major versions[\s\S]*standards uninstall[\s\S]*install again/);
+});

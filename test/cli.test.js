@@ -23,17 +23,19 @@ function output() {
 test('CLI selects an explicit project and client without confusing npm global scope with project scope', () => {
   assert.deepEqual(
     parseArguments(['install', '--project', './example', '--client=claude-code']),
-    { command: 'install', project: './example', clients: ['claude'], mode: null },
+    { command: 'install', project: './example', clients: ['claude'], mode: null, hooks: null },
   );
   assert.deepEqual(parseArguments(['install', '--client', 'codex']), {
-    command: 'install', project: '.', clients: ['codex'], mode: null,
+    command: 'install', project: '.', clients: ['codex'], mode: null, hooks: null,
   });
+  // Without --client or hook flags, the installer picks defaults from the project.
   assert.deepEqual(parseArguments(['install']), {
-    command: 'install', project: '.', clients: ['codex', 'claude'], mode: null,
+    command: 'install', project: '.', clients: null, mode: null, hooks: null,
   });
-  assert.deepEqual(parseArguments(['install', '--mode', 'greenfield']), {
-    command: 'install', project: '.', clients: ['codex', 'claude'], mode: 'GREENFIELD',
+  assert.deepEqual(parseArguments(['install', '--mode', 'greenfield', '--no-hooks']), {
+    command: 'install', project: '.', clients: null, mode: 'GREENFIELD', hooks: false,
   });
+  assert.equal(parseArguments(['install', '--hooks']).hooks, true);
 });
 
 test('CLI rejects ambiguous or unsupported install options', () => {
@@ -43,8 +45,10 @@ test('CLI rejects ambiguous or unsupported install options', () => {
   assert.throws(() => parseArguments(['install', '--global']), /Unknown install option/);
   assert.throws(() => parseArguments(['install', '--mode', 'unknown']), /Unsupported mode/);
   assert.deepEqual(parseArguments(['install', '--yes']), {
-    command: 'install', project: '.', clients: ['codex', 'claude'], mode: null, yes: true,
+    command: 'install', project: '.', clients: null, mode: null, hooks: null, yes: true,
   });
+  assert.throws(() => parseArguments(['install', '--hooks', '--no-hooks']), /either --hooks or --no-hooks/);
+  assert.throws(() => parseArguments(['install', '--no-hooks=yes']), /does not take a value/);
   assert.throws(() => parseArguments(['install', '--yes=true']), /does not take a value/);
 });
 
@@ -120,16 +124,20 @@ test('interactive install asks for project, mode, and clients, then writes only 
   const stdout = output();
   stdout.stream.isTTY = true;
   const stderr = output();
-  const prompts = fakePrompts([root, 'BROWNFIELD', ['codex'], false]);
+  const prompts = fakePrompts([root, 'BROWNFIELD', ['codex'], true, false]);
   const environment = { cwd: projectRoot, stdin: { isTTY: true },
     stdout: stdout.stream, stderr: stderr.stream, prompts };
   assert.equal(await runCli(['install'], environment), 0);
   assert.deepEqual(await readdir(root), []);
   assert.deepEqual(prompts.calls.filter(([name]) => ['text', 'select', 'multiselect', 'confirm'].includes(name))
-    .map(([name]) => name), ['text', 'select', 'multiselect', 'confirm']);
+    .map(([name]) => name), ['text', 'select', 'multiselect', 'confirm', 'confirm']);
+  assert.match(prompts.calls.find(([name]) => name === 'confirm')[1].message, /STANDARDS hooks/);
   const preview = prompts.calls.find(([name]) => name === 'note');
   assert.match(preview[2], /Mode: BROWNFIELD/);
   assert.match(preview[2], /Clients: codex/);
+  assert.match(preview[2], /Hooks: on/);
+  assert.match(preview[2], /write: \.codex\/hooks\.json/);
+  assert.match(preview[2], /Next:\nCodex runs new or changed hooks only after you trust them/);
   assert.doesNotMatch(preview[2], /\.claude\/skills/);
   assert.equal(stderr.read(), '');
 
@@ -151,7 +159,7 @@ test('interactive uninstall previews full removal and preserves files when decli
   const stderr = output();
   const environment = { cwd: root, stdin: { isTTY: true },
     stdout: stdout.stream, stderr: stderr.stream };
-  const installPrompts = fakePrompts(['GREENFIELD', ['codex', 'claude'], true]);
+  const installPrompts = fakePrompts(['GREENFIELD', ['codex', 'claude'], true, true]);
   assert.equal(await runCli(['install', '--project', root], { ...environment, prompts: installPrompts }), 0);
 
   const decline = fakePrompts([false]);
@@ -175,8 +183,11 @@ test('interactive install stops if the project changes after preview', () => tem
   stdout.stream.isTTY = true;
   const stderr = output();
   const prompts = fakePrompts(['GREENFIELD', ['codex', 'claude']]);
+  let confirmations = 0;
   prompts.confirm = async () => {
-    await writeFile(path.join(root, 'AGENTS.md'), '# New project guidance\n');
+    // The first confirmation is the hooks question; change the project before the second.
+    confirmations += 1;
+    if (confirmations === 2) await writeFile(path.join(root, 'AGENTS.md'), '# New project guidance\n');
     return true;
   };
   assert.equal(await runCli(['install', '--project', root], {
@@ -208,3 +219,18 @@ test('uninstall rejects missing and file targets before touching project files',
     assert.match(stderr.read(), /Project (directory does not exist|path is not a directory)/);
   }
 });
+
+test('interactive reinstall offers the installed clients and hook choice as defaults', () => temporaryProject(async (root) => {
+  const stdout = output();
+  stdout.stream.isTTY = true;
+  const stderr = output();
+  const environment = { cwd: root, stdin: { isTTY: true }, stdout: stdout.stream, stderr: stderr.stream };
+  assert.equal(await runCli(['install', '--project', root, '--client', 'codex', '--no-hooks', '--yes'], environment), 0);
+  const prompts = fakePrompts([['codex'], false, true]);
+  assert.equal(await runCli(['install', '--project', root], { ...environment, prompts }), 0);
+  const [, clients] = prompts.calls.find(([name]) => name === 'multiselect');
+  assert.deepEqual(clients.initialValues, ['codex']);
+  const [, hooks] = prompts.calls.find(([name]) => name === 'confirm');
+  assert.equal(hooks.initialValue, false);
+  assert.equal(stderr.read(), '');
+}));

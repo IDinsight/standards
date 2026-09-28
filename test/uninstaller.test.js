@@ -55,11 +55,9 @@ test('uninstall preserves exact text outside managed blocks and an existing Clau
   await write(root, 'CLAUDE.md', '# Personal guidance\r\n@AGENTS.md\r\n');
   await installProject({ projectRoot: root });
   await write(root, 'AGENTS.md', (await read(root, 'AGENTS.md')) + '\r\nMore project guidance\r\n');
-  const agents = await read(root, 'AGENTS.md');
-  const range = blockRange(agents, 'AGENTS.md');
-  const expected = agents.slice(0, range.start) + agents.slice(range.end);
   await uninstallProject({ projectRoot: root });
-  assert.equal(await read(root, 'AGENTS.md'), expected);
+  // The block goes, and so does the blank line install put before it.
+  assert.equal(await read(root, 'AGENTS.md'), '# Project\r\nKeep me\r\n\r\nMore project guidance\r\n');
   assert.equal(await read(root, 'CLAUDE.md'), '# Personal guidance\r\n@AGENTS.md\r\n');
 }));
 
@@ -120,7 +118,7 @@ test('existing parent directories stay, even when the installer created their ch
   await installProject({ projectRoot: root });
   const record = JSON.parse(await read(root, '.standards/INSTALLATION.json'));
   assert.deepEqual(record.createdPaths, [
-    '.agents/skills', '.claude/skills', '.claude/settings.json',
+    '.agents/skills', '.claude/skills', '.claude/settings.json', '.codex', '.codex/hooks.json',
   ]);
   await uninstallProject({ projectRoot: root });
   assert.deepEqual(await readdir(path.join(root, '.claude')), ['notes.md']);
@@ -146,11 +144,11 @@ test('generated settings and client directories remain when a user adds content'
 test('adding a client later records only paths created at that time', () => fixture(async (root) => {
   await installProject({ projectRoot: root, clients: ['codex'] });
   assert.deepEqual(JSON.parse(await read(root, '.standards/INSTALLATION.json')).createdPaths,
-    ['.agents', '.agents/skills']);
+    ['.agents', '.agents/skills', '.codex', '.codex/hooks.json']);
   await mkdir(path.join(root, '.claude'));
   await installProject({ projectRoot: root, clients: ['claude'] });
   assert.deepEqual(JSON.parse(await read(root, '.standards/INSTALLATION.json')).createdPaths,
-    ['.agents', '.agents/skills', '.claude/skills', '.claude/settings.json']);
+    ['.agents', '.agents/skills', '.codex', '.codex/hooks.json', '.claude/skills', '.claude/settings.json']);
   await uninstallProject({ projectRoot: root });
   assert.equal((await readdir(root)).includes('.agents'), false);
   assert.deepEqual(await readdir(path.join(root, '.claude')), []);
@@ -306,4 +304,31 @@ test('CLI previews, uninstalls, and reports a repeated uninstall from the curren
   output = '';
   assert.equal(await runCli(['uninstall'], streams), 0);
   assert.match(output, /No STANDARDS installation found/);
+}));
+
+test('install then uninstall returns instruction files to their original text', () => fixture(async (root) => {
+  await write(root, 'AGENTS.md', '# Project\nKeep\n');
+  await write(root, 'CLAUDE.md', '# Claude notes\n');
+  await installProject({ projectRoot: root });
+  await uninstallProject({ projectRoot: root });
+  assert.equal(await read(root, 'AGENTS.md'), '# Project\nKeep\n');
+  assert.equal(await read(root, 'CLAUDE.md'), '# Claude notes\n');
+}));
+
+test('uninstall removes the Codex hooks file and folder it created', () => fixture(async (root) => {
+  await installProject({ projectRoot: root });
+  assert.match(await read(root, '.codex/hooks.json'), /hook\.mjs/);
+  const result = await uninstallProject({ projectRoot: root });
+  assert.ok(result.paths.some((entry) => entry.path === '.codex' && entry.action === 'remove'));
+  assert.equal((await readdir(root)).includes('.codex'), false);
+}));
+
+test('an unrelated skill with a symlinked SKILL.md does not block uninstall', () => fixture(async (root) => {
+  await installProject({ projectRoot: root, clients: ['claude'] });
+  await write(root, 'shared-skill.md', '# Shared skill\n');
+  await mkdir(path.join(root, '.claude/skills/shared'));
+  await symlink(path.join(root, 'shared-skill.md'), path.join(root, '.claude/skills/shared/SKILL.md'));
+  const result = await uninstallProject({ projectRoot: root });
+  assert.equal(result.paths.some((entry) => entry.path === '.claude/skills/shared'), false);
+  assert.equal(await read(root, '.claude/skills/shared/SKILL.md'), '# Shared skill\n');
 }));

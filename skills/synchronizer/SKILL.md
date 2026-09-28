@@ -101,11 +101,13 @@ for contradictions. Planned implementation alone does not stale Auditor context.
    affected paths/identities, evidence, impact on applicability, owner,
    canonical failure type, and required correction. Persist every unresolved
    discrepancy before routing one using **Failure Handoffs**, **Recovery
-   Mechanics**, and **Outstanding Obligations**. Keep stable local discrepancy
-   references on resumption. A material gap blocks completion even without an
-   established defect. If user action is necessary, persist
-   `Active Work.BlockedOn` before asking; clear it only after incorporating the
-   answer. User-requested rework uses **User Decisions and Intervention**.
+   Mechanics**, and **Outstanding Obligations**. Record each discrepancy as a
+   `### D-NNN` entry numbered with `node .standards/bin/id.mjs next D <record>`
+   and keep the numbers stable on resumption. Refer to entries in other records
+   by path and ID. A material gap blocks completion even without an established
+   defect. If user action is necessary, persist `Active Work.BlockedOn` before
+   asking; clear it only after incorporating the answer. User-requested rework
+   uses **User Decisions and Intervention**.
 6. On every resumption, compare current inputs with recorded identities,
    including incomplete records. Invalidate unsupported conclusions and reopen
    an unsupported `COMPLETE` status. Reconcile the entire current acceptance
@@ -133,7 +135,9 @@ for contradictions. Planned implementation alone does not stale Auditor context.
 Apply **Synchronization Gate** and recheck input identities immediately before
 finalizing the conclusion. `COMPLETE` means this role's full gate passed; it
 does not mean the user accepted the work or that all recovery routing is
-finished.
+finished. Before any handoff, `node .standards/bin/check.mjs` must report no
+problem in files Synchronizer owns (see the protocol's **Runtime Tools and
+Hooks**).
 
 Apply canonical **Recovery Mechanics** first. When Synchronizer owns the active
 frame, correct its reconciliation and identify any completed downstream work

@@ -10,9 +10,11 @@ review, or documentation.
 Keep the artifact concise. Preserve `DEV-NNN` identifiers for the active cycle;
 do not renumber completed steps when revising the plan.
 
-Every development plan is a STANDARDS cycle-owned artifact. Prepend this block
-and replace the placeholder with the exact active cycle ID. The provenance
-`Cycle` and the visible `Cycle` field below must always agree.
+Every development plan is a STANDARDS cycle-owned artifact. Create it with
+`node .standards/bin/artifact.mjs init DEVELOPMENT`, which writes this block and
+the header below with the active cycle ID. The provenance `Cycle` and the
+visible `Cycle` field must always agree. Number new steps with
+`node .standards/bin/id.mjs next DEV <plan>`.
 
 ```markdown
 <!-- STANDARDS

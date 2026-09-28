@@ -5,7 +5,8 @@ Use the location and provenance defined by **Workflow Artifact Provenance** in
 the protocol. Tests remain in the repository's established test locations. Both
 modes use this format; do not create a separate preferences or status file.
 
-Prepend the exact current-cycle provenance:
+Create the report with `node .standards/bin/artifact.mjs init VERIFICATION`,
+which writes this provenance block and the header below:
 
 ```markdown
 <!-- STANDARDS

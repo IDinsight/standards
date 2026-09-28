@@ -348,6 +348,18 @@
         "The handoff names IMPLEMENTATION and gives the advisory model recommendation without switching models or asking routine author-model confirmation.",
         "Reviewer conclusions are not fabricated by Tester."
       ]
+    },
+    {
+      "id": 30,
+      "prompt": "Continue the active STANDARDS workflow as Tester in a fresh chat. ProjectMode is BROWNFIELD, CycleMode is STANDARD, WorkflowState is TESTING, recovery is inactive, and the scope, architecture, and COMPLETE development plan are current. Before starting, `node .standards/bin/check.mjs` reports: \"docs/development/add-search-20260927T101500Z-1a2b3c4d.md: DEV-003 depends on DEV-008, which is not a step in this plan.\"",
+      "expected_output": "Tester does not edit the development plan. It routes the plan defect to Developer through an IMPLEMENTATION failure handoff with a recovery frame, instead of starting verification or handing off forward.",
+      "files": [],
+      "assertions": [
+        "The response treats the reported problem as a defect in the Developer-owned plan",
+        "It does not edit the development plan or fix the dependency itself",
+        "It routes the defect with an IMPLEMENTATION failure handoff to DEVELOPING and pushes a recovery frame with ResumeAt TESTING",
+        "It does not make a forward handoff to Reviewer while the problem remains"
+      ]
     }
   ]
 }

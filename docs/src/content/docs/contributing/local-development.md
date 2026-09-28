@@ -50,17 +50,22 @@ Rebuild after further edits so the production preview includes them.
 ## Validate the installer
 
 ```sh
-pnpm run test:cli
-pnpm run test:installer
-pnpm run test:package
+make test
 ```
+
+`make test` runs every test file in `test/` (the same as `pnpm test`). To run
+one group, use `pnpm run test:cli`, `test:installer`, `test:runtime`,
+`test:release`, or `test:package`.
 
 The package test creates a pnpm tarball in a temporary directory, checks the
 packed framework assets, and tests installation, reinstallation, a compatible
 upgrade, uninstall preview, removal, and fresh installation in a temporary
 project. The installer tests also cover preservation of project files and
-settings, ownership failures, and rollback of removals. These checks do not
-publish the package or install STANDARDS into this repository.
+settings, hooks, ownership failures, and rollback of removals. The runtime tests
+run the tools installed in `.standards/bin/` and the hook script in temporary
+projects. The release tests simulate releases in a temporary git repository to
+check the release checks described below. These checks do not publish the
+package or install STANDARDS into this repository.
 
 To preview the local uninstaller against a project before publishing a release:
 
@@ -104,12 +109,49 @@ docs cache and build output, generated reference pages, and their downloadable
 originals. See [Repository Structure](../repository-structure/) for the source
 locations.
 
+## Release versions
+
+release-please opens a release pull request based on the Conventional Commit
+messages on `main`. Choose messages with the version in mind, because the
+installer upgrades an existing project only within one major version:
+
+- A change needs a major release when it adds, removes, or renames a role, or
+  changes runtime files or record formats so that an existing installation's
+  files would no longer pass. Existing projects then have to uninstall and
+  install again, because STANDARDS has no migration between major versions.
+- Mark such a change with `!` after the type, as in `feat!: add a Planner role`,
+  or with a `BREAKING CHANGE:` footer. release-please then raises the major
+  version, including from `0.x` to `1.0.0`.
+- To set a version directly, add a footer such as `Release-As: 2.0.0` to a
+  commit.
+
+The **Release Checks** workflow enforces this on pull requests whose
+`package.json` version differs from the latest release tag, which is the case on
+release-please pull requests. It fails when:
+
+- roles were added, removed, or renamed and the new version is not major; or
+- the new version is not major and the new installer cannot upgrade a project
+  installed by the previous release. The check installs the previous release,
+  loads each saved workflow state and its cycle records from
+  `test/fixtures/upgrade/`, upgrades with the pull request's code, and confirms
+  that `STATE.md` and `CYCLE_IDS.md` are unchanged and that `check.mjs` reports
+  no problems.
+
+Run it locally with `pnpm run check:release`; it needs the release tags. Add an
+upgrade fixture when a release introduces a new kind of saved state.
+
+Publishing the package to npm is a separate, manual step.
+
 ## CI and deployment
 
 The repository runs these checks for pull requests:
 
 - **Documentation:** builds with Node.js 24 and runs the local link checker.
-- **Installer:** runs the CLI and installer tests and checks the pnpm tarball.
+- **Tests:** runs `make test` (the CLI, installer, runtime-tool, and
+  release-check tests, and the pnpm tarball check) on Node.js 22.12 and 24, for
+  pull requests to `main` and for pushes to any branch.
+- **Release Checks:** compares a release pull request with the previous release,
+  as described in [Release versions](#release-versions).
 - **Linting:** runs the Markdown check.
 - **Secret Scan:** checks pull requests targeting `main` for verified secrets.
 

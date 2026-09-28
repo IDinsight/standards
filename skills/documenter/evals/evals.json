@@ -719,6 +719,18 @@
         "A previous verified label cannot authorize a stale corrective return.",
         "The frame and incomplete record remain until the saved correction has sufficient current evidence."
       ]
+    },
+    {
+      "id": 70,
+      "prompt": "Invoke Documenter. ProjectMode=BROWNFIELD, CycleMode=STANDARD, WorkflowState=DOCUMENTING, Active Work.Id=add-search-20260927T101500Z-1a2b3c4d, and implementation review is COMPLETE with finding F-002 RESOLVED. While updating the user guide, Documenter finds that the README still describes the old search syntax, and the fix needs a behavior decision owned by Scoper.",
+      "expected_output": "Documenter records the problem as a `### DOC-001` discrepancy numbered with `node .standards/bin/id.mjs next DOC`, refers to the review finding by path and ID, and routes the decision to Scoper.",
+      "files": [],
+      "assertions": [
+        "The documentation record is created with `artifact.mjs init DOCUMENTATION` if it does not exist",
+        "The discrepancy is numbered `DOC-001` with `id.mjs next DOC`, not `D-001`",
+        "The review finding is referenced as docs/reviews/add-search-20260927T101500Z-1a2b3c4d/implementation.md#F-002",
+        "The Scoper-owned decision is routed through a SCOPING failure rather than decided by Documenter"
+      ]
     }
   ]
 }

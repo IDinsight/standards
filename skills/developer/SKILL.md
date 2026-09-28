@@ -28,14 +28,14 @@ Own implementation changes for the active cycle and the Developer-owned
 development plan.
 
 Persist the development plan as a STANDARDS cycle-owned artifact under the
-protocol's **Workflow Artifact Provenance** rules. Use
-`docs/development/<Active Work.Id>.md` unless the repository requires another
-development-plan directory; any alternative must still use the current
-`Active Work.Id` as its cycle-specific filename. Add the current-cycle
-`DEVELOPMENT` provenance block and keep the plan's visible `Cycle` field equal
-to `Active Work.Id`. Never reuse a shared project-owned plan or a STANDARDS
-development artifact owned by another cycle. Record its repository-relative path
-in `STATE.md` as `Active Work.Development`.
+protocol's **Workflow Artifact Provenance** rules. Create it with
+`node .standards/bin/artifact.mjs init DEVELOPMENT`, which writes
+`docs/development/<Active Work.Id>.md` with the provenance block and header. Add
+`--dir <folder>` only when the repository requires another development-plan
+folder; the file name stays `<Active Work.Id>.md`. Keep the plan's visible
+`Cycle` field equal to `Active Work.Id`. Never reuse a shared project-owned plan
+or a STANDARDS development artifact owned by another cycle. Record its
+repository-relative path in `STATE.md` as `Active Work.Development`.
 
 Do not change Scoper-owned requirements or acceptance identifiers,
 Architect-owned technical design, Auditor-owned project context, Tester-owned
@@ -99,24 +99,26 @@ request may select `EXPEDITED` only when `CycleMode` is `UNSET`. First honor
 Developer from inferring `EXPEDITED`, while a pending `EXPEDITED` preference
 still requires the request to satisfy the expedited contract. If
 `PendingCycleRequest` is not `UNSET`, use that persisted request when resolving
-the pre-cycle decision rather than requiring the user to repeat it. If the
-current state is `SIGNED_OFF` or retained `CANCELLED`, a successful pending
-request/preference resolution must continue through the protocol's **Start a new
-cycle** transition; do not directly replace terminal `Active Work` or bypass its
-handoff and baseline-reconciliation steps. Otherwise, when a pending
-request/preference is successfully consumed for the initialized first cycle,
-persist the selected mode into `CycleMode` and clear `PendingCycleMode`,
-`PendingCycleRequest`, and `PendingCycleBlockedOn` to their neutral values. If
-no pending preference exists, Developer may infer `EXPEDITED` only for a
+the pre-cycle decision rather than requiring the user to repeat it. If no
+pending preference exists, Developer may infer `EXPEDITED` only for a
 sufficiently bounded brownfield request. If the request cannot use the selected
 expedited contract, do not silently reinterpret it as `STANDARD`; follow the
-protocol's user-decision rule. For a selected or defaulted `STANDARD` request,
-allocate its cycle ID through the protocol's **Cycle ID Registry** first. If
-`CYCLE_IDS.md` is unexpectedly missing from the installed runtime, stop and
-report the incomplete runtime; do not recreate or infer the registry. After a
-valid registry append succeeds, persist the reserved ID and initial request,
-then stop Developer work because the standard entry state remains owned by
-Scoper or Auditor.
+protocol's user-decision rule.
+
+Then start the cycle. From `SIGNED_OFF` or retained `CANCELLED`, every new
+request, whether or not it was pending, starts through the protocol's **Start a
+new cycle** transition; do not directly replace terminal `Active Work` or bypass
+its handoff and baseline-reconciliation steps. For the initialized first cycle,
+reserve the cycle ID with
+`node .standards/bin/cycle.mjs new --request "<request>"` (see **Cycle ID
+Registry**). If the tool refuses or `CYCLE_IDS.md` is missing, stop and report
+it; never invent an ID or edit the registry. After the tool prints the ID,
+persist it, the request, and the selected `CycleMode`, and clear
+`PendingCycleMode`, `PendingCycleRequest`, and `PendingCycleBlockedOn` to their
+neutral values; an `EXPEDITED` cycle also follows the protocol's **Select
+expedited mode for the initialized cycle**. In both routes, continue Developer
+work only when the resulting state is `DEVELOPING`; a `STANDARD` cycle's entry
+state is owned by Scoper or Auditor, so stop there.
 
 If another role owns the active state and no protocol-authorized control-plane
 transition applies, do not perform Developer work. Leave role-owned artifacts
@@ -275,7 +277,8 @@ chosen is not Developer-owned architecture.
 Before changing project implementation, create or revise the persisted Developer
 plan using [`template.md`](template.md).
 
-The plan must decompose implementation into atomic `DEV-NNN` steps that are:
+The plan must decompose implementation into atomic `DEV-NNN` steps, each
+numbered with `node .standards/bin/id.mjs next DEV <plan>`, that are:
 
 - understandable without reading the eventual diff;
 - dependency-aware and resumable;
@@ -430,6 +433,8 @@ implementation change exists, not when the plan is created or approved.
 
 Developer is complete when:
 
+- `node .standards/bin/check.mjs` reports no problem in files Developer owns
+  (see the protocol's **Runtime Tools and Hooks**);
 - every current approved `DEV-NNN` step is `DONE`;
 - the development plan is `Status: COMPLETE`, carries matching current-cycle
   `DEVELOPMENT` provenance, and `Active Work.Development` points to it;

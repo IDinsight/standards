@@ -50,8 +50,8 @@ updates each document at the listed location. `<cycle-id>` is the ID saved in
 
 | Document               | Location                                                                                                                |
 | ---------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| Scope                  | An appropriate existing project document, or a new file under `docs/scope/`.                                            |
-| Technical design       | An appropriate existing project document, or a new file under `docs/specs/`.                                            |
+| Scope                  | An appropriate existing project document, or `docs/scope/<cycle-id>.md`.                                                |
+| Technical design       | An appropriate existing project document, or `docs/specs/<cycle-id>.md`.                                                |
 | Development plan       | `docs/development/<cycle-id>.md`; a project-required plan directory may differ, but the filename stays `<cycle-id>.md`. |
 | Project context        | `.standards/CONTEXT.md`                                                                                                 |
 | Verification report    | `docs/verification/<cycle-id>.md`                                                                                       |
@@ -73,11 +73,20 @@ An existing unmarked project scope or design document can remain shared across
 cycles. Tests, guides, and docstrings also remain reusable project files; their
 assessment records belong to a cycle.
 
-If a new scope or design would overwrite another cycle's file, the agent chooses
-a different path. If a required report path contains an unrelated or incorrectly
-marked file, the agent keeps it and stops work that depends on the report until
-the conflict is resolved. It does not overwrite or relabel that file or silently
-choose another report path.
+New scope and design files are named after the cycle ID, so they never collide
+with another cycle's files. If a required report path contains an unrelated or
+incorrectly marked file, the agent keeps it and stops work that depends on the
+report until the conflict is resolved. It does not overwrite or relabel that
+file or silently choose another report path.
 
 See [file ownership](../../concepts/ownership/#artifact-provenance) and the
 [exact path and marker rules](../protocol/#workflow-artifact-provenance).
+
+## Entry numbers and references
+
+Records number their entries: development steps as `DEV-001`, review findings as
+`F-001`, synchronization discrepancies as `D-001`, and documentation
+discrepancies as `DOC-001`. The agent gets each new number from
+`node .standards/bin/id.mjs next`, so a number is never reused. When one record
+mentions an entry in another, it includes that record's path, for example
+`docs/reviews/<cycle-id>/implementation.md#F-003`.

@@ -62,6 +62,15 @@ instructions. The agent checks the saved report and prior evidence; you only
 need to start the appropriate chat and invoke the role. See
 [independent assessment chats](../../concepts/states-and-handoffs/#independent-assessment-chats).
 
+## Work on more than one branch
+
+Each branch can carry one active cycle. If you merge a branch into another one
+that also changed `.standards/`, you resolve the merge conflict yourself: keep
+every line of `CYCLE_IDS.md` and exactly one cycle in `STATE.md`. To avoid it,
+sign off or cancel a cycle before merging its branch. An agent that finds
+unresolved conflict markers stops and asks you to resolve them. See
+[Branches and merges](../../reference/runtime-files/#branches-and-merges).
+
 ## Answer decisions that are waiting on you
 
 If the role paused for a question, answer it in that role’s chat. The agent

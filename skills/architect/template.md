@@ -11,8 +11,9 @@ unresolved architecture while coding.
 Omit empty sections. Add detail only when it materially reduces implementation
 ambiguity.
 
-When Architect creates a new STANDARDS-owned technical-design artifact, prepend
-this block and replace the placeholder with the exact active cycle ID:
+When Architect creates a new STANDARDS-owned technical-design artifact, create
+it with `node .standards/bin/artifact.mjs init ARCHITECTURE`, which writes this
+block with the active cycle ID:
 
 ```markdown
 <!-- STANDARDS
@@ -90,6 +91,13 @@ Include lifecycle or state transitions when they materially affect behavior.
 
 - Meaningful rejected alternative and why it was not chosen.
 
+## Previous Cycles
+
+Only in a design document reused across cycles, and always the last section: the
+earlier cycles' acceptance coverage and technical acceptance criteria, moved
+here unchanged, including their headings. Everything below this heading is
+history, not current coverage or criteria.
+
 ---
 
 ## Authoring Rules
@@ -106,7 +114,8 @@ Include lifecycle or state transitions when they materially affect behavior.
   which satisfaction depends when material. Do not invent architecture or claim
   the technical design satisfies a condition it does not own. Retired acceptance
   identifiers are not current coverage obligations; remove stale references to
-  them when revising the design.
+  them when revising the design. In a reused design document, keep earlier
+  cycles' acceptance references only under **Previous Cycles**.
 - Record only material technical decisions. Leave local, easily reversible
   coding choices to Developer.
 - Make replacements to established architecture, conventions, dependencies, or

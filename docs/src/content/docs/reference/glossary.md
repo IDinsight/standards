@@ -60,9 +60,11 @@ new ID and cycle.
 
 ## Cycle ID registry
 
-The `.standards/CYCLE_IDS.md` list of reserved IDs. The agent adds each new ID;
-you do not need to manage the list. An ID cannot be reused while STANDARDS
-remains installed, even if cycle setup failed after the ID was reserved. See
+The `.standards/CYCLE_IDS.md` list of reserved IDs. The agent adds each new ID
+with `node .standards/bin/cycle.mjs new`; you do not manage the list, and
+editing it by hand is not supported except to resolve a merge conflict. An ID
+cannot be reused while STANDARDS remains installed, even if cycle setup failed
+after the ID was reserved. See
 [cycle identity](../runtime-files/#cycle-identity).
 
 ## Cycle mode
@@ -174,6 +176,13 @@ complete the cycle or provide user sign-off. See the
 A choice of how one role works, such as Developer's `STEPWISE` or Navigator's
 `EXPLAIN`. It does not change project mode, cycle mode, or workflow state.
 
+## Runtime tools
+
+The Node.js tools in `.standards/bin/`: `cycle.mjs` reserves cycle IDs,
+`artifact.mjs` creates cycle records, `id.mjs` numbers their entries, and
+`check.mjs` checks the workflow files. See
+[runtime tools](../runtime-files/#runtime-tools).
+
 ## Scope-level acceptance condition
 
 An observable outcome used to decide whether a requirement is met. Scoper
@@ -192,6 +201,14 @@ The full workflow for a change, including separate verification, documentation,
 final review, and synchronization before your sign-off decision. The starting
 role depends on project mode. See
 [workflow paths](../../concepts/states-and-handoffs/#standard-forward-paths).
+
+## STANDARDS hook
+
+A Claude Code or Codex hook, added by the installer, that runs
+`.standards/bin/hook.mjs`. One runs `check` when the agent finishes a turn; the
+other blocks agent edits to the cycle-ID registry made with file-editing tools
+or common shell commands. See
+[Hooks](../../getting-started/installation/#hooks).
 
 ## Synchronization record
 

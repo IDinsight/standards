@@ -52,7 +52,7 @@
     },
     {
       "id": 5,
-      "prompt": "Invoke Reviewer in an independent chat. ProjectMode=BROWNFIELD, CycleMode=STANDARD, WorkflowState=REVIEWING_IMPLEMENTATION, Active Work.Id=export-20260924-a7f3. Current scope, architecture, context, Development and Tester report are available with valid ownership; recovery and outstanding obligations are inactive unless specified. State is now REVIEWING_FINAL. Documentation was completed after a passing implementation review. The guide accurately describes current flags and permissions. Every current AC and relevant technical criterion has sufficient current evidence, including the guide condition previously pending Documenter. No findings or gaps remain.",
+      "prompt": "Invoke Reviewer in an independent chat. ProjectMode=BROWNFIELD, CycleMode=STANDARD, WorkflowState=REVIEWING_FINAL, Active Work.Id=export-20260924-a7f3. Current scope, architecture, context, Development, Tester report, passing implementation review, and Documenter record are available with valid ownership; recovery and outstanding obligations are inactive unless specified. Documentation was completed after a passing implementation review. The guide accurately describes current flags and permissions. Every current AC and relevant technical criterion has sufficient current evidence, including the guide condition previously pending Documenter. No findings or gaps remain.",
       "expected_output": "Complete FINAL_DELIVERABLE review and hand off to Synchronizer without claiming sign-off.",
       "files": [],
       "assertions": [
@@ -65,7 +65,7 @@
     },
     {
       "id": 6,
-      "prompt": "Invoke Reviewer in an independent chat. ProjectMode=BROWNFIELD, CycleMode=STANDARD, WorkflowState=REVIEWING_IMPLEMENTATION, Active Work.Id=export-20260924-a7f3. Current scope, architecture, context, Development and Tester report are available with valid ownership; recovery and outstanding obligations are inactive unless specified. State is REVIEWING_FINAL. The operations guide says all signed-in users can export, while AC-002, implementation, and verified behavior require administrators. At docs/operations.md:42 the incorrect instruction tells support users to run the admin command.",
+      "prompt": "Invoke Reviewer in an independent chat. ProjectMode=BROWNFIELD, CycleMode=STANDARD, WorkflowState=REVIEWING_FINAL, Active Work.Id=export-20260924-a7f3. Current scope, architecture, context, Development, Tester report, passing implementation review, and Documenter record are available with valid ownership; recovery and outstanding obligations are inactive unless specified. The operations guide says all signed-in users can export, while AC-002, implementation, and verified behavior require administrators. At docs/operations.md:42 the incorrect instruction tells support users to run the admin command.",
       "expected_output": "Record a DOCUMENTATION finding and route to Documenter with ResumeAt REVIEWING_FINAL.",
       "files": [],
       "assertions": [
@@ -220,7 +220,7 @@
     },
     {
       "id": 20,
-      "prompt": "Invoke Reviewer in an independent chat. ProjectMode=BROWNFIELD, CycleMode=STANDARD, WorkflowState=REVIEWING_IMPLEMENTATION, Active Work.Id=export-20260924-a7f3. Current scope, architecture, context, Development and Tester report are available with valid ownership; recovery and outstanding obligations are inactive unless specified. State is REVIEWING_FINAL. AC-003 requires a restore guide, but the final report draft still carries it pending Documenter from implementation review. The guide is absent.",
+      "prompt": "Invoke Reviewer in an independent chat. ProjectMode=BROWNFIELD, CycleMode=STANDARD, WorkflowState=REVIEWING_FINAL, Active Work.Id=export-20260924-a7f3. Current scope, architecture, context, Development, Tester report, passing implementation review, and Documenter record are available with valid ownership; recovery and outstanding obligations are inactive unless specified. AC-003 requires a restore guide, but the final report draft still carries it pending Documenter from implementation review. The guide is absent.",
       "expected_output": "Block final completion and route the missing documentation to Documenter.",
       "files": [],
       "assertions": [
@@ -374,7 +374,7 @@
     },
     {
       "id": 34,
-      "prompt": "Invoke Reviewer in an independent chat. ProjectMode=BROWNFIELD, CycleMode=STANDARD, WorkflowState=REVIEWING_IMPLEMENTATION, Active Work.Id=export-20260924-a7f3. Current scope, architecture, context, Development and Tester report are available with valid ownership; recovery and outstanding obligations are inactive unless specified. State is REVIEWING_FINAL. Its required final-deliverable.md has REVIEW provenance for the current cycle but ReviewKind IMPLEMENTATION. A valid implementation.md also exists.",
+      "prompt": "Invoke Reviewer in an independent chat. ProjectMode=BROWNFIELD, CycleMode=STANDARD, WorkflowState=REVIEWING_FINAL, Active Work.Id=export-20260924-a7f3. Current scope, architecture, context, Development, Tester report, passing implementation review, and Documenter record are available with valid ownership; recovery and outstanding obligations are inactive unless specified. Its required final-deliverable.md has REVIEW provenance for the current cycle but ReviewKind IMPLEMENTATION. A valid implementation.md also exists.",
       "expected_output": "Block on the wrong-kind provenance collision instead of repurposing either report.",
       "files": [],
       "assertions": [
@@ -457,6 +457,18 @@
         "Documenter authoring history is prohibited even though the chat contains no Developer work.",
         "The handoff names FINAL_DELIVERABLE, directs reading persisted artifacts and any active recovery frame, and gives the advisory model recommendation.",
         "No final report conclusion or session-freshness attestation is fabricated."
+      ]
+    },
+    {
+      "id": 42,
+      "prompt": "Invoke Reviewer in an independent chat. ProjectMode=BROWNFIELD, CycleMode=STANDARD, WorkflowState=REVIEWING_IMPLEMENTATION, Active Work.Id=add-search-20260927T101500Z-1a2b3c4d. The scope, architecture, development plan, and COMPLETE verification report are current, and no review report exists yet. Reviewer finds that the search endpoint ignores the documented page-size limit.",
+      "expected_output": "Reviewer creates its report with `node .standards/bin/artifact.mjs init REVIEW --kind IMPLEMENTATION`, records the defect as a finding numbered with `node .standards/bin/id.mjs next F`, and routes it to Developer.",
+      "files": [],
+      "assertions": [
+        "The report is created with `artifact.mjs init REVIEW --kind IMPLEMENTATION` at docs/reviews/add-search-20260927T101500Z-1a2b3c4d/implementation.md",
+        "The finding is a `### F-001` entry whose number comes from `id.mjs next F`",
+        "When the report cites Tester evidence or another record's entry, it names that record's path",
+        "Reviewer does not change the implementation or the verification report"
       ]
     }
   ]

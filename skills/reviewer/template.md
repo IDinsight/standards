@@ -4,8 +4,10 @@ Both review kinds use this concise, resumable report. Use the fixed path and
 provenance defined by **Workflow Artifact Provenance** in the protocol; do not
 add a review-path field or a separate preferences/status file.
 
-Prepend the block with the exact active ID and one concrete kind matching the
-path and review state:
+Create the report with
+`node .standards/bin/artifact.mjs init REVIEW --kind IMPLEMENTATION` or
+`--kind FINAL_DELIVERABLE`, which writes this block and the header below with
+the active ID and the kind matching the review state:
 
 ```markdown
 <!-- STANDARDS
@@ -75,9 +77,12 @@ Reviewer diagnostics; explain what each result actually supports.
 - **Reassessment:** for resolution/withdrawal, Reviewer-checked evidence and
   reason; preserve useful history and do not accept author status alone.
 
-Use stable report-local finding IDs, qualifying cross-report references with
-path and ID. Apply severity and status definitions from Reviewer SKILL.md. Write
-**No material findings** when none are established; do not fill a quota.
+Use stable report-local finding IDs numbered with
+`node .standards/bin/id.mjs next F <report>`. Refer to a finding in another
+report by path and ID, for example
+`docs/reviews/<Active Work.Id>/implementation.md#F-003`. Apply severity and
+status definitions from Reviewer SKILL.md. Write **No material findings** when
+none are established; do not fill a quota.
 
 ## Questions, Limitations, and Later Dependencies
 

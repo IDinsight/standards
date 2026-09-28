@@ -73,9 +73,11 @@ cancelling, or changing a cycle requires leaving Navigator. Stopping a quiz only
 stops the quiz.
 
 It runs a diagnostic only after establishing that it will not change files or
-external systems. A test or a command called “dry run” is not automatically
-safe. Where that cannot be established, Navigator uses existing evidence and
-explains what still needs checking.
+external systems. It may run `node .standards/bin/check.mjs`, which only reads
+files, and it reports any problems the check or a hook finds without fixing
+them. A test or a command called “dry run” is not automatically safe. Where that
+cannot be established, Navigator uses existing evidence and explains what still
+needs checking.
 
 Navigator can explain a suspected defect and its likely owner. It does not make
 repairs, provide Tester's verification, or issue Reviewer's verdict. For where

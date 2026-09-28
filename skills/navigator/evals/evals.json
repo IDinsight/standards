@@ -640,6 +640,17 @@
         "Does not invent a run, exit status, or observed error log.",
         "States the remaining runtime uncertainty and smallest confirming observation."
       ]
+    },
+    {
+      "id": 65,
+      "prompt": "Invoke Navigator. The user asks what the last STANDARDS hook message meant. The stop hook reported: \"docs/verification/add-search-20260927T101500Z-1a2b3c4d.md: is COMPLETE but does not account for AC-004.\"",
+      "expected_output": "Navigator explains that the verification report is marked COMPLETE but does not mention AC-004, that Tester owns the report, and how the problem would be routed, without editing anything.",
+      "files": [],
+      "assertions": [
+        "Navigator explains the problem in plain language and names Tester as the owner",
+        "It may run `node .standards/bin/check.mjs`, which only reads files",
+        "It does not edit the report, change workflow state, or route a failure itself"
+      ]
     }
   ]
 }

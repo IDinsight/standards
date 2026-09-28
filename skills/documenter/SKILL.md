@@ -194,14 +194,16 @@ a style precedence list cannot settle them.
    from passes. Record attempted errors or why no attempt was permitted; never
    invent outputs or execution. Diagnose ownership before fixing failures.
    Documentation checks do not create Tester-owned formal acceptance evidence.
-7. Persist all unresolved discrepancies before routing one. Use stable local
-   references with evidence, impact, owner/failure type, affected ACs, and the
-   required correction. Apply **Failure Handoffs**, **Recovery Mechanics**, and
-   **Outstanding Obligations**; preserve older frames and all remaining work. If
-   a user decision is necessary, persist `Active Work.BlockedOn` before asking
-   and clear it after incorporating the answer. User-requested contract changes
-   follow **User Decisions and Intervention** rather than being labeled
-   agent-discovered failures.
+7. Persist all unresolved discrepancies before routing one. Record each as a
+   stable `### DOC-NNN` entry numbered with
+   `node .standards/bin/id.mjs next DOC <record>`, with evidence, impact,
+   owner/failure type, affected ACs, and the required correction. Refer to
+   entries in other records by path and ID. Apply **Failure Handoffs**,
+   **Recovery Mechanics**, and **Outstanding Obligations**; preserve older
+   frames and all remaining work. If a user decision is necessary, persist
+   `Active Work.BlockedOn` before asking and clear it after incorporating the
+   answer. User-requested contract changes follow **User Decisions and
+   Intervention** rather than being labeled agent-discovered failures.
 8. On every resumption, compare current inputs with recorded identities,
    including incomplete records. Reconcile changed contracts and the entire
    current AC inventory, including added and retired IDs. Invalidate unsupported
@@ -223,6 +225,8 @@ Use this one gate for every target, collaboration mode, interruption, and
 correction. Before marking the record `COMPLETE`, recheck assessed identities
 against current content and confirm:
 
+- `node .standards/bin/check.mjs` reports no problem in files Documenter owns
+  (see the protocol's **Runtime Tools and Hooks**);
 - the current-cycle record has valid provenance and enough evidence/resume
   context for an independent reader using the protocol's documentation-evidence
   interface in **Synchronization Gate**;

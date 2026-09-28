@@ -42,7 +42,7 @@ try {
   assert.equal(packageJson.bin.standards, './bin/standards.js');
   assert.ok(packageJson.dependencies['@clack/prompts']);
   assert.ok((await stat(path.join(packedRoot, 'bin/standards.js'))).mode & 0o111);
-  for (const asset of ['PROTOCOL.md', 'skills', 'templates', 'lib', 'bin']) {
+  for (const asset of ['PROTOCOL.md', 'skills', 'templates', 'lib', 'bin', 'runtime']) {
     await compareTree(path.join(sourceRoot, asset), path.join(packedRoot, asset));
   }
 
@@ -63,6 +63,13 @@ try {
   assert.equal(installedVersion.version, packageJson.version);
   await stat(path.join(project, '.agents/skills/scoper/SKILL.md'));
   await stat(path.join(project, '.claude/skills/scoper/SKILL.md'));
+  // The packed runtime tools and hooks work in the installed project.
+  assert.match(await readFile(path.join(project, '.codex/hooks.json'), 'utf8'), /\.standards\/bin\/hook\.mjs/);
+  assert.match(await readFile(path.join(project, '.claude/settings.json'), 'utf8'), /\.standards\/bin\/hook\.mjs/);
+  const checked = await run(process.execPath, [path.join(project, '.standards/bin/check.mjs')]);
+  assert.match(checked.stdout, /STANDARDS check passed/);
+  const cycle = await run(process.execPath, [path.join(project, '.standards/bin/cycle.mjs'), 'new', '--request', 'Packed test']);
+  assert.match(cycle.stdout, /^packed-test-\d{8}T\d{6}Z-[0-9a-f]{8}\n$/);
   const second = await run(process.execPath, [executable, 'install', '--project', project]);
   assert.match(second.stdout, /Verified STANDARDS/);
 
@@ -88,11 +95,12 @@ try {
   assert.equal((await readdir(project)).includes('.standards'), false);
   assert.equal((await readdir(project)).includes('.agents'), false);
   assert.equal((await readdir(project)).includes('.claude'), false);
+  assert.equal((await readdir(project)).includes('.codex'), false);
   const repeated = await run(process.execPath, [executable, 'uninstall', '--project', project]);
   assert.match(repeated.stdout, /No STANDARDS installation found/);
   const fresh = await run(process.execPath, [executable, 'install', '--project', project]);
   assert.match(fresh.stdout, /Installed STANDARDS/);
-  process.stdout.write(`Packed @idinsight/standards@${packageJson.version}: assets, install, reinstall, compatible upgrade, and uninstall verified\n`);
+  process.stdout.write(`Packed @idinsight/standards@${packageJson.version}: assets, install, runtime tools, hooks, reinstall, compatible upgrade, and uninstall verified\n`);
 } finally {
   await rm(temporary, { recursive: true, force: true });
 }

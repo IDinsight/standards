@@ -1,7 +1,7 @@
 #!make
 
 .DEFAULT_GOAL := help
-.PHONY: clean help lint
+.PHONY: clean help lint test
 
 # Put it first so that "make" without argument is like "make help".
 help: ## Display available commands
@@ -34,6 +34,12 @@ clean: ## Remove caches, build output, and testing artifacts
 		node_modules/.vitest
 	@pnpm store prune
 	@echo "$(GREEN)Cleanup complete.$(RESET)"
+
+########## TESTING ##########
+test: ## Run every test in test/ (CLI, installer, runtime tools, release checks, packed package)
+	@echo "$(BLUE)Running tests...$(RESET)"
+	@pnpm test
+	@echo "$(GREEN)All tests passed.$(RESET)"
 
 ########## LINTING ##########
 lint: lint-markdown ## Run all linters and formatters

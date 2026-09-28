@@ -14,11 +14,14 @@ with the file responsible for the part you want to change.
 | `PROTOCOL.md`            | Shared rules for roles, states, handoffs, recovery, and installation. |
 | `README.md`              | A high-level introduction and development entry points.               |
 | `skills/`                | The nine role packages.                                               |
+| `runtime/`               | Tools installed into `.standards/bin/`, including `check.mjs`.        |
 | `templates/`             | Initial runtime files and client integration templates.               |
 | `docs/src/content/docs/` | Website content, including generated references.                      |
 | `docs/astro.config.mjs`  | Sidebar navigation, site URL, and base path.                          |
 | `docs/scripts/`          | Reference generation and local link checking.                         |
-| `.github/workflows/`     | Documentation, installer, Markdown, secret scanning, and releases.    |
+| `scripts/`               | The release checks run in CI (`pnpm run check:release`).              |
+| `test/`                  | Tests, and saved workflow states for the upgrade check.               |
+| `.github/workflows/`     | Tests, documentation, Markdown, secrets, release checks, releases.    |
 
 ## Inside a role package
 
@@ -50,11 +53,14 @@ See [Roles](../../roles/overview/) for behavior and
 
 `templates/greenfield/` and `templates/brownfield/` contain initial
 `.standards/MODE.md` and `.standards/STATE.md` files.
-`templates/claude/.claude/settings.json` supplies the Claude Code role
-invocation settings.
+`templates/claude/.claude/settings.json` is the starting Claude Code settings
+file; the installer adds the role invocation settings. The hook definitions are
+in `templates/claude/settings-hooks.json` for Claude Code and
+`templates/codex/.codex/hooks.json` for Codex.
 
-The published CLI in `bin/` and `lib/` installs these templates and the role
-packages. Installation and preservation requirements are defined in the
+The published CLI in `bin/` and `lib/` installs these templates, the role
+packages, and the tools in `runtime/`, which it copies to `.standards/bin/`.
+Installation and preservation requirements are defined in the
 [protocol](../../reference/protocol/#installed-runtime-contract).
 
 ## Website sources and generated files

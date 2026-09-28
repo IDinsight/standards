@@ -59,15 +59,16 @@ interrupted work.
 
 ## Artifact provenance
 
-When a role creates a workflow document for one cycle, it adds a marker
-identifying the document's type and cycle. The protocol calls this **artifact
-provenance**. You do not need to add the marker yourself. For example, a new
-scope document begins with a block like this:
+When a role creates a workflow document for one cycle, it runs
+`node .standards/bin/artifact.mjs init`, which adds a marker identifying the
+document's type and cycle. The protocol calls this **artifact provenance**. You
+do not need to add the marker yourself. For example, a new scope document begins
+with a block like this:
 
 ```markdown
 <!-- STANDARDS
 Artifact: SCOPE
-Cycle: add-user-search-20260924T150000Z-a7f3
+Cycle: add-user-search-20260924T150000Z-a7f3c2e9
 -->
 ```
 
@@ -85,9 +86,11 @@ There are two important distinctions:
 
 Development plans always belong to one cycle and include its ID in the filename.
 Verification, review, documentation, and synchronization records have fixed
-paths derived from that ID. If a required path contains an unrelated or
-incorrectly marked file, dependent work stops until the conflict is resolved.
-The role cannot overwrite the file or quietly choose another path.
+paths derived from that ID, and new scope and design documents are named after
+it. If a required path contains an unrelated or incorrectly marked file,
+dependent work stops until the conflict is resolved. A file with a broken marker
+is treated the same way wherever it is. The role cannot overwrite the file or
+quietly choose another path.
 
 See [output paths](../../reference/artifact-templates/) and the
 [exact marker and preservation rules](../../reference/protocol/#workflow-artifact-provenance).

@@ -77,6 +77,7 @@ resolve findings. Protocol coordination updates remain governed by the protocol.
 | Required project context                     | `PROJECT_CONTEXT` / Auditor        |
 | User/project documentation                   | `DOCUMENTATION` / Documenter       |
 | Review reasoning, finding, or conclusion     | `REVIEW` / Reviewer, affected kind |
+| Synchronization record or reconciliation     | `SYNCHRONIZATION` / Synchronizer   |
 
 Use **Failure Handoffs**, **Recovery Mechanics**, **Outstanding Obligations**,
 and **Instruction Layering and Conflicts**. In expedited work, an omitted owner
@@ -177,12 +178,14 @@ or limitation, not an unsupported severity claim. A material assessment gap
 blocks completion even without a finding; a non-material limit needs an explicit
 reason it does not prevent assessing this gate.
 
-Use stable report-local `F-NNN` identifiers (reference path plus ID across
-kinds). Each finding includes severity, exact file/line or artifact section and
-assessed content identity, concrete triggering case, impact, supporting
-evidence, owning role/failure type, and the smallest necessary correction. These
-are finding IDs, not substitute acceptance IDs. Link affected ACs where
-applicable.
+Record each finding as a stable `### F-NNN` entry numbered with
+`node .standards/bin/id.mjs next F <report>`. Refer to a finding in the other
+report by path and ID, for example
+`docs/reviews/<Active Work.Id>/implementation.md#F-003`. Each finding includes
+severity, exact file/line or artifact section and assessed content identity,
+concrete triggering case, impact, supporting evidence, owning role/failure type,
+and the smallest necessary correction. These are finding IDs, not substitute
+acceptance IDs. Link affected ACs where applicable.
 
 Finding status is `OPEN`, `RESOLVED`, or `WITHDRAWN`. Only Reviewer changes its
 finding status after independent assessment. Resolution records the checked fix
@@ -196,6 +199,8 @@ Apply the protocol's **Review Gates** for the selected kind and cycle mode.
 Immediately before marking the report `COMPLETE`, recheck that the assessed
 inputs still match current content; reconcile any intervening changes. Ensure:
 
+- `node .standards/bin/check.mjs` reports no problem in files Reviewer owns (see
+  the protocol's **Runtime Tools and Hooks**);
 - the report and provenance match this cycle/kind and assessed current inputs;
 - relevant claims have been independently examined and the applicable contract,
   technical criteria, and evidence have a current disposition;

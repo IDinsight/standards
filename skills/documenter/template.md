@@ -3,7 +3,9 @@
 Use one record across collaboration modes, targets, corrections, and resumption.
 Use the fixed path and collision rules in **Workflow Artifact Provenance** in
 the protocol. No documentation-path state field, separate preferences file, or
-acceptance ledger is needed. Prepend the exact active-cycle provenance:
+acceptance ledger is needed. Create the record with
+`node .standards/bin/artifact.mjs init DOCUMENTATION`, which writes this
+provenance block and the header below:
 
 ```markdown
 <!-- STANDARDS
@@ -66,12 +68,19 @@ another owner's completion. Ordinary documents remain reusable project assets.
 
 ## Discrepancies, Dependencies, and Remaining Work
 
-Use stable local references (for example `D-001`) for discrepancies, not new
-acceptance IDs. Record `OPEN | RESOLVED | WITHDRAWN`, affected path/identity and
+### DOC-001 — concrete discrepancy
+
+`Status`: `OPEN | RESOLVED | WITHDRAWN` `Owner`: `<role or installer/protocol>`
+
+Record each discrepancy as a `### DOC-NNN` entry numbered with
+`node .standards/bin/id.mjs next DOC <record>`; these are discrepancy
+references, not acceptance IDs. Record the affected path/identity and
 AC/criterion, concrete evidence and impact, owner/canonical failure type (or
 `NONE` for installer/protocol ownership), required correction, and verified
 resolution or withdrawal reason. Preserve all unresolved items before routing
-one. Link Reviewer findings without changing their dispositions.
+one. Link Reviewer findings by path and ID, for example
+`docs/reviews/<Active Work.Id>/implementation.md#F-002`, without changing their
+dispositions.
 
 Include material gaps, required documentation outside the selected target,
 owner/user dependencies, and non-blocking limits with reasons. Record `NONE`

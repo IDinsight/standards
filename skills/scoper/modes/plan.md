@@ -18,23 +18,23 @@ Apply the Scoper skill's shared **Inputs**, **Ownership**, and **Invariants**.
    non-blocking assumptions.
 2. Resolve only ambiguities that materially change scope. Persist a blocking
    user question in `Active Work.BlockedOn` before asking it.
-3. Break the work into coarse, outcome-oriented work items with observable
+3. Select the artifact path under the shared provenance rules. Reuse an
+   appropriate unmarked project-owned canonical scope document when applicable;
+   if it holds another cycle's acceptance conditions, move them under a final
+   `## Previous Cycles` section first. Otherwise create the scope with
+   `node .standards/bin/artifact.mjs init SCOPE`. Record the repository-relative
+   artifact path in `Active Work.Scope`.
+4. Break the work into coarse, outcome-oriented work items with observable
    completion conditions and meaningful dependencies. Ensure the acceptance
    conditions cover every verifiable in-scope obligation that must be proven at
    completion. Keep separable obligations in different acceptance conditions
    when their satisfaction or evidence will be established in different workflow
    phases, and assign each condition a unique `AC-NNN` identifier for the active
-   cycle.
-4. Keep implementation choices out of the scope unless they are already
+   cycle with `node .standards/bin/id.mjs next AC <scope>`. Write each condition
+   into the scope before requesting the next identifier.
+5. Keep implementation choices out of the scope unless they are already
    established project constraints or requirements.
-5. Select the artifact path under the shared provenance rules. Reuse an
-   appropriate unmarked project-owned canonical scope document when applicable;
-   otherwise create a feature- or change-specific file under `docs/scope/` with
-   a `SCOPE` provenance block whose `Cycle` matches `Active Work.Id`. If the
-   natural target path is a STANDARDS artifact owned by another cycle, choose a
-   distinct path instead of overwriting it.
-6. Record the repository-relative artifact path in `Active Work.Scope`.
-7. Apply the Scoper completion gate and protocol-defined handoff behavior.
+6. Apply the Scoper completion gate and protocol-defined handoff behavior.
 
 ## Result
 

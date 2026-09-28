@@ -8,7 +8,8 @@ description:
 Installation prepares the workflow files, but it does not start a cycle. To
 start one, give your request to the first role for your project. There is no
 separate setup command, and you do not need to create a cycle ID or edit
-`.standards/STATE.md` yourself.
+`.standards/STATE.md` yourself. Editing these files by hand is not supported;
+see [Runtime Files](../../reference/runtime-files/).
 
 ## Give the first role your request
 
@@ -62,10 +63,12 @@ to repeat a saved request after making that decision.
 
 Before the first role begins its work, the agent:
 
-1. Checks the installed project mode, any saved preference, and whether the
+1. Checks the workflow files with `node .standards/bin/check.mjs`.
+2. Checks the installed project mode, any saved preference, and whether the
    request can use the selected cycle mode.
-2. Reserves a unique cycle ID in `.standards/CYCLE_IDS.md`.
-3. Saves the request, mode, ID, and initial workflow state in
+3. Reserves a unique cycle ID with `node .standards/bin/cycle.mjs new`, which
+   adds it to `.standards/CYCLE_IDS.md`.
+4. Saves the request, mode, ID, and initial workflow state in
    `.standards/STATE.md`.
 
 Those are agent responsibilities, not manual steps for you. The agent asks when

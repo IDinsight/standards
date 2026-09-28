@@ -13,6 +13,7 @@
 		"bin/",
 		"lib/",
 		"PROTOCOL.md",
+		"runtime/",
 		"skills/",
 		"templates/"
 	],
@@ -27,14 +28,18 @@
 		"url": "git+https://github.com/IDinsight/standards.git"
 	},
 	"scripts": {
+		"check:release": "node scripts/check-release.mjs",
 		"docs:dev": "pnpm --filter standards-docs run dev",
 		"docs:build": "pnpm --filter standards-docs run build",
-		"docs:preview": "pnpm --filter standards-docs run preview",
 		"docs:check-links": "pnpm --filter standards-docs run check-links",
+		"docs:preview": "pnpm --filter standards-docs run preview",
 		"docs:sync-reference": "pnpm --filter standards-docs run sync-reference",
+		"test": "node --test \"test/*.test.js\"",
 		"test:cli": "node --test test/cli.test.js",
 		"test:installer": "node --test test/installer.test.js test/uninstaller.test.js",
-		"test:package": "node test/packed-install.test.js"
+		"test:package": "node test/packed-install.test.js",
+		"test:runtime": "node --test test/runtime.test.js",
+		"test:release": "node --test test/release.test.js"
 	},
 	"type": "module",
 	"version": "0.3.1"

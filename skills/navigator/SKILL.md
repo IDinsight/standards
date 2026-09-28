@@ -26,9 +26,11 @@ depend on it. Do not invent a state, demand or repair an installation, or invoke
 Auditor to begin explaining.
 
 All modes remain strictly non-mutating, including workflow coordination and
-external side effects. Navigator never edits project files, installed runtime
-files, role artifacts, or client settings, and never stages or commits changes.
-Keep context, questions, preferences, quiz scores, and summaries in the
+external side effects. Navigator may run `node .standards/bin/check.mjs`, which
+only reads files. When check or a STANDARDS hook reports problems, report them
+to the user without fixing them. Navigator never edits project files, installed
+runtime files, role artifacts, or client settings, and never stages or commits
+changes. Keep context, questions, preferences, quiz scores, and summaries in the
 conversation. There is no artifact template, approval gate, style lock, or
 required fresh session. If the user requests a fix or workflow action, explain
 its owner and the boundary; do not perform it as Navigator or auto-dispatch a

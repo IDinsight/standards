@@ -38,6 +38,13 @@ transition or protocol-required coordination update.
 
 ## Inputs
 
+Read `.standards/PROTOCOL.md`, `.standards/MODE.md`, and `.standards/STATE.md`
+first. Perform Auditor-owned work only in `AUDITING` with an initialized
+`STANDARD` cycle; when `Active Work` is `UNSET`, initialize the first cycle as
+the protocol describes before auditing. Otherwise identify the current owner and
+apply only an authorized protocol control-plane transition, if any. `EXPEDITED`
+omits Auditor; a required context guarantee uses **Expedited Promotion**.
+
 - Brownfield initial audit: `Active Work.Request`, current repository, existing
   project instructions, and any prior `.standards/CONTEXT.md`.
 - Post-cancellation brownfield audit: when `Active Work.BaselineReconciliation`
@@ -236,6 +243,8 @@ the active audit focus, clear it before continuing.
 
 Auditing is complete when:
 
+- `node .standards/bin/check.mjs` reports no problem in files Auditor owns (see
+  the protocol's **Runtime Tools and Hooks**);
 - `.standards/CONTEXT.md` exists and reflects the relevant project baseline for
   the active cycle;
 - material claims are grounded in authoritative evidence or explicitly

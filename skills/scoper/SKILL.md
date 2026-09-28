@@ -25,19 +25,30 @@ tooling, systems software, infrastructure, or similar work.
 Own the project scope. The completed scope must be persisted under the
 protocol's **Workflow Artifact Provenance** rules. An appropriate pre-existing
 unmarked project-owned scope document may remain the canonical scope location.
-If Scoper creates a new scope artifact, use a feature- or change-specific file
-under `docs/scope/` and add the current-cycle `SCOPE` provenance block. Never
+If Scoper creates a new scope artifact, create it with
+`node .standards/bin/artifact.mjs init SCOPE`, which writes
+`docs/scope/<Active Work.Id>.md` with the current-cycle provenance block. Never
 overwrite, repurpose, or adopt a STANDARDS scope artifact whose recorded cycle
 differs from `Active Work.Id`. Record the selected repository-relative path in
 `STATE.md` as `Active Work.Scope`.
 
 Own the wording and stable `AC-NNN` identifiers of scope-level acceptance
-conditions for the active cycle.
+conditions for the active cycle. Number each new condition with
+`node .standards/bin/id.mjs next AC <scope>`. When reusing a scope document that
+holds another cycle's conditions, move them under a final `## Previous Cycles`
+section as the protocol's **Acceptance Traceability** describes.
 
 Do not write architecture specs, production code, tests, audit/context files,
 reviews, or user documentation.
 
 ## Inputs
+
+Read `.standards/PROTOCOL.md`, `.standards/MODE.md`, and `.standards/STATE.md`
+first. Perform Scoper-owned work only in `SCOPING` with an initialized
+`STANDARD` cycle; when `Active Work` is `UNSET`, initialize the first cycle as
+the protocol describes before scoping. Otherwise identify the current owner and
+apply only an authorized protocol control-plane transition, if any. `EXPEDITED`
+omits Scoper; a required scoping guarantee uses **Expedited Promotion**.
 
 - Always: `Active Work.Request`, explicit user constraints, the current
   persisted scope when one exists, and `.standards/CONTEXT.md` when it exists
@@ -105,6 +116,8 @@ authoritative shape and authoring contract for the persisted scope artifact.
 
 Scoping is complete when:
 
+- `node .standards/bin/check.mjs` reports no problem in files Scoper owns (see
+  the protocol's **Runtime Tools and Hooks**);
 - the persisted scope satisfies the artifact shape and authoring contract in
   `template.md`, including matching current-cycle provenance when Scoper created
   the artifact;

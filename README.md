@@ -106,11 +106,18 @@ npx @idinsight/standards@latest install
 ```
 
 In a terminal, the installer asks for the project directory (default: the
-current directory), project mode, and coding agents, then previews its changes
-for confirmation. You can pass `--project`, `--mode`, and `--client` to supply
+current directory), project mode, coding agents, and whether to install the
+STANDARDS hooks, then previews its changes for confirmation. You can pass
+`--project`, `--mode`, `--client`, and `--hooks` or `--no-hooks` to supply
 answers; `--yes` skips all questions and uses the defaults for omitted options.
+On a reinstall, the defaults keep the installed coding agents and hook choice.
 Piped or automated runs also use those defaults without prompting. The installer
-does not add a package dependency or start a workflow cycle. See
+does not add a package dependency or start a workflow cycle.
+
+The hooks run `node .standards/bin/check.mjs` when an agent finishes a turn and
+block agent edits to the cycle-ID registry made with file-editing tools or
+common shell commands. Codex runs them only after you trust them with `/hooks`.
+See
 [Installation and Setup](docs/src/content/docs/getting-started/installation.md)
 for options, upgrades, and uninstall instructions.
 
@@ -125,10 +132,10 @@ npx @idinsight/standards@latest uninstall --project /absolute/path/to/project --
 Use `--yes` with `uninstall` to skip confirmation in scripts. Uninstall deletes
 the installed skills and the entire `.standards/` directory, including saved
 workflow history, context, and any files you added there. It also removes
-managed instruction blocks and matching installer-added settings. Project work
-outside the removed directories is preserved. Installer-created client
-directories are removed when empty. Existing files and directories stay. A
-globally installed CLI stays installed.
+managed instruction blocks, the STANDARDS hooks, and matching installer-added
+settings. Project work outside the removed directories is preserved.
+Installer-created client directories are removed when empty. Existing files and
+directories stay. A globally installed CLI stays installed.
 
 The installer supports greenfield and brownfield projects. The authoritative
 installer and runtime requirements live in [`PROTOCOL.md`](PROTOCOL.md),
@@ -139,8 +146,9 @@ protocol and workflow skills for the chosen coding agent, applies explicit-only
 invocation controls, merges the managed `AGENTS.md` / `CLAUDE.md` integration
 without overwriting project-owned instructions, and initializes runtime
 coordination files only when needed. Reinstallation preserves active workflow
-state and project-owned artifacts unless the user explicitly requests
-reinitialization.
+state and project-owned artifacts. STANDARDS has no migration between major
+versions: moving a project to a new major version means uninstalling and
+installing again, which deletes `.standards/`.
 
 A typical installed project will contain:
 
@@ -149,20 +157,25 @@ project/
 ├── AGENTS.md
 ├── CLAUDE.md
 ├── .standards/
+│   ├── bin/              # tools the agent runs, including check.mjs
 │   ├── CYCLE_IDS.md
 │   ├── INSTALLATION.json
 │   ├── MODE.md
 │   ├── PROTOCOL.md
 │   ├── STATE.md
 │   └── VERSION.json
-└── <agent-specific skill installation>
+├── <agent-specific skill installation>
+└── <hook settings>       # .claude/settings.json, .codex/hooks.json
 ```
 
 `STATE.md` is the persisted coordination record for the active cycle, including
 its `WorkflowState`, `CycleMode`, and pending-cycle coordination fields.
 `CYCLE_IDS.md` is the append-only reservation registry that prevents cycle-ID
-reuse for as long as the S.T.A.N.D.A.R.D.S. runtime remains installed. Role
-ownership, standard and expedited forward transitions, promotion, recovery, user
+reuse for as long as the S.T.A.N.D.A.R.D.S. runtime remains installed. Each
+branch carries at most one active cycle; if you merge branches whose
+`.standards/` files both changed, you resolve the merge conflict by keeping
+every `CYCLE_IDS.md` line and exactly one cycle in `STATE.md`. Role ownership,
+standard and expedited forward transitions, promotion, recovery, user
 intervention, project-mode changes, cancellation/reset behavior, project
 context, installation ownership checks, and client-setting preservation are
 defined only in [`PROTOCOL.md`](PROTOCOL.md) and are intentionally not restated

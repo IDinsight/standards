@@ -7,7 +7,10 @@ description:
 The installed STANDARDS files and settings are its **runtime**. Files under
 `.standards/` hold the workflow rules and saved progress. Plans, reports, tests,
 and project documentation live elsewhere. The agent updates workflow records as
-it works; you do not need to maintain them by hand.
+it works; you do not need to maintain them by hand. Editing them by hand is not
+supported, except to resolve a merge conflict (see
+[Branches and merges](#branches-and-merges)). If you edit them anyway, you are
+responsible for the result.
 
 This page describes the required layout installed by the CLI. See
 [Installation and Setup](../../getting-started/installation/).
@@ -16,6 +19,7 @@ This page describes the required layout installed by the CLI. See
 
 | File                           | Purpose                                                               |
 | ------------------------------ | --------------------------------------------------------------------- |
+| `.standards/bin/`              | Tools the agent runs; see [Runtime tools](#runtime-tools).            |
 | `.standards/CONTEXT.md`        | Auditor's record of the existing project, created when an audit runs. |
 | `.standards/CYCLE_IDS.md`      | Reserved cycle IDs; entries cannot be reused.                         |
 | `.standards/INSTALLATION.json` | Client settings and paths created by the installer.                   |
@@ -23,6 +27,27 @@ This page describes the required layout installed by the CLI. See
 | `.standards/PROTOCOL.md`       | Shared workflow rules, aligned with the installed skills.             |
 | `.standards/STATE.md`          | Current workflow step, request, handoff, and recovery.                |
 | `.standards/VERSION.json`      | Installed framework version and upgrade compatibility check.          |
+
+## Runtime tools
+
+`.standards/bin/` contains small Node.js tools. Agents use them instead of doing
+these steps by hand, and you can run them too:
+
+| Command                                                   | What it does                                                                  |
+| --------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| `node .standards/bin/cycle.mjs new --request "<request>"` | Reserves a new cycle ID and adds it to `CYCLE_IDS.md`.                        |
+| `node .standards/bin/artifact.mjs init <TYPE>`            | Creates one of the active cycle's records at the right path, with its marker. |
+| `node .standards/bin/id.mjs next <prefix> <file>`         | Prints the next free number in a record, such as `AC-004` or `F-002`.         |
+| `node .standards/bin/check.mjs`                           | Checks the workflow files and the active cycle's records. It changes nothing. |
+
+Each role runs `check` before it starts and before it hands off. It fixes
+problems in its own work and passes others to the responsible role; if no role
+can fix a problem, it stops and tells you. With
+[hooks](../../getting-started/installation/#hooks) installed, the check also
+runs when the agent finishes a turn. `check` finds mechanical problems, such as
+an unregistered cycle ID, a broken marker, or a requirement that no finished
+report accounts for. It does not judge the quality of the work. See the
+[tool rules](../protocol/#runtime-tools-and-hooks).
 
 ## Workflow state
 
@@ -63,27 +88,42 @@ See the [full state format](../protocol/#persisted-workflow-state) and
 `CYCLE_IDS.md` reserves every cycle ID for as long as STANDARDS remains
 installed. It is a list of IDs, not a history of requests or completed work.
 
-When a cycle starts, the agent:
-
-1. Combines a name based on the request with a fresh, hard-to-duplicate suffix,
-   such as a UUID or timestamp plus random characters.
-2. Checks the ID list, existing document paths, and cycle markers to make sure
-   the ID is unused.
-3. Adds the ID to the list and saves it.
-4. Only then saves that ID in `Active Work` and starts the cycle.
+When a cycle starts, the agent runs
+`node .standards/bin/cycle.mjs new --request "<request>"`. The tool builds an ID
+from the request, the time, and a random suffix, such as
+`add-user-search-20260927T190146Z-7bef0f04`. It checks that the list, existing
+document paths, and cycle markers don't already use the ID, adds it to the list,
+and prints it. Only then does the agent save the ID in `Active Work` and start
+the cycle. The tool refuses while another cycle is active.
 
 If saving the ID fails, the agent cannot start the cycle. If a later setup step
-fails, the ID stays reserved. The agent must not edit, remove, reorder, or reuse
-an existing entry.
+fails, the ID stays reserved. No one edits, removes, reorders, or reuses an
+existing entry. With hooks installed, agent edits to the list through
+file-editing tools or common shell commands are blocked.
 
-The installer preserves this list during reinstall or upgrade. A workflow reset
-within the same installation also keeps it. If the list is missing, the agent
-stops work that needs a new ID and reports the problem; it cannot safely guess
-the missing IDs or start an empty list. Removing STANDARDS and installing it
-again starts a new list, but the agent still checks existing files for ID
-collisions.
+The installer preserves this list during reinstall or upgrade. If the list is
+missing, the agent stops work that needs a new ID and reports the problem; it
+cannot safely guess the missing IDs or start an empty list. Removing STANDARDS
+and installing it again starts a new list, but the agent still checks existing
+files for ID collisions.
 
 See the [registry rules](../protocol/#cycle-id-registry).
+
+## Branches and merges
+
+`STATE.md` is saved with the branch it is committed on, and each branch can
+carry one active cycle. If you merge two branches whose `.standards/` files both
+changed, git reports a merge conflict in `STATE.md` and `CYCLE_IDS.md`.
+Resolving it is your job, and it is the one time you edit these files by hand:
+
+- In `CYCLE_IDS.md`, keep every line from both sides.
+- In `STATE.md`, keep exactly one cycle. STANDARDS stops tracking the other
+  cycle. Its records under `docs/` stay, and what to do with them is up to you.
+
+To avoid the conflict, sign off or cancel a cycle before merging its branch. If
+an agent finds unresolved conflict markers in `.standards/`, it stops and asks
+you to resolve them; it never picks a side. See the
+[merge rules](../protocol/#branches-and-merges).
 
 ## Outstanding baseline reconciliation
 
@@ -97,10 +137,10 @@ entry records a cancelled cycle's exact ID and request:
 ```markdown
 `BaselineReconciliation`:
 
-- `SourceCycle`: `invoice-cache-hotfix-20260923-a7f3` `Request`:
-  `Change invoice-cache invalidation behavior.`
-- `SourceCycle`: `admin-notes-20260924-b8e4` `Request`:
-  `Add internal notes to admin records.`
+- `SourceCycle`: `change-invoice-cache-invalidation-20260923T141500Z-5d2e8b17`
+  `Request`: `Change invoice-cache invalidation behavior.`
+- `SourceCycle`: `add-internal-notes-to-admin-records-20260924T093000Z-c81f4a06`
+  `Request`: `Add internal notes to admin records.`
 ```
 
 The agent keeps the list through handoffs, corrections, rework, and
@@ -129,25 +169,32 @@ instructions. `CLAUDE.md` lets Claude Code use those instructions. The installer
 preserves project-owned text and compatible existing settings.
 
 `INSTALLATION.json` records only client-setting changes and client paths the
-installer actually created. Reinstall, upgrade, and removal use it to avoid
-claiming or undoing your own settings or paths. A compatible setting that
-already existed remains yours. If the record is missing, the installer does not
-guess what it once changed.
+installer actually created, and which files have STANDARDS hooks. Reinstall,
+upgrade, and removal use it to avoid claiming or undoing your own settings or
+paths. A compatible setting that already existed remains yours. If the record is
+missing, the installer does not guess what it once changed.
+
+With hooks on, the Claude Code hooks are in `.claude/settings.json` and the
+Codex hooks in `.codex/hooks.json`. The installer recognizes its hooks by the
+script they run, `.standards/bin/hook.mjs`, and never changes other hooks.
 
 The installer keeps project mode, workflow state, and the cycle-ID list during a
-reinstall. On upgrade, it updates the protocol and skills together without
-resetting progress. It accepts newer minor and patch versions within the same
-major version, but rejects downgrades and major-version changes. If required
-information is missing or settings conflict, it reports the problem instead of
-guessing. See
+reinstall. On upgrade, it updates the protocol, skills, and tools together
+without resetting progress. It keeps files you added inside installed skill
+folders, and it puts back settings and hooks it added if they were changed or
+removed. It accepts newer minor and patch versions within the same major version
+and rejects downgrades. There is no migration between major versions: moving to
+one means uninstalling and installing again, which deletes `.standards/`. If
+required information is missing or a setting it never added conflicts, it
+reports the problem instead of guessing. See
 [the installation contract](../protocol/#installed-runtime-contract).
 
 Uninstalling STANDARDS from a project deletes all of `.standards/`, including
 context and cycle-ID history. It preserves project work outside the runtime and
-installed skills, removes only managed instruction blocks, and reverses only
-matching recorded settings. It removes recorded client directories when they
-become empty and a recorded Claude settings file when only its generated
-defaults remain. Unverified files or directories remain. See
+installed skills, removes only managed instruction blocks and STANDARDS hooks,
+and reverses only matching recorded settings. It removes recorded client
+directories when they become empty and a recorded Claude settings file when only
+its generated defaults remain. Unverified files or directories remain. See
 [Uninstall from a project](../../getting-started/installation/#uninstall-from-a-project)
 for the preview and approval steps.
 

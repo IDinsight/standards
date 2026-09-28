@@ -208,13 +208,16 @@ criterion, but may not masquerade as an unexecuted runtime check.
 
 ## Defects and Routing
 
-| Defective artifact or decision        | Tester action                      |
-| ------------------------------------- | ---------------------------------- |
-| Test, fixture, setup, evidence        | Correct owned `VERIFICATION` work. |
-| Implementation or Developer claims    | `IMPLEMENTATION` to Developer.     |
-| Acceptance identity or meaning        | `SCOPING` to Scoper.               |
-| Technical contract or design coverage | `ARCHITECTURE` to Architect.       |
-| Required baseline context             | `PROJECT_CONTEXT` to Auditor.      |
+| Defective artifact or decision        | Tester action                        |
+| ------------------------------------- | ------------------------------------ |
+| Test, fixture, setup, evidence        | Correct owned `VERIFICATION` work.   |
+| Implementation or Developer claims    | `IMPLEMENTATION` to Developer.       |
+| Acceptance identity or meaning        | `SCOPING` to Scoper.                 |
+| Technical contract or design coverage | `ARCHITECTURE` to Architect.         |
+| Required baseline context             | `PROJECT_CONTEXT` to Auditor.        |
+| User/project documentation            | `DOCUMENTATION` to Documenter.       |
+| Review reasoning, finding, conclusion | `REVIEW` to Reviewer, affected kind. |
+| Synchronization record                | `SYNCHRONIZATION` to Synchronizer.   |
 
 Planned implementation does not alone invalidate baseline context. Investigate
 relevant repository facts for verification without taking over an Auditor audit.
@@ -226,6 +229,8 @@ Decisions and Intervention**, not an invented agent-discovered failure.
 
 Tester is complete only when:
 
+- `node .standards/bin/check.mjs` reports no problem in files Tester owns (see
+  the protocol's **Runtime Tools and Hooks**);
 - the current-cycle report satisfies `template.md` and protocol provenance;
 - every current AC and relevant technical criterion has sufficient valid
   verification evidence, except explicit later-role dependencies recorded as

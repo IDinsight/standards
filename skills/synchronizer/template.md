@@ -3,7 +3,9 @@
 Use this shared record for initial synchronization, interruptions, and corrected
 work. The fixed path and preservation rules are defined by **Workflow Artifact
 Provenance** in the protocol. No mode or synchronization-path state field is
-needed. Prepend the exact current-cycle provenance:
+needed. Create the record with
+`node .standards/bin/artifact.mjs init SYNCHRONIZATION`, which writes this
+provenance block and the header below:
 
 ```markdown
 <!-- STANDARDS
@@ -58,7 +60,8 @@ acceptance text, reports, or an authoritative pass/fail ledger here.
 `FailureType`: `<canonical type, or NONE for non-workflow ownership>`
 
 - **Reference:** affected path/section, content identity, related AC/criterion,
-  and Reviewer finding reference when applicable.
+  and Reviewer finding reference by path and ID, for example
+  `docs/reviews/<Active Work.Id>/final-deliverable.md#F-001`, when applicable.
 - **Evidence and impact:** what disagrees or is missing, and why it matters for
   applicability or completion. Separate facts from uncertainty.
 - **Required correction:** smallest outcome required from the owner, including
@@ -66,9 +69,11 @@ acceptance text, reports, or an authoritative pass/fail ledger here.
 - **Disposition:** owner evidence checked on return, or reason a Synchronizer
   claim was withdrawn. Resolution here never changes another owner's markers.
 
-Use stable record-local IDs; these are discrepancy references, not acceptance
-identifiers. Write `NONE` when assessment found no discrepancies. Do not leave
-the example finding in a no-change result or duplicate entries on repeated runs.
+Use stable record-local IDs numbered with
+`node .standards/bin/id.mjs next D <record>`; these are discrepancy references,
+not acceptance identifiers. Write `NONE` when assessment found no discrepancies.
+Do not leave the example finding in a no-change result or duplicate entries on
+repeated runs.
 
 ## Limitations and Remaining Work
 
