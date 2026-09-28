@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.1](https://github.com/IDinsight/standards/compare/v0.5.0...v0.5.1) (2026-09-28)
+
+
+### Bug Fixes
+
+* **runtime:** attribute check findings to the role that owns them ([273db46](https://github.com/IDinsight/standards/commit/273db46875c00e7f0a9c4cad9e5af666ae42f7c9))
+
 ## [0.5.0](https://github.com/IDinsight/standards/compare/v0.4.0...v0.5.0) (2026-09-28)
 
 
