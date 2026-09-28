@@ -105,19 +105,14 @@ sufficiently bounded brownfield request. If the request cannot use the selected
 expedited contract, do not silently reinterpret it as `STANDARD`; follow the
 protocol's user-decision rule.
 
-Then start the cycle. From `SIGNED_OFF` or retained `CANCELLED`, every new
-request, whether or not it was pending, starts through the protocol's **Start a
-new cycle** transition; do not directly replace terminal `Active Work` or bypass
-its handoff and baseline-reconciliation steps. For the initialized first cycle,
-generate the cycle ID with
+Then start the cycle through the protocol's **Start a cycle**, whether it is the
+first cycle or follows `SIGNED_OFF` or retained `CANCELLED`, and whether or not
+the request was pending; do not directly replace terminal `Active Work` or
+bypass its handoff and baseline-reconciliation steps. Generate the cycle ID with
 `node .standards/bin/cycle.mjs new --request "<request>"` (see **Cycle IDs**).
-If the tool refuses, stop and report it; never write an ID yourself. After the
-tool prints the ID, persist it, the request, and the selected `CycleMode`, and
-clear `PendingCycleMode`, `PendingCycleRequest`, and `PendingCycleBlockedOn` to
-their neutral values; an `EXPEDITED` cycle also follows the protocol's **Select
-expedited mode for the initialized cycle**. In both routes, continue Developer
-work only when the resulting state is `DEVELOPING`; a `STANDARD` cycle's entry
-state is owned by Scoper or Auditor, so stop there.
+If the tool refuses, stop and report it; never write an ID yourself. Continue
+Developer work only when the resulting state is `DEVELOPING`; a `STANDARD`
+cycle's entry state is owned by Scoper or Auditor, so stop there.
 
 If another role owns the active state and no protocol-authorized control-plane
 transition applies, do not perform Developer work. Leave role-owned artifacts
@@ -219,7 +214,7 @@ material revisions that return the plan to `PROPOSED`, and expedited promotion.
 Do not replace or recreate the active cycle's plan to bypass the lock. Repeating
 the same normalized identifier is not a change. A different selection requires a
 new cycle and its own development plan under the protocol's terminal-state and
-**Start a new cycle** rules. Do not silently cancel, sign off, start a cycle, or
+**Start a cycle** rules. Do not silently cancel, sign off, start a cycle, or
 restyle completed work; persist the blocking choice and ask whether to continue
 with the locked style or end this cycle through an allowed transition.
 
