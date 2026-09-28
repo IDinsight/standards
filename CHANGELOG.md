@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.0](https://github.com/IDinsight/standards/compare/v0.4.0...v0.5.0) (2026-09-28)
+
+
+### Features
+
+* keep cycle records in .standards/docs/ ([e137a3e](https://github.com/IDinsight/standards/commit/e137a3ead3f988f10da23214d13c47a1ca49cd1d))
+
 ## [0.4.0](https://github.com/IDinsight/standards/compare/v0.3.1...v0.4.0) (2026-09-28)
 
 
