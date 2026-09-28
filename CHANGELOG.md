@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/IDinsight/standards/compare/v0.3.1...v0.4.0) (2026-09-28)
+
+
+### Features
+
+* add runtime tools, agent hooks, and release checks ([c81cc96](https://github.com/IDinsight/standards/commit/c81cc96dd7190f9216967185d8cf483bc59ae59d))
+
 ## [0.3.1](https://github.com/IDinsight/standards/compare/v0.3.0...v0.3.1) (2026-09-26)
 
 
