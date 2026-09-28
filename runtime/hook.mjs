@@ -1,27 +1,23 @@
 #!/usr/bin/env node
-// Hook entry point for Claude Code and Codex. The client sends the event as
-// JSON on stdin; exit code 2 with a message on stderr blocks the action (both
-// clients support this), and exit code 0 lets it through.
+// Stop hook for Claude Code and Codex. The client sends the event as JSON on
+// stdin; exit code 2 with a message on stderr sends the agent back (both
+// clients support this), and exit code 0 lets it stop.
 //
-//   node .standards/bin/hook.mjs stop            (Stop event)
-//   node .standards/bin/hook.mjs pre-tool-use    (PreToolUse event)
+//   node .standards/bin/hook.mjs stop
 //
-// stop:         when workflow files changed, run the STANDARDS check and, if
-//               it finds problems, send the agent back once per turn with them.
-//               It does not hold the current state's own COMPLETE records to
-//               full acceptance coverage, since the turn may have ended with
-//               a handoff to that state's owner, who reconciles them. During
-//               recovery it holds the record of the state whose role made the
-//               last handoff instead, except while in SCOPING.
-// pre-tool-use: refuse direct agent edits to .standards/CYCLE_IDS.md, so cycle
-//               IDs are only reserved through `cycle.mjs new`.
+// When workflow files changed, run the STANDARDS check and, if it finds
+// problems, send the agent back once per turn with them. It does not hold the
+// current state's own COMPLETE records to full acceptance coverage, since the
+// turn may have ended with a handoff to that state's owner, who reconciles
+// them. During recovery it holds the record of the state whose role made the
+// last handoff instead, except while in SCOPING.
 import { createHash } from 'node:crypto';
 import { mkdir, readdir, rm, stat, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 
 import { runCheck } from './check.mjs';
-import { git, isMain, projectRootFor, resolveReal } from './lib/core.mjs';
+import { git, isMain, projectRootFor } from './lib/core.mjs';
 
 const BLOCK = 2;
 const MARKER_DIR = path.join(os.tmpdir(), 'standards-hooks');
@@ -104,52 +100,14 @@ async function onStop(root, input) {
   return BLOCK;
 }
 
-// Files an edit tool call would write. Claude Code sends `file_path` or
-// `notebook_path`; Codex sends `apply_patch` text in `command`.
-function editedFiles(input) {
-  const toolInput = input.tool_input ?? {};
-  const files = [toolInput.file_path, toolInput.notebook_path, toolInput.path].filter((value) => typeof value === 'string');
-  if (input.tool_name === 'apply_patch' || /^\*\*\* Begin Patch/m.test(String(toolInput.command ?? ''))) {
-    const patch = Array.isArray(toolInput.command) ? toolInput.command.join('\n') : String(toolInput.command ?? toolInput.patch ?? '');
-    for (const match of patch.matchAll(/^\*\*\* (?:(?:Add|Update|Delete) File|Move to): (.+?)\s*$/gm)) files.push(match[1]);
-  }
-  return files;
-}
-
-// Shell commands that write to the registry. This is a best-effort guard for
-// obvious cases; `check` still reports any registry entry that is malformed.
-export function shellWritesRegistry(command) {
-  if (!/CYCLE_IDS\.md/.test(command)) return false;
-  return />>?\s*["']?[^\s"'|;&]*CYCLE_IDS\.md/.test(command)
-    || /\b(tee|truncate|mv|cp|rm|ln|dd)\b/.test(command)
-    || /\b(sed|perl)\s+(-[a-zA-Z]*i\b|--in-place)/.test(command)
-    || /\b(writeFile|appendFile|writeFileSync|appendFileSync|open)\s*\(/.test(command);
-}
-
-async function onPreToolUse(root, input) {
-  const registry = await resolveReal(path.join(root, '.standards', 'CYCLE_IDS.md'));
-  const cwd = typeof input.cwd === 'string' ? input.cwd : process.cwd();
-  // Compare real paths: the client may send a path through a symlink.
-  const targets = await Promise.all(editedFiles(input).map((file) => resolveReal(path.resolve(cwd, file))));
-  const writesRegistry = targets.includes(registry);
-  const command = input.tool_input?.command;
-  const shell = input.tool_name === 'Bash' && shellWritesRegistry(Array.isArray(command) ? command.join(' ') : String(command ?? ''));
-  if (!writesRegistry && !shell) return 0;
-  process.stderr.write('Do not edit .standards/CYCLE_IDS.md directly. Reserve a cycle ID with '
-    + '`node .standards/bin/cycle.mjs new --request "<request>"`. If the file has a merge conflict, '
-    + 'ask the user to resolve it.\n');
-  return BLOCK;
-}
-
 async function main(args) {
-  const [event] = args;
-  if (!['stop', 'pre-tool-use'].includes(event) || args.length !== 1) {
-    process.stderr.write('Usage: node .standards/bin/hook.mjs <stop|pre-tool-use>\n');
+  if (args.length !== 1 || args[0] !== 'stop') {
+    process.stderr.write('Usage: node .standards/bin/hook.mjs stop\n');
     return 1;
   }
   const input = await readInput();
   const root = await projectRootFor(import.meta.url);
-  return event === 'stop' ? onStop(root, input) : onPreToolUse(root, input);
+  return onStop(root, input);
 }
 
 if (isMain(import.meta.url)) {

@@ -23,7 +23,7 @@ Add search by name and email to the existing user directory,
 and update the user guide to explain how to use it.
 ```
 
-The agent validates the mode, reserves a fresh cycle ID, and saves the request
+The agent validates the mode, generates a fresh cycle ID, and saves the request
 before Auditor begins. Auditor then checks the relevant code, behavior,
 conventions, and commands, saving its findings in `.standards/CONTEXT.md`.
 

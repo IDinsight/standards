@@ -97,9 +97,10 @@ See [output paths](../../reference/artifact-templates/) and the
 
 ## Shared workflow records
 
-Workflow roles can update the installed state, mode, and cycle-ID records when
-the protocol requires it, such as when saving a handoff or unanswered question.
-They cannot rewrite the installed protocol to change the rules.
+Workflow roles can update the installed state and mode records when the protocol
+requires it, such as when saving a handoff or unanswered question.
+[`standards reset`](../../getting-started/installation/#reset-the-workflow) also
+rewrites them. Roles cannot rewrite the installed protocol to change the rules.
 
 Compatible guidance can be applied together, such as a project formatter and
 general coding style. If instructions materially conflict, the responsible role

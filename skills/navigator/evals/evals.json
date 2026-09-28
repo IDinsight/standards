@@ -93,11 +93,11 @@
     },
     {
       "id": 10,
-      "prompt": "Invoke Navigator. Explain the project while the greenfield runtime has SCOPING, CycleMode=UNSET, Id=UNSET, Request=UNSET, and an empty registry. README and a scaffold are available.",
+      "prompt": "Invoke Navigator. Explain the project while the greenfield runtime has SCOPING, CycleMode=UNSET, Id=UNSET, and Request=UNSET. README and a scaffold are available.",
       "expected_output": "Explain the scaffold and its limits without starting a cycle.",
       "files": [],
       "assertions": [
-        "No ID allocation, request persistence, cycle-mode choice, or blocker write occurs.",
+        "No cycle ID generation, request persistence, cycle-mode choice, or blocker write occurs.",
         "Does not pretend the scaffold is a completed implementation."
       ]
     },
@@ -107,7 +107,7 @@
       "expected_output": "Explain current evidence and distinguish retained work from an active cycle.",
       "files": [],
       "assertions": [
-        "No NEW_CYCLE, registry append, or terminal-state replacement occurs.",
+        "No NEW_CYCLE, cycle ID generation, or terminal-state replacement occurs.",
         "An empty current diff is not treated as no project to explain."
       ]
     },
@@ -133,11 +133,11 @@
     },
     {
       "id": 14,
-      "prompt": "Invoke Navigator. Explain the worker. Installed STATE.md exists but CYCLE_IDS.md, MODE.md, and INSTALLATION.json are absent. Worker source is readable.",
+      "prompt": "Invoke Navigator. Explain the worker. Installed STATE.md exists but MODE.md and INSTALLATION.json are absent. Worker source is readable.",
       "expected_output": "Limit workflow-status claims and continue ordinary worker explanation.",
       "files": [],
       "assertions": [
-        "Does not repair missing metadata or reconstruct registry ownership.",
+        "Does not repair missing metadata or reconstruct installation ownership.",
         "Missing installed files do not block independent code explanation."
       ]
     },
@@ -197,7 +197,7 @@
       "expected_output": "Keep the question and preference in conversation and explain the Navigator boundary.",
       "files": [],
       "assertions": [
-        "Does not write pending fields, Active Work, a preferences file, or the registry.",
+        "Does not write pending fields, Active Work, a preferences file, or any other workflow file.",
         "Does not silently start another role to carry out the writes."
       ]
     },

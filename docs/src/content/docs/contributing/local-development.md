@@ -58,14 +58,14 @@ one group, use `pnpm run test:cli`, `test:installer`, `test:runtime`,
 `test:release`, or `test:package`.
 
 The package test creates a pnpm tarball in a temporary directory, checks the
-packed framework assets, and tests installation, reinstallation, a compatible
-upgrade, uninstall preview, removal, and fresh installation in a temporary
-project. The installer tests also cover preservation of project files and
-settings, hooks, ownership failures, and rollback of removals. The runtime tests
-run the tools installed in `.standards/bin/` and the hook script in temporary
-projects. The release tests simulate releases in a temporary git repository to
-check the release checks described below. These checks do not publish the
-package or install STANDARDS into this repository.
+packed framework assets, and tests installation, reinstallation, reset, a
+compatible upgrade, uninstall preview, removal, and fresh installation in a
+temporary project. The installer tests also cover preservation of project files
+and settings, hooks, reset, ownership failures, and rollback of removals. The
+runtime tests run the tools installed in `.standards/bin/` and the hook script
+in temporary projects. The release tests simulate releases in a temporary git
+repository to check the release checks described below. These checks do not
+publish the package or install STANDARDS into this repository.
 
 To preview the local uninstaller against a project before publishing a release:
 
@@ -74,9 +74,11 @@ node bin/standards.js uninstall --project /absolute/path/to/project --dry-run
 ```
 
 Remove `--dry-run` only when you intend to remove its installed framework and
-saved workflow history. This runs the code in your checkout;
-`npx @idinsight/standards@latest` uses the published release, while an existing
-global command uses its installed version.
+saved workflow history. `node bin/standards.js reset` previews and resets the
+same way, but only in a project installed with your checkout's version. These
+commands run the code in your checkout; `npx @idinsight/standards@latest` uses
+the published release, while an existing global command uses its installed
+version.
 
 ## Check Markdown
 
@@ -134,8 +136,7 @@ release-please pull requests. It fails when:
   installed by the previous release. The check installs the previous release,
   loads each saved workflow state and its cycle records from
   `test/fixtures/upgrade/`, upgrades with the pull request's code, and confirms
-  that `STATE.md` and `CYCLE_IDS.md` are unchanged and that `check.mjs` reports
-  no problems.
+  that `STATE.md` is unchanged and that `check.mjs` reports no problems.
 
 Run it locally with `pnpm run check:release`; it needs the release tags. Add an
 upgrade fixture when a release introduces a new kind of saved state.

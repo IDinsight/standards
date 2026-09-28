@@ -116,21 +116,13 @@ persisted progress.
 
 ## Documentation Styles
 
-Always load [`styles/universal.md`](styles/universal.md). Load a user profile
-only on explicit selection, or reload this record's persisted selection on
-resume. Default to `User Style: NONE`. Never infer `tony` from identity,
-repository ownership, Developer's selection, prior usage, or file existence.
-
-Use Developer's direct-child identifier convention: `tony` and `tony.md` both
-select `user-styles/tony.md` and persist `tony`; `NONE` is reserved for no
-profile. Accept only a filename stem, optionally ending in `.md`, resolving to
-exactly one available direct child Markdown file in this package's
-`user-styles/`. Reject separators, absolute/relative/nested paths, traversal,
-and symlinks escaping that directory before loading content. Do not load other
-profiles to guess a match. If an explicit or persisted selection is invalid or
-unavailable, persist the blocker and ask for an available selection,
-restoration, or explicit clearing to `NONE`; never silently substitute. The user
-may change or clear a selection during the cycle without plan approval. Persist
+Always load [`styles/universal.md`](styles/universal.md). Apply a user style
+only as the protocol's **User Styles** defines: the user explicitly selects
+`.standards/user-styles/documenter/<identifier>.md`, and the record persists its
+identifier as `User Style`, `NONE` by default, and reloads it on resume. If a
+selection is invalid or unavailable, persist the blocker and ask for an
+available selection, restoration, or explicit clearing to `NONE`. The user may
+change or clear the selection during the cycle without plan approval; persist
 the choice, reassess affected documentation, and avoid unrelated restyling.
 
 Load only technology styles relevant to the documentation being assessed or

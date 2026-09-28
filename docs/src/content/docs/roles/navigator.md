@@ -63,7 +63,10 @@ behavior, what the evidence supports, and what is still uncertain. If files
 change, it rechecks affected explanations.
 
 Answers, questions, and quiz progress stay in the conversation. Navigator
-creates no saved report or score and needs no fresh assessment session.
+creates no saved report or score and needs no fresh assessment session. If you
+select a [user style](../../reference/runtime-files/#user-styles) from
+`.standards/user-styles/navigator/`, Navigator applies it for the rest of the
+conversation; name it again in a new chat.
 
 ## What stays unchanged
 
@@ -74,10 +77,10 @@ stops the quiz.
 
 It runs a diagnostic only after establishing that it will not change files or
 external systems. It may run `node .standards/bin/check.mjs`, which only reads
-files, and it reports any problems the check or a hook finds without fixing
-them. A test or a command called “dry run” is not automatically safe. Where that
-cannot be established, Navigator uses existing evidence and explains what still
-needs checking.
+files, and it reports any problems the check or the stop hook finds without
+fixing them. A test or a command called “dry run” is not automatically safe.
+Where that cannot be established, Navigator uses existing evidence and explains
+what still needs checking.
 
 Navigator can explain a suspected defect and its likely owner. It does not make
 repairs, provide Tester's verification, or issue Reviewer's verdict. For where

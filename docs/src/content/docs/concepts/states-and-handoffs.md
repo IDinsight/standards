@@ -182,9 +182,9 @@ Sign-off ends the cycle in `SIGNED_OFF`. Retained cancellation ends it in
 cycle mode to `UNSET`. New work starts a new cycle rather than reopening the old
 one.
 
-Greenfield cancellation can instead remove the framework installation if no
-implementation has been created. The agent previews the uninstall command and
-waits for your explicit removal approval; the active cycle remains in place
-until removal succeeds. See
+Greenfield cancellation can instead reset the workflow if no implementation has
+been created. The agent previews `standards reset` and waits for your explicit
+approval; the active cycle remains in place until the reset succeeds. The reset
+keeps STANDARDS installed and leaves no `CANCELLED` state. See
 [cancellation and new cycles](../../guides/cancelling-and-new-cycles/) for the
 conditions, and [Human Decisions](../human-decisions/) for your choices.

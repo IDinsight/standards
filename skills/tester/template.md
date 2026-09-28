@@ -20,7 +20,7 @@ Cycle: <Active Work.Id>
 # Verification Report
 
 `Cycle`: `<Active Work.Id>` `Mode`: `VERIFY | REVERIFY` `Status`:
-`IN_PROGRESS | BLOCKED | COMPLETE`
+`IN_PROGRESS | BLOCKED | COMPLETE` `User Style`: `NONE | <identifier>`
 
 ## Assessed Inputs
 
@@ -95,6 +95,9 @@ recovery routing remain canonical in `STATE.md`, not in this report.
 Keep Assessed Inputs, Acceptance Evidence, Scenario Budget, Execution Evidence,
 and Resume or Handoff. Omit Open Findings and Dependencies only when empty. Use
 explicit NONE or not-yet-run explanations rather than empty required tables.
+
+Set `User Style` to the user's explicit selection under the protocol's **User
+Styles**, or `NONE`.
 
 `IN_PROGRESS` means verification is underway; `BLOCKED` means required work
 cannot currently complete. Neither is passing evidence. `COMPLETE` means the

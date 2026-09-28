@@ -44,6 +44,12 @@ The [review reports](../../reference/templates/reviewer/) are saved under
 Each report records the work inspected, evidence, findings, unanswered
 questions, and whether this review can pass.
 
+You can select a [user style](../../reference/runtime-files/#user-styles) you
+keep at `.standards/user-styles/reviewer/<name>.md`. Each report saves the
+selection, and Reviewer reloads it when it resumes. A style shapes how findings
+and summaries are written, never their severity, the evidence required, or
+whether the review passes.
+
 ## Modes
 
 The saved state determines which review runs. Re-review uses the same mode:

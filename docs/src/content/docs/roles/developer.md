@@ -65,11 +65,14 @@ over specific approved work when you ask.
 
 ## Coding style and responsibilities
 
-Developer follows project constraints and applicable coding guidance. You can
-explicitly select a personal style, such as `tony`, before the first plan
-approval. That approval locks the selection, including no personal style, for
-the rest of the cycle. A different selection requires a new cycle. An
-unavailable locked profile must be restored before implementation continues.
+Developer follows project constraints and applicable coding guidance. Before the
+first plan approval, you can explicitly select a
+[user style](../../reference/runtime-files/#user-styles) you keep at
+`.standards/user-styles/developer/<name>.md`, such as `tony`. The plan saves the
+selection, and Developer reloads it when it resumes. First approval locks the
+selection, including no user style, for the rest of the cycle. A different
+selection requires a new cycle. If a locked style's file goes missing, it must
+be restored before implementation continues.
 
 Developer makes local coding choices within the agreed design. Requirements,
 consequential design decisions, and project context stay with their owners. It

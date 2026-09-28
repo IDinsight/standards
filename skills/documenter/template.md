@@ -22,7 +22,7 @@ Cycle: <Active Work.Id>
 `Collaboration`: `AUTONOMOUS | GUIDED` `Target`:
 `FILE | FOLDER | VERTICAL_SLICE | ACTIVE_CHANGE` `Target Detail`:
 `<repository-relative path, capability, or active cycle>` `User Style`:
-`NONE | <direct-child identifier>`
+`NONE | <identifier>`
 
 ## Assessed Inputs and Boundary
 

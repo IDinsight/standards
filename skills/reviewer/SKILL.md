@@ -56,6 +56,12 @@ corrections is part of that procedure, not a third mode. A requested kind that
 conflicts with persisted state does not authorize changing the state or
 reviewing the other kind.
 
+Apply a user style only as the protocol's **User Styles** defines: the user
+explicitly selects `.standards/user-styles/reviewer/<identifier>.md`, and each
+report persists its identifier as `User Style`, `NONE` by default, and reloads
+it on resume. A style shapes how findings and summaries are written, never
+severity, evidence requirements, or whether a gate passes.
+
 ## Ownership
 
 Own the review reports and correction of Reviewer findings. Use

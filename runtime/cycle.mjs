@@ -1,20 +1,18 @@
 #!/usr/bin/env node
-// Reserve a new cycle ID in `.standards/CYCLE_IDS.md` and print it.
+// Generate a new cycle ID and print it.
 //
 //   node .standards/bin/cycle.mjs new --request "Add user search by name"
 //
-// The ID is `<request-slug>-<UTC time>-<random hex>`. The tool checks the
-// registry and every existing cycle artifact, then appends the ID while holding
-// a lock so two agents cannot reserve at the same time. It does not edit
-// STATE.md; the agent records the printed ID in `Active Work.Id`.
+// The ID is `<request-slug>-<UTC time>-<random hex>`. The tool checks that no
+// existing cycle record uses it. It changes no files; the agent records the
+// printed ID in `Active Work.Id`.
 import { randomBytes } from 'node:crypto';
 
-import { CYCLE_ID, TERMINAL_STATES, UsageError, exists, isMain, printProblem, projectRootFor, readText, withLock, writeAtomic } from './lib/core.mjs';
+import { GENERATED_CYCLE_ID, TERMINAL_STATES, UsageError, exists, isMain, printProblem, projectRootFor, readText } from './lib/core.mjs';
 import { RECORDS_ROOT, defaultPath, scanArtifacts } from './lib/records.mjs';
-import { validateRegistry, validateState } from './lib/state.mjs';
+import { validateState } from './lib/state.mjs';
 
 const USAGE = 'Usage: node .standards/bin/cycle.mjs new --request "<request text>"';
-const REGISTRY = '.standards/CYCLE_IDS.md';
 
 function parseArgs(args) {
   if (args[0] !== 'new') throw new UsageError(USAGE);
@@ -45,18 +43,17 @@ function timestamp(date) {
   return date.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
 }
 
-// A cycle ID may be reserved only when no cycle is active: before the first
+// A cycle ID may be generated only when no cycle is active: before the first
 // cycle (`Active Work.Id` is UNSET) or after sign-off or retained cancellation.
 function assertCanAllocate(stateText) {
   const { id, workflowState } = validateState(stateText);
   if (id !== 'UNSET' && !TERMINAL_STATES.has(workflowState)) {
-    throw new UsageError(`Cycle ${id} is still active (${workflowState}). A new cycle ID is only reserved `
+    throw new UsageError(`Cycle ${id} is still active (${workflowState}). A new cycle ID is only generated `
       + 'before the first cycle or after sign-off or cancellation.');
   }
 }
 
-async function isUsed(root, id, registered, artifacts) {
-  if (registered.has(id)) return true;
+async function isUsed(root, id, artifacts) {
   if (artifacts.some((artifact) => artifact.provenance.cycle === id)) return true;
   // Every path `artifact init` could create for this ID, plus the reviews folder.
   const paths = [`${RECORDS_ROOT}/reviews/${id}`,
@@ -74,25 +71,14 @@ async function main(args) {
   if (/^<<<<<<< /m.test(stateText)) throw new UsageError('.standards/STATE.md has unresolved merge conflicts.');
   assertCanAllocate(stateText);
   const slug = slugFor(request);
-  return withLock(root, '.standards/.cycle-ids.lock', async () => {
-    const registryText = await readText(root, REGISTRY);
-    if (registryText === null) {
-      throw new UsageError(`${REGISTRY} is missing. Restore it, or uninstall and reinstall STANDARDS; `
-        + 'never recreate it empty.');
-    }
-    if (/^<<<<<<< /m.test(registryText)) throw new UsageError(`${REGISTRY} has unresolved merge conflicts.`);
-    const registered = validateRegistry(registryText);
-    const artifacts = (await scanArtifacts(root)).filter((artifact) => !artifact.provenance.error);
-    for (let attempt = 0; attempt < 5; attempt += 1) {
-      const id = `${slug}-${timestamp(new Date())}-${randomBytes(4).toString('hex')}`;
-      if (!CYCLE_ID.test(id) || await isUsed(root, id, registered, artifacts)) continue;
-      const separator = registryText.endsWith('\n') ? '' : '\n';
-      await writeAtomic(root, REGISTRY, `${registryText}${separator}- ${id}\n`);
-      process.stdout.write(`${id}\n`);
-      return 0;
-    }
-    throw new UsageError('Could not generate an unused cycle ID; try again.');
-  });
+  const artifacts = (await scanArtifacts(root)).filter((artifact) => !artifact.provenance.error);
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    const id = `${slug}-${timestamp(new Date())}-${randomBytes(4).toString('hex')}`;
+    if (!GENERATED_CYCLE_ID.test(id) || await isUsed(root, id, artifacts)) continue;
+    process.stdout.write(`${id}\n`);
+    return 0;
+  }
+  throw new UsageError('Could not generate an unused cycle ID; try again.');
 }
 
 if (isMain(import.meta.url)) {

@@ -63,7 +63,8 @@ updates each document at the listed location. `<cycle-id>` is the ID saved in
 Only the Scope, Architecture, and Development paths are saved in `STATE.md`. The
 development plan, verification report, reviews, and documentation and
 synchronization records always use the fixed paths above, derived from the cycle
-ID. Uninstalling STANDARDS deletes everything under `.standards/docs/`.
+ID. Resetting the workflow or uninstalling STANDARDS deletes everything under
+`.standards/docs/`.
 
 ## Preserve files from earlier cycles
 

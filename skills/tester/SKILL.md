@@ -95,9 +95,12 @@ component, integration, CLI, or system techniques. Load
 [`styles/web.md`](styles/web.md) when testing rendered web behavior, and
 [`styles/data-and-services.md`](styles/data-and-services.md) when testing
 persistence or service boundaries. Techniques can be combined within either
-mode. There is no Tester `user-styles/` layer. Repository-enforced tooling and
-established conventions guide test implementation; styles do not override the
-contract or protocol conflict rules.
+mode. Apply a user style only as the protocol's **User Styles** defines: the
+user explicitly selects `.standards/user-styles/tester/<identifier>.md`, and the
+report persists its identifier as `User Style`, `NONE` by default, and reloads
+it on resume. The user may change it during the cycle. Repository-enforced
+tooling and established conventions guide test implementation; styles do not
+override the contract or protocol conflict rules.
 
 ## Test Budget
 

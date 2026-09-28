@@ -9,11 +9,11 @@
 import { readdir } from 'node:fs/promises';
 import path from 'node:path';
 
-import { FAILURE_TYPES, HANDOFF_KINDS, STATES, TERMINAL_STATES, UsageError, committedText, exists, fieldPairs, git, isMain, printProblem, projectRootFor, readText } from './lib/core.mjs';
-import { LOCAL_PREFIX, QUALIFIED_PREFIXES, RECORDS_ROOT, acceptanceInventory, acceptanceMentions, bareIds, fixedPath, fixedRecords, headerFields, headingIds, parseProvenance, qualifiedReferences, recordName, scanArtifacts, withoutLinkLabels, withoutPreviousCycles } from './lib/records.mjs';
-import { modeFromFile, parseState, validateRegistry, validateState } from './lib/state.mjs';
+import { FAILURE_TYPES, GENERATED_CYCLE_ID, HANDOFF_KINDS, STATES, TERMINAL_STATES, UsageError, committedText, exists, fieldPairs, git, isMain, printProblem, projectRootFor, readText } from './lib/core.mjs';
+import { LOCAL_PREFIX, QUALIFIED_PREFIXES, acceptanceInventory, acceptanceMentions, bareIds, fixedPath, fixedRecords, headerFields, headingIds, parseProvenance, qualifiedReferences, recordName, scanArtifacts, withoutLinkLabels, withoutPreviousCycles } from './lib/records.mjs';
+import { modeFromFile, parseState, validateState } from './lib/state.mjs';
 
-const RUNTIME_FILES = ['PROTOCOL.md', 'VERSION.json', 'INSTALLATION.json', 'CYCLE_IDS.md', 'MODE.md', 'STATE.md'];
+const RUNTIME_FILES = ['PROTOCOL.md', 'VERSION.json', 'INSTALLATION.json', 'MODE.md', 'STATE.md'];
 const STATE_FILE = '.standards/STATE.md';
 // Order of the standard states from implementation onward. Earlier states
 // (scoping, architecture, audit) all rank 0.
@@ -46,6 +46,7 @@ const EXAMPLE_RECORD = {
   DOC: fixedPath('DOCUMENTATION', '<cycle>'),
 };
 const COLLISION = 'Treat it as a collision: leave it unchanged and ask the user how to resolve it.';
+const NEW_ID = 'Get cycle IDs only from `node .standards/bin/cycle.mjs new`.';
 // How a scope defines a condition (PROTOCOL.md, Acceptance Traceability).
 const DEFINE_CONDITION = 'Each condition must be a list item that starts with its ID, for example '
   + '"- `AC-001`: <condition>"; a table row, heading, or prose mention does not define it.';
@@ -53,15 +54,20 @@ const DEFINE_CONDITION = 'Each condition must be a list item that starts with it
 const within = (file) => (message) => message.replace(` in ${file}`, '');
 const ownersOf = (failureType) => FAILURE_OWNER[failureType] ?? [];
 
-function checkState(state, { registered, mode, report }) {
+function checkState(state, { committed, mode, report }) {
   const problem = (message) => report(STATE_FILE, message);
   const workflowState = state.WorkflowState;
   const cycleMode = state.CycleMode;
   const { id } = state.active;
   const terminal = TERMINAL_STATES.has(workflowState);
 
-  if (id !== 'UNSET' && registered && !registered.has(id)) {
-    problem(`Active Work.Id \`${id}\` is not in .standards/CYCLE_IDS.md. Cycle IDs must come from \`node .standards/bin/cycle.mjs new\`.`);
+  if (id !== 'UNSET' && !GENERATED_CYCLE_ID.test(id)) {
+    problem(`Active Work.Id \`${id}\` is not in the form cycle.mjs generates. ${NEW_ID}`);
+  }
+  // A finished cycle is never reopened: when the last commit ended a cycle and
+  // a cycle is active now, it needs a new ID.
+  if (committed && TERMINAL_STATES.has(committed.workflowState) && !terminal && committed.id === id) {
+    problem(`Active Work.Id \`${id}\` belongs to the cycle the last commit ended in ${committed.workflowState}; a new cycle needs a new ID. ${NEW_ID}`);
   }
   if (id === 'UNSET' && cycleMode !== 'UNSET') problem('CycleMode is set, but no cycle has started (Active Work.Id is UNSET).');
   if (id !== 'UNSET' && !terminal && cycleMode === 'UNSET') {
@@ -182,8 +188,8 @@ function checkState(state, { registered, mode, report }) {
     }
     sources.add(entry.sourceCycle);
     if (entry.sourceCycle === id) problem(`BaselineReconciliation lists the active cycle \`${id}\` itself; it lists only cancelled source cycles.`);
-    if (registered && !registered.has(entry.sourceCycle)) {
-      problem(`BaselineReconciliation source \`${entry.sourceCycle}\` is not in .standards/CYCLE_IDS.md.`);
+    if (!GENERATED_CYCLE_ID.test(entry.sourceCycle)) {
+      problem(`BaselineReconciliation source \`${entry.sourceCycle}\` is not a cycle ID; copy the cancelled cycle's Active Work.Id exactly.`);
     }
   }
   if (cycleMode === 'EXPEDITED' && baseline.entries?.length) {
@@ -658,10 +664,9 @@ export async function runCheck(root, { atTurnEnd = false } = {}) {
   }
   if (conflicted.size) {
     for (const file of [...conflicted].sort()) {
-      report(file, file.startsWith(`${RECORDS_ROOT}/`)
-        ? 'has an unresolved merge conflict. Stop and ask the user to resolve it.'
-        : 'has an unresolved merge conflict. Stop and ask the user to resolve it: keep every line of '
-          + 'CYCLE_IDS.md and exactly one cycle in STATE.md.');
+      report(file, file === STATE_FILE
+        ? 'has an unresolved merge conflict. Stop and ask the user to resolve it by keeping exactly one cycle.'
+        : 'has an unresolved merge conflict. Stop and ask the user to resolve it.');
     }
     return { problems, notes };
   }
@@ -669,12 +674,6 @@ export async function runCheck(root, { atTurnEnd = false } = {}) {
     notes.push('This project is not a git repository (or git is unavailable), so comparisons with the last commit were skipped.');
   }
 
-  let registered = null;
-  if (files['CYCLE_IDS.md'] !== null) {
-    try { registered = validateRegistry(files['CYCLE_IDS.md']); } catch (error) {
-      report('.standards/CYCLE_IDS.md', within('.standards/CYCLE_IDS.md')(error.message));
-    }
-  }
   let mode = null;
   if (files['MODE.md'] !== null) {
     try { mode = modeFromFile(files['MODE.md']); } catch (error) {
@@ -690,11 +689,18 @@ export async function runCheck(root, { atTurnEnd = false } = {}) {
       report(STATE_FILE, within(STATE_FILE)(error.message));
     }
   }
-  if (state) checkState(state, { registered, mode, report });
+  if (state) {
+    // The last committed STATE.md, to catch a finished cycle's ID being reused.
+    let committed = null;
+    try {
+      const text = await committedText(root, STATE_FILE);
+      if (text !== null) committed = validateState(text);
+    } catch {
+      // An unreadable or invalid committed state has nothing to compare.
+    }
+    checkState(state, { committed, mode, report });
+  }
 
-  // Records from other cycles are history and may predate this registry: a
-  // reinstall starts a new registry but keeps them. Only the active cycle's ID
-  // (checked with STATE.md) must be registered.
   const artifacts = await scanArtifacts(root, {
     onUnreadable: (file, error) => notes.push(`Could not read ${file} (${error.code ?? error.message}), so it was not checked.`),
   });

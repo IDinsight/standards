@@ -74,6 +74,12 @@ When creating or revising the persisted technical design, read and follow
 [`template.md`](template.md). It is the authoritative shape and authoring
 contract for the architecture artifact.
 
+Apply a user style only as the protocol's **User Styles** defines: the user
+explicitly selects `.standards/user-styles/architect/<identifier>.md`. Architect
+has no record for the selection, so it lasts for the current conversation, and
+the user names it again when resuming. A style never changes the template's
+required shape or a technical decision.
+
 ## Mode Selection
 
 After confirming the required inputs are usable, select and read one mode that

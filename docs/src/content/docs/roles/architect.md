@@ -39,6 +39,12 @@ cycle's acceptance conditions, Architect moves that coverage under a "Previous
 Cycles" heading at the end of the document, so an old ID is never read as
 current. Developer later writes the detailed implementation plan.
 
+You can select a [user style](../../reference/runtime-files/#user-styles) you
+keep at `.standards/user-styles/architect/<name>.md`. Architect has no record
+for it, so the selection lasts for the current chat; name it again when you
+resume. A style never changes the design's required shape or a technical
+decision.
+
 ## Modes
 
 Architect chooses one mode based on the main design problem.

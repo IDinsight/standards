@@ -9,7 +9,7 @@ Use this guide when there is no existing implementation to preserve. Complete
 ## Establish scope first
 
 Invoke Scoper with your request. The agent handles
-[cycle initialization](../starting-a-cycle/), including reserving an ID and
+[cycle initialization](../starting-a-cycle/), including generating an ID and
 starting `STANDARD` work in `SCOPING`. Scoper then defines what to build and how
 to check the result.
 

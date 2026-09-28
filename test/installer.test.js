@@ -89,10 +89,30 @@ test('a package manifest and lockfile alone do not imply a brownfield implementa
   assert.equal(result.mode, 'GREENFIELD');
 }));
 
-test('reinstall and upgrade preserve registry, workflow state, and auditor context', () => fixture(async (root) => {
+test('a project holding only coding-agent settings installs as greenfield', () => fixture(async (root) => {
+  await mkdir(path.join(root, '.claude'));
+  await write(root, '.claude/settings.local.json', '{}\n');
+  await mkdir(path.join(root, '.codex'));
+  await write(root, '.codex/config.toml', 'model = "x"\n');
+  await mkdir(path.join(root, '.agents'));
+  const result = await installProject({ projectRoot: root });
+  assert.equal(result.mode, 'GREENFIELD');
+}));
+
+test('skills are installed without the evals used to develop them', () => fixture(async (root) => {
   await installProject({ projectRoot: root });
-  await write(root, '.standards/CYCLE_IDS.md', (await read(root, '.standards/CYCLE_IDS.md')) + '- saved-cycle-123\n');
+  for (const base of ['.agents/skills', '.claude/skills']) {
+    assert.ok((await readdir(path.join(root, base, 'scoper'))).includes('SKILL.md'));
+    assert.equal((await readdir(path.join(root, base, 'scoper'))).includes('evals'), false);
+  }
+  assert.equal((await installProject({ projectRoot: root })).action, 'Verified');
+}));
+
+test('reinstall and upgrade preserve workflow state, auditor context, and user styles', () => fixture(async (root) => {
+  await installProject({ projectRoot: root });
   await write(root, '.standards/CONTEXT.md', 'Auditor-owned context\n');
+  await mkdir(path.join(root, '.standards/user-styles/developer'), { recursive: true });
+  await write(root, '.standards/user-styles/developer/alex.md', '# Alex\n');
   const state = await read(root, '.standards/STATE.md');
   const unchanged = await installProject({ projectRoot: root });
   assert.equal(unchanged.action, 'Verified');
@@ -104,8 +124,8 @@ test('reinstall and upgrade preserve registry, workflow state, and auditor conte
   assert.doesNotMatch(await read(root, '.standards/PROTOCOL.md'), /Old version/);
   assert.doesNotMatch(await read(root, '.agents/skills/scoper/SKILL.md'), /Old version/);
   assert.equal(await read(root, '.standards/STATE.md'), state);
-  assert.match(await read(root, '.standards/CYCLE_IDS.md'), /- saved-cycle-123/);
   assert.equal(await read(root, '.standards/CONTEXT.md'), 'Auditor-owned context\n');
+  assert.equal(await read(root, '.standards/user-styles/developer/alex.md'), '# Alex\n');
 }));
 
 test('unmarked runtime and skill collisions leave project files untouched', () => fixture(async (root) => {
@@ -125,8 +145,8 @@ test('unmarked runtime and skill collisions leave project files untouched', () =
 test('an incomplete runtime fails before mutation', () => fixture(async (root) => {
   await installProject({ projectRoot: root });
   const agents = await read(root, 'AGENTS.md');
-  await rm(path.join(root, '.standards/CYCLE_IDS.md'));
-  await assert.rejects(installProject({ projectRoot: root }), /missing \.standards\/CYCLE_IDS\.md/);
+  await rm(path.join(root, '.standards/MODE.md'));
+  await assert.rejects(installProject({ projectRoot: root }), /missing \.standards\/MODE\.md/);
   assert.equal(await read(root, 'AGENTS.md'), agents);
 }));
 
@@ -210,14 +230,6 @@ test('interrupted installer backups and malformed state block reinstall', () => 
   assert.match(await read(root, '.standards/STATE.md'), /`PendingCycleMode`: `INVALID`/);
 }));
 
-test('an active cycle must remain registered before upgrade', () => fixture(async (root) => {
-  await installProject({ projectRoot: root });
-  const state = await read(root, '.standards/STATE.md');
-  await write(root, '.standards/STATE.md', state.replace('`Id`: `UNSET`', '`Id`: `missing-cycle-123`'));
-  await assert.rejects(installProject({ projectRoot: root }), /active cycle ID is absent/);
-  assert.equal(await read(root, '.standards/STATE.md'), state.replace('`Id`: `UNSET`', '`Id`: `missing-cycle-123`'));
-}));
-
 test('compatible releases can upgrade, while downgrades and cross-major changes stop', () => {
   assert.doesNotThrow(() => checkUpgrade('1.2.3', '1.2.3'));
   assert.doesNotThrow(() => checkUpgrade('1.2.3', '1.3.0'));
@@ -242,11 +254,11 @@ test('missing or incompatible version record blocks writes to an installed runti
 
 test('reinstall keeps files a user added inside installed skill folders', () => fixture(async (root) => {
   await installProject({ projectRoot: root });
-  await write(root, '.claude/skills/developer/user-styles/alex.md', '# Alex\n');
+  await write(root, '.claude/skills/developer/NOTES.md', '# Notes\n');
   await write(root, '.claude/skills/developer/template.md', 'Edited\n');
   const result = await installProject({ projectRoot: root });
   assert.deepEqual(result.paths, [{ action: 'update skill', path: '.claude/skills/developer' }]);
-  assert.equal(await read(root, '.claude/skills/developer/user-styles/alex.md'), '# Alex\n');
+  assert.equal(await read(root, '.claude/skills/developer/NOTES.md'), '# Notes\n');
   assert.match(await read(root, '.claude/skills/developer/template.md'), /Developer Artifact Template/);
 }));
 

@@ -93,7 +93,20 @@ test('CLI parses uninstall separately from install and rejects unsafe or ambiguo
   assert.throws(() => parseArguments(['uninstall', '--dry-run', '--dry-run']), /more than once/);
   assert.throws(() => parseArguments(['uninstall', '--project']), /requires a value/);
   assert.throws(() => parseArguments(['install', '--dry-run']), /Unknown install option/);
+  assert.throws(() => parseArguments(['constructor']), /Unknown command or option: constructor/);
   assert.equal(parseArguments(['uninstall', '--yes']).yes, true);
+});
+
+test('CLI parses reset with its own options', () => {
+  assert.deepEqual(parseArguments(['reset']), { command: 'reset', project: '.', mode: null, dryRun: false });
+  assert.deepEqual(parseArguments(['reset', '--project=./example', '--mode', 'greenfield', '--dry-run']), {
+    command: 'reset', project: './example', mode: 'GREENFIELD', dryRun: true,
+  });
+  for (const option of ['--client=codex', '--hooks', '--no-hooks', '--force']) {
+    assert.throws(() => parseArguments(['reset', option]), /Unknown reset option/);
+  }
+  assert.equal(parseArguments(['reset', '--yes']).yes, true);
+  assert.deepEqual(parseArguments(['reset', '--help']), { command: 'reset-help' });
 });
 
 function fakePrompts(answers) {
@@ -168,7 +181,7 @@ test('interactive uninstall previews full removal and preserves files when decli
   const preview = decline.calls.find(([name]) => name === 'note');
   assert.match(preview[2], /remove: \.standards/);
   assert.match(preview[2], /Clients: codex, claude/);
-  assert.match(preview[2], /cycle-ID history/);
+  assert.match(preview[2], /user styles/);
   assert.match(preview[2], /cycle records/);
   assert.deepEqual(decline.calls.filter(([name]) => name === 'confirm').length, 1);
 
@@ -205,11 +218,37 @@ test('uninstall help explains deletion before resolving any project', async () =
     cwd: '/does-not-exist', stdout: stdout.stream, stderr: stderr.stream,
   }), 0);
   assert.match(stdout.read(), /entire .standards/);
-  assert.match(stdout.read(), /cycle-ID history/);
+  assert.match(stdout.read(), /user styles/);
   assert.match(stdout.read(), /every cycle record in \.standards\/docs\//);
   assert.match(stdout.read(), /global CLI stays installed/);
   assert.equal(stderr.read(), '');
 });
+
+test('interactive reset asks for the mode, previews, and changes nothing when declined', () => temporaryProject(async (root) => {
+  const stdout = output();
+  stdout.stream.isTTY = true;
+  const stderr = output();
+  const environment = { cwd: root, stdin: { isTTY: true }, stdout: stdout.stream, stderr: stderr.stream };
+  assert.equal(await runCli(['install', '--project', root, '--yes'], environment), 0);
+  await writeFile(path.join(root, '.standards/CONTEXT.md'), '# Project Context\n');
+
+  const decline = fakePrompts(['BROWNFIELD', false]);
+  assert.equal(await runCli(['reset', '--project', root], { ...environment, prompts: decline }), 0);
+  const [, select] = decline.calls.find(([name]) => name === 'select');
+  assert.equal(select.initialValue, 'GREENFIELD');
+  const preview = decline.calls.find(([name]) => name === 'note');
+  assert.match(preview[2], /Mode: BROWNFIELD/);
+  assert.match(preview[2], /remove: \.standards\/CONTEXT\.md/);
+  assert.match(preview[2], /user styles stay/);
+  assert.equal(decline.calls.find(([name]) => name === 'confirm')[1].initialValue, false);
+  assert.equal((await readdir(path.join(root, '.standards'))).includes('CONTEXT.md'), true);
+
+  const approve = fakePrompts(['GREENFIELD', true]);
+  assert.equal(await runCli(['reset', '--project', root], { ...environment, prompts: approve }), 0);
+  assert.equal((await readdir(path.join(root, '.standards'))).includes('CONTEXT.md'), false);
+  assert.match(stdout.read(), /Reset STANDARDS/);
+  assert.equal(stderr.read(), '');
+}));
 
 test('uninstall rejects missing and file targets before touching project files', async () => {
   for (const project of ['./does-not-exist', './package.json']) {

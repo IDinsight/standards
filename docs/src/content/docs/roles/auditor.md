@@ -30,6 +30,12 @@ Its output is `.standards/CONTEXT.md`, following the
 roles enough information to work without repeating the investigation. Planned
 design stays separate from facts about what already exists.
 
+You can select a [user style](../../reference/runtime-files/#user-styles) you
+keep at `.standards/user-styles/auditor/<name>.md`. Auditor has no record for
+it, so the selection lasts for the current chat; name it again when you resume.
+A style never changes the context's required shape or what counts as an
+established fact.
+
 ## Modes
 
 Auditor chooses the narrowest inspection that can establish reliable context. A

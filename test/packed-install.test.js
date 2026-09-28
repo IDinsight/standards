@@ -9,6 +9,8 @@ import { fileURLToPath } from 'node:url';
 const run = promisify(execFile);
 const sourceRoot = fileURLToPath(new URL('../', import.meta.url));
 
+// Compare a source asset with its packed copy. Skill `evals/` folders are for
+// developing the skills and are left out of the package.
 async function compareTree(source, packed) {
   if ((await stat(source)).isFile()) {
     assert.deepEqual(await readFile(packed), await readFile(source), `Packed file differs: ${packed}`);
@@ -17,6 +19,10 @@ async function compareTree(source, packed) {
   assert.ok((await stat(packed)).isDirectory(), `Missing packed directory: ${packed}`);
   for (const entry of await readdir(source, { withFileTypes: true })) {
     if (entry.name === '.DS_Store') continue;
+    if (entry.name === 'evals' && path.basename(path.dirname(source)) === 'skills') {
+      await assert.rejects(stat(path.join(packed, entry.name)), `Packed evals: ${packed}`);
+      continue;
+    }
     const left = path.join(source, entry.name);
     const right = path.join(packed, entry.name);
     if (entry.isDirectory() || entry.isFile()) {
@@ -72,10 +78,16 @@ try {
   assert.match(cycle.stdout, /^packed-test-\d{8}T\d{6}Z-[0-9a-f]{8}\n$/);
   const second = await run(process.execPath, [executable, 'install', '--project', project]);
   assert.match(second.stdout, /Verified STANDARDS/);
+  await stat(path.join(project, '.claude/skills/scoper/SKILL.md'));
+  await assert.rejects(stat(path.join(project, '.claude/skills/scoper/evals')));
 
-  const registryPath = path.join(project, '.standards/CYCLE_IDS.md');
-  const registry = `${await readFile(registryPath, 'utf8')}- reserved-test-cycle-123\n`;
-  await writeFile(registryPath, registry);
+  const contextPath = path.join(project, '.standards/CONTEXT.md');
+  await writeFile(contextPath, '# Project Context\n');
+  const reset = await run(process.execPath, [executable, 'reset', '--project', project]);
+  assert.match(reset.stdout, /Reset STANDARDS/);
+  await assert.rejects(stat(contextPath));
+  const context = '# Project Context\n';
+  await writeFile(contextPath, context);
   // Simulate the next compatible package release without changing the source checkout.
   const [major, minor] = packageJson.version.split('.').map(Number);
   const nextVersion = `${major}.${minor + 1}.0`;
@@ -86,10 +98,10 @@ try {
   assert.match(upgraded.stdout, /Updated STANDARDS/);
   assert.equal(JSON.parse(await readFile(path.join(project, '.standards/VERSION.json'), 'utf8')).version,
     nextVersion);
-  assert.equal(await readFile(registryPath, 'utf8'), registry);
+  assert.equal(await readFile(contextPath, 'utf8'), context);
   const preview = await run(process.execPath, [executable, 'uninstall', '--project', project, '--dry-run']);
   assert.match(preview.stdout, /Would uninstall STANDARDS/);
-  assert.equal(await readFile(registryPath, 'utf8'), registry);
+  assert.equal(await readFile(contextPath, 'utf8'), context);
   const removed = await run(process.execPath, [executable, 'uninstall', '--project', project]);
   assert.match(removed.stdout, /Uninstalled STANDARDS/);
   assert.equal((await readdir(project)).includes('.standards'), false);
@@ -100,7 +112,7 @@ try {
   assert.match(repeated.stdout, /No STANDARDS installation found/);
   const fresh = await run(process.execPath, [executable, 'install', '--project', project]);
   assert.match(fresh.stdout, /Installed STANDARDS/);
-  process.stdout.write(`Packed @idinsight/standards@${packageJson.version}: assets, install, runtime tools, hooks, reinstall, compatible upgrade, and uninstall verified\n`);
+  process.stdout.write(`Packed @idinsight/standards@${packageJson.version}: assets, install, runtime tools, hooks, reinstall, reset, compatible upgrade, and uninstall verified\n`);
 } finally {
   await rm(temporary, { recursive: true, force: true });
 }

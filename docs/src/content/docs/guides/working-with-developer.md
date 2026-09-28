@@ -31,13 +31,14 @@ require another approval. The
 [Developer page](../../roles/developer/#approval-before-implementation) explains
 when another approval is required.
 
-## Choose a personal coding style
+## Choose a user style
 
-You may choose an available personal coding style, such as `tony`, before
-approving the first plan. If you do not choose one, Developer records no
-personal style; you do not need to edit a field or select `NONE` yourself. Check
-the style shown in the proposed plan before approving it. First approval locks
-that choice for the cycle, even if the plan is revised later. To use a different
+You may choose a [user style](../../reference/runtime-files/#user-styles) you
+keep at `.standards/user-styles/developer/<name>.md`, such as `tony`, before
+approving the first plan. If you do not choose one, Developer records no user
+style; you do not need to edit a field or select `NONE` yourself. Check the
+style shown in the proposed plan before approving it. First approval locks that
+choice for the cycle, even if the plan is revised later. To use a different
 style, you would need to finish or cancel this cycle and start another.
 Developer handles the saved selection and lock.
 

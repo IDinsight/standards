@@ -89,6 +89,12 @@ active-cycle scope, use REPLAN.
 For either mode, read and follow [`template.md`](template.md). It is the
 authoritative shape and authoring contract for the persisted scope artifact.
 
+Apply a user style only as the protocol's **User Styles** defines: the user
+explicitly selects `.standards/user-styles/scoper/<identifier>.md`. Scoper has
+no record for the selection, so it lasts for the current conversation, and the
+user names it again when resuming. A style never changes the template's required
+shape or the form of acceptance conditions.
+
 ## Invariants
 
 1. Ask only questions that materially change scope. Resolve blocking ambiguity
