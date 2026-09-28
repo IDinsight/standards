@@ -44,12 +44,13 @@ shape or what counts as established fact.
 
 ## Inputs
 
-Read `.standards/PROTOCOL.md`, `.standards/MODE.md`, and `.standards/STATE.md`
-first. Perform Auditor-owned work only in `AUDITING` with an initialized
-`STANDARD` cycle; when `Active Work` is `UNSET`, initialize the first cycle as
-the protocol describes before auditing. Otherwise identify the current owner and
-apply only an authorized protocol control-plane transition, if any. `EXPEDITED`
-omits Auditor; a required context guarantee uses **Expedited Promotion**.
+Read all of `.standards/PROTOCOL.md` (in consecutive parts if a read is cut
+off), `.standards/MODE.md`, and `.standards/STATE.md` first. Perform
+Auditor-owned work only in `AUDITING` with an initialized `STANDARD` cycle; when
+`Active Work` is `UNSET`, initialize the first cycle as the protocol describes
+before auditing. Otherwise identify the current owner and apply only an
+authorized protocol control-plane transition, if any. `EXPEDITED` omits Auditor;
+a required context guarantee uses **Expedited Promotion**.
 
 - Brownfield initial audit: `Active Work.Request`, current repository, existing
   project instructions, and any prior `.standards/CONTEXT.md`.

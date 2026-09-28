@@ -150,8 +150,10 @@ removed when empty. Existing files and directories stay. A globally installed
 CLI stays installed.
 
 The installer supports greenfield and brownfield projects. The authoritative
-installer and runtime requirements live in [`PROTOCOL.md`](PROTOCOL.md),
-especially **Installed Runtime Contract** and **Installer File Preservation**.
+installer requirements live in [`INSTALLER.md`](INSTALLER.md), which stays in
+this repository. The **Installed Runtime Contract** in
+[`PROTOCOL.md`](PROTOCOL.md) tells agents what an installed project contains
+and how they may run reset and uninstall.
 
 At a high level, installation selects the initial project mode, installs the
 protocol and workflow skills for the chosen coding agent, applies explicit-only

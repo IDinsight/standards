@@ -11,7 +11,8 @@ with the file responsible for the part you want to change.
 
 | Path                     | What belongs here                                                     |
 | ------------------------ | --------------------------------------------------------------------- |
-| `PROTOCOL.md`            | Shared rules for roles, states, handoffs, recovery, and installation. |
+| `PROTOCOL.md`            | Shared rules for roles, states, handoffs, recovery, and the runtime.  |
+| `INSTALLER.md`           | Rules for the CLI's install, upgrade, and uninstall; not installed.   |
 | `README.md`              | A high-level introduction and development entry points.               |
 | `skills/`                | The nine role packages.                                               |
 | `runtime/`               | Tools installed into `.standards/bin/`, including `check.mjs`.        |
@@ -65,7 +66,7 @@ definitions are in `templates/claude/settings-hooks.json` for Claude Code and
 The published CLI in `bin/` and `lib/` installs these templates, the role
 packages without their `evals/` folders, and the tools in `runtime/`, which it
 copies to `.standards/bin/`. Installation and preservation requirements are
-defined in the [protocol](../../reference/protocol/#installed-runtime-contract).
+defined in the [Installer Contract](../../reference/installer/).
 
 ## Website sources and generated files
 
@@ -73,10 +74,10 @@ Handwritten pages live under `docs/src/content/docs/`. The sidebar is listed
 explicitly in `docs/astro.config.mjs`; adding a file alone does not add a
 navigation entry.
 
-`docs/scripts/sync-reference.mjs` generates the Protocol page and eight role
-template pages from their repository originals. It also copies downloadable
-originals into `docs/public/reference/`. Edit the source files rather than these
-generated copies.
+`docs/scripts/sync-reference.mjs` generates the Protocol and Installer Contract
+pages and eight role template pages from their repository originals. It also
+copies downloadable originals into `docs/public/reference/`. Edit the source
+files rather than these generated copies.
 
 The built website goes to `docs/dist/`. `docs/scripts/check-links.mjs` checks
 local links and anchors in that output.
