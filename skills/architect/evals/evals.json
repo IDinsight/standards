@@ -135,12 +135,12 @@
     {
       "id": 10,
       "prompt": "Continue the active STANDARDS workflow as Architect. ProjectMode is BROWNFIELD, CycleMode is STANDARD, WorkflowState is ARCHITECTING, recovery is inactive, Active Work.Id is improve-search-20260923-x9k2, Active Work.Scope points to the completed current-cycle scope, valid active-cycle project context exists, and Active Work.Architecture is NONE. The natural path docs/specs/user-search.md already exists and begins with a STANDARDS provenance block declaring Artifact: ARCHITECTURE and Cycle: user-search-v1-old. The current scope requires a new design. No appropriate unmarked project-owned canonical architecture document exists.",
-      "expected_output": "Architect preserves the prior-cycle STANDARDS design, creates the current-cycle design with `artifact.mjs init ARCHITECTURE` at docs/specs/improve-search-20260923-x9k2.md, records that path in Active Work.Architecture, and performs the normal handoff after its completion gate.",
+      "expected_output": "Architect preserves the prior-cycle STANDARDS design, creates the current-cycle design with `artifact.mjs init ARCHITECTURE` at .standards/docs/specs/improve-search-20260923-x9k2.md, records that path in Active Work.Architecture, and performs the normal handoff after its completion gate.",
       "files": [],
       "assertions": [
         "The response recognizes docs/specs/user-search.md as a STANDARDS cycle-owned artifact belonging to user-search-v1-old",
         "It does not overwrite, repurpose, or adopt that prior-cycle design as the current architecture artifact",
-        "It creates the new design with `node .standards/bin/artifact.mjs init ARCHITECTURE`, which writes docs/specs/improve-search-20260923-x9k2.md with provenance Artifact ARCHITECTURE and Cycle improve-search-20260923-x9k2",
+        "It creates the new design with `node .standards/bin/artifact.mjs init ARCHITECTURE`, which writes .standards/docs/specs/improve-search-20260923-x9k2.md with provenance Artifact ARCHITECTURE and Cycle improve-search-20260923-x9k2",
         "It records the new repository-relative path in Active Work.Architecture before completing Architect's gate"
       ]
     },

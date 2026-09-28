@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 // Print the next free identifier for a record.
 //
-//   node .standards/bin/id.mjs next AC docs/scope/<cycle-id>.md
-//   node .standards/bin/id.mjs next DEV docs/development/<cycle-id>.md
-//   node .standards/bin/id.mjs next F docs/reviews/<cycle-id>/implementation.md
-//   node .standards/bin/id.mjs next D docs/synchronization/<cycle-id>.md
-//   node .standards/bin/id.mjs next DOC docs/documentation/<cycle-id>.md
+//   node .standards/bin/id.mjs next AC .standards/docs/scope/<cycle-id>.md
+//   node .standards/bin/id.mjs next DEV .standards/docs/development/<cycle-id>.md
+//   node .standards/bin/id.mjs next F .standards/docs/reviews/<cycle-id>/implementation.md
+//   node .standards/bin/id.mjs next D .standards/docs/synchronization/<cycle-id>.md
+//   node .standards/bin/id.mjs next DOC .standards/docs/documentation/<cycle-id>.md
 //
 // The next number is one more than the highest number used in the file now or
 // in its last committed version, including retired IDs and earlier cycles'

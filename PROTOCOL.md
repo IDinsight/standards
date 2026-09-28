@@ -248,7 +248,7 @@ artifact presence.
 `Id`: `add-user-search-by-name-and-email-20260923T150000Z-a7f3c2e9`
 `Request`: `Add user search by name and email.` `Scope`: `docs/scope/add-user-search.md`
 `Architecture`: `docs/specs/add-user-search.md`
-`Development`: `docs/development/add-user-search-by-name-and-email-20260923T150000Z-a7f3c2e9.md`
+`Development`: `.standards/docs/development/add-user-search-by-name-and-email-20260923T150000Z-a7f3c2e9.md`
 `PromotionReason`: `NONE` `AuditTarget`: `NONE` `BlockedOn`: `NONE`
 
 `BaselineReconciliation`: `NONE`
@@ -282,8 +282,8 @@ Resolving that conflict is the user's job:
 
 - keep every line from both sides of `CYCLE_IDS.md`;
 - keep exactly one cycle in `STATE.md`. The other cycle stops being tracked. Its
-  records under `docs/` stay in the repository, and deciding what to do with
-  them is also the user's responsibility.
+  records under `.standards/docs/` stay in the repository, and deciding what to
+  do with them is also the user's responsibility.
 
 To avoid the conflict, sign off or cancel a cycle before merging its branch.
 
@@ -1125,9 +1125,11 @@ operation after obtaining explicit user approval of the removal:
    shared-file updates, any warnings, and the exact removal command including
    `--yes`. Explain that removal covers the entire `.standards/` runtime, the
    STANDARDS hooks, and all verified role skill directories for both clients,
-   including local edits or added files inside them. Saved workflow state,
-   context, and cycle-ID history will be lost; another cycle will require fresh
-   installation.
+   including local edits or added files inside them. Warn explicitly that every
+   cycle record under `.standards/docs/` (scope, design, development,
+   verification, review, documentation, and synchronization records) will be
+   deleted. Saved workflow state, context, and cycle-ID history will also be
+   lost; another cycle will require fresh installation.
 3. Ask for explicit approval to execute that removal command for the previewed
    project and scope. A generic cancellation request does not grant removal
    approval. During the active cycle, record the target, command, and pending
@@ -1162,8 +1164,9 @@ outside the removed runtime and verified skill directories is preserved.
 S.T.A.N.D.A.R.D.S. does not restore the project working tree. Reverting project
 changes is the user's responsibility.
 
-The reset removes `STATE.md` and `CYCLE_IDS.md`, so no persisted `CANCELLED`
-state or runtime cycle-ID registry remains. Removal of the runtime ends the
+The reset removes `STATE.md`, `CYCLE_IDS.md`, and the cycle records under
+`.standards/docs/`, so no persisted `CANCELLED` state, cycle record, or runtime
+cycle-ID registry remains. Removal of the runtime ends the
 registry-backed no-reuse guarantee. The next workflow attempt requires fresh
 installation, which re-evaluates project mode from then-current state and starts
 a new cycle-ID registry. Do not carry the cancelled bootstrap's former
@@ -1484,29 +1487,31 @@ Those roles may update an appropriate unmarked canonical project document, and
 must not add STANDARDS provenance solely because the document is referenced by
 `Active Work.Scope` or `Active Work.Architecture`. If either role instead
 creates a new workflow artifact, it creates it with `artifact init` at
-`docs/scope/<Active Work.Id>.md` or `docs/specs/<Active Work.Id>.md`. Because
-these paths include the cycle ID, they never belong to another cycle.
+`.standards/docs/scope/<Active Work.Id>.md` or
+`.standards/docs/specs/<Active Work.Id>.md`. Because these paths include the
+cycle ID, they never belong to another cycle.
 
-Developer's development plan is always a STANDARDS cycle-owned artifact. Its
-path must be unique to the active cycle and include `Active Work.Id`; use
-`docs/development/<Active Work.Id>.md` unless the repository requires another
-development-plan directory, in which case preserve the same cycle-specific
-filename. Its provenance block and the plan's visible `Cycle` field must both
-match `Active Work.Id`.
+Developer's development plan is always a STANDARDS cycle-owned artifact at
+`.standards/docs/development/<Active Work.Id>.md`, and `Active Work.Development`
+must name that path. Its provenance block and the plan's visible `Cycle` field
+must both match `Active Work.Id`.
 
 Tester's verification report is always a STANDARDS cycle-owned artifact at
-`docs/verification/<Active Work.Id>.md`. Its `VERIFICATION` provenance block
-and visible `Cycle` field must match `Active Work.Id`. This fixed path is
-recoverable from the cycle ID; do not add a verification-path field to
-`STATE.md`. Preserve reports from other cycles. If the required path contains
-an unrelated or incorrectly marked file, report the collision and block
+`.standards/docs/verification/<Active Work.Id>.md`. Its `VERIFICATION`
+provenance block and visible `Cycle` field must match `Active Work.Id`. This
+fixed path is recoverable from the cycle ID; do not add a verification-path
+field to `STATE.md`. Preserve reports from other cycles. If the required path
+contains an unrelated or incorrectly marked file, report the collision and block
 dependent work until it is resolved; do not overwrite or adopt it. Test suites
-and fixtures remain reusable project assets and do not require report provenance.
+and fixtures remain reusable project assets and do not require report
+provenance.
 
 Reviewer owns two fixed cycle-specific report paths:
 
-- `docs/reviews/<Active Work.Id>/implementation.md` for `IMPLEMENTATION`;
-- `docs/reviews/<Active Work.Id>/final-deliverable.md` for `FINAL_DELIVERABLE`.
+- `.standards/docs/reviews/<Active Work.Id>/implementation.md` for
+  `IMPLEMENTATION`;
+- `.standards/docs/reviews/<Active Work.Id>/final-deliverable.md` for
+  `FINAL_DELIVERABLE`.
 
 Every review report begins with this specialized provenance block:
 
@@ -1530,10 +1535,10 @@ when a non-directory or unsafe path prevents the required report location.
 
 The following records have fixed cycle-specific paths:
 
-| Owner        | Path                                       | Artifact type     |
-|--------------|--------------------------------------------|-------------------|
-| Documenter   | `docs/documentation/<Active Work.Id>.md`   | `DOCUMENTATION`   |
-| Synchronizer | `docs/synchronization/<Active Work.Id>.md` | `SYNCHRONIZATION` |
+| Owner        | Path                                                  | Artifact type     |
+|--------------|-------------------------------------------------------|-------------------|
+| Documenter   | `.standards/docs/documentation/<Active Work.Id>.md`   | `DOCUMENTATION`   |
+| Synchronizer | `.standards/docs/synchronization/<Active Work.Id>.md` | `SYNCHRONIZATION` |
 
 For each record, use the listed artifact type; its provenance block's `Cycle`
 and visible `Cycle` field must match `Active Work.Id`. Derive the path from
@@ -1555,10 +1560,10 @@ plan, `### F-NNN` in review reports, `### D-NNN` in the synchronization record,
 and `### DOC-NNN` in the documentation record. Get each new number with
 `node .standards/bin/id.mjs next <prefix> <file>`. When a record refers to an
 entry in another record, it names that record's path with the identifier, for
-example `docs/reviews/<Active Work.Id>/implementation.md#F-003`. A path relative
-to the referring file, as in a Markdown link, also works. Acceptance identifiers
-(`AC-NNN`) and development steps (`DEV-NNN`) of the active cycle are referred to
-without a path.
+example `.standards/docs/reviews/<Active Work.Id>/implementation.md#F-003`. A
+path relative to the referring file, as in a Markdown link, also works.
+Acceptance identifiers (`AC-NNN`) and development steps (`DEV-NNN`) of the
+active cycle are referred to without a path.
 
 Before editing the verification report or an artifact referenced by
 `Active Work.Scope`, `Active Work.Architecture`, or `Active Work.Development`,
@@ -1623,6 +1628,8 @@ An installed project should provide:
   context;
 - `.standards/bin/`: the runtime tools and hook script described in **Runtime
   Tools and Hooks**, replaced as a whole on every install and upgrade;
+- `.standards/docs/`: the role-owned cycle records defined in **Workflow
+  Artifact Provenance**, created only by the roles through `artifact init`;
 - the S.T.A.N.D.A.R.D.S. workflow skills installed in the location required by
   the selected coding agent;
 - unless the user declines them, STANDARDS hooks in `.claude/settings.json` for
@@ -1654,14 +1661,14 @@ from settings ownership and workflow state. Reinstallation with the same version
 is allowed. An installer may upgrade to a newer minor or patch release within
 the same major version after verifying the existing runtime; it must preserve
 workflow data and update the recorded version with the framework assets. Reject
-older versions and cross-major upgrades. A major release may be installed into
-a fresh project. STANDARDS provides no migration between major versions: the
-only route for an existing project is `standards uninstall`, which deletes
-`.standards/` (including workflow state, Auditor context, and the cycle-ID
-registry), followed by a fresh installation. The framework maintainer chooses
-the release version. Adding, removing, or renaming a role is a major change, and
-so is any change to the runtime files or record formats that an existing
-installation's files would no longer pass.
+older versions and cross-major upgrades. A major release may be installed into a
+fresh project. STANDARDS provides no migration between major versions: the only
+route for an existing project is `standards uninstall`, which deletes
+`.standards/` (including workflow state, Auditor context, cycle records, and the
+cycle-ID registry), followed by a fresh installation. The framework maintainer
+chooses the release version. Adding, removing, or renaming a role is a major
+change, and so is any change to the runtime files or record formats that an
+existing installation's files would no longer pass.
 
 ### Installer File Preservation
 
@@ -1740,6 +1747,8 @@ After ownership checks:
   runtime, stop and report the incomplete runtime; do not recreate it empty or
   reconstruct it by inference.
 - Preserve `.standards/CONTEXT.md`; it is Auditor-owned, not installer-owned.
+- Preserve `.standards/docs/` and every cycle record in it; the records are
+  role-owned, not installer-owned.
 - Preserve project-level instructions. When they materially conflict with the
   protocol, integration contract, workflow artifacts, or other authoritative
   constraints, follow **Instruction Layering and Conflicts**.
@@ -1764,7 +1773,9 @@ conversation-level approval. The globally installed CLI is unaffected.
   project directory. Offer `--dry-run` to report every planned path removal or
   shared-file update without writing files. Help and preview output must explain
   that removing `.standards/` deletes saved workflow state, Auditor context,
-  cycle-ID history, and any other content in that directory.
+  cycle records, cycle-ID history, and any other content in that directory. When
+  `.standards/docs/` holds cycle records, the preview must warn with their
+  count.
 - Require the runtime ownership marker and a valid, supported
   `.standards/INSTALLATION.json` before removal. Do not infer settings ownership
   from current values. Unknown ownership records require an uninstaller that
@@ -1806,10 +1817,12 @@ conversation-level approval. The globally installed CLI is unaffected.
   interrupted process may leave a partial operation; retain a mapping from
   backups to original paths and block both install and uninstall until it is
   resolved. Do not claim atomicity across process interruption.
-- Preserve implementation, plans, reports, tests, and documentation outside the
-  removed runtime and verified skill directories. A later fresh installation
-  starts a new runtime and registry; existing artifacts and cycle markers still
-  require collision checks when allocating new cycle IDs.
+- Delete the cycle records under `.standards/docs/` with the runtime. Preserve
+  implementation, tests, documentation, and reused project scope or design
+  documents outside the removed runtime and verified skill directories. A later
+  fresh installation starts a new runtime and registry; artifacts and cycle
+  markers outside the removed runtime still require collision checks when
+  allocating new cycle IDs.
 
 There is no force removal or client-only uninstall. Removing one client while
 retaining shared runtime ownership requires a separate contract.
@@ -1834,24 +1847,27 @@ Use these terms consistently across all skills:
   records collaboration mode and resumable progress, and never replaces scope,
   architecture, Tester verification, review, or documentation.
 - **verification report**: Tester-owned cycle-specific assessment at
-  `docs/verification/<Active Work.Id>.md`, recording acceptance coverage, scenario
-  allocations, actual execution evidence, gaps, and later-phase dependencies.
-  It does not replace scope, design, or workflow coordination state.
+  `.standards/docs/verification/<Active Work.Id>.md`, recording acceptance
+  coverage, scenario allocations, actual execution evidence, gaps, and
+  later-phase dependencies. It does not replace scope, design, or workflow
+  coordination state.
 - **review report**: Reviewer-owned cycle- and kind-specific assessment at
-  `docs/reviews/<Active Work.Id>/implementation.md` or `final-deliverable.md`
-  within that same directory. It records inspected inputs, checks, findings,
-  limitations, dependencies, and resumable progress under **Review Gates**.
+  `.standards/docs/reviews/<Active Work.Id>/implementation.md` or
+  `final-deliverable.md` within that same directory. It records inspected
+  inputs, checks, findings, limitations, dependencies, and resumable progress
+  under **Review Gates**.
 - **documentation record**: Documenter-owned cycle-specific evidence and
-  progress at `docs/documentation/<Active Work.Id>.md`, identifying assessed
-  documents/content, actual checks and limits, current AC/technical criterion
-  references, collaboration mode, target, user style, remaining work, and
-  resumable completion context. It is distinct from reusable project
+  progress at `.standards/docs/documentation/<Active Work.Id>.md`, identifying
+  assessed documents/content, actual checks and limits, current AC/technical
+  criterion references, collaboration mode, target, user style, remaining work,
+  and resumable completion context. It is distinct from reusable project
   documentation and does not replace another role's evidence or an acceptance
   authority.
 - **synchronization record**: Synchronizer-owned cycle-specific reconciliation
-  at `docs/synchronization/<Active Work.Id>.md`, recording assessed identities,
-  references to completion/evidence artifacts, discrepancies and their owners,
-  limitations, and a resumable conclusion under **Synchronization Gate**. It is
+  at `.standards/docs/synchronization/<Active Work.Id>.md`, recording assessed
+  identities, references to completion/evidence artifacts, discrepancies and
+  their owners, limitations, and a resumable conclusion under **Synchronization
+  Gate**. It is
   not an acceptance ledger or user sign-off.
 - **project context**: Auditor-owned baseline stored at
   `.standards/CONTEXT.md`. It may persist as evidence across cycles, but

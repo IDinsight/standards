@@ -10,7 +10,7 @@
 import { randomBytes } from 'node:crypto';
 
 import { CYCLE_ID, TERMINAL_STATES, UsageError, exists, isMain, printProblem, projectRootFor, readText, withLock, writeAtomic } from './lib/core.mjs';
-import { fixedPath, scanArtifacts } from './lib/records.mjs';
+import { RECORDS_ROOT, defaultPath, scanArtifacts } from './lib/records.mjs';
 import { validateRegistry, validateState } from './lib/state.mjs';
 
 const USAGE = 'Usage: node .standards/bin/cycle.mjs new --request "<request text>"';
@@ -58,8 +58,10 @@ function assertCanAllocate(stateText) {
 async function isUsed(root, id, registered, artifacts) {
   if (registered.has(id)) return true;
   if (artifacts.some((artifact) => artifact.provenance.cycle === id)) return true;
-  const paths = [`docs/development/${id}.md`, `docs/reviews/${id}`,
-    ...['VERIFICATION', 'DOCUMENTATION', 'SYNCHRONIZATION'].map((type) => fixedPath(type, id))];
+  // Every path `artifact init` could create for this ID, plus the reviews folder.
+  const paths = [`${RECORDS_ROOT}/reviews/${id}`,
+    ...['SCOPE', 'ARCHITECTURE', 'DEVELOPMENT', 'VERIFICATION', 'DOCUMENTATION', 'SYNCHRONIZATION']
+      .map((type) => defaultPath(type, id))];
   for (const relative of paths) if (await exists(root, relative)) return true;
   return false;
 }

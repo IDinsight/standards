@@ -30,12 +30,11 @@ development plan.
 Persist the development plan as a STANDARDS cycle-owned artifact under the
 protocol's **Workflow Artifact Provenance** rules. Create it with
 `node .standards/bin/artifact.mjs init DEVELOPMENT`, which writes
-`docs/development/<Active Work.Id>.md` with the provenance block and header. Add
-`--dir <folder>` only when the repository requires another development-plan
-folder; the file name stays `<Active Work.Id>.md`. Keep the plan's visible
-`Cycle` field equal to `Active Work.Id`. Never reuse a shared project-owned plan
-or a STANDARDS development artifact owned by another cycle. Record its
-repository-relative path in `STATE.md` as `Active Work.Development`.
+`.standards/docs/development/<Active Work.Id>.md` with the provenance block and
+header. Keep the plan's visible `Cycle` field equal to `Active Work.Id`. Never
+reuse a shared project-owned plan or a STANDARDS development artifact owned by
+another cycle. Record its repository-relative path in `STATE.md` as
+`Active Work.Development`.
 
 Do not change Scoper-owned requirements or acceptance identifiers,
 Architect-owned technical design, Auditor-owned project context, Tester-owned

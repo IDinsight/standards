@@ -276,13 +276,13 @@
     },
     {
       "id": 21,
-      "prompt": "Use Developer to start a new bounded brownfield change with CycleMode UNSET, PendingCycleMode UNSET, Active Work.Id and Request UNSET. The append-only .standards/CYCLE_IDS.md registry already contains 'admin-note-20260920T120000Z-a1b2' from a previous cycle, and docs/development/admin-note-20260920T120000Z-a1b2.md still exists, although STATE.md and CONTEXT.md no longer reference that old cycle. The new request would naturally derive the same slug 'admin-note'.",
+      "prompt": "Use Developer to start a new bounded brownfield change with CycleMode UNSET, PendingCycleMode UNSET, Active Work.Id and Request UNSET. The append-only .standards/CYCLE_IDS.md registry already contains 'admin-note-20260920T120000Z-a1b2' from a previous cycle, and .standards/docs/development/admin-note-20260920T120000Z-a1b2.md still exists, although STATE.md and CONTEXT.md no longer reference that old cycle. The new request would naturally derive the same slug 'admin-note'.",
       "expected_output": "Developer reserves a new cycle ID with `node .standards/bin/cycle.mjs new`, which checks the registry and existing cycle artifacts and adds a timestamp and random suffix, so the old ID and its artifact are never reused. It writes the printed ID to Active Work.Id and creates the new development plan with `node .standards/bin/artifact.mjs init DEVELOPMENT`.",
       "files": [],
       "assertions": [
         "The response treats the existing CYCLE_IDS.md entry as permanently reserving admin-note-20260920T120000Z-a1b2 while the runtime remains installed",
         "The cycle ID is reserved by running `node .standards/bin/cycle.mjs new --request \"<request>\"`; the agent does not invent an ID or edit CYCLE_IDS.md itself, and writes the printed ID to Active Work.Id only after the tool succeeds",
-        "It does not overwrite or repurpose docs/development/admin-note-20260920T120000Z-a1b2.md",
+        "It does not overwrite or repurpose .standards/docs/development/admin-note-20260920T120000Z-a1b2.md",
         "The new development plan is created with `artifact.mjs init DEVELOPMENT`, so its path is derived from the newly printed cycle ID"
       ]
     },
@@ -330,13 +330,13 @@
     },
     {
       "id": 25,
-      "prompt": "Continue the active STANDARDS workflow as Developer. ProjectMode is BROWNFIELD, CycleMode is STANDARD, WorkflowState is DEVELOPING, recovery is inactive, Active Work.Id is improve-search-20260923-x9k2, Active Work.Scope and Active Work.Architecture point to completed current-cycle artifacts, valid project context exists, and Active Work.Development is NONE. The repository has an old shared docs/development/plan.md and a prior-cycle docs/development/user-search-v1-old.md whose STANDARDS provenance declares Artifact: DEVELOPMENT and Cycle: user-search-v1-old. Create the development plan for the active cycle; the user has not approved it yet.",
+      "prompt": "Continue the active STANDARDS workflow as Developer. ProjectMode is BROWNFIELD, CycleMode is STANDARD, WorkflowState is DEVELOPING, recovery is inactive, Active Work.Id is improve-search-20260923-x9k2, Active Work.Scope and Active Work.Architecture point to completed current-cycle artifacts, valid project context exists, and Active Work.Development is NONE. The repository has an old shared docs/development/plan.md and a prior-cycle .standards/docs/development/user-search-v1-old.md whose STANDARDS provenance declares Artifact: DEVELOPMENT and Cycle: user-search-v1-old. Create the development plan for the active cycle; the user has not approved it yet.",
       "expected_output": "Developer does not reuse either shared or prior-cycle plan. It creates the active cycle's distinct development plan using the current cycle ID, writes matching DEVELOPMENT provenance and visible Cycle metadata, records the path in Active Work.Development, and waits for required plan approval before implementation.",
       "files": [],
       "assertions": [
         "Developer treats the development plan as always cycle-owned and does not reuse docs/development/plan.md as a shared cross-cycle plan",
         "It does not overwrite or repurpose the prior-cycle DEVELOPMENT artifact",
-        "The new plan path is cycle-specific and includes improve-search-20260923-x9k2, using docs/development/improve-search-20260923-x9k2.md unless an established alternate development-plan directory is required",
+        "The new plan is created with `node .standards/bin/artifact.mjs init DEVELOPMENT` at its fixed cycle-specific path, .standards/docs/development/improve-search-20260923-x9k2.md",
         "The plan provenance declares Artifact DEVELOPMENT and Cycle improve-search-20260923-x9k2, and its visible Cycle field matches",
         "Active Work.Development is updated to the new plan path before implementation and Developer still requires plan approval before modifying project implementation"
       ]

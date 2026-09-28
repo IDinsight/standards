@@ -4,27 +4,27 @@
 //
 //   node .standards/bin/artifact.mjs init VERIFICATION
 //   node .standards/bin/artifact.mjs init REVIEW --kind IMPLEMENTATION
-//   node .standards/bin/artifact.mjs init DEVELOPMENT [--dir <folder>]
 //
 // Types: SCOPE, ARCHITECTURE, DEVELOPMENT, VERIFICATION, REVIEW,
-// DOCUMENTATION, SYNCHRONIZATION. The header comes from the owning role's
-// installed template, with the cycle ID filled in; the role writes the rest.
-// Running it again for a record that already exists prints the path and
-// changes nothing. It never overwrites a different file.
+// DOCUMENTATION, SYNCHRONIZATION. Each record is created under
+// `.standards/docs/`. The header comes from the owning role's installed
+// template, with the cycle ID filled in; the role writes the rest. Running it
+// again for a record that already exists prints the path and changes nothing.
+// It never overwrites a different file.
 
-import { TERMINAL_STATES, UsageError, isMain, printProblem, projectRelative, projectRootFor, readText, writeNew } from './lib/core.mjs';
+import { TERMINAL_STATES, UsageError, isMain, printProblem, projectRootFor, readText, writeNew } from './lib/core.mjs';
 import { ARTIFACT_TYPES, REVIEW_KINDS, TEMPLATE_ROLE, defaultPath, parseProvenance, provenanceBlock } from './lib/records.mjs';
 import { validateState } from './lib/state.mjs';
 
-const USAGE = 'Usage: node .standards/bin/artifact.mjs init <TYPE> [--kind IMPLEMENTATION|FINAL_DELIVERABLE] [--dir <folder>]';
+const USAGE = 'Usage: node .standards/bin/artifact.mjs init <TYPE> [--kind IMPLEMENTATION|FINAL_DELIVERABLE]';
 
 function parseArgs(args) {
   const [command, type, ...rest] = args;
   if (command !== 'init' || !ARTIFACT_TYPES.has(type)) throw new UsageError(USAGE);
-  const options = { type, kind: null, dir: null };
+  const options = { type, kind: null };
   for (let index = 0; index < rest.length; index += 1) {
     const [name, inline] = rest[index].split(/=(.*)/s, 2);
-    const key = { '--kind': 'kind', '--dir': 'dir' }[name];
+    const key = { '--kind': 'kind' }[name];
     if (!key || options[key] !== null) throw new UsageError(USAGE);
     options[key] = inline ?? rest[(index += 1)] ?? null;
     if (options[key] === null) throw new UsageError(USAGE);
@@ -34,9 +34,6 @@ function parseArgs(args) {
       : '--kind is only used with REVIEW.');
   }
   if (options.kind !== null && !REVIEW_KINDS.has(options.kind)) throw new UsageError(USAGE);
-  if (options.dir !== null && type !== 'DEVELOPMENT') {
-    throw new UsageError('--dir is only used with DEVELOPMENT, when the project keeps plans in another folder.');
-  }
   return options;
 }
 
@@ -73,11 +70,7 @@ async function main(args) {
   if (id === 'UNSET' || TERMINAL_STATES.has(workflowState)) {
     throw new UsageError('There is no active cycle. Start one before creating its records.');
   }
-  let relative = defaultPath(options.type, id, options.kind);
-  if (options.dir !== null) {
-    const folder = await projectRelative(root, options.dir);
-    relative = `${folder.replace(/\/$/, '')}/${id}.md`;
-  }
+  const relative = defaultPath(options.type, id, options.kind);
   const existing = await readText(root, relative);
   if (existing !== null) {
     const provenance = parseProvenance(existing);

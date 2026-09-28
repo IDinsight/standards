@@ -27,10 +27,10 @@ protocol's **Workflow Artifact Provenance** rules. An appropriate pre-existing
 unmarked project-owned scope document may remain the canonical scope location.
 If Scoper creates a new scope artifact, create it with
 `node .standards/bin/artifact.mjs init SCOPE`, which writes
-`docs/scope/<Active Work.Id>.md` with the current-cycle provenance block. Never
-overwrite, repurpose, or adopt a STANDARDS scope artifact whose recorded cycle
-differs from `Active Work.Id`. Record the selected repository-relative path in
-`STATE.md` as `Active Work.Scope`.
+`.standards/docs/scope/<Active Work.Id>.md` with the current-cycle provenance
+block. Never overwrite, repurpose, or adopt a STANDARDS scope artifact whose
+recorded cycle differs from `Active Work.Id`. Record the selected
+repository-relative path in `STATE.md` as `Active Work.Scope`.
 
 Own the wording and stable `AC-NNN` identifiers of scope-level acceptance
 conditions for the active cycle. Number each new condition with

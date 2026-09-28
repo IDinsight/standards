@@ -5,28 +5,29 @@ description:
 ---
 
 The installed STANDARDS files and settings are its **runtime**. Files under
-`.standards/` hold the workflow rules and saved progress. Plans, reports, tests,
-and project documentation live elsewhere. The agent updates workflow records as
-it works; you do not need to maintain them by hand. Editing them by hand is not
-supported, except to resolve a merge conflict (see
-[Branches and merges](#branches-and-merges)). If you edit them anyway, you are
-responsible for the result.
+`.standards/` hold the workflow rules, saved progress, and the cycle records in
+`.standards/docs/`, such as plans and reports. Tests and project documentation
+live elsewhere. The agent updates workflow records as it works; you do not need
+to maintain them by hand. Editing them by hand is not supported, except to
+resolve a merge conflict (see [Branches and merges](#branches-and-merges)). If
+you edit them anyway, you are responsible for the result.
 
 This page describes the required layout installed by the CLI. See
 [Installation and Setup](../../getting-started/installation/).
 
 ## Files at a glance
 
-| File                           | Purpose                                                               |
-| ------------------------------ | --------------------------------------------------------------------- |
-| `.standards/bin/`              | Tools the agent runs; see [Runtime tools](#runtime-tools).            |
-| `.standards/CONTEXT.md`        | Auditor's record of the existing project, created when an audit runs. |
-| `.standards/CYCLE_IDS.md`      | Reserved cycle IDs; entries cannot be reused.                         |
-| `.standards/INSTALLATION.json` | Client settings and paths created by the installer.                   |
-| `.standards/MODE.md`           | The project's greenfield or brownfield mode.                          |
-| `.standards/PROTOCOL.md`       | Shared workflow rules, aligned with the installed skills.             |
-| `.standards/STATE.md`          | Current workflow step, request, handoff, and recovery.                |
-| `.standards/VERSION.json`      | Installed framework version and upgrade compatibility check.          |
+| File                           | Purpose                                                                                            |
+| ------------------------------ | -------------------------------------------------------------------------------------------------- |
+| `.standards/bin/`              | Tools the agent runs; see [Runtime tools](#runtime-tools).                                         |
+| `.standards/CONTEXT.md`        | Auditor's record of the existing project, created when an audit runs.                              |
+| `.standards/CYCLE_IDS.md`      | Reserved cycle IDs; entries cannot be reused.                                                      |
+| `.standards/docs/`             | Cycle records the roles create; see [Plans, reports, and Navigator](#plans-reports-and-navigator). |
+| `.standards/INSTALLATION.json` | Client settings and paths created by the installer.                                                |
+| `.standards/MODE.md`           | The project's greenfield or brownfield mode.                                                       |
+| `.standards/PROTOCOL.md`       | Shared workflow rules, aligned with the installed skills.                                          |
+| `.standards/STATE.md`          | Current workflow step, request, handoff, and recovery.                                             |
+| `.standards/VERSION.json`      | Installed framework version and upgrade compatibility check.                                       |
 
 ## Runtime tools
 
@@ -118,7 +119,8 @@ Resolving it is your job, and it is the one time you edit these files by hand:
 
 - In `CYCLE_IDS.md`, keep every line from both sides.
 - In `STATE.md`, keep exactly one cycle. STANDARDS stops tracking the other
-  cycle. Its records under `docs/` stay, and what to do with them is up to you.
+  cycle. Its records under `.standards/docs/` stay, and what to do with them is
+  up to you.
 
 To avoid the conflict, sign off or cancel a cycle before merging its branch. If
 an agent finds unresolved conflict markers in `.standards/`, it stops and asks
@@ -178,19 +180,20 @@ With hooks on, the Claude Code hooks are in `.claude/settings.json` and the
 Codex hooks in `.codex/hooks.json`. The installer recognizes its hooks by the
 script they run, `.standards/bin/hook.mjs`, and never changes other hooks.
 
-The installer keeps project mode, workflow state, and the cycle-ID list during a
-reinstall. On upgrade, it updates the protocol, skills, and tools together
-without resetting progress. It keeps files you added inside installed skill
-folders, and it puts back settings and hooks it added if they were changed or
-removed. It accepts newer minor and patch versions within the same major version
-and rejects downgrades. There is no migration between major versions: moving to
-one means uninstalling and installing again, which deletes `.standards/`. If
-required information is missing or a setting it never added conflicts, it
-reports the problem instead of guessing. See
+The installer keeps project mode, workflow state, cycle records, and the
+cycle-ID list during a reinstall. On upgrade, it updates the protocol, skills,
+and tools together without resetting progress. It keeps files you added inside
+installed skill folders, and it puts back settings and hooks it added if they
+were changed or removed. It accepts newer minor and patch versions within the
+same major version and rejects downgrades. There is no migration between major
+versions: moving to one means uninstalling and installing again, which deletes
+`.standards/`. If required information is missing or a setting it never added
+conflicts, it reports the problem instead of guessing. See
 [the installation contract](../protocol/#installed-runtime-contract).
 
 Uninstalling STANDARDS from a project deletes all of `.standards/`, including
-context and cycle-ID history. It preserves project work outside the runtime and
+context, cycle-ID history, and every cycle record; the preview warns how many
+records it will delete. It preserves project work outside the runtime and
 installed skills, removes only managed instruction blocks and STANDARDS hooks,
 and reverses only matching recorded settings. It removes recorded client
 directories when they become empty and a recorded Claude settings file when only

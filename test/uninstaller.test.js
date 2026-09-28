@@ -50,6 +50,24 @@ test('uninstall removes both clients and saved history, keeps project work, and 
   assert.equal((await installProject({ projectRoot: root })).action, 'Installed');
 }));
 
+test('uninstall deletes the cycle records in .standards/docs/ and warns with their count', () => fixture(async (root) => {
+  await installProject({ projectRoot: root });
+  // No records yet: no warning about them.
+  assert.equal((await uninstallProject({ projectRoot: root, dryRun: true })).warnings.some((line) => /cycle record/.test(line)), false);
+  await mkdir(path.join(root, '.standards/docs/scope'), { recursive: true });
+  await mkdir(path.join(root, '.standards/docs/reviews/add-search-1'), { recursive: true });
+  await write(root, '.standards/docs/scope/add-search-1.md', 'Scope record\n');
+  await write(root, '.standards/docs/reviews/add-search-1/implementation.md', 'Review record\n');
+  const warning = 'Deletes 2 cycle records in .standards/docs/ (scope, design, development, verification, review, '
+    + 'documentation, and synchronization records).';
+  const preview = await uninstallProject({ projectRoot: root, dryRun: true });
+  assert.ok(preview.warnings.includes(warning), preview.warnings.join('\n'));
+  assert.equal(await read(root, '.standards/docs/scope/add-search-1.md'), 'Scope record\n');
+  const result = await uninstallProject({ projectRoot: root });
+  assert.ok(result.warnings.includes(warning));
+  assert.equal((await readdir(root)).includes('.standards'), false);
+}));
+
 test('uninstall preserves exact text outside managed blocks and an existing Claude import', () => fixture(async (root) => {
   await write(root, 'AGENTS.md', '# Project\r\nKeep me\r\n');
   await write(root, 'CLAUDE.md', '# Personal guidance\r\n@AGENTS.md\r\n');

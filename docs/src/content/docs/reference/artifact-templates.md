@@ -48,20 +48,22 @@ Paths below are relative to the project using STANDARDS. The agent creates or
 updates each document at the listed location. `<cycle-id>` is the ID saved in
 `Active Work.Id`.
 
-| Document               | Location                                                                                                                |
-| ---------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| Scope                  | An appropriate existing project document, or `docs/scope/<cycle-id>.md`.                                                |
-| Technical design       | An appropriate existing project document, or `docs/specs/<cycle-id>.md`.                                                |
-| Development plan       | `docs/development/<cycle-id>.md`; a project-required plan directory may differ, but the filename stays `<cycle-id>.md`. |
-| Project context        | `.standards/CONTEXT.md`                                                                                                 |
-| Verification report    | `docs/verification/<cycle-id>.md`                                                                                       |
-| Implementation review  | `docs/reviews/<cycle-id>/implementation.md`                                                                             |
-| Final review           | `docs/reviews/<cycle-id>/final-deliverable.md`                                                                          |
-| Documentation record   | `docs/documentation/<cycle-id>.md`                                                                                      |
-| Synchronization record | `docs/synchronization/<cycle-id>.md`                                                                                    |
+| Document               | Location                                                                            |
+| ---------------------- | ----------------------------------------------------------------------------------- |
+| Scope                  | An appropriate existing project document, or `.standards/docs/scope/<cycle-id>.md`. |
+| Technical design       | An appropriate existing project document, or `.standards/docs/specs/<cycle-id>.md`. |
+| Development plan       | `.standards/docs/development/<cycle-id>.md`                                         |
+| Project context        | `.standards/CONTEXT.md`                                                             |
+| Verification report    | `.standards/docs/verification/<cycle-id>.md`                                        |
+| Implementation review  | `.standards/docs/reviews/<cycle-id>/implementation.md`                              |
+| Final review           | `.standards/docs/reviews/<cycle-id>/final-deliverable.md`                           |
+| Documentation record   | `.standards/docs/documentation/<cycle-id>.md`                                       |
+| Synchronization record | `.standards/docs/synchronization/<cycle-id>.md`                                     |
 
 Only the Scope, Architecture, and Development paths are saved in `STATE.md`. The
-other locations are fixed or derived from the cycle ID.
+development plan, verification report, reviews, and documentation and
+synchronization records always use the fixed paths above, derived from the cycle
+ID. Uninstalling STANDARDS deletes everything under `.standards/docs/`.
 
 ## Preserve files from earlier cycles
 
@@ -89,4 +91,4 @@ Records number their entries: development steps as `DEV-001`, review findings as
 discrepancies as `DOC-001`. The agent gets each new number from
 `node .standards/bin/id.mjs next`, so a number is never reused. When one record
 mentions an entry in another, it includes that record's path, for example
-`docs/reviews/<cycle-id>/implementation.md#F-003`.
+`.standards/docs/reviews/<cycle-id>/implementation.md#F-003`.

@@ -61,7 +61,8 @@ acceptance text, reports, or an authoritative pass/fail ledger here.
 
 - **Reference:** affected path/section, content identity, related AC/criterion,
   and Reviewer finding reference by path and ID, for example
-  `docs/reviews/<Active Work.Id>/final-deliverable.md#F-001`, when applicable.
+  `.standards/docs/reviews/<Active Work.Id>/final-deliverable.md#F-001`, when
+  applicable.
 - **Evidence and impact:** what disagrees or is missing, and why it matters for
   applicability or completion. Separate facts from uncertainty.
 - **Required correction:** smallest outcome required from the owner, including

@@ -26,9 +26,10 @@ project actually does before describing it.
 
 Alongside the updated documentation, it saves a
 [documentation record](../../reference/templates/documenter/) at
-`docs/documentation/<Active Work.Id>.md`. This records what was inspected and
-changed, checks performed, limitations, remaining work, and your collaboration
-choices. Reviewer and Synchronizer use it to assess the documentation later.
+`.standards/docs/documentation/<Active Work.Id>.md`. This records what was
+inspected and changed, checks performed, limitations, remaining work, and your
+collaboration choices. Reviewer and Synchronizer use it to assess the
+documentation later.
 
 ## Modes
 

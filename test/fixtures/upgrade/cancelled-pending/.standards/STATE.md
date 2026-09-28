@@ -10,8 +10,8 @@
 `Id`: `invoice-cache-20260903T150000Z-9c0d1e2f` `Request`:
 `Change invoice-cache invalidation behavior.` `Scope`: `NONE` `Architecture`:
 `NONE` `Development`:
-`docs/development/invoice-cache-20260903T150000Z-9c0d1e2f.md` `PromotionReason`:
-`NONE` `AuditTarget`: `NONE` `BlockedOn`: `NONE`
+`.standards/docs/development/invoice-cache-20260903T150000Z-9c0d1e2f.md`
+`PromotionReason`: `NONE` `AuditTarget`: `NONE` `BlockedOn`: `NONE`
 
 `BaselineReconciliation`:
 

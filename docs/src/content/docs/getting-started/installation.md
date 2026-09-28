@@ -102,6 +102,7 @@ project/
 ├── CLAUDE.md
 ├── .standards/
 │   ├── bin/                  # Tools the agent runs
+│   ├── docs/                 # Cycle records, created as roles work
 │   ├── CYCLE_IDS.md
 │   ├── INSTALLATION.json
 │   ├── MODE.md
@@ -117,9 +118,9 @@ For Claude Code, it also sets the installed roles to user-invocable-only in
 `.claude/settings.json` and adds the Claude Code hooks there. Codex skill
 adapters disable implicit invocation. `.standards/bin/` holds the tools the
 agent uses to reserve cycle IDs, create records, number entries, and check the
-workflow files. The installer maintains a marked section in `AGENTS.md` and
-connects `CLAUDE.md` to it, keeping project-owned text and an existing
-`@AGENTS.md` import. The
+workflow files. The roles keep their cycle records in `.standards/docs/`. The
+installer maintains a marked section in `AGENTS.md` and connects `CLAUDE.md` to
+it, keeping project-owned text and an existing `@AGENTS.md` import. The
 [runtime file reference](../../reference/runtime-files/) explains what each file
 does.
 
@@ -141,15 +142,15 @@ rejects downgrades.
 STANDARDS has no migration between major versions. To move an existing project
 to a new major version, sign off or cancel the active cycle,
 [uninstall](#uninstall-from-a-project), and install again. Uninstalling deletes
-`.standards/`, including workflow state, Auditor context, and the cycle-ID
-registry. Your project files and the cycle records under `docs/` stay.
+`.standards/`, including workflow state, Auditor context, every cycle record,
+and the cycle-ID registry. Your project files stay.
 
 The installer checks that existing framework files belong to STANDARDS before
 replacing them. It preserves project-owned instructions, the saved project mode,
-active workflow state, cycle IDs, and Auditor context. It also keeps files you
-added inside installed skill folders, such as a personal style under
-`user-styles/`. It does not take ownership of compatible Claude Code settings
-that were already present.
+active workflow state, cycle IDs, cycle records, and Auditor context. It also
+keeps files you added inside installed skill folders, such as a personal style
+under `user-styles/`. It does not take ownership of compatible Claude Code
+settings that were already present.
 
 If a setting or hook that the installer added was changed or removed, a
 reinstall puts it back and lists it under "Restores" in the preview. If the
@@ -194,7 +195,9 @@ npx @idinsight/standards@latest uninstall --project /absolute/path/to/project --
 It removes:
 
 - The entire `.standards/` directory, including saved workflow state, Auditor
-  context, cycle-ID history, and any files you added there.
+  context, cycle-ID history, every cycle record in `.standards/docs/`, and any
+  files you added there. The preview warns how many cycle records it will
+  delete.
 - Verified STANDARDS role directories for Codex and Claude Code, including local
   edits inside them. If both clients are installed, both are removed.
 - The marked STANDARDS sections of `AGENTS.md` and `CLAUDE.md`, with the blank
@@ -207,14 +210,14 @@ It removes:
   values still match. Changed settings and compatible settings that were already
   there remain.
 
-Your implementation, plans, reports, tests, documentation, and unrelated skills
-outside the removed directories remain. The uninstaller removes a generated
-Claude settings file when only its defaults remain, then removes client
-directories it created if they are empty. It preserves files and directories it
-cannot verify as installer-created. If a client directory remains, inspect its
-contents before deleting anything manually. The global CLI is unaffected. You
-can omit `--project` when you run the command inside the project; there is no
-`--client` or `--force` option for uninstall.
+Your implementation, tests, documentation, and unrelated skills outside the
+removed directories remain. The uninstaller removes a generated Claude settings
+file when only its defaults remain, then removes client directories it created
+if they are empty. It preserves files and directories it cannot verify as
+installer-created. If a client directory remains, inspect its contents before
+deleting anything manually. The global CLI is unaffected. You can omit
+`--project` when you run the command inside the project; there is no `--client`
+or `--force` option for uninstall.
 
 The uninstaller stops before removal if it cannot establish ownership or safely
 read an affected file. Missing workflow records do not prevent removal when

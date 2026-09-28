@@ -31,11 +31,12 @@ checked gets an **acceptance condition**, with an ID such as `AC-001`. Later
 roles use that same ID to connect design and results to the requirement.
 
 Scoper can update an appropriate existing project scope document or create a new
-one at `docs/scope/<cycle-id>.md`. Its location is saved in `Active Work.Scope`.
-Documents belonging to earlier cycles are preserved. If Scoper reuses a shared
-scope document that already lists another cycle's conditions, it moves them
-under a "Previous Cycles" heading at the end of the document and continues
-numbering from the highest ID, so an ID never changes meaning.
+one at `.standards/docs/scope/<cycle-id>.md`. Its location is saved in
+`Active Work.Scope`. Documents belonging to earlier cycles are preserved. If
+Scoper reuses a shared scope document that already lists another cycle's
+conditions, it moves them under a "Previous Cycles" heading at the end of the
+document and continues numbering from the highest ID, so an ID never changes
+meaning.
 
 ## Modes
 

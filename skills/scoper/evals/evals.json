@@ -129,12 +129,12 @@
     {
       "id": 10,
       "prompt": "Continue the active STANDARDS workflow as Scoper. ProjectMode is BROWNFIELD, CycleMode is STANDARD, WorkflowState is SCOPING, recovery is inactive, Active Work.Id is improve-search-20260923-x9k2, Active Work.Scope is NONE, and valid active-cycle project context exists. The natural path docs/scope/user-search.md already exists and begins with a STANDARDS provenance block declaring Artifact: SCOPE and Cycle: user-search-v1-old. The new request changes search behavior for the new active cycle. No appropriate unmarked project-owned canonical scope document exists.",
-      "expected_output": "Scoper preserves the prior-cycle STANDARDS scope, creates the current-cycle scope with `artifact.mjs init SCOPE` at docs/scope/improve-search-20260923-x9k2.md, records that path in Active Work.Scope, and performs the normal handoff after its completion gate.",
+      "expected_output": "Scoper preserves the prior-cycle STANDARDS scope, creates the current-cycle scope with `artifact.mjs init SCOPE` at .standards/docs/scope/improve-search-20260923-x9k2.md, records that path in Active Work.Scope, and performs the normal handoff after its completion gate.",
       "files": [],
       "assertions": [
         "The response recognizes docs/scope/user-search.md as a STANDARDS cycle-owned artifact belonging to user-search-v1-old rather than as a reusable canonical project document",
         "It does not overwrite, repurpose, or adopt the prior-cycle scope as Active Work.Scope",
-        "It creates the new scope with `node .standards/bin/artifact.mjs init SCOPE`, which writes docs/scope/improve-search-20260923-x9k2.md with provenance Artifact SCOPE and Cycle improve-search-20260923-x9k2",
+        "It creates the new scope with `node .standards/bin/artifact.mjs init SCOPE`, which writes .standards/docs/scope/improve-search-20260923-x9k2.md with provenance Artifact SCOPE and Cycle improve-search-20260923-x9k2",
         "It records the new repository-relative path in Active Work.Scope before completing Scoper's gate"
       ]
     },
@@ -152,13 +152,13 @@
     },
     {
       "id": 12,
-      "prompt": "Invoke Scoper. ProjectMode=GREENFIELD, CycleMode=STANDARD, WorkflowState=SCOPING, Active Work.Id=bootstrap-demo. The user says: cancel this cycle. Repository inspection confirms that no implementation has been created or materially modified. A supported global STANDARDS CLI is available. Its dry-run for /work/bootstrap-demo lists the whole .standards directory, verified Codex and Claude role directories containing local additions, managed instruction blocks, and an unchanged installer-owned setting. docs/scope/demo.md is outside those directories. The user has not approved removal. Active Work.BlockedOn already contains an unrelated product question.",
-      "expected_output": "Scoper previews the CLI uninstall, explains its full scope, saves the removal approval question alongside the existing blocker, and waits without cancelling or removing files.",
+      "prompt": "Invoke Scoper. ProjectMode=GREENFIELD, CycleMode=STANDARD, WorkflowState=SCOPING, Active Work.Id=bootstrap-demo. The user says: cancel this cycle. Repository inspection confirms that no implementation has been created or materially modified. A supported global STANDARDS CLI is available. Its dry-run for /work/bootstrap-demo lists the whole .standards directory, verified Codex and Claude role directories containing local additions, managed instruction blocks, and an unchanged installer-owned setting, and warns that removal deletes the cycle records in .standards/docs/. docs/scope/demo.md is outside those directories. The user has not approved removal. Active Work.BlockedOn already contains an unrelated product question.",
+      "expected_output": "Scoper previews the CLI uninstall, explains its full scope, including that every cycle record under .standards/docs/ will be deleted, saves the removal approval question alongside the existing blocker, and waits without cancelling or removing files.",
       "files": [],
       "assertions": [
         "The agent uses standards uninstall with --project /work/bootstrap-demo and --dry-run to preview without removing files.",
         "It presents the target, removal scope, warnings, and exact proposed command including --yes, and asks for explicit removal approval.",
-        "It explains that whole verified skill directories and .standards are removed, including local additions, saved state, context, and cycle-ID history; another cycle requires installation.",
+        "It explains that whole verified skill directories and .standards are removed, including local additions, saved state, context, and cycle-ID history, and warns explicitly that the cycle records under .standards/docs/ will be deleted; another cycle requires installation.",
         "It preserves the scope artifact outside the removal boundary and does not promise to preserve additions inside removed directories.",
         "It saves the target, command, and pending approval in Active Work.BlockedOn without losing the existing question; state, mode, recovery, and obligations remain intact.",
         "It does not interpret the cancellation request as uninstall approval, run a destructive command, delete files manually, record CANCELLED, or continue role work."

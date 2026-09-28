@@ -131,11 +131,12 @@ npx @idinsight/standards@latest uninstall --project /absolute/path/to/project --
 
 Use `--yes` with `uninstall` to skip confirmation in scripts. Uninstall deletes
 the installed skills and the entire `.standards/` directory, including saved
-workflow history, context, and any files you added there. It also removes
-managed instruction blocks, the STANDARDS hooks, and matching installer-added
-settings. Project work outside the removed directories is preserved.
-Installer-created client directories are removed when empty. Existing files and
-directories stay. A globally installed CLI stays installed.
+workflow history, context, every cycle record in `.standards/docs/`, and any
+files you added there. The preview warns how many cycle records it will delete.
+It also removes managed instruction blocks, the STANDARDS hooks, and matching
+installer-added settings. Project work outside the removed directories is
+preserved. Installer-created client directories are removed when empty. Existing
+files and directories stay. A globally installed CLI stays installed.
 
 The installer supports greenfield and brownfield projects. The authoritative
 installer and runtime requirements live in [`PROTOCOL.md`](PROTOCOL.md),
@@ -158,6 +159,7 @@ project/
 ├── CLAUDE.md
 ├── .standards/
 │   ├── bin/              # tools the agent runs, including check.mjs
+│   ├── docs/             # cycle records, created as roles work
 │   ├── CYCLE_IDS.md
 │   ├── INSTALLATION.json
 │   ├── MODE.md

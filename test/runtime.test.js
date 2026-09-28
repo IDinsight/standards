@@ -177,7 +177,7 @@ test('id next counts current, retired, and last-committed identifiers', () => pr
 test('id next ignores references into other records and checks the record type', () => project(async (root) => {
   const id = await startCycle(root, { state: 'REVIEWING_IMPLEMENTATION' });
   const review = await init(root, 'REVIEW', '--kind', 'IMPLEMENTATION');
-  await write(root, review, `${await read(root, review)}\n### F-001 — Bug\n\nSee docs/reviews/${id}/final-deliverable.md#F-009.\n`);
+  await write(root, review, `${await read(root, review)}\n### F-001 — Bug\n\nSee .standards/docs/reviews/${id}/final-deliverable.md#F-009.\n`);
   assert.equal((await tool(root, 'id', 'next', 'F', review)).stdout.trim(), 'F-002');
   const wrong = await tool(root, 'id', 'next', 'DEV', review);
   assert.equal(wrong.code, 1);
@@ -189,7 +189,7 @@ test('id next ignores references into other records and checks the record type',
 test('artifact init writes provenance and the template header, and is safe to repeat', () => project(async (root) => {
   const id = await startCycle(root, { state: 'TESTING' });
   const report = await init(root, 'VERIFICATION');
-  assert.equal(report, `docs/verification/${id}.md`);
+  assert.equal(report, `.standards/docs/verification/${id}.md`);
   const text = await read(root, report);
   assert.ok(text.startsWith(`<!-- STANDARDS\nArtifact: VERIFICATION\nCycle: ${id}\n-->\n\n# Verification Report\n`));
   assert.match(text, new RegExp(`\`Cycle\`: \`${id}\` \`Mode\`: \`VERIFY \\| REVERIFY\``));
@@ -197,24 +197,25 @@ test('artifact init writes provenance and the template header, and is safe to re
   assert.equal(await read(root, report), text);
 
   const review = await init(root, 'REVIEW', '--kind', 'FINAL_DELIVERABLE');
-  assert.equal(review, `docs/reviews/${id}/final-deliverable.md`);
+  assert.equal(review, `.standards/docs/reviews/${id}/final-deliverable.md`);
   assert.match(await read(root, review), /ReviewKind: FINAL_DELIVERABLE\n-->[\s\S]*`ReviewKind`: `FINAL_DELIVERABLE`/);
   assert.equal((await tool(root, 'artifact', 'init', 'REVIEW')).code, 1);
 
   const scope = await init(root, 'SCOPE');
-  assert.equal(scope, `docs/scope/${id}.md`);
+  assert.equal(scope, `.standards/docs/scope/${id}.md`);
   assert.equal(await read(root, scope), `<!-- STANDARDS\nArtifact: SCOPE\nCycle: ${id}\n-->\n`);
-  assert.equal(await init(root, 'DEVELOPMENT', '--dir', 'plans'), `plans/${id}.md`);
+  assert.equal(await init(root, 'DEVELOPMENT'), `.standards/docs/development/${id}.md`);
+  assert.equal((await tool(root, 'artifact', 'init', 'DEVELOPMENT', '--dir', 'plans')).code, 1);
 }));
 
 test('artifact init never overwrites another file and needs an active cycle', () => project(async (root) => {
   assert.match((await tool(root, 'artifact', 'init', 'SCOPE')).stderr, /no active cycle/);
   const id = await startCycle(root, { state: 'TESTING' });
-  await write(root, `docs/verification/${id}.md`, '# Notes kept by the team\n');
+  await write(root, `.standards/docs/verification/${id}.md`, '# Notes kept by the team\n');
   const result = await tool(root, 'artifact', 'init', 'VERIFICATION');
   assert.equal(result.code, 1);
   assert.match(result.stderr, /collision/);
-  assert.equal(await read(root, `docs/verification/${id}.md`), '# Notes kept by the team\n');
+  assert.equal(await read(root, `.standards/docs/verification/${id}.md`), '# Notes kept by the team\n');
 }));
 
 test('check passes on a fresh install and on a consistent cycle', () => project(async (root) => {
@@ -261,7 +262,7 @@ test('check reports provenance problems', () => project(async (root) => {
   hasProblem(result, /broken\.md: has a malformed provenance block \(unknown Artifact `VERIFICATON`\)/);
   // A record from an earlier cycle is history, even when its ID is not in this registry.
   assert.equal(messages(result).some((line) => line.includes('review.md')), false);
-  hasProblem(result, new RegExp(`report\\.md: is this cycle's VERIFICATION record, but it must be at docs/verification/${id}\\.md`));
+  hasProblem(result, new RegExp(`report\\.md: is this cycle's VERIFICATION record, but it must be at \\.standards/docs/verification/${id}\\.md`));
   hasProblem(result, /report\.md: shows Cycle `other-cycle`/);
   hasProblem(result, /report\.md: field `Mode` still shows the template's choices/);
 }));
@@ -683,25 +684,21 @@ test('check reports expedited cycles outside their three states and duplicate re
   hasProblem(result, /implementation\.md: shows ReviewKind `FINAL_DELIVERABLE` but its provenance block says `IMPLEMENTATION`/);
 }));
 
-test('artifact init refuses a development folder outside the project', () => project(async (root) => {
-  await startCycle(root, { state: 'DEVELOPING', mode: 'EXPEDITED' });
-  const result = await tool(root, 'artifact', 'init', 'DEVELOPMENT', '--dir', '../elsewhere');
-  assert.equal(result.code, 1);
-  assert.match(result.stderr, /outside the project/);
-}));
-
-test('records from before a reinstall do not make check fail', () => project(async (root) => {
-  await startCycle(root, { state: 'DEVELOPING', mode: 'EXPEDITED' });
+test('records kept outside the runtime across a reinstall do not make check fail', () => project(async (root) => {
+  const id = await startCycle(root, { state: 'DEVELOPING', mode: 'EXPEDITED' });
   const plan = await init(root, 'DEVELOPMENT');
+  const kept = `archive/${id}.md`;
+  await write(root, kept, await read(root, plan));
   const { uninstallProject } = await import('../lib/uninstaller.js');
   await uninstallProject({ projectRoot: root });
   await installProject({ projectRoot: root, clients: ['claude'] });
-  assert.match(await read(root, plan), /Artifact: DEVELOPMENT/);
-  const result = await check(root);
-  assert.deepEqual(messages(result), []);
-  // A new cycle still gets an ID that does not collide with the old record.
+  // Uninstall deleted the record inside .standards/docs/; the copy outside stays.
+  await assert.rejects(read(root, plan), { code: 'ENOENT' });
+  assert.match(await read(root, kept), /Artifact: DEVELOPMENT/);
+  assert.deepEqual(messages(await check(root)), []);
+  // A new cycle still gets an ID that does not collide with the kept record.
   const { stdout } = await tool(root, 'cycle', 'new', '--request', 'Add user search');
-  assert.notEqual(`docs/development/${stdout.trim()}.md`, plan);
+  assert.notEqual(stdout.trim(), id);
 }));
 
 // A recovery frame for STATE.md, written the way the protocol shows it.
@@ -720,7 +717,7 @@ test('check examines the cycle\'s fixed record paths directly', () => project(as
   hasProblem(await check(root), /holds a VERIFICATION record for cycle `old-cycle-1`, not this cycle's VERIFICATION record/);
   // A gitignored record is still read and checked.
   await write(root, report, text.replace('| AC-002 | pending Documenter | pending |\n', ''));
-  await write(root, '.gitignore', 'docs/verification/\n');
+  await write(root, '.gitignore', '.standards/docs/verification/\n');
   hasProblem(await check(root), new RegExp(`${report}: is COMPLETE but does not account for AC-002`));
 }, { withGit: true }));
 
@@ -743,7 +740,7 @@ test('Active Work paths written with ./ name the same files', () => project(asyn
 
 test('a gitignored plan still gets its record checks', () => project(async (root) => {
   const { plan } = await standardCycle(root);
-  await write(root, '.gitignore', 'docs/development/\n');
+  await write(root, '.gitignore', '.standards/docs/development/\n');
   await fillHeader(root, plan, { Mode: 'AUTONOMOUS | STEPWISE | CODE_WITH_ME' });
   hasProblem(await check(root), new RegExp(`${plan}: field \`Mode\` still shows the template's choices`));
 }, { withGit: true }));
@@ -821,7 +818,7 @@ test('an unfinished documentation record may carry on past DOCUMENTING until sig
   await fillHeader(root, documentation, { Status: 'IN_PROGRESS', Collaboration: 'AUTONOMOUS', Target: 'ACTIVE_CHANGE',
     'Target Detail': 'active cycle', 'User Style': 'NONE' });
   await editState(root, (text) => setField(text, 'WorkflowState', 'REVIEWING_FINAL'));
-  assert.equal(messages(await check(root)).some((line) => line.startsWith(`docs/documentation/${id}.md:`)), false);
+  assert.equal(messages(await check(root)).some((line) => line.startsWith(`.standards/docs/documentation/${id}.md:`)), false);
   // By sign-off it must be complete.
   await editState(root, (text) => setField(text, 'WorkflowState', 'AWAITING_USER_SIGNOFF'));
   hasProblem(await check(root), /documentation\/.*: must be COMPLETE once the cycle has passed DOCUMENTING/);
@@ -901,7 +898,7 @@ test('a wrong Scope pointer or a stray copy gets a single message', () => projec
 
 test('bare references to a record\'s own entries and to plan steps must resolve', () => project(async (root) => {
   const { id } = await standardCycle(root);
-  const review = `docs/reviews/${id}/implementation.md`;
+  const review = `.standards/docs/reviews/${id}/implementation.md`;
   await init(root, 'REVIEW', '--kind', 'IMPLEMENTATION');
   await fillHeader(root, review, { Status: 'IN_PROGRESS' });
   await write(root, review, `${await read(root, review)}\n### F-001 — Missing escape\n\nF-001 is fixed by DEV-001. AC-001.\n`);
@@ -916,3 +913,40 @@ test('conflict markers anywhere in .standards/ stop the check', () => project(as
   await write(root, '.standards/CONTEXT.md', '# Context\n<<<<<<< ours\nA\n=======\nB\n>>>>>>> theirs\n');
   hasProblem(await check(root), /\.standards\/CONTEXT\.md: has an unresolved merge conflict/);
 }));
+
+test('records under .standards/docs/ are scanned, but other runtime files are not', async () => {
+  for (const withGit of [false, true]) {
+    await project(async (root) => {
+      await startCycle(root, { state: 'TESTING' });
+      await write(root, '.standards/docs/stray/broken.md', '<!-- STANDARDS\nArtifact: NOPE\nCycle: x-1\n-->\n');
+      await write(root, '.standards/NOTES.md', '<!-- STANDARDS\nArtifact: NOPE\nCycle: x-1\n-->\n');
+      const result = await check(root);
+      hasProblem(result, /^\.standards\/docs\/stray\/broken\.md: has a malformed provenance block/);
+      assert.equal(messages(result).some((line) => line.startsWith('.standards/NOTES.md:')), false);
+    }, { withGit });
+  }
+});
+
+test('the development plan must be at its fixed path', () => project(async (root) => {
+  const { id, plan } = await standardCycle(root);
+  const moved = `docs/plans/${id}.md`;
+  await write(root, moved, await read(root, plan));
+  await rm(path.join(root, plan));
+  await editState(root, (text) => setField(text, 'Development', moved));
+  const result = await check(root);
+  hasProblem(result, new RegExp(`^docs/plans/${id}\\.md: is this cycle's DEVELOPMENT record, but it must be at \\.standards/docs/development/${id}\\.md`));
+  hasProblem(result, new RegExp(`^\\.standards/STATE\\.md: Active Work\\.Development points to docs/plans/${id}\\.md, but this cycle's DEVELOPMENT record must be at`));
+}));
+
+test('a merge conflict in a cycle record stops the check with its own message', () => project(async (root) => {
+  const { report } = await standardCycle(root);
+  await commit(root);
+  await git(root, 'checkout', '-q', '-b', 'other');
+  await write(root, report, `${await read(root, report)}\nOther branch.\n`);
+  await commit(root);
+  await git(root, 'checkout', '-q', 'main');
+  await write(root, report, `${await read(root, report)}\nMain branch.\n`);
+  await commit(root);
+  await git(root, 'merge', '-q', 'other');
+  assert.deepEqual(messages(await check(root)), [`${report}: has an unresolved merge conflict. Stop and ask the user to resolve it.`]);
+}, { withGit: true }));

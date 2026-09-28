@@ -10,7 +10,7 @@ import { readdir } from 'node:fs/promises';
 import path from 'node:path';
 
 import { FAILURE_TYPES, HANDOFF_KINDS, STATES, TERMINAL_STATES, UsageError, committedText, exists, fieldPairs, git, isMain, printProblem, projectRootFor, readText } from './lib/core.mjs';
-import { LOCAL_PREFIX, QUALIFIED_PREFIXES, acceptanceInventory, bareIds, fixedPath, fixedRecords, headerFields, headingIds, parseProvenance, qualifiedReferences, recordName, scanArtifacts, withoutLinkLabels, withoutPreviousCycles } from './lib/records.mjs';
+import { LOCAL_PREFIX, QUALIFIED_PREFIXES, RECORDS_ROOT, acceptanceInventory, bareIds, fixedPath, fixedRecords, headerFields, headingIds, parseProvenance, qualifiedReferences, recordName, scanArtifacts, withoutLinkLabels, withoutPreviousCycles } from './lib/records.mjs';
 import { modeFromFile, parseState, validateRegistry, validateState } from './lib/state.mjs';
 
 const RUNTIME_FILES = ['PROTOCOL.md', 'VERSION.json', 'INSTALLATION.json', 'CYCLE_IDS.md', 'MODE.md', 'STATE.md'];
@@ -41,8 +41,8 @@ const FAILURE_OWNER = {
 };
 // Where each qualified identifier lives, for the example in a message.
 const EXAMPLE_RECORD = {
-  F: 'docs/reviews/<cycle>/implementation.md', D: 'docs/synchronization/<cycle>.md',
-  DOC: 'docs/documentation/<cycle>.md',
+  F: fixedPath('REVIEW', '<cycle>', 'IMPLEMENTATION'), D: fixedPath('SYNCHRONIZATION', '<cycle>'),
+  DOC: fixedPath('DOCUMENTATION', '<cycle>'),
 };
 const COLLISION = 'Treat it as a collision: leave it unchanged and ask the user how to resolve it.';
 
@@ -330,13 +330,14 @@ async function checkAcceptance(root, context) {
 }
 
 // A reference may name its file from the project root
-// (`docs/reviews/<id>/implementation.md#F-003`, optionally with a leading
-// `/`) or relative to the referring file, as a Markdown link would
-// (`../reviews/<id>/implementation.md#F-003`).
+// (`.standards/docs/reviews/<id>/implementation.md#F-003`, optionally with a
+// leading `/`) or relative to the referring file, as a Markdown link would
+// (`../reviews/<id>/implementation.md#F-003`). Only `./` and `../` mark a
+// relative path; `.standards/...` is from the root.
 function referencedRecord(byPath, from, file) {
   const fromRoot = file.replace(/^\/+/, '');
   const relative = path.posix.normalize(path.posix.join(path.posix.dirname(from), file));
-  return byPath.get(file.startsWith('.') ? relative : fromRoot) ?? byPath.get(relative) ?? byPath.get(fromRoot);
+  return byPath.get(/^\.\.?\//.test(file) ? relative : fromRoot) ?? byPath.get(relative) ?? byPath.get(fromRoot);
 }
 
 function checkReferences(artifact, { byPath, planIds, report }) {
@@ -438,8 +439,7 @@ async function checkActiveCycle(root, state, mode, artifacts, report) {
   const valid = artifacts.filter((artifact) => !artifact.provenance.error);
   // Records at their required location come first, so a stray copy is the one
   // reported as the duplicate.
-  const inPlace = ({ path: file, provenance: { artifact, reviewKind } }) => file === fixedPath(artifact, id, reviewKind)
-    || (artifact === 'DEVELOPMENT' && file === active.development);
+  const inPlace = ({ path: file, provenance: { artifact, reviewKind } }) => file === fixedPath(artifact, id, reviewKind);
   const mine = valid.filter((artifact) => artifact.provenance.cycle === id)
     .sort((left, right) => Number(inPlace(right)) - Number(inPlace(left)));
   const byPath = new Map(valid.map((artifact) => [artifact.path, artifact]));
@@ -465,9 +465,6 @@ async function checkActiveCycle(root, state, mode, artifacts, report) {
     seen.set(key, artifact.path);
     const expected = fixedPath(type, id, reviewKind);
     if (expected && artifact.path !== expected) report(artifact.path, `is this cycle's ${type} record, but it must be at ${expected}.`);
-    if (type === 'DEVELOPMENT' && !artifact.path.endsWith(`/${id}.md`) && artifact.path !== `${id}.md`) {
-      report(artifact.path, `is this cycle's development plan, so its file name must be ${id}.md.`);
-    }
     if (!HEADER_RECORDS.has(type)) continue;
     const fields = headerFields(artifact.text);
     if (fields.Cycle !== id) report(artifact.path, `shows Cycle \`${fields.Cycle ?? ''}\` but its provenance block says \`${id}\`.`);
@@ -499,6 +496,11 @@ async function checkActiveCycle(root, state, mode, artifacts, report) {
   for (const [name, type] of Object.entries(references)) {
     const relative = active[name.toLowerCase()];
     if (relative === 'NONE') continue;
+    // The plan has a fixed location; scope and design may be project documents.
+    const required = fixedPath(type, id);
+    if (required && relative !== required) {
+      report(STATE_FILE, `Active Work.${name} points to ${relative}, but this cycle's ${type} record must be at ${required}.`);
+    }
     const { text, error } = await readRecord(root, relative);
     if (error) {
       report(STATE_FILE, `Active Work.${name} points to ${relative}, which ${error}.`);
@@ -607,8 +609,10 @@ export async function runCheck(root) {
   }
   if (conflicted.size) {
     for (const file of [...conflicted].sort()) {
-      report(file, 'has an unresolved merge conflict. Stop and ask the user to resolve it: keep every line of '
-        + 'CYCLE_IDS.md and exactly one cycle in STATE.md.');
+      report(file, file.startsWith(`${RECORDS_ROOT}/`)
+        ? 'has an unresolved merge conflict. Stop and ask the user to resolve it.'
+        : 'has an unresolved merge conflict. Stop and ask the user to resolve it: keep every line of '
+          + 'CYCLE_IDS.md and exactly one cycle in STATE.md.');
     }
     return { problems, notes };
   }

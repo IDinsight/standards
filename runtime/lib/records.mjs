@@ -17,18 +17,21 @@ export const TEMPLATE_ROLE = {
 // Record-local identifier prefix for each record type.
 export const LOCAL_PREFIX = { DEVELOPMENT: 'DEV', REVIEW: 'F', SYNCHRONIZATION: 'D', DOCUMENTATION: 'DOC' };
 // Identifiers that exist in more than one record, so a reference from another
-// record must name the file: `docs/reviews/<id>/implementation.md#F-003`.
+// record must name the file: `.standards/docs/reviews/<id>/implementation.md#F-003`.
 export const QUALIFIED_PREFIXES = ['F', 'D', 'DOC'];
+// Folder that holds every cycle record `artifact init` creates.
+export const RECORDS_ROOT = '.standards/docs';
 
-// The protocol-fixed location of a record, or null when the location is chosen
-// by the role (scope, architecture) or may use another folder (development).
+// The protocol-fixed location of a record, or null when the role may instead
+// keep it in an existing project document (scope, architecture).
 export function fixedPath(artifact, cycle, reviewKind) {
   switch (artifact) {
-    case 'VERIFICATION': return `docs/verification/${cycle}.md`;
-    case 'DOCUMENTATION': return `docs/documentation/${cycle}.md`;
-    case 'SYNCHRONIZATION': return `docs/synchronization/${cycle}.md`;
+    case 'DEVELOPMENT': return `${RECORDS_ROOT}/development/${cycle}.md`;
+    case 'VERIFICATION': return `${RECORDS_ROOT}/verification/${cycle}.md`;
+    case 'DOCUMENTATION': return `${RECORDS_ROOT}/documentation/${cycle}.md`;
+    case 'SYNCHRONIZATION': return `${RECORDS_ROOT}/synchronization/${cycle}.md`;
     case 'REVIEW':
-      return `docs/reviews/${cycle}/${reviewKind === 'FINAL_DELIVERABLE' ? 'final-deliverable' : 'implementation'}.md`;
+      return `${RECORDS_ROOT}/reviews/${cycle}/${reviewKind === 'FINAL_DELIVERABLE' ? 'final-deliverable' : 'implementation'}.md`;
     default: return null;
   }
 }
@@ -50,9 +53,8 @@ export const recordName = (artifact, reviewKind) => (reviewKind ? `${artifact} $
 
 // Default location for a new artifact created by `artifact init`.
 export function defaultPath(artifact, cycle, reviewKind) {
-  if (artifact === 'SCOPE') return `docs/scope/${cycle}.md`;
-  if (artifact === 'ARCHITECTURE') return `docs/specs/${cycle}.md`;
-  if (artifact === 'DEVELOPMENT') return `docs/development/${cycle}.md`;
+  if (artifact === 'SCOPE') return `${RECORDS_ROOT}/scope/${cycle}.md`;
+  if (artifact === 'ARCHITECTURE') return `${RECORDS_ROOT}/specs/${cycle}.md`;
   return fixedPath(artifact, cycle, reviewKind);
 }
 
@@ -122,11 +124,15 @@ async function walkMarkdown(root, relative = '') {
 // Markdown files that may hold workflow artifacts: git-tracked and untracked
 // (but not ignored) files when git is available, otherwise a folder walk.
 // Framework and client folders are skipped because their templates contain
-// example provenance blocks.
+// example provenance blocks; inside `.standards/`, only the records folder is
+// read.
 export async function markdownFiles(root) {
   const listed = await git(root, ['ls-files', '-z', '--cached', '--others', '--exclude-standard', '--', '*.md']);
-  const files = listed === null ? await walkMarkdown(root) : listed.split('\0').filter(Boolean);
-  return [...new Set(files)].filter((file) => !SKIPPED_FOLDERS.has(file.split('/')[0])).sort();
+  const files = listed === null
+    ? [...await walkMarkdown(root), ...await walkMarkdown(root, RECORDS_ROOT)]
+    : listed.split('\0').filter(Boolean);
+  const scanned = (file) => file.startsWith(`${RECORDS_ROOT}/`) || !SKIPPED_FOLDERS.has(file.split('/')[0]);
+  return [...new Set(files)].filter(scanned).sort();
 }
 
 // Every file whose first line opens a STANDARDS provenance block. A file that

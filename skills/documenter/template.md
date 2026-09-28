@@ -79,8 +79,8 @@ AC/criterion, concrete evidence and impact, owner/canonical failure type (or
 `NONE` for installer/protocol ownership), required correction, and verified
 resolution or withdrawal reason. Preserve all unresolved items before routing
 one. Link Reviewer findings by path and ID, for example
-`docs/reviews/<Active Work.Id>/implementation.md#F-002`, without changing their
-dispositions.
+`.standards/docs/reviews/<Active Work.Id>/implementation.md#F-002`, without
+changing their dispositions.
 
 Include material gaps, required documentation outside the selected target,
 owner/user dependencies, and non-blocking limits with reasons. Record `NONE`

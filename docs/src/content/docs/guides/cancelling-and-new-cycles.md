@@ -34,9 +34,10 @@ Once you approve, the agent runs the command with `--yes` to avoid a second
 terminal prompt. The uninstaller removes the entire `.standards/` runtime, the
 STANDARDS hooks, and verified STANDARDS role directories for both clients,
 including local additions inside them. This deletes saved workflow state,
-context, and cycle-ID history. It also removes marked integration sections and
-unchanged settings that the installer added. Project work and role outputs
-outside the removed directories remain. See
+context, cycle-ID history, and every cycle record in `.standards/docs/`; the
+agent warns you about the records before asking for approval. It also removes
+marked integration sections and unchanged settings that the installer added.
+Project work outside the removed directories remains. See
 [Uninstall from a project](../../getting-started/installation/#uninstall-from-a-project)
 for the removal boundaries.
 

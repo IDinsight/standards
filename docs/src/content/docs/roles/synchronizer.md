@@ -26,9 +26,9 @@ files. It compares the versions assessed with the current work and checks that
 every required outcome has sufficient evidence.
 
 Its [synchronization record](../../reference/templates/synchronizer/) is saved
-at `docs/synchronization/<Active Work.Id>.md`. It links to the supporting
-evidence, explains disagreements or missing information, and records whether
-work is ready for your decision.
+at `.standards/docs/synchronization/<Active Work.Id>.md`. It links to the
+supporting evidence, explains disagreements or missing information, and records
+whether work is ready for your decision.
 
 ## Modes
 

@@ -36,7 +36,7 @@ history, and results. A completion label or a passing command does not prove
 that all required behavior is correct.
 
 The [review reports](../../reference/templates/reviewer/) are saved under
-`docs/reviews/<Active Work.Id>/`:
+`.standards/docs/reviews/<Active Work.Id>/`:
 
 - `implementation.md` assesses the implementation in both cycle modes.
 - `final-deliverable.md` assesses the assembled work in standard cycles only.

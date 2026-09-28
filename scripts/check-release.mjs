@@ -100,7 +100,7 @@ export function upgradeFailures(repo, tag) {
         failures.push(`${name}: the ${tag} installer failed:\n${installed.output}`);
         continue;
       }
-      // Load the saved runtime files and the cycle's records under docs/.
+      // Load the saved runtime files and the cycle's records under .standards/docs/.
       cpSync(fixture, project, { recursive: true });
       const before = ['STATE.md', 'CYCLE_IDS.md'].map((file) => readFileSync(path.join(project, '.standards', file), 'utf8'));
       const upgraded = run(process.execPath, [path.join(repo, 'bin/standards.js'), 'install', '--project', project, '--yes'], project);

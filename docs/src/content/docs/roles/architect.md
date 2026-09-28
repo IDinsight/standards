@@ -33,7 +33,7 @@ from the scope. Where a condition needs no technical design, such as completing
 a user guide, the design explains which other work it depends on.
 
 Architect may update an appropriate existing project design document or create
-one at `docs/specs/<cycle-id>.md`. The path is saved in
+one at `.standards/docs/specs/<cycle-id>.md`. The path is saved in
 `Active Work.Architecture`. If a reused design document still covers another
 cycle's acceptance conditions, Architect moves that coverage under a "Previous
 Cycles" heading at the end of the document, so an old ID is never read as

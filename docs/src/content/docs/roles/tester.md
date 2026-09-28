@@ -34,10 +34,10 @@ committed work and affected code that did not change.
 
 Tests stay in the project's established test locations. The
 [verification report](../../reference/templates/tester/) is saved at
-`docs/verification/<Active Work.Id>.md`. It records what was checked, actual
-results, remaining gaps, and the next action. Each current acceptance condition
-and relevant technical criterion is linked to supporting evidence or an
-explanation of what is still missing.
+`.standards/docs/verification/<Active Work.Id>.md`. It records what was checked,
+actual results, remaining gaps, and the next action. Each current acceptance
+condition and relevant technical criterion is linked to supporting evidence or
+an explanation of what is still missing.
 
 ## Modes
 

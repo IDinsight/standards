@@ -25,9 +25,8 @@ context. In expedited work, the saved request defines the change. If safe
 completion needs a skipped role, the cycle moves to the standard workflow.
 
 Alongside code changes, Developer saves a
-[development plan](../../reference/templates/developer/), normally at
-`docs/development/<Active Work.Id>.md`. Your project's required plan directory
-can differ; the filename must still identify this cycle. The path is recorded in
+[development plan](../../reference/templates/developer/) at
+`.standards/docs/development/<Active Work.Id>.md`. The path is recorded in
 `Active Work.Development`.
 
 Each step has an ID such as `DEV-001`, an expected outcome, dependencies,

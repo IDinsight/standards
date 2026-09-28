@@ -169,6 +169,7 @@ test('interactive uninstall previews full removal and preserves files when decli
   assert.match(preview[2], /remove: \.standards/);
   assert.match(preview[2], /Clients: codex, claude/);
   assert.match(preview[2], /cycle-ID history/);
+  assert.match(preview[2], /cycle records/);
   assert.deepEqual(decline.calls.filter(([name]) => name === 'confirm').length, 1);
 
   const approve = fakePrompts([true]);
@@ -205,6 +206,7 @@ test('uninstall help explains deletion before resolving any project', async () =
   }), 0);
   assert.match(stdout.read(), /entire .standards/);
   assert.match(stdout.read(), /cycle-ID history/);
+  assert.match(stdout.read(), /every cycle record in \.standards\/docs\//);
   assert.match(stdout.read(), /global CLI stays installed/);
   assert.equal(stderr.read(), '');
 });

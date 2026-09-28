@@ -181,11 +181,11 @@ reason it does not prevent assessing this gate.
 Record each finding as a stable `### F-NNN` entry numbered with
 `node .standards/bin/id.mjs next F <report>`. Refer to a finding in the other
 report by path and ID, for example
-`docs/reviews/<Active Work.Id>/implementation.md#F-003`. Each finding includes
-severity, exact file/line or artifact section and assessed content identity,
-concrete triggering case, impact, supporting evidence, owning role/failure type,
-and the smallest necessary correction. These are finding IDs, not substitute
-acceptance IDs. Link affected ACs where applicable.
+`.standards/docs/reviews/<Active Work.Id>/implementation.md#F-003`. Each finding
+includes severity, exact file/line or artifact section and assessed content
+identity, concrete triggering case, impact, supporting evidence, owning
+role/failure type, and the smallest necessary correction. These are finding IDs,
+not substitute acceptance IDs. Link affected ACs where applicable.
 
 Finding status is `OPEN`, `RESOLVED`, or `WITHDRAWN`. Only Reviewer changes its
 finding status after independent assessment. Resolution records the checked fix

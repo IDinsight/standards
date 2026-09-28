@@ -33,10 +33,10 @@ criteria, move them under a final `## Previous Cycles` section first, as the
 protocol's **Acceptance Traceability** describes. If Architect creates a new
 design artifact, create it with
 `node .standards/bin/artifact.mjs init ARCHITECTURE`, which writes
-`docs/specs/<Active Work.Id>.md` with the current-cycle provenance block. Never
-overwrite, repurpose, or adopt a STANDARDS architecture artifact whose recorded
-cycle differs from `Active Work.Id`. Record the selected repository-relative
-path in `STATE.md` as `Active Work.Architecture`.
+`.standards/docs/specs/<Active Work.Id>.md` with the current-cycle provenance
+block. Never overwrite, repurpose, or adopt a STANDARDS architecture artifact
+whose recorded cycle differs from `Active Work.Id`. Record the selected
+repository-relative path in `STATE.md` as `Active Work.Architecture`.
 
 Do not change scope intent, write production code, tests, audit/context files,
 reviews, or user documentation.

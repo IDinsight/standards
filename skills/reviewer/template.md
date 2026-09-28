@@ -80,9 +80,9 @@ Reviewer diagnostics; explain what each result actually supports.
 Use stable report-local finding IDs numbered with
 `node .standards/bin/id.mjs next F <report>`. Refer to a finding in another
 report by path and ID, for example
-`docs/reviews/<Active Work.Id>/implementation.md#F-003`. Apply severity and
-status definitions from Reviewer SKILL.md. Write **No material findings** when
-none are established; do not fill a quota.
+`.standards/docs/reviews/<Active Work.Id>/implementation.md#F-003`. Apply
+severity and status definitions from Reviewer SKILL.md. Write **No material
+findings** when none are established; do not fill a quota.
 
 ## Questions, Limitations, and Later Dependencies
 
