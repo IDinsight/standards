@@ -19,13 +19,13 @@ assessments. There are no separate modes.
 
 ## Entry and Inputs
 
-Read all of `.standards/PROTOCOL.md` (in consecutive parts if a read is cut
-off), `.standards/MODE.md`, and `.standards/STATE.md` first. Perform role-owned
-work only in `SYNCHRONIZING` with an initialized active `STANDARD` cycle and a
-legal state/mode combination. Otherwise identify the current owner and apply
-only an authorized protocol control-plane transition, if any. Do not infer entry
-from chat or the existence of reports. `EXPEDITED` intentionally omits
-synchronization; a required guarantee uses **Expedited Promotion**, not an
+Read all of `.standards/PROTOCOL.md` (in consecutive parts if a read shows only
+part of it), `.standards/MODE.md`, and `.standards/STATE.md` first. Perform
+role-owned work only in `SYNCHRONIZING` with an initialized active `STANDARD`
+cycle and a legal state/mode combination. Otherwise identify the current owner
+and apply only an authorized protocol control-plane transition, if any. Do not
+infer entry from chat or the existence of reports. `EXPEDITED` intentionally
+omits synchronization; a required guarantee uses **Expedited Promotion**, not an
 invented expedited synchronization path.
 
 Read the active request, scope, architecture, Auditor context, development plan,

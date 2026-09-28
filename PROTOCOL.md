@@ -8,9 +8,10 @@ transitions, recovery, and the installed runtime in S.T.A.N.D.A.R.D.S.
 `README.md` explains the framework at a high level. Individual skills define
 role-specific behavior. This protocol defines the rules those skills must share.
 
-Read all of this file before workflow work. If a read stops before the end,
-continue from where it stopped until you reach **Canonical Terms**, the last
-section.
+Read all of this file before workflow work. It is longer than a single read in
+some tools. If a read shows only part of it, such as its beginning, or its
+beginning and end with lines left out between them, read the missing lines in
+consecutive parts before acting.
 
 ## How to read this document
 
@@ -1674,11 +1675,10 @@ fresh installation.
 
 ### Running the CLI
 
-Agents do not install, upgrade, or uninstall STANDARDS unless the user asks.
-`standards reset` and `standards uninstall` delete workflow data, so an agent
-runs them only when the user explicitly asks, or runs reset for **Greenfield
-Bootstrap Cancellation**, which defines its own approval steps. For either
-command:
+Agents run the `standards` CLI only when the user explicitly asks, except that
+they run reset for **Greenfield Bootstrap Cancellation**, which defines its own
+approval steps. `standards reset` and `standards uninstall` delete workflow
+data, so for either command:
 
 1. Pass `--project` with the project's absolute path and run the command with
    `--dry-run` first. Show the user the target, the planned changes, any

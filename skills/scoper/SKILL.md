@@ -43,8 +43,8 @@ reviews, or user documentation.
 
 ## Inputs
 
-Read all of `.standards/PROTOCOL.md` (in consecutive parts if a read is cut
-off), `.standards/MODE.md`, and `.standards/STATE.md` first. Perform
+Read all of `.standards/PROTOCOL.md` (in consecutive parts if a read shows only
+part of it), `.standards/MODE.md`, and `.standards/STATE.md` first. Perform
 Scoper-owned work only in `SCOPING` with an initialized `STANDARD` cycle; when
 `Active Work` is `UNSET`, initialize the first cycle as the protocol describes
 before scoping. Otherwise identify the current owner and apply only an

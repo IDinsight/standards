@@ -19,8 +19,8 @@ omissions, and defects. Do not silently replace their decisions.
 
 ## Entry and Inputs
 
-Read all of `.standards/PROTOCOL.md` (in consecutive parts if a read is cut
-off), `.standards/MODE.md`, and `.standards/STATE.md` first. Perform
+Read all of `.standards/PROTOCOL.md` (in consecutive parts if a read shows only
+part of it), `.standards/MODE.md`, and `.standards/STATE.md` first. Perform
 Reviewer-owned work only in `REVIEWING_IMPLEMENTATION` or `REVIEWING_FINAL` with
 an active cycle and a legal cycle/state combination. Otherwise identify the
 current owner and apply only an authorized protocol control-plane transition, if

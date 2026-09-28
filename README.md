@@ -193,6 +193,7 @@ without a reset, you resolve the merge conflict by keeping exactly one cycle in
 `STATE.md`. A role applies a user style from `.standards/user-styles/<role>/`
 only when you select it by name. Role ownership, standard and expedited forward
 transitions, promotion, recovery, user intervention, project-mode changes,
-cancellation/reset behavior, project context, user styles, installation
-ownership checks, and client-setting preservation are defined only in
-[`PROTOCOL.md`](PROTOCOL.md) and are intentionally not restated here.
+cancellation/reset behavior, project context, and user styles are defined only
+in [`PROTOCOL.md`](PROTOCOL.md), and installation ownership checks and
+client-setting preservation only in [`INSTALLER.md`](INSTALLER.md); they are
+intentionally not restated here.

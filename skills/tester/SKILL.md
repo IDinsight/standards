@@ -20,9 +20,9 @@ not conclusions to inherit.
 
 ## Entry and Inputs
 
-Read all of `.standards/PROTOCOL.md` (in consecutive parts if a read is cut
-off), `.standards/MODE.md`, and `.standards/STATE.md` before substantive work.
-Perform Tester-owned work only in `TESTING` with `CycleMode: STANDARD`.
+Read all of `.standards/PROTOCOL.md` (in consecutive parts if a read shows only
+part of it), `.standards/MODE.md`, and `.standards/STATE.md` before substantive
+work. Perform Tester-owned work only in `TESTING` with `CycleMode: STANDARD`.
 Otherwise identify the current owner and apply only an authorized protocol
 control-plane transition, if any; Tester has no expedited entry path.
 

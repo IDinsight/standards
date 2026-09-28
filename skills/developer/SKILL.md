@@ -47,8 +47,9 @@ Those results are not Tester-owned formal verification and do not replace the
 
 ## Inputs
 
-Read all of `.standards/PROTOCOL.md` (in consecutive parts if a read is cut
-off), `.standards/MODE.md`, and `.standards/STATE.md` before substantive work.
+Read all of `.standards/PROTOCOL.md` (in consecutive parts if a read shows only
+part of it), `.standards/MODE.md`, and `.standards/STATE.md` before substantive
+work.
 
 For `STANDARD` cycles, use:
 
