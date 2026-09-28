@@ -372,7 +372,16 @@ Runtime Contract**):
 
 - When an agent finishes a turn and workflow files have uncommitted changes,
   the stop hook runs `check`. If it finds problems, it sends the agent back once
-  with the list, and the agent handles them as described above.
+  with the list, and the agent handles them as described above. Because the
+  turn may have ended with a handoff, the hook does not hold the current
+  state's own `COMPLETE` records to full acceptance coverage; the role that
+  owns the state reconciles them when it starts, and its own `check` before
+  handing off still includes them. During recovery, when `check` otherwise
+  holds only the current state's `COMPLETE` records, the hook instead holds
+  those of the state named in `Handoff.From` after a `FORWARD`, `RESUME`, or
+  `FAILURE` handoff, which that state's role made with its records current. It
+  holds none while in `SCOPING`, because Scoper may have changed the acceptance
+  conditions since that handoff.
 - A pre-tool hook refuses agent edits to `.standards/CYCLE_IDS.md` made with
   file-editing tools or common shell commands. `check` reports a malformed or
   unregistered ID that gets through another way.
@@ -571,11 +580,18 @@ topology reaches `SCOPING`.
    their satisfaction or verification evidence is established in different
    workflow phases. The identifier is a reference, not an ordering guarantee.
    Get each new identifier with `node .standards/bin/id.mjs next AC <scope>`.
+   Define each condition as a Markdown list item, bulleted or numbered, that
+   starts with its identifier followed by a colon or dash, for example
+   ``- `AC-001`: Users can search by name.`` A table row, heading, or prose
+   mention does not define a condition, and `check` reports an identifier the
+   scope mentions without defining. This applies to a reused project scope
+   document too: write its current conditions in this form.
 2. During REPLAN, preserve an identifier when meaning is unchanged. New or
    materially replaced conditions receive previously unused identifiers.
    Removed or replaced identifiers remain in the scope's retired-identifier
-   record. Never renumber surviving identifiers or reuse retired ones within
-   the cycle.
+   record: list items in the same form under a
+   `## Retired Acceptance Identifiers` heading. Never renumber surviving
+   identifiers or reuse retired ones within the cycle.
 3. When a cycle reuses a canonical scope document that already holds another
    cycle's acceptance conditions, numbering continues from the highest
    identifier ever used in that document. Move the earlier cycle's conditions,

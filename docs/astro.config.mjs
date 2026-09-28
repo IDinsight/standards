@@ -54,6 +54,36 @@ export default defineConfig({
           ],
         },
         {
+          label: "Guides",
+          collapsed: true,
+          items: [
+            {
+              slug: "guides/new-project",
+            },
+            {
+              slug: "guides/existing-project",
+            },
+            {
+              slug: "guides/starting-a-cycle",
+            },
+            {
+              slug: "guides/working-with-developer",
+            },
+            {
+              slug: "guides/revising-scope-or-design",
+            },
+            {
+              slug: "guides/review-findings",
+            },
+            {
+              slug: "guides/resuming-work",
+            },
+            {
+              slug: "guides/cancelling-and-new-cycles",
+            },
+          ],
+        },
+        {
           label: "Roles",
           collapsed: false,
           items: [
@@ -86,36 +116,6 @@ export default defineConfig({
             },
             {
               slug: "roles/synchronizer",
-            },
-          ],
-        },
-        {
-          label: "Guides",
-          collapsed: true,
-          items: [
-            {
-              slug: "guides/new-project",
-            },
-            {
-              slug: "guides/existing-project",
-            },
-            {
-              slug: "guides/starting-a-cycle",
-            },
-            {
-              slug: "guides/working-with-developer",
-            },
-            {
-              slug: "guides/revising-scope-or-design",
-            },
-            {
-              slug: "guides/review-findings",
-            },
-            {
-              slug: "guides/resuming-work",
-            },
-            {
-              slug: "guides/cancelling-and-new-cycles",
             },
           ],
         },

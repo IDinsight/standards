@@ -8,6 +8,11 @@
 //
 // stop:         when workflow files changed, run the STANDARDS check and, if
 //               it finds problems, send the agent back once per turn with them.
+//               It does not hold the current state's own COMPLETE records to
+//               full acceptance coverage, since the turn may have ended with
+//               a handoff to that state's owner, who reconciles them. During
+//               recovery it holds the record of the state whose role made the
+//               last handoff instead, except while in SCOPING.
 // pre-tool-use: refuse direct agent edits to .standards/CYCLE_IDS.md, so cycle
 //               IDs are only reserved through `cycle.mjs new`.
 import { createHash } from 'node:crypto';
@@ -92,7 +97,7 @@ async function onStop(root, input) {
   // that do not send it.
   if (input.stop_hook_active === true) return 0;
   if (!(await workflowFilesChanged(root))) return 0;
-  const { problems } = await runCheck(root);
+  const { problems } = await runCheck(root, { atTurnEnd: true });
   if (problems.length === 0) return 0;
   if (typeof input.stop_hook_active !== 'boolean' && await markTurn(root, input) !== 'new') return 0;
   process.stderr.write(`${stopMessage(problems)}\n`);

@@ -85,9 +85,11 @@ for details.
 After a bootstrap reset, STANDARDS must be
 [installed again](../../getting-started/installation/) before another cycle. The
 installer checks the project's current contents and asks you to choose its mode,
-then creates a new runtime and cycle-ID registry. Existing project files and
-role outputs remain, including cycle-owned files that cannot be reused as new
-work.
+then creates a new runtime and cycle-ID registry. Your implementation, tests,
+and documentation outside `.standards/` remain, including a project scope or
+design document the cancelled cycle reused there. The reset deleted the cycle's
+records in `.standards/docs/`, such as its plan and reports, and its Auditor
+context, so the new cycle starts without them.
 
 At sign-off, requesting changes is rework of the active cycle. It is not a new
 cycle. See [Human Decisions and Sign-off](../../concepts/human-decisions/).

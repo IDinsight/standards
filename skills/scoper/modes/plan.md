@@ -19,8 +19,9 @@ Apply the Scoper skill's shared **Inputs**, **Ownership**, and **Invariants**.
 2. Resolve only ambiguities that materially change scope. Persist a blocking
    user question in `Active Work.BlockedOn` before asking it.
 3. Select the artifact path under the shared provenance rules. Reuse an
-   appropriate unmarked project-owned canonical scope document when applicable;
-   if it holds another cycle's acceptance conditions, move them under a final
+   appropriate unmarked project-owned canonical scope document when applicable,
+   and write this cycle's conditions in it in the template's list form; if it
+   holds another cycle's acceptance conditions, move them under a final
    `## Previous Cycles` section first. Otherwise create the scope with
    `node .standards/bin/artifact.mjs init SCOPE`. Record the repository-relative
    artifact path in `Active Work.Scope`.

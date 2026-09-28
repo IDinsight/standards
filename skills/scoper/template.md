@@ -118,6 +118,13 @@ not current obligations.
 - Assign every scope-level acceptance condition a unique `AC-NNN` identifier
   within the active cycle. Treat the identifier as a stable reference, not as an
   ordering guarantee.
+- Define each condition as a list item, bulleted or numbered, that starts with
+  its identifier followed by a colon or dash, as in **Done when** above:
+  ``- `AC-001`: <condition>``. Do not define conditions in a table, heading, or
+  prose; `check` does not recognize those forms and reports the identifier as
+  undefined. Retired identifiers use the same form under
+  `## Retired Acceptance Identifiers`. When reusing a project scope document,
+  rewrite its current conditions in this form.
 - During REPLAN, preserve an acceptance identifier when the condition keeps the
   same meaning. Use a new, previously unused identifier for a new or materially
   replaced condition. Record removed or replaced identifiers under **Retired

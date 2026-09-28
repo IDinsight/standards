@@ -358,6 +358,36 @@ test('during a rerun, the current state\'s own COMPLETE record must cover a new 
   assert.equal((await coverage()).some((line) => line.startsWith(`${spec}:`)), false);
 }));
 
+test('a condition the scope mentions without defining is reported on the scope, marked or not', () => project(async (root) => {
+  const { scope, spec, report } = await standardCycle(root);
+  const undefinedHere = /AC-00\d appears in the scope but is not defined as a condition\. Each condition must be a list item/;
+  // A table row does not define a condition, so Scoper's own check reports it on the scope.
+  await write(root, scope, (await read(root, scope)).replace('- `AC-001`: Users can search by name.\n',
+    '| ID | Condition |\n| - | - |\n| `AC-001` | Users can search by name. |\n'));
+  let lines = messages(await check(root));
+  assert.ok(lines.some((line) => line.startsWith(`${scope}: `) && undefinedHere.test(line)), lines.join('\n'));
+  // The scope gets that one message, not a second one as a record citing its own ID.
+  assert.equal(lines.filter((line) => line.startsWith(`${scope}: `) && line.includes('AC-001')).length, 1, lines.join('\n'));
+  // A record that cites it is told why the ID is undefined.
+  const cited = `${spec}: mentions AC-001, which appears in the scope ${scope} but is not defined there as a condition.`;
+  assert.ok(lines.some((line) => line.startsWith(cited)), lines.join('\n'));
+  // The same holds for an unmarked project document used as the scope, whose check used to pass silently.
+  await write(root, 'docs/requirements.md', '# Requirements\n\n## Acceptance\n\n### AC-001 — Search by name\n\n'
+    + '- `AC-002`: The guide explains search.\n');
+  await editState(root, (text) => setField(text, 'Scope', 'docs/requirements.md'));
+  lines = messages(await check(root));
+  assert.ok(lines.some((line) => line.startsWith('docs/requirements.md: AC-001 appears in the scope')), lines.join('\n'));
+  // Mentions in a code block or under Previous Cycles are not reported.
+  await write(root, 'docs/requirements.md', '# Requirements\n\n## Acceptance\n\n- `AC-001`: Search by name.\n'
+    + '- `AC-002`: The guide explains search.\n\n```md\n| `AC-007` | Example |\n```\n\n'
+    + '## Previous Cycles\n\n| `AC-000` | An earlier condition in a table. |\n');
+  await write(root, report, `${await read(root, report)}\nSee AC-000.\n`);
+  lines = messages(await check(root));
+  assert.equal(lines.some((line) => /appears in the scope/.test(line)), false, lines.join('\n'));
+  // A record citing an ID found only in that history gets the plain message, not the format hint.
+  assert.ok(lines.includes(`${report}: mentions AC-000, which is not defined in the scope docs/requirements.md.`), lines.join('\n'));
+}));
+
 test('design coverage and paths are checked from the state after ARCHITECTING', () => project(async (root) => {
   const { scope, spec } = await standardCycle(root);
   await write(root, scope, (await read(root, scope)).replace('## Retired', '- `AC-005`: Search is fast.\n\n## Retired'));
@@ -519,6 +549,97 @@ test('stop sends the agent back on every turn with problems, but not while it is
   await rm(path.join(root, 'docs/notes/broken.md'));
   assert.equal((await hook(root, 'stop', claudeStop(root, session, false))).code, 0);
 }, { withGit: true }));
+
+test('at turn end, stop holds the role that made the last handoff, not the one that took over', () => project(async (root) => {
+  const { scope, spec, report } = await standardCycle(root);
+  const session = randomUUID();
+  const review = await init(root, 'REVIEW', '--kind', 'IMPLEMENTATION');
+  await fillHeader(root, review, { Status: 'COMPLETE' });
+  await write(root, review, `${await read(root, review)}\n## Contract and Evidence Assessment\n\nAC-001 and AC-002 supported.\n`);
+  const docs = await init(root, 'DOCUMENTATION');
+  await fillHeader(root, docs, { Status: 'COMPLETE', Collaboration: 'AUTONOMOUS', Target: 'ACTIVE_CHANGE',
+    'Target Detail': 'active cycle', 'User Style': 'NONE' });
+  await write(root, docs, `${await read(root, docs)}\n## Documentation Work and Evidence\n\nAC-001 and AC-002 documented.\n`);
+  // A user rework added AC-005; every COMPLETE record above is now stale.
+  await write(root, scope, (await read(root, scope)).replace('## Retired', '- `AC-005`: Results are paged.\n\n## Retired'));
+  const frame = (number, from, owner, type, rerun) => `### Frame ${number}\n\n\`From\`: \`${from}\` \`Owner\`: \`${owner}\` `
+    + `\`FailureType\`: \`${type}\`\n\`Reason\`: \`Paging was added.\` \`ResumeAt\`: \`${from}\` \`RerunThrough\`: \`${rerun}\`\n\n`;
+  const rework = frame(1, 'AWAITING_USER_SIGNOFF', 'SCOPING', 'SCOPING', 'SYNCHRONIZING');
+  // Put the workflow in a state after a given handoff, then run the stop hook.
+  async function after({ state, kind, from, failureType = 'NONE', frames = [] }) {
+    await editState(root, (text) => [['WorkflowState', state], ['Kind', kind], ['From', from], ['FailureType', failureType]]
+      .reduce((current, [name, value]) => setField(current, name, value), text)
+      .replace(/## Recovery[\s\S]*?(?=## Outstanding)/, `## Recovery\n\n\`Active\`: \`${frames.length > 0}\`\n\n${frames.join('')}`));
+    return hook(root, 'stop', claudeStop(root, session, false));
+  }
+  const stale = (file) => new RegExp(`${file}: (is COMPLETE but )?does not account for AC-005`);
+  const expectSentBack = (result, cited, spared) => {
+    assert.equal(result.code, 2, result.stderr);
+    for (const file of cited) assert.match(result.stderr, stale(file));
+    for (const file of spared) assert.doesNotMatch(result.stderr, stale(file));
+  };
+
+  // During a rerun, the role that just took over is never blamed for its own stale record.
+  let result = await after({ state: 'TESTING', kind: 'FORWARD', from: 'DEVELOPING', frames: [rework] });
+  assert.equal(result.code, 0, result.stderr);
+  // Running check directly still reports it to that role.
+  hasProblem(await check(root), stale(report));
+  // A FORWARD, RESUME, or FAILURE handoff was made by its From state's role, so that record is held.
+  expectSentBack(await after({ state: 'REVIEWING_IMPLEMENTATION', kind: 'FORWARD', from: 'TESTING', frames: [rework] }),
+    [report], [review, spec]);
+  expectSentBack(await after({ state: 'REVIEWING_IMPLEMENTATION', kind: 'RESUME', from: 'TESTING', frames: [rework] }),
+    [report], [review, spec]);
+  expectSentBack(await after({ state: 'ARCHITECTING', kind: 'FAILURE', from: 'TESTING', failureType: 'ARCHITECTURE',
+    frames: [rework, frame(2, 'TESTING', 'ARCHITECTING', 'ARCHITECTURE', 'NONE')] }), [report], [spec]);
+  // Any agent may record a user rework, so its From state's record is not held:
+  // here the user asks for an implementation change before Tester has started.
+  result = await after({ state: 'DEVELOPING', kind: 'USER_REWORK', from: 'TESTING', failureType: 'IMPLEMENTATION',
+    frames: [rework, frame(2, 'TESTING', 'DEVELOPING', 'IMPLEMENTATION', 'NONE')] });
+  assert.equal(result.code, 0, result.stderr);
+  // Nor is anything held in SCOPING, where Scoper may have changed the conditions since the handoff.
+  result = await after({ state: 'SCOPING', kind: 'RESUME', from: 'DOCUMENTING', frames: [rework] });
+  assert.equal(result.code, 0, result.stderr);
+
+  // Outside recovery, every earlier state's record is held, not just the one handed off from...
+  expectSentBack(await after({ state: 'DOCUMENTING', kind: 'FORWARD', from: 'REVIEWING_IMPLEMENTATION' }),
+    [report, review, spec], [docs]);
+  // ...and the current state's own record is still left to its owner, while check reports it.
+  expectSentBack(await after({ state: 'REVIEWING_IMPLEMENTATION', kind: 'RESUME', from: 'TESTING' }), [report, spec], [review]);
+  hasProblem(await check(root), stale(review));
+}));
+
+test('during a rerun, the design is held once Architect hands off, not while it is interrupted', () => project(async (root) => {
+  const { scope, spec } = await standardCycle(root);
+  // A user rework added AC-005 and the design does not cover it yet.
+  await write(root, scope, (await read(root, scope)).replace('## Retired', '- `AC-005`: Results are paged.\n\n## Retired'));
+  const frame = (number, from, owner, type, rerun) => `### Frame ${number}\n\n\`From\`: \`${from}\` \`Owner\`: \`${owner}\` `
+    + `\`FailureType\`: \`${type}\`\n\`Reason\`: \`Paging was added.\` \`ResumeAt\`: \`${from}\` \`RerunThrough\`: \`${rerun}\`\n\n`;
+  const rework = frame(1, 'AWAITING_USER_SIGNOFF', 'SCOPING', 'SCOPING', 'SYNCHRONIZING');
+  const gap = new RegExp(`^${spec}: does not account for AC-005`);
+  // Put the workflow in a state after a given handoff and report whether check finds the design gap.
+  async function designGap({ state, kind, from, failureType = 'NONE', frames = [rework] }) {
+    await editState(root, (text) => [['WorkflowState', state], ['Kind', kind], ['From', from], ['FailureType', failureType]]
+      .reduce((current, [name, value]) => setField(current, name, value), text)
+      .replace(/## Recovery[\s\S]*?(?=## Outstanding)/, `## Recovery\n\n\`Active\`: \`true\`\n\n${frames.join('')}`));
+    return messages(await check(root)).some((line) => gap.test(line));
+  }
+  // While Architect is working on the rerun, the design is not held yet.
+  assert.equal(await designGap({ state: 'ARCHITECTING', kind: 'RESUME', from: 'SCOPING' }), false);
+  // Once Architect hands off forward or resumes, it must cover every current condition...
+  assert.equal(await designGap({ state: 'DEVELOPING', kind: 'FORWARD', from: 'ARCHITECTING' }), true);
+  const sent = await hook(root, 'stop', claudeStop(root, randomUUID(), false));
+  assert.equal(sent.code, 2);
+  assert.match(sent.stderr, new RegExp(`${spec}: does not account for AC-005`));
+  assert.equal(await designGap({ state: 'TESTING', kind: 'RESUME', from: 'ARCHITECTING' }), true);
+  // ...but a FAILURE from ARCHITECTING interrupted the design,
+  assert.equal(await designGap({ state: 'AUDITING', kind: 'FAILURE', from: 'ARCHITECTING', failureType: 'PROJECT_CONTEXT',
+    frames: [rework, frame(2, 'ARCHITECTING', 'AUDITING', 'PROJECT_CONTEXT', 'NONE')] }), false);
+  // a user rework may be recorded by any agent,
+  assert.equal(await designGap({ state: 'DEVELOPING', kind: 'USER_REWORK', from: 'ARCHITECTING', failureType: 'IMPLEMENTATION',
+    frames: [rework, frame(2, 'ARCHITECTING', 'DEVELOPING', 'IMPLEMENTATION', 'NONE')] }), false);
+  // and in SCOPING, Scoper may have changed the conditions since Architect handed off.
+  assert.equal(await designGap({ state: 'SCOPING', kind: 'RESUME', from: 'ARCHITECTING' }), false);
+}));
 
 test('without stop_hook_active, stop falls back to sending the agent back once per turn', () => project(async (root) => {
   await write(root, 'docs/notes/broken.md', '<!-- STANDARDS\nArtifact: NOPE\nCycle: x-1\n-->\n');

@@ -10,7 +10,7 @@ import { readdir } from 'node:fs/promises';
 import path from 'node:path';
 
 import { FAILURE_TYPES, HANDOFF_KINDS, STATES, TERMINAL_STATES, UsageError, committedText, exists, fieldPairs, git, isMain, printProblem, projectRootFor, readText } from './lib/core.mjs';
-import { LOCAL_PREFIX, QUALIFIED_PREFIXES, RECORDS_ROOT, acceptanceInventory, bareIds, fixedPath, fixedRecords, headerFields, headingIds, parseProvenance, qualifiedReferences, recordName, scanArtifacts, withoutLinkLabels, withoutPreviousCycles } from './lib/records.mjs';
+import { LOCAL_PREFIX, QUALIFIED_PREFIXES, RECORDS_ROOT, acceptanceInventory, acceptanceMentions, bareIds, fixedPath, fixedRecords, headerFields, headingIds, parseProvenance, qualifiedReferences, recordName, scanArtifacts, withoutLinkLabels, withoutPreviousCycles } from './lib/records.mjs';
 import { modeFromFile, parseState, validateRegistry, validateState } from './lib/state.mjs';
 
 const RUNTIME_FILES = ['PROTOCOL.md', 'VERSION.json', 'INSTALLATION.json', 'CYCLE_IDS.md', 'MODE.md', 'STATE.md'];
@@ -26,7 +26,8 @@ const pastArchitecture = (state, mode) => rank(state) > 0 || (state === 'AUDITIN
 // The state that completes each record. From that state on, a COMPLETE record
 // must account for every current acceptance condition, so its owner's own
 // check before handoff catches a gap. During recovery only the current state's
-// own record is held to this; see checkAcceptance.
+// own record is held to this, and at the end of a turn the stop hook holds a
+// different record set; see `held` in checkAcceptance.
 const COMPLETED_IN = {
   VERIFICATION: 'TESTING', DOCUMENTATION: 'DOCUMENTING', SYNCHRONIZATION: 'SYNCHRONIZING',
   'REVIEW:IMPLEMENTATION': 'REVIEWING_IMPLEMENTATION', 'REVIEW:FINAL_DELIVERABLE': 'REVIEWING_FINAL',
@@ -45,6 +46,9 @@ const EXAMPLE_RECORD = {
   DOC: fixedPath('DOCUMENTATION', '<cycle>'),
 };
 const COLLISION = 'Treat it as a collision: leave it unchanged and ask the user how to resolve it.';
+// How a scope defines a condition (PROTOCOL.md, Acceptance Traceability).
+const DEFINE_CONDITION = 'Each condition must be a list item that starts with its ID, for example '
+  + '"- `AC-001`: <condition>"; a table row, heading, or prose mention does not define it.';
 
 const within = (file) => (message) => message.replace(` in ${file}`, '');
 const ownersOf = (failureType) => FAILURE_OWNER[failureType] ?? [];
@@ -300,29 +304,70 @@ async function checkAcceptance(root, context) {
     }
   }
 
+  // An ID the scope mentions without defining is written in a form that does
+  // not count, such as a table row or a heading. Reporting it on the scope lets
+  // Scoper's own check catch it, including in an unmarked project document.
   const known = new Set([...current, ...retired, ...previous]);
+  for (const id of acceptanceMentions(scope)) {
+    if (!known.has(id)) problem(`${id} appears in the scope but is not defined as a condition. ${DEFINE_CONDITION}`);
+  }
+  const inScope = new Set(acceptanceMentions(scope));
   for (const artifact of mine) {
+    if (artifact.path === scopePath) continue;
     for (const id of bareIds(artifact.text, ['AC'])) {
-      if (!known.has(id)) report(artifact.path, `mentions ${id}, which is not defined in the scope ${scopePath}.`);
+      if (known.has(id)) continue;
+      report(artifact.path, inScope.has(id)
+        ? `mentions ${id}, which appears in the scope ${scopePath} but is not defined there as a condition. ${DEFINE_CONDITION}`
+        : `mentions ${id}, which is not defined in the scope ${scopePath}.`);
     }
   }
 
   // During recovery, states run out of order: the design and other roles'
   // records may be stale until the rerun reaches them. Only the record the
-  // current state owns is checked then, since its owner is about to hand off.
+  // current state owns is checked then, since its owner is about to hand off,
+  // and the design once Architect has handed it off (below). At the end of a
+  // turn, the hook holds the record of the role that made the last handoff
+  // instead of the current state's (see `held`).
   const recovering = state.recovery.active;
   const missing = (text) => [...current].filter((id) => !bareIds(text, ['AC']).includes(id));
-  if (!recovering && pastArchitecture(workflowState, context.mode) && context.architecture !== null) {
+  // The state whose role made the last handoff, for the given kinds. Only a
+  // FORWARD, RESUME, or FAILURE handoff is made by its From state's own role;
+  // any agent may record a USER_REWORK, whose From state's owner may not have
+  // reconciled its work yet. Handoff.From stays set until the next handoff,
+  // and only Scoper changes the acceptance conditions, so nothing is taken
+  // from it while in SCOPING: Scoper's changes may have made that work stale.
+  const handedOffBy = (kinds) => (workflowState !== 'SCOPING' && kinds.includes(state.handoff.Kind)
+    ? state.handoff.From : null);
+  // The design has no Status, so it is held once Architect has handed off:
+  // outside recovery, in any state after ARCHITECTING; during recovery, while
+  // the last handoff is a FORWARD or RESUME from ARCHITECTING, which Architect
+  // makes only after passing its gate. A FAILURE from ARCHITECTING interrupts
+  // the design, so it is not held then.
+  const designDone = recovering
+    ? handedOffBy(['FORWARD', 'RESUME']) === 'ARCHITECTING'
+    : pastArchitecture(workflowState, context.mode);
+  if (designDone && context.architecture !== null) {
     for (const id of missing(withoutPreviousCycles(context.architecture))) {
       report(path.posix.normalize(state.active.architecture), `does not account for ${id}. Every current acceptance condition needs design coverage or "No architectural impact".`);
     }
   }
+  // At the end of a turn, the current state's own record is left to its owner.
+  // Right after a handoff it still carries its last COMPLETE status, and the
+  // role that just took over reconciles it when it starts; the owner's own
+  // check before handing off still holds it to full coverage. During recovery
+  // the record of the state whose role made the last handoff is held instead:
+  // that role made the handoff, so its record had to be current then.
+  const justLeft = handedOffBy(['FORWARD', 'RESUME', 'FAILURE']);
+  const held = (phase) => {
+    if (context.atTurnEnd && phase === workflowState) return false;
+    if (recovering) return phase === (context.atTurnEnd ? justLeft : workflowState);
+    return rank(workflowState) >= rank(phase);
+  };
   for (const artifact of mine) {
     const key = artifact.provenance.artifact === 'REVIEW'
       ? `REVIEW:${artifact.provenance.reviewKind}` : artifact.provenance.artifact;
     const phase = COMPLETED_IN[key];
-    if (!phase || headerFields(artifact.text).Status !== 'COMPLETE') continue;
-    if (recovering ? phase !== workflowState : rank(workflowState) < rank(phase)) continue;
+    if (!phase || headerFields(artifact.text).Status !== 'COMPLETE' || !held(phase)) continue;
     for (const id of missing(artifact.text)) {
       report(artifact.path, `is COMPLETE but does not account for ${id}.`);
     }
@@ -383,7 +428,7 @@ async function readRecord(root, relative) {
   }
 }
 
-async function checkActiveCycle(root, state, mode, artifacts, report) {
+async function checkActiveCycle(root, state, mode, artifacts, report, { atTurnEnd }) {
   const { id } = state.active;
   if (id === 'UNSET' || TERMINAL_STATES.has(state.WorkflowState)) return;
   const recovering = state.recovery.active;
@@ -566,7 +611,9 @@ async function checkActiveCycle(root, state, mode, artifacts, report) {
     }
   }
   if (standard && texts.Scope !== undefined) {
-    await checkAcceptance(root, { state, mode, scope: texts.Scope, architecture: texts.Architecture ?? null, mine, report });
+    await checkAcceptance(root, {
+      state, mode, scope: texts.Scope, architecture: texts.Architecture ?? null, mine, report, atTurnEnd,
+    });
   }
   if (state.CycleMode === 'EXPEDITED') {
     for (const artifact of mine) {
@@ -576,7 +623,9 @@ async function checkActiveCycle(root, state, mode, artifacts, report) {
   }
 }
 
-export async function runCheck(root) {
+// `atTurnEnd` is set by the stop hook, which runs after the agent's last
+// action, possibly a handoff (see checkAcceptance).
+export async function runCheck(root, { atTurnEnd = false } = {}) {
   const problems = [];
   const notes = [];
   const reported = new Set();
@@ -654,7 +703,7 @@ export async function runCheck(root) {
       report(artifact.path, `has a malformed provenance block (${artifact.provenance.error}). ${COLLISION}`);
     }
   }
-  if (state) await checkActiveCycle(root, state, mode, artifacts, report);
+  if (state) await checkActiveCycle(root, state, mode, artifacts, report, { atTurnEnd });
   return { problems, notes };
 }
 

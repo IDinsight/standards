@@ -234,8 +234,18 @@ function definedIds(line) {
   return match ? match[1].match(/AC-\d{3,}/g) : [];
 }
 
+// Acceptance IDs a scope mentions anywhere before "## Previous Cycles" and
+// outside code blocks, whether or not the mention is a definition. An ID found
+// here but missing from the inventory below is written in a form that does not
+// define it, such as a table row or a heading.
+export function acceptanceMentions(text) {
+  const lines = markdownLines(withoutPreviousCycles(text)).filter((entry) => !entry.fenced);
+  return bareIds(lines.map(({ line }) => line).join('\n'), ['AC']);
+}
+
 // Acceptance conditions in a scope document. Definitions are list items that
-// start with the identifier, e.g. "- `AC-001`: ...", outside code blocks.
+// start with the identifier, e.g. "- `AC-001`: ...", outside code blocks
+// (PROTOCOL.md, Acceptance Traceability).
 // Items under "## Retired Acceptance Identifiers" are retired; everything from
 // "## Previous Cycles" to the end belongs to earlier cycles that reused this
 // document.

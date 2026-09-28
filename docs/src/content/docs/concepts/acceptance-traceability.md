@@ -19,10 +19,13 @@ work to count as done. Each gets an ID that is unique within the cycle.
 
 Outcomes checked at different steps need separate conditions. For example:
 
-| ID       | Acceptance condition                                  |
-| -------- | ----------------------------------------------------- |
-| `AC-001` | A user can export the selected records as a CSV file. |
-| `AC-002` | The user guide explains how to export records.        |
+- `AC-001`: A user can export the selected records as a CSV file.
+- `AC-002`: The user guide explains how to export records.
+
+Each condition is a list item that starts with its ID, as above. A table row,
+heading, or sentence that mentions an ID does not define a condition, and the
+[workflow check](../../reference/runtime-files/#runtime-tools) reports an ID the
+scope mentions without defining it.
 
 Tester can check the export behavior before Documenter finishes the guide.
 Combining both outcomes under one ID would make their progress harder to judge.
