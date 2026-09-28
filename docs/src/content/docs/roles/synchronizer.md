@@ -30,6 +30,12 @@ at `.standards/docs/synchronization/<Active Work.Id>.md`. It links to the
 supporting evidence, explains disagreements or missing information, and records
 whether work is ready for your decision.
 
+You can select a [user style](../../reference/runtime-files/#user-styles) you
+keep at `.standards/user-styles/synchronizer/<name>.md`. The record saves the
+selection, and Synchronizer reloads it when it resumes. A style shapes how the
+record and summary are written, never what counts as a disagreement or whether
+work is ready.
+
 ## Modes
 
 Synchronizer has no separate modes. When you resume it, it checks what changed

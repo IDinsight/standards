@@ -97,7 +97,7 @@ Run `pnpm run docs:build` and `pnpm run docs:check-links` to validate the
 documentation. See [the documentation README](docs/README.md) for preview and
 reference-generation commands.
 
-## Install and Uninstall
+## Install, Reset, and Uninstall
 
 Install the latest public release with Node.js 22.12 or newer:
 
@@ -107,19 +107,29 @@ npx @idinsight/standards@latest install
 
 In a terminal, the installer asks for the project directory (default: the
 current directory), project mode, coding agents, and whether to install the
-STANDARDS hooks, then previews its changes for confirmation. You can pass
+STANDARDS stop hook, then previews its changes for confirmation. You can pass
 `--project`, `--mode`, `--client`, and `--hooks` or `--no-hooks` to supply
 answers; `--yes` skips all questions and uses the defaults for omitted options.
 On a reinstall, the defaults keep the installed coding agents and hook choice.
 Piped or automated runs also use those defaults without prompting. The installer
 does not add a package dependency or start a workflow cycle.
 
-The hooks run `node .standards/bin/check.mjs` when an agent finishes a turn and
-block agent edits to the cycle-ID registry made with file-editing tools or
-common shell commands. Codex runs them only after you trust them with `/hooks`.
-See
+The stop hook runs `node .standards/bin/check.mjs` when an agent finishes a turn
+with uncommitted workflow changes. Codex runs it only after you trust it with
+`/hooks`. See
 [Installation and Setup](docs/src/content/docs/getting-started/installation.md)
-for options, upgrades, and uninstall instructions.
+for options, upgrades, reset, and uninstall instructions.
+
+To start the workflow over without reinstalling, run
+`npx @idinsight/standards@<version> reset`, where `<version>` is the version
+recorded in `.standards/VERSION.json`; a global `standards reset` works when it
+has that version. Reset deletes the saved workflow state, Auditor context, and
+every cycle record in `.standards/docs/`, writes a fresh `STATE.md` and
+`MODE.md`, and chooses the project mode again from `--mode` or the project's
+contents. The protocol, tools, skills, stop hook, client settings, and user
+styles stay. In a terminal it asks for the mode, previews its changes, and asks
+for confirmation; `--dry-run` previews without changes and `--yes` skips the
+prompts.
 
 Run `npx @idinsight/standards@latest uninstall` in a terminal to select a
 project, preview everything it will remove, and confirm. To preview removal
@@ -131,12 +141,13 @@ npx @idinsight/standards@latest uninstall --project /absolute/path/to/project --
 
 Use `--yes` with `uninstall` to skip confirmation in scripts. Uninstall deletes
 the installed skills and the entire `.standards/` directory, including saved
-workflow history, context, every cycle record in `.standards/docs/`, and any
-files you added there. The preview warns how many cycle records it will delete.
-It also removes managed instruction blocks, the STANDARDS hooks, and matching
-installer-added settings. Project work outside the removed directories is
-preserved. Installer-created client directories are removed when empty. Existing
-files and directories stay. A globally installed CLI stays installed.
+workflow history, context, every cycle record in `.standards/docs/`, user
+styles, and any files you added there. The preview warns how many cycle records
+and user styles it will delete. It also removes managed instruction blocks, the
+STANDARDS stop hook, and matching installer-added settings. Project work outside
+the removed directories is preserved. Installer-created client directories are
+removed when empty. Existing files and directories stay. A globally installed
+CLI stays installed.
 
 The installer supports greenfield and brownfield projects. The authoritative
 installer and runtime requirements live in [`PROTOCOL.md`](PROTOCOL.md),
@@ -147,9 +158,9 @@ protocol and workflow skills for the chosen coding agent, applies explicit-only
 invocation controls, merges the managed `AGENTS.md` / `CLAUDE.md` integration
 without overwriting project-owned instructions, and initializes runtime
 coordination files only when needed. Reinstallation preserves active workflow
-state and project-owned artifacts. STANDARDS has no migration between major
-versions: moving a project to a new major version means uninstalling and
-installing again, which deletes `.standards/`.
+state, user styles, and project-owned artifacts. STANDARDS has no migration
+between major versions: moving a project to a new major version means
+uninstalling and installing again, which deletes `.standards/`.
 
 A typical installed project will contain:
 
@@ -160,25 +171,26 @@ project/
 ├── .standards/
 │   ├── bin/              # tools the agent runs, including check.mjs
 │   ├── docs/             # cycle records, created as roles work
-│   ├── CYCLE_IDS.md
+│   ├── user-styles/      # optional personal styles you add, per role
 │   ├── INSTALLATION.json
 │   ├── MODE.md
 │   ├── PROTOCOL.md
 │   ├── STATE.md
 │   └── VERSION.json
 ├── <agent-specific skill installation>
-└── <hook settings>       # .claude/settings.json, .codex/hooks.json
+└── <stop hook settings>  # .claude/settings.json, .codex/hooks.json
 ```
 
 `STATE.md` is the persisted coordination record for the active cycle, including
-its `WorkflowState`, `CycleMode`, and pending-cycle coordination fields.
-`CYCLE_IDS.md` is the append-only reservation registry that prevents cycle-ID
-reuse for as long as the S.T.A.N.D.A.R.D.S. runtime remains installed. Each
-branch carries at most one active cycle; if you merge branches whose
-`.standards/` files both changed, you resolve the merge conflict by keeping
-every `CYCLE_IDS.md` line and exactly one cycle in `STATE.md`. Role ownership,
-standard and expedited forward transitions, promotion, recovery, user
-intervention, project-mode changes, cancellation/reset behavior, project
-context, installation ownership checks, and client-setting preservation are
-defined only in [`PROTOCOL.md`](PROTOCOL.md) and are intentionally not restated
-here.
+its `WorkflowState`, `CycleMode`, and pending-cycle coordination fields. Commit
+`.standards/` with the project, so anyone who checks out a branch continues its
+workflow; each branch carries at most one active cycle. Run `standards reset` on
+a branch before merging it into the main branch, so the main branch keeps a
+fresh installation. If you merge branches whose `.standards/` files both changed
+without a reset, you resolve the merge conflict by keeping exactly one cycle in
+`STATE.md`. A role applies a user style from `.standards/user-styles/<role>/`
+only when you select it by name. Role ownership, standard and expedited forward
+transitions, promotion, recovery, user intervention, project-mode changes,
+cancellation/reset behavior, project context, user styles, installation
+ownership checks, and client-setting preservation are defined only in
+[`PROTOCOL.md`](PROTOCOL.md) and are intentionally not restated here.

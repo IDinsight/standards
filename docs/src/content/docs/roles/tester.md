@@ -39,6 +39,12 @@ actual results, remaining gaps, and the next action. Each current acceptance
 condition and relevant technical criterion is linked to supporting evidence or
 an explanation of what is still missing.
 
+You can select a [user style](../../reference/runtime-files/#user-styles) you
+keep at `.standards/user-styles/tester/<name>.md`, such as how you like tests
+named. The report saves the selection, Tester reloads it when it resumes, and
+you can change it during the cycle. It never overrides the requirements,
+repository tooling, or established test conventions.
+
 ## Modes
 
 Starting a new chat does not reset the work. A change to requirements can

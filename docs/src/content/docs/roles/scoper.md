@@ -38,6 +38,12 @@ conditions, it moves them under a "Previous Cycles" heading at the end of the
 document and continues numbering from the highest ID, so an ID never changes
 meaning.
 
+You can select a [user style](../../reference/runtime-files/#user-styles) you
+keep at `.standards/user-styles/scoper/<name>.md`. Scoper has no record for it,
+so the selection lasts for the current chat; name it again when you resume. A
+style never changes the scope's required shape or the form of acceptance
+conditions.
+
 ## Modes
 
 ### PLAN

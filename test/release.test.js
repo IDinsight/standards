@@ -12,7 +12,10 @@ const source = fileURLToPath(new URL('../', import.meta.url));
 // What a release needs: the published package files plus the upgrade fixtures.
 const PARTS = ['bin', 'lib', 'runtime', 'skills', 'templates', 'PROTOCOL.md', 'package.json', 'test/fixtures/upgrade'];
 
-const git = (repo, ...args) => execFileSync('git', ['-C', repo, '-c', 'user.name=Test', '-c', 'user.email=test@example.com', ...args],
+// Automatic maintenance is off: after a commit, git may repack in a detached
+// process, which races the removal of the temporary repository.
+const git = (repo, ...args) => execFileSync('git', ['-C', repo, '-c', 'user.name=Test', '-c', 'user.email=test@example.com',
+  '-c', 'maintenance.auto=false', '-c', 'gc.auto=0', ...args],
   { encoding: 'utf8' });
 
 // A git repository whose first commit, tagged as a release, is this checkout.

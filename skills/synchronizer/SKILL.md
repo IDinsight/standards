@@ -44,6 +44,12 @@ Own only the synchronization record and correction of reconciliation errors. Use
 provenance before writing; preserve unrelated content and other cycles. Protocol
 coordination updates remain governed by the protocol.
 
+Apply a user style only as the protocol's **User Styles** defines: the user
+explicitly selects `.standards/user-styles/synchronizer/<identifier>.md`, and
+the record persists its identifier as `User Style`, `NONE` by default, and
+reloads it on resume. A style shapes how the record and summary are written,
+never what counts as a discrepancy or whether the gate passes.
+
 | Discrepancy concerns                         | Owner / failure type               |
 | -------------------------------------------- | ---------------------------------- |
 | Code or Developer plan/claims                | Developer / `IMPLEMENTATION`       |

@@ -25,11 +25,11 @@ The sections are grouped and ordered to be read in sequence:
    the bounded brownfield path and its one-way promotion to standard.
 6. **User decisions** (`User Decisions and Intervention`) — the control-plane
    transitions only the user authorizes.
-7. **Formats and reference** (`Cycle ID Registry` to `Project context
-   lifecycle`) — cycle-ID allocation, the `STATE.md` field contract, artifact
-   provenance, and the project-context lifecycle.
+7. **Formats and reference** (`Cycle IDs` to `User Styles`) — cycle IDs, the
+   `STATE.md` field contract, artifact provenance, the project-context
+   lifecycle, and user styles.
 8. **Installed runtime** (`Installed Runtime Contract`) — what installation
-   creates, preserves, and removes.
+   creates, preserves, resets, and removes.
 
 The grouping is for orientation purposes only: a role applies every applicable
 rule regardless of where it appears. **Canonical Terms** at the end defines each
@@ -92,7 +92,9 @@ project implementation artifact. The trigger is implementation existence, not
 authorship: it applies equally to code written by Developer and code applied by
 the user during Developer collaboration. Workflow metadata and role-owned
 planning, context, test, review, or documentation artifacts do not count as
-project implementation. The mode never reverts, including during recovery.
+project implementation. The mode never reverts, including during recovery;
+only **Project Reset** chooses it again, from the project's contents at that
+time.
 
 For a `STANDARD` cycle:
 
@@ -105,8 +107,8 @@ actually requires context that cannot be established from completed upstream
 artifacts and known project constraints.
 
 Cancellation while still `GREENFIELD` follows **Greenfield Bootstrap
-Cancellation**. Cancellation after the permanent transition to `BROWNFIELD`
-retains the runtime and enters terminal `CANCELLED`.
+Cancellation**, which resets the workflow. Cancellation after the permanent
+transition to `BROWNFIELD` enters terminal `CANCELLED`.
 
 ## Cycle Modes
 
@@ -275,17 +277,24 @@ artifact presence.
 
 ### Branches and merges
 
-`STATE.md` belongs to the branch it is committed on, and each branch carries at
-most one active cycle. Merging two branches whose `.standards/` files both
-changed usually produces a merge conflict in `STATE.md` and `CYCLE_IDS.md`.
-Resolving that conflict is the user's job:
+Commit `.standards/` like any other project files. `STATE.md` belongs to the
+branch it is committed on, and each branch carries at most one active cycle, so
+anyone who checks out a branch continues its workflow where it was left.
 
-- keep every line from both sides of `CYCLE_IDS.md`;
-- keep exactly one cycle in `STATE.md`. The other cycle stops being tracked. Its
-  records under `.standards/docs/` stay in the repository, and deciding what to
-  do with them is also the user's responsibility.
+- To start over on a branch, including one created from a branch with an active
+  cycle, the user cancels the cycle or runs **Project Reset**.
+- Once a branch's cycle is signed off or cancelled, the user runs **Project
+  Reset** on the branch before merging it into the project's main branch. The
+  main branch then keeps a fresh installation rather than one branch's workflow
+  state, Auditor context, and cycle records, and every branch created from it
+  starts with no cycle. The reset also keeps `MODE.md` accurate, because it
+  chooses the mode from the project's contents.
 
-To avoid the conflict, sign off or cancel a cycle before merging its branch.
+Merging two branches that both changed `.standards/` without a reset usually
+produces a merge conflict in `STATE.md`. Resolving that conflict is the user's
+job: keep exactly one cycle in `STATE.md`. The other cycle stops being tracked.
+Its records under `.standards/docs/` stay in the repository, and deciding what
+to do with them is also the user's responsibility.
 
 When `.standards/` has unmerged files or conflict markers, a workflow role
 stops, tells the user which cycles are involved, and waits for the user to
@@ -309,7 +318,7 @@ state or persisted artifact and has no workflow completion gate.
 - Navigator persists nothing. It creates no quiz scores, preferences, or
   summaries, and conversation context stays in the conversation.
 - The control-plane permissions elsewhere in this protocol do not apply while
-  Navigator runs. It never initializes cycles, allocates IDs, records blockers,
+  Navigator runs. It never initializes cycles, generates IDs, records blockers,
   selects or promotes cycle modes, signs off, cancels, or creates failure,
   recovery, or other state-changing handoffs. It may explain these actions and
   their owners, but performing them requires leaving Navigator.
@@ -348,7 +357,7 @@ Roles use them instead of doing these steps by hand:
 
 | Command                                                       | Purpose                                                                                                               |
 |---------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------|
-| `node .standards/bin/cycle.mjs new --request "<request>"`     | Reserve a new cycle ID (see **Cycle ID Registry**).                                                                   |
+| `node .standards/bin/cycle.mjs new --request "<request>"`     | Generate a new cycle ID (see **Cycle IDs**).                                                                          |
 | `node .standards/bin/artifact.mjs init <TYPE>`                | Create one of the active cycle's records with its provenance block and header (see **Workflow Artifact Provenance**). |
 | `node .standards/bin/id.mjs next <AC\|DEV\|F\|D\|DOC> <file>` | Print the next free identifier for a record.                                                                          |
 | `node .standards/bin/check.mjs`                               | Check the runtime files and the active cycle's records. It only reads files.                                          |
@@ -362,29 +371,24 @@ every state-changing handoff. For each problem it reports:
    stop and report it to the user.
 
 A forward handoff requires that `check` reports no problem in files the current
-role owns. `check` finds mechanical errors such as unregistered IDs, broken
+role owns. `check` finds mechanical errors such as malformed cycle IDs, broken
 provenance, or missing acceptance coverage; it does not replace a role's
 completion gate. If a tool is missing or fails, stop and report it; do not do
 its step by hand.
 
-Installation can also add hooks for Claude Code and Codex (see **Installed
-Runtime Contract**):
-
-- When an agent finishes a turn and workflow files have uncommitted changes,
-  the stop hook runs `check`. If it finds problems, it sends the agent back once
-  with the list, and the agent handles them as described above. Because the
-  turn may have ended with a handoff, the hook does not hold the current
-  state's own `COMPLETE` records to full acceptance coverage; the role that
-  owns the state reconciles them when it starts, and its own `check` before
-  handing off still includes them. During recovery, when `check` otherwise
-  holds only the current state's `COMPLETE` records, the hook instead holds
-  those of the state named in `Handoff.From` after a `FORWARD`, `RESUME`, or
-  `FAILURE` handoff, which that state's role made with its records current. It
-  holds none while in `SCOPING`, because Scoper may have changed the acceptance
-  conditions since that handoff.
-- A pre-tool hook refuses agent edits to `.standards/CYCLE_IDS.md` made with
-  file-editing tools or common shell commands. `check` reports a malformed or
-  unregistered ID that gets through another way.
+Installation can also add a stop hook for Claude Code and Codex (see
+**Installed Runtime Contract**). When an agent finishes a turn and workflow
+files have uncommitted changes, the stop hook runs `check`. If it finds
+problems, it sends the agent back once with the list, and the agent handles them
+as described above. Because the turn may have ended with a handoff, the hook
+does not hold the current state's own `COMPLETE` records to full acceptance
+coverage; the role that owns the state reconciles them when it starts, and its
+own `check` before handing off still includes them. During recovery, when
+`check` otherwise holds only the current state's `COMPLETE` records, the hook
+instead holds those of the state named in `Handoff.From` after a `FORWARD`,
+`RESUME`, or `FAILURE` handoff, which that state's role made with its records
+current. It holds none while in `SCOPING`, because Scoper may have changed the
+acceptance conditions since that handoff.
 
 Navigator may run `check`, because it changes nothing. When `check` or a hook
 reports problems during Navigator work, Navigator reports them and changes
@@ -1035,13 +1039,13 @@ pending request becomes legal from `SIGNED_OFF` or retained `CANCELLED`, do not
 initialize `Active Work` through this generic path; continue through **Start a
 new cycle** using `PendingCycleRequest` as the new request so terminal handoff
 and baseline-reconciliation requirements are preserved. Otherwise, for the
-initialized first cycle, allocate the ID through **Cycle ID Registry** first;
-after that registry append succeeds, persist the reserved `Active Work.Id`, that
-request, and the validated/defaulted mode in the cycle-state update; clear
-`PendingCycleMode` to `UNSET`, `PendingCycleRequest` to `UNSET`, and
-`PendingCycleBlockedOn` to `NONE`; then enter the legal workflow state. If the
-user abandons the blocked pre-cycle request, clear `PendingCycleRequest` and
-`PendingCycleBlockedOn` without modifying `Active Work` or starting a cycle.
+initialized first cycle, generate the ID as **Cycle IDs** describes; then
+persist that `Active Work.Id`, the request, and the validated/defaulted mode in
+the cycle-state update; clear `PendingCycleMode` to `UNSET`,
+`PendingCycleRequest` to `UNSET`, and `PendingCycleBlockedOn` to `NONE`; then
+enter the legal workflow state. If the user abandons the blocked pre-cycle
+request, clear `PendingCycleRequest` and `PendingCycleBlockedOn` without
+modifying `Active Work` or starting a cycle.
 
 If no pending preference exists for a new request, invoking the standard entry
 role selects `STANDARD` by default. Use the standard entry state for the current
@@ -1056,11 +1060,11 @@ request or Developer is explicitly invoked with a new sufficiently bounded
 implementation request while `PendingCycleMode: UNSET`. A pending
 `STANDARD` preference prevents Developer from inferring `EXPEDITED`.
 
-After expedited eligibility is validated, allocate the new ID through **Cycle
-ID Registry** before assigning it to `Active Work`. Then set `CycleMode:
+After expedited eligibility is validated, generate the new ID as **Cycle IDs**
+describes. Then set `CycleMode:
 EXPEDITED`; clear `PendingCycleMode` to `UNSET`, `PendingCycleRequest` to `UNSET`,
 and `PendingCycleBlockedOn` to `NONE`; set `WorkflowState: DEVELOPING`;
-initialize `Active Work` with the reserved ID/request plus `Scope: NONE`,
+initialize `Active Work` with the new ID and request plus `Scope: NONE`,
 `Architecture: NONE`, `Development: NONE`, `PromotionReason: NONE`, and
 `BaselineReconciliation: NONE`; keep `Handoff.Kind: INITIAL`, set `From: NONE`
 and `FailureType: NONE`, record a concise expedited-entry reason, and keep
@@ -1109,7 +1113,7 @@ represented as completed.
 ### Cancel an active cycle
 
 - If `ProjectMode: GREENFIELD`, follow **Greenfield Bootstrap Cancellation**,
-  including explicit approval of the uninstall operation before removal.
+  including explicit approval of the reset before it runs.
 - If `ProjectMode: BROWNFIELD`, transition to `CANCELLED`, set
   `CycleMode: UNSET`, leave all pending-cycle fields clear, record
   `Handoff.Kind: CANCEL`, set `From` to the
@@ -1126,67 +1130,51 @@ If cancellation occurs while `ProjectMode` is still `GREENFIELD`, first verify
 that the active cycle has not successfully created or materially modified a
 project implementation artifact. If such implementation exists, persist the
 permanent `BROWNFIELD` transition and use retained brownfield `CANCELLED`
-semantics instead. Only when no such implementation exists should cancellation
-be treated as a S.T.A.N.D.A.R.D.S. reset rather than a reusable terminal cycle.
+semantics instead. Only when no such implementation exists is cancellation a
+reset of the workflow rather than a reusable terminal cycle.
 
-The agent must perform the reset through the CLI's **Project Uninstallation**
-operation after obtaining explicit user approval of the removal:
+The agent performs the reset with **Project Reset** after obtaining explicit
+user approval:
 
-1. Select `standards uninstall` if a globally installed STANDARDS CLI supports
-   the required uninstall options and ownership records. Otherwise use
-   `npx @idinsight/standards@latest uninstall`. Pass `--project` with the
+1. Use `standards reset` if a globally installed STANDARDS CLI has the version
+   recorded in `.standards/VERSION.json`; otherwise use
+   `npx @idinsight/standards@<that version> reset`. Pass `--project` with the
    project's absolute path for both preview and execution.
-2. Run the selected command with `--dry-run`. This preview may run before
-   removal approval. Show the user the target project, planned removals and
-   shared-file updates, any warnings, and the exact removal command including
-   `--yes`. Explain that removal covers the entire `.standards/` runtime, the
-   STANDARDS hooks, and all verified role skill directories for both clients,
-   including local edits or added files inside them. Warn explicitly that every
-   cycle record under `.standards/docs/` (scope, design, development,
-   verification, review, documentation, and synchronization records) will be
-   deleted. Saved workflow state, context, and cycle-ID history will also be
-   lost; another cycle will require fresh installation.
-3. Ask for explicit approval to execute that removal command for the previewed
-   project and scope. A generic cancellation request does not grant removal
-   approval. During the active cycle, record the target, command, and pending
-   approval in `Active Work.BlockedOn`, preserving any other unresolved
-   questions. Keep the workflow state, cycle mode, recovery, and outstanding
-   obligations intact while waiting. Do not remove files, record `CANCELLED`,
-   or continue role work while removal approval is pending. A resumed chat
-   must resolve the saved question; silence or a request to continue is not
-   approval to uninstall.
-4. After approval, recheck bootstrap eligibility and the removal preview. If
+2. Run the command with `--dry-run`. This preview may run before approval. Show
+   the user the target project, the planned changes, any warnings, and the exact
+   command including `--yes`. Warn that the reset deletes the saved workflow
+   state, the Auditor's project context, and every cycle record under
+   `.standards/docs/`, and that the skills, hooks, client settings, and user
+   styles stay installed.
+3. Ask for explicit approval to run that command. A generic cancellation request
+   does not grant it. Record the target, command, and pending approval in
+   `Active Work.BlockedOn`, preserving any other unresolved questions, and keep
+   the workflow state, cycle mode, recovery, and outstanding obligations intact
+   while waiting. Do not record `CANCELLED` or continue role work while approval
+   is pending. A resumed chat must resolve the saved question; silence or a
+   request to continue is not approval.
+4. After approval, recheck bootstrap eligibility and the preview. If
    implementation now exists, persist `BROWNFIELD` and use retained cancellation
-   instead. If the target, command, planned removal scope, or warnings have
-   changed, present the updated preview and obtain fresh approval. Otherwise
-   run the approved command with `--yes`; this flag avoids a second CLI prompt
-   and never substitutes for user approval.
-5. Confirm successful removal before reporting the bootstrap reset complete.
-   Do not recreate runtime files to record completion.
+   instead. If the target, command, planned changes, or warnings changed,
+   present the updated preview and obtain fresh approval. Otherwise run the
+   approved command with `--yes`; the flag avoids a second CLI prompt and never
+   substitutes for user approval.
+5. Confirm that the reset succeeded before reporting the cancellation complete.
+   Do not edit `STATE.md` afterwards to record it; the fresh state is the
+   result.
 
-If approval is declined, clear only the reset approval question, preserve the
-installation and active cycle, and report that cancellation was not completed.
-Further role work requires a user instruction to continue. If a usable CLI is
-unavailable, the preview fails, or uninstall refuses or fails, stop and report
-that the reset did not complete. Follow **Project Uninstallation** recovery
-rules, preserving any reported backups. Do not bypass a refusal by switching
-commands or by manually deleting files, editing managed blocks, or reverting
-settings. A retry requires a valid preview and approval covering the retry.
+If approval is declined, clear only the approval question, keep the active
+cycle, and report that cancellation was not completed. Further role work
+requires a user instruction to continue. If a matching CLI is unavailable, the
+preview fails, or the reset refuses or fails, stop and report that cancellation
+did not complete, including any backups the CLI reports. Do not work around a
+refusal by switching commands or by deleting or rewriting the files yourself. A
+retry requires a valid preview and approval covering it.
 
-The uninstaller enforces ownership using `.standards/INSTALLATION.json`, skill
-markers, and managed integration boundaries. It removes only marked integration
-blocks and recorded client settings whose values still match; project work
-outside the removed runtime and verified skill directories is preserved.
-S.T.A.N.D.A.R.D.S. does not restore the project working tree. Reverting project
-changes is the user's responsibility.
-
-The reset removes `STATE.md`, `CYCLE_IDS.md`, and the cycle records under
-`.standards/docs/`, so no persisted `CANCELLED` state, cycle record, or runtime
-cycle-ID registry remains. Removal of the runtime ends the
-registry-backed no-reuse guarantee. The next workflow attempt requires fresh
-installation, which re-evaluates project mode from then-current state and starts
-a new cycle-ID registry. Do not carry the cancelled bootstrap's former
-`GREENFIELD` classification across reinstall.
+The reset leaves no `CANCELLED` state or cycle record behind, and it chooses the
+project mode again from the project's contents. S.T.A.N.D.A.R.D.S. does not
+revert the project working tree; reverting project changes is the user's
+responsibility.
 
 This exception ends permanently once Developer observes and verifies that the
 active cycle has successfully created or materially modified a project
@@ -1219,12 +1207,11 @@ From `SIGNED_OFF` or retained `CANCELLED`:
    user to replace or clear the preference, revise the pending request, or
    abandon it. A later resolution must use the persisted pending request rather
    than requiring the user to restate it.
-3. After mode validation succeeds, allocate the new ID through **Cycle ID
-   Registry**. If the registry append cannot be persisted, leave terminal state
-   unchanged and do not start the cycle. Once appended, the ID is reserved even
-   if a later state write fails.
+3. After mode validation succeeds, generate the new ID as **Cycle IDs**
+   describes. If the tool refuses, leave the terminal state unchanged and do not
+   start the cycle.
 4. Record `Handoff.Kind: NEW_CYCLE`, `Handoff.From` = prior terminal state,
-   `FailureType: NONE`, and a concise reason. Persist the reserved ID and new
+   `FailureType: NONE`, and a concise reason. Persist the new ID and new
    `Request` into `Active Work`; reset `Scope`, `Architecture`, `Development`,
    `PromotionReason`, `AuditTarget`, and `BlockedOn` to `NONE`; clear recovery
    and outstanding obligations; persist the reconciliation obligation determined
@@ -1239,8 +1226,8 @@ From `SIGNED_OFF` or retained `CANCELLED`:
    expedited brownfield cycle at `DEVELOPING`. `CycleMode` must not remain
    `UNSET` after this transition. The prior cycle is not reopened.
 
-A greenfield bootstrap cancellation removes the runtime, so future workflow work
-requires fresh installation and a fresh project-mode decision.
+A greenfield bootstrap cancellation resets the workflow instead of entering
+`CANCELLED`, so the next request starts a first cycle from the fresh state.
 
 At `AWAITING_USER_SIGNOFF`, available actions are sign off, rework, or cancel;
 for expedited work, explicit promotion is also available. Bounded expedited
@@ -1248,59 +1235,28 @@ rework follows normal recovery back to sign-off. Rework requiring a skipped
 standard guarantee promotes and restarts the standard brownfield topology at
 `AUDITING`.
 
-## Cycle ID Registry
+## Cycle IDs
 
-`.standards/CYCLE_IDS.md` is the protocol-owned, append-only registry of every
-cycle ID allocated while the current S.T.A.N.D.A.R.D.S. runtime remains
-installed. It exists only to reserve cycle identifiers; it is not workflow
-history and must not duplicate requests, states, handoffs, or artifact metadata.
-Store one allocated ID per Markdown list entry:
-
-```markdown
-# S.T.A.N.D.A.R.D.S. Cycle ID Registry
-
-- <cycle-id>
-```
-
-Reserve a new cycle ID only with
+Every cycle has a unique ID. Get it only from
 `node .standards/bin/cycle.mjs new --request "<request>"`. The tool:
 
-1. builds an ID from the request, the UTC time, and a random suffix, for example
-   `add-user-search-20260927T190146Z-7bef0f04`, using only letters, digits, `.`,
-   `_`, and `-`;
-2. checks that the ID is not in `CYCLE_IDS.md` and is not used by any
-   cycle-owned artifact path or STANDARDS provenance block;
-3. appends the ID to `CYCLE_IDS.md` while holding a lock, so two agents cannot
-   reserve at the same time; and
-4. prints the ID.
+1. builds an ID from the request, the UTC time, and eight random hex digits, for
+   example `add-user-search-20260927T190146Z-7bef0f04`;
+2. checks that no cycle-owned artifact path or STANDARDS provenance block uses
+   it; and
+3. prints it without changing any file.
 
 It refuses while a cycle is active (`Active Work.Id` is set and the state is not
-terminal), when the registry is missing or has a merge conflict, and when
-`STATE.md` is invalid. Only after the tool succeeds may the printed ID be
-written to `Active Work.Id` and cycle initialization continue. Never invent an
-ID or edit the registry by hand.
+terminal), when `STATE.md` has a merge conflict, and when `STATE.md` is invalid.
+Only after the tool succeeds may the printed ID be written to `Active Work.Id`
+and cycle initialization continue. If initialization fails afterwards, run the
+tool again for the next attempt; an unused ID needs no cleanup.
 
-Registry entries are immutable while the runtime remains installed: never edit,
-remove, reorder for deduplication, or reuse an existing entry. If cycle
-initialization fails after the append, leave the ID reserved; a burned ID is
-safe, while reuse is not. The registry is the authoritative no-reuse record;
-artifact-path and provenance checks are additional collision protection, not a
-replacement for the registry.
-
-Initialize `CYCLE_IDS.md` empty on first installation. Preserve it across normal
-reinstall and framework upgrade.
-
-If `CYCLE_IDS.md` is unexpectedly missing from an installed runtime, treat the
-runtime as incomplete: stop cycle allocation and workflow work that would
-require a new cycle ID, report the missing registry, and require restoration of
-the registry or intentional runtime removal followed by a fresh installation.
-Never recreate an empty registry or best-effort reconstruct one in place,
-because doing so would silently break the installed-runtime no-reuse guarantee.
-
-Intentional removal of the S.T.A.N.D.A.R.D.S. runtime may remove the registry
-with `.standards/`; that removal ends the registry-backed lifetime guarantee. A
-later fresh installation starts a new registry, while existing artifact and
-provenance collision checks still apply.
+Never write a cycle ID yourself or reuse one. `check` reports an
+`Active Work.Id` that does not have the generated form, and a cycle that is
+active under the ID of a cycle that the last commit ended in `SIGNED_OFF` or
+`CANCELLED`: a new cycle always gets a new ID, and a finished cycle is never
+reopened.
 
 ## Workflow State Reference
 
@@ -1311,11 +1267,9 @@ updating them. The subsections follow the order of the shape example in
 
 ### Active Work
 
-- `Id`: stable, user-readable identifier reserved with `cycle.mjs new` through
-  **Cycle ID Registry**. While the current S.T.A.N.D.A.R.D.S. runtime remains
-  installed, every allocated cycle ID is reserved permanently and must never be
-  reused by another cycle. Never overwrite or repurpose an artifact belonging to
-  another cycle.
+- `Id`: stable, user-readable identifier generated by `cycle.mjs new` (see
+  **Cycle IDs**). It is never reused by another cycle. Never overwrite or
+  repurpose an artifact belonging to another cycle.
 - `Request`: persisted user request at enough fidelity for the entry role to
   understand the work.
 - `Scope`, `Architecture`, and `Development`: repository-relative paths to the
@@ -1347,10 +1301,9 @@ updating them. The subsections follow the order of the shape example in
 Installation initializes `Id` and `Request` as `UNSET`. Before the first
 workflow role performs substantive work, select and validate `CycleMode`
 according to **Cycle Modes**, consuming `PendingCycleMode` when present; then
-allocate the cycle ID through **Cycle ID Registry**. Only after the registry
-append succeeds may the reserved ID, request, and selected mode be persisted as
-the initialized cycle. Every later `NEW_CYCLE` follows the same allocation rule
-as part of the transition.
+generate the cycle ID as **Cycle IDs** describes. Only then may the ID, request,
+and selected mode be persisted as the initialized cycle. Every later
+`NEW_CYCLE` generates its ID the same way as part of the transition.
 
 ### Baseline Reconciliation Format
 
@@ -1618,13 +1571,53 @@ it merely because `ProjectMode` remains `GREENFIELD`. The permanent change to
 `BROWNFIELD` follows **Project Modes**.
 
 `.standards/MODE.md` and `.standards/STATE.md` are protocol-owned coordination
-artifacts. A role or user may change them only as required by a legal protocol
-transition or a protocol-required coordination update defined here, including
+artifacts. A role or user may change them only through **Project Reset**, a
+legal protocol transition, or a protocol-required coordination update defined
+here, including
 initializing `Active Work`, recording artifact paths, selecting or promoting
 `CycleMode`, and setting or clearing `PromotionReason`,
 `BaselineReconciliation`, `AuditTarget`, or `BlockedOn`.
 `.standards/PROTOCOL.md` is framework-owned and may be changed only by framework
 installation or upgrade.
+
+## User Styles
+
+A user style is a Markdown file of personal preferences for one role, kept at
+`.standards/user-styles/<role>/<identifier>.md`, where `<role>` is the role's
+skill name, such as `developer` or `tester`. Users add and maintain these files;
+STANDARDS ships none. Installation and **Project Reset** keep them, and
+**Project Uninstallation** deletes them with `.standards/`.
+
+A role uses a user style only when the user explicitly selects one:
+
+- The identifier is the filename stem: `tony` and `tony.md` both select
+  `.standards/user-styles/<role>/tony.md`. Only a direct child Markdown file of
+  that role's folder can be selected; reject paths, separators, traversal, and
+  symlinks that leave the folder. `NONE` is reserved and means no user style.
+- Never infer a style from the user's identity, repository ownership, prior
+  usage, another role's selection, or the mere presence of a file.
+- If a selection does not resolve to exactly one available file, stop and ask
+  the user to choose an available style or clear the selection; never
+  substitute another.
+
+A user style governs discretionary choices only. Within a role's style
+guidance, apply the role's `styles/universal.md` first when it has one, then the
+selected user style, then the role's other applicable style files. A user style
+never overrides the protocol, role ownership, the active contract, the required
+shape of a role's artifacts, repository-enforced constraints, project
+instructions, or correctness. A precedence list never settles a material
+conflict; use **Instruction Layering and Conflicts**.
+
+Roles that keep a cycle record persist the selection as `User Style` in that
+record and reload it on resume: Developer's development plan, Tester's
+verification report, Reviewer's review reports, Documenter's documentation
+record, and Synchronizer's synchronization record. Scoper, Architect, Auditor,
+and Navigator have no record for it, so their selection lasts only for the
+current conversation and the user names it again when resuming. The user may
+change or clear a selection at any time, except that Developer locks its
+selection when the user first approves the development plan. If a persisted
+selection's file is missing on resume, stop and ask the user to restore it or,
+when the selection is not locked, to choose another or clear it.
 
 ## Installed Runtime Contract
 
@@ -1637,8 +1630,6 @@ An installed project should provide:
   eligibility;
 - `.standards/INSTALLATION.json`: installer-owned metadata for the client-setting
   mutations and client paths S.T.A.N.D.A.R.D.S. actually created;
-- `.standards/CYCLE_IDS.md`: protocol-owned append-only registry of allocated
-  cycle IDs for the lifetime of the installed runtime;
 - `.standards/MODE.md`: current `ProjectMode`;
 - `.standards/STATE.md`: current workflow/cycle state and resumable coordination
   context;
@@ -1646,10 +1637,12 @@ An installed project should provide:
   Tools and Hooks**, replaced as a whole on every install and upgrade;
 - `.standards/docs/`: the role-owned cycle records defined in **Workflow
   Artifact Provenance**, created only by the roles through `artifact init`;
+- `.standards/user-styles/`: optional user-owned styles defined in **User
+  Styles**;
 - the S.T.A.N.D.A.R.D.S. workflow skills installed in the location required by
   the selected coding agent;
-- unless the user declines them, STANDARDS hooks in `.claude/settings.json` for
-  Claude Code and in `.codex/hooks.json` for Codex;
+- unless the user declines it, the STANDARDS stop hook in
+  `.claude/settings.json` for Claude Code and in `.codex/hooks.json` for Codex;
 - explicit-invocation controls: Codex adapters use
   `allow_implicit_invocation: false`; Claude Code project settings use
   `skillOverrides.<skill>: "user-invocable-only"` for installed role skills,
@@ -1662,9 +1655,7 @@ greenfield-to-brownfield transition follows **Project Modes**.
 `.standards/INSTALLATION.json` is installer metadata, not workflow state: create
 it on first installation, preserve/update it across normal reinstall or upgrade,
 and record only mutations the installer actually created. Never retroactively
-claim compatible pre-existing settings. `.standards/CYCLE_IDS.md` is protocol
-coordination data, not installer metadata; preserve it for the entire lifetime
-of the installed runtime as defined by **Cycle ID Registry**.
+claim compatible pre-existing settings.
 
 Record a client directory or settings file in `createdPaths` only if that exact
 path was absent before installation created it. Supported paths are `.agents`,
@@ -1680,8 +1671,8 @@ workflow data and update the recorded version with the framework assets. Reject
 older versions and cross-major upgrades. A major release may be installed into a
 fresh project. STANDARDS provides no migration between major versions: the only
 route for an existing project is `standards uninstall`, which deletes
-`.standards/` (including workflow state, Auditor context, cycle records, and the
-cycle-ID registry), followed by a fresh installation. The framework maintainer
+`.standards/` (including workflow state, Auditor context, cycle records, and
+user styles), followed by a fresh installation. The framework maintainer
 chooses the release version. Adding, removing, or renaming a role is a major
 change, and so is any change to the runtime files or record formats that an
 existing installation's files would no longer pass.
@@ -1712,14 +1703,12 @@ After ownership checks:
   user-owned unbounded `@AGENTS.md` import exists, preserve it and do not add a
   framework duplicate. Otherwise add or update a bounded integration block. If
   multiple unbounded imports exist, preserve them and report the conflict.
-- Before replacing `.standards/PROTOCOL.md` during an upgrade, require the
-  existing cycle-ID registry to be present and valid enough to preserve. If it
-  is missing or invalid, stop and report the incomplete runtime.
 - Update `.standards/PROTOCOL.md` from the installed framework version only
-  after runtime ownership verification and the registry check above. Install or
-  update each skill definition only after that destination skill package passes
-  its ownership check. Update skill packages file by file: write every file the
-  release ships and leave any other file in the folder unchanged. Keep the
+  after runtime ownership verification. Install or update each skill definition
+  only after that destination skill package passes its ownership check. Update
+  skill packages file by file: write every file the release ships, except the
+  `evals/` folder used to develop the skill, and leave any other file in the
+  folder unchanged. Keep the
   installed protocol aligned with the installed skills.
 - A reinstall keeps the installed clients. The user may add a client; removing
   one requires uninstalling.
@@ -1757,14 +1746,10 @@ After ownership checks:
   Do not reset, reinterpret, or discard existing workflow state during upgrades.
   Missing required fields or invalid formats are runtime inconsistencies, not
   permission to add inferred defaults.
-- Initialize `.standards/CYCLE_IDS.md` on first install. Thereafter preserve it
-  across reinstall and upgrade; never clear or rewrite existing entries while
-  the runtime remains installed. If it is unexpectedly missing from a verified
-  runtime, stop and report the incomplete runtime; do not recreate it empty or
-  reconstruct it by inference.
 - Preserve `.standards/CONTEXT.md`; it is Auditor-owned, not installer-owned.
 - Preserve `.standards/docs/` and every cycle record in it; the records are
   role-owned, not installer-owned.
+- Preserve `.standards/user-styles/`; its files are user-owned.
 - Preserve project-level instructions. When they materially conflict with the
   protocol, integration contract, workflow artifacts, or other authoritative
   constraints, follow **Instruction Layering and Conflicts**.
@@ -1774,30 +1759,51 @@ After ownership checks:
 Installation does not fabricate completed workflow artifacts such as scope,
 technical design, project context, tests, reviews, or documentation.
 
+### Project Reset
+
+An explicit `standards reset` returns an installed project's workflow to the
+state of a fresh installation without reinstalling anything. It is a user
+operation: an agent runs it only when the user explicitly asks, or for
+**Greenfield Bootstrap Cancellation** after the approval that section requires.
+It ends any active cycle without a terminal state.
+
+- Default to the current directory; accept `--project <path>` and `--mode`.
+  Offer `--dry-run` to report every planned change without writing files, and
+  confirm interactively unless `--yes` is given.
+- Require the runtime ownership marker and a valid `.standards/VERSION.json`
+  that matches the CLI's version, because the fresh files come from the CLI's
+  templates. Missing or invalid workflow files do not prevent a reset.
+- Delete `.standards/CONTEXT.md` and `.standards/docs/`, warning with the count
+  of cycle records, and write fresh `.standards/STATE.md` and
+  `.standards/MODE.md`. Take the mode from `--mode`, otherwise choose it from
+  the project's contents as a first installation would.
+- Keep everything else: `PROTOCOL.md`, `VERSION.json`, `INSTALLATION.json`,
+  `bin/`, `.standards/user-styles/`, the skills, hooks, client settings, and
+  managed blocks.
+- Refuse symlinks in the paths it deletes, and keep backups during the operation
+  as **Project Uninstallation** describes.
+
 ### Project Uninstallation
 
 An explicit `standards uninstall` removes the project's installed runtime and
 all verified STANDARDS skill packages for Codex and Claude Code. It is allowed
 in either project mode, with or without an active cycle. Removal ends the
 runtime's lifetime; the command itself does not complete, sign off, cancel,
-or revert project work. **Greenfield Bootstrap Cancellation** uses this same
-operation after the agent verifies eligibility and obtains explicit removal
-approval. The CLI does not determine cancellation eligibility or enforce that
-conversation-level approval. The globally installed CLI is unaffected.
+or revert project work. The globally installed CLI is unaffected.
 
 - Default to the current directory; accept `--project <path>` for an existing
   project directory. Offer `--dry-run` to report every planned path removal or
   shared-file update without writing files. Help and preview output must explain
   that removing `.standards/` deletes saved workflow state, Auditor context,
-  cycle records, cycle-ID history, and any other content in that directory. When
-  `.standards/docs/` holds cycle records, the preview must warn with their
-  count.
+  cycle records, user styles, and any other content in that directory. When
+  `.standards/docs/` holds cycle records or `.standards/user-styles/` holds user
+  styles, the preview must warn with their counts.
 - Require the runtime ownership marker and a valid, supported
   `.standards/INSTALLATION.json` before removal. Do not infer settings ownership
   from current values. Unknown ownership records require an uninstaller that
   understands them. Missing or invalid workflow metadata does not prevent
   explicit removal when ownership is established; uninstall does not need a
-  valid version, mode, state, or cycle-ID registry and is not an upgrade.
+  valid version, mode, or state and is not an upgrade.
 - Discover marked skill packages under `.agents/skills/` and `.claude/skills/`,
   including marked roles absent from the current distribution. Remove their
   entire verified directories. Remove a recorded client parent directory only
@@ -1831,14 +1837,13 @@ conversation-level approval. The globally installed CLI is unaffected.
   Retain backups during the operation and restore prior files on an ordinary
   failure. If recovery fails, retain backups and report their location. An
   interrupted process may leave a partial operation; retain a mapping from
-  backups to original paths and block both install and uninstall until it is
+  backups to original paths and block install, reset, and uninstall until it is
   resolved. Do not claim atomicity across process interruption.
 - Delete the cycle records under `.standards/docs/` with the runtime. Preserve
   implementation, tests, documentation, and reused project scope or design
   documents outside the removed runtime and verified skill directories. A later
-  fresh installation starts a new runtime and registry; artifacts and cycle
-  markers outside the removed runtime still require collision checks when
-  allocating new cycle IDs.
+  fresh installation starts a new runtime; artifacts and cycle markers outside
+  the removed runtime still count when `cycle.mjs` checks a new ID.
 
 There is no force removal or client-only uninstall. Removing one client while
 retaining shared runtime ownership requires a separate contract.
@@ -1897,6 +1902,10 @@ Use these terms consistently across all skills:
   Tools and Hooks**: `cycle.mjs`, `artifact.mjs`, `id.mjs`, and `check.mjs`.
 - **STANDARDS hook**: a Claude Code or Codex hook handler whose command runs
   `.standards/bin/hook.mjs`.
+- **project reset**: `standards reset`, which returns an installed project's
+  workflow to a fresh installation's state (see **Project Reset**).
+- **user style**: a user-owned file of discretionary preferences for one role,
+  applied only on explicit selection (see **User Styles**).
 - **failure handoff**: routing a defect to the owner of the affected artifact or
   decision.
 - **forward handoff**: advancing after the current completion gate succeeds.

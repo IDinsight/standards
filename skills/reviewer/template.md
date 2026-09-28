@@ -22,7 +22,7 @@ ReviewKind: IMPLEMENTATION | FINAL_DELIVERABLE
 # Review Report
 
 `Cycle`: `<Active Work.Id>` `ReviewKind`: `IMPLEMENTATION | FINAL_DELIVERABLE`
-`Status`: `IN_PROGRESS | BLOCKED | COMPLETE`
+`Status`: `IN_PROGRESS | BLOCKED | COMPLETE` `User Style`: `NONE | <identifier>`
 
 ## Assessed Inputs and Scope
 
@@ -115,9 +115,11 @@ empty.
 ## Authoring Rules
 
 Keep each section; use explicit NONE, no material findings, or not-yet-assessed
-explanations rather than empty tables. `IN_PROGRESS` means assessment is
-underway; `BLOCKED` means required correction or evidence prevents completion;
-neither is passing. `COMPLETE` requires the shared Reviewer gate and applicable
-protocol gate, not merely an empty finding list. Reopen it when changed inputs
-invalidate that conclusion. Preserve the other kind's report and other cycles.
-Keep useful history, but make current conclusions and next actions unambiguous.
+explanations rather than empty tables. Set `User Style` to the user's explicit
+selection under the protocol's **User Styles**, or `NONE`. `IN_PROGRESS` means
+assessment is underway; `BLOCKED` means required correction or evidence prevents
+completion; neither is passing. `COMPLETE` requires the shared Reviewer gate and
+applicable protocol gate, not merely an empty finding list. Reopen it when
+changed inputs invalidate that conclusion. Preserve the other kind's report and
+other cycles. Keep useful history, but make current conclusions and next actions
+unambiguous.

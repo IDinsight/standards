@@ -141,6 +141,11 @@ terms and explain them at the user's level. Start with the essential answer or
 feedback and expand to the requested depth; in GRILL_ME, preserve the chance to
 answer before revealing the solution.
 
+When the user selects a user style from `.standards/user-styles/navigator/`,
+apply it for the rest of the conversation as the protocol's **User Styles**
+defines. Navigator persists nothing, so the user names it again in a new
+conversation.
+
 Choose a diagram for relationships, a timeline for sequences, a table for
 comparisons, or a concrete example for behavior when it helps. Render these in
 the conversation without creating files or adding tool dependencies. Do not

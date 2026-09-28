@@ -28,8 +28,8 @@ resolve the choice. It does not silently switch modes or start the cycle. See
 During an active cycle, you can request changes, promotion to standard work, or
 cancellation. An explicit request can authorize the receiving agent to update
 the workflow record, even when another role owns the current step. A greenfield
-bootstrap reset also requires your explicit approval of the uninstall command
-after the agent shows its removal preview. Until you approve and removal
+bootstrap reset also requires your explicit approval of the `standards reset`
+command after the agent shows its preview. Until you approve and the reset
 succeeds, that cancellation is not complete. Doing the next role's work still
 requires invoking that role.
 

@@ -1,6 +1,6 @@
-// Parsing for `.standards/STATE.md`, `.standards/MODE.md`, and
-// `.standards/CYCLE_IDS.md`. The installer imports the basic validators from
-// here too, so installs, upgrades, and `check` read these files the same way.
+// Parsing for `.standards/STATE.md` and `.standards/MODE.md`. The installer
+// imports the basic validators from here too, so installs, upgrades, and
+// `check` read these files the same way.
 import { MODES, STATES, fieldPairs, withoutBom } from './core.mjs';
 
 // The one non-empty value of a field, or an error naming the field.
@@ -87,29 +87,6 @@ export function validateState(input) {
     }
   }
   return { workflowState, cycleMode, pendingMode, id };
-}
-
-export function validateRegistry(input) {
-  const lines = withoutBom(input).split(/\r?\n/);
-  if (lines[0].trimEnd() !== '# S.T.A.N.D.A.R.D.S. Cycle ID Registry') {
-    throw new Error('Invalid .standards/CYCLE_IDS.md header');
-  }
-  const ids = new Set();
-  let inComment = false;
-  for (const raw of lines.slice(1)) {
-    const line = raw.trim();
-    if (!line) continue;
-    if (line.startsWith('<!--')) inComment = true;
-    if (inComment) {
-      if (line.includes('-->')) inComment = false;
-      continue;
-    }
-    const match = /^- ([A-Za-z0-9][A-Za-z0-9._-]*)$/.exec(line);
-    if (!match || ids.has(match[1])) throw new Error('Invalid or duplicate ID in .standards/CYCLE_IDS.md');
-    ids.add(match[1]);
-  }
-  if (inComment) throw new Error('Unclosed comment in .standards/CYCLE_IDS.md');
-  return ids;
 }
 
 export function modeFromFile(text) {

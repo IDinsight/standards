@@ -7,8 +7,8 @@
 //   1. Adding, removing, or renaming a role requires a major version.
 //   2. Without a major version, the new installer must upgrade projects that the
 //      previous release installed, including the saved workflow states and
-//      cycle records in test/fixtures/upgrade/, without changing their STATE.md
-//      or CYCLE_IDS.md, and the new check.mjs must find no problem in them.
+//      cycle records in test/fixtures/upgrade/, without changing their
+//      STATE.md, and the new check.mjs must find no problem in them.
 //
 // Needs the full git history and tags (actions/checkout with fetch-depth: 0).
 //
@@ -102,15 +102,14 @@ export function upgradeFailures(repo, tag) {
       }
       // Load the saved runtime files and the cycle's records under .standards/docs/.
       cpSync(fixture, project, { recursive: true });
-      const before = ['STATE.md', 'CYCLE_IDS.md'].map((file) => readFileSync(path.join(project, '.standards', file), 'utf8'));
+      const before = readFileSync(path.join(project, '.standards/STATE.md'), 'utf8');
       const upgraded = run(process.execPath, [path.join(repo, 'bin/standards.js'), 'install', '--project', project, '--yes'], project);
       if (upgraded.code !== 0) {
         failures.push(`${name}: upgrading from ${tag} failed:\n${upgraded.output}`);
         continue;
       }
-      const after = ['STATE.md', 'CYCLE_IDS.md'].map((file) => readFileSync(path.join(project, '.standards', file), 'utf8'));
-      if (after[0] !== before[0] || after[1] !== before[1]) {
-        failures.push(`${name}: the upgrade changed STATE.md or CYCLE_IDS.md.`);
+      if (readFileSync(path.join(project, '.standards/STATE.md'), 'utf8') !== before) {
+        failures.push(`${name}: the upgrade changed STATE.md.`);
       }
       // The saved files follow the record formats of the previous release, so the
       // new check must accept them as they are.

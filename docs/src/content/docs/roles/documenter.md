@@ -71,15 +71,19 @@ selected file does not automatically complete the cycle's documentation.
 
 Documenter follows shared guidance for plain language, accurate examples, and
 consistent terms, plus relevant language-specific documentation conventions. You
-can explicitly select an available personal style; none is selected by default.
+can explicitly select a [user style](../../reference/runtime-files/#user-styles)
+you keep at `.standards/user-styles/documenter/<name>.md`; none is selected by
+default.
 
-For example, `Use user style tony` selects NumPy-style Python docstrings with a
-simple usage example for functions and methods being written or substantially
-updated. It does not apply that format to unrelated guides.
+For example, `Use user style tony` selects
+`.standards/user-styles/documenter/tony.md`. If that file asks for NumPy-style
+Python docstrings, Documenter applies it to the docstrings it writes or
+substantially updates, not to unrelated guides. The record saves the selection,
+and Documenter reloads it when it resumes.
 
-You may change or clear Documenter's personal style during the cycle. The choice
-is separate from Developer's locked coding style and cannot override correctness
-or project requirements.
+You may change or clear Documenter's user style during the cycle. The choice is
+separate from Developer's locked coding style and cannot override correctness or
+project requirements.
 
 ## Completion and recovery
 

@@ -58,13 +58,12 @@ One piece of work, from its saved request to sign-off or cancellation. Rework,
 recovery, and promotion stay within that cycle. Work after a cycle ends needs a
 new ID and cycle.
 
-## Cycle ID registry
+## Cycle ID
 
-The `.standards/CYCLE_IDS.md` list of reserved IDs. The agent adds each new ID
-with `node .standards/bin/cycle.mjs new`; you do not manage the list, and
-editing it by hand is not supported except to resolve a merge conflict. An ID
-cannot be reused while STANDARDS remains installed, even if cycle setup failed
-after the ID was reserved. See
+A cycle's unique name, such as `add-user-search-20260927T190146Z-7bef0f04`,
+built from the request, the UTC time, and random hex digits. The agent gets it
+from `node .standards/bin/cycle.mjs new` when the cycle starts and saves it in
+`Active Work.Id`. No one writes an ID by hand or reuses one. See
 [cycle identity](../runtime-files/#cycle-identity).
 
 ## Cycle mode
@@ -141,6 +140,14 @@ or not yet (`GREENFIELD`). Developer permanently changes greenfield to
 brownfield when it verifies that implementation has been created or materially
 changed. See [project modes](../../concepts/project-modes/).
 
+## Project reset
+
+`standards reset`, which returns an installed project's workflow to the state of
+a fresh installation. It deletes the saved workflow state, Auditor context, and
+cycle records, chooses the project mode again, and keeps everything else
+installed. See
+[Reset the workflow](../../getting-started/installation/#reset-the-workflow).
+
 ## Promotion
 
 The one-way change from expedited to standard work. It keeps the cycle and
@@ -178,7 +185,7 @@ A choice of how one role works, such as Developer's `STEPWISE` or Navigator's
 
 ## Runtime tools
 
-The Node.js tools in `.standards/bin/`: `cycle.mjs` reserves cycle IDs,
+The Node.js tools in `.standards/bin/`: `cycle.mjs` generates cycle IDs,
 `artifact.mjs` creates cycle records, `id.mjs` numbers their entries, and
 `check.mjs` checks the workflow files. See
 [runtime tools](../runtime-files/#runtime-tools).
@@ -204,11 +211,9 @@ role depends on project mode. See
 
 ## STANDARDS hook
 
-A Claude Code or Codex hook, added by the installer, that runs
-`.standards/bin/hook.mjs`. One runs `check` when the agent finishes a turn; the
-other blocks agent edits to the cycle-ID registry made with file-editing tools
-or common shell commands. See
-[Hooks](../../getting-started/installation/#hooks).
+A Claude Code or Codex stop hook, added by the installer, that runs
+`.standards/bin/hook.mjs` to check the workflow files when the agent finishes a
+turn. See [Hooks](../../getting-started/installation/#hooks).
 
 ## Synchronization record
 
@@ -222,6 +227,13 @@ the [template](../templates/synchronizer/).
 A technical condition Architect derives from a scope acceptance condition. It
 references the existing acceptance ID rather than creating a new requirement
 identity.
+
+## User style
+
+A Markdown file of your personal preferences for one role, kept at
+`.standards/user-styles/<role>/<name>.md`. A role applies it only when you
+select it by name, and only to discretionary choices. See
+[user styles](../runtime-files/#user-styles).
 
 ## Verification report
 

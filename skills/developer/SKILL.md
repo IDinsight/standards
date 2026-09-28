@@ -108,13 +108,12 @@ Then start the cycle. From `SIGNED_OFF` or retained `CANCELLED`, every new
 request, whether or not it was pending, starts through the protocol's **Start a
 new cycle** transition; do not directly replace terminal `Active Work` or bypass
 its handoff and baseline-reconciliation steps. For the initialized first cycle,
-reserve the cycle ID with
-`node .standards/bin/cycle.mjs new --request "<request>"` (see **Cycle ID
-Registry**). If the tool refuses or `CYCLE_IDS.md` is missing, stop and report
-it; never invent an ID or edit the registry. After the tool prints the ID,
-persist it, the request, and the selected `CycleMode`, and clear
-`PendingCycleMode`, `PendingCycleRequest`, and `PendingCycleBlockedOn` to their
-neutral values; an `EXPEDITED` cycle also follows the protocol's **Select
+generate the cycle ID with
+`node .standards/bin/cycle.mjs new --request "<request>"` (see **Cycle IDs**).
+If the tool refuses, stop and report it; never write an ID yourself. After the
+tool prints the ID, persist it, the request, and the selected `CycleMode`, and
+clear `PendingCycleMode`, `PendingCycleRequest`, and `PendingCycleBlockedOn` to
+their neutral values; an `EXPEDITED` cycle also follows the protocol's **Select
 expedited mode for the initialized cycle**. In both routes, continue Developer
 work only when the resulting state is `DEVELOPING`; a `STANDARD` cycle's entry
 state is owned by Scoper or Auditor, so stop there.
@@ -150,25 +149,13 @@ Load only the selected mode file.
 
 Always read and follow [`styles/universal.md`](styles/universal.md).
 
-Before first plan approval, if the user explicitly selects an available personal
-development style, load only the corresponding direct child Markdown file under
-`user-styles/` and persist its style identifier in the development plan. The
-identifier is the filename stem: `tony` and `tony.md` both select
-`user-styles/tony.md`, while the plan stores `tony`. `NONE` is the reserved
-sentinel for no selected user style. Do not treat path separators, relative
-paths, or nested paths as style identifiers.
-
-When resuming an existing plan, reload the persisted user style without
-requiring the user to restate it. Do not infer a user style from the user's
-identity, repository ownership, prior usage, filename, or the mere presence of a
-matching file.
-
-Before first approval, if an explicitly selected style does not resolve to
-exactly one available direct child `user-styles/<identifier>.md`, stop and ask
-the user to select an available style or clear the selection. If a locked style
-file is missing on resume, stop and report the inconsistency. Restore the
-selected file before continuing this cycle; do not clear or substitute the
-locked selection.
+Apply a user style only as the protocol's **User Styles** defines: the user
+explicitly selects `.standards/user-styles/developer/<identifier>.md` before
+first plan approval, and the plan persists its identifier, or `NONE` when none
+is selected. When resuming an existing plan, reload the persisted style without
+requiring the user to restate it. If a locked style's file is missing on resume,
+stop and report the inconsistency; restore the file before continuing this
+cycle, and do not clear or substitute the locked selection.
 
 Then load only the technology style files relevant to implementation Developer
 will materially create or modify:
@@ -190,7 +177,7 @@ technologies. Do not load unrelated style files or unselected user styles.
 Within the Developer style layer, use this precedence for style guidance:
 
 1. `styles/universal.md`;
-2. the explicitly selected `user-styles/<style>.md`, when any;
+2. the selected user style, when any;
 3. applicable technology files under `styles/`.
 
 When two Developer style files disagree only about a discretionary coding

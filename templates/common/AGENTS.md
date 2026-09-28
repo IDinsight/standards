@@ -13,7 +13,8 @@ When a workflow role is invoked:
    The protocol is authoritative for cycle start, states, transitions, recovery,
    sign-off, and cancellation.
 2. Use the tools in `.standards/bin/` as the protocol's **Runtime Tools and
-   Hooks** describes. Never invent a cycle ID or edit `.standards/CYCLE_IDS.md`.
+   Hooks** describes. Get every cycle ID from `cycle.mjs new`; never write one
+   yourself.
 3. If `.standards/` has a merge conflict, stop and ask the user to resolve it.
 
 Navigator never changes files or workflow state; its skill defines its boundary.

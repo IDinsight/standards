@@ -8,7 +8,7 @@ import test from 'node:test';
 
 import { installProject } from '../lib/install.js';
 import { slugFor } from '../runtime/cycle.mjs';
-import { shellWritesRegistry, stopMessage } from '../runtime/hook.mjs';
+import { stopMessage } from '../runtime/hook.mjs';
 
 const read = (root, relative) => readFile(path.join(root, relative), 'utf8');
 async function write(root, relative, value) {
@@ -25,7 +25,10 @@ function run(command, args, cwd) {
 }
 
 const tool = (root, name, ...args) => run(process.execPath, [path.join(root, '.standards/bin', `${name}.mjs`), ...args], root);
-const git = (root, ...args) => run('git', ['-c', 'user.name=Test', '-c', 'user.email=test@example.com', ...args], root);
+// Automatic maintenance is off: after a commit, git may repack in a detached
+// process, which races the removal of the temporary project.
+const git = (root, ...args) => run('git', ['-c', 'user.name=Test', '-c', 'user.email=test@example.com',
+  '-c', 'maintenance.auto=false', '-c', 'gc.auto=0', ...args], root);
 
 async function commit(root) {
   await git(root, 'add', '-A');
@@ -54,7 +57,7 @@ async function editState(root, edit) {
 
 const setField = (text, name, value) => text.replace(new RegExp('`' + name + '`:(\\s*)`[^`]*`'), `\`${name}\`:$1\`${value}\``);
 
-// Reserve an ID with the tool and record it as the active cycle.
+// Generate an ID with the tool and record it as the active cycle.
 async function startCycle(root, { state = 'SCOPING', mode = 'STANDARD' } = {}) {
   const { stdout, code } = await tool(root, 'cycle', 'new', '--request', 'Add user search');
   assert.equal(code, 0);
@@ -64,10 +67,13 @@ async function startCycle(root, { state = 'SCOPING', mode = 'STANDARD' } = {}) {
   return id;
 }
 
+// Create a record the way a role does, with no user style selected.
 async function init(root, ...args) {
   const result = await tool(root, 'artifact', 'init', ...args);
   assert.equal(result.code, 0, result.stderr);
-  return result.stdout.trim();
+  const relative = result.stdout.trim();
+  await write(root, relative, (await read(root, relative)).replace('`User Style`: `NONE | <identifier>`', '`User Style`: `NONE`'));
+  return relative;
 }
 
 async function fillHeader(root, relative, values) {
@@ -119,12 +125,15 @@ test('slugs use plain lowercase words and stay short', () => {
   assert.equal(slugFor('!!!'), 'cycle');
 });
 
-test('cycle new reserves a registered ID that the installer and check accept', () => project(async (root) => {
+test('cycle new prints an ID that check accepts and changes no file', () => project(async (root) => {
+  const state = await read(root, '.standards/STATE.md');
   const { code, stdout } = await tool(root, 'cycle', 'new', '--request', 'Add user search by name');
   assert.equal(code, 0);
   const id = stdout.trim();
   assert.match(id, /^add-user-search-by-name-\d{8}T\d{6}Z-[0-9a-f]{8}$/);
-  assert.match(await read(root, '.standards/CYCLE_IDS.md'), new RegExp(`^- ${id}$`, 'm'));
+  assert.equal(await read(root, '.standards/STATE.md'), state);
+  await editState(root, (text) => [['Id', id], ['Request', 'Add user search by name'], ['CycleMode', 'STANDARD']]
+    .reduce((current, [name, value]) => setField(current, name, value), text));
   await installProject({ projectRoot: root, clients: ['claude'] });
   assert.equal((await check(root)).ok, true);
 }));
@@ -138,28 +147,22 @@ test('cycle new refuses while a cycle is active and works again after sign-off',
   assert.equal((await tool(root, 'cycle', 'new', '--request', 'Another change')).code, 0);
 }));
 
-test('parallel cycle new calls reserve distinct IDs', () => project(async (root) => {
-  const results = await Promise.all(Array.from({ length: 8 }, (_, index) =>
-    tool(root, 'cycle', 'new', '--request', `Change ${index}`)));
+test('cycle new calls with the same request print distinct IDs', () => project(async (root) => {
+  const results = await Promise.all(Array.from({ length: 8 }, () => tool(root, 'cycle', 'new', '--request', 'Change')));
   assert.deepEqual(results.map((result) => result.code), Array(8).fill(0));
-  const ids = results.map((result) => result.stdout.trim());
-  assert.equal(new Set(ids).size, 8);
-  const registry = await read(root, '.standards/CYCLE_IDS.md');
-  for (const id of ids) assert.match(registry, new RegExp(`^- ${id}$`, 'm'));
-  assert.equal((await check(root)).ok, true);
+  assert.equal(new Set(results.map((result) => result.stdout.trim())).size, 8);
 }));
 
-test('cycle new refuses a missing or conflicted registry and leaves it alone', () => project(async (root) => {
-  const registry = await read(root, '.standards/CYCLE_IDS.md');
-  await write(root, '.standards/CYCLE_IDS.md', `${registry}<<<<<<< ours\n- a-1\n=======\n- b-2\n>>>>>>> theirs\n`);
+test('cycle new refuses a conflicted or missing STATE.md', () => project(async (root) => {
+  const state = await read(root, '.standards/STATE.md');
+  await write(root, '.standards/STATE.md', `<<<<<<< ours\n${state}=======\n${state}>>>>>>> theirs\n`);
   const conflicted = await tool(root, 'cycle', 'new', '--request', 'Search');
   assert.equal(conflicted.code, 1);
   assert.match(conflicted.stderr, /merge conflicts/);
-  await rm(path.join(root, '.standards/CYCLE_IDS.md'));
+  await rm(path.join(root, '.standards/STATE.md'));
   const missing = await tool(root, 'cycle', 'new', '--request', 'Search');
   assert.equal(missing.code, 1);
-  assert.match(missing.stderr, /never recreate it empty/);
-  await assert.rejects(read(root, '.standards/CYCLE_IDS.md'));
+  assert.match(missing.stderr, /STATE\.md is missing/);
 }));
 
 test('id next counts current, retired, and last-committed identifiers', () => project(async (root) => {
@@ -249,8 +252,24 @@ test('check reports workflow state problems', () => project(async (root) => {
   hasProblem(result, /Obligation 1: `Reason` is missing/);
   hasProblem(result, /AWAITING_USER_SIGNOFF requires an empty recovery stack/);
   await editState(root, (text) => setField(text, 'Id', 'made-up-id-1234'));
-  hasProblem(await check(root), /Active Work\.Id `made-up-id-1234` is not in \.standards\/CYCLE_IDS\.md/);
+  hasProblem(await check(root), /Active Work\.Id `made-up-id-1234` is not in the form cycle\.mjs generates/);
 }));
+
+test('a new cycle may not reuse the ID of the cycle the last commit ended', () => project(async (root) => {
+  const id = await startCycle(root, { state: 'AWAITING_USER_SIGNOFF' });
+  await editState(root, (text) => [['WorkflowState', 'SIGNED_OFF'], ['CycleMode', 'UNSET'], ['Kind', 'SIGNOFF'],
+    ['From', 'AWAITING_USER_SIGNOFF']].reduce((current, [name, value]) => setField(current, name, value), text));
+  await commit(root);
+  // The next cycle's ID is generated while no cycle is active.
+  const next = await tool(root, 'cycle', 'new', '--request', 'Next change');
+  assert.equal(next.code, 0, next.stderr);
+  const reopen = (cycle) => editState(root, (text) => [['WorkflowState', 'AUDITING'], ['CycleMode', 'STANDARD'],
+    ['Kind', 'NEW_CYCLE'], ['From', 'SIGNED_OFF'], ['Id', cycle]].reduce((current, [name, value]) => setField(current, name, value), text));
+  await reopen(id);
+  hasProblem(await check(root), new RegExp(`Active Work\\.Id \`${id}\` belongs to the cycle the last commit ended in SIGNED_OFF`));
+  await reopen(next.stdout.trim());
+  assert.deepEqual(messages(await check(root)), []);
+}, { withGit: true }));
 
 test('check reports provenance problems', () => project(async (root) => {
   const id = await startCycle(root, { state: 'TESTING' });
@@ -260,7 +279,7 @@ test('check reports provenance problems', () => project(async (root) => {
     + '# Verification Report\n\n`Cycle`: `other-cycle` `Mode`: `VERIFY | REVERIFY` `Status`: `COMPLETE`\n');
   const result = await check(root);
   hasProblem(result, /broken\.md: has a malformed provenance block \(unknown Artifact `VERIFICATON`\)/);
-  // A record from an earlier cycle is history, even when its ID is not in this registry.
+  // A record from an earlier cycle is history, whatever form its ID has.
   assert.equal(messages(result).some((line) => line.includes('review.md')), false);
   hasProblem(result, new RegExp(`report\\.md: is this cycle's VERIFICATION record, but it must be at \\.standards/docs/verification/${id}\\.md`));
   hasProblem(result, /report\.md: shows Cycle `other-cycle`/);
@@ -487,39 +506,11 @@ function withStdin(command, args, { cwd, input, env = {} }) {
 const hook = (root, event, input) =>
   withStdin(process.execPath, [path.join(root, '.standards/bin/hook.mjs'), event], { cwd: root, input: { cwd: root, ...input } });
 
-test('pre-tool-use blocks agent edits to the cycle ID registry and allows everything else', () => project(async (root) => {
-  const registry = path.join(root, '.standards/CYCLE_IDS.md');
-  const blocked = [
-    { tool_name: 'Edit', tool_input: { file_path: registry } },
-    { tool_name: 'Write', tool_input: { file_path: '.standards/CYCLE_IDS.md' } },
-    { tool_name: 'apply_patch', tool_input: { command: '*** Begin Patch\n*** Update File: .standards/CYCLE_IDS.md\n@@\n+- x-1\n*** End Patch' } },
-    { tool_name: 'Bash', tool_input: { command: 'echo "- x-1" >> .standards/CYCLE_IDS.md' } },
-    { tool_name: 'Bash', tool_input: { command: ['bash', '-lc', "sed -i '' 's/a/b/' .standards/CYCLE_IDS.md"] } },
-  ];
-  for (const input of blocked) {
-    const result = await hook(root, 'pre-tool-use', input);
-    assert.equal(result.code, 2, JSON.stringify(input));
-    assert.match(result.stderr, /cycle\.mjs new/);
-  }
-  const allowed = [
-    { tool_name: 'Edit', tool_input: { file_path: path.join(root, 'app.py') } },
-    { tool_name: 'Write', tool_input: { file_path: '.standards/STATE.md' } },
-    { tool_name: 'Bash', tool_input: { command: 'cat .standards/CYCLE_IDS.md' } },
-    { tool_name: 'Bash', tool_input: { command: 'grep search .standards/CYCLE_IDS.md 2>/dev/null' } },
-    { tool_name: 'Bash', tool_input: { command: 'node .standards/bin/cycle.mjs new --request "Search"' } },
-  ];
-  for (const input of allowed) assert.equal((await hook(root, 'pre-tool-use', input)).code, 0, JSON.stringify(input));
+test('the hook script handles only the stop event', () => project(async (root) => {
+  const result = await hook(root, 'pre-tool-use', { tool_name: 'Edit', tool_input: { file_path: 'app.py' } });
+  assert.equal(result.code, 1);
+  assert.match(result.stderr, /Usage: node \.standards\/bin\/hook\.mjs stop/);
 }));
-
-test('the shell guard recognizes common ways of writing a file', () => {
-  for (const command of ['printf x > .standards/CYCLE_IDS.md', 'tee -a .standards/CYCLE_IDS.md', 'rm .standards/CYCLE_IDS.md',
-    "perl -pi -e 's/a/b/' .standards/CYCLE_IDS.md", "python3 -c \"open('.standards/CYCLE_IDS.md','a').write('- x')\""]) {
-    assert.equal(shellWritesRegistry(command), true, command);
-  }
-  for (const command of ['git diff .standards/CYCLE_IDS.md', 'wc -l .standards/CYCLE_IDS.md', 'ls .standards']) {
-    assert.equal(shellWritesRegistry(command), false, command);
-  }
-});
 
 // The Stop payload Claude Code sends (session_id, transcript_path, cwd,
 // permission_mode, hook_event_name, stop_hook_active, last_assistant_message).
@@ -669,17 +660,20 @@ test('the installed hook commands reach the hook script', () => project(async (r
   const codex = JSON.parse(await readFile(new URL('../templates/codex/.codex/hooks.json', import.meta.url), 'utf8'));
   const claude = JSON.parse(await readFile(new URL('../templates/claude/settings-hooks.json', import.meta.url), 'utf8'));
   await mkdir(path.join(root, 'src/deep'), { recursive: true });
-  const input = { tool_name: 'Bash', tool_input: { command: 'echo "- x-1" >> .standards/CYCLE_IDS.md' }, cwd: root };
   for (const [config, options] of [[codex, { cwd: path.join(root, 'src/deep') }],
     [claude, { cwd: path.join(root, 'src/deep'), env: { CLAUDE_PROJECT_DIR: root } }]]) {
-    const [preToolUse] = config.hooks.PreToolUse;
+    assert.deepEqual(Object.keys(config.hooks), ['Stop']);
     const [stop] = config.hooks.Stop;
-    assert.match(preToolUse.matcher, /Bash/);
     assert.match(stop.hooks[0].command, /hook\.mjs" stop$/);
-    const result = await withStdin('sh', ['-c', preToolUse.hooks[0].command], { ...options, input });
-    assert.equal(result.code, 2, result.stderr);
     const allowed = await withStdin('sh', ['-c', stop.hooks[0].command], { ...options, input: { session_id: randomUUID() } });
     assert.equal(allowed.code, 0, allowed.stderr);
+    // A problem in an uncommitted workflow file sends the agent back, so the command ran check.
+    await write(root, 'docs/broken.md', '<!-- STANDARDS\nArtifact: NOPE\nCycle: x-1\n-->\n');
+    const sent = await withStdin('sh', ['-c', stop.hooks[0].command], { ...options,
+      input: { session_id: randomUUID(), stop_hook_active: false } });
+    assert.equal(sent.code, 2, sent.stderr);
+    assert.match(sent.stderr, /broken\.md: has a malformed provenance block/);
+    await rm(path.join(root, 'docs/broken.md'));
   }
 }, { withGit: true }));
 
@@ -705,8 +699,6 @@ test('the Codex hooks work in a project inside a larger repository', async () =>
     const cwd = path.join(root, 'src/deep');
     await mkdir(cwd, { recursive: true });
     const run = (event, input) => withStdin('sh', ['-c', hooks[event][0].hooks[0].command], { cwd, input });
-    const blocked = await run('PreToolUse', { tool_name: 'Bash', tool_input: { command: 'echo "- x-1" >> .standards/CYCLE_IDS.md' }, cwd: root });
-    assert.equal(blocked.code, 2, blocked.stderr);
 
     // The Codex Stop payload: nothing changed since the commit, so the turn ends.
     const stop = { session_id: randomUUID(), turn_id: 't1', cwd: root, hook_event_name: 'Stop', stop_hook_active: false };
@@ -727,12 +719,6 @@ test('paths through a symlink to the project are recognized', () => project(asyn
   const link = path.join(await realpath(os.tmpdir()), `standards-link-${randomUUID()}`);
   await symlink(root, link);
   try {
-    const viaLink = path.join(link, '.standards/CYCLE_IDS.md');
-    const blocked = await hook(root, 'pre-tool-use', { cwd: link, tool_name: 'Edit', tool_input: { file_path: viaLink } });
-    assert.equal(blocked.code, 2);
-    const patch = await hook(root, 'pre-tool-use', { cwd: link, tool_name: 'apply_patch',
-      tool_input: { command: '*** Begin Patch\n*** Update File: .standards/CYCLE_IDS.md\n*** End Patch' } });
-    assert.equal(patch.code, 2);
     await startCycle(root);
     const scope = await init(root, 'SCOPE');
     const next = await tool(root, 'id', 'next', 'AC', path.join(link, scope));
@@ -752,10 +738,11 @@ test('tools run when started through a symlinked project path', () => project(as
     assert.equal(JSON.parse(checked.stdout).ok, true);
     const cycle = await run(process.execPath, [path.join(link, '.standards/bin/cycle.mjs'), 'new', '--request', 'Search'], link);
     assert.match(cycle.stdout, /^search-\d{8}T\d{6}Z-[0-9a-f]{8}\n$/);
-    const blocked = await withStdin(process.execPath, [path.join(link, '.standards/bin/hook.mjs'), 'pre-tool-use'], {
-      cwd: link, input: { cwd: link, tool_name: 'Edit', tool_input: { file_path: path.join(link, '.standards/CYCLE_IDS.md') } },
+    await write(root, 'docs/broken.md', '<!-- STANDARDS\nArtifact: NOPE\nCycle: x-1\n-->\n');
+    const sent = await withStdin(process.execPath, [path.join(link, '.standards/bin/hook.mjs'), 'stop'], {
+      cwd: link, input: { cwd: link, session_id: randomUUID(), stop_hook_active: false },
     });
-    assert.equal(blocked.code, 2);
+    assert.equal(sent.code, 2, sent.stderr);
   } finally {
     await rm(link, { force: true });
   }
@@ -770,7 +757,7 @@ test('check reports baseline reconciliation and handoff problems', () => project
   const result = await check(root);
   hasProblem(result, /A FAILURE handoff needs a FailureType/);
   hasProblem(result, /BaselineReconciliation lists `ghost-cycle-1` more than once/);
-  hasProblem(result, /BaselineReconciliation source `ghost-cycle-1` is not in \.standards\/CYCLE_IDS\.md/);
+  hasProblem(result, /BaselineReconciliation source `ghost-cycle-1` is not a cycle ID/);
   await editState(root, (text) => text.replace(/`BaselineReconciliation`:[\s\S]*?(?=\n## Handoff)/, '`BaselineReconciliation`: `SOMETIMES`\n'));
   hasProblem(await check(root), /BaselineReconciliation must be `NONE` or a list/);
 }));

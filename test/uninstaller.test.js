@@ -34,7 +34,6 @@ test('uninstall removes both clients and saved history, keeps project work, and 
   await installProject({ projectRoot: root });
   await write(root, '.standards/STATE.md', 'Active unfinished work\n');
   await write(root, '.standards/CONTEXT.md', 'Saved audit\n');
-  await write(root, '.standards/CYCLE_IDS.md', 'Reserved old cycle\n');
   await mkdir(path.join(root, 'docs'));
   await write(root, 'docs/scope.md', 'Keep role output\n');
   await write(root, 'app.js', 'Keep implementation\n');
@@ -66,6 +65,17 @@ test('uninstall deletes the cycle records in .standards/docs/ and warns with the
   const result = await uninstallProject({ projectRoot: root });
   assert.ok(result.warnings.includes(warning));
   assert.equal((await readdir(root)).includes('.standards'), false);
+}));
+
+test('uninstall deletes user styles and warns with their count', () => fixture(async (root) => {
+  await installProject({ projectRoot: root });
+  assert.equal((await uninstallProject({ projectRoot: root, dryRun: true })).warnings.some((line) => /user style/.test(line)), false);
+  await mkdir(path.join(root, '.standards/user-styles/developer'), { recursive: true });
+  await write(root, '.standards/user-styles/developer/alex.md', '# Alex\n');
+  const preview = await uninstallProject({ projectRoot: root, dryRun: true });
+  assert.ok(preview.warnings.includes('Deletes 1 user style in .standards/user-styles/; copy any you want to keep first.'),
+    preview.warnings.join('\n'));
+  assert.equal(await read(root, '.standards/user-styles/developer/alex.md'), '# Alex\n');
 }));
 
 test('uninstall preserves exact text outside managed blocks and an existing Claude import', () => fixture(async (root) => {
@@ -239,7 +249,7 @@ for (const [name, prepare, error] of failures) {
 
 test('incomplete workflow metadata and missing skills do not block removal with valid ownership', () => fixture(async (root) => {
   await installProject({ projectRoot: root });
-  for (const name of ['MODE.md', 'STATE.md', 'VERSION.json', 'CYCLE_IDS.md']) {
+  for (const name of ['MODE.md', 'STATE.md', 'VERSION.json']) {
     await rm(path.join(root, '.standards', name));
   }
   await rm(path.join(root, '.agents/skills/scoper'), { recursive: true });

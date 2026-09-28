@@ -19,6 +19,7 @@ Cycle: <Active Work.Id>
 # Synchronization Record
 
 `Cycle`: `<Active Work.Id>` `Status`: `IN_PROGRESS | BLOCKED | COMPLETE`
+`User Style`: `NONE | <identifier>`
 
 ## Assessed Inputs
 
@@ -103,7 +104,9 @@ that work is not yet assessed instead of empty required sections. Persist enough
 to resume without chat history. `IN_PROGRESS` means reconciliation remains;
 `BLOCKED` means required reconciliation cannot complete; `COMPLETE` means the
 full **Synchronization Gate** passed, subject to current input applicability.
-Reopen unsupported conclusions and preserve useful superseded reasoning.
+Reopen unsupported conclusions and preserve useful superseded reasoning. Set
+`User Style` to the user's explicit selection under the protocol's **User
+Styles**, or `NONE`.
 
 Reuse unchanged, sufficiently assessed content without cosmetic rewrites or
 repeated history entries. Correct only this record; route defects in referenced

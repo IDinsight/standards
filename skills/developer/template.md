@@ -88,11 +88,11 @@ on an individual step.
 - Create steps from the active request, completed scope/design when present, and
   relevant repository evidence; do not invent new requirements or architecture.
 - Set `User Style` only from an explicit user selection or a previously
-  persisted selection for this development plan. Store the direct-child
-  `user-styles/<identifier>.md` filename stem only: for example, both `tony` and
-  `tony.md` persist as `tony`. Use `NONE` otherwise; `NONE` is reserved for no
-  selected user style. Never infer a profile from identity, repository
-  ownership, prior usage, or filename, and never store a path as the identifier.
+  persisted selection for this development plan, under the protocol's **User
+  Styles**. Store the identifier of
+  `.standards/user-styles/developer/<identifier>.md` only: for example, both
+  `tony` and `tony.md` persist as `tony`. Use `NONE` otherwise, and never store
+  a path as the identifier.
 - Start a new plan with `User Style Locked: false`. Allow selecting, changing,
   or clearing `User Style` only before first approval, while the plan remains
   `PROPOSED`. First approval covers the selection, including `NONE`, and sets

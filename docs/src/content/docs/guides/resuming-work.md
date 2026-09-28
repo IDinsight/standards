@@ -35,8 +35,8 @@ these fields or repeat a request already saved in the state. See
 The role decides how to continue from its own saved work:
 
 - **Developer** checks the saved plan and current code, then continues from the
-  first incomplete approved step. If the plan needs a material revision, it asks
-  for your approval before coding. See
+  first incomplete approved step with the user style saved in the plan. If the
+  plan needs a material revision, it asks for your approval before coding. See
   [Working with Developer](../working-with-developer/#resume-or-correct-implementation).
 - **Tester** checks its earlier verification report and current files. It
   decides whether it can continue an interrupted check or needs to reassess
@@ -50,7 +50,10 @@ The role decides how to continue from its own saved work:
 
 Other roles likewise read their saved work and any active recovery instructions.
 You do not choose a verification mode, reopen plan steps, or decide which
-evidence remains valid for them.
+evidence remains valid for them. Tester, Reviewer, Documenter, and Synchronizer
+also reload the [user style](../../reference/runtime-files/#user-styles) saved
+in their record. Scoper, Architect, Auditor, and Navigator do not save one, so
+name your style again when you resume them.
 
 ## Keep independent assessments separate
 
@@ -64,11 +67,18 @@ need to start the appropriate chat and invoke the role. See
 
 ## Work on more than one branch
 
-Each branch can carry one active cycle. If you merge a branch into another one
-that also changed `.standards/`, you resolve the merge conflict yourself: keep
-every line of `CYCLE_IDS.md` and exactly one cycle in `STATE.md`. To avoid it,
-sign off or cancel a cycle before merging its branch. An agent that finds
-unresolved conflict markers stops and asks you to resolve them. See
+Commit `.standards/` with your other changes. Each branch can carry one active
+cycle, and whoever checks out the branch continues that cycle from its saved
+state. To start over on a branch instead, including one created from a branch
+with an active cycle, cancel the cycle or run
+[`standards reset`](../../getting-started/installation/#reset-the-workflow).
+Before merging a branch into your main branch, reset it so the main branch keeps
+a fresh installation.
+
+If you merge two branches that both changed `.standards/` without a reset, you
+resolve the merge conflict yourself by keeping exactly one cycle in `STATE.md`.
+An agent that finds unresolved conflict markers stops and asks you to resolve
+them. See
 [Branches and merges](../../reference/runtime-files/#branches-and-merges).
 
 ## Answer decisions that are waiting on you
@@ -79,9 +89,8 @@ Developer plan still needs your explicit approval before implementation. At
 `AWAITING_USER_SIGNOFF`, review the finished work and decide whether to accept
 it, request changes, or cancel.
 
-After sign-off or a cancellation that retained the installation, a new request
-starts a [new cycle](../cancelling-and-new-cycles/#start-the-next-cycle). After
-a bootstrap reset,
-[install STANDARDS again](../../getting-started/installation/) before starting
-another cycle. Navigator can explain available project evidence at any time, but
-cannot advance the workflow.
+After sign-off or a retained cancellation, a new request starts a
+[new cycle](../cancelling-and-new-cycles/#start-the-next-cycle). After a
+bootstrap reset or `standards reset`, a new request starts the first cycle from
+the fresh state. Navigator can explain available project evidence at any time,
+but cannot advance the workflow.

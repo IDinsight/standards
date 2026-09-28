@@ -66,8 +66,8 @@ Before the first role begins its work, the agent:
 1. Checks the workflow files with `node .standards/bin/check.mjs`.
 2. Checks the installed project mode, any saved preference, and whether the
    request can use the selected cycle mode.
-3. Reserves a unique cycle ID with `node .standards/bin/cycle.mjs new`, which
-   adds it to `.standards/CYCLE_IDS.md`.
+3. Generates a unique cycle ID with `node .standards/bin/cycle.mjs new`, which
+   checks that no earlier cycle's records use it.
 4. Saves the request, mode, ID, and initial workflow state in
    `.standards/STATE.md`.
 
@@ -76,10 +76,12 @@ it needs a decision it cannot make from your request. Once a role finishes, you
 still invoke the next role from its handoff; changing the saved state does not
 run another role automatically.
 
-If you are starting work after sign-off or a cancellation that retained the
-installation, the agent follows the
+If you are starting work after sign-off or a retained cancellation, the agent
+follows the
 [new-cycle procedure](../cancelling-and-new-cycles/#start-the-next-cycle) to
 check any work left by cancellation and initialize the new cycle. After a
-bootstrap reset, [install STANDARDS again](../../getting-started/installation/)
-first. The [protocol](../../reference/protocol/#cycle-modes) has the exact state
-and ID rules.
+bootstrap reset or
+[`standards reset`](../../getting-started/installation/#reset-the-workflow), the
+project is back to a fresh installation, so start as described above. The
+[protocol](../../reference/protocol/#cycle-modes) has the exact state and ID
+rules.

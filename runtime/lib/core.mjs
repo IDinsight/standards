@@ -2,9 +2,8 @@
 // inside the user's project with plain Node.js, so they must not import
 // anything outside `.standards/bin/` or any npm package.
 import { execFile } from 'node:child_process';
-import { randomBytes } from 'node:crypto';
 import { realpathSync } from 'node:fs';
-import { lstat, mkdir, open, readFile, realpath, rename, rm, writeFile } from 'node:fs/promises';
+import { lstat, mkdir, readFile, realpath, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -24,8 +23,13 @@ export const HANDOFF_KINDS = new Set([
   'INITIAL', 'FORWARD', 'FAILURE', 'RESUME', 'PROMOTE', 'USER_REWORK',
   'NEW_CYCLE', 'SIGNOFF', 'CANCEL',
 ]);
-// Same character rule the installer applies to `.standards/CYCLE_IDS.md`.
+// Characters a cycle ID may use. Provenance blocks from any cycle are read
+// with this rule.
 export const CYCLE_ID = /^[A-Za-z0-9][A-Za-z0-9._-]*$/;
+// The exact shape `cycle.mjs new` generates: a lowercase slug of the request,
+// the UTC time, and eight random hex digits, e.g.
+// `add-user-search-20260927T190146Z-7bef0f04`.
+export const GENERATED_CYCLE_ID = /^[a-z0-9]+(?:-[a-z0-9]+)*-\d{8}T\d{6}Z-[0-9a-f]{8}$/;
 
 // Tools live at `<project>/.standards/bin/<tool>.mjs`, so the project root is
 // two directories above the script, whatever the caller's working directory.
@@ -123,64 +127,10 @@ async function prepareParents(root, relative) {
   }
 }
 
-// Write to a temporary file in the same folder, then rename, so readers never
-// see a half-written file.
-export async function writeAtomic(root, relative, contents) {
-  await prepareParents(root, relative);
-  const target = path.join(root, relative);
-  const temporary = path.join(path.dirname(target),
-    `.${path.basename(target)}.tmp-${process.pid}-${randomBytes(4).toString('hex')}`);
-  await writeFile(temporary, contents, { flag: 'wx' });
-  try {
-    await rename(temporary, target);
-  } catch (error) {
-    await rm(temporary, { force: true });
-    throw error;
-  }
-}
-
 // Create a new file, failing if anything already exists at that path.
 export async function writeNew(root, relative, contents) {
   await prepareParents(root, relative);
   await writeFile(path.join(root, relative), contents, { flag: 'wx' });
-}
-
-function processIsAlive(pid) {
-  try {
-    process.kill(pid, 0);
-    return true;
-  } catch (error) {
-    return error.code === 'EPERM';
-  }
-}
-
-// Exclusive lock file holding the owner's process ID. A lock left behind by a
-// process that no longer exists is removed automatically.
-export async function withLock(root, relative, run, { attempts = 100, delayMs = 50 } = {}) {
-  const lockPath = path.join(root, relative);
-  for (let attempt = 0; attempt < attempts; attempt += 1) {
-    let handle;
-    try {
-      handle = await open(lockPath, 'wx');
-    } catch (error) {
-      if (error.code !== 'EEXIST') throw error;
-      const owner = Number.parseInt((await readText(root, relative)) ?? '', 10);
-      if (Number.isInteger(owner) && owner > 0 && !processIsAlive(owner)) {
-        await rm(lockPath, { force: true });
-        continue;
-      }
-      await new Promise((resolve) => setTimeout(resolve, delayMs));
-      continue;
-    }
-    try {
-      await handle.writeFile(String(process.pid));
-      await handle.close();
-      return await run();
-    } finally {
-      await rm(lockPath, { force: true });
-    }
-  }
-  throw new UsageError(`Timed out waiting for ${relative}; another STANDARDS tool is still running`);
 }
 
 // Run git in the project. Returns null when git is missing, the project is not

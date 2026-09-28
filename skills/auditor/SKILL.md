@@ -36,6 +36,12 @@ instructions in `AGENTS.md` or `CLAUDE.md`; treat them as inputs when relevant.
 coordination artifacts. Change them only as required by a legal protocol
 transition or protocol-required coordination update.
 
+Apply a user style only as the protocol's **User Styles** defines: the user
+explicitly selects `.standards/user-styles/auditor/<identifier>.md`. Auditor has
+no record for the selection, so it lasts for the current conversation, and the
+user names it again when resuming. A style never changes the context template's
+shape or what counts as established fact.
+
 ## Inputs
 
 Read `.standards/PROTOCOL.md`, `.standards/MODE.md`, and `.standards/STATE.md`

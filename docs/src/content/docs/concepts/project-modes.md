@@ -79,9 +79,11 @@ Approving a plan or creating tests, reviews, or documentation alone does not.
 
 Returning to an earlier role does not make the project greenfield again.
 Cancellation must also check for implementation, even if the saved mode has not
-yet been updated. If implementation exists, cancellation retains the framework
-and the cycle record. See
-[the cancellation rules](../../guides/cancelling-and-new-cycles/).
+yet been updated. If implementation exists, cancellation keeps the cycle record
+and ends in `CANCELLED`. See
+[the cancellation rules](../../guides/cancelling-and-new-cycles/). Only
+[`standards reset`](../../getting-started/installation/#reset-the-workflow)
+chooses the mode again, from the project's contents at that time.
 
 The installed `.standards/MODE.md` saves project mode; `.standards/STATE.md`
 saves cycle mode and any next-cycle preference.
