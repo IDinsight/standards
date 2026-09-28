@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.0](https://github.com/IDinsight/standards/compare/v0.5.1...v0.6.0) (2026-09-28)
+
+
+### Features
+
+* add reset and project user styles; drop the cycle-ID registry ([#9](https://github.com/IDinsight/standards/issues/9)) ([041dc6f](https://github.com/IDinsight/standards/commit/041dc6f375a8b662402555f821d75d53f66cee37))
+
 ## [0.5.1](https://github.com/IDinsight/standards/compare/v0.5.0...v0.5.1) (2026-09-28)
 
 
