@@ -151,6 +151,9 @@ export default defineConfig({
               slug: "reference/protocol",
             },
             {
+              slug: "reference/installer",
+            },
+            {
               slug: "reference/runtime-files",
             },
             {

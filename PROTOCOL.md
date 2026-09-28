@@ -3,10 +3,15 @@
 <!-- standards:framework-owned -->
 
 This file is the canonical contract for shared workflow vocabulary, state,
-transitions, recovery, and installation behavior in S.T.A.N.D.A.R.D.S.
+transitions, recovery, and the installed runtime in S.T.A.N.D.A.R.D.S.
 
 `README.md` explains the framework at a high level. Individual skills define
 role-specific behavior. This protocol defines the rules those skills must share.
+
+Read all of this file before workflow work. It is longer than a single read in
+some tools. If a read shows only part of it, such as its beginning, or its
+beginning and end with lines left out between them, read the missing lines in
+consecutive parts before acting.
 
 ## How to read this document
 
@@ -28,8 +33,8 @@ The sections are grouped and ordered to be read in sequence:
 7. **Formats and reference** (`Cycle IDs` to `User Styles`) — cycle IDs, the
    `STATE.md` field contract, artifact provenance, the project-context
    lifecycle, and user styles.
-8. **Installed runtime** (`Installed Runtime Contract`) — what installation
-   creates, preserves, resets, and removes.
+8. **Installed runtime** (`Installed Runtime Contract`) — the installed files
+   and their owners, how agents run the CLI, and what reset and uninstall do.
 
 The grouping is for orientation purposes only: a role applies every applicable
 rule regardless of where it appears. **Canonical Terms** at the end defines each
@@ -1621,7 +1626,10 @@ when the selection is not locked, to choose another or clear it.
 
 ## Installed Runtime Contract
 
-An installed project should provide:
+The user installs, upgrades, resets, and uninstalls STANDARDS with the
+`standards` CLI. The CLI's full contract is maintained in the STANDARDS
+repository (`INSTALLER.md`) and is not installed. An installed project should
+provide:
 
 - `AGENTS.md`: project-facing entrypoint to the protocol and role skills;
 - `CLAUDE.md`: Claude Code compatibility entrypoint importing `AGENTS.md`;
@@ -1652,112 +1660,35 @@ An installed project should provide:
 greenfield-to-brownfield transition follows **Project Modes**.
 `.standards/STATE.md` contains exactly one canonical `WorkflowState` and
 `CycleMode` and follows **Persisted Workflow State**.
-`.standards/INSTALLATION.json` is installer metadata, not workflow state: create
-it on first installation, preserve/update it across normal reinstall or upgrade,
-and record only mutations the installer actually created. Never retroactively
-claim compatible pre-existing settings.
+`.standards/INSTALLATION.json` is installer metadata, not workflow state. It
+records only the client settings, client paths, and hook files the installer
+created, so a reinstall or uninstall never claims or undoes the user's own
+settings.
 
-Record a client directory or settings file in `createdPaths` only if that exact
-path was absent before installation created it. Supported paths are `.agents`,
-`.agents/skills`, `.claude`, `.claude/skills`, `.claude/settings.json`,
-`.codex`, and `.codex/hooks.json`. Preserve this record across reinstall and
-upgrade.
+A reinstall of the same version, or an upgrade to a newer minor or patch release
+of the same major version, keeps workflow state, Auditor context, cycle records,
+user styles, and project-owned instructions and settings, and replaces the
+protocol, tools, skill files, and managed blocks. STANDARDS provides no
+migration between major versions: moving an existing project to a new major
+version means `standards uninstall`, which deletes `.standards/`, followed by a
+fresh installation.
 
-`.standards/VERSION.json` records the installed framework release separately
-from settings ownership and workflow state. Reinstallation with the same version
-is allowed. An installer may upgrade to a newer minor or patch release within
-the same major version after verifying the existing runtime; it must preserve
-workflow data and update the recorded version with the framework assets. Reject
-older versions and cross-major upgrades. A major release may be installed into a
-fresh project. STANDARDS provides no migration between major versions: the only
-route for an existing project is `standards uninstall`, which deletes
-`.standards/` (including workflow state, Auditor context, cycle records, and
-user styles), followed by a fresh installation. The framework maintainer
-chooses the release version. Adding, removing, or renaming a role is a major
-change, and so is any change to the runtime files or record formats that an
-existing installation's files would no longer pass.
+### Running the CLI
 
-### Installer File Preservation
+Agents run the `standards` CLI only when the user explicitly asks, except that
+they run reset for **Greenfield Bootstrap Cancellation**, which defines its own
+approval steps. `standards reset` and `standards uninstall` delete workflow
+data, so for either command:
 
-Installation must be idempotent and preserve project-owned instructions.
-Before creating, replacing, updating, or removing a framework-controlled runtime
-path or installed skill package, verify ownership deterministically.
-
-Ownership rules:
-
-- `.standards/` is framework-owned only when `.standards/PROTOCOL.md` contains
-  `<!-- standards:framework-owned -->`. Otherwise report a path collision and
-  do not adopt, overwrite, or remove it.
-- An installed skill package is framework-owned only when its root `SKILL.md`
-  carries the same marker. Otherwise report a skill collision and do not
-  overwrite, merge, or remove it.
-- Framework source `PROTOCOL.md` and root workflow `SKILL.md` files must retain
-  the marker. Never infer ownership from names, paths, or similar content.
-
-After ownership checks:
-
-- Create `AGENTS.md` from `templates/common/AGENTS.md` if absent. Otherwise
-  preserve existing content and add or update only the bounded block between
-  `<!-- standards:start -->` and `<!-- standards:end -->`.
-- Create `CLAUDE.md` from `templates/common/CLAUDE.md` if absent. If an existing
-  user-owned unbounded `@AGENTS.md` import exists, preserve it and do not add a
-  framework duplicate. Otherwise add or update a bounded integration block. If
-  multiple unbounded imports exist, preserve them and report the conflict.
-- Update `.standards/PROTOCOL.md` from the installed framework version only
-  after runtime ownership verification. Install or update each skill definition
-  only after that destination skill package passes its ownership check. Update
-  skill packages file by file: write every file the release ships, except the
-  `evals/` folder used to develop the skill, and leave any other file in the
-  folder unchanged. Keep the
-  installed protocol aligned with the installed skills.
-- A reinstall keeps the installed clients. The user may add a client; removing
-  one requires uninstalling.
-- Preserve Codex `allow_implicit_invocation: false`.
-- For Claude Code, safely merge `.claude/settings.json` while preserving
-  unrelated settings: add each missing required
-  `skillOverrides.<skill>: "user-invocable-only"` and record that exact created
-  key/value in `.standards/INSTALLATION.json`; preserve an already-compatible
-  unowned value without claiming it; report conflicting unowned values rather
-  than overriding them. On reinstall, restore any recorded key that was changed
-  or removed, and show each restoration in the install preview.
-- Hooks: unless the user declines them, add the STANDARDS hook groups to
-  `.claude/settings.json` and `.codex/hooks.json` for the installed clients,
-  creating `.codex/hooks.json` if needed. A STANDARDS hook is a hook handler
-  whose command runs `.standards/bin/hook.mjs`; installation replaces or removes
-  only those handlers and leaves every other hook unchanged. Record in
-  `.standards/INSTALLATION.json` which files have STANDARDS hooks. A reinstall
-  keeps the current hook choice unless the user makes another one, restores
-  missing or edited STANDARDS hooks, and removes them when the user turns hooks
-  off. Codex runs new or changed hooks only after the user trusts them with
-  `/hooks`.
-- Record ownership of newly created client directories, the Claude settings
-  file, and the Codex hooks file separately from individual setting keys. Never
-  record a pre-existing file or directory as created by the installer, even when
-  it is empty or has only compatible values.
-- Preserve an existing verified `.standards/INSTALLATION.json` and update only
-  installer-owned metadata. If it is unexpectedly missing from an otherwise
-  verified runtime, stop and report the incomplete runtime; never reconstruct
-  ownership by inference.
-- Require a valid `.standards/VERSION.json` in an existing verified runtime
-  before replacing framework assets. If it is missing or invalid, stop and
-  report the incomplete runtime; do not infer a version from file contents.
-- Preserve existing `.standards/MODE.md` and `.standards/STATE.md` on normal
-  reinstall; initialize them only on first install.
-  Do not reset, reinterpret, or discard existing workflow state during upgrades.
-  Missing required fields or invalid formats are runtime inconsistencies, not
-  permission to add inferred defaults.
-- Preserve `.standards/CONTEXT.md`; it is Auditor-owned, not installer-owned.
-- Preserve `.standards/docs/` and every cycle record in it; the records are
-  role-owned, not installer-owned.
-- Preserve `.standards/user-styles/`; its files are user-owned.
-- Preserve project-level instructions. When they materially conflict with the
-  protocol, integration contract, workflow artifacts, or other authoritative
-  constraints, follow **Instruction Layering and Conflicts**.
-- Reinstallation must not duplicate managed blocks/imports, reset workflow
-  mode/state, or erase project instructions.
-
-Installation does not fabricate completed workflow artifacts such as scope,
-technical design, project context, tests, reviews, or documentation.
+1. Pass `--project` with the project's absolute path and run the command with
+   `--dry-run` first. Show the user the target, the planned changes, any
+   warnings, and the exact command with `--yes`.
+2. Run that command only after the user explicitly approves it. Outside a
+   terminal the CLI does not ask for confirmation, so the approval must come
+   from the user in the conversation.
+3. If the preview changes before the command runs, show it again and get fresh
+   approval. If the command refuses or fails, stop and report it with any
+   backups it lists; do not delete or rewrite the files yourself.
 
 ### Project Reset
 
@@ -1780,73 +1711,24 @@ It ends any active cycle without a terminal state.
 - Keep everything else: `PROTOCOL.md`, `VERSION.json`, `INSTALLATION.json`,
   `bin/`, `.standards/user-styles/`, the skills, hooks, client settings, and
   managed blocks.
-- Refuse symlinks in the paths it deletes, and keep backups during the operation
-  as **Project Uninstallation** describes.
+- Refuse symlinks in the paths it deletes. Keep backups during the operation
+  and restore them on an ordinary failure. If recovery fails, keep the backups
+  and report their location. An interrupted operation blocks install, reset,
+  and uninstall until the user resolves it.
 
 ### Project Uninstallation
 
-An explicit `standards uninstall` removes the project's installed runtime and
-all verified STANDARDS skill packages for Codex and Claude Code. It is allowed
-in either project mode, with or without an active cycle. Removal ends the
-runtime's lifetime; the command itself does not complete, sign off, cancel,
-or revert project work. The globally installed CLI is unaffected.
-
-- Default to the current directory; accept `--project <path>` for an existing
-  project directory. Offer `--dry-run` to report every planned path removal or
-  shared-file update without writing files. Help and preview output must explain
-  that removing `.standards/` deletes saved workflow state, Auditor context,
-  cycle records, user styles, and any other content in that directory. When
-  `.standards/docs/` holds cycle records or `.standards/user-styles/` holds user
-  styles, the preview must warn with their counts.
-- Require the runtime ownership marker and a valid, supported
-  `.standards/INSTALLATION.json` before removal. Do not infer settings ownership
-  from current values. Unknown ownership records require an uninstaller that
-  understands them. Missing or invalid workflow metadata does not prevent
-  explicit removal when ownership is established; uninstall does not need a
-  valid version, mode, or state and is not an upgrade.
-- Discover marked skill packages under `.agents/skills/` and `.claude/skills/`,
-  including marked roles absent from the current distribution. Remove their
-  entire verified directories. Remove a recorded client parent directory only
-  if it is empty after planned removals. Preserve unrecorded or nonempty client
-  directories and unrelated skills; a folder whose `SKILL.md` is missing or a
-  symlink is not a STANDARDS package and is skipped. Stop on a collision at a
-  known framework role rather than adopting it.
-- Remove only the bounded STANDARDS block from `AGENTS.md` and `CLAUDE.md`,
-  together with the blank line and final newline that installation added around
-  it. Preserve all other text, including unbounded `@AGENTS.md` imports. Delete
-  either file only when its remaining content is whitespace. Malformed or
-  duplicate boundaries must stop removal before mutation.
-- Remove each recorded client setting only if its current value exactly matches
-  the recorded installed value. Preserve changed values and report them; leave
-  absent settings absent. Preserve compatible settings not recorded as owned,
-  unrelated settings, and files or containers whose creation was not recorded.
-  Remove every STANDARDS hook handler from `.claude/settings.json` and
-  `.codex/hooks.json`, leaving other hooks in place. Remove
-  `.claude/settings.json` only if its creation was recorded and, after reverting
-  owned settings and hooks, it contains nothing but `$schema` and an empty
-  `skillOverrides` object. Remove `.codex/hooks.json` only if its creation was
-  recorded and nothing else remains in it. Otherwise retain the file and
-  preserve unrelated or changed content. If `createdPaths` is absent, retain the
-  file and parent directories even if they look like installer output.
-- Validate all affected paths and settings before making changes. Refuse symlinks
-  in affected paths or within directories to be removed. Do not follow unrelated
-  skill symlinks. A missing runtime with remaining marked skills or integration
-  blocks is an incomplete installation requiring ownership recovery, not
-  permission to guess. With no runtime or identifiable remnants, report a no-op.
-- Apply shared-file changes and skill removals before removing `.standards/`.
-  Retain backups during the operation and restore prior files on an ordinary
-  failure. If recovery fails, retain backups and report their location. An
-  interrupted process may leave a partial operation; retain a mapping from
-  backups to original paths and block install, reset, and uninstall until it is
-  resolved. Do not claim atomicity across process interruption.
-- Delete the cycle records under `.standards/docs/` with the runtime. Preserve
-  implementation, tests, documentation, and reused project scope or design
-  documents outside the removed runtime and verified skill directories. A later
-  fresh installation starts a new runtime; artifacts and cycle markers outside
-  the removed runtime still count when `cycle.mjs` checks a new ID.
-
-There is no force removal or client-only uninstall. Removing one client while
-retaining shared runtime ownership requires a separate contract.
+An explicit `standards uninstall` removes all verified STANDARDS skill packages
+for Codex and Claude Code, the managed blocks in `AGENTS.md` and `CLAUDE.md`,
+the STANDARDS hooks, installer-added settings whose values are unchanged,
+client files and folders the installer created once nothing else is in them,
+and the entire
+`.standards/` directory: saved workflow state, Auditor context, cycle records,
+user styles, and any other content in it. It keeps project work outside those
+paths, including reused scope or design documents, settings the user changed,
+and a globally installed CLI. It is allowed in either project mode, with or
+without an active cycle, and does not complete, sign off, cancel, or revert
+project work. There is no force removal or client-only uninstall.
 
 ## Canonical Terms
 

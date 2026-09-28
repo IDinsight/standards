@@ -156,7 +156,7 @@ incomplete runtime, or an interrupted install, resolve the reported condition
 before retrying. It will not fill in missing workflow history by guessing.
 
 The exact preservation and upgrade rules are in the
-[Installed Runtime Contract](../../reference/protocol/#installed-runtime-contract).
+[Installer Contract](../../reference/installer/).
 
 ## Reset the workflow
 
@@ -254,6 +254,6 @@ read an affected file. Missing workflow records do not prevent removal when
 ownership is clear. If a removal fails, it attempts to restore the files. If it
 reports an interrupted operation or incomplete recovery, keep the reported
 backup directory and resolve it before retrying. See the
-[uninstallation contract](../../reference/protocol/#project-uninstallation) for
+[uninstallation contract](../../reference/installer/#project-uninstallation) for
 the recovery rules. A later install starts a fresh runtime; it does not erase
 your remaining project work.

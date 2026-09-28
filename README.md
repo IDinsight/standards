@@ -150,8 +150,10 @@ removed when empty. Existing files and directories stay. A globally installed
 CLI stays installed.
 
 The installer supports greenfield and brownfield projects. The authoritative
-installer and runtime requirements live in [`PROTOCOL.md`](PROTOCOL.md),
-especially **Installed Runtime Contract** and **Installer File Preservation**.
+installer requirements live in [`INSTALLER.md`](INSTALLER.md), which stays in
+this repository. The **Installed Runtime Contract** in
+[`PROTOCOL.md`](PROTOCOL.md) tells agents what an installed project contains
+and how they may run reset and uninstall.
 
 At a high level, installation selects the initial project mode, installs the
 protocol and workflow skills for the chosen coding agent, applies explicit-only
@@ -191,6 +193,7 @@ without a reset, you resolve the merge conflict by keeping exactly one cycle in
 `STATE.md`. A role applies a user style from `.standards/user-styles/<role>/`
 only when you select it by name. Role ownership, standard and expedited forward
 transitions, promotion, recovery, user intervention, project-mode changes,
-cancellation/reset behavior, project context, user styles, installation
-ownership checks, and client-setting preservation are defined only in
-[`PROTOCOL.md`](PROTOCOL.md) and are intentionally not restated here.
+cancellation/reset behavior, project context, and user styles are defined only
+in [`PROTOCOL.md`](PROTOCOL.md), and installation ownership checks and
+client-setting preservation only in [`INSTALLER.md`](INSTALLER.md); they are
+intentionally not restated here.

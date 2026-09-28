@@ -12,6 +12,12 @@ const sources = [
     "The exact rules agents follow during a STANDARDS workflow.",
   ],
   [
+    "INSTALLER.md",
+    "installer",
+    "Installer Contract",
+    "The exact rules the STANDARDS CLI follows when it installs, upgrades, and uninstalls.",
+  ],
+  [
     "skills/scoper/template.md",
     "templates/scoper",
     "Scope Template",
@@ -91,6 +97,9 @@ for (const [source, slug, title, description] of sources) {
       `The agent handles the workflow files: it chooses or checks the cycle mode, generates an ID, saves the request and current step, writes its role's documents, and records handoffs and corrections. You do not need to edit \`.standards/STATE.md\` yourself.\n\n` +
       `## Full protocol\n\n` +
       `The rules below come from \`${source}\` during docs setup and builds. Commands such as “read” and “save” address the agent unless a rule asks you to make a decision. The exact field names help agents keep workflow records consistent. Contributors change the source file, then rebuild the docs. [Download the original Markdown](${prefix}reference/${source}).\n\n`
+    : slug === "installer"
+    ? `This page contains the exact rules the \`standards\` CLI follows. For a shorter explanation, see [Installation and Setup](${prefix}getting-started/installation/). Installed projects do not include this file; agents follow the [Installed Runtime Contract](${prefix}reference/protocol/#installed-runtime-contract) in the protocol.\n\n` +
+      `The rules below come from \`${source}\` during docs setup and builds. Contributors change the source file, then rebuild the docs. [Download the original Markdown](${prefix}reference/${source}).\n\n`
     : `:::note[About this reference]\n${description} For usage and examples, see [the role guide](${prefix}roles/${slug.split("/")[1]}/).\n\n` +
       `The text below is copied from \`${source}\` during docs setup and builds. ` +
       `To change it, edit that source file and rebuild the docs.\n\n` +

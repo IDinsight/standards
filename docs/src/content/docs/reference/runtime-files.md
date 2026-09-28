@@ -220,7 +220,7 @@ major version and rejects downgrades. There is no migration between major
 versions: moving to one means uninstalling and installing again, which deletes
 `.standards/`. If required information is missing or a setting it never added
 conflicts, it reports the problem instead of guessing. See
-[the installation contract](../protocol/#installed-runtime-contract).
+[the installer contract](../installer/).
 
 `standards reset` deletes `CONTEXT.md` and `.standards/docs/`, writes a fresh
 `STATE.md` and `MODE.md`, and keeps everything else installed. See

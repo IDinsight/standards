@@ -17,11 +17,12 @@ documentation and its evidence, not the behavior it describes.
 
 ## Entry and Inputs
 
-Read `.standards/PROTOCOL.md`, `.standards/MODE.md`, and `.standards/STATE.md`
-first. Perform role-owned work only in `DOCUMENTING` with an initialized active
-`STANDARD` cycle and a legal state/mode combination. Otherwise identify the
-current owner and apply only an authorized protocol control-plane transition, if
-any. `EXPEDITED` omits Documenter; a required documentation guarantee uses
+Read all of `.standards/PROTOCOL.md` (in consecutive parts if a read shows only
+part of it), `.standards/MODE.md`, and `.standards/STATE.md` first. Perform
+role-owned work only in `DOCUMENTING` with an initialized active `STANDARD`
+cycle and a legal state/mode combination. Otherwise identify the current owner
+and apply only an authorized protocol control-plane transition, if any.
+`EXPEDITED` omits Documenter; a required documentation guarantee uses
 **Expedited Promotion**. An invocation or a file argument does not bypass state
 ownership or initialize a documentation-only expedited path.
 

@@ -43,12 +43,13 @@ reviews, or user documentation.
 
 ## Inputs
 
-Read `.standards/PROTOCOL.md`, `.standards/MODE.md`, and `.standards/STATE.md`
-first. Perform Scoper-owned work only in `SCOPING` with an initialized
-`STANDARD` cycle; when `Active Work` is `UNSET`, initialize the first cycle as
-the protocol describes before scoping. Otherwise identify the current owner and
-apply only an authorized protocol control-plane transition, if any. `EXPEDITED`
-omits Scoper; a required scoping guarantee uses **Expedited Promotion**.
+Read all of `.standards/PROTOCOL.md` (in consecutive parts if a read shows only
+part of it), `.standards/MODE.md`, and `.standards/STATE.md` first. Perform
+Scoper-owned work only in `SCOPING` with an initialized `STANDARD` cycle; when
+`Active Work` is `UNSET`, initialize the first cycle as the protocol describes
+before scoping. Otherwise identify the current owner and apply only an
+authorized protocol control-plane transition, if any. `EXPEDITED` omits Scoper;
+a required scoping guarantee uses **Expedited Promotion**.
 
 - Always: `Active Work.Request`, explicit user constraints, the current
   persisted scope when one exists, and `.standards/CONTEXT.md` when it exists
