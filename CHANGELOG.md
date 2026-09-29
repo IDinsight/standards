@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.1](https://github.com/IDinsight/standards/compare/v0.7.0...v0.7.1) (2026-09-29)
+
+
+### Miscellaneous Chores
+
+* release 0.7.1 ([8b95710](https://github.com/IDinsight/standards/commit/8b95710f478bab46938e439e034887e8011e5e5c))
+
 ## [0.7.0](https://github.com/IDinsight/standards/compare/v0.6.0...v0.7.0) (2026-09-29)
 
 
