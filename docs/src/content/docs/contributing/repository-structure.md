@@ -89,6 +89,7 @@ The root `package.json` provides the `docs:*` commands and pins pnpm.
 dependencies for the workspace. Website dependencies and package scripts stay in
 `docs/package.json`.
 
-The `Makefile` includes a Markdown formatter and cleanup commands. See
+The `Makefile` includes a Markdown formatter, the JavaScript lint, and cleanup
+commands. `eslint.config.mjs` sets the JavaScript lint rules. See
 [Local Development](../local-development/) for setup and validation, and
 [Writing Documentation](../documentation/) for page conventions.

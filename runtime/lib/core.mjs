@@ -167,7 +167,7 @@ export function fieldPairs(text) {
 }
 
 // Remove a UTF-8 byte order mark, which some editors add.
-export const withoutBom = (text) => text.replace(/^﻿/, '');
+export const withoutBom = (text) => text.replace(/^\uFEFF/, '');
 
 // Report a failure and return the process exit code.
 export function printProblem(error) {

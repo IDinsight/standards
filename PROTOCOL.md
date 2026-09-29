@@ -75,8 +75,8 @@ authorship: it applies equally to code written by Developer and code applied by
 the user during Developer collaboration. Workflow metadata and role-owned
 planning, context, test, review, or documentation artifacts do not count as
 project implementation. The mode never reverts, including during recovery;
-only **Project Reset** chooses it again, from the project's contents at that
-time.
+only **Project Reset** chooses it again, from `--mode` or the project's
+contents at that time.
 
 For a `STANDARD` cycle:
 
@@ -1002,9 +1002,11 @@ rather than a reusable terminal cycle.
 The agent performs the reset with **Project Reset**, following **Running the
 CLI**:
 
-1. Use `standards reset` if a globally installed STANDARDS CLI has the version
-   recorded in `.standards/VERSION.json`; otherwise use
-   `npx @idinsight/standards@<that version> reset`.
+1. Use `standards reset --mode greenfield` if a globally installed STANDARDS
+   CLI has the version recorded in `.standards/VERSION.json`; otherwise use
+   `npx @idinsight/standards@<that version> reset --mode greenfield`. The cycle
+   produced no implementation, so the project stays `GREENFIELD`; do not let
+   the reset choose the mode from the project's files.
 2. Preview it with `--dry-run`, which may run before approval. Also warn that
    the reset deletes the saved workflow state, the Auditor's project context,
    and every cycle record under `.standards/docs/`, and that the skills, hooks,
@@ -1035,9 +1037,9 @@ a refusal by switching commands or by deleting or rewriting the files
 yourself. A retry requires a valid preview and approval covering it.
 
 The reset leaves no `CANCELLED` state or cycle record behind, so the next
-request starts a first cycle from the fresh state, and it chooses the project
-mode again from the project's contents. S.T.A.N.D.A.R.D.S. does not revert the
-project working tree; reverting project changes is the user's responsibility.
+request starts a first greenfield cycle from the fresh state.
+S.T.A.N.D.A.R.D.S. does not revert the project working tree; reverting project
+changes is the user's responsibility.
 
 ## Cycle IDs
 

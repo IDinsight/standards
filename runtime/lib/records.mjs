@@ -67,7 +67,7 @@ export function provenanceBlock(artifact, cycle, reviewKind) {
 // has none, `{ error }` when it starts like one but is malformed, and
 // `{ artifact, cycle, reviewKind }` otherwise.
 export function parseProvenance(text) {
-  const start = text.replace(/^﻿/, '');
+  const start = text.replace(/^\uFEFF/, '');
   if (!/^<!--\s*STANDARDS(\s|$)/.test(start)) return null;
   const end = start.indexOf('-->');
   if (end === -1) return { error: 'the provenance block is never closed with `-->`' };
@@ -92,7 +92,7 @@ export function parseProvenance(text) {
 // The `Name`: `value` fields between a record's `# Title` and its first `##`
 // section, e.g. `Cycle`, `Status`, `Mode`.
 export function headerFields(text) {
-  const body = text.replace(/^﻿?<!--[\s\S]*?-->/, '');
+  const body = text.replace(/^\uFEFF?<!--[\s\S]*?-->/, '');
   const title = /^# .*$/m.exec(body);
   if (!title) return {};
   const rest = body.slice(title.index + title[0].length);
@@ -173,7 +173,7 @@ export function headingIds(text, prefix) {
 
 // References that name another record: `path/to/file.md#F-003`.
 export function qualifiedReferences(text) {
-  return [...text.matchAll(/([A-Za-z0-9_.\/-]+\.md)#((?:F|D|DOC)-\d{3,})(?![0-9])/g)]
+  return [...text.matchAll(/([A-Za-z0-9_./-]+\.md)#((?:F|D|DOC)-\d{3,})(?![0-9])/g)]
     .map((match) => ({ file: match[1], id: match[2] }));
 }
 

@@ -51,59 +51,70 @@ the trade-off: each role works in its own session, checks its work, and saves it
 so the next role can check it independently. A standard cycle has nine of these
 steps, and an expedited cycle has two.
 
-To measure the difference, we made the same two changes with and without
-STANDARDS, using Claude Opus 5.5 in Claude Code on a small command-line project
-(about 80 lines of code and 6 tests). We counted **new tokens**: the input the
-model hadn't already seen earlier in the same session. Most of what an agent
-sends at each step is context it already has, which is re-read from cache at a
-much lower price, so new tokens reflect the actual work better than the raw
-total.
+To measure the difference, we made the same changes with and without STANDARDS,
+using Claude Opus 5.5 in Claude Code, on two projects: a small command-line tool
+(about 80 lines of code and 6 tests) and the Commander.js library (about 4,200
+lines of code and 1,373 tests). We counted **new tokens**: the input the model
+hadn't already seen earlier in the same session. Most of what an agent sends at
+each step is context it already has, which is re-read from cache at a much lower
+price, so new tokens reflect the actual work better than the raw total.
 
-| Change                                     | Without STANDARDS | With STANDARDS                                 |
-| ------------------------------------------ | ----------------- | ---------------------------------------------- |
-| Add a `--json` option, with tests and docs | about 60,000      | about 1.1 million (standard cycle, 9 sessions) |
-| Fix a one-word typo in an error message    | about 50,000      | about 270,000 (expedited cycle, with sign-off) |
+| Change                               | Without STANDARDS | With STANDARDS                     | Ratio     |
+| ------------------------------------ | ----------------- | ---------------------------------- | --------- |
+| Small tool: add a `--json` option    | about 60,000      | about 1.1 million (standard cycle) | about 19× |
+| Small tool: fix a one-word typo      | about 50,000      | about 270,000 (expedited cycle)    | about 5×  |
+| Commander.js: add deprecated options | about 125,000     | about 1.5 million (standard cycle) | about 12× |
 
-For these changes, the standard cycle used about 19 times the new tokens of a
-single session, and the expedited cycle about 5 times. Counting cached re-reads
-too, the ratios were about 45 and 20 times.
+Counting cached re-reads too, the ratios were about 45, 20, and 18 times. Time
+grew about as much as new tokens: on Commander.js, the standard cycle's nine
+sessions took about 80 minutes of agent time, against about 6.5 minutes for a
+single session.
 
-The ratio is high here partly because the changes were tiny. Every workflow role
-first reads the full workflow rules and its own instructions, about 40,000 to
-50,000 new tokens whatever the size of the change. That fixed cost was about a
-third of the standard cycle's new tokens. On larger changes, where the coding
-work itself takes more tokens, it should make up a smaller share, though we
-haven't measured that yet.
+The ratio shrinks as the change grows because part of the cost is fixed. Every
+workflow role first reads the full workflow rules and its own instructions,
+about 40,000 to 50,000 new tokens whatever the size of the change. That was
+about a third of the standard cycle's new tokens on the small tool and about a
+quarter on Commander.js.
 
-The extra tokens also bought more work. The standard cycle produced a written
-scope with 11 acceptance conditions, a design, independently written tests, two
-independent reviews, and a final consistency check. The reviews also found an
-existing bug that the single sessions didn't mention: installed through npm, the
-command printed nothing.
+The extra tokens buy more than code. Each standard cycle produced written
+requirements, a design, independently written tests, two independent reviews,
+and a final consistency check. On Commander.js, Scoper also asked about three
+points the request left open. The two single sessions had settled one of them in
+opposite ways without asking. On the small tool, the reviews found an existing
+bug that the single sessions didn't mention.
 
-New tokens by role in the same test:
+Don't expect fewer bugs on every change, though. The Commander.js request was
+detailed, and the single sessions got it right: all three versions passed the
+same 25 hidden checks, and a blind code review found the core behavior correct
+in all three. The reviewer actually preferred one of the single-session
+versions. For a clear, well-defined change like this one, the benefit was mostly
+settled questions and a written record rather than fewer bugs.
 
-| Role                     | New tokens            |
-| ------------------------ | --------------------- |
-| Navigator (one question) | about 45,000          |
-| Scoper                   | about 85,000          |
-| Architect                | about 85,000          |
-| Developer                | about 105,000–120,000 |
-| Reviewer                 | about 85,000–125,000  |
-| Auditor                  | about 110,000         |
-| Documenter               | about 115,000         |
-| Synchronizer             | about 120,000         |
-| Tester                   | about 265,000         |
-| Sign-off (no role)       | about 65,000          |
+New tokens by role:
 
-The Developer and Reviewer ranges cover both changes. Your coding agent, model,
-and project size will change these numbers.
+| Role                     | Small tool            | Commander.js  |
+| ------------------------ | --------------------- | ------------- |
+| Navigator (one question) | about 45,000          | not measured  |
+| Scoper                   | about 85,000          | about 125,000 |
+| Architect                | about 85,000          | about 160,000 |
+| Auditor                  | about 110,000         | about 190,000 |
+| Developer                | about 105,000–120,000 | about 160,000 |
+| Reviewer                 | about 85,000–125,000  | about 160,000 |
+| Documenter               | about 115,000         | about 155,000 |
+| Synchronizer             | about 120,000         | about 155,000 |
+| Tester                   | about 265,000         | about 235,000 |
+| Sign-off (no role)       | about 65,000          | not measured  |
+
+On the small tool, the Developer and Reviewer ranges cover both the feature and
+the typo fix. Each figure comes from one run, and your coding agent, model, and
+project will change them.
 
 To keep usage down:
 
 - Use expedited work for small, clearly defined changes to an existing project.
 - Use Navigator for questions. It doesn't read the full workflow rules.
 - Keep each cycle to one focused change.
+- Use lower-tier models for roles that don't need the highest capability.
 
 ### Does STANDARDS send my code or data anywhere?
 

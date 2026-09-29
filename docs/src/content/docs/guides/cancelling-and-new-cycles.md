@@ -26,19 +26,20 @@ wrote. If it did, the project becomes brownfield and uses the retained
 If there is no implementation, cancellation is a **bootstrap reset**, done with
 [`standards reset`](../../getting-started/installation/#reset-the-workflow). The
 agent first previews it for the project with `--dry-run`. It uses
-`standards reset` if your global CLI has the version recorded in
-`.standards/VERSION.json`, or `npx @idinsight/standards@<that version> reset`
-otherwise. It shows you the project path, the planned changes, any warnings, and
-the exact command, then asks for your explicit approval. Saying "cancel this
-cycle" alone does not approve the reset.
+`standards reset --mode greenfield` if your global CLI has the version recorded
+in `.standards/VERSION.json`, or
+`npx @idinsight/standards@<that version> reset --mode greenfield` otherwise. It
+shows you the project path, the planned changes, any warnings, and the exact
+command, then asks for your explicit approval. Saying "cancel this cycle" alone
+does not approve the reset.
 
 Once you approve, the agent runs the command with `--yes` to avoid a second
 terminal prompt. The reset deletes the saved workflow state, Auditor context,
 and every cycle record in `.standards/docs/`; the agent warns you about the
-records before asking for approval. It writes a fresh workflow state and chooses
-the project mode again from the project's contents, so no `CANCELLED` state
-remains. The skills, stop hook, client settings, and your user styles stay
-installed, and project work outside `.standards/` remains.
+records before asking for approval. It writes a fresh workflow state and keeps
+the project greenfield, so no `CANCELLED` state remains. The skills, stop hook,
+client settings, and your user styles stay installed, and project work outside
+`.standards/` remains.
 
 While approval is pending, the agent saves the question, pauses, and keeps the
 active cycle in place. If you decline, cancellation is not completed; tell the
@@ -82,12 +83,11 @@ and
 for details.
 
 After a bootstrap reset, STANDARDS stays installed and your next request starts
-a first cycle from the fresh state, in the mode the reset chose from the
-project's contents. Your implementation, tests, and documentation outside
-`.standards/` remain, including a project scope or design document the cancelled
-cycle reused there. The reset deleted the cycle's records in `.standards/docs/`,
-such as its plan and reports, and its Auditor context, so the new cycle starts
-without them.
+a first greenfield cycle from the fresh state. Your implementation, tests, and
+documentation outside `.standards/` remain, including a project scope or design
+document the cancelled cycle reused there. The reset deleted the cycle's records
+in `.standards/docs/`, such as its plan and reports, and its Auditor context, so
+the new cycle starts without them.
 
 At sign-off, requesting changes is rework of the active cycle. It is not a new
 cycle. See [Human Decisions and Sign-off](../../concepts/human-decisions/).

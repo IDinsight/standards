@@ -96,8 +96,21 @@ pre-commit run markdownlint-cli2 --files docs/src/content/docs/index.md
 ```
 
 The root `make lint` command runs Prettier in write mode across Markdown,
-excluding `PROTOCOL.md` and `CHANGELOG.md`. It can change files beyond the page
-you are editing and does not replace the Markdown check above.
+excluding `PROTOCOL.md` and `CHANGELOG.md`, and then the JavaScript check below.
+Prettier can change files beyond the page you are editing and does not replace
+the Markdown check above.
+
+## Check JavaScript
+
+Run the same JavaScript check as CI:
+
+```sh
+make lint-js
+```
+
+It runs ESLint with its recommended rules over the repository's JavaScript, as
+set in `eslint.config.mjs`, and is the same as `pnpm run lint:js`. ESLint needs
+Node.js 22.13 or newer.
 
 ## Dependencies and generated files
 
@@ -153,7 +166,7 @@ The repository runs these checks for pull requests:
   pull requests to `main` and for pushes to any branch.
 - **Release Checks:** compares a release pull request with the previous release,
   as described in [Release versions](#release-versions).
-- **Linting:** runs the Markdown check.
+- **Linting:** runs the Markdown and JavaScript checks.
 - **Secret Scan:** checks pull requests targeting `main` for verified secrets.
 
 The documentation workflow also runs on pushes to `main` and manual runs. After

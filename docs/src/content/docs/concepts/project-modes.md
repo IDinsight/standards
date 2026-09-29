@@ -83,7 +83,7 @@ yet been updated. If implementation exists, cancellation keeps the cycle record
 and ends in `CANCELLED`. See
 [the cancellation rules](../../guides/cancelling-and-new-cycles/). Only
 [`standards reset`](../../getting-started/installation/#reset-the-workflow)
-chooses the mode again, from the project's contents at that time.
+chooses the mode again, from `--mode` or the project's contents at that time.
 
 The installed `.standards/MODE.md` saves project mode; `.standards/STATE.md`
 saves cycle mode and any next-cycle preference.

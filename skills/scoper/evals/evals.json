@@ -156,8 +156,8 @@
       "expected_output": "Scoper previews the reset, explains what it deletes and keeps, including that every cycle record under .standards/docs/ will be deleted, saves the reset approval question alongside the existing blocker, and waits without cancelling or changing files.",
       "files": [],
       "assertions": [
-        "The agent runs standards reset with --project /work/bootstrap-demo and --dry-run to preview without changing files.",
-        "It presents the target, planned changes including the mode the reset will choose, warnings, and exact proposed command including --yes, and asks for explicit approval.",
+        "The agent runs standards reset with --project /work/bootstrap-demo, --mode greenfield, and --dry-run to preview without changing files.",
+        "It presents the target, planned changes including that the project stays GREENFIELD, warnings, and exact proposed command including --yes, and asks for explicit approval.",        "It explains that the reset deletes the saved workflow state, Auditor context, and every cycle record under .standards/docs/, and that the skills, hooks, client settings, and user styles stay installed.",
         "It explains that the reset deletes the saved workflow state, Auditor context, and every cycle record under .standards/docs/, and that the skills, hooks, client settings, and user styles stay installed.",
         "It notes that docs/scope/demo.md is outside .standards/ and is not changed by the reset.",
         "It saves the target, command, and pending approval in Active Work.BlockedOn without losing the existing question; state, mode, recovery, and obligations remain intact.",
@@ -166,24 +166,24 @@
     },
     {
       "id": 13,
-      "prompt": "Resume Scoper in /work/bootstrap-demo. GREENFIELD, STANDARD, SCOPING; no implementation exists. Active Work.BlockedOn records a pending bootstrap reset approval. The previous preview and approval request identified /work/bootstrap-demo, the removal of .standards/CONTEXT.md and .standards/docs/ with its cycle-record warning, fresh STATE.md and MODE.md, and standards reset --project /work/bootstrap-demo --yes. The user now explicitly approves that exact reset. The same global CLI, matching the installed version, is available. Eligibility and preview rechecks are unchanged. The reset will succeed.",
+      "prompt": "Resume Scoper in /work/bootstrap-demo. GREENFIELD, STANDARD, SCOPING; no implementation exists. Active Work.BlockedOn records a pending bootstrap reset approval. The previous preview and approval request identified /work/bootstrap-demo, the removal of .standards/CONTEXT.md and .standards/docs/ with its cycle-record warning, fresh STATE.md and MODE.md, and standards reset --project /work/bootstrap-demo --mode greenfield --yes. The user now explicitly approves that exact reset. The same global CLI, matching the installed version, is available. Eligibility and preview rechecks are unchanged. The reset will succeed.",
       "expected_output": "Scoper runs the approved global CLI reset after rechecking eligibility and preview, confirms that it succeeded, and leaves the fresh workflow state as the result.",
       "files": [],
       "assertions": [
         "It rechecks implementation eligibility and the reset preview before execution.",
-        "It runs standards reset --project /work/bootstrap-demo --yes only after the explicit approval.",
+        "It runs standards reset --project /work/bootstrap-demo --mode greenfield --yes only after the explicit approval.",
         "It does not ask for redundant approval when the approved target, command, planned changes, and warnings remain unchanged.",
-        "It waits for successful command completion before reporting the cancellation complete and explains that the next request starts a first cycle, in the mode the reset chose from the project's contents, without reinstalling.",
+        "It waits for successful command completion before reporting the cancellation complete and explains that the next request starts a first cycle, as a greenfield project, without reinstalling.",
         "It does not edit the fresh STATE.md afterwards, persist CANCELLED, or manually remove remaining project files."
       ]
     },
     {
       "id": 14,
-      "prompt": "Resume Scoper in /work/bootstrap-demo with a GREENFIELD cycle before implementation. .standards/VERSION.json records version 0.6.0; the globally installed standards CLI is version 0.7.0. The agent has already previewed npx @idinsight/standards@0.6.0 reset --project /work/bootstrap-demo --dry-run and disclosed what it deletes and keeps. The user explicitly approves npx @idinsight/standards@0.6.0 reset --project /work/bootstrap-demo --yes for that preview. Eligibility and preview are unchanged; the npx command succeeds.",
+      "prompt": "Resume Scoper in /work/bootstrap-demo with a GREENFIELD cycle before implementation. .standards/VERSION.json records version 0.6.0; the globally installed standards CLI is version 0.7.0. The agent has already previewed npx @idinsight/standards@0.6.0 reset --project /work/bootstrap-demo --mode greenfield --dry-run and disclosed what it deletes and keeps. The user explicitly approves npx @idinsight/standards@0.6.0 reset --project /work/bootstrap-demo --mode greenfield --yes for that preview. Eligibility and preview are unchanged; the npx command succeeds.",
       "expected_output": "Scoper carries out the approved bootstrap reset with npx at the installed version and reports completion only after success.",
       "files": [],
       "assertions": [
-        "It uses npx @idinsight/standards@0.6.0 reset with the explicit absolute project path and --yes after approval and rechecks.",
+        "It uses npx @idinsight/standards@0.6.0 reset --mode greenfield with the explicit absolute project path and --yes after approval and rechecks.",
         "It does not use the global standards CLI, whose version differs from the installed one, @latest, or manual file changes.",
         "It reports the cancellation complete only after the CLI succeeds and does not edit the fresh workflow state afterwards."
       ]
@@ -213,7 +213,7 @@
     },
     {
       "id": 17,
-      "prompt": "Invoke Scoper to cancel a GREENFIELD cycle before implementation in /work/bootstrap-demo. A global CLI is available, but standards reset --project /work/bootstrap-demo --dry-run refuses because .standards/VERSION.json is invalid. No reset has been approved. The agent can read and edit the workflow files.",
+      "prompt": "Invoke Scoper to cancel a GREENFIELD cycle before implementation in /work/bootstrap-demo. A global CLI is available, but standards reset --project /work/bootstrap-demo --mode greenfield --dry-run refuses because .standards/VERSION.json is invalid. No reset has been approved. The agent can read and edit the workflow files.",
       "expected_output": "Scoper reports that the preview failed and cancellation is incomplete; it does not guess the version or use another route to reset.",
       "files": [],
       "assertions": [
@@ -235,7 +235,7 @@
     },
     {
       "id": 19,
-      "prompt": "Resume Scoper in /work/bootstrap-demo. The GREENFIELD cycle still has no implementation. The user explicitly approved standards reset --project /work/bootstrap-demo --yes for a previously shown preview. The mandatory recheck now shows one more cycle record to delete under .standards/docs/, so the warning changed. The user's next message is: continue.",
+      "prompt": "Resume Scoper in /work/bootstrap-demo. The GREENFIELD cycle still has no implementation. The user explicitly approved standards reset --project /work/bootstrap-demo --mode greenfield --yes for a previously shown preview. The mandatory recheck now shows one more cycle record to delete under .standards/docs/, so the warning changed. The user's next message is: continue.",
       "expected_output": "Scoper presents the changed preview and warning, updates the saved approval question, and waits for explicit approval of the revised reset.",
       "files": [],
       "assertions": [

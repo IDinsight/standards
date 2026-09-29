@@ -1,7 +1,7 @@
 #!make
 
 .DEFAULT_GOAL := help
-.PHONY: clean help lint test
+.PHONY: clean help lint lint-js lint-markdown test
 
 # Put it first so that "make" without argument is like "make help".
 help: ## Display available commands
@@ -42,7 +42,12 @@ test: ## Run every test in test/ (CLI, installer, runtime tools, release checks,
 	@echo "$(GREEN)All tests passed.$(RESET)"
 
 ########## LINTING ##########
-lint: lint-markdown ## Run all linters and formatters
+lint: lint-markdown lint-js ## Run all linters and formatters
+
+lint-js: ## Lint JavaScript with ESLint's recommended rules
+	@echo "$(BLUE)Running ESLint...$(RESET)"
+	@pnpm run lint:js
+	@echo "$(GREEN)JavaScript linting passed.$(RESET)"
 
 lint-markdown: ## Format Markdown with Prettier (write), excluding PROTOCOL.md
 	@echo "$(BLUE)Running prettier...$(RESET)"

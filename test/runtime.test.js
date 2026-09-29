@@ -886,7 +886,7 @@ test('check reports unreadable workflow files instead of crashing', () => projec
 
 test('STATE.md accepts backticks in values, a byte order mark, and fields in any order', () => project(async (root) => {
   await standardCycle(root);
-  await editState(root, (text) => `﻿${text
+  await editState(root, (text) => `\uFEFF${text
     .replace('`Request`: `Add user search`', '`Request`: ``Add a `--json` flag``')
     .replace('`BlockedOn`: `NONE`', '')
     .replace('`BaselineReconciliation`: `NONE`', '`BaselineReconciliation`: `NONE`\n\n`BlockedOn`: `NONE`')}`);

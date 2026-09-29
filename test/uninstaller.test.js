@@ -7,7 +7,7 @@ import test from 'node:test';
 import { runCli } from '../lib/cli.js';
 import { installProject } from '../lib/install.js';
 import { applyOperations } from '../lib/install-files.js';
-import { MARKER, blockRange } from '../lib/ownership.js';
+import { MARKER } from '../lib/ownership.js';
 import { uninstallProject } from '../lib/uninstaller.js';
 
 async function fixture(run) {
