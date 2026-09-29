@@ -241,11 +241,11 @@ this role's documentation gate; persist their reassessment dependency without
 claiming it satisfied. Independent defects or missing documentation evidence
 still block. A verified correction can clear its owned obligation without
 passing the full gate. If remaining documentation depends on unfinished work in
-the interrupted owner's preserved route, apply the protocol's **Documenter
-Corrective Return** conditions. Persist the verified correction and each
-remaining dependency, owner, and required evidence; keep the record incomplete
-while the full gate is unmet. This permits only canonical recovery routing, not
-normal forward handoff or a documentation-completion claim.
+the interrupted owner's preserved route, apply the **Documenter Corrective
+Return** conditions below. Persist the verified correction and each remaining
+dependency, owner, and required evidence; keep the record incomplete while the
+full gate is unmet. This permits only canonical recovery routing, not normal
+forward handoff or a documentation-completion claim.
 
 Apply canonical recovery before normal forward handoff. Only the active frame
 owner plans resumption and identifies previously completed downstream work
@@ -262,6 +262,25 @@ persisted-input/recovery directions, and advisory model recommendation. Do not
 conduct final review in the documentation-authoring conversation even when both
 roles were invoked. Use those session rules for any corrective handoff to Tester
 or Reviewer. Never auto-dispatch roles, sign off, or claim cycle completion.
+
+## Documenter Corrective Return
+
+Applies in `DOCUMENTING` to a documentation or project-guidance defect, in
+addition to the shared conditions of the protocol's **Corrective Returns**. The
+correction must be verified in saved content against current inputs with
+sufficient actual evidence, and no unverified corrective edit, unresolved
+actionable documentation defect, Documenter-owned outstanding obligation, or
+blocking user question may remain. For each remaining item, also persist its
+prerequisite and when documentation must be revisited, and persist the
+correction's applicability limits and resume context. Preserve current AC
+references where they exist; do not fabricate future scope, design,
+implementation, verification, or review artifacts, or acceptance identifiers.
+Missing evidence needed to verify the correction, independent defects or gaps,
+and currently actionable documentation outside a selected editing boundary
+follow normal failure and blocking rules; a selected target or collaboration
+mode waives none of these conditions. GUIDED work must have an inspected saved
+correction; supplying a snippet is insufficient. On re-entry, reconcile current
+inputs and the retained work.
 
 ## Plain-Language Summary
 

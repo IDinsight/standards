@@ -606,7 +606,7 @@ async function checkActiveCycle(root, state, mode, artifacts, report, { atTurnEn
       }
       // A Documenter Corrective Return may leave the documentation record
       // unfinished while a later role resumes, so it must be COMPLETE only
-      // by sign-off (PROTOCOL.md, Documenter Corrective Return).
+      // by sign-off (PROTOCOL.md, Corrective Returns).
       if (record.artifact === 'DOCUMENTATION' && workflowState !== 'AWAITING_USER_SIGNOFF') continue;
       const status = headerFields(artifact.text).Status;
       // A missing, unfilled, or invalid Status is already reported with the

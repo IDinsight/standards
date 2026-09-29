@@ -58,8 +58,8 @@ rework, or cancel. Synchronizer does not accept it for you.
 
 During recovery, a verified correction to Synchronizer's own record can
 sometimes return to an interrupted role before the full assessment is finished.
-That [limited return](../../reference/protocol/#synchronizer-corrective-return)
-keeps the record incomplete and cannot bypass the requirements for sign-off.
+That [limited return](../../reference/protocol/#corrective-returns) keeps the
+record incomplete and cannot bypass the requirements for sign-off.
 
 ## Who fixes disagreements
 
@@ -69,5 +69,6 @@ Tester, and outdated review conclusions to the relevant Reviewer.
 
 It does not supply another role's missing evidence or close that role's
 findings. If a disagreement prevents a reliable conclusion, it remains a blocker
-until resolved. See the
-[complete synchronization requirements](../../reference/protocol/#synchronization-gate).
+until resolved. The Synchronizer skill defines the complete requirements; see
+the protocol's
+[synchronization gate](../../reference/protocol/#synchronization-gate).
