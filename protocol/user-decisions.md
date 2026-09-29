@@ -143,7 +143,8 @@ CLI**, both in `.standards/protocol/installation.md`:
    user approval.
 5. Confirm that the reset succeeded before reporting the cancellation complete.
    Do not edit `STATE.md` afterwards to record it; the fresh state is the
-   result.
+   result. Reset approval authorizes only the reset, not starting a new cycle or
+   resuming role work. After reporting success, stop and wait for a new request.
 
 If approval is declined, clear only the approval question, keep the active
 cycle, and report that cancellation was not completed; further role work
