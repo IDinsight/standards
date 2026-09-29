@@ -23,6 +23,7 @@ continue in another chat.
 - [Roles](./roles/overview/): find the right role for a task.
 - [Guides](./guides/starting-a-cycle/): start, resume, or change ongoing work.
 - [Reference](./reference/protocol/): look up exact rules and document formats.
+- [FAQ](./faq/): get short answers to common questions.
 - [Need Help?](./need-help/): ask a question, report a bug, or suggest an
   improvement.
 

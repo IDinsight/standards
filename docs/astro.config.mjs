@@ -35,6 +35,10 @@ export default defineConfig({
           slug: "index",
         },
         {
+          label: "FAQ",
+          slug: "faq",
+        },
+        {
           label: "Need Help?",
           slug: "need-help",
         },
