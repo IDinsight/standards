@@ -1328,8 +1328,9 @@ Every other record is always cycle-owned at its fixed path. Its provenance block
 must match `Active Work.Id` and the path, and its visible `Cycle` field, plus
 the visible `ReviewKind` field in a review report, must match the block.
 `Active Work.Development` names the plan; the other fixed paths derive from the
-cycle ID, so `STATE.md` gets no path field for them. Because every path in the
-table includes the cycle ID, a new record's path never belongs to another cycle.
+cycle ID, so `STATE.md` gets no path field for them. Because every path that
+`artifact init` creates includes the cycle ID, a new record's path never belongs
+to another cycle.
 
 A valid provenance block makes the file a STANDARDS cycle-owned artifact even if
 it is later renamed or moved. A different cycle may read it as prior evidence
