@@ -152,8 +152,8 @@ CLI stays installed.
 The installer supports greenfield and brownfield projects. The authoritative
 installer requirements live in [`INSTALLER.md`](INSTALLER.md), which stays in
 this repository. The **Installed Runtime Contract** in
-[`PROTOCOL.md`](PROTOCOL.md) tells agents what an installed project contains
-and how they may run reset and uninstall.
+[`PROTOCOL.md`](PROTOCOL.md) tells agents what an installed project contains and
+how they may run reset and uninstall.
 
 At a high level, installation selects the initial project mode, installs the
 protocol and workflow skills for the chosen coding agent, applies explicit-only

@@ -95,7 +95,7 @@ completion.
 
 Sometimes an earlier role needs a documentation fix before it can continue. The
 protocol allows a
-[limited corrective return](../../reference/protocol/#documenter-corrective-return):
+[limited corrective return](../../reference/protocol/#corrective-returns):
 Documenter verifies that fix and returns while recording documentation that must
 wait for the unfinished work. Its record stays incomplete. This cannot excuse
 unrelated defects or work that is already possible.

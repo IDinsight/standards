@@ -119,7 +119,7 @@ explanations rather than empty tables. Set `User Style` to the user's explicit
 selection under the protocol's **User Styles**, or `NONE`. `IN_PROGRESS` means
 assessment is underway; `BLOCKED` means required correction or evidence prevents
 completion; neither is passing. `COMPLETE` requires the shared Reviewer gate and
-applicable protocol gate, not merely an empty finding list. Reopen it when
-changed inputs invalidate that conclusion. Preserve the other kind's report and
-other cycles. Keep useful history, but make current conclusions and next actions
-unambiguous.
+the applicable review gate in `SKILL.md`, not merely an empty finding list.
+Reopen it when changed inputs invalidate that conclusion. Preserve the other
+kind's report and other cycles. Keep useful history, but make current
+conclusions and next actions unambiguous.

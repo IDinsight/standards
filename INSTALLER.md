@@ -29,22 +29,22 @@ older versions and cross-major upgrades. A major release may be installed into a
 fresh project. STANDARDS provides no migration between major versions: the only
 route for an existing project is `standards uninstall`, which deletes
 `.standards/` (including workflow state, Auditor context, cycle records, and
-user styles), followed by a fresh installation. The framework maintainer
-chooses the release version. Adding, removing, or renaming a role is a major
-change, and so is any change to the runtime files or record formats that an
-existing installation's files would no longer pass.
+user styles), followed by a fresh installation. The framework maintainer chooses
+the release version. Adding, removing, or renaming a role is a major change, and
+so is any change to the runtime files or record formats that an existing
+installation's files would no longer pass.
 
 ## Installer File Preservation
 
-Installation must be idempotent and preserve project-owned instructions.
-Before creating, replacing, updating, or removing a framework-controlled runtime
-path or installed skill package, verify ownership deterministically.
+Installation must be idempotent and preserve project-owned instructions. Before
+creating, replacing, updating, or removing a framework-controlled runtime path
+or installed skill package, verify ownership deterministically.
 
 Ownership rules:
 
 - `.standards/` is framework-owned only when `.standards/PROTOCOL.md` contains
-  `<!-- standards:framework-owned -->`. Otherwise report a path collision and
-  do not adopt, overwrite, or remove it.
+  `<!-- standards:framework-owned -->`. Otherwise report a path collision and do
+  not adopt, overwrite, or remove it.
 - An installed skill package is framework-owned only when its root `SKILL.md`
   carries the same marker. Otherwise report a skill collision and do not
   overwrite, merge, or remove it.
@@ -65,8 +65,8 @@ After ownership checks:
   only after that destination skill package passes its ownership check. Update
   skill packages file by file: write every file the release ships, except the
   `evals/` folder used to develop the skill, and leave any other file in the
-  folder unchanged. Keep the
-  installed protocol aligned with the installed skills.
+  folder unchanged. Keep the installed protocol aligned with the installed
+  skills.
 - A reinstall keeps the installed clients. The user may add a client; removing
   one requires uninstalling.
 - Preserve Codex `allow_implicit_invocation: false`.
@@ -99,10 +99,10 @@ After ownership checks:
   before replacing framework assets. If it is missing or invalid, stop and
   report the incomplete runtime; do not infer a version from file contents.
 - Preserve existing `.standards/MODE.md` and `.standards/STATE.md` on normal
-  reinstall; initialize them only on first install.
-  Do not reset, reinterpret, or discard existing workflow state during upgrades.
-  Missing required fields or invalid formats are runtime inconsistencies, not
-  permission to add inferred defaults.
+  reinstall; initialize them only on first install. Do not reset, reinterpret,
+  or discard existing workflow state during upgrades. Missing required fields or
+  invalid formats are runtime inconsistencies, not permission to add inferred
+  defaults.
 - Preserve `.standards/CONTEXT.md`; it is Auditor-owned, not installer-owned.
 - Preserve `.standards/docs/` and every cycle record in it; the records are
   role-owned, not installer-owned.
@@ -121,8 +121,8 @@ technical design, project context, tests, reviews, or documentation.
 An explicit `standards uninstall` removes the project's installed runtime and
 all verified STANDARDS skill packages for Codex and Claude Code. It is allowed
 in either project mode, with or without an active cycle. Removal ends the
-runtime's lifetime; the command itself does not complete, sign off, cancel,
-or revert project work. The globally installed CLI is unaffected.
+runtime's lifetime; the command itself does not complete, sign off, cancel, or
+revert project work. The globally installed CLI is unaffected.
 
 - Default to the current directory; accept `--project <path>` for an existing
   project directory. Offer `--dry-run` to report every planned path removal or
@@ -139,8 +139,8 @@ or revert project work. The globally installed CLI is unaffected.
   valid version, mode, or state and is not an upgrade.
 - Discover marked skill packages under `.agents/skills/` and `.claude/skills/`,
   including marked roles absent from the current distribution. Remove their
-  entire verified directories. Remove a recorded client parent directory only
-  if it is empty after planned removals. Preserve unrecorded or nonempty client
+  entire verified directories. Remove a recorded client parent directory only if
+  it is empty after planned removals. Preserve unrecorded or nonempty client
   directories and unrelated skills; a folder whose `SKILL.md` is missing or a
   symlink is not a STANDARDS package and is skipped. Stop on a collision at a
   known framework role rather than adopting it.

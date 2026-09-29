@@ -100,10 +100,10 @@ for contradictions. Planned implementation alone does not stale Auditor context.
    same identifiers, referring to existing evidence and design sections. Check
    the current inventory against the coverage in completed artifacts; retired
    IDs are history only. Confirm that earlier pending dependencies have current
-   evidence from their owners. Use the documentation evidence interface in
-   **Synchronization Gate**; do not invent a Documenter report format or infer
-   completion from a guide's existence. Reference results and their limits
-   without copying reports or creating a second acceptance ledger.
+   evidence from their owners. Use the documentation evidence interface in the
+   protocol's **Synchronization Gate**; do not invent a Documenter report format
+   or infer completion from a guide's existence. Reference results and their
+   limits without copying reports or creating a second acceptance ledger.
 5. Distinguish concrete discrepancies from questions and limitations. Record the
    affected paths/identities, evidence, impact on applicability, owner,
    canonical failure type, and required correction. Persist every unresolved
@@ -137,11 +137,50 @@ for contradictions. Planned implementation alone does not stale Auditor context.
    prior work, avoid duplicate entries and unnecessary rewrites, and never
    manufacture a change or a finding merely to show activity.
 
+## Synchronization Gate
+
+Initial work, resumption, and reconciliation after corrections share this full
+completion gate. A corrective return below does not declare this gate passed.
+
+Synchronization passes when:
+
+- the current-cycle synchronization record has matching provenance and current
+  assessed input identities, with references to the existing completion and
+  evidence artifacts;
+- cycle identities, artifact references, current files, and completion claims
+  agree, and implementation and final review conclusions remain applicable;
+- every current acceptance condition and relevant technical criterion has
+  sufficient current evidence under **Acceptance Traceability**, including
+  evidence resolving any earlier later-role dependencies under the same IDs;
+- no unresolved material discrepancy or reconciliation gap remains, and no
+  blocking user question or obligation owned by `SYNCHRONIZING` remains;
+- limitations, remaining work, and a concise conclusion with resume/handoff
+  context are persisted. A sufficiently assessed no-change result is valid.
+
+The record references evidence; it is not another authoritative acceptance
+ledger. File presence or a `COMPLETE` label alone proves neither completion nor
+continued applicability. Synchronizer owns its record and corrections to its
+reconciliation, not another role's evidence, findings, or completion markers.
+
+Passing this gate is not cycle completion or user acceptance. Apply **Recovery
+Mechanics** after owned correction and the gate: an active recovery stack does
+not by itself prevent the Synchronizer gate from passing. A correction or rerun
+may need to return to `ResumeAt` instead of advancing toward sign-off.
+
+## Synchronizer Corrective Return
+
+Applies in `SYNCHRONIZING` to a Synchronizer-owned reconciliation error, in
+addition to the shared conditions of the protocol's **Corrective Returns**. The
+correction must be verified against current inputs, and no unresolved
+Synchronizer-owned defect, obligation, or blocking question may prevent that
+corrective outcome. An open Reviewer finding awaiting reassessment of this
+correction remains Reviewer-owned.
+
 ## Completion and Handoff
 
-Apply **Synchronization Gate** and recheck input identities immediately before
-finalizing the conclusion. `COMPLETE` means this role's full gate passed; it
-does not mean the user accepted the work or that all recovery routing is
+Apply **Synchronization Gate** above and recheck input identities immediately
+before finalizing the conclusion. `COMPLETE` means this role's full gate passed;
+it does not mean the user accepted the work or that all recovery routing is
 finished. Before any handoff, `node .standards/bin/check.mjs` must report no
 problem in files Synchronizer owns (see the protocol's **Runtime Tools and
 Hooks**).
@@ -154,7 +193,7 @@ an empty stack merely to complete owned corrective work, clear an owned
 obligation, or pass this role's gate. Do not clear another owner's obligations.
 
 If an interrupted assessment is waiting for an owned reconciliation correction,
-apply the protocol's **Synchronizer Corrective Return** conditions. Record the
+apply the **Synchronizer Corrective Return** conditions above. Record the
 verified correction and remaining owner work; keep this record incomplete when
 the full gate is unmet. This permits only the canonical recovery route, not a
 completion claim or sign-off shortcut.

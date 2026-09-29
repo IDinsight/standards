@@ -9,20 +9,20 @@ with the file responsible for the part you want to change.
 
 ## Main locations
 
-| Path                     | What belongs here                                                     |
-| ------------------------ | --------------------------------------------------------------------- |
-| `PROTOCOL.md`            | Shared rules for roles, states, handoffs, recovery, and the runtime.  |
-| `INSTALLER.md`           | Rules for the CLI's install, upgrade, and uninstall; not installed.   |
-| `README.md`              | A high-level introduction and development entry points.               |
-| `skills/`                | The nine role packages.                                               |
-| `runtime/`               | Tools installed into `.standards/bin/`, including `check.mjs`.        |
-| `templates/`             | Initial runtime files and client integration templates.               |
-| `docs/src/content/docs/` | Website content, including generated references.                      |
-| `docs/astro.config.mjs`  | Sidebar navigation, site URL, and base path.                          |
-| `docs/scripts/`          | Reference generation and local link checking.                         |
-| `scripts/`               | The release checks run in CI (`pnpm run check:release`).              |
-| `test/`                  | Tests, and saved workflow states for the upgrade check.               |
-| `.github/workflows/`     | Tests, documentation, Markdown, secrets, release checks, releases.    |
+| Path                     | What belongs here                                                    |
+| ------------------------ | -------------------------------------------------------------------- |
+| `PROTOCOL.md`            | Shared rules for roles, states, handoffs, recovery, and the runtime. |
+| `INSTALLER.md`           | Rules for the CLI's install, upgrade, and uninstall; not installed.  |
+| `README.md`              | A high-level introduction and development entry points.              |
+| `skills/`                | The nine role packages.                                              |
+| `runtime/`               | Tools installed into `.standards/bin/`, including `check.mjs`.       |
+| `templates/`             | Initial runtime files and client integration templates.              |
+| `docs/src/content/docs/` | Website content, including generated references.                     |
+| `docs/astro.config.mjs`  | Sidebar navigation, site URL, and base path.                         |
+| `docs/scripts/`          | Reference generation and local link checking.                        |
+| `scripts/`               | The release checks run in CI (`pnpm run check:release`).             |
+| `test/`                  | Tests, and saved workflow states for the upgrade check.              |
+| `.github/workflows/`     | Tests, documentation, Markdown, secrets, release checks, releases.   |
 
 ## Inside a role package
 

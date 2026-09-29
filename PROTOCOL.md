@@ -588,36 +588,10 @@ identify the requested kind.
 
 ### Review Gates
 
-Critical, independent assessment is required in both review kinds. Scope and
-architecture are authoritative statements of intended behavior, not proof that
-those statements are consistent or complete. Reviewer examines relevant claims
-from all roles and repository evidence without inheriting completion conclusions
-or silently replacing owned decisions.
-
-`IMPLEMENTATION` assesses implementation against the active contract, upstream
-consistency, Developer claims, and, in `STANDARD`, Tester coverage and evidence.
-Account for every current `AC-NNN` and relevant technical criterion. Explicit
-later-phase dependencies may remain only when satisfaction belongs to that later
-role; record the owner, required evidence, and the same AC ID. Pending is not
-evidence and cannot defer a present-phase defect or verification gap.
-
-`FINAL_DELIVERABLE` is available only in `STANDARD`. It assesses the assembled
-work after documentation: current acceptance evidence, documentation accuracy,
-unresolved findings, and consistency across artifacts. Every current acceptance
-condition and relevant technical criterion must have sufficient current evidence;
-unresolved dependencies or material evidence gaps cannot pass this gate.
-
-In `EXPEDITED`, implementation review assesses the bounded `Active Work.Request`
-and Developer evidence under **Expedited Cycle Contract**. Do not demand
-intentionally skipped artifacts, fabricate acceptance IDs, perform final review,
-or claim skipped guarantees. Promote when an omitted guarantee becomes necessary.
-
-A review passes only when no unresolved material finding or material assessment
-gap remains, no blocking user question or obligation owned by the current review
-state remains, and the applicable gate above is satisfied. No material findings
-is a valid outcome; there is no finding quota. A report with no established
-defects but insufficient material evidence is still incomplete. Reviewer defines
-severity and evidence details in its shared procedure and report template.
+Reviewer's skill defines the gate for each review kind. `FINAL_DELIVERABLE` is
+available only in `STANDARD`; in `EXPEDITED`, implementation review assesses the
+bounded `Active Work.Request` and Developer evidence under **Expedited Cycle
+Contract**.
 
 Passing a review gate does not complete the cycle. Apply **Recovery Mechanics**
 when active; otherwise follow **Forward Transitions**. Before entering
@@ -630,28 +604,8 @@ Synchronizer reconciles completed assessments, the current deliverable, and
 workflow records in `SYNCHRONIZING` during `STANDARD` only. Reviewer owns the
 assessment of soundness; Synchronizer establishes whether that assessment and
 its supporting evidence still apply to the work being offered for sign-off.
-Initial work, resumption, and reconciliation after corrections share this full
-completion gate. A corrective return below does not declare this gate passed.
-
-Synchronization passes when:
-
-- the current-cycle synchronization record has matching provenance and current
-  assessed input identities, with references to the existing completion and
-  evidence artifacts;
-- cycle identities, artifact references, current files, and completion claims
-  agree, and implementation and final review conclusions remain applicable;
-- every current acceptance condition and relevant technical criterion has
-  sufficient current evidence under **Acceptance Traceability**, including
-  evidence resolving any earlier later-role dependencies under the same IDs;
-- no unresolved material discrepancy or reconciliation gap remains, and no
-  blocking user question or obligation owned by `SYNCHRONIZING` remains;
-- limitations, remaining work, and a concise conclusion with resume/handoff
-  context are persisted. A sufficiently assessed no-change result is valid.
-
-The record references evidence; it is not another authoritative acceptance
-ledger. File presence or a `COMPLETE` label alone proves neither completion nor
-continued applicability. Synchronizer owns its record and corrections to its
-reconciliation, not another role's evidence, findings, or completion markers.
+Synchronizer's skill defines the gate; passing it is not cycle completion or
+user acceptance.
 
 Project-facing documentation and agent guidance are Documenter-owned, including
 project instructions outside managed framework blocks. Their completion evidence
@@ -668,11 +622,6 @@ manufactures its evidence or rewrites documentation. Managed framework blocks,
 installed protocol, and installation metadata retain installer/protocol ownership.
 Preserve user-authored instructions and apply **Instruction Layering and
 Conflicts** when necessary.
-
-Passing this gate is not cycle completion or user acceptance. Apply **Recovery
-Mechanics** after owned correction and the gate: an active recovery stack does
-not by itself prevent the Synchronizer gate from passing. A correction or rerun
-may need to return to `ResumeAt` instead of advancing toward sign-off.
 
 ## Standard Cycle Completion
 
@@ -765,10 +714,9 @@ routing.
 3. **Only the active frame owner plans resumption.** After correcting the defect
    and passing its normal gate, that owner decides whether previously completed
    downstream states must be re-established before `ResumeAt`. The only
-   exceptions are **Documenter Corrective Return** and **Synchronizer Corrective
-   Return**. Their conditions allow the respective owner to plan resumption
-   without declaring its full gate passed; the routing algorithm below remains
-   unchanged.
+   exceptions are the **Corrective Returns**. Their conditions allow the
+   respective owner to plan resumption without declaring its full gate passed;
+   the routing algorithm below remains unchanged.
 4. **No rerun:** pop the frame and transition directly to `ResumeAt` with
    `Handoff.Kind: RESUME`.
 5. **Rerun required:** set `RerunThrough` to the last required state and
@@ -821,7 +769,8 @@ it applies only when:
   `NONE`, and `ResumeAt` is another workflow role's state, not a user-owned
   state;
 - its record has valid current-cycle provenance, and the frame's specific
-  correction has been verified as its subsection below requires;
+  correction has been verified as that role's skill requires under
+  **Documenter Corrective Return** or **Synchronizer Corrective Return**;
 - every remaining full-gate gap exists only because work or assessment already
   assigned to the interrupted role or the preserved recovery route is
   unfinished. Record each remaining item, its owner, and the evidence still
@@ -839,33 +788,6 @@ does not own the active frame, or a return to `AWAITING_USER_SIGNOFF` cannot use
 this exception. The full gate still applies before a normal forward handoff,
 and **Standard Cycle Completion** still requires completed documentation and
 full synchronization before sign-off readiness.
-
-#### Documenter Corrective Return
-
-Applies in `DOCUMENTING` to a documentation or project-guidance defect, in
-addition to the shared conditions of **Corrective Returns**. The correction must
-be verified in saved content against current inputs with sufficient actual
-evidence, and no unverified corrective edit, unresolved actionable documentation
-defect, Documenter-owned outstanding obligation, or blocking user question may
-remain. For each remaining item, also persist its prerequisite and when
-documentation must be revisited, and persist the correction's applicability
-limits and resume context. Preserve current AC references where they exist; do
-not fabricate future scope, design, implementation, verification, or review
-artifacts, or acceptance identifiers. Missing evidence needed to verify the
-correction, independent defects or gaps, and currently actionable documentation
-outside a selected editing boundary follow normal failure and blocking rules; a
-selected target or collaboration mode waives none of these conditions. GUIDED
-work must have an inspected saved correction; supplying a snippet is
-insufficient. On re-entry, reconcile current inputs and the retained work.
-
-#### Synchronizer Corrective Return
-
-Applies in `SYNCHRONIZING` to a Synchronizer-owned reconciliation error, in
-addition to the shared conditions of **Corrective Returns**. The correction
-must be verified against current inputs, and no unresolved
-Synchronizer-owned defect, obligation, or blocking question may prevent that
-corrective outcome. An open Reviewer finding awaiting reassessment of this
-correction remains Reviewer-owned.
 
 ## Expedited Cycle Contract
 
@@ -1572,15 +1494,15 @@ active work, cycle mode, user style, runtime tools, and project reset:
   actual execution evidence, gaps, and later-phase dependencies; it does not
   replace scope, design, or workflow coordination state.
 - **review report**: records inspected inputs, checks, findings, limitations,
-  dependencies, and resumable progress under **Review Gates**.
+  dependencies, and resumable progress under Reviewer's **Review Gates**.
 - **documentation record**: holds the evidence and progress that
   **Synchronization Gate** describes; it is distinct from reusable project
   documentation and does not replace another role's evidence or an acceptance
   authority.
 - **synchronization record**: records assessed identities, references to
   completion and evidence artifacts, discrepancies and their owners,
-  limitations, and a resumable conclusion under **Synchronization Gate**; it is
-  not an acceptance ledger or user sign-off.
+  limitations, and a resumable conclusion under Synchronizer's
+  **Synchronization Gate**; it is not an acceptance ledger or user sign-off.
 - **project context**: the Auditor-owned baseline in `.standards/CONTEXT.md`.
   It may persist as evidence across cycles under **Project context lifecycle**.
   A `PROJECT_CONTEXT` failure means it is materially incomplete, incorrect, or

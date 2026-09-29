@@ -200,11 +200,46 @@ and evidence; withdrawal records why the original claim was mistaken or is no
 longer applicable under the corrected contract. Keep useful prior reasoning for
 traceability without preserving a false conclusion as current fact.
 
+## Review Gates
+
+Critical, independent assessment is required in both review kinds. Scope and
+architecture are authoritative statements of intended behavior, not proof that
+those statements are consistent or complete. Reviewer examines relevant claims
+from all roles and repository evidence without inheriting completion conclusions
+or silently replacing owned decisions.
+
+`IMPLEMENTATION` assesses implementation against the active contract, upstream
+consistency, Developer claims, and, in `STANDARD`, Tester coverage and evidence.
+Account for every current `AC-NNN` and relevant technical criterion. Explicit
+later-phase dependencies may remain only when satisfaction belongs to that later
+role; record the owner, required evidence, and the same AC ID. Pending is not
+evidence and cannot defer a present-phase defect or verification gap.
+
+`FINAL_DELIVERABLE` is available only in `STANDARD`. It assesses the assembled
+work after documentation: current acceptance evidence, documentation accuracy,
+unresolved findings, and consistency across artifacts. Every current acceptance
+condition and relevant technical criterion must have sufficient current
+evidence; unresolved dependencies or material evidence gaps cannot pass this
+gate.
+
+In `EXPEDITED`, implementation review assesses the bounded `Active Work.Request`
+and Developer evidence under **Expedited Cycle Contract**. Do not demand
+intentionally skipped artifacts, fabricate acceptance IDs, perform final review,
+or claim skipped guarantees. Promote when an omitted guarantee becomes
+necessary.
+
+A review passes only when no unresolved material finding or material assessment
+gap remains, no blocking user question or obligation owned by the current review
+state remains, and the applicable gate above is satisfied. No material findings
+is a valid outcome; there is no finding quota. A report with no established
+defects but insufficient material evidence is still incomplete. Reviewer defines
+severity and evidence details in its shared procedure and report template.
+
 ## Completion and Handoff
 
-Apply the protocol's **Review Gates** for the selected kind and cycle mode.
-Immediately before marking the report `COMPLETE`, recheck that the assessed
-inputs still match current content; reconcile any intervening changes. Ensure:
+Apply **Review Gates** above for the selected kind and cycle mode. Immediately
+before marking the report `COMPLETE`, recheck that the assessed inputs still
+match current content; reconcile any intervening changes. Ensure:
 
 - `node .standards/bin/check.mjs` reports no problem in files Reviewer owns (see
   the protocol's **Runtime Tools and Hooks**);

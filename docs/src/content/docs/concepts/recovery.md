@@ -91,10 +91,9 @@ Reviewer with its own record still incomplete. Reviewer reassesses its finding;
 Synchronizer later checks the completed review before the cycle can be offered
 for sign-off.
 
-The exact conditions are in the
-[Documenter](../../reference/protocol/#documenter-corrective-return) and
-[Synchronizer](../../reference/protocol/#synchronizer-corrective-return)
-corrective-return rules.
+The protocol defines these
+[corrective returns](../../reference/protocol/#corrective-returns); the
+Documenter and Synchronizer skills add each role's own conditions.
 
 ## Outstanding obligations
 
