@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.2](https://github.com/IDinsight/standards/compare/v0.7.1...v0.7.2) (2026-09-29)
+
+
+### Bug Fixes
+
+* clear ESLint recommended-rule errors ([18431df](https://github.com/IDinsight/standards/commit/18431dfe6fbe216b45c27d883c7832f4f80d09c7))
+
 ## [0.7.1](https://github.com/IDinsight/standards/compare/v0.7.0...v0.7.1) (2026-09-29)
 
 
