@@ -16,9 +16,9 @@ S.T.A.N.D.A.R.D.S. is a project-agnostic, role-based workflow for coding agents.
 Each skill owns a specific class of decisions or artifacts, and work moves
 between roles through explicit completion gates and failure handoffs.
 
-`PROTOCOL.md` is the canonical definition of workflow states, project modes,
-cycle modes, transitions, failure types, and shared terminology. Individual
-skills define role-specific behavior.
+`PROTOCOL.md`, with its chapters in `protocol/`, is the canonical definition of
+workflow states, project modes, cycle modes, transitions, failure types, and
+shared terminology. Individual skills define role-specific behavior.
 
 ## Roles
 
@@ -151,9 +151,9 @@ CLI stays installed.
 
 The installer supports greenfield and brownfield projects. The authoritative
 installer requirements live in [`INSTALLER.md`](INSTALLER.md), which stays in
-this repository. The **Installed Runtime Contract** in
-[`PROTOCOL.md`](PROTOCOL.md) tells agents what an installed project contains and
-how they may run reset and uninstall.
+this repository. The **Installed Runtime Contract** in the protocol chapter
+[`protocol/installation.md`](protocol/installation.md) tells agents what an
+installed project contains and how they may run reset and uninstall.
 
 At a high level, installation selects the initial project mode, installs the
 protocol and workflow skills for the chosen coding agent, applies explicit-only
@@ -173,6 +173,7 @@ project/
 ├── .standards/
 │   ├── bin/              # tools the agent runs, including check.mjs
 │   ├── docs/             # cycle records, created as roles work
+│   ├── protocol/         # protocol chapters, read when a situation needs them
 │   ├── user-styles/      # optional personal styles you add, per role
 │   ├── INSTALLATION.json
 │   ├── MODE.md
@@ -194,6 +195,6 @@ without a reset, you resolve the merge conflict by keeping exactly one cycle in
 only when you select it by name. Role ownership, standard and expedited forward
 transitions, promotion, recovery, user intervention, project-mode changes,
 cancellation/reset behavior, project context, and user styles are defined only
-in [`PROTOCOL.md`](PROTOCOL.md), and installation ownership checks and
-client-setting preservation only in [`INSTALLER.md`](INSTALLER.md); they are
-intentionally not restated here.
+in [`PROTOCOL.md`](PROTOCOL.md) and its chapters in [`protocol/`](protocol/),
+and installation ownership checks and client-setting preservation only in
+[`INSTALLER.md`](INSTALLER.md); they are intentionally not restated here.

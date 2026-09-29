@@ -59,10 +59,10 @@ the glossary for every paragraph.
 ## Edit the source of generated pages
 
 The Protocol page, the Installer Contract page, and eight template pages are
-generated from `PROTOCOL.md`, `INSTALLER.md`, and `skills/<role>/template.md`.
-Their rules and required formats come from those files; the introductory text
-comes from `docs/scripts/sync-reference.mjs`. Make changes in the relevant
-source, then run:
+generated from `PROTOCOL.md` and its chapters in `protocol/`, `INSTALLER.md`,
+and `skills/<role>/template.md`. Their rules and required formats come from
+those files; the introductory text comes from `docs/scripts/sync-reference.mjs`.
+Make changes in the relevant source, then run:
 
 ```sh
 pnpm run docs:sync-reference

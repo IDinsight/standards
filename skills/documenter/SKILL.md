@@ -18,13 +18,15 @@ documentation and its evidence, not the behavior it describes.
 ## Entry and Inputs
 
 Read all of `.standards/PROTOCOL.md` (in consecutive parts if a read shows only
-part of it), `.standards/MODE.md`, and `.standards/STATE.md` first. Perform
-role-owned work only in `DOCUMENTING` with an initialized active `STANDARD`
-cycle and a legal state/mode combination. Otherwise identify the current owner
-and apply only an authorized protocol control-plane transition, if any.
-`EXPEDITED` omits Documenter; a required documentation guarantee uses
-**Expedited Promotion**. An invocation or a file argument does not bypass state
-ownership or initialize a documentation-only expedited path.
+part of it), `.standards/MODE.md`, and `.standards/STATE.md` first, then each
+chapter in `.standards/protocol/` that the protocol's reading guide names for
+the current state or request. Perform role-owned work only in `DOCUMENTING` with
+an initialized active `STANDARD` cycle and a legal state/mode combination.
+Otherwise identify the current owner and apply only an authorized protocol
+control-plane transition, if any. `EXPEDITED` omits Documenter; a required
+documentation guarantee uses **Expedited Promotion** in
+`.standards/protocol/expedited.md`. An invocation or a file argument does not
+bypass state ownership or initialize a documentation-only expedited path.
 
 Read the active request, current scope and architecture, relevant Auditor
 context, development plan, Tester verification, implementation review, and any
@@ -192,11 +194,12 @@ a style precedence list cannot settle them.
    `node .standards/bin/id.mjs next DOC <record>`, with evidence, impact,
    owner/failure type, affected ACs, and the required correction. Refer to
    entries in other records by path and ID. Apply **Failure Handoffs**,
-   **Recovery Mechanics**, and **Outstanding Obligations**; preserve older
-   frames and all remaining work. If a user decision is necessary, persist
-   `Active Work.BlockedOn` before asking and clear it after incorporating the
-   answer. User-requested contract changes follow **User Decisions and
-   Intervention** rather than being labeled agent-discovered failures.
+   **Recovery Mechanics**, and **Outstanding Obligations** (in
+   `.standards/protocol/expedited.md`); preserve older frames and all remaining
+   work. If a user decision is necessary, persist `Active Work.BlockedOn` before
+   asking and clear it after incorporating the answer. User-requested contract
+   changes follow **User Decisions and Intervention** rather than being labeled
+   agent-discovered failures.
 8. On every resumption, compare current inputs with recorded identities,
    including incomplete records. Reconcile changed contracts and the entire
    current AC inventory, including added and retired IDs. Invalidate unsupported

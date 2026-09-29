@@ -101,6 +101,7 @@ project/
 ├── .standards/
 │   ├── bin/                  # Tools the agent runs
 │   ├── docs/                 # Cycle records, created as roles work
+│   ├── protocol/             # Protocol chapters for specific situations
 │   ├── INSTALLATION.json
 │   ├── MODE.md
 │   ├── PROTOCOL.md
@@ -115,9 +116,11 @@ For Claude Code, it also sets the installed roles to user-invocable-only in
 `.claude/settings.json` and adds the Claude Code hook there. Codex skill
 adapters disable implicit invocation. `.standards/bin/` holds the tools the
 agent uses to generate cycle IDs, create records, number entries, and check the
-workflow files. The roles keep their cycle records in `.standards/docs/`. The
-installer maintains a marked section in `AGENTS.md` and connects `CLAUDE.md` to
-it, keeping project-owned text and an existing `@AGENTS.md` import. The
+workflow files. `.standards/protocol/` holds the protocol chapters that agents
+read only when a situation calls for them, such as starting or cancelling a
+cycle. The roles keep their cycle records in `.standards/docs/`. The installer
+maintains a marked section in `AGENTS.md` and connects `CLAUDE.md` to it,
+keeping project-owned text and an existing `@AGENTS.md` import. The
 [runtime file reference](../../reference/runtime-files/) explains what each file
 does.
 
@@ -185,10 +188,10 @@ Reset deletes the saved workflow state, the Auditor's `.standards/CONTEXT.md`,
 and every cycle record in `.standards/docs/`; the preview warns how many records
 it will delete. It then writes a fresh `.standards/STATE.md` and
 `.standards/MODE.md`, as a first install would. Everything else stays: the
-protocol, the tools in `.standards/bin/`, the version and installation records,
-your user styles, the installed skills, the stop hook, client settings, and the
-managed sections of `AGENTS.md` and `CLAUDE.md`. Reset does not undo changes to
-your project files.
+protocol and its chapters, the tools in `.standards/bin/`, the version and
+installation records, your user styles, the installed skills, the stop hook,
+client settings, and the managed sections of `AGENTS.md` and `CLAUDE.md`. Reset
+does not undo changes to your project files.
 
 Reset is yours to run. An agent runs it only when you ask, or to
 [cancel a greenfield cycle](../../guides/cancelling-and-new-cycles/) that has no

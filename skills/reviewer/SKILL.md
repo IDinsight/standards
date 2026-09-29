@@ -20,11 +20,13 @@ omissions, and defects. Do not silently replace their decisions.
 ## Entry and Inputs
 
 Read all of `.standards/PROTOCOL.md` (in consecutive parts if a read shows only
-part of it), `.standards/MODE.md`, and `.standards/STATE.md` first. Perform
-Reviewer-owned work only in `REVIEWING_IMPLEMENTATION` or `REVIEWING_FINAL` with
-an active cycle and a legal cycle/state combination. Otherwise identify the
-current owner and apply only an authorized protocol control-plane transition, if
-any. Do not infer entry from a report or chat.
+part of it), `.standards/MODE.md`, and `.standards/STATE.md` first, then each
+chapter in `.standards/protocol/` that the protocol's reading guide names for
+the current state or request. Perform Reviewer-owned work only in
+`REVIEWING_IMPLEMENTATION` or `REVIEWING_FINAL` with an active cycle and a legal
+cycle/state combination. Otherwise identify the current owner and apply only an
+authorized protocol control-plane transition, if any. Do not infer entry from a
+report or chat.
 
 Apply the protocol's **Independent Assessment Sessions** and **Independent
 Reviewer Session** rules before formal assessment, including honest session
@@ -86,11 +88,12 @@ resolve findings. Protocol coordination updates remain governed by the protocol.
 | Review reasoning, finding, or conclusion     | `REVIEW` / Reviewer, affected kind |
 | Synchronization record or reconciliation     | `SYNCHRONIZATION` / Synchronizer   |
 
-Use **Failure Handoffs**, **Recovery Mechanics**, **Outstanding Obligations**,
-and **Instruction Layering and Conflicts**. In expedited work, an omitted owner
-or guarantee requires **Expedited Promotion**, not a failure route into a
-skipped state. Planned implementation alone does not invalidate baseline
-context.
+Use **Failure Handoffs**, **Recovery Mechanics**, **Outstanding Obligations**
+(in `.standards/protocol/expedited.md`), and **Instruction Layering and
+Conflicts**. In expedited work, an omitted owner or guarantee requires
+**Expedited Promotion** in `.standards/protocol/expedited.md`, not a failure
+route into a skipped state. Planned implementation alone does not invalidate
+baseline context.
 
 ## Shared Assessment Procedure
 
@@ -223,10 +226,10 @@ evidence; unresolved dependencies or material evidence gaps cannot pass this
 gate.
 
 In `EXPEDITED`, implementation review assesses the bounded `Active Work.Request`
-and Developer evidence under **Expedited Cycle Contract**. Do not demand
-intentionally skipped artifacts, fabricate acceptance IDs, perform final review,
-or claim skipped guarantees. Promote when an omitted guarantee becomes
-necessary.
+and Developer evidence under **Expedited Cycle Contract** in
+`.standards/protocol/expedited.md`. Do not demand intentionally skipped
+artifacts, fabricate acceptance IDs, perform final review, or claim skipped
+guarantees. Promote when an omitted guarantee becomes necessary.
 
 A review passes only when no unresolved material finding or material assessment
 gap remains, no blocking user question or obligation owned by the current review

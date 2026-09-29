@@ -80,11 +80,11 @@ grew about as much as new tokens: on Commander.js, the standard cycle's nine
 sessions took about 80 minutes of agent time, against about 6.5 minutes for a
 single session.
 
-The ratio shrinks as the change grows because part of the cost is fixed. Every
-workflow role first reads the full workflow rules and its own instructions,
-about 40,000 to 50,000 new tokens whatever the size of the change. That was
-about a third of the standard cycle's new tokens on the small tool and about a
-quarter on Commander.js.
+The ratio shrinks as the change grows because part of the cost is fixed. In
+these runs, every workflow role first read the full workflow rules and its own
+instructions, about 40,000 to 50,000 new tokens whatever the size of the change.
+That was about a third of the standard cycle's new tokens on the small tool and
+about a quarter on Commander.js.
 
 The extra tokens buy more than code. Each standard cycle produced written
 requirements, a design, independently written tests, two independent reviews,

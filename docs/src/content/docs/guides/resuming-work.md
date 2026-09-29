@@ -23,12 +23,13 @@ explain the current state before invoking a role. The handoff is a prompt to
 continue; it does not start the next role automatically.
 
 The invoked role reads `.standards/PROTOCOL.md`, `.standards/MODE.md`, and
-`.standards/STATE.md`, then the relevant project files and role reports. It
-checks the saved request, plan approval, unfinished work, blockers, and any
-correction or promotion history before proceeding. The agent handles a saved
-pending request or new-cycle setup when applicable. You do not need to inspect
-these fields or repeat a request already saved in the state. See
-[Runtime Files](../../reference/runtime-files/) for what the files contain.
+`.standards/STATE.md`, plus any protocol chapter the situation needs, then the
+relevant project files and role reports. It checks the saved request, plan
+approval, unfinished work, blockers, and any correction or promotion history
+before proceeding. The agent handles a saved pending request or new-cycle setup
+when applicable. You do not need to inspect these fields or repeat a request
+already saved in the state. See [Runtime Files](../../reference/runtime-files/)
+for what the files contain.
 
 ## What each role does when it resumes
 

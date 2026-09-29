@@ -48,7 +48,7 @@ try {
   assert.equal(packageJson.bin.standards, './bin/standards.js');
   assert.ok(packageJson.dependencies['@clack/prompts']);
   assert.ok((await stat(path.join(packedRoot, 'bin/standards.js'))).mode & 0o111);
-  for (const asset of ['PROTOCOL.md', 'skills', 'templates', 'lib', 'bin', 'runtime']) {
+  for (const asset of ['PROTOCOL.md', 'protocol', 'skills', 'templates', 'lib', 'bin', 'runtime']) {
     await compareTree(path.join(sourceRoot, asset), path.join(packedRoot, asset));
   }
 

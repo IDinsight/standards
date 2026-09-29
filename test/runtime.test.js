@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { execFile, spawn } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
-import { chmod, mkdtemp, readFile, realpath, rm, symlink, writeFile, mkdir } from 'node:fs/promises';
+import { chmod, mkdtemp, readFile, readdir, realpath, rm, symlink, writeFile, mkdir } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
@@ -486,6 +486,19 @@ test('install ships the tools, and reinstall restores them without other changes
   const restored = await installProject({ projectRoot: root, clients: ['claude'] });
   assert.equal(restored.changed, 1);
   assert.match(await read(root, '.standards/bin/check.mjs'), /runCheck/);
+  assert.equal((await installProject({ projectRoot: root, clients: ['claude'] })).changed, 0);
+}));
+
+test('install ships the protocol chapters, and reinstall restores them without other changes', () => project(async (root) => {
+  const source = new URL('../protocol/', import.meta.url);
+  const chapters = (await readdir(source)).sort();
+  assert.deepEqual((await readdir(path.join(root, '.standards/protocol'))).sort(), chapters);
+  await rm(path.join(root, '.standards/protocol'), { recursive: true });
+  const restored = await installProject({ projectRoot: root, clients: ['claude'] });
+  assert.equal(restored.changed, 1);
+  for (const name of chapters) {
+    assert.equal(await read(root, `.standards/protocol/${name}`), await readFile(new URL(name, source), 'utf8'));
+  }
   assert.equal((await installProject({ projectRoot: root, clients: ['claude'] })).changed, 0);
 }));
 

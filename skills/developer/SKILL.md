@@ -49,7 +49,8 @@ Those results are not Tester-owned formal verification and do not replace the
 
 Read all of `.standards/PROTOCOL.md` (in consecutive parts if a read shows only
 part of it), `.standards/MODE.md`, and `.standards/STATE.md` before substantive
-work.
+work, then each chapter in `.standards/protocol/` that the protocol's reading
+guide names for the current state or request.
 
 For `STANDARD` cycles, use:
 
@@ -64,7 +65,7 @@ For `EXPEDITED` cycles, use `Active Work.Request` as the change contract.
 Existing `.standards/CONTEXT.md` may be consulted as prior evidence, but
 Developer does not refresh Auditor-owned baseline context or fabricate skipped
 scope/design artifacts. If safe completion requires an omitted standard
-guarantee, apply `.standards/PROTOCOL.md` **Expedited Promotion**.
+guarantee, apply **Expedited Promotion** in `.standards/protocol/expedited.md`.
 
 When recovery is active:
 
@@ -105,14 +106,16 @@ sufficiently bounded brownfield request. If the request cannot use the selected
 expedited contract, do not silently reinterpret it as `STANDARD`; follow the
 protocol's user-decision rule.
 
-Then start the cycle through the protocol's **Start a cycle**, whether it is the
-first cycle or follows `SIGNED_OFF` or retained `CANCELLED`, and whether or not
-the request was pending; do not directly replace terminal `Active Work` or
-bypass its handoff and baseline-reconciliation steps. Generate the cycle ID with
-`node .standards/bin/cycle.mjs new --request "<request>"` (see **Cycle IDs**).
-If the tool refuses, stop and report it; never write an ID yourself. Continue
-Developer work only when the resulting state is `DEVELOPING`; a `STANDARD`
-cycle's entry state is owned by Scoper or Auditor, so stop there.
+Then start the cycle through **Start a cycle** in
+`.standards/protocol/user-decisions.md`, whether it is the first cycle or
+follows `SIGNED_OFF` or retained `CANCELLED`, and whether or not the request was
+pending; do not directly replace terminal `Active Work` or bypass its handoff
+and baseline-reconciliation steps. Generate the cycle ID with
+`node .standards/bin/cycle.mjs new --request "<request>"` (see **Cycle IDs** in
+`.standards/protocol/user-decisions.md`). If the tool refuses, stop and report
+it; never write an ID yourself. Continue Developer work only when the resulting
+state is `DEVELOPING`; a `STANDARD` cycle's entry state is owned by Scoper or
+Auditor, so stop there.
 
 If another role owns the active state and no protocol-authorized control-plane
 transition applies, do not perform Developer work. Leave role-owned artifacts
@@ -214,9 +217,10 @@ material revisions that return the plan to `PROPOSED`, and expedited promotion.
 Do not replace or recreate the active cycle's plan to bypass the lock. Repeating
 the same normalized identifier is not a change. A different selection requires a
 new cycle and its own development plan under the protocol's terminal-state and
-**Start a cycle** rules. Do not silently cancel, sign off, start a cycle, or
-restyle completed work; persist the blocking choice and ask whether to continue
-with the locked style or end this cycle through an allowed transition.
+**Start a cycle** rules in `.standards/protocol/user-decisions.md`. Do not
+silently cancel, sign off, start a cycle, or restyle completed work; persist the
+blocking choice and ask whether to continue with the locked style or end this
+cycle through an allowed transition.
 
 A plan missing `User Style Locked` is invalid. Report the inconsistency and
 block implementation until corrected; do not infer the lock from plan status.
@@ -247,7 +251,8 @@ Route defects instead of guessing:
 For `EXPEDITED`, a need for formal scope, consequential architecture,
 authoritative refreshed project context, Tester-owned verification,
 documentation, final review, synchronization, or another omitted guarantee
-requires **Expedited Promotion** rather than silently assuming that ownership.
+requires **Expedited Promotion** in `.standards/protocol/expedited.md` rather
+than silently assuming that ownership.
 
 Looking up how to use a technology or API already established by the active
 contract is implementation research. Deciding which consequential technology,
