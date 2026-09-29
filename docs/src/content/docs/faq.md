@@ -8,6 +8,24 @@ the full details (where applicable).
 
 ## Deciding whether to use STANDARDS
 
+### Is it overkill for small changes?
+
+It doesn't have to be. For a small, clearly defined change to an existing
+project, give your request to Developer to use **expedited** work. It runs only
+Developer and an independent implementation Reviewer before you decide whether
+to accept the change. Developer still shows you a plan and waits for your
+approval before coding.
+
+Expedited work skips the separate requirements, design, project audit, testing,
+documentation, and final-check steps, so use it only when the change doesn't
+need them. If it turns out to need one, the cycle switches to the full standard
+workflow. New projects always use standard work. See
+[Project and Cycle Modes](../concepts/project-modes/#choose-the-cycle-mode).
+
+If you only want to understand something in the project, use
+[Navigator](../roles/navigator/). It answers questions without changing any
+files or starting a cycle.
+
 ### Which coding agents does STANDARDS support?
 
 Codex and Claude Code. The installer can set up either one or both, and you can
@@ -26,23 +44,15 @@ else.
 The workflow tools run on Node.js, so you need Node.js 22.12 or newer even if
 your project doesn't use JavaScript.
 
-### Is it overkill for small changes?
+### Does STANDARDS send my code or data anywhere?
 
-It doesn't have to be. For a small, clearly defined change to an existing
-project, give your request to Developer to use **expedited** work. It runs only
-Developer and an independent implementation Reviewer before you decide whether
-to accept the change. Developer still shows you a plan and waits for your
-approval before coding.
+No. When you run the installer or another STANDARDS command with `npx`, it
+downloads the STANDARDS package from npm. Everything else runs on your machine.
+The tools in `.standards/bin/` use only Node.js and git, and they don't connect
+to the internet. STANDARDS collects no telemetry.
 
-Expedited work skips the separate requirements, design, project audit, testing,
-documentation, and final-check steps, so use it only when the change doesn't
-need them. If it turns out to need one, the cycle switches to the full standard
-workflow. New projects always use standard work. See
-[Project and Cycle Modes](../concepts/project-modes/#choose-the-cycle-mode).
-
-If you only want to understand something in the project, use
-[Navigator](../roles/navigator/). It answers questions without changing any
-files or starting a cycle.
+Your coding agent works as it always does: it still sends your prompts and the
+files it reads to its provider. STANDARDS doesn't change that.
 
 ### Does STANDARDS use more agent time or tokens?
 
@@ -116,131 +126,7 @@ To keep usage down:
 - Keep each cycle to one focused change.
 - Use lower-tier models for roles that don't need the highest capability.
 
-### Does STANDARDS send my code or data anywhere?
-
-No. When you run the installer or another STANDARDS command with `npx`, it
-downloads the STANDARDS package from npm. Everything else runs on your machine.
-The tools in `.standards/bin/` use only Node.js and git, and they don't connect
-to the internet. STANDARDS collects no telemetry.
-
-Your coding agent works as it always does: it still sends your prompts and the
-files it reads to its provider. STANDARDS doesn't change that.
-
-## How the workflow works
-
-### Why do I have to start each role myself?
-
-So you stay in control of when each step happens and where it runs. When a role
-finishes, it saves its work and gives you the command for the next role. You
-decide when to run it and in which chat. That matters for Tester and Reviewer,
-which need a fresh chat that only you can open.
-
-The saved workflow state decides which role is allowed to work next, but it
-never starts a role on its own. The installer also turns off automatic skill use
-in both coding agents, so a role runs only when you call it. See
-[Human Decisions and Sign-off](../concepts/human-decisions/#run-each-role-explicitly).
-
-### Why can't a role just fix a problem it finds?
-
-Each role owns certain decisions, and a fix belongs to the role that owns the
-thing that's wrong. Suppose Tester finds that the design never says when a
-failed request should be retried. Tester can't settle that by writing a test.
-Architect makes the decision, and then testing continues.
-
-This keeps a fix from quietly changing your requirements or design. The agent
-works out who owns the problem, records it, and gives you the command for that
-role. See
-[Roles and Ownership](../concepts/ownership/#send-problems-to-their-owners).
-
-### Why do Tester and Reviewer need a fresh chat? Should I switch models?
-
-A check is only useful if it isn't shaped by the reasoning that produced the
-work. Tester runs in a chat separate from Developer's implementation chat.
-Reviewer runs in a chat separate from every chat that produced the work under
-review: the requirements, design, project context, code, tests, and
-documentation. Both work from the saved files and evidence, not from what the
-author said.
-
-For Reviewer, a different model of equal or higher capability is recommended
-when you can choose one, but it's optional. The separate chat is required either
-way. See
-[Independent assessment chats](../concepts/states-and-handoffs/#independent-assessment-chats).
-
-### Can I skip a role?
-
-Not one at a time. Expedited work leaves out a fixed set of roles for small
-changes to an existing project, and you can't pick and choose beyond that. A
-skipped role's job also doesn't move to another role. For example, Developer's
-own checks don't replace Tester's verification.
-
-If expedited work turns out to need a skipped role, the cycle is promoted to
-standard work and continues from Auditor. See
-[Promote an expedited cycle](../concepts/states-and-handoffs/#promote-an-expedited-cycle).
-
-### What does sign-off mean? Is my work merged or deployed?
-
-Sign-off means you accept the finished work, and it ends the cycle. It doesn't
-commit, merge, push, or deploy anything. Those stay your decisions.
-
-You're asked to decide only after the required checks are complete, and when you
-sign off, the agent confirms that they still hold for the current files. You can
-also ask for changes or cancel instead. See
-[Decide at sign-off](../concepts/human-decisions/#decide-at-sign-off).
-
-### How do I know every requirement was actually checked?
-
-In standard work, Scoper writes each outcome that must be true as an
-**acceptance condition** with an ID, such as `AC-001`. The design, the
-implementation plan, and every assessment report refer to the same IDs. Tester
-records the evidence for each one, or why it can't be verified yet. Final review
-checks that every condition has enough evidence, and Synchronizer checks that
-the evidence still matches the files you're signing off.
-
-The workflow check also flags a finished report that leaves out a current ID. It
-can't judge whether the evidence is good; that's the job of Tester and Reviewer.
-Expedited work has no IDs and is checked against your saved request instead. See
-[Acceptance Criteria and Traceability](../concepts/acceptance-traceability/).
-
-## Customizing
-
-### Can I make a role follow my own preferences?
-
-Yes, with a **user style**: a Markdown file with your preferences for one role,
-such as how you like test names or docstrings written. Save it at
-`.standards/user-styles/<role>/<name>.md` and name it when you invoke the role,
-for example `$developer Use user style tony.` (`/developer` in Claude Code). A
-role never picks a style on its own.
-
-A style covers choices the role would otherwise make itself. It can't override
-the workflow rules, your project's instructions or tooling, the agreed
-requirements and design, or correctness. Developer, Tester, Reviewer,
-Documenter, and Synchronizer save your choice and reload it when they resume;
-Developer keeps the same style for the whole cycle once you approve its plan.
-With Scoper, Architect, Auditor, and Navigator, name the style again in each new
-chat. See [User styles](../reference/runtime-files/#user-styles).
-
-### Can I add, remove, or rename a role?
-
-No. The nine roles are built into STANDARDS, and the rules for passing work
-between them depend on every one of them. Adding, removing, or renaming a role
-is a change to STANDARDS itself and comes only in a new **major** version.
-
-You can add your own separate skills next to the STANDARDS roles; the installer
-and uninstaller leave them alone. To change how a role works for you, use a user
-style.
-
 ## Day-to-day use
-
-### How big should one cycle be?
-
-A cycle is one request, from the moment you give it to your sign-off or
-cancellation. A good size is a change you'd want to accept or reject as a whole,
-such as one feature or one fix. Each cycle gets its own requirements, reviews,
-and sign-off, so unrelated changes are easier to judge in separate cycles.
-
-For a large project, work through several cycles, one after another. For a
-small, clearly defined fix to an existing project, consider expedited work. Each
-branch holds one active cycle at a time.
 
 ### Which role do I run next?
 
@@ -272,19 +158,6 @@ workflow waits at that step. When you come back and run the role again, it sees
 the saved question and asks you again. Once you answer, it carries on. See
 [Answer decisions that are waiting on you](../guides/resuming-work/#answer-decisions-that-are-waiting-on-you).
 
-### Can I use my own requirements or design document?
-
-Yes. Tell Scoper or Architect where it is, and it can update your document
-instead of creating a new one. The document stays yours: STANDARDS doesn't mark
-it as a workflow file, and reset and uninstall leave it in place.
-
-Expect a few changes to it. Scoper writes each requirement as a list item that
-starts with its ID, such as `- AC-001: Users can search by name.` When a later
-cycle reuses the document, the earlier cycle's items move under a "Previous
-Cycles" heading at the end, so an ID never changes meaning. See
-[Scoper](../roles/scoper/#inputs-and-output) and
-[Architect](../roles/architect/#inputs-and-output).
-
 ### Can I change my mind partway through?
 
 Yes. Tell the agent you're working with what you want to be different, even if a
@@ -297,27 +170,6 @@ After the change is made, that role decides which later steps need to run again,
 and the workflow returns to where it was interrupted. In expedited work, a
 change that needs a skipped role moves the cycle to standard work. See
 [Revising Scope or Design](../guides/revising-scope-or-design/).
-
-### Does the agent commit my changes?
-
-Not unless you ask. When a role finishes a meaningful set of changes, it
-suggests a commit message in the Conventional Commits format, such as
-`feat(search): add search by name`. You decide when and what to commit.
-Navigator never suggests one, because it doesn't change anything.
-
-### What does the stop hook do? Can I turn it off?
-
-When the agent finishes a turn and there are uncommitted changes in
-`.standards/` or in Markdown files, the hook runs the workflow check. If the
-check finds problems, it sends the agent back once to fix them, pass them to the
-right role, or tell you. The check catches mistakes such as a malformed record
-or a requirement that a finished report left out. It doesn't judge the quality
-of the work.
-
-The installer adds the hook unless you say no. To turn it off later, run the
-installer again with `--no-hooks`; `--hooks` turns it back on. Codex runs the
-hook only after you trust it by running `/hooks` in Codex. See
-[Hooks](../getting-started/installation/#hooks).
 
 ### How do I stop, start over, upgrade, or remove STANDARDS? What does each delete?
 
@@ -346,6 +198,51 @@ Add `--dry-run` to reset or uninstall to preview the changes without making
 them. Moving to a new major version means uninstalling and installing again. See
 [Installation and Setup](../getting-started/installation/#reinstall-or-upgrade)
 and [Cancelling or Starting a New Cycle](../guides/cancelling-and-new-cycles/).
+
+### How big should one cycle be?
+
+A cycle is one request, from the moment you give it to your sign-off or
+cancellation. A good size is a change you'd want to accept or reject as a whole,
+such as one feature or one fix. Each cycle gets its own requirements, reviews,
+and sign-off, so unrelated changes are easier to judge in separate cycles.
+
+For a large project, work through several cycles, one after another. For a
+small, clearly defined fix to an existing project, consider expedited work. Each
+branch holds one active cycle at a time.
+
+### Does the agent commit my changes?
+
+Not unless you ask. When a role finishes a meaningful set of changes, it
+suggests a commit message in the Conventional Commits format, such as
+`feat(search): add search by name`. You decide when and what to commit.
+Navigator never suggests one, because it doesn't change anything.
+
+### Can I use my own requirements or design document?
+
+Yes. Tell Scoper or Architect where it is, and it can update your document
+instead of creating a new one. The document stays yours: STANDARDS doesn't mark
+it as a workflow file, and reset and uninstall leave it in place.
+
+Expect a few changes to it. Scoper writes each requirement as a list item that
+starts with its ID, such as `- AC-001: Users can search by name.` When a later
+cycle reuses the document, the earlier cycle's items move under a "Previous
+Cycles" heading at the end, so an ID never changes meaning. See
+[Scoper](../roles/scoper/#inputs-and-output) and
+[Architect](../roles/architect/#inputs-and-output).
+
+### What does the stop hook do? Can I turn it off?
+
+When the agent finishes a turn and there are uncommitted changes in
+`.standards/` or in Markdown files, the hook runs the workflow check. If the
+check finds problems, it sends the agent back once to fix them, pass them to the
+right role, or tell you. The check catches mistakes such as a malformed record
+or a requirement that a finished report left out. It doesn't judge the quality
+of the work.
+
+The installer adds the hook unless you say no. To turn it off later, run the
+installer again with `--no-hooks`; `--hooks` turns it back on. Codex runs the
+hook only after you trust it by running `/hooks` in Codex. See
+[Hooks](../getting-started/installation/#hooks).
 
 ## Files, git, and teams
 
@@ -403,3 +300,106 @@ that was deleted instead of retired. The stop hook also can't tell whether
 workflow files changed, so it runs the check at the end of every turn. Roles
 that assess changes, such as Reviewer, also have less to go on when working out
 exactly what changed.
+
+## How the workflow works
+
+### What does sign-off mean? Is my work merged or deployed?
+
+Sign-off means you accept the finished work, and it ends the cycle. It doesn't
+commit, merge, push, or deploy anything. Those stay your decisions.
+
+You're asked to decide only after the required checks are complete, and when you
+sign off, the agent confirms that they still hold for the current files. You can
+also ask for changes or cancel instead. See
+[Decide at sign-off](../concepts/human-decisions/#decide-at-sign-off).
+
+### Can I skip a role?
+
+Not one at a time. Expedited work leaves out a fixed set of roles for small
+changes to an existing project, and you can't pick and choose beyond that. A
+skipped role's job also doesn't move to another role. For example, Developer's
+own checks don't replace Tester's verification.
+
+If expedited work turns out to need a skipped role, the cycle is promoted to
+standard work and continues from Auditor. See
+[Promote an expedited cycle](../concepts/states-and-handoffs/#promote-an-expedited-cycle).
+
+### Why do I have to start each role myself?
+
+So you stay in control of when each step happens and where it runs. When a role
+finishes, it saves its work and gives you the command for the next role. You
+decide when to run it and in which chat. That matters for Tester and Reviewer,
+which need a fresh chat that only you can open.
+
+The saved workflow state decides which role is allowed to work next, but it
+never starts a role on its own. The installer also turns off automatic skill use
+in both coding agents, so a role runs only when you call it. See
+[Human Decisions and Sign-off](../concepts/human-decisions/#run-each-role-explicitly).
+
+### Why do Tester and Reviewer need a fresh chat? Should I switch models?
+
+A check is only useful if it isn't shaped by the reasoning that produced the
+work. Tester runs in a chat separate from Developer's implementation chat.
+Reviewer runs in a chat separate from every chat that produced the work under
+review: the requirements, design, project context, code, tests, and
+documentation. Both work from the saved files and evidence, not from what the
+author said.
+
+For Reviewer, a different model of equal or higher capability is recommended
+when you can choose one, but it's optional. The separate chat is required either
+way. See
+[Independent assessment chats](../concepts/states-and-handoffs/#independent-assessment-chats).
+
+### Why can't a role just fix a problem it finds?
+
+Each role owns certain decisions, and a fix belongs to the role that owns the
+thing that's wrong. Suppose Tester finds that the design never says when a
+failed request should be retried. Tester can't settle that by writing a test.
+Architect makes the decision, and then testing continues.
+
+This keeps a fix from quietly changing your requirements or design. The agent
+works out who owns the problem, records it, and gives you the command for that
+role. See
+[Roles and Ownership](../concepts/ownership/#send-problems-to-their-owners).
+
+### How do I know every requirement was actually checked?
+
+In standard work, Scoper writes each outcome that must be true as an
+**acceptance condition** with an ID, such as `AC-001`. The design, the
+implementation plan, and every assessment report refer to the same IDs. Tester
+records the evidence for each one, or why it can't be verified yet. Final review
+checks that every condition has enough evidence, and Synchronizer checks that
+the evidence still matches the files you're signing off.
+
+The workflow check also flags a finished report that leaves out a current ID. It
+can't judge whether the evidence is good; that's the job of Tester and Reviewer.
+Expedited work has no IDs and is checked against your saved request instead. See
+[Acceptance Criteria and Traceability](../concepts/acceptance-traceability/).
+
+## Customizing
+
+### Can I make a role follow my own preferences?
+
+Yes, with a **user style**: a Markdown file with your preferences for one role,
+such as how you like test names or docstrings written. Save it at
+`.standards/user-styles/<role>/<name>.md` and name it when you invoke the role,
+for example `$developer Use user style tony.` (`/developer` in Claude Code). A
+role never picks a style on its own.
+
+A style covers choices the role would otherwise make itself. It can't override
+the workflow rules, your project's instructions or tooling, the agreed
+requirements and design, or correctness. Developer, Tester, Reviewer,
+Documenter, and Synchronizer save your choice and reload it when they resume;
+Developer keeps the same style for the whole cycle once you approve its plan.
+With Scoper, Architect, Auditor, and Navigator, name the style again in each new
+chat. See [User styles](../reference/runtime-files/#user-styles).
+
+### Can I add, remove, or rename a role?
+
+No. The nine roles are built into STANDARDS, and the rules for passing work
+between them depend on every one of them. Adding, removing, or renaming a role
+is a change to STANDARDS itself and comes only in a new **major** version.
+
+You can add your own separate skills next to the STANDARDS roles; the installer
+and uninstaller leave them alone. To change how a role works for you, use a user
+style.
