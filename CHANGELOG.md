@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.0](https://github.com/IDinsight/standards/compare/v0.6.0...v0.7.0) (2026-09-29)
+
+
+### Features
+
+* slim the AGENTS.md block and move the installer spec out of the protocol ([#11](https://github.com/IDinsight/standards/issues/11)) ([adcc82c](https://github.com/IDinsight/standards/commit/adcc82c5c0ec8c1016bb854ef41c0fdd91ccbb81))
+
 ## [0.6.0](https://github.com/IDinsight/standards/compare/v0.5.1...v0.6.0) (2026-09-28)
 
 
