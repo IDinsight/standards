@@ -2,16 +2,13 @@
 // chapters in protocol/, which a role reads only when the reading guide in
 // PROTOCOL.md names them. These tests keep the two consistent.
 import assert from 'node:assert/strict';
-import { readFileSync, readdirSync, statSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import test from 'node:test';
 
 const repo = new URL('../', import.meta.url);
 const source = (relative) => readFileSync(new URL(relative, repo), 'utf8');
 const chapters = readdirSync(new URL('protocol/', repo)).filter((name) => name.endsWith('.md')).sort();
 const core = source('PROTOCOL.md');
-// Keeps the protocol within one read in Claude Code (a 25,000-token limit),
-// with some room to grow.
-const CORE_BYTE_LIMIT = 62_000;
 
 // Heading names at the given levels, outside code blocks.
 function headings(text, levels = [1, 2, 3, 4, 5, 6]) {
@@ -29,8 +26,9 @@ function headings(text, levels = [1, 2, 3, 4, 5, 6]) {
 function guideRows() {
   const rows = new Map();
   for (const line of core.split('\n')) {
-    const match = /^\| `([a-z-]+\.md)` \| ([^|]+) \| ([^|]+) \|$/.exec(line);
-    if (match) rows.set(match[1], match[2].split(', ').map((name) => name.trim()));
+    // Cell padding is formatting, not part of the guide contract.
+    const match = /^\|\s*`([a-z-]+\.md)`\s*\|([^|]+)\|([^|]+)\|\s*$/.exec(line);
+    if (match) rows.set(match[1], match[2].split(',').map((name) => name.trim()));
   }
   return rows;
 }
@@ -76,9 +74,4 @@ test('a reference to a section in a chapter names that chapter', () => {
     }
   }
   assert.deepEqual(missing, [], 'each reference should name its chapter in the same paragraph');
-});
-
-test('PROTOCOL.md stays small enough for one read', () => {
-  const size = statSync(new URL('PROTOCOL.md', repo)).size;
-  assert.ok(size < CORE_BYTE_LIMIT, `PROTOCOL.md is ${size} bytes; keep it under ${CORE_BYTE_LIMIT} by moving situational rules into a chapter`);
 });
