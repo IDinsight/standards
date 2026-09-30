@@ -120,7 +120,10 @@ does not add a package dependency or start a workflow cycle.
 
 The stop hook runs `node .standards/bin/check.mjs` when an agent finishes a turn
 with uncommitted workflow changes. Codex runs it only after you trust it with
-`/hooks`. See
+`/hooks` in the Codex CLI. Follow
+[Finish local setup](docs/src/content/docs/getting-started/installation.md#finish-local-setup)
+to trust the project and hook where required and verify Claude Code's skills and
+hook. See
 [Installation and Setup](docs/src/content/docs/getting-started/installation.md)
 for options, upgrades, reset, and uninstall instructions.
 
