@@ -158,7 +158,8 @@ export async function scanArtifacts(root, { onUnreadable = () => {} } = {}) {
 // identifier marks a reference into another file, which is not counted as a
 // local identifier.
 export function identifierNumbers(text, prefix) {
-  const pattern = new RegExp(`(?<![A-Za-z0-9_#-])${prefix}-(\\d{3,})(?![0-9])`, 'g');
+  const escapedPrefix = prefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const pattern = new RegExp(`(?<![A-Za-z0-9_#-])${escapedPrefix}-(\\d{3,})(?![0-9])`, 'g');
   return [...text.matchAll(pattern)].map((match) => Number(match[1]));
 }
 

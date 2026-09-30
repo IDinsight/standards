@@ -6,8 +6,8 @@ import { defineConfig, globalIgnores } from 'eslint/config';
 import globals from 'globals';
 
 export default defineConfig([
-  // Docs build output and Astro's generated cache.
-  globalIgnores(['docs/dist/', 'docs/.astro/']),
+  // Docs build output, Astro's generated cache, and local evaluation results.
+  globalIgnores(['docs/dist/', 'docs/.astro/', 'results/']),
   js.configs.recommended,
   {
     languageOptions: { globals: globals.node },
