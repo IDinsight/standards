@@ -25,6 +25,20 @@ project; it does not add a package dependency or start a workflow cycle. It
 prints the installed version, project mode, coding agents, whether the hook is
 on, the number of changed paths, and any warnings.
 
+## Choose a branch for the first installation
+
+For a project using Git, we recommend creating a dedicated setup branch from
+`main` (or your default branch) for the first installation. Install STANDARDS on
+that branch, review and commit the generated files, then merge it into `main`
+before creating feature branches. Future branches will inherit the installation.
+If your project permits direct commits to `main`, you can install and commit
+there instead.
+
+Installing on a feature branch also works, but other branches will not inherit
+STANDARDS until that installation is merged into the branch they start from. See
+[Branches and merges](../../reference/runtime-files/#branches-and-merges) for
+guidance on workflow state and resets after installation.
+
 ## Choose a project mode and coding agent
 
 On a first install, the installer suggests **greenfield** for an empty or

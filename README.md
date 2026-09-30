@@ -99,6 +99,10 @@ reference-generation commands.
 
 ## Install, Reset, and Uninstall
 
+For a first installation, get STANDARDS onto your main branch before creating
+feature branches; see
+[Choose a branch for the first installation](docs/src/content/docs/getting-started/installation.md#choose-a-branch-for-the-first-installation).
+
 Install the latest public release with Node.js 22.12 or newer:
 
 ```sh
