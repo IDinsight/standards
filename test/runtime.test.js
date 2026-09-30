@@ -433,7 +433,9 @@ test('check requires cross-record references to name their file', () => project(
   await write(root, doc, `${await read(root, doc)}\n### D-001 — Old style\n\nSee F-001 and ${review}#F-001 and ${review}#F-007. AC-001 AC-002\n`);
   const result = await check(root);
   hasProblem(result, /documentation\/.*: mentions F-001 without naming its record/);
-  hasProblem(result, new RegExp(`refers to ${review.replace(/\//g, '\\/')}#F-007, but that file has no F-007`));
+  assert.ok(messages(result).some((line) => line.includes(
+    `refers to ${review}#F-007, but that file has no F-007`,
+  )), JSON.stringify(result));
   hasProblem(result, /numbers its discrepancies D-NNN; documentation records use DOC-NNN/);
   assert.equal(messages(result).some((line) => line.includes(`#F-001, but`)), false);
 
@@ -781,7 +783,9 @@ test('check reports Active Work paths that are missing or belong to another reco
   await editState(root, (text) => setField(setField(text, 'Scope', 'docs/scope/missing.md'), 'Architecture', report));
   const result = await check(root);
   hasProblem(result, /Active Work\.Scope points to docs\/scope\/missing\.md, which does not exist/);
-  hasProblem(result, new RegExp(`Active Work\\.Architecture points to ${report.replace(/\//g, '\\/')}, which is a VERIFICATION record for cycle \`${id}\``));
+  assert.ok(messages(result).some((line) => line.includes(
+    `Active Work.Architecture points to ${report}, which is a VERIFICATION record for cycle \`${id}\``,
+  )), JSON.stringify(result));
 }));
 
 test('check requires scope and design paths once a standard cycle has moved past them', () => project(async (root) => {
