@@ -71,49 +71,53 @@ price, so new tokens reflect the actual work better than the raw total.
 
 | Change                               | Without STANDARDS | With STANDARDS                     | Ratio     |
 | ------------------------------------ | ----------------- | ---------------------------------- | --------- |
-| Small tool: add a `--json` option    | about 60,000      | about 1.1 million (standard cycle) | about 19× |
-| Small tool: fix a one-word typo      | about 50,000      | about 270,000 (expedited cycle)    | about 5×  |
-| Commander.js: add deprecated options | about 125,000     | about 1.5 million (standard cycle) | about 12× |
+| Small tool: add a `--json` option    | about 63,000      | about 1.0 million (standard cycle) | about 16× |
+| Small tool: fix a one-word typo      | about 56,000      | about 265,000 (expedited cycle)    | about 5×  |
+| Commander.js: add deprecated options | about 133,000     | about 1.4 million (standard cycle) | about 10× |
 
-Counting cached re-reads too, the ratios were about 45, 20, and 18 times. Time
+Counting cached re-reads too, the ratios were about 53, 13, and 15 times. Time
 grew about as much as new tokens: on Commander.js, the standard cycle's nine
-sessions took about 80 minutes of agent time, against about 6.5 minutes for a
+sessions took about 75 minutes of agent time, against about 7 minutes for a
 single session.
 
 The ratio shrinks as the change grows because part of the cost is fixed. In
-these runs, every workflow role first read the full workflow rules and its own
-instructions, about 40,000 to 50,000 new tokens whatever the size of the change.
-That was about a third of the standard cycle's new tokens on the small tool and
-about a quarter on Commander.js.
+these runs, every workflow role first read the workflow rules and its own
+instructions, about 30,000 to 40,000 new tokens for most roles whatever the size
+of the change. That was about 30% of the standard cycle's new tokens on the
+small tool and about 20% on Commander.js.
 
 The extra tokens buy more than code. Each standard cycle produced written
 requirements, a design, independently written tests, two independent reviews,
-and a final consistency check. On Commander.js, Scoper also asked about three
-points the request left open. The two single sessions had settled one of them in
-opposite ways without asking. On the small tool, the reviews found an existing
-bug that the single sessions didn't mention.
+and a final consistency check. On Commander.js, Scoper also asked about two
+points the request left open: whether the warning should also go through
+Commander's `outputError` hook, and whether to update the Chinese translation.
+The single sessions decided both without asking. On the small tool, the reviews
+found an existing bug that the single sessions didn't mention.
 
 Don't expect fewer bugs on every change, though. The Commander.js request was
 detailed, and the single sessions got it right: all three versions passed the
-same 25 hidden checks, and a blind code review found the core behavior correct
-in all three. The reviewer actually preferred one of the single-session
-versions. For a clear, well-defined change like this one, the benefit was mostly
-settled questions and a written record rather than fewer bugs.
+same 25 hidden checks and every repository check, and a blind code review found
+the core behavior correct in all three. The reviewer ranked both single-session
+versions above the STANDARDS one, because the STANDARDS version wrote the
+warning only to the error stream, so a program that customizes errors through
+`outputError` doesn't see it. That was one of Scoper's two questions, and we had
+accepted its recommended answer. For a clear, well-defined change like this one,
+the benefit was mostly settled questions and a written record rather than fewer
+bugs.
 
 New tokens by role:
 
-| Role                     | Small tool            | Commander.js  |
-| ------------------------ | --------------------- | ------------- |
-| Navigator (one question) | about 45,000          | not measured  |
-| Scoper                   | about 85,000          | about 125,000 |
-| Architect                | about 85,000          | about 160,000 |
-| Auditor                  | about 110,000         | about 190,000 |
-| Developer                | about 105,000–120,000 | about 160,000 |
-| Reviewer                 | about 85,000–125,000  | about 160,000 |
-| Documenter               | about 115,000         | about 155,000 |
-| Synchronizer             | about 120,000         | about 155,000 |
-| Tester                   | about 265,000         | about 235,000 |
-| Sign-off (no role)       | about 65,000          | not measured  |
+| Role               | Small tool            | Commander.js  |
+| ------------------ | --------------------- | ------------- |
+| Architect          | about 80,000          | about 130,000 |
+| Scoper             | about 85,000          | about 110,000 |
+| Reviewer           | about 85,000–120,000  | about 145,000 |
+| Developer          | about 105,000–120,000 | about 140,000 |
+| Auditor            | about 115,000         | about 180,000 |
+| Synchronizer       | about 125,000         | about 150,000 |
+| Documenter         | about 130,000         | about 190,000 |
+| Tester             | about 130,000         | about 185,000 |
+| Sign-off (no role) | about 65,000          | not measured  |
 
 On the small tool, the Developer and Reviewer ranges cover both the feature and
 the typo fix. Each figure comes from one run, and your coding agent, model, and
