@@ -2,10 +2,12 @@
 
 This file defines what the `standards` CLI must do when it installs, upgrades,
 or uninstalls STANDARDS in a project. It stays in this repository and is not
-installed. Installed projects receive `PROTOCOL.md`, whose **Installed Runtime
-Contract** lists the installed files and their owners, defines **Project
-Reset**, and sets the rules for agents that run the CLI. A section name in bold
-refers to `PROTOCOL.md` unless this file defines it.
+installed. Installed projects receive `.standards/PROTOCOL.md` and its chapters
+in `.standards/protocol/`. The **Installed Runtime Contract** in
+`.standards/protocol/installation.md` lists the installed files and their
+owners, defines **Project Reset**, and sets the rules for agents that run the
+CLI. A section name in bold refers to the protocol or its chapters unless this
+file defines it.
 
 ## Installation Metadata and Versions
 
@@ -60,13 +62,13 @@ After ownership checks:
   user-owned unbounded `@AGENTS.md` import exists, preserve it and do not add a
   framework duplicate. Otherwise add or update a bounded integration block. If
   multiple unbounded imports exist, preserve them and report the conflict.
-- Update `.standards/PROTOCOL.md` from the installed framework version only
-  after runtime ownership verification. Install or update each skill definition
-  only after that destination skill package passes its ownership check. Update
-  skill packages file by file: write every file the release ships, except the
-  `evals/` folder used to develop the skill, and leave any other file in the
-  folder unchanged. Keep the installed protocol aligned with the installed
-  skills.
+- Update `.standards/PROTOCOL.md`, and replace `.standards/protocol/` as a
+  whole, from the installed framework version only after runtime ownership
+  verification. Install or update each skill definition only after that
+  destination skill package passes its ownership check. Update skill packages
+  file by file: write every file the release ships, except the `evals/` folder
+  used to develop the skill, and leave any other file in the folder unchanged.
+  Keep the installed protocol aligned with the installed skills.
 - A reinstall keeps the installed clients. The user may add a client; removing
   one requires uninstalling.
 - Preserve Codex `allow_implicit_invocation: false`.

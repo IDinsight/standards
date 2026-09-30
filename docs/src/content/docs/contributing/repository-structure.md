@@ -12,6 +12,7 @@ with the file responsible for the part you want to change.
 | Path                     | What belongs here                                                    |
 | ------------------------ | -------------------------------------------------------------------- |
 | `PROTOCOL.md`            | Shared rules for roles, states, handoffs, recovery, and the runtime. |
+| `protocol/`              | Protocol chapters, installed into `.standards/protocol/`.            |
 | `INSTALLER.md`           | Rules for the CLI's install, upgrade, and uninstall; not installed.  |
 | `README.md`              | A high-level introduction and development entry points.              |
 | `skills/`                | The nine role packages.                                              |
@@ -63,10 +64,11 @@ settings file; the installer adds the role invocation settings. The stop hook
 definitions are in `templates/claude/settings-hooks.json` for Claude Code and
 `templates/codex/.codex/hooks.json` for Codex.
 
-The published CLI in `bin/` and `lib/` installs these templates, the role
-packages without their `evals/` folders, and the tools in `runtime/`, which it
-copies to `.standards/bin/`. Installation and preservation requirements are
-defined in the [Installer Contract](../../reference/installer/).
+The published CLI in `bin/` and `lib/` installs these templates, the protocol
+and its chapters, the role packages without their `evals/` folders, and the
+tools in `runtime/`, which it copies to `.standards/bin/`. Installation and
+preservation requirements are defined in the
+[Installer Contract](../../reference/installer/).
 
 ## Website sources and generated files
 

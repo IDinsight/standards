@@ -22,9 +22,11 @@ not conclusions to inherit.
 
 Read all of `.standards/PROTOCOL.md` (in consecutive parts if a read shows only
 part of it), `.standards/MODE.md`, and `.standards/STATE.md` before substantive
-work. Perform Tester-owned work only in `TESTING` with `CycleMode: STANDARD`.
-Otherwise identify the current owner and apply only an authorized protocol
-control-plane transition, if any; Tester has no expedited entry path.
+work, then each chapter in `.standards/protocol/` that the protocol's reading
+guide names for the current state or request. Perform Tester-owned work only in
+`TESTING` with `CycleMode: STANDARD`. Otherwise identify the current owner and
+apply only an authorized protocol control-plane transition, if any; Tester has
+no expedited entry path.
 
 Apply the protocol's **Independent Tester Session** rule. If this is known to be
 Developer's implementation conversation, persist any missing handoff context

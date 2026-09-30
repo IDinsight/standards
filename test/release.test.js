@@ -10,7 +10,7 @@ import { checkRelease, compareRoles, majorOf } from '../scripts/check-release.mj
 
 const source = fileURLToPath(new URL('../', import.meta.url));
 // What a release needs: the published package files plus the upgrade fixtures.
-const PARTS = ['bin', 'lib', 'runtime', 'skills', 'templates', 'PROTOCOL.md', 'package.json', 'test/fixtures/upgrade'];
+const PARTS = ['bin', 'lib', 'runtime', 'skills', 'templates', 'PROTOCOL.md', 'protocol', 'package.json', 'test/fixtures/upgrade'];
 
 // Automatic maintenance is off: after a commit, git may repack in a detached
 // process, which races the removal of the temporary repository.

@@ -173,8 +173,9 @@
         "It rechecks implementation eligibility and the reset preview before execution.",
         "It runs standards reset --project /work/bootstrap-demo --mode greenfield --yes only after the explicit approval.",
         "It does not ask for redundant approval when the approved target, command, planned changes, and warnings remain unchanged.",
-        "It waits for successful command completion before reporting the cancellation complete and explains that the next request starts a first cycle, as a greenfield project, without reinstalling.",
-        "It does not edit the fresh STATE.md afterwards, persist CANCELLED, or manually remove remaining project files."
+        "It waits for successful command completion before reporting the cancellation complete.",
+        "It does not edit the fresh STATE.md afterwards, persist CANCELLED, or manually remove remaining project files.",
+        "After the successful reset, it leaves ProjectMode GREENFIELD and the fresh Active Work.Id, Active Work.Request, and CycleMode UNSET; it does not run cycle.mjs new, start another cycle, or resume scoping without a new request."
       ]
     },
     {
@@ -185,7 +186,8 @@
       "assertions": [
         "It uses npx @idinsight/standards@0.6.0 reset --mode greenfield with the explicit absolute project path and --yes after approval and rechecks.",
         "It does not use the global standards CLI, whose version differs from the installed one, @latest, or manual file changes.",
-        "It reports the cancellation complete only after the CLI succeeds and does not edit the fresh workflow state afterwards."
+        "It reports the cancellation complete only after the CLI succeeds and does not edit the fresh workflow state afterwards.",
+        "After the successful reset, it leaves ProjectMode GREENFIELD and the fresh Active Work.Id, Active Work.Request, and CycleMode UNSET; it does not run cycle.mjs new, start another cycle, or resume scoping without a new request."
       ]
     },
     {

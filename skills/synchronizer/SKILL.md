@@ -20,13 +20,15 @@ assessments. There are no separate modes.
 ## Entry and Inputs
 
 Read all of `.standards/PROTOCOL.md` (in consecutive parts if a read shows only
-part of it), `.standards/MODE.md`, and `.standards/STATE.md` first. Perform
-role-owned work only in `SYNCHRONIZING` with an initialized active `STANDARD`
-cycle and a legal state/mode combination. Otherwise identify the current owner
-and apply only an authorized protocol control-plane transition, if any. Do not
-infer entry from chat or the existence of reports. `EXPEDITED` intentionally
-omits synchronization; a required guarantee uses **Expedited Promotion**, not an
-invented expedited synchronization path.
+part of it), `.standards/MODE.md`, and `.standards/STATE.md` first, then each
+chapter in `.standards/protocol/` that the protocol's reading guide names for
+the current state or request. Perform role-owned work only in `SYNCHRONIZING`
+with an initialized active `STANDARD` cycle and a legal state/mode combination.
+Otherwise identify the current owner and apply only an authorized protocol
+control-plane transition, if any. Do not infer entry from chat or the existence
+of reports. `EXPEDITED` intentionally omits synchronization; a required
+guarantee uses **Expedited Promotion** in `.standards/protocol/expedited.md`,
+not an invented expedited synchronization path.
 
 Read the active request, scope, architecture, Auditor context, development plan,
 verification report, both review reports, Documenter's documentation record,
@@ -108,13 +110,14 @@ for contradictions. Planned implementation alone does not stale Auditor context.
    affected paths/identities, evidence, impact on applicability, owner,
    canonical failure type, and required correction. Persist every unresolved
    discrepancy before routing one using **Failure Handoffs**, **Recovery
-   Mechanics**, and **Outstanding Obligations**. Record each discrepancy as a
-   `### D-NNN` entry numbered with `node .standards/bin/id.mjs next D <record>`
-   and keep the numbers stable on resumption. Refer to entries in other records
-   by path and ID. A material gap blocks completion even without an established
-   defect. If user action is necessary, persist `Active Work.BlockedOn` before
-   asking; clear it only after incorporating the answer. User-requested rework
-   uses **User Decisions and Intervention**.
+   Mechanics**, and **Outstanding Obligations** (in
+   `.standards/protocol/expedited.md`). Record each discrepancy as a `### D-NNN`
+   entry numbered with `node .standards/bin/id.mjs next D <record>` and keep the
+   numbers stable on resumption. Refer to entries in other records by path and
+   ID. A material gap blocks completion even without an established defect. If
+   user action is necessary, persist `Active Work.BlockedOn` before asking;
+   clear it only after incorporating the answer. User-requested rework uses
+   **User Decisions and Intervention**.
 6. On every resumption, compare current inputs with recorded identities,
    including incomplete records. Invalidate unsupported conclusions and reopen
    an unsupported `COMPLETE` status. Reconcile the entire current acceptance

@@ -25,6 +25,7 @@ This page describes the required layout installed by the CLI. See
 | `.standards/INSTALLATION.json` | Client settings and paths created by the installer.                                                |
 | `.standards/MODE.md`           | The project's greenfield or brownfield mode.                                                       |
 | `.standards/PROTOCOL.md`       | Shared workflow rules, aligned with the installed skills.                                          |
+| `.standards/protocol/`         | Protocol chapters the agent reads only when a situation calls for them.                            |
 | `.standards/STATE.md`          | Current workflow step, request, handoff, and recovery.                                             |
 | `.standards/user-styles/`      | Optional personal styles you add for a role; see [User styles](#user-styles).                      |
 | `.standards/VERSION.json`      | Installed framework version and upgrade compatibility check.                                       |

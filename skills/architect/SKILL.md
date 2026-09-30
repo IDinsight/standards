@@ -44,11 +44,13 @@ reviews, or user documentation.
 ## Inputs
 
 Read all of `.standards/PROTOCOL.md` (in consecutive parts if a read shows only
-part of it), `.standards/MODE.md`, and `.standards/STATE.md` first. Perform
-Architect-owned work only in `ARCHITECTING` with an initialized `STANDARD`
-cycle. Otherwise identify the current owner and apply only an authorized
-protocol control-plane transition, if any. `EXPEDITED` omits Architect; a
-required architecture guarantee uses **Expedited Promotion**.
+part of it), `.standards/MODE.md`, and `.standards/STATE.md` first, then each
+chapter in `.standards/protocol/` that the protocol's reading guide names for
+the current state or request. Perform Architect-owned work only in
+`ARCHITECTING` with an initialized `STANDARD` cycle. Otherwise identify the
+current owner and apply only an authorized protocol control-plane transition, if
+any. `EXPEDITED` omits Architect; a required architecture guarantee uses
+**Expedited Promotion** in `.standards/protocol/expedited.md`.
 
 - Always: the persisted scope referenced by `Active Work.Scope`, established
   project constraints, the current persisted design when one exists, and
