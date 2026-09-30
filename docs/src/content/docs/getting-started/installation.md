@@ -25,6 +25,20 @@ project; it does not add a package dependency or start a workflow cycle. It
 prints the installed version, project mode, coding agents, whether the hook is
 on, the number of changed paths, and any warnings.
 
+## Choose a branch for the first installation
+
+For a project using Git, we recommend creating a dedicated setup branch from
+`main` (or your default branch) for the first installation. Install STANDARDS on
+that branch, review and commit the generated files, then merge it into `main`
+before creating feature branches. Future branches will inherit the installation.
+If your project permits direct commits to `main`, you can install and commit
+there instead.
+
+Installing on a feature branch also works, but other branches will not inherit
+STANDARDS until that installation is merged into the branch they start from. See
+[Branches and merges](../../reference/runtime-files/#branches-and-merges) for
+guidance on workflow state and resets after installation.
+
 ## Choose a project mode and coding agent
 
 On a first install, the installer suggests **greenfield** for an empty or
@@ -73,22 +87,69 @@ The Claude Code hook goes in `.claude/settings.json` and the Codex hook in
 hooks you set up yourself stay as they are. A reinstall keeps your current
 choice. Pass `--hooks` or `--no-hooks` to turn it on or off later.
 
-Codex runs new or changed project hooks only after you trust them. After
-installing or upgrading, open Codex in the project and run `/hooks` to review
-and trust the STANDARDS hook. An organization can instead manage hooks centrally
-through Codex's `requirements.toml`, which Codex trusts by policy. See
+Codex runs new or changed project hooks only after you trust them. Follow
+[Finish local setup](#finish-local-setup) to review and trust the installed
+hook. An organization can instead manage hooks centrally through Codex's
+`requirements.toml`, which Codex trusts by policy. See
 [Codex hooks](https://learn.chatgpt.com/docs/hooks).
 
-The hook needs Node.js on the path your coding agent uses. The Codex hook looks
-for `.standards/` in the folder where Codex started and then in each folder
-above it, so STANDARDS can live in a subfolder of a larger git repository. Start
-Codex in the project folder. Inside a git repository you can also start it in a
-subfolder of the project, because Codex then loads the project's skills and
-hooks from the folders above. Outside git, Codex may not find them unless it
-starts in the project folder itself. Claude Code must start in the project
-folder, because it reads `.claude/settings.json`, which holds the STANDARDS hook
-and the settings that keep role skills user-invoked, only from the folder where
-it starts.
+The Codex hook looks for `.standards/` in the folder where Codex started and
+then in each folder above it, so STANDARDS can live in a subfolder of a larger
+git repository. Start Codex in the project folder. Inside a git repository you
+can also start it in a subfolder of the project, because Codex then loads the
+project's skills and hooks from the folders above. Outside git, Codex may not
+find them unless it starts in the project folder itself. Claude Code must start
+in the project folder, because it reads `.claude/settings.json`, which holds the
+STANDARDS hook and the settings that keep role skills user-invoked, only from
+the folder where it starts.
+
+## Finish local setup
+
+The installer supplies the project skills, agent instructions, and client
+settings. You do not need to copy the skills into your home directory or edit
+global client settings to use STANDARDS in this project.
+
+We recommend starting a fresh client session after installing, upgrading, or
+reinstalling, especially after an uninstall/install test, so the client loads
+the current instructions and configuration. If you installed hooks, make sure
+Node.js 22.12 or newer is on the PATH available to the client; run
+`node --version` in the environment where it runs.
+
+### Codex
+
+1. Open the installed project in Codex and start a session there. Accept the
+   project trust prompt if shown; project-local `.codex/` hooks load only for
+   trusted projects.
+2. If you installed hooks, start the Codex CLI from the project folder and run
+   `/hooks` inside its interactive session. Review the STANDARDS `Stop` hook
+   from `.codex/hooks.json` and trust it if it is awaiting review. `/hooks` here
+   is a Codex CLI command, not a shell command. New or changed hook definitions
+   need review again; reinstalling an identical hook may retain its trust.
+3. Invoke roles explicitly with `$<role>`, such as `$auditor` or `$navigator`.
+
+See [Codex hook discovery and trust](https://learn.chatgpt.com/docs/hooks) for
+the client requirements.
+
+### Claude Code
+
+1. Start Claude Code from the project root:
+
+   ```sh
+   cd /path/to/project
+   claude
+   ```
+
+2. Accept the workspace trust prompt if shown. In interactive sessions,
+   settings-file hooks run only after the workspace is trusted.
+3. Run `/skills` to confirm the nine STANDARDS roles are available. If you
+   installed hooks, run `/hooks` and inspect the `Stop` hook from Project
+   Settings; its command should run `.standards/bin/hook.mjs`.
+4. Invoke roles explicitly with `/<role>`, such as `/auditor` or `/navigator`.
+
+Claude Code's `/hooks` menu inspects the installed configuration; no additional
+settings edits are needed for this setup. See
+[Claude Code skills](https://code.claude.com/docs/en/skills) and
+[hooks](https://code.claude.com/docs/en/hooks#workspace-trust).
 
 ## What the installer adds
 
