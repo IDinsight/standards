@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.3](https://github.com/IDinsight/standards/compare/v0.7.2...v0.7.3) (2026-09-30)
+
+
+### Performance Improvements
+
+* **protocol:** move situational rules into chapters read on demand ([#18](https://github.com/IDinsight/standards/issues/18)) ([cae5b40](https://github.com/IDinsight/standards/commit/cae5b40ecf88027e41ae219699bf55b063817ea8))
+
 ## [0.7.2](https://github.com/IDinsight/standards/compare/v0.7.1...v0.7.2) (2026-09-29)
 
 
