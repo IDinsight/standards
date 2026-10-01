@@ -65,8 +65,9 @@ pnpm run docs:preview
 ```
 
 The build includes stable release tags from v0.7.4 onward automatically. Tagged
-pages, navigation, protocol, installer, and templates come from that release;
-the current checkout provides the shared rendering tools and components. New
+pages, navigation, protocol, installer, and templates come from that release.
+The Roadmap is shared across versions so it can describe current plans. The
+current checkout also provides shared rendering tools and components. Other new
 content appears in Next until it is tagged as a release. Archives are rebuilt
 from tags without committing duplicate documentation trees.
 

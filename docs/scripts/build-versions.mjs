@@ -25,6 +25,7 @@ const assembled = join(work, "site");
 const shared = [
   "package.json", "tsconfig.json", "versioning.mjs",
   "src/content.config.ts", "src/components", "src/styles", "src/versioning",
+  "src/content/docs/roadmap.md",
   "public/favicon.svg",
 ];
 
