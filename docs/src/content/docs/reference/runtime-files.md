@@ -179,12 +179,18 @@ as how you like docstrings or test names written. Add it at
 `.standards/user-styles/<role>/<name>.md`, where `<role>` is the role's skill
 name, such as `developer` or `tester`. STANDARDS ships none.
 
-A role uses a style only when you name it, for example
-`$documenter Use user style tony.` Both `tony` and `tony.md` select
-`.standards/user-styles/documenter/tony.md`, and `NONE` selects no style. Only a
-file directly inside the role's folder can be selected. The role never picks a
-style because of who you are, which files exist, or what another role uses. If
-your choice matches no file, it asks you to choose again.
+A role uses a style only when you name it, for example:
+
+```text
+Codex:       $documenter Use user style tony.
+Claude Code: /documenter Use user style tony.
+```
+
+Both `tony` and `tony.md` select `.standards/user-styles/documenter/tony.md`,
+and `NONE` selects no style. Only a file directly inside the role's folder can
+be selected. The role never picks a style because of who you are, which files
+exist, or what another role uses. If your choice matches no file, it asks you to
+choose again.
 
 A style covers discretionary choices only. The role's universal style guidance
 comes first when it has one, then your style, then the role's other style files.

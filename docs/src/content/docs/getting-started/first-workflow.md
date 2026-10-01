@@ -12,14 +12,24 @@ It assumes an existing project set up for STANDARDS, with no active cycle. See
 skills.
 
 Use each role's handoff to invoke the next one when it is ready. The examples
-below use Codex's `$role` syntax; in Claude Code, use `/role` instead.
+below show the command for each client; use the one for yours.
 
 ## 1. Start with Auditor
 
 Give Auditor the request and choose standard work:
 
+In Codex:
+
 ```text
 $auditor Start a STANDARD cycle.
+Add search by name and email to the existing user directory,
+and update the user guide to explain how to use it.
+```
+
+In Claude Code:
+
+```text
+/auditor Start a STANDARD cycle.
 Add search by name and email to the existing user directory,
 and update the user guide to explain how to use it.
 ```
@@ -84,7 +94,8 @@ When Developer hands off to Tester, open a fresh chat separate from the
 implementation conversation and run:
 
 ```text
-$tester Continue from .standards/STATE.md.
+Codex:       $tester Continue from .standards/STATE.md.
+Claude Code: /tester Continue from .standards/STATE.md.
 ```
 
 Tester reads the saved requirements, design, implementation, and existing tests.
@@ -104,7 +115,8 @@ After Tester's handoff, open a fresh chat separate from the conversations that
 produced the requirements, design, project context, code, and tests. Run:
 
 ```text
-$reviewer Continue IMPLEMENTATION review from .standards/STATE.md.
+Codex:       $reviewer Continue IMPLEMENTATION review from .standards/STATE.md.
+Claude Code: /reviewer Continue IMPLEMENTATION review from .standards/STATE.md.
 ```
 
 Reviewer checks the implementation against the requirements, design, and test
@@ -130,7 +142,8 @@ Documenter hands off to final Reviewer. Use a fresh chat separate from the
 conversations that authored the work, including documentation:
 
 ```text
-$reviewer Continue FINAL_DELIVERABLE review from .standards/STATE.md.
+Codex:       $reviewer Continue FINAL_DELIVERABLE review from .standards/STATE.md.
+Claude Code: /reviewer Continue FINAL_DELIVERABLE review from .standards/STATE.md.
 ```
 
 Final review checks the assembled result, including the user guide and current

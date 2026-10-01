@@ -135,8 +135,12 @@ To keep usage down:
 ### Which role do I run next?
 
 The one named in the last handoff. When a role finishes, it gives you a command
-to copy and paste, such as
-`$architect Continue the active workflow from .standards/STATE.md.`
+to run. For example:
+
+```text
+Codex:       $architect Continue the active workflow from .standards/STATE.md.
+Claude Code: /architect Continue the active workflow from .standards/STATE.md.
+```
 
 If you've lost it, ask the agent, or Navigator, which step the workflow is on.
 If you run the wrong role, it checks the saved state, leaves the work alone, and
