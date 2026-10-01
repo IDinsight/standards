@@ -1,0 +1,12 @@
+---
+import Head from "@astrojs/starlight/components/Head.astro";
+import { getVersionContext } from "../versioning/context.mjs";
+import { SITE_BASE } from "../versioning/versions.mjs";
+
+const context = getVersionContext();
+const current = context.versions.find((version) => version.id === context.currentVersion);
+const indexable = current?.latest && context.currentBase === SITE_BASE;
+---
+
+<Head />
+{!indexable && <meta name="robots" content="noindex, follow" />}

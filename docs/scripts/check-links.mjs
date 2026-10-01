@@ -1,5 +1,5 @@
 import { readdir, readFile, stat } from "node:fs/promises";
-import { extname, relative, resolve, sep } from "node:path";
+import { basename, extname, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import config from "../astro.config.mjs";
@@ -34,7 +34,7 @@ for (const page of pages) {
       .replace(/index\.html$/, "");
   for (const match of (await html(page)).matchAll(/<[^>]+\bhref="([^"]*)"[^>]*>/g)) {
     // Astro emits /404/ as canonical metadata, but Pages serves 404.html.
-    if (relative(root, page) === "404.html" && /\brel="canonical"/.test(match[0]))
+    if (basename(page) === "404.html" && /\brel="canonical"/.test(match[0]))
       continue;
     const href = match[1].replaceAll("&amp;", "&");
     const url = new URL(href, `${origin}${route}`);

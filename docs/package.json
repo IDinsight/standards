@@ -1,11 +1,14 @@
 {
-  "name": "standards-docs",
-  "version": "0.0.0",
-  "private": true,
-  "type": "module",
+  "dependencies": {
+    "@astrojs/starlight": "0.42.4",
+    "astro": "7.3.5",
+    "sharp": "0.35.4"
+  },
   "engines": {
     "node": ">=22.12.0"
   },
+  "name": "standards-docs",
+  "private": true,
   "scripts": {
     "sync-reference": "node scripts/sync-reference.mjs",
     "predev": "pnpm run sync-reference",
@@ -13,11 +16,9 @@
     "prebuild": "pnpm run sync-reference",
     "build": "astro build",
     "preview": "astro preview",
-    "check-links": "node scripts/check-links.mjs"
+    "check-links": "node scripts/check-links.mjs",
+    "build:versions": "node scripts/build-versions.mjs"
   },
-  "dependencies": {
-    "@astrojs/starlight": "0.42.4",
-    "astro": "7.3.5",
-    "sharp": "0.35.4"
-  }
+  "type": "module",
+  "version": "0.0.0"
 }
