@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.0](https://github.com/IDinsight/standards/compare/v0.7.4...v0.8.0) (2026-10-01)
+
+
+### Features
+
+* add incremental Developer/Tester verification ([#32](https://github.com/IDinsight/standards/issues/32)) ([89509aa](https://github.com/IDinsight/standards/commit/89509aa2732456c945667dfd86e269660939febd))
+
 ## [0.7.4](https://github.com/IDinsight/standards/compare/v0.7.3...v0.7.4) (2026-09-30)
 
 
