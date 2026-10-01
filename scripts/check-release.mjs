@@ -111,8 +111,7 @@ export function upgradeFailures(repo, tag) {
       if (readFileSync(path.join(project, '.standards/STATE.md'), 'utf8') !== before) {
         failures.push(`${name}: the upgrade changed STATE.md.`);
       }
-      // The saved files follow the record formats of the previous release, so the
-      // new check must accept them as they are.
+      // Check the maintained workflow scenarios after reinstalling the runtime.
       const checked = run(process.execPath, [path.join(project, '.standards/bin/check.mjs'), '--json'], project);
       let report = null;
       try { report = JSON.parse(checked.stdout); } catch { /* reported below */ }

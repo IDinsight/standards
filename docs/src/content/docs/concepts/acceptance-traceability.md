@@ -49,6 +49,12 @@ Tester accounts for every current condition with results, a reason it cannot yet
 be verified, or a dependency on a later role. Tests that were not run and
 Developer's own checks do not replace Tester's independent verification.
 
+During an increment assessment, the report keeps the full acceptance inventory.
+Conditions waiting on future implementation use `AWAITING_IMPLEMENTATION`, while
+the assigned outcome needs sufficient current evidence. Before Reviewer, full
+verification must resolve all such implementation gaps. Earlier increment
+results count only while their supporting inputs remain valid.
+
 A later dependency may remain open during implementation review only when the
 condition actually depends on that later work. For example, `AC-002` can wait
 for Documenter. A failing export test cannot be deferred that way.

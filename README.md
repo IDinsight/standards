@@ -25,8 +25,9 @@ shared terminology. Individual skills define role-specific behavior.
 - **Scoper** defines what must be built and what counts as done.
 - **Tester** verifies implemented behavior and records traceability status for
   current scope acceptance conditions and technical acceptance criteria. It
-  starts in a fresh chat separate from Developer and uses VERIFY or REVERIFY,
-  preserving coverage and the active change's test budget.
+  works in an independent chat reusable across increments and corrections,
+  separate from Developer, and uses VERIFY or REVERIFY, preserving coverage and
+  the active change's test budget.
 - **Architect** defines consequential technical decisions and contracts.
 - **Navigator** helps users understand the project through EXPLAIN (default),
   INVESTIGATE, and adaptive GRILL_ME questions. It uses repository evidence,
@@ -34,7 +35,10 @@ shared terminology. Individual skills define role-specific behavior.
   without requiring an active cycle.
 - **Developer** turns the active contract into an approved atomic development
   plan, then implements it within established constraints using Autonomous,
-  Stepwise, or Code With Me collaboration.
+  Stepwise, or Code With Me collaboration. In standard work, any of these modes
+  can alternate with Tester through incremental verification or use the default
+  verification after implementation; see
+  [Working with Developer](docs/src/content/docs/guides/working-with-developer.md#choose-when-tester-runs).
 - **Auditor** establishes and refreshes project context for the active workflow
   cycle.
 - **Reviewer** independently assesses implementation and final deliverables in a
@@ -53,7 +57,7 @@ shared terminology. Individual skills define role-specific behavior.
 
 1. The role that discovers a problem does not automatically own the fix. Route
    the problem to the role that owns the affected artifact or decision.
-2. Advance only after the current role's completion gate succeeds.
+2. Hand off only after the applicable assignment or completion gate succeeds.
 3. Keep scope, architecture, implementation, verification, review,
    documentation, and synchronization as distinct responsibilities.
 4. Keep the framework usable across applications, services, libraries,

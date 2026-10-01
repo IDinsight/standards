@@ -31,7 +31,8 @@ Alongside code changes, Developer saves a
 
 Each step has an ID such as `DEV-001`, an expected outcome, dependencies,
 progress, and a way to check the implementation. Standard steps refer to the
-scope's acceptance IDs; expedited steps refer to the saved request.
+scope's acceptance IDs; expedited steps refer to the saved request. The plan
+also saves verification cadence and any increment definitions and selection.
 
 ## Approval before implementation
 
@@ -56,12 +57,21 @@ The default. Developer works through approved steps without routine pauses.
 ### STEPWISE
 
 Developer completes and checks one step, reports the result, then waits for you
-to continue.
+to continue unless the assigned outcome is ready for a handoff. Multi-step
+increments retain these per-step pauses.
 
 ### CODE_WITH_ME
 
 Developer explains the next step and inspects code you write. It writes or takes
 over specific approved work when you ask.
+
+## Verification cadence
+
+All three modes support `AFTER_IMPLEMENTATION` (the default) and `INCREMENTAL`
+verification in standard work. Cadence controls when Tester receives work;
+collaboration mode controls Developer's coding permissions and pauses. See
+[Working with Developer](../../guides/working-with-developer/#choose-when-tester-runs)
+for the two-chat exchange and switching cadence during a cycle.
 
 ## Coding style and responsibilities
 
@@ -81,13 +91,18 @@ change independently.
 
 ## Completion and handoff
 
-Developer finishes when all approved steps are done, the implementation meets
-the agreed requirements, its checks are satisfactory, and no unresolved
-Developer correction or blocking question remains.
+Developer reaches full completion when all approved steps are done, the
+implementation meets the agreed requirements, its checks are satisfactory, and
+no unresolved Developer correction or blocking question remains.
 
-Standard work goes to Tester; expedited work goes to implementation Reviewer.
-Both require the [separate assessment chat](../overview/#run-a-role) described
-by the handoff. Recovery may direct a different return.
+Before full completion, incremental work can hand a ready outcome to Tester and
+resume after its assessment. Corrections follow the saved
+[recovery assignment](../../concepts/recovery/#when-a-correction-must-return-before-full-completion).
+
+Full standard work goes to Tester; expedited work goes to implementation
+Reviewer. Both require the [separate assessment chat](../overview/#run-a-role)
+described by the handoff. Developer and Tester must both pass their full gates
+before standard implementation review, including on a recovery return.
 
 For a new project, Developer records the permanent change to brownfield as soon
 as it verifies the first implementation was created or materially changed. This

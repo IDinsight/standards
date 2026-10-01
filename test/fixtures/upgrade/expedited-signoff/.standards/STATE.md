@@ -12,6 +12,8 @@
 `.standards/docs/development/fix-date-format-20260902T090000Z-5e6f7a8b.md`
 `PromotionReason`: `NONE` `AuditTarget`: `NONE` `BlockedOn`: `NONE`
 
+`PendingVerificationCadence`: `NONE`
+
 `BaselineReconciliation`: `NONE`
 
 ## Handoff

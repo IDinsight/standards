@@ -6,10 +6,11 @@
       "prompt": "Continue the active STANDARDS workflow as Developer. ProjectMode is BROWNFIELD, CycleMode is STANDARD, WorkflowState is DEVELOPING, recovery is inactive, Active Work.Scope and Active Work.Architecture point to completed artifacts, valid project context exists, and Active Work.Development is NONE. The feature adds a profile nickname field and the architecture defines the persistence field, API contract, and affected service/component boundaries. The user has not approved a Developer plan yet. Implement it.",
       "expected_output": "A persisted PROPOSED development plan in default AUTONOMOUS mode with atomic DEV-NNN steps mapped to the current AC-NNN identifiers, followed by a blocking request for user approval and no project implementation changes.",
       "files": [],
-      "assertions": [
-        "The response reads the active scope, architecture, project context, and only the relevant implementation areas before planning",
-        "It creates a Developer-owned development plan, records its repository-relative path in Active Work.Development, and uses stable DEV-NNN identifiers",
-        "The plan is Status PROPOSED and Mode AUTONOMOUS because the user did not select another collaboration mode",
+    "assertions": [
+      "The response reads the active scope, architecture, project context, and only the relevant implementation areas before planning",
+      "It creates a Developer-owned development plan, records its repository-relative path in Active Work.Development, and uses stable DEV-NNN identifiers",
+      "The plan is Status PROPOSED and Mode AUTONOMOUS because the user did not select another collaboration mode",
+      "With no explicit cadence selection, the new plan records Verification Cadence AFTER_IMPLEMENTATION and Current Increment NONE",
         "Each step has a coherent goal, acceptance mapping, dependencies when needed, observable expected outcome, and implementation-level self-check",
         "The response persists Active Work.BlockedOn as a concise Developer-plan approval request",
         "It stops before changing project implementation even though the user originally said to implement the feature"
@@ -27,7 +28,7 @@
         "Developer follows the relevant style files for the technologies it materially changes",
         "Existing checks may be run as self-checks but are not represented as formal Tester verification",
         "Normal STANDARD completion persists DEVELOPING -> TESTING and provides the next-role Tester invocation",
-        "A handoff entering TESTING explicitly requests a fresh Tester chat separate from Developer and persists implementation claims, actual self-check evidence, limitations, and resume context before the invocation."
+        "A handoff entering TESTING directs the user to an existing independent Tester chat or a fresh one, separate from Developer history, and persists implementation claims, actual self-check evidence, limitations, and resume context before the invocation."
       ]
     },
     {
@@ -124,7 +125,7 @@
         "The existing recovery frame keeps ResumeAt REVIEWING_IMPLEMENTATION and sets RerunThrough TESTING",
         "Developer routes DEVELOPING -> TESTING while preserving the frame rather than popping directly to review",
         "Testing will later pop the frame at the rerun boundary and resume REVIEWING_IMPLEMENTATION under protocol rules",
-        "A handoff entering TESTING explicitly requests a fresh Tester chat separate from Developer and persists implementation claims, actual self-check evidence, limitations, and resume context before the invocation."
+        "A handoff entering TESTING directs the user to an existing independent Tester chat or a fresh one, separate from Developer history, and persists implementation claims, actual self-check evidence, limitations, and resume context before the invocation."
       ]
     },
     {
@@ -259,7 +260,7 @@
         "Removing the obligation does not itself imply Developer completion; Developer still evaluates every remaining normal completion-gate condition",
         "After all DEV-NNN steps are DONE and all remaining gate conditions pass, the plan becomes COMPLETE",
         "With no unresolved DEVELOPING-owned obligation remaining, the full Developer completion gate passes and STANDARD hands off DEVELOPING -> TESTING",
-        "A handoff entering TESTING explicitly requests a fresh Tester chat separate from Developer and persists implementation claims, actual self-check evidence, limitations, and resume context before the invocation."
+        "A handoff entering TESTING directs the user to an existing independent Tester chat or a fresh one, separate from Developer history, and persists implementation claims, actual self-check evidence, limitations, and resume context before the invocation."
       ]
     },
     {
@@ -615,6 +616,119 @@
         "It records CycleMode EXPEDITED, WorkflowState DEVELOPING, and a NEW_CYCLE handoff from CANCELLED; BaselineReconciliation is NONE because the user confirmed no cancelled-cycle project changes remain.",
         "Scope and Architecture remain NONE, and the proposed development plan uses EXPEDITED_REQUEST rather than invented scope acceptance IDs.",
         "It requires plan approval before implementation, leaves implementation files unchanged, and does not request redundant permission merely to generate the authorized fresh cycle ID."
+      ]
+    },
+    {
+      "id": 49,
+      "prompt": "Continue as Developer in a STANDARD brownfield cycle at DEVELOPING with no recovery or blocker. The approved, style-locked AUTONOMOUS plan is IN_PROGRESS with Verification Cadence INCREMENTAL and Current Increment 1. Increment 1 is the independently usable search endpoint: DEV-001 implements it for AC-001; DEV-002 is a later search UI step for AC-002 and remains PENDING. DEV-001 is dependency-ready but not implemented. Implement the current increment.",
+      "expected_output": "Developer implements and self-checks DEV-001, persists the ready outcome, and hands Increment 1 to the independent Tester chat before implementing DEV-002.",
+      "files": [],
+      "assertions": [
+        "It records the actual self-check execution and marks DEV-001 DONE only after its expected outcome is satisfied.",
+        "It keeps the plan IN_PROGRESS and DEV-002 PENDING, without a routine Autonomous confirmation or a claim of complete implementation.",
+        "It persists WorkflowState TESTING with Handoff Kind CHECKPOINT, From DEVELOPING, FailureType NONE, and a Reason naming exactly Increment 1.",
+        "It supplies the active-client Tester invocation and uses an existing independent Tester chat or requests a fresh one, with the active cycle and checkout identified.",
+        "It does not run formal Tester verification in Developer's chat or enter Reviewer."
+      ]
+    },
+    {
+      "id": 50,
+      "prompt": "Continue as Developer at normal DEVELOPING in STANDARD. The approved, locked STEPWISE plan is IN_PROGRESS, cadence INCREMENTAL, Current Increment 1. Increment 1 delivers login and requires DEV-001 (credentials, AC-001) and DEV-002 (session, AC-002); neither outcome works independently. Both are PENDING and DEV-002 depends on DEV-001. The user authorizes the next step.",
+      "expected_output": "Developer implements and self-checks DEV-001, then pauses for permission to implement DEV-002 because the increment is not yet testable.",
+      "files": [],
+      "assertions": [
+        "Only DEV-001 is implemented and marked DONE after satisfactory self-checking.",
+        "It retains Current Increment 1 and persists a mode-continuation blocker for DEV-002.",
+        "It stays in DEVELOPING and does not assign a checkpoint for a partial, unusable outcome.",
+        "It retains the approved grouping and avoids asking for new plan approval merely because two dependent steps form one increment."
+      ]
+    },
+    {
+      "id": 51,
+      "prompt": "Continue as Developer at normal DEVELOPING in STANDARD. The approved, locked CODE_WITH_ME plan is IN_PROGRESS with INCREMENTAL cadence and Current Increment 1. Increment 1 covers DEV-001 / AC-001, the usable search endpoint; DEV-002 is a future UI step. The user directs the final DEV-001 edit and its existing self-check command. These changes satisfy Increment 1. No additional implementation is authorized.",
+      "expected_output": "Developer performs the directed edit and self-check, persists the ready increment, and checkpoints to Tester without coding DEV-002 or changing collaboration mode.",
+      "files": [],
+      "assertions": [
+        "It follows the user's bounded coding direction and does not treat the Tester handoff as authority for another edit.",
+        "It records DONE and actual self-check evidence for DEV-001, keeps the plan IN_PROGRESS, and leaves DEV-002 pending.",
+        "It persists a CHECKPOINT from DEVELOPING to TESTING with FailureType NONE and Reason naming Increment 1.",
+        "It provides the independent Tester invocation while retaining Mode CODE_WITH_ME; it does not insert a continuation question in place of the ready handoff."
+      ]
+    },
+    {
+      "id": 52,
+      "prompt": "Continue as Developer in a STANDARD cycle at normal DEVELOPING after scope and architecture completion. No development plan exists. During Scoper's work the user explicitly selected INCREMENTAL, recorded in Active Work.PendingVerificationCadence. The user has not approved implementation. Prepare the plan for the existing ACs and dependencies.",
+      "expected_output": "Developer creates a proposed plan with the explicit incremental scheduling, then clears the pending request after saving and requests the required implementation approval.",
+      "files": [],
+      "assertions": [
+        "It applies the pending explicit selection instead of overwriting it with the new-plan default.",
+        "It defines numbered increments by observable outcomes, with valid DEV and AC references, and selects the first assignment.",
+        "It persists cadence and scheduling in the plan before clearing PendingVerificationCadence to NONE.",
+        "It keeps Status PROPOSED, obtains plan approval, and does not implement merely because cadence was selected."
+      ]
+    },
+    {
+      "id": 53,
+      "prompt": "Continue as Developer at normal DEVELOPING in STANDARD after Tester's CHECKPOINT return for Increment 1. The approved, locked STEPWISE plan is IN_PROGRESS with INCREMENTAL cadence and Current Increment 2, which has not been assigned to Tester. The report is IN_PROGRESS / INCREMENT / Increment 1 and has current passing evidence. The user selects AFTER_IMPLEMENTATION. A STEPWISE continuation blocker for DEV-002 remains unanswered.",
+      "expected_output": "Developer clears the selected increment and saves AFTER_IMPLEMENTATION before clearing pending intent, preserving the historical report and mode pause.",
+      "files": [],
+      "assertions": [
+        "It applies the request at the normal Developer boundary, persists Current Increment NONE, and retains earlier increment definitions and evidence.",
+        "It does not rewrite Tester's historical Assessment Target or report status to match the new cadence.",
+        "It preserves STEPWISE mode, style lock, and the unanswered continuation blocker; cadence selection alone does not authorize DEV-002.",
+        "It requires no duplicate approval for regrouping unchanged approved work.",
+        "It clears PendingVerificationCadence only after saving the plan's effective cadence and reconciled scheduling."
+      ]
+    },
+    {
+      "id": 54,
+      "prompt": "Continue as Developer at normal DEVELOPING in STANDARD. The approved, locked AUTONOMOUS plan is IN_PROGRESS with AFTER_IMPLEMENTATION cadence and Current Increment NONE. DEV-001 / AC-001 is DONE with satisfactory persisted self-checks and is independently testable; DEV-002 / AC-002 remains PENDING. No Tester assignment or recovery is active. The user selects INCREMENTAL.",
+      "expected_output": "Developer groups unchanged approved work, selects the already implemented outcome, and checkpoints it to Tester without requiring another coding step.",
+      "files": [],
+      "assertions": [
+        "It saves INCREMENTAL, numbered outcome definitions, and Current Increment 1 before clearing pending intent.",
+        "It checks dependencies and actual self-check evidence before assigning Increment 1.",
+        "It makes a CHECKPOINT to TESTING for Increment 1 while DEV-002 remains pending.",
+        "It does not demand duplicate plan approval, fabricate a new coding step, or claim full implementation completion."
+      ]
+    },
+    {
+      "id": 55,
+      "prompt": "Continue as Developer in STANDARD after a cadence switch to AFTER_IMPLEMENTATION. The IN_PROGRESS approved plan has Current Increment NONE and a future DEV-002 still PENDING. Normal development found a defective test assertion and persisted a suspended DEVELOPMENT assignment for recovery Frame 1 with its exact Reason before handing correction to Tester. Tester subsequently routed an implementation defect back to Developer, preserving its CORRECTION assignment for Frame 2. Frame 2 is now topmost, Owner DEVELOPING, ResumeAt TESTING. An INCREMENTAL request is pending.",
+      "expected_output": "Developer repairs the nested implementation defect and resumes Tester's correction under the saved recovery route, leaving future development and the pending switch for the normal return.",
+      "files": [],
+      "assertions": [
+        "It restores the top-frame assignment from persisted artifacts and reconciles changed inputs rather than inferring scope from AFTER_IMPLEMENTATION.",
+        "It completes and self-checks the required correction without completing unrelated DEV-002.",
+        "It uses RESUME and the preserved frame route, not CHECKPOINT, and does not overwrite the outer suspended DEVELOPMENT assignment.",
+        "It leaves the pending cadence request unapplied until the required recovery returns reach normal development.",
+        "It does not mark the partial plan COMPLETE or route to Reviewer."
+      ]
+    },
+    {
+      "id": 56,
+      "prompt": "Continue as Developer in STANDARD at normal DEVELOPING with no recovery. The approved AUTONOMOUS plan is IN_PROGRESS with INCREMENTAL cadence and Current Increment 2. Every current approved DEV step is now DONE with satisfactory self-checks, including all corrections and earlier revisited ACs. The report remains IN_PROGRESS / INCREMENT / Increment 1. A request for AFTER_IMPLEMENTATION is pending, but no implementation or increment scheduling remains.",
+      "expected_output": "Developer completes the plan, clears Current Increment and ineffective pending intent, and hands a FULL assignment to Tester before implementation review.",
+      "files": [],
+      "assertions": [
+        "It reconciles all approved steps and Developer obligations before marking the plan COMPLETE and Current Increment NONE.",
+        "It clears pending intent and explains that there is no remaining scheduling effect without reopening work to change cadence.",
+        "It persists a FORWARD handoff to TESTING for full verification rather than another incremental checkpoint or Reviewer entry.",
+        "It retains prior increment definitions, report evidence, mode, and style lock; Tester owns reconciling the report to FULL / NONE.",
+        "It does not represent earlier increment passes as completion of the full Tester gate."
+      ]
+    },
+    {
+      "id": 57,
+      "prompt": "Continue as Developer in an EXPEDITED brownfield cycle at DEVELOPING with unfinished work. The approved STEPWISE plan uses AFTER_IMPLEMENTATION / NONE and EXPEDITED_REQUEST acceptance. A Developer-owned corrective obligation from expedited recovery remains unsatisfied. The user explicitly requests INCREMENTAL verification.",
+      "expected_output": "Developer promotes the cycle to STANDARD, preserves pending incremental intent and corrective obligations, and follows the Auditor route before scheduling standard increments.",
+      "files": [],
+      "assertions": [
+        "It treats the explicit request as authorization for expedited promotion and records CycleMode STANDARD with a promotion reason.",
+        "It records PendingVerificationCadence INCREMENTAL during promotion instead of running a checkpoint inside EXPEDITED.",
+        "It preserves the existing plan, style lock, mode, and unsatisfied corrective obligation through the required Auditor handoff.",
+        "It does not fabricate AC identifiers or claim standard-plan completion before scope, architecture, and the approved plan are reconciled.",
+        "It applies scheduling at the later safe normal Developer boundary, with approval only if the material plan changes."
       ]
     }
   ]

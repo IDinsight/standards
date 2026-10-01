@@ -75,6 +75,13 @@ The pending request and question are a pair: the request is `UNSET` exactly when
 the question is `NONE`. A question about the next cycle belongs there, not in
 the current or previous cycle's `Active Work.BlockedOn`.
 
+`Active Work.PendingVerificationCadence` holds an explicit cadence request for
+this cycle: `INCREMENTAL`, `AFTER_IMPLEMENTATION`, or `NONE`. The effective
+cadence and current increment belong to the development plan. Developer applies
+the request at the
+[safe switching boundary](../../guides/working-with-developer/#switch-cadence-during-a-cycle);
+it never carries into a new cycle.
+
 On installation, the ID and request are `UNSET`. Before workflow work begins,
 the agent checks the cycle mode and generates an ID. Document paths use `NONE`
 until the responsible roles create the files. In expedited work, scope and

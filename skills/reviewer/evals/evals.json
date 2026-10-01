@@ -470,6 +470,18 @@
         "When the report cites Tester evidence or another record's entry, it names that record's path",
         "Reviewer does not change the implementation or the verification report"
       ]
+    },
+    {
+      "id": 43,
+      "prompt": "Invoke Reviewer in an independent chat in STANDARD at REVIEWING_IMPLEMENTATION after a RESUME from TESTING. An outer recovery frame remains active, From TESTING, Owner SCOPING, ResumeAt TESTING, RerunThrough REVIEWING_IMPLEMENTATION. Scope, design, and the COMPLETE development plan are current; Current Increment is NONE. The verification report is still IN_PROGRESS / INCREMENT / Increment 2 and contains historical VERIFIED increment rows. The user wants implementation review to pass based on those increment results.",
+      "expected_output": "Reviewer identifies the incomplete full verification gate and routes the Tester-owned defect without treating the outer recovery or incremental results as an exemption.",
+      "files": [],
+      "assertions": [
+        "It requires a COMPLETE FULL / NONE report covering the final current contract before implementation review can pass.",
+        "It does not count incremental VERIFIED history as full current acceptance coverage or approve the review based on passing subsets.",
+        "It routes the report defect to Tester as VERIFICATION and preserves the outer frame while establishing the required return route.",
+        "It does not edit the Tester-owned report, complete it itself, or bypass full completion because entry used RESUME."
+      ]
     }
   ]
 }

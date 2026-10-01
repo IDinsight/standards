@@ -1,7 +1,7 @@
 # S.T.A.N.D.A.R.D.S. Workflow State
 
-`WorkflowState`: `ARCHITECTING` `CycleMode`: `STANDARD` `PendingCycleMode`:
-`UNSET` `PendingCycleRequest`: `UNSET` `PendingCycleBlockedOn`: `NONE`
+`WorkflowState`: `TESTING` `CycleMode`: `STANDARD` `PendingCycleMode`: `UNSET`
+`PendingCycleRequest`: `UNSET` `PendingCycleBlockedOn`: `NONE`
 
 ## Active Work
 
@@ -14,24 +14,18 @@
 `.standards/docs/development/add-user-search-20260901T120000Z-1a2b3c4d.md`
 `PromotionReason`: `NONE` `AuditTarget`: `NONE` `BlockedOn`: `NONE`
 
-`PendingVerificationCadence`: `NONE`
+`PendingVerificationCadence`: `AFTER_IMPLEMENTATION`
 
 `BaselineReconciliation`: `NONE`
 
 ## Handoff
 
-`Kind`: `FAILURE` `From`: `TESTING` `FailureType`: `ARCHITECTURE` `Reason`:
-`Retry behavior is not defined by the technical design.`
+`Kind`: `CHECKPOINT` `From`: `DEVELOPING` `FailureType`: `NONE` `Reason`:
+`Increment 1 ready.`
 
 ## Recovery
 
-`Active`: `true`
-
-### Frame 1
-
-`From`: `TESTING` `Owner`: `ARCHITECTING` `FailureType`: `ARCHITECTURE`
-`Reason`: `Retry behavior is not defined by the technical design.` `ResumeAt`:
-`TESTING` `RerunThrough`: `NONE`
+`Active`: `false`
 
 ## Outstanding Obligations
 

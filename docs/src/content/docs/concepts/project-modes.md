@@ -16,6 +16,11 @@ A **cycle** is one piece of work, from its saved request to sign-off or
 cancellation. Project mode can span many cycles; choosing a role mode does not
 change the workflow.
 
+[Verification cadence](../../guides/working-with-developer/#choose-when-tester-runs)
+is a separate scheduling choice for the active cycle: test after all
+implementation or alternate testable increments with Tester. It works with every
+Developer mode; incremental verification requires a standard cycle.
+
 ## Greenfield
 
 A greenfield project has no meaningful existing implementation to preserve. Its

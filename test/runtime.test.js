@@ -118,6 +118,37 @@ async function standardCycle(root) {
   return { id, scope, spec, plan, report };
 }
 
+// One independently tested outcome, with an approved future outcome unfinished.
+async function incrementalCycle(root) {
+  const cycle = await standardCycle(root);
+  const { scope, spec, plan, report } = cycle;
+  await write(root, scope, (await read(root, scope)).replace('## Retired', '- `AC-004`: Users see search results.\n\n## Retired'));
+  await write(root, spec, `${await read(root, spec)}- \`AC-004\`: Search-results component.\n`);
+  await fillHeader(root, plan, { Status: 'IN_PROGRESS', 'Verification Cadence': 'INCREMENTAL', 'Current Increment': '1' });
+  await write(root, plan, (await read(root, plan)).replace('### DEV-002',
+    '**Self-Check**\n\n`node --test test/search.test.js` in project root; dirty endpoint content; exit 0.\n\n### DEV-002')
+    .replace('`Status`: `DONE` `Depends On`: `DEV-001`\n`Acceptance`: `AC-001`',
+      '`Status`: `PENDING` `Depends On`: `DEV-001`\n`Acceptance`: `AC-004`')
+    + '\n## Verification Increments\n\n### Increment 1\n\n'
+    + '`Development Steps`: `DEV-001` `Acceptance`: `AC-001`\n\n**Ready Outcome**\n\nSearch endpoint returns matches.\n\n'
+    + '### Increment 2\n\n`Development Steps`: `DEV-002` `Acceptance`: `AC-004`\n\n**Ready Outcome**\n\nSearch results are displayed.\n');
+  await fillHeader(root, report, { Status: 'IN_PROGRESS', 'Assessment Purpose': 'INCREMENT', 'Assessment Target': 'Increment 1' });
+  await write(root, report, `${await read(root, report)}| AC-004 | DEV-002 | AWAITING_IMPLEMENTATION |\n`
+    + '\n## Increment Assessments\n\n| Increment | Outcome | Evidence | Disposition |\n| --- | --- | --- | --- |\n'
+    + '| 1 | Endpoint / AC-001 | dirty endpoint content; search tests passed | VERIFIED |\n'
+    + '\n## Execution Evidence\n\n`node --test test/search.test.js` in project root; dirty endpoint content; exit 0, 3 passes.\n');
+  await editState(root, (text) => [['WorkflowState', 'TESTING'], ['Kind', 'CHECKPOINT'], ['From', 'DEVELOPING'],
+    ['FailureType', 'NONE'], ['Reason', 'Increment 1 ready.']]
+    .reduce((current, [name, value]) => setField(current, name, value), text));
+  return cycle;
+}
+
+function suspendedAssignment({ number = 1, frame = 1, reason = 'A defect.', purpose, target }) {
+  return `### Suspended Assignment ${number}\n\n\`Recovery Frame\`: \`${frame}\` \`Recovery Reason\`: \`${reason}\`\n`
+    + `\`Purpose\`: \`${purpose}\` \`Target\`: \`${target}\`\n`
+    + '`Assessed Inputs`: `dirty endpoint and search test content`\n`Next Action`: `reconcile evidence and continue the assignment`\n';
+}
+
 test('slugs use plain lowercase words and stay short', () => {
   assert.equal(slugFor('Add user search by name & e-mail (v2)!'), 'add-user-search-by-name-e-mail-v2');
   assert.equal(slugFor('Ünïcode — café search'), 'unicode-cafe-search');
@@ -592,9 +623,9 @@ test('at turn end, stop holds the role that made the last handoff, not the one t
   hasProblem(await check(root), stale(report));
   // A FORWARD, RESUME, or FAILURE handoff was made by its From state's role, so that record is held.
   expectSentBack(await after({ state: 'REVIEWING_IMPLEMENTATION', kind: 'FORWARD', from: 'TESTING', frames: [rework] }),
-    [report], [review, spec]);
+    [report, spec], [review]);
   expectSentBack(await after({ state: 'REVIEWING_IMPLEMENTATION', kind: 'RESUME', from: 'TESTING', frames: [rework] }),
-    [report], [review, spec]);
+    [report, spec], [review]);
   expectSentBack(await after({ state: 'ARCHITECTING', kind: 'FAILURE', from: 'TESTING', failureType: 'ARCHITECTURE',
     frames: [rework, frame(2, 'TESTING', 'ARCHITECTING', 'ARCHITECTURE', 'NONE')] }), [report], [spec]);
   // Any agent may record a user rework, so its From state's record is not held:
@@ -846,6 +877,22 @@ test('check examines the cycle\'s fixed record paths directly', () => project(as
   hasProblem(await check(root), new RegExp(`${report}: is COMPLETE but does not account for AC-002`));
 }, { withGit: true }));
 
+test('Reviewer entry requires the verification artifact type, not merely a file at its path', () => project(async (root) => {
+  const { spec, report } = await standardCycle(root);
+  // Architecture may be an unmarked project document. A misplaced architecture
+  // record at the verification path must not satisfy the Tester completion gate.
+  await write(root, spec, (await read(root, spec)).replace(/^<!--[\s\S]*?-->\s*/, ''));
+  await write(root, report, (await read(root, report)).replace('Artifact: VERIFICATION', 'Artifact: ARCHITECTURE'));
+  await editState(root, (text) => setField(setField(text, 'Kind', 'FORWARD'), 'From', 'TESTING'));
+  hasProblem(await check(root), /must hold.*VERIFICATION.*holds ARCHITECTURE/);
+  await editState(root, (text) => withFrame(text, { From: 'AWAITING_USER_SIGNOFF', Owner: 'SCOPING',
+    FailureType: 'SCOPING', ResumeAt: 'AWAITING_USER_SIGNOFF', RerunThrough: 'SYNCHRONIZING' }));
+  hasProblem(await check(root), /must hold.*VERIFICATION.*holds ARCHITECTURE/);
+  const stop = await hook(root, 'stop', claudeStop(root, randomUUID(), false));
+  assert.equal(stop.code, 2, stop.stderr);
+  assert.match(stop.stderr, /must hold.*VERIFICATION.*holds ARCHITECTURE/);
+}));
+
 test('a record\'s Status must be IN_PROGRESS, BLOCKED, or COMPLETE', () => project(async (root) => {
   const { report } = await standardCycle(root);
   const reportProblems = async () => messages(await check(root)).filter((line) => line.startsWith(`${report}:`));
@@ -1075,3 +1122,387 @@ test('a merge conflict in a cycle record stops the check with its own message', 
   await git(root, 'merge', '-q', 'other');
   assert.deepEqual(messages(await check(root)), [`${report}: has an unresolved merge conflict. Stop and ask the user to resolve it.`]);
 }, { withGit: true }));
+
+test('verification scheduling and assessment fields are required, unique, and concrete', () => project(async (root) => {
+  const { plan, report } = await standardCycle(root);
+  for (const [file, name] of [[plan, 'Verification Cadence'], [plan, 'Current Increment'],
+    [report, 'Assessment Purpose'], [report, 'Assessment Target'], ['.standards/STATE.md', 'PendingVerificationCadence']]) {
+    const original = await read(root, file);
+    const field = new RegExp('`' + name + '`:\\s*`[^`]*`');
+    await write(root, file, original.replace(field, ''));
+    hasProblem(await check(root), new RegExp(name));
+    await write(root, file, original.replace(field, (value) => `${value}\n${value}`));
+    hasProblem(await check(root), new RegExp(name));
+    await write(root, file, setField(original, name, 'invalid'));
+    hasProblem(await check(root), new RegExp(name));
+    await write(root, file, original);
+  }
+  assert.deepEqual(messages(await check(root)), []);
+}));
+
+test('Developer checkpoints require an approved, self-checked outcome and completed dependencies', () => project(async (root) => {
+  const { plan } = await incrementalCycle(root);
+  for (const mode of ['AUTONOMOUS', 'STEPWISE', 'CODE_WITH_ME']) {
+    await fillHeader(root, plan, { Mode: mode });
+    assert.deepEqual(messages(await check(root)), []);
+  }
+  const original = await read(root, plan);
+  for (const [changed, expected] of [
+    [setField(original, 'Status', 'PROPOSED'), /checkpoint requires an approved plan/],
+    [setField(original, 'User Style Locked', 'false'), /checkpoint requires an approved plan/],
+    [original.replace('`Status`: `DONE`', '`Status`: `PENDING`'), /requires DEV-001.*DONE/],
+    [original.replace('**Self-Check**', '**Notes**'), /DEV-001 needs persisted.*Self-Check/],
+    [original.replace('`Depends On`: `NONE`', '`Depends On`: `DEV-002`'), /requires DEV-002.*DONE/],
+    [setField(original, 'Current Increment', '9'), /Current Increment 9 has no definition/],
+    [original.replace('`Development Steps`: `DEV-001`', '`Development Steps`: `DEV-009`'), /DEV-009 is not a step/],
+    [original.replace('### Increment 2', '### Increment 3'), /entries must be numbered/],
+  ]) {
+    await write(root, plan, changed);
+    hasProblem(await check(root), expected);
+  }
+  await write(root, plan, original);
+  // Execution evidence may be expressed as fenced commands and results.
+  await write(root, plan, original.replace('`node --test test/search.test.js` in project root; dirty endpoint content; exit 0.',
+    '```text\nnode --test test/search.test.js\nproject root; dirty endpoint content; exit 0\n```'));
+  assert.deepEqual(messages(await check(root)), []);
+}));
+
+test('checkpoint routes are checked without changing pending cadence intent', () => project(async (root) => {
+  await incrementalCycle(root);
+  const original = await read(root, '.standards/STATE.md');
+  for (const [changed, expected] of [
+    [setField(original, 'Development', 'NONE'), /Active Work.Development is NONE/],
+    [setField(original, 'From', 'ARCHITECTING'), /CHECKPOINT requires a STANDARD Developer\/Tester exchange/],
+    [setField(original, 'FailureType', 'VERIFICATION'), /CHECKPOINT requires.*FailureType NONE/],
+    [setField(original, 'Reason', 'Ready.'), /Reason must identify exactly one/],
+    [setField(original, 'Reason', 'Increment 1 and Increment 2 ready.'), /Reason must identify exactly one/],
+    [withFrame(original, { From: 'DEVELOPING', Owner: 'TESTING', FailureType: 'VERIFICATION', ResumeAt: 'DEVELOPING' }),
+      /CHECKPOINT requires.*no active recovery/],
+  ]) {
+    await write(root, '.standards/STATE.md', changed);
+    hasProblem(await check(root), expected);
+  }
+  const pending = setField(original, 'PendingVerificationCadence', 'AFTER_IMPLEMENTATION');
+  await write(root, '.standards/STATE.md', pending);
+  assert.deepEqual(messages(await check(root)), []);
+  assert.equal(await read(root, '.standards/STATE.md'), pending);
+}));
+
+test('Tester checkpoints require current assessment evidence while allowing historical handoffs after a switch', () => project(async (root) => {
+  const { plan, report } = await incrementalCycle(root);
+  await editState(root, (text) => setField(setField(setField(text, 'WorkflowState', 'DEVELOPING'), 'From', 'TESTING'),
+    'Reason', 'Increment 1 verified.'));
+  assert.deepEqual(messages(await check(root)), []);
+  const original = await read(root, report);
+  await write(root, report, original.replace('| VERIFIED |', '| BLOCKED |'));
+  hasProblem(await check(root), /Increment 1 assessment recorded as VERIFIED/);
+  await write(root, report, original.replace(/## Execution Evidence[\s\S]*/, '## Execution Evidence\n'));
+  hasProblem(await check(root), /checkpoint needs persisted Execution Evidence/);
+  await write(root, report, original);
+  await fillHeader(root, plan, { 'Current Increment': '2' });
+  assert.deepEqual(messages(await check(root)), []);
+  await fillHeader(root, plan, { 'Verification Cadence': 'AFTER_IMPLEMENTATION', 'Current Increment': 'NONE' });
+  // The Developer may reopen previously tested work without rewriting the historical handoff.
+  await write(root, plan, (await read(root, plan)).replace('`Status`: `DONE`', '`Status`: `IN_PROGRESS`'));
+  assert.deepEqual(messages(await check(root)), []);
+  await fillHeader(root, plan, { 'Verification Cadence': 'INCREMENTAL', 'Current Increment': '2' });
+  assert.deepEqual(messages(await check(root)), []);
+  // A new user question belongs to the receiving role, not the historical gate.
+  await editState(root, (text) => setField(text, 'BlockedOn', 'Awaiting implementation detail.'));
+  assert.deepEqual(messages(await check(root)), []);
+}));
+
+test('partial Tester assignments retain the full acceptance inventory and stop holds the handing-off role', () => project(async (root) => {
+  const { report } = await incrementalCycle(root);
+  const original = await read(root, report);
+  await write(root, report, original.replace('| AC-004 | DEV-002 | AWAITING_IMPLEMENTATION |\n', ''));
+  hasProblem(await check(root), /partial assessment does not account for AC-004/);
+  await write(root, report, `${await read(root, report)}\n## Assessed Inputs\n\nThe current contract includes AC-004.\n`);
+  hasProblem(await check(root), /partial assessment does not account for AC-004/);
+  // Developer has handed off, but the receiving Tester has yet to reconcile its old report.
+  await fillHeader(root, report, { 'Assessment Target': 'Increment 2' });
+  const stop = () => hook(root, 'stop', claudeStop(root, randomUUID(), false));
+  assert.equal((await stop()).code, 0);
+  hasProblem(await check(root), /assigned checkpoint requires.*Increment 1/);
+  await write(root, report, original);
+  await editState(root, (text) => setField(setField(text, 'WorkflowState', 'DEVELOPING'), 'From', 'TESTING'));
+  await write(root, report, original.replace('| VERIFIED |', '| BLOCKED |'));
+  const failed = await stop();
+  assert.equal(failed.code, 2);
+  assert.match(failed.stderr, /assessment recorded as VERIFIED/);
+}));
+
+test('scoped verification corrections and nested returns do not depend on the effective cadence', () => project(async (root) => {
+  const { plan, report } = await incrementalCycle(root);
+  await fillHeader(root, plan, { 'Verification Cadence': 'AFTER_IMPLEMENTATION', 'Current Increment': 'NONE' });
+  await write(root, plan, `${await read(root, plan)}\n## Plan Notes\n\n`
+    + suspendedAssignment({ purpose: 'DEVELOPMENT', target: 'NONE' }));
+  await fillHeader(root, report, { Mode: 'REVERIFY', 'Assessment Purpose': 'CORRECTION', 'Assessment Target': 'Repair endpoint assertion' });
+  await editState(root, (text) => withFrame([['Kind', 'FAILURE'], ['From', 'DEVELOPING'], ['FailureType', 'VERIFICATION'],
+    ['PendingVerificationCadence', 'INCREMENTAL']].reduce((current, [name, value]) => setField(current, name, value), text),
+  { From: 'DEVELOPING', Owner: 'TESTING', FailureType: 'VERIFICATION', ResumeAt: 'DEVELOPING' }));
+  assert.deepEqual(messages(await check(root)), []);
+  const outer = await read(root, '.standards/STATE.md');
+  const outerReport = await read(root, report);
+  await fillHeader(root, report, { 'Assessment Purpose': 'FULL', 'Assessment Target': 'NONE' });
+  hasProblem(await check(root), /scoped Tester correction requires Assessment Purpose CORRECTION/);
+  await fillHeader(root, report, { Status: 'COMPLETE', 'Assessment Purpose': 'FULL', 'Assessment Target': 'NONE' });
+  hasProblem(await check(root), /scoped recovery cannot certify unfinished implementation/);
+  await write(root, report, outerReport);
+  const saved = suspendedAssignment({ frame: 2, purpose: 'CORRECTION', target: 'Repair endpoint assertion' });
+  await write(root, report, `${outerReport}\n## Resume or Handoff\n\n${saved}`);
+  await write(root, '.standards/STATE.md', [['WorkflowState', 'DEVELOPING'], ['From', 'TESTING'], ['FailureType', 'IMPLEMENTATION']]
+    .reduce((current, [name, value]) => setField(current, name, value), outer)
+    .replace('## Outstanding Obligations', `${frameText({ From: 'TESTING', Owner: 'DEVELOPING',
+      FailureType: 'IMPLEMENTATION', ResumeAt: 'TESTING' }).replace('### Frame 1', '### Frame 2')}\n## Outstanding Obligations`));
+  assert.deepEqual(messages(await check(root)), []);
+  await write(root, report, outerReport);
+  hasProblem(await check(root), /Scoped recovery needs a suspended assignment for Frame 2/);
+  await write(root, report, `${outerReport}\n## Resume or Handoff\n\n${saved.replace('`Recovery Reason`: `A defect.`',
+    '`Recovery Reason`: `Another defect.`')}`);
+  hasProblem(await check(root), /Scoped recovery needs a suspended assignment for Frame 2/);
+  await write(root, report, `${outerReport}\n## Resume or Handoff\n\n${saved}`);
+  // Pop the nested repair, resume Tester's correction, then pop the outer repair back to Developer.
+  await write(root, '.standards/STATE.md', [['Kind', 'RESUME'], ['From', 'DEVELOPING'], ['FailureType', 'NONE']]
+    .reduce((current, [name, value]) => setField(current, name, value), outer));
+  assert.deepEqual(messages(await check(root)), []);
+  await editState(root, (text) => [['WorkflowState', 'DEVELOPING'], ['From', 'TESTING']]
+    .reduce((current, [name, value]) => setField(current, name, value), text)
+    .replace(/## Recovery[\s\S]*?(?=## Outstanding)/, '## Recovery\n\n`Active`: `false`\n\n'));
+  assert.deepEqual(messages(await check(root)), []);
+}));
+
+test('full Tester assignment requires full metadata after implementation, without blaming its previous increment at handoff', () => project(async (root) => {
+  const { plan, report } = await incrementalCycle(root);
+  await fillHeader(root, plan, { Status: 'COMPLETE', 'Current Increment': 'NONE' });
+  await write(root, plan, (await read(root, plan)).replace('`Status`: `PENDING`', '`Status`: `DONE`'));
+  await editState(root, (text) => setField(text, 'Kind', 'FORWARD'));
+  hasProblem(await check(root), /Full verification requires Assessment Purpose FULL/);
+  assert.equal((await hook(root, 'stop', claudeStop(root, randomUUID(), false))).code, 0);
+  await fillHeader(root, report, { 'Assessment Purpose': 'FULL', 'Assessment Target': 'NONE' });
+  assert.deepEqual(messages(await check(root)), []);
+}));
+
+test('a resumed increment and a same-state test correction can retain unfinished future implementation', () => project(async (root) => {
+  const { report } = await incrementalCycle(root);
+  await write(root, report, `${await read(root, report)}\n## Resume or Handoff\n\n`
+    + suspendedAssignment({ purpose: 'INCREMENT', target: 'Increment 1' }));
+  await editState(root, (text) => setField(text, 'Kind', 'RESUME'));
+  assert.deepEqual(messages(await check(root)), []);
+  await fillHeader(root, report, { 'Assessment Purpose': 'CORRECTION', 'Assessment Target': 'Repair assertion' });
+  hasProblem(await check(root), /Restore the suspended INCREMENT assessment/);
+  await fillHeader(root, report, { 'Assessment Purpose': 'INCREMENT', 'Assessment Target': 'Increment 1' });
+  await editState(root, (text) => [['Kind', 'FAILURE'], ['From', 'TESTING'], ['FailureType', 'VERIFICATION']]
+    .reduce((current, [name, value]) => setField(current, name, value), text));
+  assert.deepEqual(messages(await check(root)), []);
+}));
+
+test('a nested Tester correction resumes without restoring the older interrupted increment', () => project(async (root) => {
+  const { plan, report } = await incrementalCycle(root);
+  await write(root, plan, (await read(root, plan)).replace('`Status`: `DONE`', '`Status`: `IN_PROGRESS`')
+    + '\n## Plan Notes\n\n' + suspendedAssignment({ frame: 2, purpose: 'CORRECTION', target: 'Repair endpoint' }));
+  await fillHeader(root, report, { 'Assessment Purpose': 'CORRECTION', 'Assessment Target': 'Repair assertion' });
+  await write(root, report, `${await read(root, report)}\n## Resume or Handoff\n\n`
+    + suspendedAssignment({ purpose: 'CORRECTION', target: 'Earlier resolved correction' })
+    + '\n' + suspendedAssignment({ number: 2, purpose: 'INCREMENT', target: 'Increment 1' })
+    + '\n' + suspendedAssignment({ number: 3, frame: 3, purpose: 'CORRECTION', target: 'Repair assertion' }));
+  const frames = [
+    frameText({ From: 'TESTING', Owner: 'DEVELOPING', FailureType: 'IMPLEMENTATION', ResumeAt: 'TESTING' }),
+    frameText({ From: 'DEVELOPING', Owner: 'TESTING', FailureType: 'VERIFICATION', ResumeAt: 'DEVELOPING' })
+      .replace('### Frame 1', '### Frame 2'),
+  ];
+  await editState(root, (text) => setField(text, 'Kind', 'RESUME')
+    .replace(/## Recovery[\s\S]*?(?=## Outstanding)/, `## Recovery\n\n\`Active\`: \`true\`\n\n${frames.join('\n')}\n`));
+  assert.deepEqual(messages(await check(root)), []);
+  const stop = await hook(root, 'stop', claudeStop(root, randomUUID(), false));
+  assert.equal(stop.code, 0, stop.stderr);
+  // Finish the nested test correction and return to the original Developer repair.
+  await editState(root, (text) => [['WorkflowState', 'DEVELOPING'], ['From', 'TESTING']]
+    .reduce((current, [name, value]) => setField(current, name, value), text)
+    .replace(/## Recovery[\s\S]*?(?=## Outstanding)/, `## Recovery\n\n\`Active\`: \`true\`\n\n${frames[0]}\n`));
+  assert.deepEqual(messages(await check(root)), []);
+  // After the last frame is popped, restore the latest Frame 1 assignment;
+  // the older Frame 1 record and newer nested Frame 3 record are both history.
+  await write(root, plan, (await read(root, plan)).replace('`Status`: `IN_PROGRESS` `Depends On`', '`Status`: `DONE` `Depends On`'));
+  await editState(root, (text) => [['WorkflowState', 'TESTING'], ['From', 'DEVELOPING']]
+    .reduce((current, [name, value]) => setField(current, name, value), text)
+    .replace(/## Recovery[\s\S]*?(?=## Outstanding)/, '## Recovery\n\n`Active`: `false`\n\n'));
+  hasProblem(await check(root), /Restore the suspended INCREMENT assessment/);
+  await fillHeader(root, report, { 'Assessment Purpose': 'INCREMENT', 'Assessment Target': 'Increment 1' });
+  assert.deepEqual(messages(await check(root)), []);
+}));
+
+test('stop checks partial Tester coverage after the final corrective frame has been popped', () => project(async (root) => {
+  const { plan, report } = await incrementalCycle(root);
+  await fillHeader(root, plan, { 'Verification Cadence': 'AFTER_IMPLEMENTATION', 'Current Increment': 'NONE' });
+  await write(root, plan, `${await read(root, plan)}\n## Plan Notes\n\n`
+    + suspendedAssignment({ purpose: 'DEVELOPMENT', target: 'NONE' }));
+  await fillHeader(root, report, { 'Assessment Purpose': 'CORRECTION', 'Assessment Target': 'Repair assertion' });
+  await editState(root, (text) => [['WorkflowState', 'DEVELOPING'], ['Kind', 'RESUME'], ['From', 'TESTING']]
+    .reduce((current, [name, value]) => setField(current, name, value), text));
+  const stop = () => hook(root, 'stop', claudeStop(root, randomUUID(), false));
+  assert.equal((await stop()).code, 0);
+  await write(root, report, (await read(root, report)).replace('| AC-004 | DEV-002 | AWAITING_IMPLEMENTATION |\n', ''));
+  const incomplete = await stop();
+  assert.equal(incomplete.code, 2, incomplete.stderr);
+  assert.match(incomplete.stderr, /partial assessment does not account for AC-004/);
+}));
+
+test('Reviewer entry enforces full completion even with an outer recovery frame', () => project(async (root) => {
+  const { spec, plan, report } = await incrementalCycle(root);
+  await write(root, report, `${await read(root, report)}\n## Resume or Handoff\n\n`
+    + suspendedAssignment({ purpose: 'INCREMENT', target: 'Increment 1' }));
+  const original = await read(root, '.standards/STATE.md');
+  for (const kind of ['FORWARD', 'RESUME']) {
+    await write(root, '.standards/STATE.md', withFrame([['WorkflowState', 'REVIEWING_IMPLEMENTATION'], ['Kind', kind],
+      ['From', 'TESTING'], ['PendingVerificationCadence', 'AFTER_IMPLEMENTATION']]
+      .reduce((current, [name, value]) => setField(current, name, value), original),
+    { From: 'TESTING', Owner: 'SCOPING', FailureType: 'SCOPING', ResumeAt: 'TESTING', RerunThrough: 'REVIEWING_IMPLEMENTATION' }));
+    const result = await check(root);
+    hasProblem(result, /plan must be COMPLETE/);
+    hasProblem(result, /Reviewer entry requires Assessment Purpose FULL/);
+    hasProblem(result, /must be COMPLETE once the cycle has passed TESTING/);
+    hasProblem(result, /Clear pending cadence intent/);
+  }
+  await fillHeader(root, plan, { Status: 'COMPLETE', 'Current Increment': 'NONE' });
+  await write(root, plan, (await read(root, plan)).replace('`Status`: `PENDING`', '`Status`: `DONE`'));
+  await fillHeader(root, report, { Status: 'COMPLETE', 'Assessment Purpose': 'FULL', 'Assessment Target': 'NONE' });
+  hasProblem(await check(root), /COMPLETE report cannot retain AWAITING_IMPLEMENTATION/);
+  await write(root, report, (await read(root, report)).replace('AWAITING_IMPLEMENTATION', 'passed'));
+  await editState(root, (text) => setField(text, 'PendingVerificationCadence', 'NONE'));
+  assert.deepEqual(messages(await check(root)), []);
+  // Scope and design cannot be omitted at this boundary, even in recovery.
+  await write(root, spec, (await read(root, spec)).replace('- `AC-004`: Search-results component.\n', ''));
+  hasProblem(await check(root), /does not account for AC-004.*design coverage/);
+  await editState(root, (text) => setField(text, 'Scope', 'NONE'));
+  hasProblem(await check(root), /Active Work.Scope is NONE/);
+}));
+
+test('full verification cannot count historical increment evidence as current acceptance coverage', () => project(async (root) => {
+  const { plan, report } = await incrementalCycle(root);
+  await fillHeader(root, plan, { Status: 'COMPLETE', 'Current Increment': 'NONE' });
+  await write(root, plan, (await read(root, plan)).replace('`Status`: `PENDING`', '`Status`: `DONE`'));
+  await fillHeader(root, report, { Status: 'COMPLETE', 'Assessment Purpose': 'FULL', 'Assessment Target': 'NONE' });
+  await write(root, report, (await read(root, report))
+    .replace('| AC-004 | DEV-002 | AWAITING_IMPLEMENTATION |\n', '')
+    .replace('## Execution Evidence', '| 2 | Search results / AC-004 | Earlier source and results | SUPERSEDED |\n\n## Execution Evidence'));
+  await editState(root, (text) => [['WorkflowState', 'REVIEWING_IMPLEMENTATION'], ['Kind', 'FORWARD'], ['From', 'TESTING']]
+    .reduce((current, [name, value]) => setField(current, name, value), text));
+  hasProblem(await check(root), /is COMPLETE but does not account for AC-004/);
+  const stop = await hook(root, 'stop', claudeStop(root, randomUUID(), false));
+  assert.equal(stop.code, 2, stop.stderr);
+  assert.match(stop.stderr, /is COMPLETE but does not account for AC-004/);
+  await write(root, report, (await read(root, report)).replace('## Increment Assessments',
+    '| AC-004 | Search-results tests on final content | passed |\n\n## Increment Assessments'));
+  assert.deepEqual(messages(await check(root)), []);
+}));
+
+test('expedited and inactive cycles cannot carry incremental scheduling intent', () => project(async (root) => {
+  const original = await read(root, '.standards/STATE.md');
+  await editState(root, (text) => setField(text, 'PendingVerificationCadence', 'INCREMENTAL'));
+  hasProblem(await check(root), /Inactive cycles require PendingVerificationCadence NONE/);
+  await write(root, '.standards/STATE.md', original);
+  await startCycle(root, { state: 'DEVELOPING', mode: 'EXPEDITED' });
+  const plan = await init(root, 'DEVELOPMENT');
+  await fillHeader(root, plan, { Mode: 'AUTONOMOUS', 'User Style Locked': 'true', Status: 'APPROVED',
+    'Verification Cadence': 'INCREMENTAL' });
+  await editState(root, (text) => setField(setField(text, 'Development', plan), 'PendingVerificationCadence', 'INCREMENTAL'));
+  const result = await check(root);
+  hasProblem(result, /EXPEDITED cycle requires AFTER_IMPLEMENTATION/);
+  hasProblem(result, /INCREMENTAL request requires expedited promotion/);
+  for (const state of ['CANCELLED', 'SIGNED_OFF']) {
+    await editState(root, (text) => setField(setField(text, 'WorkflowState', state), 'CycleMode', 'UNSET'));
+    hasProblem(await check(root), /Inactive cycles require PendingVerificationCadence NONE/);
+  }
+}));
+
+for (const mode of ['AUTONOMOUS', 'STEPWISE', 'CODE_WITH_ME']) {
+  test(`${mode} supports grouped, revisited increments followed by full verification`, () => project(async (root) => {
+    const { plan, report } = await incrementalCycle(root);
+    await fillHeader(root, plan, { Mode: mode });
+    await write(root, plan, (await read(root, plan)).replace('## Verification Increments',
+      '### DEV-003 — Result ordering\n\n`Status`: `PENDING` `Depends On`: `DEV-002`\n`Acceptance`: `AC-004`\n\n## Verification Increments')
+      .replace('`Development Steps`: `DEV-002` `Acceptance`: `AC-004`',
+        '`Development Steps`: `DEV-001, DEV-002` `Acceptance`: `AC-001, AC-004`'));
+    assert.deepEqual(messages(await check(root)), []);
+    await editState(root, (text) => [['WorkflowState', 'DEVELOPING'], ['From', 'TESTING'], ['Reason', 'Increment 1 verified.']]
+      .reduce((current, [name, value]) => setField(current, name, value), text));
+    await fillHeader(root, plan, { 'Current Increment': '2' });
+    assert.deepEqual(messages(await check(root)), []);
+
+    await editState(root, (text) => [['WorkflowState', 'TESTING'], ['From', 'DEVELOPING'], ['Reason', 'Increment 2 ready.']]
+      .reduce((current, [name, value]) => setField(current, name, value), text));
+    await fillHeader(root, report, { Mode: 'REVERIFY', 'Assessment Target': 'Increment 2' });
+    hasProblem(await check(root), /Increment 2 requires DEV-002.*DONE/);
+    await write(root, plan, (await read(root, plan))
+      .replace('`Status`: `PENDING` `Depends On`: `DEV-001`', '`Status`: `DONE` `Depends On`: `DEV-001`')
+      .replace('### DEV-003', '**Self-Check**\n\nSearch-box checks passed on the updated endpoint and UI.\n\n### DEV-003'));
+    assert.deepEqual(messages(await check(root)), []);
+    await write(root, report, (await read(root, report)).replace('AWAITING_IMPLEMENTATION', 'passed on updated endpoint and UI')
+      .replace('## Execution Evidence', '| 2 | Endpoint and results / AC-001, AC-004 | Updated endpoint and UI checks passed | VERIFIED |\n\n## Execution Evidence'));
+    await editState(root, (text) => [['WorkflowState', 'DEVELOPING'], ['From', 'TESTING'], ['Reason', 'Increment 2 verified.']]
+      .reduce((current, [name, value]) => setField(current, name, value), text));
+    assert.deepEqual(messages(await check(root)), []);
+    assert.match(await read(root, report), /\| 1 \| Endpoint \/ AC-001/);
+
+    await write(root, plan, (await read(root, plan)).replace('`Status`: `PENDING`', '`Status`: `DONE`')
+      .replace('## Verification Increments', '**Self-Check**\n\nResult-ordering checks passed on final content.\n\n## Verification Increments'));
+    await fillHeader(root, plan, { Status: 'COMPLETE', 'Current Increment': 'NONE' });
+    await editState(root, (text) => [['WorkflowState', 'TESTING'], ['Kind', 'FORWARD'], ['From', 'DEVELOPING']]
+      .reduce((current, [name, value]) => setField(current, name, value), text));
+    await fillHeader(root, report, { 'Assessment Purpose': 'FULL', 'Assessment Target': 'NONE' });
+    assert.deepEqual(messages(await check(root)), []);
+    await editState(root, (text) => setField(setField(text, 'WorkflowState', 'REVIEWING_IMPLEMENTATION'), 'From', 'TESTING'));
+    hasProblem(await check(root), /must be COMPLETE once the cycle has passed TESTING/);
+    await fillHeader(root, report, { Status: 'COMPLETE' });
+    assert.deepEqual(messages(await check(root)), []);
+    assert.match(await read(root, plan), new RegExp('`Mode`: `' + mode + '`'));
+    const stop = await hook(root, 'stop', claudeStop(root, randomUUID(), false));
+    assert.equal(stop.code, 0, stop.stderr);
+  }));
+}
+
+test('a cadence request made before a plan exists survives reinstall', () => project(async (root) => {
+  await startCycle(root);
+  await editState(root, (text) => setField(text, 'PendingVerificationCadence', 'INCREMENTAL'));
+  const saved = await read(root, '.standards/STATE.md');
+  assert.deepEqual(messages(await check(root)), []);
+  await installProject({ projectRoot: root, clients: ['claude'] });
+  assert.equal(await read(root, '.standards/STATE.md'), saved);
+  assert.deepEqual(messages(await check(root)), []);
+}));
+
+test('both cadence switches preserve historical assessments through save-before-clear and reinstall', () => project(async (root) => {
+  const { plan, report } = await incrementalCycle(root);
+  await editState(root, (text) => [['WorkflowState', 'DEVELOPING'], ['From', 'TESTING'], ['Reason', 'Increment 1 verified.']]
+    .reduce((current, [name, value]) => setField(current, name, value), text));
+  const assessment = await read(root, report);
+  for (const cadence of ['AFTER_IMPLEMENTATION', 'INCREMENTAL']) {
+    await editState(root, (text) => setField(text, 'PendingVerificationCadence', cadence));
+    await fillHeader(root, plan, { 'Verification Cadence': cadence, 'Current Increment': cadence === 'INCREMENTAL' ? '2' : 'NONE' });
+    const savedState = await read(root, '.standards/STATE.md');
+    const savedPlan = await read(root, plan);
+    assert.deepEqual(messages(await check(root)), []);
+    await installProject({ projectRoot: root, clients: ['claude'] });
+    assert.equal(await read(root, '.standards/STATE.md'), savedState);
+    assert.equal(await read(root, plan), savedPlan);
+    assert.equal(await read(root, report), assessment);
+    await editState(root, (text) => setField(text, 'PendingVerificationCadence', 'NONE'));
+    assert.deepEqual(messages(await check(root)), []);
+  }
+}));
+
+test('a reused recovery frame with a latest FULL assignment cannot use an older increment to bypass completion', () => project(async (root) => {
+  const { plan, report } = await incrementalCycle(root);
+  await fillHeader(root, plan, { 'Verification Cadence': 'AFTER_IMPLEMENTATION', 'Current Increment': 'NONE' });
+  await fillHeader(root, report, { 'Assessment Purpose': 'FULL', 'Assessment Target': 'NONE' });
+  await write(root, report, `${await read(root, report)}\n## Resume or Handoff\n\n`
+    + suspendedAssignment({ purpose: 'INCREMENT', target: 'Increment 1' })
+    + '\n' + suspendedAssignment({ number: 2, purpose: 'FULL', target: 'NONE' }));
+  await editState(root, (text) => withFrame(setField(text, 'Kind', 'RESUME'),
+    { From: 'TESTING', Owner: 'ARCHITECTING', FailureType: 'ARCHITECTURE', ResumeAt: 'TESTING', RerunThrough: 'TESTING' }));
+  hasProblem(await check(root), /plan must be COMPLETE/);
+  await fillHeader(root, plan, { Status: 'COMPLETE' });
+  await write(root, plan, (await read(root, plan)).replace('`Status`: `PENDING`', '`Status`: `DONE`'));
+  assert.deepEqual(messages(await check(root)), []);
+}));

@@ -4,7 +4,8 @@ description: Follow a search feature from its request to your sign-off decision.
 ---
 
 This example adds **search by name and email to an existing user directory** and
-updates its user guide. It uses the standard workflow.
+updates its user guide. It uses the standard workflow with the default
+`AFTER_IMPLEMENTATION` verification cadence.
 
 It assumes an existing project set up for STANDARDS, with no active cycle. See
 [Installation and Setup](../installation/) to install the runtime and role
@@ -65,12 +66,17 @@ Read the plan, request changes if needed, and approve it before coding starts.
 Choose how to work:
 
 - **AUTONOMOUS:** the default; work through approved steps.
-- **STEPWISE:** complete and check one step, then wait for you to continue.
+- **STEPWISE:** review progress one completed step at a time.
 - **CODE_WITH_ME:** explain the next step and help with code you write.
 
 Developer saves progress and runs implementation checks. Important changes to
 the plan require approval again. See
 [Working with Developer](../../guides/working-with-developer/) for the details.
+
+To test outcomes as you build them, choose
+[incremental verification](../../guides/working-with-developer/#choose-when-tester-runs)
+in any collaboration mode. Developer and Tester then exchange checkpoints before
+their full completion gates and implementation review.
 
 ## 5. Test in a separate chat
 
