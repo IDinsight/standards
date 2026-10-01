@@ -73,9 +73,12 @@ Commit `.standards/` with your other changes. Each branch can carry one active
 cycle, and whoever checks out the branch continues that cycle from its saved
 state. To start over on a branch instead, including one created from a branch
 with an active cycle, cancel the cycle or run
-[`standards reset`](../../getting-started/installation/#reset-the-workflow).
-Before merging a branch into your main branch, reset it so the main branch keeps
-a fresh installation.
+[`standards reset`](../../getting-started/installation/#reset-the-workflow). If
+your main branch has STANDARDS installed, run `standards reset` in the feature
+branch before merging so main keeps a fresh installation. If main has no
+installation,
+[uninstall STANDARDS](../../getting-started/installation/#uninstall-from-a-project)
+on the feature branch before merging.
 
 If you merge two branches that both changed `.standards/` without a reset, you
 resolve the merge conflict yourself by keeping exactly one cycle in `STATE.md`.

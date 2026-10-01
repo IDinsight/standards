@@ -94,11 +94,15 @@ cycle. See [Human Decisions and Sign-off](../../concepts/human-decisions/).
 
 ## Before merging a branch
 
-Run [`standards reset`](../../getting-started/installation/#reset-the-workflow)
-on a branch before merging it into your main branch. The main branch then keeps
-a fresh installation, and branches created from it start with no cycle. To start
-over on a branch that carries a cycle, including one created from a branch with
-an active cycle, cancel the cycle or reset. If you merge two branches that both
-changed `.standards/` without a reset, you resolve the conflict yourself by
-keeping exactly one cycle in `STATE.md`. See
+If your main branch has STANDARDS installed, run
+[`standards reset`](../../getting-started/installation/#reset-the-workflow) on
+the feature branch before merging. The main branch then keeps a fresh
+installation, and branches created from it start with no cycle. If your main
+branch has no installation, you can instead
+[uninstall STANDARDS](../../getting-started/installation/#uninstall-from-a-project)
+on the feature branch before merging. To start over on a branch that carries a
+cycle, including one created from a branch with an active cycle, cancel the
+cycle or reset. If you merge two branches that both changed `.standards/`
+without a reset, you resolve the conflict yourself by keeping exactly one cycle
+in `STATE.md`. See
 [Branches and merges](../../reference/runtime-files/#branches-and-merges).

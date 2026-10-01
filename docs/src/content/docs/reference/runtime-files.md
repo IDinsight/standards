@@ -119,11 +119,15 @@ who checks out a branch continues its workflow where it was left.
 - To start over on a branch, including one created from a branch with an active
   cycle, cancel the cycle or run
   [`standards reset`](../../getting-started/installation/#reset-the-workflow).
-- Before merging a branch into your main branch, run `standards reset` on it.
-  The main branch then keeps a fresh installation instead of one branch's
-  workflow state, Auditor context, and cycle records, and every branch created
-  from it starts with no cycle. The reset also chooses the project mode from the
-  project's contents, so `MODE.md` stays accurate.
+- If your main branch has STANDARDS installed, run `standards reset` on the
+  branch before merging. The main branch then keeps a fresh installation instead
+  of one branch's workflow state, Auditor context, and cycle records. The reset
+  also chooses the project mode from the project's contents, so `MODE.md` stays
+  accurate.
+- If STANDARDS was installed only on the feature branch, you can
+  [uninstall it](../../getting-started/installation/#uninstall-from-a-project)
+  before merging into a main branch without STANDARDS. Save any records you need
+  first; uninstall removes the entire `.standards/` directory.
 
 If you merge two branches that both changed `.standards/` without a reset, git
 usually reports a merge conflict in `STATE.md`. Resolving it is your job, and it
