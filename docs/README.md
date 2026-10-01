@@ -44,9 +44,11 @@ pnpm run docs:preview
 
 Stable tags from v0.7.4 onward are included automatically, sorted numerically.
 Release pages, navigation, and authoritative reference sources come from each
-tag. The current checkout supplies the shared rendering components and build
-tools. Historical sources are extracted into temporary directories rather than
-copied into the repository. Each snapshot has its own search index.
+tag. The Roadmap is current project information, so its page and sidebar entry
+are shared across versions. The current checkout also supplies the shared
+rendering components and build tools. Historical sources are extracted into
+temporary directories rather than copied into the repository. Each snapshot has
+its own search index.
 
 Ordinary `docs:dev` and `docs:build` show only the current checkout, labeled
 **Next (unreleased)**. Use the combined build to test version switching.
