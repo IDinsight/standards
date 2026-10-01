@@ -46,8 +46,9 @@ earlier one. This preserves both pieces of unfinished work.
 ## Correct, then decide what to repeat
 
 The role responsible for the active correction fixes it and passes its
-completion checks. That role then decides which completed steps need to run
-again.
+applicable checks. It then decides which already-produced work needs to run
+again, including affected implementation or tested increments in unfinished
+phases. Unimplemented future work alone does not require a rerun.
 
 If no steps need repeating, the frame is removed and work returns directly to
 `ResumeAt`. Otherwise, the frame stays while the affected roles repeat their
@@ -67,6 +68,21 @@ Each role still requires explicit invocation. Recovery does not automatically
 dispatch the next role.
 
 ## When a correction must return before full completion
+
+Developer and Tester can correct a specific defect or repeat affected checks
+without completing unrelated future implementation. They save the interrupted
+assignment in their existing plan or report before routing the correction, then
+restore it and reconcile changed inputs on return. This applies with either
+verification cadence; switching cadence does not change a recovery assignment or
+its return route.
+
+For example, Developer may need Tester to fix an assertion while later build
+steps are still pending. Tester verifies the correction and returns so Developer
+can continue those steps. The report remains incomplete. Nested corrections
+preserve each interrupted assignment, and ordinary incremental checkpoints
+resume only after recovery ends. Every return to Reviewer still requires full
+Developer and Tester completion. See the
+[implementation and verification recovery gates](../../reference/protocol/#implementation-and-verification-recovery-gates).
 
 Documenter or Synchronizer may need to fix something for an earlier role that
 has not finished its own work. Requiring that unfinished work before returning

@@ -333,14 +333,22 @@ standard work and continues from Auditor. See
 So you stay in control of when each step happens and where it runs. When a role
 finishes, it saves its work and gives you the command for the next role. You
 decide when to run it and in which chat. That matters for Tester and Reviewer,
-which need a fresh chat that only you can open.
+which need conversations separate from the work's authors.
 
 The saved workflow state decides which role is allowed to work next, but it
 never starts a role on its own. The installer also turns off automatic skill use
 in both coding agents, so a role runs only when you call it. See
 [Human Decisions and Sign-off](../concepts/human-decisions/#run-each-role-explicitly).
 
-### Why do Tester and Reviewer need a fresh chat? Should I switch models?
+### Can Developer and Tester go back and forth as I code?
+
+Yes. Choose `INCREMENTAL` verification in a standard cycle and keep separate
+Developer and Tester chats open. All three Developer modes support it, and you
+can switch back to `AFTER_IMPLEMENTATION` during the cycle. See
+[Working with Developer](../guides/working-with-developer/#choose-when-tester-runs)
+for testable increments, handoffs, and when a switch takes effect.
+
+### Why do Tester and Reviewer need separate chats? Should I switch models?
 
 A check is only useful if it isn't shaped by the reasoning that produced the
 work. Tester runs in a chat separate from Developer's implementation chat.
@@ -348,6 +356,10 @@ Reviewer runs in a chat separate from every chat that produced the work under
 review: the requirements, design, project context, code, tests, and
 documentation. Both work from the saved files and evidence, not from what the
 author said.
+
+Tester can reuse its independent chat for later increments and corrections;
+Reviewer can resume its own assessment chat. Switching roles in an authoring
+chat does not remove that history.
 
 For Reviewer, a different model of equal or higher capability is recommended
 when you can choose one, but it's optional. The separate chat is required either

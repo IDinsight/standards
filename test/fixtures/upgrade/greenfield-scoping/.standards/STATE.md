@@ -10,6 +10,8 @@
 `Architecture`: `NONE` `Development`: `NONE` `PromotionReason`: `NONE`
 `AuditTarget`: `NONE` `BlockedOn`: `NONE`
 
+`PendingVerificationCadence`: `NONE`
+
 `BaselineReconciliation`: `NONE`
 
 ## Handoff

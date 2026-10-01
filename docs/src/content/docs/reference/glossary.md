@@ -16,9 +16,9 @@ or execution order. See
 ## Active work
 
 The `Active Work` section in `STATE.md`: the cycle's ID, request, document
-paths, promotion reason, audit target, unresolved cancelled changes, and
-blocking question. After retained cancellation or sign-off, it describes the
-last cycle until a new one replaces it.
+paths, promotion reason, audit target, unresolved cancelled changes, pending
+verification cadence, and blocking question. After retained cancellation or
+sign-off, it describes the last cycle until a new one replaces it.
 
 ## Artifact provenance
 
@@ -26,6 +26,13 @@ A marker in a workflow document that identifies its type and owning cycle.
 Review reports also name the review kind. Moving or renaming the file does not
 change its ownership. See
 [file ownership](../../concepts/ownership/#artifact-provenance).
+
+## Assessment purpose
+
+The scope of Tester's current assignment: `FULL` for the whole implementation,
+`INCREMENT` for a selected testable outcome, or `CORRECTION` for a specific
+recovery task. It is separate from Tester's VERIFY and REVERIFY modes. See
+[Tester](../../roles/tester/#inputs-and-output).
 
 ## Baseline
 
@@ -40,6 +47,13 @@ the project, which were reverted, and which still need a decision.
 `Active Work.BaselineReconciliation` keeps each source cycle's ID and request
 until all sources are resolved.
 
+## Checkpoint handoff
+
+A normal Developer-to-Tester assignment of a ready increment or Tester's
+verified return to Developer. It keeps the cycle's implementation or
+verification in progress and creates no recovery frame. See
+[incremental verification](../../guides/working-with-developer/#alternate-between-two-chats).
+
 ## Completed scope
 
 A saved scope that has passed Scoper's completion checks. Separate user approval
@@ -47,10 +61,10 @@ is needed only if the project requires it.
 
 ## Completion gate
 
-The checks a role must pass before moving to the next normal workflow step. In
-limited cases, a role fixing a problem may return work to the interrupted step
-before passing all its usual checks. See the
-[Documenter and Synchronizer exceptions](../../concepts/recovery/#when-a-correction-must-return-before-full-completion).
+The checks a role must pass before full completion. An incremental checkpoint
+uses an assignment gate, and a scoped correction can return before unrelated
+work is finished. See the
+[corrective return rules](../../concepts/recovery/#when-a-correction-must-return-before-full-completion).
 
 ## Cycle
 
@@ -74,9 +88,10 @@ available project evidence.
 
 ## Development plan
 
-Developer's saved implementation steps, approval status, collaboration choices,
-and progress. The initial plan and material revisions need approval before
-implementation. See [Developer](../../roles/developer/).
+Developer's saved implementation steps, approval status, collaboration mode,
+verification cadence, increments, and progress. The initial plan and material
+revisions need approval before implementation. See
+[Developer](../../roles/developer/).
 
 ## Development step
 
@@ -158,7 +173,7 @@ handoff. See
 ## Recovery frame
 
 A saved correction and its return instructions: who fixes it, why, where
-interrupted work resumes, and which completed steps need repeating. Nested
+interrupted work resumes, and which affected work needs repeating. Nested
 corrections are handled newest first. See [Recovery](../../concepts/recovery/).
 
 ## Resume handoff
@@ -228,6 +243,13 @@ A technical condition Architect derives from a scope acceptance condition. It
 references the existing acceptance ID rather than creating a new requirement
 identity.
 
+## Testable increment
+
+An observable implementation outcome ready for independent testing, usually one
+acceptance condition or a small dependent group. It can span multiple
+development steps and revisit previously tested work. See
+[Working with Developer](../../guides/working-with-developer/#choose-when-tester-runs).
+
 ## User style
 
 A Markdown file of your personal preferences for one role, kept at
@@ -235,11 +257,19 @@ A Markdown file of your personal preferences for one role, kept at
 select it by name, and only to discretionary choices. See
 [user styles](../runtime-files/#user-styles).
 
+## Verification cadence
+
+When Developer hands work to Tester in a standard cycle: `AFTER_IMPLEMENTATION`
+(the default) or `INCREMENTAL`. It is independent of Developer's collaboration
+mode. See
+[choosing and switching cadence](../../guides/working-with-developer/#choose-when-tester-runs).
+
 ## Verification report
 
-Tester's record of acceptance coverage, test-scenario allocations, actual
-results, gaps, and permitted later-role dependencies. It belongs to a cycle and
-is separate from reusable test files. See the [template](../templates/tester/).
+Tester's record of its current assessment assignment, increment history,
+acceptance coverage, test-scenario allocations, actual results, gaps, and
+permitted dependencies. It belongs to a cycle and is separate from reusable test
+files. See the [template](../templates/tester/).
 
 ## Workflow state
 

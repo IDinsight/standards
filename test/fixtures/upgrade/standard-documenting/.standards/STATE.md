@@ -12,6 +12,8 @@
 `.standards/docs/development/export-csv-20260905T090000Z-4d5e6f7a.md`
 `PromotionReason`: `NONE` `AuditTarget`: `NONE` `BlockedOn`: `NONE`
 
+`PendingVerificationCadence`: `NONE`
+
 `BaselineReconciliation`: `NONE`
 
 ## Handoff

@@ -10,16 +10,16 @@ choose a template or fill one out yourself. Each template page comes from
 
 ## Templates by role
 
-| Role         | Document                                             | What it records                                                |
-| ------------ | ---------------------------------------------------- | -------------------------------------------------------------- |
-| Scoper       | [Scope](../templates/scoper/)                        | Goals, boundaries, and checkable outcomes.                     |
-| Architect    | [Technical design](../templates/architect/)          | Design decisions and how they support the requirements.        |
-| Developer    | [Development plan](../templates/developer/)          | Implementation steps, approval, progress, and checks.          |
-| Auditor      | [Project context](../templates/auditor/)             | Relevant facts about the existing project.                     |
-| Tester       | [Verification report](../templates/tester/)          | Test coverage, results, and remaining gaps.                    |
-| Reviewer     | [Review report](../templates/reviewer/)              | Independent assessment, findings, and conclusions.             |
-| Documenter   | [Documentation record](../templates/documenter/)     | Documentation checked or changed, results, and remaining work. |
-| Synchronizer | [Synchronization record](../templates/synchronizer/) | Whether current files and completed assessments still agree.   |
+| Role         | Document                                             | What it records                                                  |
+| ------------ | ---------------------------------------------------- | ---------------------------------------------------------------- |
+| Scoper       | [Scope](../templates/scoper/)                        | Goals, boundaries, and checkable outcomes.                       |
+| Architect    | [Technical design](../templates/architect/)          | Design decisions and how they support the requirements.          |
+| Developer    | [Development plan](../templates/developer/)          | Steps, approval, verification cadence, increments, and progress. |
+| Auditor      | [Project context](../templates/auditor/)             | Relevant facts about the existing project.                       |
+| Tester       | [Verification report](../templates/tester/)          | Assessment assignments, coverage, results, and remaining gaps.   |
+| Reviewer     | [Review report](../templates/reviewer/)              | Independent assessment, findings, and conclusions.               |
+| Documenter   | [Documentation record](../templates/documenter/)     | Documentation checked or changed, results, and remaining work.   |
+| Synchronizer | [Synchronization record](../templates/synchronizer/) | Whether current files and completed assessments still agree.     |
 
 Navigator has no template or saved report. Its explanations and quiz feedback
 stay in the conversation.

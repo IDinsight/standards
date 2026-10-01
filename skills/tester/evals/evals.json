@@ -361,6 +361,82 @@
         "It does not make a forward handoff to Reviewer while the problem remains",
         "After the preflight reports the Developer-owned plan defect, it does not create or modify tests, run implementation verification, or record new verification results before the failure handoff. Inspection and workflow/report updates needed to explain and route the defect are permitted."
       ]
+    },
+    {
+      "id": 31,
+      "prompt": "Continue as Tester in the existing independent Tester chat, which has never contained Developer authoring history, on the same STANDARD cycle and checkout. State is TESTING with CHECKPOINT from DEVELOPING, FailureType NONE, Reason 'Increment 2 ready.' The IN_PROGRESS incremental plan selects 2. Increment 1 verified DEV-001 / AC-001; Increment 2 groups DEV-001 and DEV-002 for AC-001 and AC-002. DEV-001's implementation changed while adding DEV-002; both are DONE with self-checks. DEV-003 / AC-003 is an approved future outcome and remains PENDING. The report is still IN_PROGRESS / INCREMENT / Increment 1, contains prior evidence and scenario allocations, and a test for AC-001 now asserts the obsolete behavior.",
+      "expected_output": "Tester reconciles the new assignment, reverifies changed earlier behavior, replaces obsolete coverage with recorded reasons, and returns Increment 2 to Developer.",
+      "files": [],
+      "assertions": [
+        "It accepts reuse of the independent Tester chat and reloads state, plan, source, tests, and report rather than requiring a new chat per increment.",
+        "It sets Assessment Purpose INCREMENT and Assessment Target Increment 2 while retaining prior increment history and the full AC inventory, including AC-003 as AWAITING_IMPLEMENTATION.",
+        "It compares assessed input identities, updates or removes the obsolete test, and records why earlier evidence is invalid and what replaces it.",
+        "It carries the scenario budget across increments; a replacement for the same scenario retains its allocation and a materially new scenario consumes a new one.",
+        "It persists current execution evidence and a VERIFIED Increment 2 assessment only after satisfying the grouped outcome.",
+        "It returns via CHECKPOINT to DEVELOPING with FailureType NONE, does not edit Current Increment, and keeps report Status IN_PROGRESS."
+      ]
+    },
+    {
+      "id": 32,
+      "prompt": "Continue as independent Tester on STANDARD Increment 1 at TESTING under a CHECKPOINT from Developer. The plan is IN_PROGRESS with effective INCREMENTAL cadence and Current Increment 1; future DEV-002 is pending. The report is IN_PROGRESS / INCREMENT / Increment 1. An earlier request to switch to AFTER_IMPLEMENTATION is already recorded in PendingVerificationCadence and has not been applied. Before this assessment finishes, the user changes their mind and explicitly requests INCREMENTAL.",
+      "expected_output": "Tester cancels the opposite pending request and finishes the already assigned increment under the unchanged effective cadence.",
+      "files": [],
+      "assertions": [
+        "The latest explicit INCREMENTAL choice matches the effective setting, so it clears the opposite pending intent to NONE.",
+        "It does not edit the Developer-owned cadence or Current Increment, restart the assessment, or leave future work as a reason to abandon the current assignment.",
+        "It completes required testing and returns to Developer through CHECKPOINT before another implementation assignment."
+      ]
+    },
+    {
+      "id": 33,
+      "prompt": "Continue as independent Tester on STANDARD Increment 1. The plan is IN_PROGRESS with INCREMENTAL / 1 and future DEV-003 PENDING. Tester finds an implementation defect, saves its INCREMENT / Increment 1 assignment for Frame 1, and routes to Developer. During that repair Developer discovers a test defect and saves a corrective assignment for Frame 2 before returning to Tester. Tester now owns the test correction. A cadence switch to AFTER_IMPLEMENTATION is pending.",
+      "expected_output": "Tester completes the nested test correction and returns to Developer by RESUME, preserving the original incremental assignment for its later return.",
+      "files": [],
+      "assertions": [
+        "It uses CORRECTION with a concrete target for the nested Developer-origin test defect and preserves the full current AC inventory, including AWAITING_IMPLEMENTATION for unrelated future work.",
+        "It preserves the existing suspended assignments and their frame labels, exact recovery Reasons, assessed input identities, and next actions; it does not overwrite the original INCREMENT / Increment 1 assignment.",
+        "After satisfying the scoped correction gate, it pops only Frame 2, persists RESUME to Developer, and stops Tester work. The report retains CORRECTION until a later assignment; it does not prematurely restore Increment 1 or continue Developer's repair.",
+        "It does not infer assignment scope from the pending cadence or require completion of DEV-003 during scoped recovery.",
+        "It leaves cadence application pending until normal Developer work resumes and does not use CHECKPOINT while recovery is active."
+      ]
+    },
+    {
+      "id": 34,
+      "prompt": "Continue as independent Tester in STANDARD at TESTING with CHECKPOINT from Developer for Increment 1. The plan is IN_PROGRESS with INCREMENTAL / 1 and future implementation pending; the report has INCREMENT / Increment 1. Tester discovers that its own new assertion used the wrong fixture, a VERIFICATION defect it can fix without another role.",
+      "expected_output": "Tester corrects its test under the current increment assignment and verifies the corrected inputs without inventing a cross-role recovery frame.",
+      "files": [],
+      "assertions": [
+        "It records the same-state VERIFICATION failure while retaining INCREMENT / Increment 1 rather than changing to a separate CORRECTION assignment.",
+        "It fixes the test mistake, reconciles affected evidence, and records the actual rerun and assessed inputs.",
+        "It reuses the existing scenario allocation for the corrected scenario and does not reset the budget.",
+        "It creates no recovery frame for the same-state correction and returns the verified increment to Developer only after its assigned outcome passes."
+      ]
+    },
+    {
+      "id": 35,
+      "prompt": "Continue as independent Tester in STANDARD at TESTING after Developer's final FORWARD handoff. The incremental plan is COMPLETE, Current Increment NONE, and every approved step is DONE. The report is IN_PROGRESS / INCREMENT / Increment 2 and contains historical VERIFIED and SUPERSEDED increment rows, an AWAITING_IMPLEMENTATION acceptance row, and scenario allocations near the limit. Later source and fixture changes affected earlier AC evidence. The user requests AFTER_IMPLEMENTATION, but no implementation or increment scheduling remains.",
+      "expected_output": "Tester performs a FULL assessment of the final contract, reconciles current coverage and budget, clears ineffective pending intent, and enters Reviewer only after full completion.",
+      "files": [],
+      "assertions": [
+        "It sets Assessment Purpose FULL and Assessment Target NONE and reconciles all current ACs and technical criteria against final inputs.",
+        "It preserves increment history but does not count SUPERSEDED rows or historical summaries as current Acceptance Evidence.",
+        "It reuses evidence only when its inputs and outcomes remain valid, reruns affected coverage, and resolves every AWAITING_IMPLEMENTATION row before COMPLETE.",
+        "It carries existing scenario allocations; if required new coverage exceeds the budget, it persists a targeted increase request and blocks full completion until resolved.",
+        "It clears pending cadence intent without adding a Developer return merely to switch scheduling after all work is complete.",
+        "It persists COMPLETE and a FORWARD handoff to Reviewer only when the full verification gate passes."
+      ]
+    },
+    {
+      "id": 36,
+      "prompt": "Continue as independent Tester in STANDARD at TESTING for CHECKPOINT Increment 1. The IN_PROGRESS plan selects 1 with INCREMENTAL cadence. DEV-001 / AC-001 is DONE and self-checked; DEV-002 / AC-002 is an unrelated future outcome and PENDING. The report is IN_PROGRESS / INCREMENT / Increment 1 and accounts for AC-002 as AWAITING_IMPLEMENTATION. An AC-001 acceptance boundary still lacks a test or equivalent check, although its happy-path test passes.",
+      "expected_output": "Tester focuses on the assigned testable outcome, leaves the future outcome awaiting implementation, and does not certify Increment 1 until its missing required boundary evidence is resolved.",
+      "files": [],
+      "assertions": [
+        "It preserves the full AC inventory and does not demand that Developer finish the unrelated AC-002 outcome before this checkpoint.",
+        "It obtains or records the missing required AC-001 evidence within the scenario budget, asking for a targeted increase if necessary.",
+        "It does not mark Increment 1 VERIFIED or return a passing checkpoint based only on the happy-path subset.",
+        "It keeps the report IN_PROGRESS and does not represent a verified increment as full verification completion."
+      ]
     }
   ]
 }

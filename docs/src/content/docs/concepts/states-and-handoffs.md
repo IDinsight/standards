@@ -64,8 +64,10 @@ at any time without changing that state.
 <!-- markdownlint-enable MD033 -->
 
 The arrows show normal forward handoffs. Each role must finish its required
-checks, and you explicitly invoke the next role. Corrections may follow a
-[recovery route](../recovery/) instead.
+checks, and you explicitly invoke the next role. With
+[incremental verification](../../guides/working-with-developer/#choose-when-tester-runs),
+Developer and Tester can alternate through checkpoints before implementation
+review. Corrections follow a [recovery route](../recovery/) instead.
 
 ## Standard forward paths
 
@@ -143,14 +145,16 @@ the active recovery frame.
 
 Handoffs to Tester and Reviewer require separate conversations:
 
-- **Tester:** use a fresh chat separate from Developer's implementation chat.
+- **Tester:** use an existing independent Tester chat or a fresh one separate
+  from Developer's implementation chat.
 - **Reviewer:** use a fresh chat separate from all conversations that authored
   the work being reviewed, including requirements, design, context, code, tests,
   and documentation.
 
 This applies during recovery too. Either role can resume its own independent
 assessment chat. Starting a different role in the authoring chat does not erase
-its history.
+its history. During a Developer/Tester exchange, use the same cycle and checkout
+and work in only the role assigned by the saved state at a time.
 
 A different model of equal or higher capability is recommended for Reviewer when
 those details are known, but is optional. Unknown session or model details must

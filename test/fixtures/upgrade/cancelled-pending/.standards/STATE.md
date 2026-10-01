@@ -13,6 +13,8 @@
 `.standards/docs/development/invoice-cache-20260903T150000Z-9c0d1e2f.md`
 `PromotionReason`: `NONE` `AuditTarget`: `NONE` `BlockedOn`: `NONE`
 
+`PendingVerificationCadence`: `NONE`
+
 `BaselineReconciliation`:
 
 - `SourceCycle`: `admin-notes-20260901T080000Z-3a4b5c6d` `Request`:

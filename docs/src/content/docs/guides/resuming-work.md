@@ -35,9 +35,10 @@ for what the files contain.
 
 The role decides how to continue from its own saved work:
 
-- **Developer** checks the saved plan and current code, then continues from the
-  first incomplete approved step with the user style saved in the plan. If the
-  plan needs a material revision, it asks for your approval before coding. See
+- **Developer** checks the saved plan, assigned increment or correction, and
+  current code, then selects the next dependency-ready approved step with the
+  user style saved in the plan. If the plan needs a material revision, it asks
+  for your approval before coding. See
   [Working with Developer](../working-with-developer/#resume-or-correct-implementation).
 - **Tester** checks its earlier verification report and current files. It
   decides whether it can continue an interrupted check or needs to reassess

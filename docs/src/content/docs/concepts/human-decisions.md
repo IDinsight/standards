@@ -45,8 +45,10 @@ important implementation work require approval again. Fixing a defect within an
 unchanged approved plan does not.
 
 [Developer's modes](../../roles/developer/#modes) let you choose whether it
-works through approved steps, pauses after each step, or codes with you.
-Choosing a mode does not replace plan approval.
+works through approved steps, pauses after each step, or codes with you. You can
+also choose or switch
+[verification cadence](../../guides/working-with-developer/#switch-cadence-during-a-cycle)
+to control when Tester receives work. Neither choice replaces plan approval.
 
 Scoper's completion does not add a separate approval step unless your project
 requires one.
