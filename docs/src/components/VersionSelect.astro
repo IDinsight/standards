@@ -1,0 +1,116 @@
+---
+import { getVersionContext } from "../versioning/context.mjs";
+import { SITE_BASE } from "../versioning/versions.mjs";
+
+const context = getVersionContext();
+---
+
+<docs-version-select
+  data-current-version={context.currentVersion}
+  data-base={context.currentBase}
+  data-manifest={SITE_BASE + "versions.json"}
+  data-pagefind-ignore
+>
+  <label>
+    <span class="sr-only">Documentation version</span>
+    <select disabled>
+      {context.versions.map((version) => (
+        <option
+          value={version.id}
+          data-href={version.base}
+          selected={version.id === context.currentVersion}
+        >
+          {version.label}
+        </option>
+      ))}
+    </select>
+  </label>
+  <noscript>
+    {context.versions.map((version) => <a href={version.base}>{version.label}</a>)}
+  </noscript>
+</docs-version-select>
+
+<script>
+  import { resolveVersionTarget } from "../versioning/versions.mjs";
+
+  type VersionManifest = {
+    versions: Array<{
+      id: string;
+      base: string;
+      pages: Record<string, string[]>;
+    }>;
+  };
+  let manifest: Promise<VersionManifest> | undefined;
+
+  class DocsVersionSelect extends HTMLElement {
+    connectedCallback() {
+      const select = this.querySelector("select");
+      if (!select) return;
+      const restore = () => {
+        select.value = this.dataset.currentVersion || "next";
+        select.disabled = select.options.length < 2;
+      };
+      restore();
+      window.addEventListener("pageshow", restore);
+      select.addEventListener("change", async () => {
+        const chosen = select.value;
+        const fallback = select.selectedOptions[0]?.dataset.href || this.dataset.base || "/";
+        select.disabled = true;
+        try {
+          manifest ??= fetch(this.dataset.manifest || "").then((response) => {
+            if (!response.ok) throw new Error("Version manifest unavailable");
+            return response.json();
+          });
+          const { versions } = await manifest;
+          window.location.assign(resolveVersionTarget(
+            versions,
+            this.dataset.base || "/",
+            chosen,
+            window.location.href,
+          ));
+        } catch {
+          window.location.assign(fallback);
+        }
+      });
+    }
+  }
+
+  customElements.define("docs-version-select", DocsVersionSelect);
+</script>
+
+<style>
+  docs-version-select {
+    display: inline-flex;
+    align-items: center;
+    min-width: 0;
+  }
+
+  select {
+    max-width: 12rem;
+    padding: 0.35rem 0.5rem;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.4rem;
+    background-color: var(--sl-color-bg-nav);
+    color: var(--sl-color-text);
+    font: inherit;
+    font-size: 0.8125rem;
+    cursor: pointer;
+  }
+
+  select:focus-visible {
+    outline: 2px solid var(--sl-color-text-accent);
+    outline-offset: 2px;
+  }
+
+  select:disabled {
+    opacity: 1;
+    cursor: default;
+  }
+
+  noscript {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    font-size: 0.8125rem;
+  }
+</style>

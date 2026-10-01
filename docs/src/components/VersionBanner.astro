@@ -1,0 +1,35 @@
+---
+import Banner from "@astrojs/starlight/components/Banner.astro";
+import { getVersionContext } from "../versioning/context.mjs";
+
+const context = getVersionContext();
+const current = context.versions.find((version) => version.id === context.currentVersion);
+const latest = context.versions.find((version) => version.latest);
+const development = current?.kind === "development";
+const older = current?.kind === "release" && !current.latest;
+---
+
+{(development || older) && (
+  <aside class="version-notice" aria-label="Documentation version" data-pagefind-ignore>
+    {development
+      ? "You are reading development documentation for unreleased changes."
+      : "You are reading the documentation for v" + context.currentVersion + "."}
+    {latest && <> <a href={latest.base}>View the latest stable documentation.</a></>}
+  </aside>
+)}
+<Banner />
+
+<style>
+  .version-notice {
+    padding: 0.75rem var(--sl-nav-pad-x);
+    border-bottom: 1px solid var(--sl-color-hairline);
+    background: var(--sl-color-accent-low);
+    color: var(--sl-color-text);
+    font-size: 0.875rem;
+    text-align: center;
+  }
+
+  a {
+    color: var(--sl-color-text-accent);
+  }
+</style>

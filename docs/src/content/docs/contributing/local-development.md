@@ -47,6 +47,33 @@ pnpm run docs:preview
 
 Rebuild after further edits so the production preview includes them.
 
+## Preview documentation versions
+
+The public site shows the latest stable release at `/standards/`, archived
+releases at `/standards/v/<version>/`, and development docs at
+`/standards/next/`. The version selector keeps the current page and heading when
+they exist in the chosen version, or opens its overview if the page is absent.
+Older releases and Next display a banner; each version searches its own pages.
+
+To build the complete site locally:
+
+```sh
+git fetch --tags
+pnpm run docs:build:versions
+pnpm run docs:check-links
+pnpm run docs:preview
+```
+
+The build includes stable release tags from v0.7.4 onward automatically. Tagged
+pages, navigation, protocol, installer, and templates come from that release;
+the current checkout provides the shared rendering tools and components. New
+content appears in Next until it is tagged as a release. Archives are rebuilt
+from tags without committing duplicate documentation trees.
+
+Ordinary `docs:dev` and `docs:build` show the current checkout as **Next
+(unreleased)**, with no other versions available. Use the combined build to
+verify the selector and links across versions.
+
 ## Validate the installer
 
 ```sh
@@ -169,9 +196,12 @@ The repository runs these checks for pull requests:
 - **Linting:** runs the Markdown and JavaScript checks.
 - **Secret Scan:** checks pull requests targeting `main` for verified secrets.
 
-The documentation workflow also runs on pushes to `main` and manual runs. After
-a successful build, it deploys only non-PR runs on `main` to GitHub Pages. The
-repository's Pages source must be **GitHub Actions**.
+The documentation workflow builds all supported versions on pull requests,
+pushes to `main`, stable release tag pushes, and manual runs. It deploys
+successful non-PR runs on `main` or release tags to GitHub Pages. Tag-triggered
+runs check out `main` to keep Next current and fetch all release tags. The
+repository's Pages source must be **GitHub Actions**. If the `github-pages`
+environment restricts deployment branches and tags, allow `main` and `v*` tags.
 
 `docs/astro.config.mjs` sets the site to
 [the STANDARDS documentation](https://idinsight.github.io/standards/) and the

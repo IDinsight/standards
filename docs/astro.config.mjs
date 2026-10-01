@@ -1,5 +1,5 @@
 import { defineConfig } from "astro/config";
-import starlight from "@astrojs/starlight";
+import starlight from "./versioning.mjs";
 
 export default defineConfig({
   site: "https://idinsight.github.io",
