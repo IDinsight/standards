@@ -37,7 +37,9 @@ there instead.
 Installing on a feature branch also works, but other branches will not inherit
 STANDARDS until that installation is merged into the branch they start from. See
 [Branches and merges](../../reference/runtime-files/#branches-and-merges) for
-guidance on workflow state and resets after installation.
+guidance on workflow state and resets after installation. If you want `main` to
+remain without STANDARDS, see the
+[feature-branch-only workflow](../../faq/#can-i-use-standards-only-on-a-feature-branch).
 
 ## Choose a project mode and coding agent
 

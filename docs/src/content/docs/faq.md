@@ -273,21 +273,40 @@ branch continues its cycle from the saved state, so a teammate can pick up your
 work. A teammate who didn't write the work can also run Tester or Reviewer in
 their own chat.
 
-You can't run two cycles on the same branch at once. Before merging a branch
-into your main branch, reset it, as the next question explains.
+You can't run two cycles on the same branch at once. Before merging, run
+`standards reset` in the feature branch if STANDARDS will remain installed on
+`main`, or run `standards uninstall` there if `main` has no installation, as the
+next two questions explain.
 
 ### What do I do with `.standards/` when I merge a branch?
 
-Finish or cancel the branch's cycle, reset the branch, commit the result, and
-then merge. The main branch then keeps a clean installation with no cycle in
-progress, and every new branch starts fresh. Reset deletes the branch's workflow
-state, project context, and cycle records.
+If `main` has STANDARDS installed, finish or cancel the feature branch's cycle,
+run `standards reset` in that branch, commit the resulting changes, and then
+merge. The main branch keeps a clean installation with no cycle in progress, and
+every new branch starts fresh. The command deletes the branch's workflow state,
+project context, and cycle records.
 
 If you merge two branches that both changed `.standards/` without resetting, git
 will usually report a conflict in `.standards/STATE.md`. Resolve it by keeping
 exactly one cycle. Agents will stop and ask you to resolve conflicts in
 `.standards/` rather than picking a "best" merge solution. See
 [Branches and merges](../reference/runtime-files/#branches-and-merges).
+
+### Can I use STANDARDS only on a feature branch?
+
+Yes. If `main` has no STANDARDS installation, create a feature branch and
+[install STANDARDS](../getting-started/installation/) there. You can commit its
+files while working so the branch's cycle can be resumed or shared. Finish and
+sign off or cancel the cycle before preparing the pull request.
+
+Before opening the pull request, stop active agent work and save any cycle
+records or user styles you want to keep outside `.standards/`. Preview
+[`standards uninstall`](../getting-started/installation/#uninstall-from-a-project)
+with `--dry-run`, then run it on the feature branch and commit the removal.
+Review the pull request diff to confirm that no STANDARDS installation files
+will be added to `main`. Your implementation, tests, and project documentation
+outside the installation remain. Use `standards reset` instead when you want
+STANDARDS to remain installed on `main`.
 
 ### Can I edit `STATE.md` or the workflow records by hand?
 

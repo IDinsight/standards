@@ -264,11 +264,16 @@ which anyone who checks out the branch continues where it was left.
 - To start over on a branch, including one created from a branch with an active
   cycle, the user cancels the cycle or runs **Project Reset** in
   `.standards/protocol/installation.md`.
-- Once a branch's cycle is signed off or cancelled, the user runs **Project
-  Reset** (in `.standards/protocol/installation.md`) on it before merging it
-  into the main branch. The main branch then keeps a fresh installation with an
-  accurate `MODE.md` instead of one branch's workflow state, Auditor context,
-  and cycle records, and every branch created from it starts with no cycle.
+- If the main branch has STANDARDS installed, once a branch's cycle is signed
+  off or cancelled, the user runs **Project Reset** (in
+  `.standards/protocol/installation.md`) before merging. The main branch then
+  keeps a fresh installation with an accurate `MODE.md` instead of one branch's
+  workflow state, Auditor context, and cycle records, and every branch created
+  from it starts with no cycle.
+- If the main branch has no STANDARDS installation, the user may instead run
+  **Project Uninstallation** (in `.standards/protocol/installation.md`) on the
+  feature branch before merging. Uninstallation removes the branch's runtime
+  and cycle records while leaving project work outside the installation.
 
 Merging two branches that both changed `.standards/` without a reset usually
 conflicts in `STATE.md`. The user resolves it by keeping exactly one cycle; the

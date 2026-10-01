@@ -103,9 +103,12 @@ reference-generation commands.
 
 ## Install, Reset, and Uninstall
 
-For a first installation, get STANDARDS onto your main branch before creating
-feature branches; see
+For a shared installation, we recommend getting STANDARDS onto your main branch
+before creating feature branches; see
 [Choose a branch for the first installation](docs/src/content/docs/getting-started/installation.md#choose-a-branch-for-the-first-installation).
+You can also
+[use it only on a feature branch](docs/src/content/docs/faq.md#can-i-use-standards-only-on-a-feature-branch)
+and uninstall it before merging into a main branch without STANDARDS.
 
 Install the latest public release with Node.js 22.12 or newer:
 
@@ -198,14 +201,16 @@ project/
 `STATE.md` is the persisted coordination record for the active cycle, including
 its `WorkflowState`, `CycleMode`, and pending-cycle coordination fields. Commit
 `.standards/` with the project, so anyone who checks out a branch continues its
-workflow; each branch carries at most one active cycle. Run `standards reset` on
-a branch before merging it into the main branch, so the main branch keeps a
-fresh installation. If you merge branches whose `.standards/` files both changed
-without a reset, you resolve the merge conflict by keeping exactly one cycle in
-`STATE.md`. A role applies a user style from `.standards/user-styles/<role>/`
-only when you select it by name. Role ownership, standard and expedited forward
-transitions, promotion, recovery, user intervention, project-mode changes,
-cancellation/reset behavior, project context, and user styles are defined only
-in [`PROTOCOL.md`](PROTOCOL.md) and its chapters in [`protocol/`](protocol/),
-and installation ownership checks and client-setting preservation only in
-[`INSTALLER.md`](INSTALLER.md); they are intentionally not restated here.
+workflow; each branch carries at most one active cycle. If the main branch has
+STANDARDS installed, run `standards reset` on a branch before merging so main
+keeps a fresh installation. If main has no installation, uninstall STANDARDS on
+the feature branch before merging. If you merge branches whose `.standards/`
+files both changed without a reset, resolve the merge conflict by keeping
+exactly one cycle in `STATE.md`. A role applies a user style from
+`.standards/user-styles/<role>/` only when you select it by name. Role
+ownership, standard and expedited forward transitions, promotion, recovery, user
+intervention, project-mode changes, cancellation/reset behavior, project
+context, and user styles are defined only in [`PROTOCOL.md`](PROTOCOL.md) and
+its chapters in [`protocol/`](protocol/), and installation ownership checks and
+client-setting preservation only in [`INSTALLER.md`](INSTALLER.md); they are
+intentionally not restated here.
