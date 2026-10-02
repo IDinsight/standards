@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.0](https://github.com/IDinsight/standards/compare/v0.8.0...v0.9.0) (2026-10-02)
+
+
+### Features
+
+* **docs:** publish only released documentation versions ([ed367f5](https://github.com/IDinsight/standards/commit/ed367f5d34793baa4c1952c4a5f279e8b27a7a92))
+
 ## [0.8.0](https://github.com/IDinsight/standards/compare/v0.7.4...v0.8.0) (2026-10-01)
 
 
