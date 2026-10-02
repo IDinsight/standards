@@ -12,6 +12,26 @@ You choose which role to run, approve the implementation plan, and decide
 whether to accept the finished work. Progress stays in project files so you can
 continue in another chat.
 
+## Quickstart
+
+1. In your project directory, with Node.js 22.12 or newer, install STANDARDS:
+
+   ```sh
+   npx @idinsight/standards@latest install
+   ```
+
+2. Open the project in Codex or Claude Code. Give the first role your request
+   (adapt to your actual request):
+   - **New project:** `$scoper Build a task tracker.` in Codex or
+     `/scoper Build a task tracker.` in Claude Code.
+   - **Existing project:** `$auditor Add search to the app.` in Codex or
+     `/auditor Add search to the app.` in Claude Code.
+3. Follow each role's handoff, approve Developer's plan, and decide whether to
+   sign off when the checks are complete.
+
+See [Installation and Setup](./getting-started/installation/) for setup options
+and [Your First Workflow](./getting-started/first-workflow/) for a walkthrough.
+
 ## Find your next step
 
 - [Introduction](./getting-started/introduction/): understand how the framework

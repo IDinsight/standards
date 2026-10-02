@@ -20,8 +20,8 @@ await mkdir(cache, { recursive: true });
 const work = await mkdtemp(join(cache, "docs-versions-"));
 const assembled = join(work, "site");
 
-// Keep historical pages, navigation, and authoritative sources from their tag.
-// Use the current rendering tools and components for every version.
+// Keep historical pages and authoritative sources from their tag. Shared
+// navigation adjustments, rendering tools, and components apply to every version.
 const shared = [
   "package.json", "tsconfig.json", "versioning.mjs",
   "src/content.config.ts", "src/components", "src/styles", "src/versioning",

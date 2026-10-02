@@ -35,14 +35,6 @@ export default defineConfig({
           slug: "index",
         },
         {
-          label: "FAQ",
-          slug: "faq",
-        },
-        {
-          label: "Need Help?",
-          slug: "need-help",
-        },
-        {
           label: "Getting Started",
           collapsed: false,
           items: [
@@ -56,6 +48,14 @@ export default defineConfig({
               slug: "getting-started/first-workflow",
             },
           ],
+        },
+        {
+          label: "FAQ",
+          slug: "faq",
+        },
+        {
+          label: "Need Help?",
+          slug: "need-help",
         },
         {
           label: "Guides",
