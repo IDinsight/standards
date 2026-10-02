@@ -201,7 +201,9 @@ The documentation workflow builds all supported versions on pull requests,
 pushes to `main`, stable release tag pushes, and manual runs. It deploys
 successful non-PR runs on `main` or release tags to GitHub Pages. Tag-triggered
 runs check out `main` for the shared rendering tools and fetch all release tags.
-The repository's Pages source must be **GitHub Actions**. If the `github-pages`
+Publication waits until the checkout's package version has a release tag, so a
+release commit does not publish older docs before its tag is created. The
+repository's Pages source must be **GitHub Actions**. If the `github-pages`
 environment restricts deployment branches and tags, allow `main` and `v*` tags.
 
 `docs/astro.config.mjs` sets the site to

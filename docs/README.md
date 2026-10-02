@@ -66,7 +66,9 @@ to **GitHub Actions**. The `.github/workflows/docs.yml` workflow builds and
 checks the combined site on pull requests, then deploys pushes to `main` and
 stable release tags. It can also be run manually on `main`. Tag-triggered runs
 check out `main` for the shared rendering tools and fetch the complete release
-history. If the `github-pages` environment restricts deployment branches and
-tags, allow `main` and the tag pattern `v*`. No `gh-pages` branch is needed.
-Commit the docs sources and root pnpm lockfile; the workflow publishes the
-generated `docs/dist/` output.
+history. Publication waits until the checkout's package version has a release
+tag. This prevents the release commit from publishing an older docs build before
+its tag is created. If the `github-pages` environment restricts deployment
+branches and tags, allow `main` and the tag pattern `v*`. No `gh-pages` branch
+is needed. Commit the docs sources and root pnpm lockfile; the workflow
+publishes the generated `docs/dist/` output.

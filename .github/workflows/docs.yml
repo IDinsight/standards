@@ -18,6 +18,8 @@ jobs:
   build:
     name: Build documentation
     runs-on: ubuntu-latest
+    outputs:
+      publish-ready: ${{ steps.release.outputs.ready }}
     steps:
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -25,6 +27,16 @@ jobs:
           fetch-depth: 0
           # Use current shared rendering tools for tag-triggered builds.
           ref: ${{ startsWith(github.ref, 'refs/tags/') && 'main' || '' }}
+      - name: Check release tag before publishing
+        id: release
+        run: |
+          version=$(node -p "require('./package.json').version")
+          if git show-ref --verify --quiet "refs/tags/v$version"; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Docs publication deferred until v$version exists."
+          fi
       - name: Build, check, and upload documentation
         uses: withastro/action@3eafd002e65cc31b4f0eae0bb05450d521562247 # v6
         with:
@@ -36,7 +48,7 @@ jobs:
 
   deploy:
     name: Deploy to GitHub Pages
-    if: github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/'))
+    if: needs.build.outputs.publish-ready == 'true' && github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/'))
     needs: build
     runs-on: ubuntu-latest
     permissions:
