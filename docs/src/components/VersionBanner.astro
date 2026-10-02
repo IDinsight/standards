@@ -5,15 +5,12 @@ import { getVersionContext } from "../versioning/context.mjs";
 const context = getVersionContext();
 const current = context.versions.find((version) => version.id === context.currentVersion);
 const latest = context.versions.find((version) => version.latest);
-const development = current?.kind === "development";
 const older = current?.kind === "release" && !current.latest;
 ---
 
-{(development || older) && (
+{older && (
   <aside class="version-notice" aria-label="Documentation version" data-pagefind-ignore>
-    {development
-      ? "You are reading development documentation for unreleased changes."
-      : "You are reading the documentation for v" + context.currentVersion + "."}
+    {"You are reading the documentation for v" + context.currentVersion + "."}
     {latest && <> <a href={latest.base}>View the latest stable documentation.</a></>}
   </aside>
 )}
