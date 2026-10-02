@@ -5,15 +5,10 @@ export function getVersionContext() {
   if (process.env.STANDARDS_DOCS_CONTEXT) {
     return JSON.parse(readFileSync(process.env.STANDARDS_DOCS_CONTEXT, "utf8"));
   }
-  // Ordinary development/build commands render the working tree as Next.
+  // Local commands preview the working tree without a published version label.
   return {
-    currentVersion: "next",
+    currentVersion: null,
     currentBase: SITE_BASE,
-    versions: [{
-      id: "next",
-      label: "Next (unreleased)",
-      kind: "development",
-      base: SITE_BASE,
-    }],
+    versions: [],
   };
 }

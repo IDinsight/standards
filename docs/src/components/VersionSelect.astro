@@ -5,7 +5,7 @@ import { SITE_BASE } from "../versioning/versions.mjs";
 const context = getVersionContext();
 ---
 
-<docs-version-select
+{context.versions.length > 0 && <docs-version-select
   data-current-version={context.currentVersion}
   data-base={context.currentBase}
   data-manifest={SITE_BASE + "versions.json"}
@@ -28,7 +28,7 @@ const context = getVersionContext();
   <noscript>
     {context.versions.map((version) => <a href={version.base}>{version.label}</a>)}
   </noscript>
-</docs-version-select>
+</docs-version-select>}
 
 <script>
   import { resolveVersionTarget } from "../versioning/versions.mjs";
@@ -47,7 +47,7 @@ const context = getVersionContext();
       const select = this.querySelector("select");
       if (!select) return;
       const restore = () => {
-        select.value = this.dataset.currentVersion || "next";
+        select.value = this.dataset.currentVersion || select.options[0]?.value || "";
         select.disabled = select.options.length < 2;
       };
       restore();

@@ -16,9 +16,8 @@ test("docs releases sort numerically and include only supported stable tags", ()
 });
 
 const versions = [
-  { id: "0.8.0", base: "/standards/", pages: { "": [], "guides/working-with-developer/": ["choose-when-tester-runs"] } },
+  { id: "0.8.0", base: "/standards/", pages: { "": [], "guides/working-with-developer/": ["choose-when-tester-runs"], "new-page/": [] } },
   { id: "0.7.4", base: "/standards/v/0.7.4/", pages: { "": [], "guides/working-with-developer/": ["approve-the-plan"] } },
-  { id: "next", base: "/standards/next/", pages: { "": [], "new-page/": [] } },
 ];
 
 test("switching versions preserves existing pages and only valid fragments", () => {
@@ -33,8 +32,8 @@ test("switching versions preserves existing pages and only valid fragments", () 
 });
 
 test("a missing page falls back to the selected version overview", () => {
-  assert.equal(resolveVersionTarget(versions, "/standards/next/", "0.7.4",
-    "https://idinsight.github.io/standards/next/new-page/?q=test#new"),
+  assert.equal(resolveVersionTarget(versions, "/standards/", "0.7.4",
+    "https://idinsight.github.io/standards/new-page/?q=test#new"),
   "https://idinsight.github.io/standards/v/0.7.4/");
   assert.equal(resolveVersionTarget(versions, "/standards/v/0.8.0/", "0.8.0",
     "https://idinsight.github.io/standards/v/0.8.0/"),

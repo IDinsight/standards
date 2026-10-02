@@ -28,10 +28,10 @@ not edit or commit generated reference copies.
 
 ## Documentation versions
 
-The deployed site serves the latest stable release at `/standards/`, every
-supported release at `/standards/v/<version>/`, and the current checkout at
-`/standards/next/`. The header selector preserves the page and heading when they
-exist in the selected version; otherwise it opens that version's overview.
+The deployed site serves the latest stable release at `/standards/` and every
+supported release at `/standards/v/<version>/`. The header selector preserves
+the page and heading when they exist in the selected version; otherwise it opens
+that version's overview.
 
 To build and check the combined site:
 
@@ -51,8 +51,10 @@ components and build tools. Historical sources are extracted into temporary
 directories rather than copied into the repository. Each snapshot has its own
 search index.
 
-Ordinary `docs:dev` and `docs:build` show only the current checkout, labeled
-**Next (unreleased)**. Use the combined build to test version switching.
+Ordinary `docs:dev` and `docs:build` preview only the current checkout, with no
+version selector or release banner. Unreleased pages are available locally; they
+are published when tagged as a release. Use the combined build to test version
+switching.
 
 ## GitHub Pages
 
@@ -63,8 +65,8 @@ In the repository's **Settings → Pages → Build and deployment**, set **Sourc
 to **GitHub Actions**. The `.github/workflows/docs.yml` workflow builds and
 checks the combined site on pull requests, then deploys pushes to `main` and
 stable release tags. It can also be run manually on `main`. Tag-triggered runs
-check out `main` so Next stays current, and fetch the complete release history.
-If the `github-pages` environment restricts deployment branches and tags, allow
-`main` and the tag pattern `v*`. No `gh-pages` branch is needed. Commit the docs
-sources and root pnpm lockfile; the workflow publishes the generated
-`docs/dist/` output.
+check out `main` for the shared rendering tools and fetch the complete release
+history. If the `github-pages` environment restricts deployment branches and
+tags, allow `main` and the tag pattern `v*`. No `gh-pages` branch is needed.
+Commit the docs sources and root pnpm lockfile; the workflow publishes the
+generated `docs/dist/` output.

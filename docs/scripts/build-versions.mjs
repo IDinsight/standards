@@ -1,6 +1,6 @@
 import { execFileSync } from "node:child_process";
 import { cp, mkdir, mkdtemp, readFile, readdir, rm, symlink, writeFile } from "node:fs/promises";
-import { dirname, join, relative, resolve, sep } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { releaseVersions, SITE_BASE } from "../src/versioning/versions.mjs";
@@ -10,10 +10,7 @@ const repoRoot = resolve(docsRoot, "..");
 const astro = join(docsRoot, "node_modules/astro/bin/astro.mjs");
 const output = join(docsRoot, "dist");
 const tags = execFileSync("git", ["tag", "--list", "v*"], { cwd: repoRoot, encoding: "utf8" }).trim().split("\n");
-const versions = [
-  ...releaseVersions(tags),
-  { id: "next", label: "Next (unreleased)", kind: "development", base: SITE_BASE + "next/" },
-];
+const versions = releaseVersions(tags);
 // Keep builds near installed dependencies so Astro can resolve shared components.
 const cache = join(repoRoot, "node_modules/.cache");
 await mkdir(cache, { recursive: true });
@@ -32,27 +29,10 @@ const shared = [
 async function prepare(version) {
   const snapshot = join(work, version.id);
   await mkdir(snapshot);
-  if (version.kind === "release") {
-    const archive = execFileSync("git", ["archive", "v" + version.id], { cwd: repoRoot, maxBuffer: 64 * 1024 * 1024 });
-    execFileSync("tar", ["-xf", "-", "-C", snapshot], { input: archive });
-    const metadata = JSON.parse(await readFile(join(snapshot, "package.json"), "utf8"));
-    if (metadata.version !== version.id) throw new Error("Release tag/package version mismatch: v" + version.id);
-  } else {
-    for (const source of ["package.json", "PROTOCOL.md", "INSTALLER.md", "protocol", "skills", "docs"]) {
-      const original = join(repoRoot, source);
-      await cp(original, join(snapshot, source), {
-        recursive: true,
-        filter: (file) => {
-          const path = relative(original, file).split(sep).join("/");
-          return !path.split("/").some((part) => ["node_modules", "dist", ".astro"].includes(part))
-            && !(source === "docs" && (
-              path === "public/reference" || path === "src/content/docs/reference/templates"
-              || path === "src/content/docs/reference/protocol.md" || path === "src/content/docs/reference/installer.md"
-            ));
-        },
-      });
-    }
-  }
+  const archive = execFileSync("git", ["archive", "v" + version.id], { cwd: repoRoot, maxBuffer: 64 * 1024 * 1024 });
+  execFileSync("tar", ["-xf", "-", "-C", snapshot], { input: archive });
+  const metadata = JSON.parse(await readFile(join(snapshot, "package.json"), "utf8"));
+  if (metadata.version !== version.id) throw new Error("Release tag/package version mismatch: v" + version.id);
   const root = join(snapshot, "docs");
   for (const source of shared) {
     await mkdir(dirname(join(root, source)), { recursive: true });
@@ -108,7 +88,7 @@ try {
   for (const version of versions) {
     const root = await prepare(version);
     if (version.latest) await build(root, version, SITE_BASE);
-    version.pages = await build(root, version, version.archiveBase || version.base);
+    version.pages = await build(root, version, version.archiveBase);
   }
   await writeFile(join(assembled, "versions.json"), JSON.stringify({
     schemaVersion: 1, latest: versions[0].id, versions,
