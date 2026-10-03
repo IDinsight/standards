@@ -241,9 +241,12 @@ For `STANDARD` work, enumerate the material values, behaviors, contracts, state
 transitions, and cross-boundary effects the implementation must realize. Confirm
 that each consequential item is established by scope, architecture, project
 context, repository constraints, or is a reversible local implementation detail
-Developer owns.
+Developer owns. Persisted or public contracts are consequential unless scope,
+architecture, project context, or repository constraints establish them. Listing
+an unestablished consequential item in the plan for user approval does not
+establish it.
 
-Route defects instead of guessing:
+Route defects instead of guessing or asking the user to settle them:
 
 - materially incomplete or contradictory requirements -> `SCOPING` failure;
 - unresolved consequential technical design or a design disproved by

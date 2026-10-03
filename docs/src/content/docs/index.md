@@ -44,6 +44,8 @@ and [Your First Workflow](./getting-started/first-workflow/) for a walkthrough.
 - [Roadmap](./roadmap/): see the directions we are exploring each quarter.
 - [Guides](./guides/starting-a-cycle/): start, resume, or change ongoing work.
 - [Reference](./reference/protocol/): look up exact rules and document formats.
+- [Skill eval report](./reference/skill-eval-report/): see how the role skills
+  were tested and how they scored.
 - [FAQ](./faq/): get short answers to common questions.
 - [Need Help?](./need-help/): ask a question, report a bug, or suggest an
   improvement.

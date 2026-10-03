@@ -14,6 +14,7 @@ with the file responsible for the part you want to change.
 | `PROTOCOL.md`            | Shared rules for roles, states, handoffs, recovery, and the runtime. |
 | `protocol/`              | Protocol chapters, installed into `.standards/protocol/`.            |
 | `INSTALLER.md`           | Rules for the CLI's install, upgrade, and uninstall; not installed.  |
+| `SKILL_EVAL_REPORT.md`   | How the role skills were evaluated and how they performed.           |
 | `README.md`              | A high-level introduction and development entry points.              |
 | `skills/`                | The nine role packages.                                              |
 | `runtime/`               | Tools installed into `.standards/bin/`, including `check.mjs`.       |
@@ -47,7 +48,8 @@ Role packages ship no user styles. Users add their own in a project under
 
 Evaluation scenarios describe intended role behavior. Checking their JSON,
 linting Markdown, or building the site does not run those evaluations or show
-that the roles passed them.
+that the roles passed them. For results from running them, see the
+[Skill Eval Report](../../reference/skill-eval-report/).
 
 See [Roles](../../roles/overview/) for behavior and
 [Artifact Templates](../../reference/artifact-templates/) for output formats.
@@ -76,10 +78,10 @@ Handwritten pages live under `docs/src/content/docs/`. The sidebar is listed
 explicitly in `docs/astro.config.mjs`; adding a file alone does not add a
 navigation entry.
 
-`docs/scripts/sync-reference.mjs` generates the Protocol and Installer Contract
-pages and eight role template pages from their repository originals. It also
-copies downloadable originals into `docs/public/reference/`. Edit the source
-files rather than these generated copies.
+`docs/scripts/sync-reference.mjs` generates the Protocol, Installer Contract,
+and Skill Eval Report pages and eight role template pages from their repository
+originals. It also copies downloadable originals into `docs/public/reference/`.
+Edit the source files rather than these generated copies.
 
 The built website goes to `docs/dist/`. `docs/scripts/check-links.mjs` checks
 local links and anchors in that output.

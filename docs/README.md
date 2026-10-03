@@ -21,10 +21,11 @@ Handwritten pages live in `src/content/docs/`; navigation is configured in
 `astro.config.mjs`. The full writing guide is available at
 `/standards/contributing/documentation/` in the local site.
 
-The protocol, installer, and artifact-template reference pages are generated
-from the repository sources before development and builds. If those sources
-change while the server is running, run `pnpm run docs:sync-reference` again. Do
-not edit or commit generated reference copies.
+The protocol, installer, skill eval report, and artifact-template reference
+pages are generated from the repository sources before development and builds.
+If those sources change while the server is running, run
+`pnpm run docs:sync-reference` again. Do not edit or commit generated reference
+copies.
 
 ## Documentation versions
 

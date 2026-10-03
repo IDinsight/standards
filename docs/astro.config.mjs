@@ -164,6 +164,9 @@ export default defineConfig({
               slug: "reference/artifact-templates",
             },
             {
+              slug: "reference/skill-eval-report",
+            },
+            {
               slug: "reference/glossary",
             },
           ],

@@ -113,13 +113,16 @@ do not apply multiple mode files concurrently.
 
 1. Ask only questions that materially change the design. Infer what is already
    established by scope or project context; do not reopen settled scope
-   decisions. Persist any blocking user question in `Active Work.BlockedOn`
-   before asking and clear it after incorporating the answer.
+   decisions, and route material open ones under invariant 2 rather than asking.
+   Persist any blocking user question in `Active Work.BlockedOn` before asking
+   and clear it after incorporating the answer.
 2. If the design requires a material scope change, stop and issue a `SCOPING`
    failure handoff to Scoper. Treat missing, duplicate, or reused acceptance
    identifiers, or materially ambiguous acceptance conditions, as a scoping
    defect because Architect must preserve traceability rather than invent or
-   repair Scoper-owned acceptance identity.
+   repair Scoper-owned acceptance identity. A material decision the scope leaves
+   open about what users are promised or who may use what is such a defect even
+   when the user could answer it directly.
 3. If required project context is missing, materially incomplete, incorrect, or
    unexpectedly invalidated, stop and issue a `PROJECT_CONTEXT` failure handoff
    to Auditor instead of performing a repository-wide audit. Treat an

@@ -358,6 +358,15 @@ provenance, or missing acceptance coverage; it does not replace a role's
 completion gate. If a tool is missing or fails, stop and report it; do not do
 its step by hand.
 
+A user instruction not to run commands covers tests, builds, scripts, package
+managers, git (including read-only git commands) and any other command, with
+these exceptions. A workflow role still runs the runtime tools above as this
+protocol requires; if the user explicitly forbids them too, apply **Instruction
+Layering and Conflicts**. Viewing, listing and searching files without changing
+them is not running a command, whatever tool the client uses, and neither is
+editing files with the client's file tools. Say which commands were not run and
+what they would have established, in the role's record when it keeps one.
+
 Installation can also add a stop hook for Claude Code and Codex (see **Installed
 Runtime Contract** in `.standards/protocol/installation.md`). When an agent
 finishes a turn and workflow files have uncommitted changes, the stop hook runs
@@ -818,7 +827,15 @@ FailureType
 | `SYNCHRONIZATION` | `SYNCHRONIZER` |
 
 The discoverer of a failure does not automatically own the fix. Route it to the
-owner of the defective artifact or decision.
+owner of the defective artifact or decision. A material decision that an owner's
+completed artifact should have settled but left open is such a defect. When
+another role owns the correction, do not ask the user to settle it in that
+role's place, offer to route it only if the user wants, continue on an assumed
+answer, or make a forward handoff with the defect noted only in the reply; the
+owner asks the user when its correction needs a decision. In `EXPEDITED`, a
+defect or guarantee owned by a skipped role requires **Expedited Promotion** in
+`.standards/protocol/expedited.md`. Navigator only explains the route; see
+**Navigator Boundary**.
 
 ## Failure Handoffs
 
@@ -1092,7 +1109,8 @@ Promotion** adds entries. When it is active, read **Outstanding Obligations** in
   it and clear it when that targeted audit completes, is abandoned, or no longer
   needs separate persistence.
 - `BlockedOn`: unresolved user question preventing completion, otherwise
-  `NONE`.
+  `NONE`. Do not use it for a defect another role owns; route that as
+  **Failure Types** describes.
 - `PendingVerificationCadence`: `NONE`, `INCREMENTAL`, or
   `AFTER_IMPLEMENTATION`; a user-requested cadence change awaiting application
   by Developer under **Switch verification cadence** in
