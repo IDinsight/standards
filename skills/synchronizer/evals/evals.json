@@ -90,11 +90,11 @@
     {
       "id": 9,
       "prompt": "Invoke Synchronizer. ProjectMode=BROWNFIELD, CycleMode=STANDARD, WorkflowState=SYNCHRONIZING, Active Work.Id=export-20260924T090000Z-a7f3c1d2. Unless specified otherwise, current scope, architecture, context, development plan, verification and both review reports have valid ownership and content identities; documentation evidence is available, recovery and outstanding obligations are inactive, and no user question is blocked. The active request and plan disagree about whether an old uncommitted migration belongs to this cycle; history cannot establish its origin and applicability depends on it.",
-      "expected_output": "Persist the material boundary gap and necessary user question.",
+      "expected_output": "Record the material boundary gap and route a SCOPING failure to Scoper, since the request includes the migration but the scope never decides it; withhold readiness.",
       "files": [],
       "assertions": [
         "The migration is not silently treated as baseline or excluded.",
-        "Active Work.BlockedOn is persisted before the question and readiness is withheld."
+        "It routes a SCOPING failure to Scoper with a recovery frame resuming at SYNCHRONIZING and withholds readiness, rather than settling the question with the user itself."
       ]
     },
     {

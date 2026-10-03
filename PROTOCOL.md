@@ -358,6 +358,15 @@ provenance, or missing acceptance coverage; it does not replace a role's
 completion gate. If a tool is missing or fails, stop and report it; do not do
 its step by hand.
 
+A user instruction not to run commands covers tests, builds, scripts, package
+managers, git (including read-only git commands) and any other command, with
+these exceptions. A workflow role still runs the runtime tools above as this
+protocol requires; if the user explicitly forbids them too, apply **Instruction
+Layering and Conflicts**. Viewing, listing and searching files without changing
+them is not running a command, whatever tool the client uses, and neither is
+editing files with the client's file tools. Say which commands were not run and
+what they would have established, in the role's record when it keeps one.
+
 Installation can also add a stop hook for Claude Code and Codex (see **Installed
 Runtime Contract** in `.standards/protocol/installation.md`). When an agent
 finishes a turn and workflow files have uncommitted changes, the stop hook runs
