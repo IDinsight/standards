@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.9.1](https://github.com/IDinsight/standards/compare/v0.9.0...v0.9.1) (2026-10-03)
+
+
+### Bug Fixes
+
+* **protocol:** define what a no-commands instruction covers ([d101780](https://github.com/IDinsight/standards/commit/d101780f6207637fc25a94b82f795e870c33032e))
+* **protocol:** route other roles' defects instead of asking the user ([d101780](https://github.com/IDinsight/standards/commit/d101780f6207637fc25a94b82f795e870c33032e))
+
 ## [0.9.0](https://github.com/IDinsight/standards/compare/v0.8.0...v0.9.0) (2026-10-02)
 
 
