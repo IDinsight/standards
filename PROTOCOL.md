@@ -818,7 +818,15 @@ FailureType
 | `SYNCHRONIZATION` | `SYNCHRONIZER` |
 
 The discoverer of a failure does not automatically own the fix. Route it to the
-owner of the defective artifact or decision.
+owner of the defective artifact or decision. A material decision that an owner's
+completed artifact should have settled but left open is such a defect. When
+another role owns the correction, do not ask the user to settle it in that
+role's place, offer to route it only if the user wants, continue on an assumed
+answer, or make a forward handoff with the defect noted only in the reply; the
+owner asks the user when its correction needs a decision. In `EXPEDITED`, a
+defect or guarantee owned by a skipped role requires **Expedited Promotion** in
+`.standards/protocol/expedited.md`. Navigator only explains the route; see
+**Navigator Boundary**.
 
 ## Failure Handoffs
 
@@ -1092,7 +1100,8 @@ Promotion** adds entries. When it is active, read **Outstanding Obligations** in
   it and clear it when that targeted audit completes, is abandoned, or no longer
   needs separate persistence.
 - `BlockedOn`: unresolved user question preventing completion, otherwise
-  `NONE`.
+  `NONE`. Do not use it for a defect another role owns; route that as
+  **Failure Types** describes.
 - `PendingVerificationCadence`: `NONE`, `INCREMENTAL`, or
   `AFTER_IMPLEMENTATION`; a user-requested cadence change awaiting application
   by Developer under **Switch verification cadence** in
