@@ -20,13 +20,13 @@ pnpm run docs:dev
 ```
 
 Open the URL printed by Astro with the `/standards/` prefix. The development
-command generates the protocol, installer, and template reference pages before
-starting the server.
+command generates the protocol, installer, skill eval report, and template
+reference pages before starting the server.
 
 If the browser still shows old wording, reload it. If that does not help,
 restart the development server from this checkout. Changes to protocol,
-installer, or template sources also need `pnpm run docs:sync-reference` while
-the server is running.
+installer, skill eval report, or template sources also need
+`pnpm run docs:sync-reference` while the server is running.
 
 ## Validate the site
 

@@ -53,6 +53,10 @@ shared terminology. Individual skills define role-specific behavior.
   and workflow records before user sign-off. It records evidence applicability
   and discrepancies, routing corrections to their owners.
 
+Each role ships eval cases in `skills/<role>/evals/evals.json`. See
+[`SKILL_EVAL_REPORT.md`](SKILL_EVAL_REPORT.md) for how they were run and how the
+role skills performed.
+
 ## Design Principles
 
 1. The role that discovers a problem does not automatically own the fix. Route

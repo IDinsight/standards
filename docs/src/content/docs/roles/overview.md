@@ -22,6 +22,10 @@ Their initials spell S.T.A.N.D.A.R.D.S.; this is not their running order. The
 is new or existing and whether the cycle uses standard or expedited work. A
 cycle is one request, ending in your sign-off or cancellation.
 
+Each role ships eval cases that check it follows the protocol. The
+[skill eval report](../../reference/skill-eval-report/) explains how they were
+run and how each role scored.
+
 ## Run a role
 
 You choose when to run each role. Use `$scoper` in Codex or `/scoper` in Claude
