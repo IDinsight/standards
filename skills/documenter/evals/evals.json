@@ -492,13 +492,13 @@
     },
     {
       "id": 48,
-      "prompt": "Invoke Documenter. ProjectMode=BROWNFIELD, CycleMode=STANDARD, WorkflowState=DOCUMENTING, Active Work.Id=export-20260924T090000Z-a7f3c1d2. Unless overridden, scope, architecture, relevant context, development, Tester verification and implementation review have matching provenance and current evidence; AC-001 covers CSV export behavior and AC-002 requires an accurate usage guide. Recovery and obligations are inactive, no user question is blocked, and editing is unrestricted. One Documenter-owned outstanding obligation is verified corrected, but another required guide remains incomplete and can be finished now and a separate Developer obligation is unresolved.",
-      "expected_output": "Remove only the verified documentation obligation and persist incomplete full-gate status.",
+      "prompt": "Invoke Documenter. ProjectMode=BROWNFIELD, CycleMode=STANDARD, WorkflowState=DOCUMENTING, Active Work.Id=export-20260924T090000Z-a7f3c1d2. Unless overridden, scope, architecture, relevant context, development, Tester verification and implementation review have matching provenance and current evidence; AC-001 covers CSV export behavior and AC-002 requires an accurate usage guide. Recovery and obligations are inactive, no user question is blocked, and editing is unrestricted. The cycle was promoted from EXPEDITED, and one Developer-owned outstanding obligation (`FailureType: IMPLEMENTATION`, a missing filter validation) remains unresolved. The required usage guide is incomplete and can be finished now.",
+      "expected_output": "Finish the usage guide, leave the Developer obligation untouched, and hand off forward to final review only once the documentation gate passes; sign-off remains blocked by the obligation.",
       "files": [],
       "assertions": [
-        "Correction is distinguished from Documenter completion.",
+        "Actionable documentation is completed rather than left pending because another role's obligation exists.",
         "The Developer obligation remains intact.",
-        "No forward handoff or corrective return occurs: no owned active frame exists and actionable documentation remains."
+        "The Developer obligation does not block Documenter's own forward handoff, and Documenter does not remove, edit, or claim to resolve it."
       ]
     },
     {

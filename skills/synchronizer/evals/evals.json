@@ -384,23 +384,23 @@
     },
     {
       "id": 37,
-      "prompt": "Invoke Synchronizer. ProjectMode=BROWNFIELD, CycleMode=STANDARD, WorkflowState=SYNCHRONIZING, Active Work.Id=export-20260924T090000Z-a7f3c1d2. Unless specified otherwise, current scope, architecture, context, development plan, verification and both review reports have valid ownership and content identities; documentation evidence is available, recovery and outstanding obligations are inactive, and no user question is blocked. Two obligations exist: SYNCHRONIZING owns an incorrect identity comparison, and TESTING owns a missing authorization check. Synchronizer verifies its own correction but the Tester gap remains.",
-      "expected_output": "Remove only the verified Synchronizer obligation and route the Tester defect.",
+      "prompt": "Invoke Synchronizer. ProjectMode=BROWNFIELD, CycleMode=STANDARD, WorkflowState=SYNCHRONIZING, Active Work.Id=export-20260924T090000Z-a7f3c1d2. Unless specified otherwise, current scope, architecture, context, development plan, verification and both review reports have valid ownership and content identities; documentation evidence is available, recovery and outstanding obligations are inactive, and no user question is blocked. The cycle was promoted from EXPEDITED and two outstanding obligations remain: REVIEWING_IMPLEMENTATION owns a review gap on CSV quoting evidence, which the current files appear to address, and DEVELOPING owns a missing authorization check that the current code still lacks.",
+      "expected_output": "Keep both obligations, since only their owners may remove them after verifying, withhold sign-off readiness, and route the outstanding corrections to their owners.",
       "files": [],
       "assertions": [
-        "Correcting an obligation is not completion of the role or cycle.",
-        "The Tester obligation remains until Tester corrects and verifies it.",
+        "Evidence that a correction appears made does not let Synchronizer remove another owner's obligation.",
+        "The DEVELOPING obligation remains until Developer corrects and verifies it.",
         "Sign-off readiness is withheld."
       ]
     },
     {
       "id": 38,
-      "prompt": "Invoke Synchronizer. ProjectMode=BROWNFIELD, CycleMode=STANDARD, WorkflowState=SYNCHRONIZING, Active Work.Id=export-20260924T090000Z-a7f3c1d2. Unless specified otherwise, current scope, architecture, context, development plan, verification and both review reports have valid ownership and content identities; documentation evidence is available, recovery and outstanding obligations are inactive, and no user question is blocked. All artifacts say COMPLETE, but Outstanding Obligations retains a DOCUMENTING correction for inaccurate usage examples; current examples still show the defect.",
-      "expected_output": "Persist the unresolved correction and route it to Documenter.",
+      "prompt": "Invoke Synchronizer. ProjectMode=BROWNFIELD, CycleMode=STANDARD, WorkflowState=SYNCHRONIZING, Active Work.Id=export-20260924T090000Z-a7f3c1d2. Unless specified otherwise, current scope, architecture, context, development plan, verification and both review reports have valid ownership and content identities; documentation evidence is available, recovery and outstanding obligations are inactive, and no user question is blocked. The cycle was promoted from EXPEDITED. All artifacts say COMPLETE, but Outstanding Obligations retains a DEVELOPING correction for unescaped CSV formula prefixes; the current code still shows the defect.",
+      "expected_output": "Persist the unresolved correction and route it to Developer.",
       "files": [],
       "assertions": [
         "Passing labels do not erase the obligation.",
-        "Synchronizer does not remove Documenter obligations or advance to sign-off."
+        "Synchronizer does not remove the Developer obligation or advance to sign-off."
       ]
     },
     {
@@ -447,12 +447,12 @@
     },
     {
       "id": 43,
-      "prompt": "Invoke Synchronizer. ProjectMode=BROWNFIELD, CycleMode=STANDARD, WorkflowState=SYNCHRONIZING, Active Work.Id=export-20260924T090000Z-a7f3c1d2. Unless specified otherwise, current scope, architecture, context, development plan, verification and both review reports have valid ownership and content identities; documentation evidence is available, recovery and outstanding obligations are inactive, and no user question is blocked. An earlier documentation discrepancy D-002 is OPEN. Documenter corrected the guide and final Reviewer independently checked it against the same AC; all recorded content matches current files. Reconcile twice without further changes.",
-      "expected_output": "Resolve D-002 once with evidence and preserve a stable record on repetition.",
+      "prompt": "Invoke Synchronizer. ProjectMode=BROWNFIELD, CycleMode=STANDARD, WorkflowState=SYNCHRONIZING, Active Work.Id=export-20260924T090000Z-a7f3c1d2. Unless specified otherwise, current scope, architecture, context, development plan, verification and both review reports have valid ownership and content identities; documentation evidence is available, recovery and outstanding obligations are inactive, and no user question is blocked. An earlier Synchronizer pass resolved documentation discrepancy D-002 with evidence (Documenter's correction and the final Reviewer's independent check against the same AC) and left D-003 blocked on a user question persisted in Active Work.BlockedOn. Nothing has changed since; the user has not answered and says: reconcile again.",
+      "expected_output": "Re-check without duplicating D-002's resolution, keep the record's history and the persisted blocker, and change nothing that has not changed.",
       "files": [],
       "assertions": [
         "The original discrepancy ID and useful history remain.",
-        "The second assessment avoids duplicate resolution entries and unnecessary rewrites.",
+        "The repeat assessment adds no duplicate resolution entry and makes no unnecessary rewrites.",
         "Reviewer finding statuses are not edited by Synchronizer."
       ]
     },
