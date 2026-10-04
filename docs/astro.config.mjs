@@ -62,6 +62,10 @@ export default defineConfig({
           collapsed: true,
           items: [
             {
+              label: "Overview",
+              slug: "guides/overview",
+            },
+            {
               slug: "guides/new-project",
             },
             {

@@ -17,63 +17,11 @@ changing that state.
 
 ## The paths at a glance
 
-<!-- markdownlint-disable MD033 -->
-<div class="workflow-map" aria-label="STANDARDS workflow paths">
-  <section class="workflow-map__panel workflow-map__panel--standard" aria-labelledby="standard-map-title">
-    <div class="workflow-map__heading">
-      <span class="workflow-map__eyebrow">Default: full deliverable</span>
-      <h3 id="standard-map-title">Standard</h3>
-    </div>
-    <p>Choose the entry that matches your project:</p>
-    <div class="workflow-map__entries">
-      <div class="workflow-map__entry">
-        <strong>New project</strong>
-        <ol class="workflow-map__steps">
-          <li>Scoper</li><li>Architect</li><li>Auditor</li>
-        </ol>
-      </div>
-      <div class="workflow-map__entry">
-        <strong>Existing project</strong>
-        <ol class="workflow-map__steps">
-          <li>Auditor</li><li>Scoper</li><li>Architect</li>
-        </ol>
-      </div>
-    </div>
-    <div class="workflow-map__join" aria-hidden="true">↓ both continue ↓</div>
-    <div class="workflow-map__shared">
-      <ol class="workflow-map__steps">
-        <li>Developer</li><li>Tester</li><li>Implementation Reviewer</li>
-      </ol>
-      <div class="workflow-map__down" aria-hidden="true">↓</div>
-      <ol class="workflow-map__steps">
-        <li>Documenter</li><li>Final Reviewer</li><li>Synchronizer</li>
-      </ol>
-      <div class="workflow-map__down" aria-hidden="true">↓</div>
-      <div class="workflow-map__decision">Your sign-off decision</div>
-    </div>
-  </section>
-  <section class="workflow-map__panel workflow-map__panel--expedited" aria-labelledby="expedited-map-title">
-    <div class="workflow-map__heading">
-      <span class="workflow-map__eyebrow">Eligible existing projects</span>
-      <h3 id="expedited-map-title">Expedited</h3>
-    </div>
-    <ol class="workflow-map__steps">
-      <li>Developer</li><li>Implementation Reviewer</li><li>Your sign-off decision</li>
-    </ol>
-  </section>
-</div>
-<!-- markdownlint-enable MD033 -->
-
-The standard map shows the default `FULL_DELIVERABLE` path. With
-`IMPLEMENTATION_REVIEWED`, implementation Reviewer can hand off directly to your
-sign-off decision after checking that no required work remains. See
-[Finishing After Implementation Review](../../guides/finishing-after-implementation-review/).
-
-The arrows show normal forward handoffs. Each role must finish its required
-checks, and you explicitly invoke the next role. With
-[incremental verification](../../guides/working-with-developer/#choose-when-tester-runs),
-Developer and Tester can alternate through checkpoints before implementation
-review. Corrections follow a [recovery route](../recovery/) instead.
+See the [standard-cycle map](../../guides/overview/#standard-cycle) for both
+project entry paths and completion policies, or the
+[expedited-cycle map](../../guides/overview/#expedited-cycle) for eligible
+existing projects and promotion to standard work. Each map links to the relevant
+guides. Corrections follow a [recovery route](../recovery/).
 
 ## Standard forward paths
 
@@ -94,7 +42,8 @@ saved names such as `DEVELOPING` and `REVIEWING_IMPLEMENTATION`.
 
 ## Expedited forward path
 
-Eligible brownfield work follows the shorter path shown above.
+Eligible brownfield work follows Developer, implementation Reviewer, and your
+sign-off decision.
 
 The saved request defines the change. Developer still saves a plan and gets your
 approval before coding. Reviewer checks the implementation against that request

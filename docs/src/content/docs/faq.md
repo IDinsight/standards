@@ -421,9 +421,14 @@ role. See
 In standard work, Scoper writes each outcome that must be true as an
 **acceptance condition** with an ID, such as `AC-001`. The design, the
 implementation plan, and every assessment report refer to the same IDs. Tester
-records the evidence for each one, or why it can't be verified yet. Final review
-checks that every condition has enough evidence, and Synchronizer checks that
-the evidence still matches the files you're signing off.
+records the evidence for each one, or why it can't be verified yet.
+
+With `FULL_DELIVERABLE`, final Reviewer checks that every condition has enough
+evidence, and Synchronizer checks that the assessments still apply to the
+current files. With `IMPLEMENTATION_REVIEWED`, implementation Reviewer
+separately checks that every requirement has current evidence and no required
+work remains before the cycle can reach your sign-off decision. The shorter
+policy omits normal final review and synchronization.
 
 The workflow check also flags a finished report that leaves out a current ID. It
 can't judge whether the evidence is good; that's the job of Tester and Reviewer.

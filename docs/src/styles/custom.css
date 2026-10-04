@@ -207,6 +207,10 @@ header.header {
   color: var(--standards-pop);
 }
 
+.workflow-map__panel--expedited .workflow-map__down {
+  color: var(--standards-pop);
+}
+
 .workflow-map__join,
 .workflow-map__down {
   margin-block: 0.55rem;
@@ -214,6 +218,11 @@ header.header {
   font-size: 0.8rem;
   font-weight: 700;
   text-align: center;
+}
+
+.workflow-map__down {
+  font-size: 1.15rem;
+  line-height: 1.25;
 }
 
 .workflow-map__decision {
@@ -238,6 +247,145 @@ header.header {
     inset-block-end: -1.08rem;
     inset-inline-end: auto;
     content: "↓";
+  }
+}
+
+/* Cycle maps share spacing, step styles, and responsive branches. */
+.workflow-map--cycle {
+  margin-inline: 0;
+}
+
+.workflow-map--cycle .workflow-map__stage-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.workflow-map--cycle .workflow-map__stage-label + .workflow-map__steps {
+  margin-top: 1rem;
+}
+
+.workflow-map--cycle .workflow-map__entries,
+.workflow-map__branches {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.workflow-map--cycle .workflow-map__steps li {
+  align-content: center;
+  gap: 0.3rem;
+  margin: 0;
+}
+
+.workflow-map__branches--centered {
+  align-items: center;
+}
+
+.workflow-map--cycle .workflow-map__entry,
+.workflow-map__branches > .workflow-map__branch,
+.workflow-map__branch > * {
+  margin-top: 0;
+}
+
+.workflow-map--cycle .workflow-map__join {
+  margin-block: 1rem;
+}
+
+.workflow-map__join--stacked > span {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 1.15rem;
+  line-height: 1.25;
+}
+
+.workflow-map__branch {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  min-width: 0;
+  padding: 1rem;
+  border: 1px solid var(--sl-color-hairline);
+  border-radius: 0.6rem;
+  background: var(--sl-color-bg);
+}
+
+.workflow-map__branch--short,
+.workflow-map__branch--promotion,
+.workflow-map__branch--incremental {
+  align-self: center;
+  border-color: var(--standards-pop);
+}
+
+.workflow-map__branch-heading h3 {
+  margin: 0.25rem 0 0;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.workflow-map__branch--short .workflow-map__eyebrow,
+.workflow-map__branch--promotion .workflow-map__eyebrow,
+.workflow-map__branch--incremental .workflow-map__eyebrow {
+  color: var(--sl-color-text);
+}
+
+.workflow-map .workflow-map__steps--vertical {
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.workflow-map__steps--vertical li {
+  flex: none;
+}
+
+.workflow-map__steps--vertical li:not(:last-child)::after {
+  inset-block-start: calc(100% + 1rem);
+  inset-block-end: auto;
+  inset-inline-start: 50%;
+  inset-inline-end: auto;
+  transform: translate(-50%, -50%);
+  content: "↓";
+}
+
+.workflow-map__gate {
+  padding: 0.75rem;
+  border: 1px solid var(--sl-color-accent);
+  border-radius: 0.45rem;
+  background: var(--sl-color-accent-low);
+  font-size: 0.85rem;
+  font-weight: 700;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.workflow-map__detail,
+.workflow-map__guide,
+.workflow-map--cycle figcaption {
+  font-size: 0.8rem;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.workflow-map__finish .workflow-map__decision {
+  margin-top: 0;
+}
+
+.workflow-map__repeat {
+  color: var(--sl-color-text-accent);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.workflow-map__repeat span {
+  display: block;
+  font-size: 1.15rem;
+  line-height: 1.25;
+}
+
+@media (max-width: 40rem) {
+  .workflow-map--cycle .workflow-map__entries,
+  .workflow-map__branches {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
