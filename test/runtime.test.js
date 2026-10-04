@@ -9,6 +9,10 @@ import test from 'node:test';
 import { installProject } from '../lib/install.js';
 import { slugFor } from '../runtime/cycle.mjs';
 import { stopMessage } from '../runtime/hook.mjs';
+import { runCheck } from '../runtime/check.mjs';
+import { resetProject } from '../lib/reset.js';
+import { parseState } from '../runtime/lib/state.mjs';
+import { recordSection } from '../runtime/lib/records.mjs';
 
 const read = (root, relative) => readFile(path.join(root, relative), 'utf8');
 async function write(root, relative, value) {
@@ -35,11 +39,11 @@ async function commit(root) {
   await git(root, 'commit', '-q', '-m', 'snapshot');
 }
 
-// An installed brownfield project in a fresh temporary folder.
-async function project(body, { withGit = false } = {}) {
+// An installed project in a fresh temporary folder; brownfield by default.
+async function project(body, { withGit = false, projectMode = 'BROWNFIELD' } = {}) {
   const root = await realpath(await mkdtemp(path.join(os.tmpdir(), 'standards-runtime-test-')));
   try {
-    await write(root, 'app.py', 'print("hi")\n');
+    if (projectMode === 'BROWNFIELD') await write(root, 'app.py', 'print("hi")\n');
     await installProject({ projectRoot: root, clients: ['claude'] });
     if (withGit) {
       await git(root, 'init', '-q', '-b', 'main');
@@ -55,14 +59,20 @@ async function editState(root, edit) {
   await write(root, '.standards/STATE.md', edit(await read(root, '.standards/STATE.md')));
 }
 
+async function editStateFields(root, fields) {
+  await editState(root, (text) => Object.entries(fields)
+    .reduce((current, [name, value]) => setField(current, name, value), text));
+}
+
 const setField = (text, name, value) => text.replace(new RegExp('`' + name + '`:(\\s*)`[^`]*`'), `\`${name}\`:$1\`${value}\``);
 
 // Generate an ID with the tool and record it as the active cycle.
-async function startCycle(root, { state = 'SCOPING', mode = 'STANDARD' } = {}) {
+async function startCycle(root, { state = 'SCOPING', mode = 'STANDARD', policy = 'FULL_DELIVERABLE' } = {}) {
   const { stdout, code } = await tool(root, 'cycle', 'new', '--request', 'Add user search');
   assert.equal(code, 0);
   const id = stdout.trim();
-  await editState(root, (text) => [['Id', id], ['Request', 'Add user search'], ['CycleMode', mode], ['WorkflowState', state]]
+  await editState(root, (text) => [['Id', id], ['Request', 'Add user search'], ['CycleMode', mode],
+    ['CompletionPolicy', mode === 'STANDARD' ? policy : 'NONE'], ['WorkflowState', state]]
     .reduce((current, [name, value]) => setField(current, name, value), text));
   return id;
 }
@@ -118,6 +128,31 @@ async function standardCycle(root) {
   return { id, scope, spec, plan, report };
 }
 
+// All acceptance evidence is implementation-owned or Tester-owned; no later
+// documentation dependency. Recorded closure evidence exercises the checker's
+// mechanical prerequisites; Reviewer still determines evidence sufficiency.
+async function implementationReviewedCycle(root) {
+  const cycle = await standardCycle(root);
+  await write(root, cycle.scope, (await read(root, cycle.scope)).replace('The guide explains search.', 'Users see search results.'));
+  await write(root, cycle.spec, (await read(root, cycle.spec)).replace('No architectural impact; Documenter owns it.', 'Search-results component.'));
+  await write(root, cycle.report, (await read(root, cycle.report)).replace('pending Documenter | pending', 'test/search-results.test.js | passed'));
+  await write(root, cycle.plan, (await read(root, cycle.plan)).replace(
+    '`Depends On`: `DEV-001`\n`Acceptance`: `AC-001`', '`Depends On`: `DEV-001`\n`Acceptance`: `AC-002`'));
+  const review = await init(root, 'REVIEW', '--kind', 'IMPLEMENTATION');
+  await fillHeader(root, review, { Status: 'COMPLETE' });
+  await write(root, review, `${await read(root, review)}\nAC-001 and AC-002 have current implementation and verification evidence.\n`);
+  await write(root, review, `${await read(root, review)}\n## Implementation-Reviewed Closure\n\n`
+    + '`Policy`: `IMPLEMENTATION_REVIEWED`\n`Eligibility`: `ELIGIBLE`\n'
+    + '`User Choice`: `User explicitly requested completion after implementation review.`\n`User Reason`: `NONE`\n'
+    + '`Assessed Inputs`: `Current search scope, results-component design, endpoint, UI, and test content.`\n'
+    + '`Evidence`: `AC-001 and AC-002: search and results tests passed in the current full verification report.`\n'
+    + '`Unmet Requirements`: `NONE`\n`Omitted Phases`: `DOCUMENTING, REVIEWING_FINAL, SYNCHRONIZING`\n'
+    + '`Omitted Guarantees`: `Normal documentation completion, assembled-deliverable final review, and independent synchronization omitted.`\n');
+  await editStateFields(root, { CompletionPolicy: 'IMPLEMENTATION_REVIEWED', WorkflowState: 'AWAITING_USER_SIGNOFF',
+    Kind: 'FORWARD', From: 'REVIEWING_IMPLEMENTATION', FailureType: 'NONE', Reason: 'Implementation review passed.' });
+  return { ...cycle, review };
+}
+
 // One independently tested outcome, with an approved future outcome unfinished.
 async function incrementalCycle(root) {
   const cycle = await standardCycle(root);
@@ -149,6 +184,265 @@ function suspendedAssignment({ number = 1, frame = 1, reason = 'A defect.', purp
     + '`Assessed Inputs`: `dirty endpoint and search test content`\n`Next Action`: `reconcile evidence and continue the assignment`\n';
 }
 
+// These lifecycle fixtures simulate role-authored transitions. The executable
+// checker verifies saved structure; role evals cover authorization, freshness,
+// and evidence sufficiency, which cannot be proved by labels in a fixture.
+async function cleanBoundary(root) {
+  assert.deepEqual(messages(await check(root)), []);
+  assert.deepEqual((await runCheck(root, { atTurnEnd: true })).problems, []);
+}
+
+async function moveCycle(root, state, { kind = 'FORWARD', ...fields } = {}) {
+  const before = parseState(await read(root, '.standards/STATE.md'));
+  await editStateFields(root, { WorkflowState: state, Kind: kind, From: before.WorkflowState,
+    FailureType: 'NONE', Reason: 'The current assignment passed its applicable gate.', ...fields });
+}
+
+async function lifecycleReview(root, projectMode, policy) {
+  await cleanBoundary(root);
+  const id = await startCycle(root, { state: projectMode === 'GREENFIELD' ? 'SCOPING' : 'AUDITING', policy });
+  await editStateFields(root, { Request: `Add user search. User selected ${policy} for this cycle.` });
+  await cleanBoundary(root);
+  if (projectMode === 'BROWNFIELD') {
+    await write(root, '.standards/CONTEXT.md', '# Project Context\n\nThe existing app prints a greeting.\n');
+    await moveCycle(root, 'SCOPING');
+    await cleanBoundary(root);
+  }
+  const scope = await init(root, 'SCOPE');
+  await write(root, scope, `${await read(root, scope)}\n# Search\n\n- \`AC-001\`: Search finds matching names.\n`);
+  await editStateFields(root, { Scope: scope });
+  await moveCycle(root, 'ARCHITECTING');
+  await cleanBoundary(root);
+  const spec = await init(root, 'ARCHITECTURE');
+  await write(root, spec, `${await read(root, spec)}\n# Design\n\n## Acceptance Coverage\n\n- AC-001: Filter names by query.\n`);
+  await editStateFields(root, { Architecture: spec });
+  if (projectMode === 'GREENFIELD') {
+    await moveCycle(root, 'AUDITING');
+    await write(root, '.standards/CONTEXT.md', '# Project Context\n\nNo implementation exists; the search design is implementable.\n');
+    await cleanBoundary(root);
+  }
+  await moveCycle(root, 'DEVELOPING');
+  await cleanBoundary(root);
+  const plan = await init(root, 'DEVELOPMENT');
+  await fillHeader(root, plan, { Mode: 'AUTONOMOUS', 'User Style': 'NONE', 'User Style Locked': 'true', Status: 'COMPLETE' });
+  await write(root, plan, `${await read(root, plan)}\n## Build Steps\n\n### DEV-001 — Search\n\n`
+    + '`Status`: `DONE` `Depends On`: `NONE`\n`Acceptance`: `AC-001`\n');
+  await editStateFields(root, { Development: plan });
+  await write(root, 'app.py', 'def search(names, query):\n    return [name for name in names if query in name]\n');
+  // Greenfield permanently becomes brownfield at the first implementation.
+  await write(root, '.standards/MODE.md', (await read(root, '.standards/MODE.md')).replace('`GREENFIELD`', '`BROWNFIELD`'));
+  await moveCycle(root, 'TESTING');
+  const verification = await init(root, 'VERIFICATION');
+  await fillHeader(root, verification, { Mode: 'VERIFY', Status: 'COMPLETE' });
+  await write(root, verification, `${await read(root, verification)}\n## Acceptance Evidence\n\n`
+    + '| AC-001 | Current search implementation | matching and nonmatching names verified |\n');
+  await cleanBoundary(root);
+  await moveCycle(root, 'REVIEWING_IMPLEMENTATION');
+  const review = await init(root, 'REVIEW', '--kind', 'IMPLEMENTATION');
+  await fillHeader(root, review, { Status: 'COMPLETE' });
+  await write(root, review, `${await read(root, review)}\n## Acceptance Assessment\n\nAC-001: current search and full verification assessed.\n`);
+  await cleanBoundary(root);
+  return { id, scope, spec, plan, verification, review };
+}
+
+async function recordClosure(root, review, eligibility = 'ELIGIBLE') {
+  const text = await read(root, review);
+  const request = parseState(await read(root, '.standards/STATE.md')).active.request;
+  assert.equal(text.includes('## Implementation-Reviewed Closure'), false, 'archive the prior assessment before replacing it');
+  await write(root, review, `${text}\n## Implementation-Reviewed Closure\n\n`
+    + '`Policy`: `IMPLEMENTATION_REVIEWED`\n' + `\`Eligibility\`: \`${eligibility}\`\n`
+    + `\`User Choice\`: \`User instruction: ${request}\`\n` + '`User Reason`: `NONE`\n'
+    + '`Assessed Inputs`: `Current scope, design, app.py and full verification`\n'
+    + '`Evidence`: `Current AC-001 implementation assessment and full verification`\n'
+    + '`Unmet Requirements`: `NONE`\n`Omitted Phases`: `DOCUMENTING, REVIEWING_FINAL, SYNCHRONIZING`\n'
+    + '`Omitted Guarantees`: `Normal documentation completion, final review, and independent synchronization`\n');
+}
+
+async function fullTail(root) {
+  for (const [state, type, reviewKind] of [
+    ['DOCUMENTING', 'DOCUMENTATION'], ['REVIEWING_FINAL', 'REVIEW', 'FINAL_DELIVERABLE'], ['SYNCHRONIZING', 'SYNCHRONIZATION'],
+  ]) {
+    if (parseState(await read(root, '.standards/STATE.md')).WorkflowState !== state) await moveCycle(root, state);
+    const file = await init(root, type, ...(reviewKind ? ['--kind', reviewKind] : []));
+    await fillHeader(root, file, { Status: 'COMPLETE', 'User Style': 'NONE', Collaboration: 'AUTONOMOUS', Target: 'ACTIVE_CHANGE', 'Target Detail': 'search' });
+    await write(root, file, `${await read(root, file)}\nAC-001: applicable evidence inspected; no remaining owned work.\n`);
+    await cleanBoundary(root);
+  }
+  await moveCycle(root, 'AWAITING_USER_SIGNOFF');
+  await cleanBoundary(root);
+}
+
+for (const projectMode of ['GREENFIELD', 'BROWNFIELD']) {
+  for (const policy of ['FULL_DELIVERABLE', 'IMPLEMENTATION_REVIEWED']) {
+    test(`completion lifecycle: ${projectMode}/${policy} reaches sign-off and starts a fresh default cycle`, () => project(async (root) => {
+      const { id, review } = await lifecycleReview(root, projectMode, policy);
+      if (policy === 'FULL_DELIVERABLE') await fullTail(root);
+      else {
+        await recordClosure(root, review);
+        await moveCycle(root, 'AWAITING_USER_SIGNOFF');
+        await cleanBoundary(root);
+        for (const file of [`.standards/docs/documentation/${id}.md`, `.standards/docs/reviews/${id}/final-deliverable.md`,
+          `.standards/docs/synchronization/${id}.md`]) await assert.rejects(read(root, file), { code: 'ENOENT' });
+      }
+      assert.match(await read(root, '.standards/MODE.md'), /`BROWNFIELD`/);
+      const historicalReview = await read(root, review);
+      await moveCycle(root, 'SIGNED_OFF', { kind: 'SIGNOFF', CycleMode: 'UNSET', Reason: 'User explicitly accepted the reviewed work.' });
+      await cleanBoundary(root);
+      assert.equal(parseState(await read(root, '.standards/STATE.md')).active.completionPolicy, policy);
+      // A new cycle replaces Active Work; history stays in the prior report.
+      const nextId = await startCycle(root, { state: 'AUDITING' });
+      await editStateFields(root, { Kind: 'NEW_CYCLE', From: 'SIGNED_OFF', Scope: 'NONE', Architecture: 'NONE', Development: 'NONE' });
+      await cleanBoundary(root);
+      assert.notEqual(nextId, id);
+      assert.equal(parseState(await read(root, '.standards/STATE.md')).active.completionPolicy, 'FULL_DELIVERABLE');
+      assert.equal(await read(root, review), historicalReview);
+    }, { projectMode }));
+  }
+}
+
+test('completion lifecycle: late selection, withdrawal, and reselection preserve history and require reassessment', () => project(async (root) => {
+  const { review } = await lifecycleReview(root, 'BROWNFIELD', 'FULL_DELIVERABLE');
+  await moveCycle(root, 'DOCUMENTING');
+  await cleanBoundary(root);
+  await moveCycle(root, 'REVIEWING_IMPLEMENTATION', { kind: 'COMPLETION_CHANGE', CompletionPolicy: 'IMPLEMENTATION_REVIEWED',
+    Request: 'Add user search. User selected IMPLEMENTATION_REVIEWED.', Reason: 'User selected FULL_DELIVERABLE -> IMPLEMENTATION_REVIEWED.' });
+  await cleanBoundary(root);
+  const returned = await read(root, '.standards/STATE.md');
+  await moveCycle(root, 'AWAITING_USER_SIGNOFF');
+  hasProblem(await check(root), /requires an Implementation-Reviewed Closure assessment/);
+  await write(root, '.standards/STATE.md', returned);
+  await recordClosure(root, review);
+  await moveCycle(root, 'AWAITING_USER_SIGNOFF');
+  await cleanBoundary(root);
+  const firstAssessment = await read(root, review);
+  await moveCycle(root, 'DOCUMENTING', { kind: 'COMPLETION_CHANGE', CompletionPolicy: 'FULL_DELIVERABLE',
+    Request: 'Add user search. User selected FULL_DELIVERABLE.', Reason: 'User withdrew IMPLEMENTATION_REVIEWED for FULL_DELIVERABLE.' });
+  await cleanBoundary(root);
+  assert.equal(await read(root, review), firstAssessment);
+  // Documenter has not begun. The user can select the shorter route again.
+  await moveCycle(root, 'REVIEWING_IMPLEMENTATION', { kind: 'COMPLETION_CHANGE', CompletionPolicy: 'IMPLEMENTATION_REVIEWED',
+    Request: 'Add user search. User selected IMPLEMENTATION_REVIEWED again.', Reason: 'User selected FULL_DELIVERABLE -> IMPLEMENTATION_REVIEWED again.' });
+  await write(root, review, firstAssessment.replace('## Implementation-Reviewed Closure', '## Closure Assessment History'));
+  await recordClosure(root, review, 'NOT_ASSESSED');
+  await cleanBoundary(root);
+  await moveCycle(root, 'AWAITING_USER_SIGNOFF');
+  hasProblem(await check(root), /requires Closure Eligibility ELIGIBLE/);
+  // Fill only the current section: the historical conclusion remains intact.
+  await write(root, review, (await read(root, review)).replace('`Eligibility`: `NOT_ASSESSED`', '`Eligibility`: `ELIGIBLE`'));
+  await cleanBoundary(root);
+  assert.equal(recordSection(await read(root, review), 'Closure Assessment History').trim(),
+    recordSection(firstAssessment, 'Implementation-Reviewed Closure').trim());
+  assert.match(recordSection(await read(root, review), 'Implementation-Reviewed Closure'), /selected IMPLEMENTATION_REVIEWED again/);
+  await moveCycle(root, 'DOCUMENTING', { kind: 'COMPLETION_CHANGE', CompletionPolicy: 'FULL_DELIVERABLE',
+    Request: 'Add user search. User selected FULL_DELIVERABLE.', Reason: 'User withdrew IMPLEMENTATION_REVIEWED for FULL_DELIVERABLE.' });
+  await fullTail(root);
+}));
+
+for (const policy of ['FULL_DELIVERABLE', 'IMPLEMENTATION_REVIEWED']) {
+  test(`completion lifecycle: cancellation retains ${policy} and new work carries reconciliation, not the old policy`, () => project(async (root) => {
+    const { id, review } = await lifecycleReview(root, 'BROWNFIELD', policy);
+    if (policy === 'IMPLEMENTATION_REVIEWED') await recordClosure(root, review);
+    const history = await read(root, review);
+    await moveCycle(root, 'CANCELLED', { kind: 'CANCEL', CycleMode: 'UNSET', Reason: 'User cancelled; implementation retained.' });
+    await cleanBoundary(root);
+    assert.equal(parseState(await read(root, '.standards/STATE.md')).active.completionPolicy, policy);
+    const nextId = await startCycle(root, { state: 'AUDITING' });
+    await editStateFields(root, { Kind: 'NEW_CYCLE', From: 'CANCELLED', Scope: 'NONE', Architecture: 'NONE', Development: 'NONE' });
+    await editState(root, (text) => text.replace('`BaselineReconciliation`: `NONE`',
+      `\`BaselineReconciliation\`:\n\n- \`SourceCycle\`: \`${id}\`\n  \`Request\`: \`Retained search implementation\``));
+    await cleanBoundary(root);
+    const next = parseState(await read(root, '.standards/STATE.md'));
+    assert.notEqual(nextId, id);
+    assert.equal(next.active.completionPolicy, 'FULL_DELIVERABLE');
+    assert.equal(next.active.baseline.entries[0].sourceCycle, id);
+    assert.equal(await read(root, review), history);
+  }));
+}
+
+test('completion lifecycle: reset removes shorter-policy work and initializes NONE', () => project(async (root) => {
+  const { review } = await lifecycleReview(root, 'BROWNFIELD', 'IMPLEMENTATION_REVIEWED');
+  await recordClosure(root, review);
+  await moveCycle(root, 'AWAITING_USER_SIGNOFF');
+  const app = await read(root, 'app.py');
+  await resetProject({ projectRoot: root });
+  await cleanBoundary(root);
+  const state = parseState(await read(root, '.standards/STATE.md'));
+  assert.equal(state.active.completionPolicy, 'NONE');
+  assert.equal(state.active.id, 'UNSET');
+  await assert.rejects(read(root, review), { code: 'ENOENT' });
+  assert.equal(await read(root, 'app.py'), app);
+}));
+
+test('completion lifecycle: expedited promotion initializes full policy and retains corrective obligations', () => project(async (root) => {
+  const id = await startCycle(root, { state: 'DEVELOPING', mode: 'EXPEDITED' });
+  await cleanBoundary(root);
+  assert.equal(parseState(await read(root, '.standards/STATE.md')).active.completionPolicy, 'NONE');
+  await editState(root, (text) => withFrame(text, { From: 'REVIEWING_IMPLEMENTATION', Owner: 'DEVELOPING',
+    FailureType: 'IMPLEMENTATION', ResumeAt: 'REVIEWING_IMPLEMENTATION' }));
+  await editStateFields(root, { Kind: 'FAILURE', From: 'REVIEWING_IMPLEMENTATION', FailureType: 'IMPLEMENTATION' });
+  await cleanBoundary(root);
+  await moveCycle(root, 'AUDITING', { kind: 'PROMOTE', CycleMode: 'STANDARD', CompletionPolicy: 'FULL_DELIVERABLE',
+    PromotionReason: 'Authorization needs a designed cross-cutting contract.' });
+  await editState(root, (text) => text.replace(/## Recovery[\s\S]*$/, '## Recovery\n\n`Active`: `false`\n\n'
+    + '## Outstanding Obligations\n\n`Active`: `true`\n\n### Obligation 1\n\n'
+    + '`Owner`: `DEVELOPING` `FailureType`: `IMPLEMENTATION` `Reason`: `A defect.`\n'));
+  await cleanBoundary(root);
+  const promoted = parseState(await read(root, '.standards/STATE.md'));
+  assert.equal(promoted.active.id, id);
+  assert.equal(promoted.active.completionPolicy, 'FULL_DELIVERABLE');
+  assert.deepEqual(promoted.recovery.frames, []);
+  assert.equal(promoted.obligations.items[0].fields.Owner, 'DEVELOPING');
+  await editStateFields(root, { CompletionPolicy: 'NONE' });
+  hasProblem(await check(root), /CompletionPolicy NONE is not valid with CycleMode STANDARD/);
+}));
+
+test('completion lifecycle: nested documentation recovery preserves the outer frame until closure reassessment', () => project(async (root) => {
+  const { review } = await lifecycleReview(root, 'BROWNFIELD', 'IMPLEMENTATION_REVIEWED');
+  await recordClosure(root, review);
+  await moveCycle(root, 'AWAITING_USER_SIGNOFF');
+  await cleanBoundary(root);
+  const outer = { From: 'AWAITING_USER_SIGNOFF', Owner: 'DOCUMENTING', FailureType: 'DOCUMENTATION',
+    ResumeAt: 'AWAITING_USER_SIGNOFF' };
+  await editState(root, (text) => withFrame(text, outer));
+  await moveCycle(root, 'DOCUMENTING', { kind: 'FAILURE', FailureType: 'DOCUMENTATION', Reason: 'A defect.' });
+  const documentation = await init(root, 'DOCUMENTATION');
+  await fillHeader(root, documentation, { Status: 'IN_PROGRESS', 'User Style': 'NONE', Collaboration: 'AUTONOMOUS', Target: 'ACTIVE_CHANGE', 'Target Detail': 'search' });
+  await cleanBoundary(root);
+  const outerState = parseState(await read(root, '.standards/STATE.md')).recovery.frames[0];
+  const nested = { From: 'DOCUMENTING', Owner: 'DEVELOPING', FailureType: 'IMPLEMENTATION', ResumeAt: 'DOCUMENTING' };
+  await editState(root, (text) => text.replace('## Outstanding Obligations',
+    `${frameText(nested).replace('### Frame 1', '### Frame 2')}\n\n## Outstanding Obligations`));
+  await moveCycle(root, 'DEVELOPING', { kind: 'FAILURE', FailureType: 'IMPLEMENTATION', Reason: 'A defect.' });
+  await cleanBoundary(root);
+  // Developer and Tester re-establish their current full evidence, then pop
+  // only the inner frame. The outer Documenter assignment is still unfinished.
+  await editState(root, (text) => text.replace(/### Frame 2[\s\S]*?(?=## Outstanding)/,
+    frameText({ ...nested, RerunThrough: 'TESTING' }).replace('### Frame 1', '### Frame 2') + '\n\n'));
+  await moveCycle(root, 'TESTING', { kind: 'RESUME' });
+  await cleanBoundary(root);
+  await editState(root, (text) => text.replace(/### Frame 2[\s\S]*?(?=## Outstanding)/, ''));
+  await moveCycle(root, 'DOCUMENTING', { kind: 'RESUME' });
+  await cleanBoundary(root);
+  assert.deepEqual(parseState(await read(root, '.standards/STATE.md')).recovery.frames, [outerState]);
+  await fillHeader(root, documentation, { Status: 'COMPLETE' });
+  await write(root, documentation, `${await read(root, documentation)}\nAC-001: corrected search example verified against current behavior.\n`);
+  await editState(root, (text) => text.replace('`RerunThrough`: `NONE`', '`RerunThrough`: `REVIEWING_IMPLEMENTATION`'));
+  await moveCycle(root, 'REVIEWING_IMPLEMENTATION', { kind: 'RESUME' });
+  await write(root, review, (await read(root, review)).replace('## Implementation-Reviewed Closure', '## Closure Assessment History'));
+  await recordClosure(root, review, 'NOT_ASSESSED');
+  await cleanBoundary(root);
+  const pending = await read(root, '.standards/STATE.md');
+  await moveCycle(root, 'AWAITING_USER_SIGNOFF', { kind: 'RESUME' });
+  hasProblem(await check(root), /AWAITING_USER_SIGNOFF requires an empty recovery stack/);
+  await editState(root, (text) => text.replace(/## Recovery[\s\S]*?(?=## Outstanding)/, '## Recovery\n\n`Active`: `false`\n\n'));
+  hasProblem(await check(root), /requires Closure Eligibility ELIGIBLE/);
+  await write(root, '.standards/STATE.md', pending);
+  await write(root, review, (await read(root, review)).replace('`Eligibility`: `NOT_ASSESSED`', '`Eligibility`: `ELIGIBLE`'));
+  await editState(root, (text) => text.replace(/## Recovery[\s\S]*?(?=## Outstanding)/, '## Recovery\n\n`Active`: `false`\n\n'));
+  await moveCycle(root, 'AWAITING_USER_SIGNOFF', { kind: 'RESUME' });
+  await cleanBoundary(root);
+}));
+
 test('slugs use plain lowercase words and stay short', () => {
   assert.equal(slugFor('Add user search by name & e-mail (v2)!'), 'add-user-search-by-name-e-mail-v2');
   assert.equal(slugFor('Ünïcode — café search'), 'unicode-cafe-search');
@@ -163,7 +457,8 @@ test('cycle new prints an ID that check accepts and changes no file', () => proj
   const id = stdout.trim();
   assert.match(id, /^add-user-search-by-name-\d{8}T\d{6}Z-[0-9a-f]{8}$/);
   assert.equal(await read(root, '.standards/STATE.md'), state);
-  await editState(root, (text) => [['Id', id], ['Request', 'Add user search by name'], ['CycleMode', 'STANDARD']]
+  await editState(root, (text) => [['Id', id], ['Request', 'Add user search by name'], ['CycleMode', 'STANDARD'],
+    ['CompletionPolicy', 'FULL_DELIVERABLE']]
     .reduce((current, [name, value]) => setField(current, name, value), text));
   await installProject({ projectRoot: root, clients: ['claude'] });
   assert.equal((await check(root)).ok, true);
@@ -295,6 +590,7 @@ test('a new cycle may not reuse the ID of the cycle the last commit ended', () =
   const next = await tool(root, 'cycle', 'new', '--request', 'Next change');
   assert.equal(next.code, 0, next.stderr);
   const reopen = (cycle) => editState(root, (text) => [['WorkflowState', 'AUDITING'], ['CycleMode', 'STANDARD'],
+    ['CompletionPolicy', 'FULL_DELIVERABLE'],
     ['Kind', 'NEW_CYCLE'], ['From', 'SIGNED_OFF'], ['Id', cycle]].reduce((current, [name, value]) => setField(current, name, value), text));
   await reopen(id);
   hasProblem(await check(root), new RegExp(`Active Work\\.Id \`${id}\` belongs to the cycle the last commit ended in SIGNED_OFF`));
@@ -1009,6 +1305,358 @@ test('an expedited cycle needs its plan and implementation review before sign-of
   assert.deepEqual(messages(await check(root)), []);
 }));
 
+test('shorter readiness requires a separate eligible closure assessment on forward and recovery returns', () => project(async (root) => {
+  const { review } = await implementationReviewedCycle(root);
+  const complete = await read(root, review);
+  for (const kind of ['FORWARD', 'RESUME']) {
+    await editStateFields(root, { Kind: kind });
+    await write(root, review, complete.split('## Implementation-Reviewed Closure')[0]);
+    hasProblem(await check(root), /requires an Implementation-Reviewed Closure assessment/);
+    await write(root, review, setField(complete, 'Eligibility', 'NOT_ASSESSED'));
+    hasProblem(await check(root), /requires Closure Eligibility ELIGIBLE/);
+    await write(root, review, complete);
+    assert.deepEqual(messages(await check(root)), []);
+  }
+}));
+
+test('a passing ordinary review can remain ineligible for shorter closure', () => project(async (root) => {
+  const { review, scope, spec, report, plan } = await implementationReviewedCycle(root);
+  await write(root, scope, (await read(root, scope)).replace('Users see search results.', 'The guide explains search.'));
+  await write(root, spec, (await read(root, spec)).replace('Search-results component.', 'No architectural impact; Documenter owns it.'));
+  await write(root, report, (await read(root, report)).replace('test/search-results.test.js | passed', 'pending Documenter | pending'));
+  await write(root, plan, (await read(root, plan)).replace('`Acceptance`: `AC-002`', '`Acceptance`: `AC-001`'));
+  await editStateFields(root, { WorkflowState: 'REVIEWING_IMPLEMENTATION', From: 'TESTING' });
+  await fillHeader(root, review, { Eligibility: 'INELIGIBLE',
+    'Unmet Requirements': 'Documenter must supply required guide evidence for AC-002.' });
+  assert.deepEqual(messages(await check(root)), []);
+  await editStateFields(root, { WorkflowState: 'AWAITING_USER_SIGNOFF', From: 'REVIEWING_IMPLEMENTATION' });
+  hasProblem(await check(root), /requires Closure Eligibility ELIGIBLE/);
+  // From Reviewer the user can choose FULL_DELIVERABLE in the same state;
+  // Reviewer can then hand off normally with the historical ineligible closure.
+  await editStateFields(root, { WorkflowState: 'DOCUMENTING', CompletionPolicy: 'FULL_DELIVERABLE',
+    Kind: 'FORWARD', From: 'REVIEWING_IMPLEMENTATION', Reason: 'Implementation review passed; user selected full completion.' });
+  assert.deepEqual(messages(await check(root)), []);
+}));
+
+test('a final review report cannot supply implementation closure eligibility', () => project(async (root) => {
+  const { review } = await implementationReviewedCycle(root);
+  const text = await read(root, review);
+  await write(root, review, text.split('## Implementation-Reviewed Closure')[0]);
+  const final = await init(root, 'REVIEW', '--kind', 'FINAL_DELIVERABLE');
+  await fillHeader(root, final, { Status: 'COMPLETE' });
+  await write(root, final, `${await read(root, final)}\n## Implementation-Reviewed Closure${text.split('## Implementation-Reviewed Closure')[1]}`);
+  const result = await check(root);
+  hasProblem(result, /implementation.md: IMPLEMENTATION_REVIEWED sign-off readiness requires an Implementation-Reviewed Closure assessment/);
+  hasProblem(result, /final-deliverable.md: Implementation-Reviewed Closure belongs only in the implementation review report/);
+}));
+
+test('shorter readiness rejects eligible claims with missing evidence or unresolved owner work', () => project(async (root) => {
+  const { review } = await implementationReviewedCycle(root);
+  const original = await read(root, review);
+  for (const name of ['User Choice', 'Assessed Inputs', 'Evidence', 'Omitted Guarantees']) {
+    await write(root, review, setField(original, name, 'NONE'));
+    hasProblem(await check(root), new RegExp(`ELIGIBLE closure requires ${name}, not NONE`));
+  }
+  await write(root, review, setField(original, 'Unmet Requirements', 'Documenter correction remains.'));
+  hasProblem(await check(root), /ELIGIBLE closure requires Unmet Requirements NONE/);
+}));
+
+test('completion policies must match the cycle mode and initialization state', () => project(async (root) => {
+  for (const policy of ['FULL_DELIVERABLE', 'IMPLEMENTATION_REVIEWED']) {
+    await editStateFields(root, { CompletionPolicy: policy });
+    hasProblem(await check(root), /No cycle has started, so Active Work.CompletionPolicy must be NONE/);
+  }
+  await editStateFields(root, { CompletionPolicy: 'NONE' });
+  await startCycle(root, { state: 'AUDITING' });
+  await editStateFields(root, { CompletionPolicy: 'NONE' });
+  hasProblem(await check(root), /CompletionPolicy NONE is not valid with CycleMode STANDARD/);
+  for (const policy of ['FULL_DELIVERABLE', 'IMPLEMENTATION_REVIEWED']) {
+    await editStateFields(root, { CompletionPolicy: policy });
+    assert.deepEqual(messages(await check(root)), []);
+    await editStateFields(root, { CycleMode: 'EXPEDITED', WorkflowState: 'DEVELOPING' });
+    hasProblem(await check(root), /is not valid with CycleMode EXPEDITED/);
+    await editStateFields(root, { CycleMode: 'STANDARD', WorkflowState: 'AUDITING' });
+  }
+  await editStateFields(root, { CycleMode: 'EXPEDITED', WorkflowState: 'DEVELOPING', CompletionPolicy: 'NONE' });
+  assert.deepEqual(messages(await check(root)), []);
+  // A terminal snapshot retains its last policy without an active cycle mode.
+  for (const policy of ['NONE', 'FULL_DELIVERABLE', 'IMPLEMENTATION_REVIEWED']) {
+    await editStateFields(root, { CycleMode: 'UNSET', WorkflowState: 'SIGNED_OFF', CompletionPolicy: policy,
+      Kind: 'SIGNOFF', From: 'AWAITING_USER_SIGNOFF' });
+    assert.deepEqual(messages(await check(root)), []);
+  }
+}));
+
+for (const mode of ['GREENFIELD', 'BROWNFIELD']) {
+  test(`${mode} standard entry supports either completion policy`, () => project(async (root) => {
+    const state = mode === 'GREENFIELD' ? 'SCOPING' : 'AUDITING';
+    await write(root, '.standards/MODE.md', setField(await read(root, '.standards/MODE.md'), 'ProjectMode', mode));
+    await editStateFields(root, { WorkflowState: state });
+    await startCycle(root, { state });
+    for (const policy of ['FULL_DELIVERABLE', 'IMPLEMENTATION_REVIEWED']) {
+      await editStateFields(root, { CompletionPolicy: policy });
+      assert.deepEqual(messages(await check(root)), []);
+    }
+  }));
+}
+
+test('shorter completion requires verification and implementation review but not the three omitted records', () => project(async (root) => {
+  const { report, review } = await implementationReviewedCycle(root);
+  assert.deepEqual(messages(await check(root)), []);
+  for (const file of [report, review]) {
+    const text = await read(root, file);
+    await rm(path.join(root, file));
+    hasProblem(await check(root), /must exist once the cycle has passed (TESTING|REVIEWING_IMPLEMENTATION)/);
+    await write(root, file, text);
+  }
+  // FULL_DELIVERABLE still requires all three downstream records.
+  await editStateFields(root, { CompletionPolicy: 'FULL_DELIVERABLE', From: 'SYNCHRONIZING' });
+  const result = await check(root);
+  for (const phase of ['DOCUMENTING', 'REVIEWING_FINAL', 'SYNCHRONIZING']) {
+    hasProblem(result, new RegExp(`must exist once the cycle has passed ${phase}`));
+  }
+}));
+
+test('shorter completion cannot bypass full implementation, verification, or acceptance coverage', () => project(async (root) => {
+  const { plan, report, review } = await implementationReviewedCycle(root);
+  for (const [file, fields, expected] of [
+    [plan, { Status: 'IN_PROGRESS' }, /The plan must be COMPLETE/],
+    [report, { Status: 'IN_PROGRESS' }, /must be COMPLETE once the cycle has passed TESTING/],
+    [report, { 'Assessment Purpose': 'CORRECTION', 'Assessment Target': 'one case' }, /A COMPLETE report requires Assessment Purpose FULL/],
+    [review, { Status: 'BLOCKED' }, /must be COMPLETE once the cycle has passed REVIEWING_IMPLEMENTATION/],
+  ]) {
+    const text = await read(root, file);
+    await fillHeader(root, file, fields);
+    hasProblem(await check(root), expected);
+    await write(root, file, text);
+  }
+  await write(root, review, (await read(root, review)).replaceAll('AC-002', ''));
+  hasProblem(await check(root), /is COMPLETE but does not account for AC-002/);
+}));
+
+test('shorter completion still validates existing records from omitted phases', () => project(async (root) => {
+  const { id } = await implementationReviewedCycle(root);
+  const file = `.standards/docs/documentation/${id}.md`;
+  await write(root, file, '# Unmarked documentation record\n');
+  hasProblem(await check(root), /does not start with a STANDARDS provenance block/);
+  await rm(path.join(root, file));
+  const final = await init(root, 'REVIEW', '--kind', 'FINAL_DELIVERABLE');
+  await fillHeader(root, final, { Status: 'COMPLETE' });
+  await write(root, final, `${await read(root, final)}\nAC-001 only.\n`);
+  hasProblem(await check(root), /final-deliverable.md: is COMPLETE but does not account for AC-002/);
+}));
+
+test('shorter completion permits corrective downstream owners only through recovery', () => project(async (root) => {
+  await implementationReviewedCycle(root);
+  for (const [state, failure] of [['DOCUMENTING', 'DOCUMENTATION'], ['REVIEWING_FINAL', 'REVIEW'], ['SYNCHRONIZING', 'SYNCHRONIZATION']]) {
+    await editStateFields(root, { WorkflowState: state, Kind: 'FAILURE', From: 'REVIEWING_IMPLEMENTATION', FailureType: failure });
+    const original = await read(root, '.standards/STATE.md');
+    hasProblem(await check(root), new RegExp(`${state} is outside the normal IMPLEMENTATION_REVIEWED route`));
+    await editState(root, (text) => withFrame(text, { From: 'REVIEWING_IMPLEMENTATION', Owner: state,
+      FailureType: failure, ResumeAt: 'REVIEWING_IMPLEMENTATION' }));
+    assert.deepEqual(messages(await check(root)), []);
+    await write(root, '.standards/STATE.md', original);
+  }
+}));
+
+test('completion-change handoffs accept late selection and withdrawal with current completed records', () => project(async (root) => {
+  const { review, report } = await implementationReviewedCycle(root);
+  for (const fields of [
+    { WorkflowState: 'REVIEWING_IMPLEMENTATION', From: 'DOCUMENTING', CompletionPolicy: 'IMPLEMENTATION_REVIEWED' },
+    { WorkflowState: 'DOCUMENTING', From: 'AWAITING_USER_SIGNOFF', CompletionPolicy: 'FULL_DELIVERABLE' },
+  ]) {
+    await editStateFields(root, { ...fields, Kind: 'COMPLETION_CHANGE', Reason: 'User changed the completion policy.' });
+    assert.deepEqual(messages(await check(root)), []);
+    const reviewText = await read(root, review);
+    await fillHeader(root, review, { Status: 'IN_PROGRESS' });
+    if (fields.WorkflowState === 'REVIEWING_IMPLEMENTATION') {
+      assert.deepEqual(messages(await check(root)), []); // Reviewer may reopen its own assessment.
+    } else {
+      hasProblem(await check(root), /must be COMPLETE for a COMPLETION_CHANGE handoff/);
+    }
+    await write(root, review, reviewText);
+    const verificationText = await read(root, report);
+    await fillHeader(root, report, { Status: 'IN_PROGRESS' });
+    hasProblem(await check(root), /must be COMPLETE once the cycle has passed TESTING/);
+    await write(root, report, verificationText);
+  }
+}));
+
+test('completion-change handoffs reject wrong routes, modes, and failure semantics', () => project(async (root) => {
+  await implementationReviewedCycle(root);
+  await editStateFields(root, { WorkflowState: 'REVIEWING_IMPLEMENTATION', From: 'DOCUMENTING',
+    Kind: 'COMPLETION_CHANGE', Reason: 'User selected IMPLEMENTATION_REVIEWED.' });
+  const original = await read(root, '.standards/STATE.md');
+  for (const [fields, expected] of [
+    [{ From: 'TESTING' }, /COMPLETION_CHANGE requires an active STANDARD cycle/],
+    [{ WorkflowState: 'AWAITING_USER_SIGNOFF' }, /COMPLETION_CHANGE requires an active STANDARD cycle/],
+    [{ WorkflowState: 'SIGNED_OFF', CycleMode: 'UNSET' }, /COMPLETION_CHANGE requires an active STANDARD cycle/],
+    [{ CompletionPolicy: 'NONE' }, /CompletionPolicy NONE is not valid with CycleMode STANDARD/],
+    [{ CycleMode: 'EXPEDITED', CompletionPolicy: 'NONE' }, /COMPLETION_CHANGE requires an active STANDARD cycle/],
+    [{ FailureType: 'REVIEW' }, /COMPLETION_CHANGE handoff requires FailureType NONE/],
+    [{ Reason: 'NONE' }, /COMPLETION_CHANGE handoff needs a reason/],
+  ]) {
+    await editStateFields(root, fields);
+    hasProblem(await check(root), expected);
+    await write(root, '.standards/STATE.md', original);
+  }
+  for (const section of ['Recovery', 'Outstanding Obligations']) {
+    await editState(root, (text) => text.replace(`## ${section}\n\n\`Active\`: \`false\``, `## ${section}\n\n\`Active\`: \`true\``));
+    hasProblem(await check(root), /COMPLETION_CHANGE requires inactive recovery with an empty stack and no outstanding obligations/);
+    await write(root, '.standards/STATE.md', original);
+  }
+  await editState(root, (text) => withFrame(text, { From: 'REVIEWING_IMPLEMENTATION', Owner: 'REVIEWING_IMPLEMENTATION',
+    FailureType: 'REVIEW', ResumeAt: 'REVIEWING_IMPLEMENTATION' }).replace('## Recovery\n\n`Active`: `true`', '## Recovery\n\n`Active`: `false`'));
+  hasProblem(await check(root), /COMPLETION_CHANGE requires inactive recovery with an empty stack and no outstanding obligations/);
+}));
+
+test('a saved completion-change handoff permits later same-state choices and receiving-role progress', () => project(async (root) => {
+  const { review } = await implementationReviewedCycle(root);
+  await editStateFields(root, { WorkflowState: 'REVIEWING_IMPLEMENTATION', From: 'DOCUMENTING',
+    Kind: 'COMPLETION_CHANGE', Reason: 'User selected IMPLEMENTATION_REVIEWED.' });
+  await editStateFields(root, { CompletionPolicy: 'FULL_DELIVERABLE', BlockedOn: 'Reviewer needs an answer.' });
+  await fillHeader(root, review, { Status: 'BLOCKED' });
+  assert.deepEqual(messages(await check(root)), []);
+  const text = await read(root, review);
+  await rm(path.join(root, review));
+  hasProblem(await check(root), /must exist for a COMPLETION_CHANGE handoff/);
+  await write(root, review, text);
+  await fillHeader(root, review, { Status: 'COMPLETE' });
+  await editStateFields(root, { WorkflowState: 'DOCUMENTING', From: 'AWAITING_USER_SIGNOFF',
+    Reason: 'User withdrew the shorter policy.', BlockedOn: 'Documenter needs approval for its target.' });
+  assert.deepEqual(messages(await check(root)), []);
+}));
+
+test('shorter sign-off readiness rejects blockers, unresolved baseline, recovery, and pending cadence', () => project(async (root) => {
+  await implementationReviewedCycle(root);
+  const original = await read(root, '.standards/STATE.md');
+  for (const [fields, expected] of [
+    [{ BlockedOn: 'Need an answer.' }, /AWAITING_USER_SIGNOFF requires Active Work.BlockedOn NONE/],
+    [{ PendingVerificationCadence: 'INCREMENTAL' }, /Clear pending cadence intent/],
+  ]) {
+    await editStateFields(root, fields);
+    hasProblem(await check(root), expected);
+    await write(root, '.standards/STATE.md', original);
+  }
+  await editState(root, (text) => text.replace('`BaselineReconciliation`: `NONE`',
+    '`BaselineReconciliation`:\n\n- `SourceCycle`: `old-work-20261001T120000Z-1234abcd`\n  `Request`: `Old work.`'));
+  hasProblem(await check(root), /cannot await sign-off while BaselineReconciliation is unresolved/);
+  await write(root, '.standards/STATE.md', original);
+  await editState(root, (text) => withFrame(text, { From: 'AWAITING_USER_SIGNOFF', Owner: 'REVIEWING_IMPLEMENTATION',
+    FailureType: 'REVIEW', ResumeAt: 'AWAITING_USER_SIGNOFF', RerunThrough: 'REVIEWING_IMPLEMENTATION' }));
+  hasProblem(await check(root), /AWAITING_USER_SIGNOFF requires an empty recovery stack/);
+  await write(root, '.standards/STATE.md', original);
+  // A finished recovery may return to sign-off with the shorter requirements.
+  await editStateFields(root, { Kind: 'RESUME', From: 'REVIEWING_IMPLEMENTATION' });
+  assert.deepEqual(messages(await check(root)), []);
+}));
+
+test('direct shorter sign-off returns require the returning downstream owner to have passed its full gate', () => project(async (root) => {
+  const { id } = await implementationReviewedCycle(root);
+  for (const [phase, type, kind, relative] of [
+    ['DOCUMENTING', 'DOCUMENTATION', null, `.standards/docs/documentation/${id}.md`],
+    ['REVIEWING_FINAL', 'REVIEW', 'FINAL_DELIVERABLE', `.standards/docs/reviews/${id}/final-deliverable.md`],
+    ['SYNCHRONIZING', 'SYNCHRONIZATION', null, `.standards/docs/synchronization/${id}.md`],
+  ]) {
+    await editStateFields(root, { Kind: 'RESUME', From: phase });
+    hasProblem(await check(root), /must exist and be COMPLETE for a direct recovery return to sign-off/);
+    const file = await init(root, type, ...(kind ? ['--kind', kind] : []));
+    assert.equal(file, relative);
+    await fillHeader(root, file, { Status: 'IN_PROGRESS', Collaboration: 'AUTONOMOUS', Target: 'ACTIVE_CHANGE',
+      'Target Detail': 'active cycle', 'User Style': 'NONE' });
+    await write(root, file, `${await read(root, file)}\nAC-001 and AC-002 assessed for this owned gate.\n`);
+    for (const Status of ['IN_PROGRESS', 'BLOCKED']) {
+      await fillHeader(root, file, { Status });
+      hasProblem(await check(root), /must be COMPLETE for a direct recovery return to sign-off; its Status/);
+    }
+    await fillHeader(root, file, { Status: 'COMPLETE' });
+    assert.deepEqual(messages(await check(root)), []);
+  }
+}));
+
+test('shorter reconciliation correction returns through Reviewer without inventing final-review completion', () => project(async (root) => {
+  const { review } = await implementationReviewedCycle(root);
+  const ready = await read(root, '.standards/STATE.md');
+  const sync = await init(root, 'SYNCHRONIZATION');
+  await fillHeader(root, sync, { Status: 'IN_PROGRESS' });
+  await write(root, sync, `${await read(root, sync)}\nOwned reconciliation corrected; normal final review intentionally omitted.\n`);
+  await write(root, '.standards/STATE.md', withFrame(ready, {
+    From: 'AWAITING_USER_SIGNOFF', Owner: 'SYNCHRONIZING', FailureType: 'SYNCHRONIZATION',
+    ResumeAt: 'AWAITING_USER_SIGNOFF', RerunThrough: 'REVIEWING_IMPLEMENTATION',
+  }));
+  await editStateFields(root, { WorkflowState: 'REVIEWING_IMPLEMENTATION', Kind: 'RESUME', From: 'SYNCHRONIZING' });
+  await fillHeader(root, review, { Eligibility: 'NOT_ASSESSED' });
+  assert.deepEqual(messages(await check(root)), []);
+  // Closing the frame alone cannot reinstate readiness before reassessment.
+  await write(root, '.standards/STATE.md', ready);
+  await editStateFields(root, { Kind: 'RESUME', From: 'REVIEWING_IMPLEMENTATION' });
+  hasProblem(await check(root), /requires Closure Eligibility ELIGIBLE/);
+  await fillHeader(root, review, { Eligibility: 'ELIGIBLE' });
+  assert.deepEqual(messages(await check(root)), []);
+}));
+
+for (const interrupted of ['REVIEWING_IMPLEMENTATION', 'AWAITING_USER_SIGNOFF']) {
+  test(`shorter corrective synchronization rerun under Developer resumes ${interrupted} through Reviewer`, () => project(async (root) => {
+    const { id, review } = await implementationReviewedCycle(root);
+    const ready = await read(root, '.standards/STATE.md');
+    const sync = await init(root, 'SYNCHRONIZATION');
+    await fillHeader(root, sync, { Status: 'IN_PROGRESS' });
+    await write(root, sync, `${await read(root, sync)}\n## Prior Corrective Evidence\n\n`
+      + 'Verified the corrected AC-001 evidence reference; normal final review intentionally omitted.\n'
+      + '\n## Rerun Evidence\n\nFrame 1, reason A defect., belongs to Developer. '
+      + 'The upstream correction changed the endpoint content. Rechecked the prior AC-001 reference '
+      + 'and AC-002 evidence against the current full verification report. No owned defect remains. '
+      + 'Full synchronization remains incomplete pending implementation Reviewer reassessment '
+      + 'and because normal final review is intentionally omitted.\n');
+    await fillHeader(root, review, { Eligibility: 'NOT_ASSESSED' });
+    const resumesReviewer = interrupted === 'REVIEWING_IMPLEMENTATION';
+    await write(root, '.standards/STATE.md', withFrame(ready, {
+      From: interrupted, Owner: 'DEVELOPING', FailureType: 'IMPLEMENTATION', ResumeAt: interrupted,
+      RerunThrough: resumesReviewer ? 'SYNCHRONIZING' : 'REVIEWING_IMPLEMENTATION',
+    }));
+    await editStateFields(root, { WorkflowState: 'SYNCHRONIZING', Kind: 'RESUME', From: 'TESTING' });
+    assert.deepEqual(messages(await check(root)), []);
+    const rerunState = await read(root, '.standards/STATE.md');
+    if (resumesReviewer) await write(root, '.standards/STATE.md', ready); // Only this completed frame is popped.
+    await editStateFields(root, { WorkflowState: 'REVIEWING_IMPLEMENTATION', Kind: 'RESUME', From: 'SYNCHRONIZING' });
+    assert.deepEqual(messages(await check(root)), []);
+    const reviewState = await read(root, '.standards/STATE.md');
+    if (!resumesReviewer) {
+      assert.equal(reviewState.split('## Recovery')[1], rerunState.split('## Recovery')[1], 'the other owner’s frame stays intact');
+    }
+    // Even a previously eligible label cannot let the incomplete rerun jump
+    // directly from Synchronizer to sign-off after clearing the frame.
+    await fillHeader(root, review, { Eligibility: 'ELIGIBLE' });
+    await write(root, '.standards/STATE.md', ready);
+    await editStateFields(root, { Kind: 'RESUME', From: 'SYNCHRONIZING' });
+    hasProblem(await check(root), /must be COMPLETE for a direct recovery return to sign-off/);
+    // A Reviewer return still requires actual closure reassessment.
+    await fillHeader(root, review, { Eligibility: 'NOT_ASSESSED' });
+    await editStateFields(root, { Kind: resumesReviewer ? 'FORWARD' : 'RESUME', From: 'REVIEWING_IMPLEMENTATION' });
+    hasProblem(await check(root), /requires Closure Eligibility ELIGIBLE/);
+    await fillHeader(root, review, { Eligibility: 'ELIGIBLE' });
+    assert.deepEqual(messages(await check(root)), []);
+    assert.match(await read(root, sync), /`Status`: `IN_PROGRESS`/);
+    await assert.rejects(read(root, `.standards/docs/reviews/${id}/final-deliverable.md`), { code: 'ENOENT' });
+  }));
+}
+
+test('normal forward handoffs use the selected completion boundary', () => project(async (root) => {
+  await implementationReviewedCycle(root);
+  await editStateFields(root, { From: 'TESTING' });
+  hasProblem(await check(root), /Forward sign-off readiness.*must come from REVIEWING_IMPLEMENTATION/);
+  await editStateFields(root, { From: 'REVIEWING_IMPLEMENTATION', CompletionPolicy: 'FULL_DELIVERABLE' });
+  hasProblem(await check(root), /Normal implementation-review success with FULL_DELIVERABLE hands off to DOCUMENTING/);
+  await editStateFields(root, { WorkflowState: 'DOCUMENTING', CompletionPolicy: 'IMPLEMENTATION_REVIEWED' });
+  hasProblem(await check(root), /Normal implementation-review success with IMPLEMENTATION_REVIEWED hands off to AWAITING_USER_SIGNOFF/);
+}));
+
+test('same-state completion-policy selection preserves an incremental checkpoint', () => project(async (root) => {
+  await incrementalCycle(root);
+  await editStateFields(root, { CompletionPolicy: 'IMPLEMENTATION_REVIEWED' });
+  assert.deepEqual(messages(await check(root)), []);
+}));
+
 test('recovery frames and handoffs must agree with each other', () => project(async (root) => {
   await standardCycle(root);
   // A failure that moved the state pushes a matching frame.
@@ -1123,10 +1771,11 @@ test('a merge conflict in a cycle record stops the check with its own message', 
   assert.deepEqual(messages(await check(root)), [`${report}: has an unresolved merge conflict. Stop and ask the user to resolve it.`]);
 }, { withGit: true }));
 
-test('verification scheduling and assessment fields are required, unique, and concrete', () => project(async (root) => {
+test('completion policy, verification scheduling, and assessment fields are required, unique, and concrete', () => project(async (root) => {
   const { plan, report } = await standardCycle(root);
   for (const [file, name] of [[plan, 'Verification Cadence'], [plan, 'Current Increment'],
-    [report, 'Assessment Purpose'], [report, 'Assessment Target'], ['.standards/STATE.md', 'PendingVerificationCadence']]) {
+    [report, 'Assessment Purpose'], [report, 'Assessment Target'], ['.standards/STATE.md', 'PendingVerificationCadence'],
+    ['.standards/STATE.md', 'CompletionPolicy']]) {
     const original = await read(root, file);
     const field = new RegExp('`' + name + '`:\\s*`[^`]*`');
     await write(root, file, original.replace(field, ''));

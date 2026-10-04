@@ -39,7 +39,10 @@ it without asking the user to restate it, and let a revised request replace it.
    `GREENFIELD` supports only `STANDARD`, and unresolved reconciliation requires
    `STANDARD`. A pending `EXPEDITED` preference does not bypass the **Expedited
    Cycle Contract** in `.standards/protocol/expedited.md`: validate eligibility
-   before consuming it.
+   before consuming it. An explicit `FULL_DELIVERABLE` or
+   `IMPLEMENTATION_REVIEWED` selection requires `STANDARD` and prevents inferred
+   expedited entry. It does not override an explicit or pending `EXPEDITED` mode
+   choice; conflicting choices require resolution in step 3.
 3. **Block instead of starting when the mode is not legal**, whether because of
    an invalid pending preference or an explicitly requested mode the current
    `ProjectMode` does not support. Never silently reinterpret the mode as
@@ -50,6 +53,10 @@ it without asking the user to restate it, and let a revised request replace it.
    choose a supported mode, replace or clear the preference, revise the request,
    or abandon it. Abandoning clears `PendingCycleRequest` and
    `PendingCycleBlockedOn` without modifying `Active Work` or starting a cycle.
+   Apply the same rule to an incompatible completion-policy choice. Keep any
+   explicit policy instruction and stated reason in the saved request text so
+   resolving the mode conflict does not lose them; there is no separate pending
+   completion-policy field.
 4. **Generate the ID** as **Cycle IDs** describes. If the tool refuses, leave
    the state unchanged and do not start the cycle.
 5. **Persist the cycle** in one state update:
@@ -57,6 +64,12 @@ it without asking the user to restate it, and let a revised request replace it.
      `Development`, `PromotionReason`, `AuditTarget`, and `BlockedOn` set to
      `NONE`; `PendingVerificationCadence: NONE`; and `BaselineReconciliation`
      from step 1.
+   - `Active Work.CompletionPolicy`: `NONE` for `EXPEDITED`; `FULL_DELIVERABLE`
+     for `STANDARD` unless the user explicitly selected
+     `IMPLEMENTATION_REVIEWED` for this request. Preserve any explicit choice
+     and stated reason in `Active Work.Request` as a workflow instruction,
+     distinct from implementation requirements. Do not inherit the prior cycle's
+     policy or invent a reason.
    - `CycleMode`: the chosen mode. `PendingCycleMode` and `PendingCycleRequest`
      become `UNSET`, and `PendingCycleBlockedOn` becomes `NONE`.
    - `Handoff`: for the first cycle, keep `Kind: INITIAL` with `From: NONE` and
@@ -73,6 +86,96 @@ it without asking the user to restate it, and let a revised request replace it.
      `ProjectMode`: `SCOPING` for `GREENFIELD` or `AUDITING` for `BROWNFIELD`.
 
 `CycleMode` never remains `UNSET` once a cycle has started.
+
+## Change completion policy
+
+An explicit user instruction may select `FULL_DELIVERABLE` or
+`IMPLEMENTATION_REVIEWED` for the active `STANDARD` cycle under **Completion
+Policies**. A request to finish after implementation review selects the shorter
+policy; it does not itself assert that review passed or accept the deliverable.
+A request to withdraw that choice selects `FULL_DELIVERABLE`. The **Navigator
+Boundary** and **User Decisions and Intervention** permissions still apply.
+
+With no active cycle, select the policy only as part of **Start a cycle**; there
+is no standalone next-cycle policy preference. With an active `EXPEDITED` cycle,
+keep `CompletionPolicy: NONE` and explain its existing path through
+implementation review to sign-off. A standard policy requires authorization for
+**Promote an expedited cycle**; selecting a policy alone does not promote it.
+Promotion first initializes `FULL_DELIVERABLE`, after which a separately
+authorized policy selection must satisfy the rules below. Both instructions may
+be given together, but selection must not bypass promotion obligations.
+
+1. **Check whether this changes the policy.** An instruction matching the saved
+   policy is a no-op: preserve state, handoff, and records. It does not reassert
+   evidence validity, sign off, or restart work. For an unset or terminal cycle,
+   do not edit the retained cycle or reopen it.
+2. **Check the boundary before applying a change.** Recovery must be inactive
+   with an empty stack, and outstanding obligations inactive with no entries. No
+   normal documentation, final-review, or synchronization work may have begun in
+   this cycle. Determine this from the saved role progress and repository
+   evidence, not merely the current state or absence of a record. Earlier
+   corrective work by those owners is not normal downstream phase entry and
+   remains subject to its existing evidence and obligations.
+3. **Select the permitted route** from the table below. These are the only
+   policy-change routes; other states or failed preconditions do not authorize a
+   change. Leave the policy and routing unchanged, explain the unmet condition,
+   and do not queue a deferred policy change. Established defects still use
+   normal owner-directed failure routing. A materially changed request uses
+   normal rework, not this policy-only action.
+
+   | Current state                                                                                 | Policy change                                   | Resulting state            | Additional precondition                                                                |
+   | --------------------------------------------------------------------------------------------- | ----------------------------------------------- | -------------------------- | -------------------------------------------------------------------------------------- |
+   | `SCOPING`, `ARCHITECTING`, `AUDITING`, `DEVELOPING`, `TESTING`, or `REVIEWING_IMPLEMENTATION` | Either standard policy to the other             | Same state                 | Preserve the current role assignment and handoff, including an incremental checkpoint. |
+   | `DOCUMENTING`                                                                                 | `FULL_DELIVERABLE` to `IMPLEMENTATION_REVIEWED` | `REVIEWING_IMPLEMENTATION` | Untouched normal Documenter handoff under the conditions below.                        |
+   | `AWAITING_USER_SIGNOFF`                                                                       | `IMPLEMENTATION_REVIEWED` to `FULL_DELIVERABLE` | `DOCUMENTING`              | Current implementation-review evidence under the conditions below.                     |
+
+   For the `DOCUMENTING` route, the saved handoff must be either `FORWARD` from
+   `REVIEWING_IMPLEMENTATION`, or `COMPLETION_CHANGE` from
+   `AWAITING_USER_SIGNOFF` after a withdrawal. Documenter must not have begun
+   its normal phase. The implementation review must have passed and remain
+   applicable to current inputs; permitted later-role dependencies may still be
+   unresolved. Entering Reviewer also requires **Full Verification Boundary**.
+   Reviewer then assesses early-closure eligibility; selecting the policy never
+   supplies that assessment or permits jumping directly to sign-off.
+
+   For the `AWAITING_USER_SIGNOFF` withdrawal route, the completed
+   implementation review and its supporting full verification must remain
+   applicable to current inputs. If changes have invalidated them, route the
+   affected work to its owners before applying the withdrawal. Withdrawal
+   removes readiness for sign-off and resumes the full forward tail at
+   Documenter; it does not require Auditor or other upstream owners to repeat
+   still-valid work.
+
+   Both state-changing routes require `Active Work.BlockedOn: NONE`. An
+   unrelated blocker does not prevent a same-state policy choice, but that
+   choice never clears it or authorizes blocked role work.
+
+4. **Persist the authorized choice.** Set `Active Work.CompletionPolicy` and
+   retain the explicit choice and any stated reason in `Active Work.Request` as
+   a workflow instruction, preserving the implementation request. Replace an
+   earlier policy instruction so the saved request and policy agree; do not
+   treat this as a scope change or an acceptance waiver. Preserve cycle ID,
+   mode, artifact references, evidence, blockers, pending verification cadence,
+   baseline reconciliation, recovery, and outstanding obligations.
+5. **Record routing only when the state changes.** For the two state-changing
+   routes, set `WorkflowState` to the target and `Handoff.Kind` to
+   `COMPLETION_CHANGE`, `From` to the source state, `FailureType: NONE`, and a
+   concise reason identifying the old and new policies. Do not push a recovery
+   frame or overwrite report conclusions. For a same-state change, preserve the
+   entire handoff and any checkpoint assignment. Cycle initialization retains
+   `INITIAL` or `NEW_CYCLE` instead.
+6. **Hand off within existing role permissions.** Persist the coordination
+   update before presenting the next action. Stop after the policy change unless
+   the user also explicitly invoked the role that owns the resulting state.
+   State-changing routes follow **Handoff Rules**, including the implementation
+   review kind and independent-session requirements when returning to Reviewer.
+   A policy change authorizes no other role's work.
+
+Existing review reports retain their historical assessments. Their closure
+conclusions apply only to the policy and inputs they assessed; a later return to
+the shorter policy requires Reviewer to reconcile eligibility again. Sign-off
+and retained cancellation preserve the last effective policy; starting a new
+cycle replaces it under **Start a cycle**.
 
 ## Switch verification cadence
 
@@ -136,13 +239,24 @@ hand off to Auditor unless Auditor was also explicitly invoked.
 From `AWAITING_USER_SIGNOFF`, sign-off is legal only when the
 `Outstanding Obligations` section is inactive. Revalidate the current mode's
 completion contract: **Standard Cycle Completion**, including every standard
-gate and the acceptance-traceability obligations, or, for `EXPEDITED`, only the
-narrower **Expedited Cycle Contract** in `.standards/protocol/expedited.md`;
-skipped standard phases must not be represented as completed. Then transition to
-`SIGNED_OFF`, set `CycleMode: UNSET`, leave all pending-cycle fields clear,
-record `Handoff.Kind: SIGNOFF`, `From: AWAITING_USER_SIGNOFF`, and
-`FailureType: NONE`, clear `Active Work.PendingVerificationCadence` to `NONE`,
-and clear recovery. The cycle is complete.
+gate applicable to `Active Work.CompletionPolicy` and the
+acceptance-traceability obligations, or, for `EXPEDITED`, only the narrower
+**Expedited Cycle Contract** in `.standards/protocol/expedited.md`; skipped
+standard phases must not be represented as completed. For
+`IMPLEMENTATION_REVIEWED`, inspect the implementation report's separate closure
+assessment, its recorded user choice, evidence references, and assessed input
+identities. Require a `COMPLETE` ordinary review and current `ELIGIBLE` closure,
+with the omitted guarantees made clear. Compare current inputs rather than
+trusting the saved label alone. If evidence or eligibility is invalidated, use
+owner-directed recovery and Reviewer reassessment under **Recovery Mechanics**;
+the agent recording sign-off does not author a replacement review conclusion. An
+unchanged, applicable assessment does not require another review merely because
+the user is now accepting it. Then transition to `SIGNED_OFF`, set
+`CycleMode: UNSET`, leave all pending-cycle fields clear, record
+`Handoff.Kind: SIGNOFF`, `From: AWAITING_USER_SIGNOFF`, and `FailureType: NONE`,
+clear `Active Work.PendingVerificationCadence` to `NONE`, preserve
+`Active Work.CompletionPolicy`, and clear recovery. The cycle is complete. A
+policy-selection instruction alone is not user sign-off.
 
 ## Cancel an active cycle
 
@@ -153,8 +267,9 @@ and clear recovery. The cycle is complete.
   `Handoff.Kind: CANCEL`, set `From` to the interrupted state,
   `FailureType: NONE`, preserve `Active Work` except for clearing
   `PendingVerificationCadence` to `NONE`, and clear recovery plus outstanding
-  obligations. Residual project-change provenance is handled through
-  `BaselineReconciliation` when a later cycle starts.
+  obligations. Preserve `Active Work.CompletionPolicy` as historical context.
+  Residual project-change provenance is handled through `BaselineReconciliation`
+  when a later cycle starts.
 
 Cancellation never reverts project artifacts and does not by itself establish
 cancelled-cycle project changes as baseline.

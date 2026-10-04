@@ -17,8 +17,9 @@ or execution order. See
 
 The `Active Work` section in `STATE.md`: the cycle's ID, request, document
 paths, promotion reason, audit target, unresolved cancelled changes, pending
-verification cadence, and blocking question. After retained cancellation or
-sign-off, it describes the last cycle until a new one replaces it.
+verification cadence, completion policy, and blocking question. After retained
+cancellation or sign-off, it describes the last cycle until a new one replaces
+it.
 
 ## Artifact provenance
 
@@ -65,6 +66,15 @@ The checks a role must pass before full completion. An incremental checkpoint
 uses an assignment gate, and a scoped correction can return before unrelated
 work is finished. See the
 [corrective return rules](../../concepts/recovery/#when-a-correction-must-return-before-full-completion).
+
+## Completion policy
+
+A standard cycle's choice of checks before sign-off. `FULL_DELIVERABLE` includes
+all standard phases. `IMPLEMENTATION_REVIEWED` keeps all steps through
+implementation review and requires a separate check that no required work
+remains. The choice applies to one cycle and is saved in
+`Active Work.CompletionPolicy`. See
+[Finishing After Implementation Review](../../guides/finishing-after-implementation-review/).
 
 ## Cycle
 
@@ -219,9 +229,10 @@ ends the cycle in `SIGNED_OFF`. Readiness for sign-off is not acceptance.
 
 ## Standard cycle
 
-The full workflow for a change, including separate verification, documentation,
-final review, and synchronization before your sign-off decision. The starting
-role depends on project mode. See
+The workflow that keeps requirements, design, audit, implementation, full
+verification, and implementation review. Its completion policy determines
+whether normal documentation, final review, and synchronization follow. The
+default includes all three. The starting role depends on project mode. See
 [workflow paths](../../concepts/states-and-handoffs/#standard-forward-paths).
 
 ## STANDARDS hook

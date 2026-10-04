@@ -6,9 +6,9 @@
 
 ## Active Work
 
-`Id`: `fix-date-format-20260902T090000Z-5e6f7a8b` `Request`:
-`Show dates as YYYY-MM-DD on the export page.` `Scope`: `NONE` `Architecture`:
-`NONE` `Development`:
+`CompletionPolicy`: `NONE` `Id`: `fix-date-format-20260902T090000Z-5e6f7a8b`
+`Request`: `Show dates as YYYY-MM-DD on the export page.` `Scope`: `NONE`
+`Architecture`: `NONE` `Development`:
 `.standards/docs/development/fix-date-format-20260902T090000Z-5e6f7a8b.md`
 `PromotionReason`: `NONE` `AuditTarget`: `NONE` `BlockedOn`: `NONE`
 

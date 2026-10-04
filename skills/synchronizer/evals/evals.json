@@ -510,7 +510,7 @@
     },
     {
       "id": 49,
-      "prompt": "Invoke Synchronizer. ProjectMode=BROWNFIELD, CycleMode=STANDARD, WorkflowState=SYNCHRONIZING, Active Work.Id=export-20260924T090000Z-a7f3c1d2. The synchronization record has valid current-cycle provenance. Recovery is active; outstanding obligations are inactive and no user question is blocked unless specified. Synchronizer is a downstream rerun, not the owner, in an active frame Owner=DOCUMENTING, ResumeAt=REVIEWING_FINAL, RerunThrough=SYNCHRONIZING. Final review is still incomplete with no applicable conclusion and the full synchronization gate does not pass. No Synchronizer-owned corrective frame exists.",
+      "prompt": "Invoke Synchronizer. ProjectMode=BROWNFIELD, CycleMode=STANDARD, CompletionPolicy=FULL_DELIVERABLE, WorkflowState=SYNCHRONIZING, Active Work.Id=export-20260924T090000Z-a7f3c1d2. The synchronization record has valid current-cycle provenance. Recovery is active; outstanding obligations are inactive and no user question is blocked unless specified. Synchronizer is a downstream rerun, not the owner, in an active frame Owner=DOCUMENTING, ResumeAt=REVIEWING_FINAL, RerunThrough=SYNCHRONIZING. Final review is still incomplete with no applicable conclusion and the full synchronization gate does not pass. No Synchronizer-owned corrective frame exists.",
       "expected_output": "Preserve the frame and resolve the incomplete assessment through canonical ownership rules; do not pop the boundary using corrective return.",
       "files": [],
       "assertions": [
@@ -527,6 +527,64 @@
         "The earlier corrective return is not treated as having already completed synchronization.",
         "Current identities and resolved Reviewer evidence are checked before completing the record.",
         "No user acceptance or SIGNED_OFF state is claimed."
+      ]
+    },
+    {
+      "id": 51,
+      "prompt": "Invoke Synchronizer. ProjectMode=BROWNFIELD, CycleMode=STANDARD, CompletionPolicy=IMPLEMENTATION_REVIEWED, WorkflowState=SYNCHRONIZING, Active Work.Id=export-20260924T090000Z-a7f3c1d2. The current-cycle synchronization record is IN_PROGRESS from an earlier verified corrective return, with its correction evidence, assessed identities, and intentionally omitted normal final-review guarantee preserved. A later Developer correction changed the implementation inputs for that evidence. The active frame belongs to DEVELOPING, From=REVIEWING_IMPLEMENTATION, ResumeAt=REVIEWING_IMPLEMENTATION, RerunThrough=SYNCHRONIZING; its saved plan includes revalidation of the existing synchronization evidence. Implementation and full Tester evidence are now current. Synchronizer has rechecked all affected prior corrective evidence against them with sufficient recorded results. No material defect, required evidence gap, owned obligation, or blocking question remains. Only omitted final review and implementation Reviewer reassessment on resume prevent full synchronization. No older frame exists.",
+      "expected_output": "Use Synchronizer Corrective Reruns: persist the verified scoped outcome, keep the synchronization record incomplete, pop the completed Developer-owned frame at its saved boundary, and RESUME implementation Reviewer.",
+      "files": [],
+      "assertions": [
+        "The exception is applied despite Synchronizer not owning the frame; it does not require an invented nested frame or missing final review.",
+        "The record retains prior correction identities, upstream changes, revalidation evidence, frame association/reason, and full-gate limitations.",
+        "Neither synchronization COMPLETE nor closure eligibility is claimed; implementation Reviewer must reassess before sign-off.",
+        "The selected policy and saved recovery boundary are preserved."
+      ]
+    },
+    {
+      "id": 52,
+      "prompt": "Invoke Synchronizer in a STANDARD IMPLEMENTATION_REVIEWED cycle at SYNCHRONIZING. A current-cycle IN_PROGRESS record preserves an earlier verified corrective return and the intentionally omitted final-review guarantee. An upstream correction invalidated its corrective evidence. The active frame belongs to DEVELOPING, From=AWAITING_USER_SIGNOFF, ResumeAt=AWAITING_USER_SIGNOFF, RerunThrough=REVIEWING_IMPLEMENTATION; the planned reruns put Synchronizer revalidation before final implementation Reviewer reassessment. All required implementation and full Tester evidence is current. The affected reconciliation evidence has been fully revalidated with current identities and actual results, no owned defect or obligation remains, and the only full-gate gaps are omitted final review and the pending Reviewer reassessment. Reviewer still carries its prior ELIGIBLE closure label.",
+      "expected_output": "Persist the scoped rerun result with synchronization incomplete and hand off to implementation Reviewer while retaining the Developer-owned frame.",
+      "files": [],
+      "assertions": [
+        "Synchronizer does not pop directly to AWAITING_USER_SIGNOFF or rewrite the saved RerunThrough boundary.",
+        "The historical ELIGIBLE label does not bypass Reviewer reassessment of changed inputs.",
+        "Missing intentionally omitted final review is not fabricated or treated as an independent defect.",
+        "The record identifies the earlier corrective evidence, changed inputs, revalidation results, and remaining full-gate limitations."
+      ]
+    },
+    {
+      "id": 53,
+      "prompt": "Invoke Synchronizer in a STANDARD IMPLEMENTATION_REVIEWED cycle at SYNCHRONIZING. A current-cycle IN_PROGRESS record preserves an earlier verified corrective return and omitted final-review guarantees. The active frame is owned by DEVELOPING, ResumeAt=REVIEWING_IMPLEMENTATION, RerunThrough=SYNCHRONIZING, and includes rerunning the existing correction after changed implementation. The old evidence reference can now be resolved, but the required authorization test has not run against the changed implementation and AC-002 lacks current evidence. This is an independent verification gap, not merely pending Reviewer reassessment. The user asks to use the scoped rerun exception anyway.",
+      "expected_output": "Withhold the scoped gate, record the missing evidence, and route the established verification gap to Tester with nested recovery while preserving the existing frame.",
+      "files": [],
+      "assertions": [
+        "The shorter policy and prior verified correction do not excuse missing required acceptance evidence.",
+        "Synchronizer does not complete or pop the Developer-owned rerun boundary.",
+        "Required missing verification is distinguished from intentionally omitted normal final review.",
+        "The record stays incomplete and no sign-off readiness is claimed."
+      ]
+    },
+    {
+      "id": 54,
+      "prompt": "Invoke Synchronizer in STANDARD/IMPLEMENTATION_REVIEWED at SYNCHRONIZING. The active owned frame was pushed from AWAITING_USER_SIGNOFF with RerunThrough NONE. An existing current-cycle synchronization record has a reconciliation error; the specific correction is now verified against current implementation and full Tester evidence. No required owned work remains. Full synchronization cannot pass because normal final review was intentionally omitted and is not required by the active contract.",
+      "expected_output": "Use the eligible corrective return, keep synchronization incomplete, and retain the frame for implementation Reviewer reassessment.",
+      "files": [],
+      "assertions": [
+        "RerunThrough becomes REVIEWING_IMPLEMENTATION; Synchronizer cannot pop directly to AWAITING_USER_SIGNOFF.",
+        "The record separates verified correction from omitted guarantees and never fabricates final review or COMPLETE synchronization.",
+        "Only Reviewer reassessment and closing the final frame can restore shorter-policy readiness."
+      ]
+    },
+    {
+      "id": 55,
+      "prompt": "Invoke Synchronizer in STANDARD/IMPLEMENTATION_REVIEWED at SYNCHRONIZING. An older recovery frame is beneath the active Developer-owned frame. The active frame resumes REVIEWING_IMPLEMENTATION at boundary SYNCHRONIZING and its saved plan includes revalidating a record left incomplete by an earlier verified corrective return. All affected corrective evidence has now been revalidated with current full implementation and Tester evidence; only intentionally omitted final review and pending Reviewer reassessment limit the full gate. No independent gap or blocker exists.",
+      "expected_output": "Use Synchronizer Corrective Reruns, pop only the active frame at its saved boundary, and resume implementation Reviewer with the older frame preserved.",
+      "files": [],
+      "assertions": [
+        "The earlier correction, changed inputs, current revalidation, frame association and remaining full-gate limitations are persisted.",
+        "The record stays incomplete and the selected policy is unchanged.",
+        "The older frame cannot be discarded and no direct sign-off readiness is declared."
       ]
     }
   ]

@@ -28,11 +28,14 @@ Cycle: <Active Work.Id>
 - Baseline/comparison range and its basis; committed, staged, unstaged,
   untracked, moved/deleted, and affected unchanged content relevant to the work.
 - Relevant dependencies/configuration and evidence execution assumptions.
-- Workflow context used: handoff, recovery, obligations, baseline
-  reconciliation, and blockers. State remains authoritative for routing; do not
-  copy its stack.
+- Workflow context used: completion policy, handoff, recovery, obligations,
+  baseline reconciliation, and blockers. State remains authoritative for
+  routing; do not copy its stack.
 - Assessment boundary and exclusions with reasons. Distinguish deliverable
-  identities from this record's own writes and legal coordination updates.
+  identities from this record's own writes and legal coordination updates. For
+  corrective work, identify the owned correction and distinguish future
+  dependencies from intentionally omitted normal-phase guarantees. Missing
+  inputs needed for the correction or active contract remain gaps.
 
 ## Completion and Evidence References
 
@@ -92,8 +95,20 @@ changes to reconcile next time. State whether the full Synchronizer gate passed
 and whether recovery requires a return before sign-off readiness. For a
 **Synchronizer Corrective Return**, record the verified owned correction and
 remaining dependencies, owners, and required evidence; explicitly state that
-full synchronization remains incomplete. Reference current state for routing.
-Readiness is not user acceptance.
+full synchronization remains incomplete. Separately identify any intentionally
+omitted guarantees allowed by the shared corrective-return conditions; do not
+invent future assignments for them. Under `IMPLEMENTATION_REVIEWED`, describe
+the saved recovery return and whether implementation Reviewer must reassess
+closure. Neither the correction nor this record replaces that assessment.
+Reference current state for routing. Readiness is not user acceptance.
+
+For **Synchronizer Corrective Reruns** under the protocol, also identify the
+active frame and its reason, the prior verified correction and content
+identities, the upstream changes, revalidation checks/results, and why each
+remaining full-gate gap is permitted. Record the saved rerun/resume boundary and
+required implementation Reviewer reassessment. Keep the record incomplete;
+passing this scoped assignment neither transfers frame ownership nor declares
+full synchronization or sign-off readiness.
 
 ---
 

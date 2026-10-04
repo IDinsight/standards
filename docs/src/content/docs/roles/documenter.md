@@ -9,9 +9,12 @@ instructions outside the framework's managed sections.
 
 ## When to use it
 
-Run Documenter in `DOCUMENTING` during a standard cycle, normally after
-implementation review or when documentation needs correction. Expedited cycles
-skip this role; requiring its work means moving to the standard workflow.
+Run Documenter in `DOCUMENTING` during a standard cycle. With the default
+`FULL_DELIVERABLE` policy, it follows implementation review. With
+`IMPLEMENTATION_REVIEWED`, it runs only through recovery for required
+documentation corrections. The shorter policy does not waive documentation
+required by the current scope. Expedited cycles skip this role; requiring its
+work means moving to the standard workflow.
 
 ```text
 Codex:       $documenter Continue from .standards/STATE.md.
@@ -100,8 +103,12 @@ Documenter verifies that fix and returns while recording documentation that must
 wait for the unfinished work. Its record stays incomplete. This cannot excuse
 unrelated defects or work that is already possible.
 
-Normal completion goes to final Reviewer in a fresh chat separate from the
-authoring conversations. Corrections follow the saved recovery route.
+Normal `FULL_DELIVERABLE` completion goes to final Reviewer in a fresh chat
+separate from the authoring conversations. Corrections follow the saved recovery
+route. Under `IMPLEMENTATION_REVIEWED`, even a complete documentation record
+follows that return route rather than starting normal final review. Changed
+evidence for early completion must return to implementation Reviewer for
+reassessment before sign-off.
 
 Documenter sends code, test, design, and other problems to their owners. It
 updates the source of generated documentation rather than patching generated

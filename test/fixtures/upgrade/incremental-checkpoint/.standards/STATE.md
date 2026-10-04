@@ -5,7 +5,8 @@
 
 ## Active Work
 
-`Id`: `add-user-search-20260901T120000Z-1a2b3c4d` `Request`:
+`CompletionPolicy`: `FULL_DELIVERABLE` `Id`:
+`add-user-search-20260901T120000Z-1a2b3c4d` `Request`:
 `Add user search by name and email.` `Scope`:
 `.standards/docs/scope/add-user-search-20260901T120000Z-1a2b3c4d.md`
 `Architecture`:

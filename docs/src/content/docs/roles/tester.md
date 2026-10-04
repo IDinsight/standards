@@ -116,6 +116,11 @@ A condition that genuinely depends on a later role, such as a user guide, can
 remain pending with its owner and required evidence recorded. It must still be
 satisfied before sign-off.
 
+This full verification gate applies to both standard completion policies.
+Choosing to finish after implementation review does not excuse a pending
+documentation requirement or replace full verification with an increment pass.
+Reviewer separately checks whether the shorter cycle is ready to finish.
+
 Tester corrects tests and test-only setup. Implementation and design defects
 return to their owners. Recovery follows its
 [saved assignment and return route](../../concepts/recovery/#when-a-correction-must-return-before-full-completion);

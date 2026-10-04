@@ -30,6 +30,12 @@ of reports. `EXPEDITED` intentionally omits synchronization; a required
 guarantee uses **Expedited Promotion** in `.standards/protocol/expedited.md`,
 not an invented expedited synchronization path.
 
+Normal synchronization belongs to `FULL_DELIVERABLE`. With
+`IMPLEMENTATION_REVIEWED`, enter only through active recovery for required
+Synchronizer-owned correction or its permitted corrective rerun. Preserve the
+policy and saved route; correcting reconciliation does not restore the omitted
+normal phases or substitute for Reviewer's early-closure assessment.
+
 Read the active request, scope, architecture, Auditor context, development plan,
 verification report, both review reports, Documenter's documentation record,
 relevant project documentation and agent instructions, and any existing
@@ -38,6 +44,17 @@ baseline reconciliation, and blockers. Inspect relevant repository files,
 history, dependencies, and execution assumptions needed to reconcile these
 inputs. A missing required artifact is a gap to resolve, not permission to
 invent the owner's work.
+
+For corrective recovery, use the available inputs needed to verify the specific
+reconciliation correction. A future artifact not yet due is a dependency; a
+normal phase intentionally omitted by the selected policy is not a future
+assignment or, by absence alone, a defect. Record these dispositions separately.
+Do not demand a final-review or documentation record solely to correct an
+existing reconciliation error under the shorter policy. Evidence required for
+the correction and the active contract remains mandatory. If the full gate
+remains unmet, use **Synchronizer Corrective Return** only for a qualifying
+owned frame, or the protocol's **Synchronizer Corrective Reruns** for a
+qualifying rerun under another role's frame.
 
 ## Ownership
 
@@ -97,7 +114,9 @@ for contradictions. Planned implementation alone does not stale Auditor context.
    artifact. Check final review against the assembled current work and
    supporting implementation review and verification, including intervening
    changes. Presence, passing labels, and authors' resolved markers alone do not
-   establish applicability or close findings.
+   establish applicability or close findings. During a corrective assignment,
+   reconcile the affected evidence and record missing full-gate inputs using the
+   entry rules above; do not fabricate omitted review conclusions.
 4. Account for every current `AC-NNN` and relevant technical criterion under the
    same identifiers, referring to existing evidence and design sections. Check
    the current inventory against the coverage in completed artifacts; retired
@@ -144,6 +163,10 @@ for contradictions. Planned implementation alone does not stale Auditor context.
 
 Initial work, resumption, and reconciliation after corrections share this full
 completion gate. A corrective return below does not declare this gate passed.
+The shorter completion policy does not weaken this gate. If intentionally
+omitted phases leave its requirements unmet, keep the record incomplete and use
+only an eligible corrective return or the protocol's **Synchronizer Corrective
+Reruns** exception. Neither outcome claims full synchronization.
 
 Synchronization passes when:
 
@@ -179,6 +202,19 @@ Synchronizer-owned defect, obligation, or blocking question may prevent that
 corrective outcome. An open Reviewer finding awaiting reassessment of this
 correction remains Reviewer-owned.
 
+If the full gate still lacks an intentionally omitted normal-phase guarantee,
+identify that guarantee and why the active contract does not require it under
+the shared conditions. Do not assign fictitious pending work to its owner.
+Preserve all required remaining work and its owners separately. The verified
+correction can return to the interrupted role while this record stays
+`IN_PROGRESS` or `BLOCKED`; it cannot certify early closure or a passing final
+review that never occurred.
+
+If the interrupted state is `AWAITING_USER_SIGNOFF` under the shorter policy,
+keep the frame and require the implementation Reviewer rerun specified by
+**Corrective Returns** before resuming readiness; never pop directly to sign-off
+on an incomplete synchronization gate.
+
 ## Completion and Handoff
 
 Apply **Synchronization Gate** above and recheck input identities immediately
@@ -194,6 +230,20 @@ invalidated by that correction. As a rerun, preserve the frame and honor its
 `RerunThrough` boundary, returning to `ResumeAt` when required. Do not require
 an empty stack merely to complete owned corrective work, clear an owned
 obligation, or pass this role's gate. Do not clear another owner's obligations.
+Include implementation Reviewer reassessment when the correction invalidates its
+closure assessment. Reconcile already-produced downstream artifacts when
+affected, without automatically adding absent normal phases to the rerun.
+
+When rerunning a record left incomplete by an earlier verified corrective return
+under `IMPLEMENTATION_REVIEWED`, apply **Synchronizer Corrective Reruns** in the
+protocol. Verify the earlier correction's evidence against changed inputs,
+persist the current scoped outcome and full-gate limitations, and keep the
+record incomplete. The active frame remains another role's: follow its saved
+boundary and preserve older frames. If its `ResumeAt` is user sign-off, keep the
+frame for the planned implementation Reviewer reassessment; do not pop directly
+or rewrite the plan. An invalid assignment or unmet scoped gate must be resolved
+under normal ownership rules, not by fabricating final review or claiming
+`COMPLETE`.
 
 If an interrupted assessment is waiting for an owned reconciliation correction,
 apply the **Synchronizer Corrective Return** conditions above. Record the
@@ -201,13 +251,19 @@ verified correction and remaining owner work; keep this record incomplete when
 the full gate is unmet. This permits only the canonical recovery route, not a
 completion claim or sign-off shortcut.
 
-Enter `AWAITING_USER_SIGNOFF` only when the protocol's full **Standard Cycle
-Completion** requirements hold after recovery routing. Persist the record before
-the legal state transition. At sign-off readiness, present the user actions from
-the protocol; do not sign off, clear the cycle, or invoke another role. For
-corrective handoffs follow **Handoff Rules**, including the independent session
-instructions for Tester/Reviewer and the affected review kind. Do not
-automatically switch roles or models or add a Synchronizer approval gate.
+Normal `FULL_DELIVERABLE` success enters `AWAITING_USER_SIGNOFF` only when the
+protocol's **Standard Cycle Completion** requirements hold after recovery
+routing. Under `IMPLEMENTATION_REVIEWED`, follow only the saved recovery route;
+a full Synchronizer pass alone does not authorize sign-off readiness. Any
+recovery return there must satisfy the selected policy's completion contract,
+including the current implementation-review closure assessment. The incomplete
+corrective-return exception never permits a direct return to user sign-off.
+Persist the record before the legal state transition. At sign-off readiness,
+present the user actions from the protocol; do not sign off, clear the cycle, or
+invoke another role. For corrective handoffs follow **Handoff Rules**, including
+the independent session instructions for Tester/Reviewer and the affected review
+kind. Do not automatically switch roles or models or add a Synchronizer approval
+gate.
 
 ## Plain-Language Summary
 

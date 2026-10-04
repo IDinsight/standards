@@ -10,9 +10,11 @@ import { readdir } from 'node:fs/promises';
 import path from 'node:path';
 
 import { FAILURE_TYPES, GENERATED_CYCLE_ID, HANDOFF_KINDS, STATES, TERMINAL_STATES, UsageError, committedText, exists, git, isMain, printProblem, projectRootFor, readText } from './lib/core.mjs';
-import { LOCAL_PREFIX, QUALIFIED_PREFIXES, acceptanceInventory, acceptanceMentions, bareIds, developmentSteps, fixedPath, fixedRecords, headerFields, headingIds, parseProvenance, qualifiedReferences, recordName, recordSection, scanArtifacts, withoutLinkLabels, withoutPreviousCycles } from './lib/records.mjs';
+import { LOCAL_PREFIX, QUALIFIED_PREFIXES, acceptanceInventory, acceptanceMentions, bareIds, developmentSteps, fixedPath, fixedRecords, headerFields, headingIds, parseProvenance, qualifiedReferences, recordName, recordSection, requiredCompletionRecords, scanArtifacts, withoutLinkLabels, withoutPreviousCycles } from './lib/records.mjs';
 import { modeFromFile, parseState, validateState } from './lib/state.mjs';
 import { checkVerificationWorkflow } from './lib/verification.mjs';
+import { FULL_DELIVERABLE_PHASES, completionChangeRoute, requiredCompletionPhases } from './lib/completion.mjs';
+import { checkClosureAssessment } from './lib/review.mjs';
 
 const RUNTIME_FILES = ['PROTOCOL.md', 'VERSION.json', 'INSTALLATION.json', 'MODE.md', 'STATE.md'];
 const STATE_FILE = '.standards/STATE.md';
@@ -61,6 +63,19 @@ function checkState(state, { committed, mode, report }) {
   const cycleMode = state.CycleMode;
   const { id } = state.active;
   const terminal = TERMINAL_STATES.has(workflowState);
+  const policy = state.active.completionPolicy;
+  const requiredPhases = requiredCompletionPhases(cycleMode, policy);
+
+  if (requiredPhases === null) {
+    problem(`CompletionPolicy ${policy} is not valid with CycleMode ${cycleMode}. STANDARD requires FULL_DELIVERABLE or IMPLEMENTATION_REVIEWED; EXPEDITED requires NONE.`);
+  }
+  if (id === 'UNSET' && policy !== 'NONE') {
+    problem('No cycle has started, so Active Work.CompletionPolicy must be NONE.');
+  }
+  if (cycleMode === 'STANDARD' && policy === 'IMPLEMENTATION_REVIEWED'
+      && FULL_DELIVERABLE_PHASES.includes(workflowState) && !state.recovery.active) {
+    problem(`${workflowState} is outside the normal IMPLEMENTATION_REVIEWED route. Required corrective work uses recovery; normal downstream work requires FULL_DELIVERABLE.`);
+  }
 
   if (id !== 'UNSET' && !GENERATED_CYCLE_ID.test(id)) {
     problem(`Active Work.Id \`${id}\` is not in the form cycle.mjs generates. ${NEW_ID}`);
@@ -75,6 +90,33 @@ function checkState(state, { committed, mode, report }) {
     problem(`Cycle \`${id}\` is active, but CycleMode is UNSET. Record STANDARD or EXPEDITED when the cycle starts.`);
   }
   const { Kind: kind, From: from, FailureType: failureType } = state.handoff;
+  if (kind === 'COMPLETION_CHANGE') {
+    if (id === 'UNSET' || terminal || cycleMode !== 'STANDARD'
+        || !completionChangeRoute(from, workflowState)) {
+      problem('COMPLETION_CHANGE requires an active STANDARD cycle and either DOCUMENTING -> REVIEWING_IMPLEMENTATION (selection), or AWAITING_USER_SIGNOFF -> DOCUMENTING (withdrawal).');
+    }
+    if (failureType !== 'NONE') problem('A COMPLETION_CHANGE handoff requires FailureType NONE.');
+    if (state.recovery.active || state.recovery.frames.length
+        || state.obligations.active || state.obligations.items.length) {
+      problem('COMPLETION_CHANGE requires inactive recovery with an empty stack and no outstanding obligations.');
+    }
+    // This is the latest saved handoff, not an event log. In Reviewer, a later
+    // same-state choice can restore FULL_DELIVERABLE while retaining this
+    // handoff. The receiving role can also record a blocker or reopen its
+    // report. Entry-time authorization and freshness remain role assessments.
+    if (!state.handoff.Reason?.trim() || state.handoff.Reason === 'NONE') {
+      problem('A COMPLETION_CHANGE handoff needs a reason identifying the policy change.');
+    }
+  }
+  if (kind === 'FORWARD' && !state.recovery.active && !state.recovery.frames.length && requiredPhases?.length) {
+    if (workflowState === 'AWAITING_USER_SIGNOFF' && from !== requiredPhases.at(-1)) {
+      problem(`Forward sign-off readiness for ${cycleMode}/${policy} must come from ${requiredPhases.at(-1)}, not ${from}.`);
+    }
+    if (cycleMode === 'STANDARD' && from === 'REVIEWING_IMPLEMENTATION') {
+      const next = policy === 'IMPLEMENTATION_REVIEWED' ? 'AWAITING_USER_SIGNOFF' : 'DOCUMENTING';
+      if (workflowState !== next) problem(`Normal implementation-review success with ${policy} hands off to ${next}, not ${workflowState}.`);
+    }
+  }
   // Before the first cycle, nothing may have moved away from the installed state.
   if (id === 'UNSET') {
     const start = { GREENFIELD: 'SCOPING', BROWNFIELD: 'AUDITING' }[mode];
@@ -177,6 +219,9 @@ function checkState(state, { committed, mode, report }) {
   }
   if ((terminal || workflowState === 'AWAITING_USER_SIGNOFF') && (frames.length || items.length)) {
     problem(`${workflowState} requires an empty recovery stack and no outstanding obligations.`);
+  }
+  if (workflowState === 'AWAITING_USER_SIGNOFF' && state.active.blockedOn !== 'NONE') {
+    problem('AWAITING_USER_SIGNOFF requires Active Work.BlockedOn NONE.');
   }
 
   const { baseline } = state.active;
@@ -520,6 +565,15 @@ async function checkActiveCycle(root, state, mode, artifacts, report, { atTurnEn
     if (type === 'REVIEW' && fields.ReviewKind !== reviewKind) {
       report(artifact.path, `shows ReviewKind \`${fields.ReviewKind ?? ''}\` but its provenance block says \`${reviewKind}\`.`);
     }
+    if (type === 'REVIEW') {
+      checkClosureAssessment(artifact.text, {
+        reviewKind,
+        required: reviewKind === 'IMPLEMENTATION' && state.CycleMode === 'STANDARD'
+          && state.active.completionPolicy === 'IMPLEMENTATION_REVIEWED'
+          && workflowState === 'AWAITING_USER_SIGNOFF',
+        problem: (message) => report(artifact.path, message),
+      });
+    }
     const unfilled = unfilledFields(fields);
     for (const [name, value] of unfilled) {
       report(artifact.path, `field \`${name}\` still shows the template's choices (\`${value}\`); set one value.`);
@@ -597,32 +651,48 @@ async function checkActiveCycle(root, state, mode, artifacts, report, { atTurnEn
       report(STATE_FILE, `Active Work.Architecture is NONE, but this STANDARD cycle is already in ${workflowState}.`);
     }
   }
-  // Once the cycle has passed a phase, that phase's record must exist and be
-  // COMPLETE. An EXPEDITED cycle has only the implementation review.
+  // Require only this policy's records. Discovery and validation above still
+  // examine all existing records, including those owned by omitted phases.
   if ((!recovering || fullBoundary) && ['STANDARD', 'EXPEDITED'].includes(state.CycleMode)) {
-    for (const record of fixedRecords(id)) {
+    const required = requiredCompletionRecords(id, state.CycleMode, state.active.completionPolicy);
+    // An incomplete downstream corrective gate may return through Reviewer,
+    // but cannot pop directly to sign-off, even when its normal phase is omitted.
+    const directReturn = standard && state.active.completionPolicy === 'IMPLEMENTATION_REVIEWED'
+      && workflowState === 'AWAITING_USER_SIGNOFF' && state.handoff.Kind === 'RESUME'
+      && FULL_DELIVERABLE_PHASES.includes(state.handoff.From)
+      ? fixedRecords(id).find((record) => record.phase === state.handoff.From) : null;
+    if (directReturn) required.push(directReturn);
+    for (const record of required) {
       // Recovery's later-role exceptions remain intact; Reviewer entry still
       // holds the verification record to full completion.
       if (recovering && record.phase !== 'TESTING') continue;
-      if (!standard && record.reviewKind !== 'IMPLEMENTATION') continue;
-      if (rank(workflowState) <= rank(record.phase)) continue;
+      const policyReturn = state.handoff.Kind === 'COMPLETION_CHANGE' && record.reviewKind === 'IMPLEMENTATION';
+      if (!policyReturn && rank(workflowState) <= rank(record.phase)) continue;
       const artifact = mine.find((candidate) => candidate.path === record.path
         && candidate.provenance.artifact === record.artifact && candidate.provenance.reviewKind === record.reviewKind);
       if (!artifact) {
         if (!(await exists(root, record.path))) {
-          report(record.path, `must exist once the cycle has passed ${record.phase}, but it does not.`);
+          report(record.path, record === directReturn ? 'must exist and be COMPLETE for a direct recovery return to sign-off.'
+            : policyReturn ? 'must exist for a COMPLETION_CHANGE handoff, but it does not.'
+            : `must exist once the cycle has passed ${record.phase}, but it does not.`);
         }
         continue;
       }
-      // A Documenter Corrective Return may leave the documentation record
-      // unfinished while a later role resumes, so it must be COMPLETE only
-      // by sign-off (PROTOCOL.md, Corrective Returns).
+      // A returned Reviewer can reopen its own report while this saved handoff
+      // remains. Its prior report must exist, but current work need not already
+      // pass the gate. Other roles still require that review to be COMPLETE.
+      if (policyReturn && workflowState === record.phase) continue;
+      // A Documenter Corrective Return may leave this required record unfinished
+      // while a later role resumes; require COMPLETE only at sign-off. Omitted
+      // records are outside this list unless making a direct recovery return.
       if (record.artifact === 'DOCUMENTATION' && workflowState !== 'AWAITING_USER_SIGNOFF') continue;
       const status = headerFields(artifact.text).Status;
       // A missing, unfilled, or invalid Status is already reported with the
       // record's header, so only a valid but unfinished one is reported here.
       if (['IN_PROGRESS', 'BLOCKED'].includes(status)) {
-        report(record.path, `must be COMPLETE once the cycle has passed ${record.phase}; its Status is \`${status}\`.`);
+        report(record.path, record === directReturn ? `must be COMPLETE for a direct recovery return to sign-off; its Status is \`${status}\`. An incomplete corrective return must rerun implementation Reviewer.`
+          : policyReturn ? `must be COMPLETE for a COMPLETION_CHANGE handoff; its Status is \`${status}\`.`
+          : `must be COMPLETE once the cycle has passed ${record.phase}; its Status is \`${status}\`.`);
       }
     }
   }

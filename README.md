@@ -53,9 +53,27 @@ shared terminology. Individual skills define role-specific behavior.
   and workflow records before user sign-off. It records evidence applicability
   and discrepancies, routing corrections to their owners.
 
-Each role ships eval cases in `skills/<role>/evals/evals.json`. See
-[`SKILL_EVAL_REPORT.md`](SKILL_EVAL_REPORT.md) for how they were run and how the
-role skills performed.
+Each role has eval cases in `skills/<role>/evals/evals.json`. See
+[`SKILL_EVAL_REPORT.md`](SKILL_EVAL_REPORT.md) for an earlier evaluation and its
+results.
+
+## Choose when a standard cycle finishes
+
+Standard work defaults to `FULL_DELIVERABLE`: documentation, final review, and
+synchronization follow implementation review. For either a new or existing
+project, you can instead ask to finish after implementation review. The agent
+saves `IMPLEMENTATION_REVIEWED` for that cycle.
+
+The shorter choice keeps all earlier standard steps, including full Tester
+verification. Reviewer must separately confirm that every current requirement
+has enough evidence and no required work remains. Required documentation and
+fixes still go to their owners. Reviewer explains the omitted checks, then you
+decide whether to sign off.
+
+Make the choice with your initial request or before normal documentation work
+begins. See
+[Finishing After Implementation Review](docs/src/content/docs/guides/finishing-after-implementation-review.md)
+for examples, restrictions, and how to return to the full workflow.
 
 ## Design Principles
 

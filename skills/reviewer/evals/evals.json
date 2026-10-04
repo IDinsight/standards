@@ -482,6 +482,120 @@
         "It routes the report defect to Tester as VERIFICATION and preserves the outer frame while establishing the required return route.",
         "It does not edit the Tester-owned report, complete it itself, or bypass full completion because entry used RESUME."
       ]
+    },
+    {
+      "id": 44,
+      "prompt": "Invoke Reviewer in a fresh independent chat. This STANDARD cycle began GREENFIELD and permanently became BROWNFIELD when implementation was created. WorkflowState=REVIEWING_IMPLEMENTATION, CompletionPolicy=IMPLEMENTATION_REVIEWED. The saved request explicitly selects this policy because no project-facing documentation is needed. All scope, architecture, Auditor context, implementation, full Tester evidence and relevant technical criteria are current and satisfied. Verification is COMPLETE / FULL / NONE, Current Increment=NONE. No required documentation, later dependency, material finding, recovery, obligation, pending cadence, baseline reconciliation or blocker remains. Normal Documenter, final Reviewer and Synchronizer have not run.",
+      "expected_output": "Complete ordinary implementation review and the separate eligible closure assessment, then offer explicit user sign-off.",
+      "files": [],
+      "assertions": [
+        "The report records COMPLETE ordinary review and a separate ELIGIBLE closure with the user choice/reason, current identities, evidence, and all three omitted guarantees.",
+        "Both the greenfield origin and current brownfield mode retain the same standard upstream requirements.",
+        "The saved handoff is FORWARD from REVIEWING_IMPLEMENTATION to AWAITING_USER_SIGNOFF, with no fabricated omitted records.",
+        "The summary distinguishes readiness from acceptance; policy selection does not authorize SIGNED_OFF."
+      ]
+    },
+    {
+      "id": 45,
+      "prompt": "Invoke Reviewer independently at REVIEWING_IMPLEMENTATION in a BROWNFIELD STANDARD cycle with CompletionPolicy=FULL_DELIVERABLE. There is no project-facing documentation and no documentation acceptance condition. All implementation-review inputs and full verification are current and pass. No recovery, obligations or blockers exist. The user has not requested a policy change.",
+      "expected_output": "Complete implementation review and hand off to Documenter under FULL_DELIVERABLE.",
+      "files": [],
+      "assertions": [
+        "Absence of documentation does not infer IMPLEMENTATION_REVIEWED.",
+        "No eligible early-closure claim or sign-off shortcut replaces the configured full tail.",
+        "Documenter may determine an evidenced no-change disposition under its own gate; Reviewer does not create that record."
+      ]
+    },
+    {
+      "id": 46,
+      "prompt": "Invoke Reviewer independently at REVIEWING_IMPLEMENTATION in STANDARD with CompletionPolicy=IMPLEMENTATION_REVIEWED explicitly selected by the user. All implementation and full Tester evidence is current. AC-002 requires a saved operations guide, which is an explicitly permitted later-role dependency for ordinary review. The guide and Documenter evidence do not yet exist. Other ordinary review gates pass; recovery and obligations are inactive.",
+      "expected_output": "Keep the passing ordinary review distinct from ineligible closure and route required documentation to Documenter through recovery.",
+      "files": [],
+      "assertions": [
+        "Ordinary Status may be COMPLETE while closure Eligibility is INELIGIBLE; Unmet Requirements names AC-002 and Documenter.",
+        "The documentation condition is not waived, rewritten, or marked satisfied merely because the normal phase is omitted.",
+        "Failure routing uses DOCUMENTATION with ResumeAt REVIEWING_IMPLEMENTATION and preserves the shorter policy.",
+        "Reviewer does not author the guide or fabricate owner evidence; it must reassess closure on return."
+      ]
+    },
+    {
+      "id": 47,
+      "prompt": "Process the user's explicit sign-off request without starting a new review. WorkflowState=AWAITING_USER_SIGNOFF, CycleMode=STANDARD, CompletionPolicy=IMPLEMENTATION_REVIEWED. The ordinary implementation report is COMPLETE and closure is ELIGIBLE with recorded identities. Since that assessment, the endpoint and authorization configuration changed and Tester evidence still refers to the old content. The report's labels have not changed. No recovery frame is active.",
+      "expected_output": "Withhold sign-off and route affected implementation/verification work to its owners, preserving required Reviewer reassessment.",
+      "files": [],
+      "assertions": [
+        "Current content is compared with the assessed inputs rather than trusting ELIGIBLE or a passing check result.",
+        "SIGNED_OFF is not recorded for the changed work.",
+        "Owner-directed recovery retains the selected policy and requires current ordinary review and closure before readiness returns.",
+        "The coordinating agent does not manufacture replacement Tester evidence or a Reviewer conclusion."
+      ]
+    },
+    {
+      "id": 48,
+      "prompt": "Process the user's explicit sign-off request. A BROWNFIELD STANDARD cycle is AWAITING_USER_SIGNOFF with CompletionPolicy=IMPLEMENTATION_REVIEWED, COMPLETE ordinary review and current ELIGIBLE closure. All assessed deliverable inputs and supporting full verification remain unchanged; the only intervening edits were lawful state coordination and saved handoff prose. No recovery, obligation, baseline reconciliation, pending cadence or blocker exists.",
+      "expected_output": "Revalidate the applicable assessment and record the authorized sign-off without demanding an unnecessary new review.",
+      "files": [],
+      "assertions": [
+        "The cycle becomes SIGNED_OFF with CycleMode UNSET, Handoff SIGNOFF from AWAITING_USER_SIGNOFF, and the shorter policy retained.",
+        "Legal coordination edits alone are not treated as changed deliverable evidence.",
+        "The review report and omitted-guarantee history remain intact; missing normal downstream reports are not fabricated."
+      ]
+    },
+    {
+      "id": 49,
+      "prompt": "Process only the user's withdrawal of IMPLEMENTATION_REVIEWED. This STANDARD cycle is AWAITING_USER_SIGNOFF with current COMPLETE implementation review, applicable COMPLETE FULL verification and ELIGIBLE closure. No normal downstream work has begun, no blockers, recovery, obligations, pending cadence or baseline reconciliation remain. Documenter is not invoked.",
+      "expected_output": "Select FULL_DELIVERABLE and hand off to DOCUMENTING using COMPLETION_CHANGE, then stop.",
+      "files": [],
+      "assertions": [
+        "The handoff is from AWAITING_USER_SIGNOFF with FailureType NONE and a reason naming the old and new policies; no recovery frame is pushed.",
+        "The saved request updates only the policy instruction, preserving the implementation contract and report history.",
+        "Still-valid upstream work is not restarted and Documenter work is not performed without invocation.",
+        "Withdrawal removes sign-off readiness and does not signify user acceptance."
+      ]
+    },
+    {
+      "id": 50,
+      "prompt": "Process the user's withdrawal of IMPLEMENTATION_REVIEWED at AWAITING_USER_SIGNOFF in STANDARD. Current code no longer matches the COMPLETE implementation report or full Tester evidence because an intervening implementation edit invalidated them. Recovery is inactive. The user asks to bypass reassessment and go straight to normal documentation.",
+      "expected_output": "Route the invalidated work to its owners before applying the withdrawal.",
+      "files": [],
+      "assertions": [
+        "The policy remains IMPLEMENTATION_REVIEWED; the failed precondition does not authorize COMPLETION_CHANGE to DOCUMENTING.",
+        "The changed inputs and affected evidence are identified and preserved for owner-directed recovery.",
+        "No deferred policy change is silently queued and no passing conclusion is fabricated."
+      ]
+    },
+    {
+      "id": 51,
+      "prompt": "Invoke Reviewer independently at REVIEWING_IMPLEMENTATION in STANDARD after COMPLETION_CHANGE from DOCUMENTING. The user reselected IMPLEMENTATION_REVIEWED after an earlier withdrawal; no normal Documenter work ever began. An earlier current closure section still says ELIGIBLE and records the old user choice. Full verification and implementation evidence are applicable. All closure requirements can pass after assessment.",
+      "expected_output": "Reconcile the current choice and inputs, preserve the superseded assessment as history, and assess closure anew before readiness.",
+      "files": [],
+      "assertions": [
+        "The previous assessment is moved under Closure Assessment History and current eligibility starts NOT_ASSESSED.",
+        "Only one current Implementation-Reviewed Closure section remains and the new conclusion records the latest explicit choice.",
+        "The old label alone cannot authorize AWAITING_USER_SIGNOFF; report evidence is persisted before the handoff."
+      ]
+    },
+    {
+      "id": 52,
+      "prompt": "Invoke Reviewer independently in STANDARD with IMPLEMENTATION_REVIEWED at REVIEWING_IMPLEMENTATION. This is the boundary of a nested recovery frame whose ResumeAt is TESTING. An older frame remains active beneath it. Ordinary implementation review and all inspected current evidence pass. The user asks to jump to sign-off because the code is now correct.",
+      "expected_output": "Finish the applicable review assignment and pop only the nested frame, resuming TESTING.",
+      "files": [],
+      "assertions": [
+        "The older frame and its obligations are preserved.",
+        "An ELIGIBLE readiness claim cannot bypass the saved recovery route or the requirement for an empty stack.",
+        "The role does not replace ResumeAt with AWAITING_USER_SIGNOFF or silently switch policy."
+      ]
+    },
+    {
+      "id": 53,
+      "prompt": "Invoke Reviewer independently at REVIEWING_IMPLEMENTATION in STANDARD with IMPLEMENTATION_REVIEWED. Normal downstream phases were never started, but an existing current-cycle IN_PROGRESS synchronization record contains a material unresolved reconciliation error from earlier corrective work. Ordinary implementation review and full verification otherwise pass. The user says Synchronizer is omitted, so ignore that record.",
+      "expected_output": "Account for the existing correction and withhold early closure until the Synchronizer-owned discrepancy is resolved.",
+      "files": [],
+      "assertions": [
+        "Omitting the normal phase does not hide affected artifacts or unresolved owner work.",
+        "Closure is INELIGIBLE with an owner and evidence requirement, independently of ordinary review status.",
+        "Recovery targets SYNCHRONIZING and returns for implementation Reviewer reassessment; no normal final-review tail is invented."
+      ]
     }
   ]
 }

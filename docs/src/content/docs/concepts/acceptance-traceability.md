@@ -59,10 +59,17 @@ A later dependency may remain open during implementation review only when the
 condition actually depends on that later work. For example, `AC-002` can wait
 for Documenter. A failing export test cannot be deferred that way.
 
-After documentation, final Reviewer checks that every current condition has
-sufficient evidence. Synchronizer checks that those assessments still apply to
-the files being offered for sign-off. Neither role invents missing evidence or
-closes another role's findings.
+With `FULL_DELIVERABLE`, after documentation, final Reviewer checks that every
+current condition has sufficient evidence. Synchronizer checks that those
+assessments still apply to the files being offered for sign-off. Neither role
+invents missing evidence or closes another role's findings.
+
+With `IMPLEMENTATION_REVIEWED`, implementation Reviewer checks that every
+current condition has enough evidence before the cycle can be ready for
+sign-off. A permitted later dependency still blocks this shorter finish. If
+`AC-002` requires a guide, Documenter must provide its evidence through
+recovery; choosing the shorter policy does not remove the requirement. See
+[Finishing After Implementation Review](../../guides/finishing-after-implementation-review/).
 
 The evidence stays in the responsible roles' records, linked by the same IDs.
 There is no separate master checklist to maintain. A condition marked pending is

@@ -300,6 +300,13 @@ not evidence and cannot permit sign-off under **Acceptance Traceability**. Mark
 the report `COMPLETE` only after the other gate conditions pass; this means
 Testing is complete, not that every later-phase acceptance condition is met.
 
+Both standard completion policies retain this full Tester gate. Under
+`IMPLEMENTATION_REVIEWED`, record any permitted later-role dependency with its
+owner and required evidence; it prevents early closure until resolved. Do not
+mark it satisfied because its owner's normal phase is omitted, silently change
+the policy, or bypass implementation Reviewer. Reviewer separately assesses
+closure eligibility and routes unmet owner work under the protocol.
+
 On full success with no recovery, hand off to **Reviewer**, review kind
 `IMPLEMENTATION` (`TESTING -> REVIEWING_IMPLEMENTATION`).
 

@@ -15,8 +15,8 @@ them. A handoff gives you the next invocation.
 
 [Navigator](../../roles/navigator/) is the exception: you can use it at any time
 to understand the project. It never changes files or workflow state, even when
-asked to sign off, cancel, or start a cycle. Those actions require leaving
-Navigator.
+asked to change completion policy, sign off, cancel, or start a cycle. Those
+actions require leaving Navigator.
 
 ## Choose or change the work
 
@@ -25,13 +25,18 @@ request cannot use your chosen mode, the agent saves the request and asks you to
 resolve the choice. It does not silently switch modes or start the cycle. See
 [Starting a Cycle](../../guides/starting-a-cycle/).
 
-During an active cycle, you can request changes, promotion to standard work, or
-cancellation. An explicit request can authorize the receiving agent to update
-the workflow record, even when another role owns the current step. A greenfield
-bootstrap reset also requires your explicit approval of the `standards reset`
-command after the agent shows its preview. Until you approve and the reset
-succeeds, that cancellation is not complete. Doing the next role's work still
-requires invoking that role.
+For standard work, you can also choose to
+[finish after implementation review](../../guides/finishing-after-implementation-review/).
+The agent checks that the choice is allowed and saves it for this cycle. You
+still need to accept the work after Reviewer confirms it is ready.
+
+During an active cycle, you can request changes, a completion-policy change,
+promotion to standard work, or cancellation. An explicit request can authorize
+the receiving agent to update the workflow record, even when another role owns
+the current step. A greenfield bootstrap reset also requires your explicit
+approval of the `standards reset` command after the agent shows its preview.
+Until you approve and the reset succeeds, that cancellation is not complete.
+Doing the next role's work still requires invoking that role.
 
 [Rework](../../guides/revising-scope-or-design/) stays within the current cycle.
 After sign-off or retained cancellation, a new request starts a
@@ -65,11 +70,17 @@ workflow update and any handoff. You can:
 - **Cancel:** ask the agent to end the cycle without accepting it.
 - **Promote expedited work:** request the full standard workflow. The agent
   records the promotion and hands off to Auditor, which you invoke.
+- **Return to full completion:** if you chose the shorter standard policy,
+  withdraw it to continue with Documenter, final Reviewer, and Synchronizer. The
+  agent first checks that the existing implementation review and full
+  verification still apply. See
+  [the withdrawal rules](../../guides/finishing-after-implementation-review/#return-to-the-full-workflow).
 
 Before recording sign-off, the agent checks that the completion requirements
 still hold for the current files. No unresolved correction or blocking question
-can remain. Accepting expedited work covers its narrower set of checks; it does
-not mean the skipped standard roles completed their work.
+can remain. Accepting shorter standard or expedited work covers the checks
+required by that choice; it does not mean the omitted roles completed their
+normal phases.
 
 Cancellation does not undo project changes. What happens to the framework
 installation depends on whether implementation exists; see

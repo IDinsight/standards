@@ -342,14 +342,29 @@ also ask for changes or cancel instead. See
 
 ### Can I skip a role?
 
-Not one at a time. Expedited work leaves out a fixed set of roles for small
-changes to an existing project, and you can't pick and choose beyond that. A
-skipped role's job also doesn't move to another role. For example, Developer's
-own checks don't replace Tester's verification.
+There are two supported ways to shorten a cycle. For either new or existing
+projects, a standard cycle can
+[finish after implementation review](../guides/finishing-after-implementation-review/)
+if you choose that policy and Reviewer confirms that no required work remains.
+It keeps all earlier standard checks and omits the normal Documenter, final
+Reviewer, and Synchronizer phases.
+
+Expedited work leaves out more roles for eligible small changes to an existing
+project. Neither option lets you skip roles one at a time or transfer their jobs
+to someone else. Developer's own checks do not replace Tester's verification.
 
 If expedited work turns out to need a skipped role, the cycle is promoted to
 standard work and continues from Auditor. See
 [Promote an expedited cycle](../concepts/states-and-handoffs/#promote-an-expedited-cycle).
+
+### Can I finish a cycle if the project has no documentation?
+
+Yes. Ask to finish after implementation review when starting a standard cycle,
+or before normal documentation work begins. Having no documentation does not
+select this policy automatically. Any documentation required by the agreed scope
+still needs to be completed and checked. Reviewer explains the omitted checks,
+then you decide whether to sign off. See
+[Finishing After Implementation Review](../guides/finishing-after-implementation-review/).
 
 ### Why do I have to start each role myself?
 

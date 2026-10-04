@@ -5,7 +5,8 @@
 
 ## Active Work
 
-`Id`: `volunteer-signup-20260904T100000Z-7b8c9d0e` `Request`:
+`CompletionPolicy`: `FULL_DELIVERABLE` `Id`:
+`volunteer-signup-20260904T100000Z-7b8c9d0e` `Request`:
 `Build a website where volunteers can sign up for local events.` `Scope`: `NONE`
 `Architecture`: `NONE` `Development`: `NONE` `PromotionReason`: `NONE`
 `AuditTarget`: `NONE` `BlockedOn`: `NONE`

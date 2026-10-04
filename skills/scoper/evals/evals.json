@@ -257,6 +257,39 @@
         "Scoper does not add STANDARDS provenance to the unmarked canonical document",
         "Active Work.Scope records docs/product/search.md"
       ]
+    },
+    {
+      "id": 21,
+      "prompt": "Start a new GREENFIELD cycle as Scoper. No cycle is active; CompletionPolicy NONE. The user requests a small application and explicitly asks to finish after implementation review because no project documentation is needed. No pending mode preference exists.",
+      "expected_output": "Start STANDARD at SCOPING with IMPLEMENTATION_REVIEWED, preserving the explicit choice and stated reason separately from product requirements.",
+      "files": [],
+      "assertions": [
+        "The cycle ID comes from the cycle tool and the initial handoff remains INITIAL.",
+        "The shorter boundary retains scope, design, audit, implementation, full verification, and implementation review.",
+        "No omission of workflow artifacts, acceptance waiver, or advance sign-off claim follows from the no-documentation reason."
+      ]
+    },
+    {
+      "id": 22,
+      "prompt": "Start a new cycle as Scoper after a BROWNFIELD cycle ended SIGNED_OFF with retained CompletionPolicy IMPLEMENTATION_REVIEWED. The new request does not select a completion policy. Old review reports retain their closure evidence and omitted-guarantee explanation. Auditor is not invoked.",
+      "expected_output": "Start a new STANDARD cycle with FULL_DELIVERABLE and a new ID, handing off to the brownfield entry owner.",
+      "files": [],
+      "assertions": [
+        "The previous shorter policy is historical and is not inherited.",
+        "Prior reports and their durable authorization/evidence are preserved.",
+        "NEW_CYCLE is recorded from SIGNED_OFF and the cycle starts at AUDITING without Scoper performing Auditor work."
+      ]
+    },
+    {
+      "id": 23,
+      "prompt": "Process a new BROWNFIELD request that explicitly selects IMPLEMENTATION_REVIEWED while PendingCycleMode is EXPEDITED. No cycle is active. The user has not resolved the conflict or authorized silently replacing the saved mode preference.",
+      "expected_output": "Persist a blocked pending request containing the explicit completion-policy instruction and reason, then ask for resolution.",
+      "files": [],
+      "assertions": [
+        "Active Work, WorkflowState, CycleMode and PendingCycleMode remain unchanged.",
+        "PendingCycleRequest retains the original implementation request and policy intent; PendingCycleBlockedOn identifies the conflict.",
+        "No new cycle ID is activated, standard mode is not silently substituted, and no separate pending-policy field is invented."
+      ]
     }
   ]
 }

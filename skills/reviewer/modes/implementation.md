@@ -10,3 +10,8 @@ Use the shared procedure, findings, ownership, **Review Gates**, and completion
 requirements in `../SKILL.md`, and the shared `../template.md`. Explicit
 later-role dependencies may remain only as permitted there. Re-review and
 interrupted work use the same mode with input reconciliation.
+
+For `STANDARD` with `IMPLEMENTATION_REVIEWED`, also apply the shared
+**Implementation-Reviewed Closure** assessment. A passing ordinary review with a
+permitted later dependency cannot establish early-closure eligibility. Keep the
+two conclusions distinct and use the policy-specific handoff in `SKILL.md`.

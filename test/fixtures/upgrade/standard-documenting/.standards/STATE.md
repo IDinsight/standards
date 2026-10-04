@@ -5,7 +5,8 @@
 
 ## Active Work
 
-`Id`: `export-csv-20260905T090000Z-4d5e6f7a` `Request`:
+`CompletionPolicy`: `FULL_DELIVERABLE` `Id`:
+`export-csv-20260905T090000Z-4d5e6f7a` `Request`:
 `Let administrators export records as CSV.` `Scope`:
 `.standards/docs/scope/export-csv-20260905T090000Z-4d5e6f7a.md` `Architecture`:
 `.standards/docs/specs/export-csv-20260905T090000Z-4d5e6f7a.md` `Development`:

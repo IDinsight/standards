@@ -25,9 +25,14 @@ The role that finds a problem does not automatically own the fix.
 
 ## Use the workflow the change needs
 
-**Standard work** is the default. It covers requirements, design, project
-context, implementation, testing, review, documentation, and a final check that
-the completed assessments still apply.
+**Standard work** is the default. Its full path covers requirements, design,
+project context, implementation, testing, review, documentation, and a final
+check that the completed assessments still apply.
+
+For either new or existing projects, you can choose to
+[finish after implementation review](../../guides/finishing-after-implementation-review/).
+That choice keeps all earlier standard checks and requires Reviewer to confirm
+that no required work remains before asking you to sign off.
 
 The starting point depends on the project:
 

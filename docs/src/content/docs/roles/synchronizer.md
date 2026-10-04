@@ -9,9 +9,10 @@ whether those earlier results still support the work you are about to accept.
 
 ## When to use it
 
-Run Synchronizer in `SYNCHRONIZING` during a standard cycle, normally after
-final review or when its own assessment needs correction. Expedited cycles skip
-this role.
+Run Synchronizer in `SYNCHRONIZING` during a standard cycle. With the default
+`FULL_DELIVERABLE` policy, it follows final review. With
+`IMPLEMENTATION_REVIEWED`, it runs only through recovery to correct or recheck
+affected reconciliation work. Expedited cycles skip this role.
 
 ```text
 Codex:       $synchronizer Continue from .standards/STATE.md.
@@ -52,14 +53,23 @@ records agree, all current requirements have sufficient evidence, and required
 corrections and recovery are finished. A file's existence or a `COMPLETE` label
 does not establish this by itself.
 
-Synchronizer then moves the workflow to `AWAITING_USER_SIGNOFF` and explains
-what was checked and any remaining limitations. You can accept the work, request
-rework, or cancel. Synchronizer does not accept it for you.
+On normal full completion, Synchronizer moves the workflow to
+`AWAITING_USER_SIGNOFF` and explains what was checked and any remaining
+limitations. You can accept the work, request rework, or cancel. Synchronizer
+does not accept it for you.
 
 During recovery, a verified correction to Synchronizer's own record can
 sometimes return to an interrupted role before the full assessment is finished.
 That [limited return](../../reference/protocol/#corrective-returns) keeps the
 record incomplete and cannot bypass the requirements for sign-off.
+
+Under `IMPLEMENTATION_REVIEWED`, Synchronizer follows the saved recovery route.
+An incomplete corrective return cannot go directly to sign-off: implementation
+Reviewer must reassess ordinary review and early completion first. If an
+upstream change later invalidates an earlier verified correction, a
+[limited rerun](../../concepts/recovery/#corrections-when-finishing-after-implementation-review)
+can recheck that evidence while the synchronization record stays incomplete.
+Neither route claims that the omitted normal phase passed.
 
 ## Who fixes disagreements
 

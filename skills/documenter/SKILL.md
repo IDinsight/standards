@@ -5,7 +5,7 @@ description:
   guidance while DOCUMENTING in an active STANDARD S.T.A.N.D.A.R.D.S. cycle.
   Work autonomously or guide one saved edit at a time, reconstruct behavior from
   evidence, persist documentation evidence and progress, and route defects to
-  their owners before independent final review.
+  their owners through the selected completion policy and recovery route.
 ---
 
 <!-- standards:framework-owned -->
@@ -28,6 +28,15 @@ documentation guarantee uses **Expedited Promotion** in
 `.standards/protocol/expedited.md`. An invocation or a file argument does not
 bypass state ownership or initialize a documentation-only expedited path.
 
+Normal documentation belongs to `FULL_DELIVERABLE`. With
+`IMPLEMENTATION_REVIEWED`, enter only through active recovery for required
+Documenter-owned correction; the shorter policy does not waive required
+documentation or transfer it to Reviewer. Corrective work does not select the
+normal documentation/final-review/synchronization tail. A user-requested policy
+change follows **Change completion policy** in
+`.standards/protocol/user-decisions.md`; process an authorized change before
+beginning normal documentation and stop unless the resulting role was invoked.
+
 Read the active request, current scope and architecture, relevant Auditor
 context, development plan, Tester verification, implementation review, and any
 existing documentation record. Include relevant later review/synchronization
@@ -39,12 +48,15 @@ not permission to fabricate its owner's work. Do not require an interrupted
 review or synchronization to be complete before correcting documentation it is
 waiting for; assess the inputs needed for this role's gate.
 
-For recovery before the scheduled documentation phase, use the available inputs
-needed to establish and verify the specific correction. Under **Documenter
-Corrective Return**, future artifacts not yet due in the preserved workflow are
-dependencies, not prerequisites for that correction. Record the unfinished owner
-work and dependent documentation without inventing absent artifacts or ACs.
-Evidence already needed to verify the correction remains required.
+For recovery before or outside the normal documentation phase, use the available
+inputs needed to establish and verify the specific correction. Under
+**Documenter Corrective Return**, future artifacts not yet due in the preserved
+workflow are dependencies, not prerequisites for that correction. Record the
+unfinished owner work and dependent documentation without inventing absent
+artifacts or ACs. Distinguish future dependencies from phases intentionally
+omitted by the selected policy; do not schedule omitted normal work merely to
+fill a record. Evidence needed to verify the correction or satisfy the contract
+remains required.
 
 ## Ownership
 
@@ -257,7 +269,11 @@ on changed documentation. As a rerun, preserve the stack and honor its
 `RerunThrough` boundary. An active stack alone does not prevent the role gate
 from passing or verified owned obligations from being removed.
 
-Normal success proceeds to `REVIEWING_FINAL`, Reviewer kind `FINAL_DELIVERABLE`.
+Normal success with `FULL_DELIVERABLE` proceeds to `REVIEWING_FINAL`, Reviewer
+kind `FINAL_DELIVERABLE`. Under `IMPLEMENTATION_REVIEWED`, use only the saved
+recovery route, even if the full Documenter gate passes. Include implementation
+Reviewer reassessment when corrected documentation invalidates early-closure
+evidence; a verified documentation correction does not establish eligibility.
 Persist the record and legal transition before providing the active-client
 invocation. Follow **Independent Assessment Sessions** and **Independent
 Reviewer Session**, including fresh-chat instructions, review kind,
@@ -283,7 +299,14 @@ and currently actionable documentation outside a selected editing boundary
 follow normal failure and blocking rules; a selected target or collaboration
 mode waives none of these conditions. GUIDED work must have an inspected saved
 correction; supplying a snippet is insufficient. On re-entry, reconcile current
-inputs and the retained work.
+inputs and the retained work. If a remaining full-gate requirement is an
+intentionally omitted guarantee under the shared corrective-return conditions,
+record that disposition instead of inventing a future owner assignment. Required
+documentation evidence and actionable defects cannot receive that disposition.
+If the interrupted state is `AWAITING_USER_SIGNOFF` under the shorter policy,
+the shared exception requires retaining the frame for implementation Reviewer
+reassessment before resuming readiness; it never permits an incomplete
+Documenter gate to return directly to sign-off.
 
 ## Plain-Language Summary
 

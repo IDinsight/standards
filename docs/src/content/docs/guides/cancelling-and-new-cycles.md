@@ -64,6 +64,12 @@ project may start with Developer for expedited work. See
 new cycle; you do not create an ID or clear fields yourself. The earlier cycle
 is not reopened.
 
+Sign-off and retained cancellation keep the previous cycle's completion policy
+as history. A new standard cycle defaults to `FULL_DELIVERABLE` unless you
+explicitly choose to
+[finish after implementation review](../finishing-after-implementation-review/)
+for that new request. The earlier shorter choice does not carry over.
+
 After cancellation, the agent checks whether any project changes from that cycle
 remain. It may ask you to confirm that no changes were made or that they were
 reverted. If changes remain or their status is unresolved, the next cycle uses

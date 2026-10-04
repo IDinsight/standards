@@ -4,6 +4,7 @@ import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 
 import { CYCLE_ID, fieldPairs, git } from './core.mjs';
+import { requiredCompletionPhases } from './completion.mjs';
 
 export const ARTIFACT_TYPES = new Set([
   'SCOPE', 'ARCHITECTURE', 'DEVELOPMENT', 'VERIFICATION', 'REVIEW', 'DOCUMENTATION', 'SYNCHRONIZATION',
@@ -46,6 +47,13 @@ export function fixedRecords(cycle) {
     { artifact: 'REVIEW', reviewKind: 'FINAL_DELIVERABLE', phase: 'REVIEWING_FINAL' },
     { artifact: 'SYNCHRONIZATION', reviewKind: null, phase: 'SYNCHRONIZING' },
   ].map((record) => ({ ...record, path: fixedPath(record.artifact, cycle, record.reviewKind) }));
+}
+
+// Presence/completion requirements are policy-dependent. Always use
+// fixedRecords for discovery so an omitted phase cannot hide an existing file.
+export function requiredCompletionRecords(cycle, cycleMode, policy) {
+  const phases = requiredCompletionPhases(cycleMode, policy);
+  return fixedRecords(cycle).filter((record) => phases?.includes(record.phase));
 }
 
 // A record's name in messages, e.g. "REVIEW IMPLEMENTATION".
@@ -223,12 +231,19 @@ function sectionName({ line, fenced }) {
 
 // A record section, excluding fenced examples and stopping at the next H2.
 export function recordSection(text, name, { includeFenced = false } = {}) {
+  return recordSections(text, name, { includeFenced })[0] ?? '';
+}
+
+// Retain repeated sections so contracts requiring one assessment cannot silently
+// accept the first of two contradictory conclusions.
+export function recordSections(text, name, { includeFenced = false } = {}) {
   const lines = markdownLines(text);
-  const start = lines.findIndex((entry) => sectionName(entry) === name.toLowerCase());
-  if (start === -1) return '';
-  const next = lines.findIndex((entry, index) => index > start && sectionName(entry) !== null);
-  return lines.slice(start + 1, next === -1 ? undefined : next)
-    .map(({ line, fenced }) => (fenced && !includeFenced ? '' : line)).join('\n');
+  return lines.flatMap((entry, start) => {
+    if (sectionName(entry) !== name.toLowerCase()) return [];
+    const next = lines.findIndex((candidate, index) => index > start && sectionName(candidate) !== null);
+    return [lines.slice(start + 1, next === -1 ? undefined : next)
+      .map(({ line, fenced }) => (fenced && !includeFenced ? '' : line)).join('\n')];
+  });
 }
 
 // The first fields in each step are authoritative; later self-check prose may

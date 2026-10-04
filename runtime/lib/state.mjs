@@ -1,7 +1,7 @@
 // Parsing for `.standards/STATE.md` and `.standards/MODE.md`. The installer
 // imports the basic validators from here too, so installs, upgrades, and
 // `check` read these files the same way.
-import { MODES, STATES, VERIFICATION_CADENCES, fieldPairs, withoutBom } from './core.mjs';
+import { COMPLETION_POLICIES, MODES, STATES, VERIFICATION_CADENCES, fieldPairs, withoutBom } from './core.mjs';
 
 // The one non-empty value of a field, or an error naming the field.
 export function field(text, name, relative) {
@@ -71,6 +71,10 @@ export function validateState(input) {
   }
   const { fields: activeFields, baseline } = splitActiveWork(stateSection(text, 'Active Work'));
   const id = field(activeFields, 'Id', relative);
+  const completionPolicy = field(activeFields, 'CompletionPolicy', relative);
+  if (!COMPLETION_POLICIES.includes(completionPolicy)) {
+    throw new Error(`Invalid CompletionPolicy in ${relative}`);
+  }
   for (const name of ['Request', 'Scope', 'Architecture', 'Development', 'PromotionReason', 'AuditTarget', 'BlockedOn']) {
     field(activeFields, name, relative);
   }
@@ -93,7 +97,7 @@ export function validateState(input) {
       throw new Error(`Invalid ${name}.Active in ${relative}`);
     }
   }
-  return { workflowState, cycleMode, pendingMode, id };
+  return { workflowState, cycleMode, pendingMode, id, completionPolicy };
 }
 
 export function modeFromFile(text) {
@@ -151,6 +155,8 @@ export function parseState(input) {
     active: {
       id: activeFields.Id,
       request: activeFields.Request,
+      completionPolicy: activeFields.CompletionPolicy,
+      blockedOn: activeFields.BlockedOn,
       scope: activeFields.Scope,
       architecture: activeFields.Architecture,
       development: activeFields.Development,

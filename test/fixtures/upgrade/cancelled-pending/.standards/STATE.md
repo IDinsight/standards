@@ -7,9 +7,9 @@
 
 ## Active Work
 
-`Id`: `invoice-cache-20260903T150000Z-9c0d1e2f` `Request`:
-`Change invoice-cache invalidation behavior.` `Scope`: `NONE` `Architecture`:
-`NONE` `Development`:
+`CompletionPolicy`: `NONE` `Id`: `invoice-cache-20260903T150000Z-9c0d1e2f`
+`Request`: `Change invoice-cache invalidation behavior.` `Scope`: `NONE`
+`Architecture`: `NONE` `Development`:
 `.standards/docs/development/invoice-cache-20260903T150000Z-9c0d1e2f.md`
 `PromotionReason`: `NONE` `AuditTarget`: `NONE` `BlockedOn`: `NONE`
 

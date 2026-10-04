@@ -8,11 +8,12 @@ The workflow state tells you which role can work next. A **handoff** saves where
 work should go and why, then tells you how to invoke the next role. Changing the
 state does not run a role automatically.
 
-The installed `.standards/STATE.md` records the current step, cycle mode, active
-request, and recovery information. When you give the first role a request, the
-agent initializes the cycle before doing that role's work; you do not edit the
-state file yourself. [Navigator](../../roles/navigator/) can explain the project
-at any time without changing that state.
+The installed `.standards/STATE.md` records the current step, cycle mode,
+completion policy, active request, and recovery information. When you give the
+first role a request, the agent initializes the cycle before doing that role's
+work; you do not edit the state file yourself.
+[Navigator](../../roles/navigator/) can explain the project at any time without
+changing that state.
 
 ## The paths at a glance
 
@@ -20,7 +21,7 @@ at any time without changing that state.
 <div class="workflow-map" aria-label="STANDARDS workflow paths">
   <section class="workflow-map__panel workflow-map__panel--standard" aria-labelledby="standard-map-title">
     <div class="workflow-map__heading">
-      <span class="workflow-map__eyebrow">Full workflow</span>
+      <span class="workflow-map__eyebrow">Default: full deliverable</span>
       <h3 id="standard-map-title">Standard</h3>
     </div>
     <p>Choose the entry that matches your project:</p>
@@ -63,6 +64,11 @@ at any time without changing that state.
 </div>
 <!-- markdownlint-enable MD033 -->
 
+The standard map shows the default `FULL_DELIVERABLE` path. With
+`IMPLEMENTATION_REVIEWED`, implementation Reviewer can hand off directly to your
+sign-off decision after checking that no required work remains. See
+[Finishing After Implementation Review](../../guides/finishing-after-implementation-review/).
+
 The arrows show normal forward handoffs. Each role must finish its required
 checks, and you explicitly invoke the next role. With
 [incremental verification](../../guides/working-with-developer/#choose-when-tester-runs),
@@ -73,8 +79,10 @@ review. Corrections follow a [recovery route](../recovery/) instead.
 
 A new, greenfield project starts with Scoper, Architect, and Auditor. An
 existing, brownfield project starts with Auditor, Scoper, and Architect. Both
-then follow the shared path through Developer, the independent assessments,
-documentation, synchronization, and your sign-off decision.
+then continue through Developer, Tester, and implementation Reviewer. By
+default, Documenter, final Reviewer, and Synchronizer follow. The shorter
+completion policy leaves out those three normal phases and requires a separate
+check by implementation Reviewer before your sign-off decision.
 
 Each role must finish its required checks before a normal handoff. If a problem
 needs an earlier role, [recovery](../recovery/) determines the route instead.
@@ -121,8 +129,9 @@ requirements or design. When Developer is reached again, it
 [updates its plan](../../guides/working-with-developer/#continue-after-expedited-promotion)
 against the standard scope and design.
 
-Promotion is one-way for the cycle. All standard completion rules apply
-afterward. The [protocol](../../reference/protocol/#expedited-promotion)
+Promotion is one-way for the cycle and selects `FULL_DELIVERABLE`. Choosing the
+shorter standard policy is a separate decision and cannot bypass unfinished
+corrections. The [protocol](../../reference/protocol/#expedited-promotion)
 specifies the exact state updates.
 
 ## What a handoff records
@@ -166,10 +175,11 @@ be disclosed rather than guessed. See the
 `AWAITING_USER_SIGNOFF` means ready for your decision, not accepted.
 
 Before presenting standard work for sign-off, the agent checks that all required
-role results still apply to the current files, including final review and
-synchronization. Every current requirement needs sufficient evidence. Required
-project context must be valid, including any checks of changes left by cancelled
-cycles.
+role results still apply to the current files. `FULL_DELIVERABLE` includes final
+review and synchronization. `IMPLEMENTATION_REVIEWED` requires a passing
+implementation review and a current eligible closure assessment. Every current
+requirement needs sufficient evidence. Required project context must be valid,
+including any checks of changes left by cancelled cycles.
 
 Expedited work needs Developer and implementation Reviewer to complete its
 narrower checks. In either mode, recovery must be finished, no outstanding
@@ -183,8 +193,9 @@ conclusions still apply.
 
 Sign-off ends the cycle in `SIGNED_OFF`. Retained cancellation ends it in
 `CANCELLED`. Both leave the previous active-work record available and reset
-cycle mode to `UNSET`. New work starts a new cycle rather than reopening the old
-one.
+cycle mode to `UNSET`. The previous completion policy stays with that record.
+New work starts a new cycle, with a fresh policy choice, rather than reopening
+the old one.
 
 Greenfield cancellation can instead reset the workflow if no implementation has
 been created. The agent previews `standards reset` and waits for your explicit
