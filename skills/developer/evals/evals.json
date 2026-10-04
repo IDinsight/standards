@@ -730,6 +730,50 @@
         "It does not fabricate AC identifiers or claim standard-plan completion before scope, architecture, and the approved plan are reconciled.",
         "It applies scheduling at the later safe normal Developer boundary, with approval only if the material plan changes."
       ]
+    },
+    {
+      "id": 58,
+      "prompt": "Process only an explicit user request to change STANDARD/FULL_DELIVERABLE to IMPLEMENTATION_REVIEWED while WorkflowState=TESTING. The saved handoff is CHECKPOINT from DEVELOPING for Increment 2. The plan uses INCREMENTAL with Current Increment 2, unfinished future work and a saved pending cadence request. Recovery and obligations are inactive; an unrelated BlockedOn question is also saved. No normal downstream phase has begun.",
+      "expected_output": "Apply the same-state policy choice while preserving the checkpoint and all other coordination.",
+      "files": [],
+      "assertions": [
+        "WorkflowState, the entire CHECKPOINT handoff, current increment, pending cadence, blockers and role artifacts remain unchanged.",
+        "The latest explicit policy instruction replaces the earlier one in Active Work.Request without revising acceptance conditions.",
+        "The choice does not imply implementation completion, clear a blocker, or authorize Developer or Reviewer to take Tester's assignment."
+      ]
+    },
+    {
+      "id": 59,
+      "prompt": "Process a request to select IMPLEMENTATION_REVIEWED during an active BROWNFIELD EXPEDITED cycle at DEVELOPING with CompletionPolicy NONE. The user has not authorized promotion or requested any additional standard guarantee.",
+      "expected_output": "Explain the expedited completion path and leave the active cycle unchanged.",
+      "files": [],
+      "assertions": [
+        "A standard policy selection alone does not authorize promotion.",
+        "CompletionPolicy stays NONE and the role does not silently add standard phases or a closure assessment.",
+        "Any needed promotion authorization is kept distinct from the requested completion preference."
+      ]
+    },
+    {
+      "id": 60,
+      "prompt": "Process explicit instructions to promote a BROWNFIELD EXPEDITED cycle and select IMPLEMENTATION_REVIEWED. An unresolved IMPLEMENTATION correction is recorded in active recovery. The cycle has not started any normal downstream standard phase.",
+      "expected_output": "Promote to STANDARD with FULL_DELIVERABLE, retain the unresolved correction as an outstanding obligation, and hand off to Auditor; explain why the shorter choice cannot yet apply.",
+      "files": [],
+      "assertions": [
+        "Promotion preserves the cycle ID and corrective reason while converting the recovery obligation and clearing only obsolete expedited routing.",
+        "The outstanding obligation prevents applying the separate policy selection; promotion does not bypass it.",
+        "No shorter policy is silently queued for later and no role work beyond the authorized coordination is performed."
+      ]
+    },
+    {
+      "id": 61,
+      "prompt": "Process a request to switch from FULL_DELIVERABLE to IMPLEMENTATION_REVIEWED at DEVELOPING in STANDARD while an active recovery frame and an outstanding obligation exist. Normal downstream work has not begun. The user asks to keep the same state and use the shorter policy to get past the correction.",
+      "expected_output": "Preserve the policy, recovery, and outstanding obligation and explain the unmet selection boundary.",
+      "files": [],
+      "assertions": [
+        "Same-state selection still requires inactive recovery and no obligations.",
+        "No frame, obligation, blocker, or pending cadence is cleared by the request.",
+        "The policy choice cannot discharge required corrective work or become deferred intent."
+      ]
     }
   ]
 }

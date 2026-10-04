@@ -92,10 +92,22 @@ Reviewer explains whether work can move forward, what was checked, and what
 remains unverified. A pass requires sufficient current evidence and no
 unresolved material findings, assessment gaps, or blocking questions.
 
-Standard implementation review normally goes to Documenter. A requirement that
-depends on that later work can remain explicitly pending at this point. Final
-review must have evidence for every current requirement and normally goes to
-Synchronizer.
+With `FULL_DELIVERABLE`, standard implementation review goes to Documenter. A
+requirement that depends on that later work can remain explicitly pending at
+this point. Final review must have evidence for every current requirement and
+normally goes to Synchronizer.
+
+With `IMPLEMENTATION_REVIEWED`, Reviewer separately checks whether the cycle can
+finish after implementation review. The ordinary review may pass while this
+separate check fails: required documentation or another later dependency may
+still be unfinished. Reviewer records the unmet work and sends it to its owner.
+
+Only a passing ordinary review and a current `ELIGIBLE` closure result allow
+this shorter cycle to reach your sign-off decision. The report saves your
+choice, the inputs and evidence assessed, and the checks being omitted. Reviewer
+reassesses it after relevant changes or a return to the shorter policy, keeping
+earlier conclusions as history. See
+[Finishing After Implementation Review](../../guides/finishing-after-implementation-review/).
 
 Expedited implementation review can go directly to your sign-off decision once
 its narrower completion requirements are met. It does not claim the skipped

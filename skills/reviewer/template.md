@@ -26,8 +26,8 @@ ReviewKind: IMPLEMENTATION | FINAL_DELIVERABLE
 
 ## Assessed Inputs and Scope
 
-- Contract paths and content identities; cycle mode and current acceptance set
-  in STANDARD, or bounded request in EXPEDITED.
+- Contract paths and content identities; cycle mode, selected completion policy,
+  and current acceptance set in STANDARD, or bounded request in EXPEDITED.
 - Repository baseline/comparison range and its basis, committed and dirty-tree
   content (including untracked/deleted paths), affected unchanged boundaries.
 - Development, verification, context, prior reviews, documentation, relevant
@@ -97,6 +97,44 @@ evidence. At final review, record the evidence resolving earlier dependencies;
 unresolved dependencies cannot support a passing final gate. Use NONE when
 empty.
 
+## Implementation-Reviewed Closure
+
+Include this section only in the implementation report when assessing shorter
+standard completion. It is separate from the ordinary review `Status`; a
+`COMPLETE` review may still have `INELIGIBLE` closure. Omit it for reports that
+have never assessed this policy, including expedited and final review. Do not
+delete a prior assessment on withdrawal; retain its assessed policy and useful
+history. Full-deliverable completion does not rely on this section.
+
+`Policy`: `IMPLEMENTATION_REVIEWED` `Eligibility`: `NOT_ASSESSED` `User Choice`:
+`NONE` `User Reason`: `NONE` `Assessed Inputs`: `NONE` `Evidence`: `NONE`
+`Unmet Requirements`: `NONE` `Omitted Phases`:
+`DOCUMENTING, REVIEWING_FINAL, SYNCHRONIZING` `Omitted Guarantees`:
+`Normal documentation, final review, and independent reconciliation omitted.`
+
+Keep each field exactly once with a concrete value. `Policy` records what this
+assessment evaluates, even after a later coordination change. `User Choice`
+records the explicit instruction and its source; `User Reason` is the user's
+stated reason or `NONE` when none was given. Preserve both beyond replacement of
+the handoff and active-cycle state. `Assessed Inputs` identifies current content
+or points to the exact identities in **Assessed Inputs and Scope**. `Evidence`
+references the current AC/technical-criterion assessment and owner-produced
+evidence, including resolution of all later dependencies and existing artifacts.
+
+Set `Eligibility` to `NOT_ASSESSED`, `INELIGIBLE`, or `ELIGIBLE` using
+`SKILL.md`. An eligible conclusion requires non-`NONE` choice, input identities,
+evidence, and omitted guarantees, with `Unmet Requirements: NONE`. An ineligible
+conclusion names the unmet requirements, owners, and needed evidence or user
+action. Explain the conclusion in prose; the fields do not replace assessment.
+Corrective work does not imply that any omitted full phase passed.
+
+Keep exactly one current section with this heading. Before replacing a previous
+assessment, preserve its conclusion, inputs, evidence, and reason for
+supersession under a separate `## Closure Assessment History` heading. On a
+return to this policy or changed inputs, reset current eligibility to
+`NOT_ASSESSED` and reconcile it before claiming eligibility again. Do not reuse
+a prior `ELIGIBLE` label alone.
+
 ## Progress and Conclusion
 
 - Completed inspection and remaining areas/checks; next concrete action on
@@ -114,12 +152,15 @@ empty.
 
 ## Authoring Rules
 
-Keep each section; use explicit NONE, no material findings, or not-yet-assessed
-explanations rather than empty tables. Set `User Style` to the user's explicit
-selection under the protocol's **User Styles**, or `NONE`. `IN_PROGRESS` means
-assessment is underway; `BLOCKED` means required correction or evidence prevents
-completion; neither is passing. `COMPLETE` requires the shared Reviewer gate and
-the applicable review gate in `SKILL.md`, not merely an empty finding list.
-Reopen it when changed inputs invalidate that conclusion. Preserve the other
-kind's report and other cycles. Keep useful history, but make current
-conclusions and next actions unambiguous.
+Keep each applicable section; use explicit NONE, no material findings, or
+not-yet-assessed explanations rather than empty tables. Set `User Style` to the
+user's explicit selection under the protocol's **User Styles**, or `NONE`.
+`IN_PROGRESS` means assessment is underway; `BLOCKED` means required correction
+or evidence prevents completion; neither is passing. `COMPLETE` requires the
+shared Reviewer gate and the applicable review gate in `SKILL.md`, not merely an
+empty finding list. Reopen it when changed inputs invalidate that conclusion.
+Preserve the other kind's report and other cycles. Keep useful history, but make
+current conclusions and next actions unambiguous. The closure section's
+eligibility is independent of ordinary review status; only current `ELIGIBLE`
+closure together with a passing ordinary review supports the shorter standard
+handoff to sign-off readiness.

@@ -53,6 +53,20 @@ You can also state a preference in advance, such as “Use STANDARD for my next
 cycle.” The agent saves that preference, but it does not start a cycle until you
 give a request.
 
+## Choose when the cycle can finish
+
+Standard cycles use `FULL_DELIVERABLE` by default. You can include “Finish this
+cycle after implementation review” in the new request to select
+`IMPLEMENTATION_REVIEWED`. Both new and existing projects can use it. All
+earlier standard checks remain required, and Reviewer must confirm that no
+required work remains before asking you to sign off.
+
+This choice applies to the request you give; it is not a saved preference for
+future cycles. If it conflicts with an explicit or saved expedited mode choice,
+the agent asks you to resolve that conflict before starting. See
+[Finishing After Implementation Review](../finishing-after-implementation-review/)
+for examples and when you can change the choice later.
+
 ## Resolve a blocked request
 
 If your chosen mode cannot handle the request, the agent keeps the request and
@@ -68,7 +82,7 @@ Before the first role begins its work, the agent:
    request can use the selected cycle mode.
 3. Generates a unique cycle ID with `node .standards/bin/cycle.mjs new`, which
    checks that no earlier cycle's records use it.
-4. Saves the request, mode, ID, and initial workflow state in
+4. Saves the request, mode, completion policy, ID, and initial workflow state in
    `.standards/STATE.md`.
 
 Those are agent responsibilities, not manual steps for you. The agent asks when

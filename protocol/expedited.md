@@ -12,6 +12,8 @@ An `EXPEDITED` cycle provides a deliberately narrower completion contract:
    is required.
 2. `Active Work.Request` is the change contract. `Scope` and `Architecture`
    remain `NONE` unless promotion later causes their owners to create them.
+   `Active Work.CompletionPolicy` is `NONE`; standard completion policies do not
+   change the expedited path or its guarantees.
 3. Existing project context may be consulted as prior evidence but is not
    refreshed by default. Prior-cycle non-baseline entries are stale for the
    current cycle.
@@ -48,6 +50,7 @@ cycle.
    request qualifies; so does an explicit rework request whose changed contract
    necessarily requires an omitted standard role or guarantee.
 2. Set `CycleMode: STANDARD`, `WorkflowState: AUDITING`, and
+   `Active Work.CompletionPolicy: FULL_DELIVERABLE`. Set
    `Handoff.Kind: PROMOTE`; set `From` to the interrupted state,
    `FailureType: NONE`, and record a concise reason identifying which omitted
    standard guarantee is now required. Persist the same reason in
@@ -64,7 +67,10 @@ cycle.
    `Owner`, `FailureType`, and `Reason`. Then clear the expedited recovery
    stack; the standard brownfield topology restarts at `AUDITING`.
 6. All standard forward, failure, recovery, outstanding-obligation,
-   traceability, and sign-off rules apply afterward.
+   traceability, and sign-off rules apply afterward. Promotion never selects
+   `IMPLEMENTATION_REVIEWED`. A separate explicit user choice follows **Change
+   completion policy** in `.standards/protocol/user-decisions.md` and cannot
+   bypass the obligations preserved by promotion.
 
 ## Outstanding Obligations
 

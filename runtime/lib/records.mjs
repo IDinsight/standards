@@ -4,6 +4,7 @@ import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 
 import { CYCLE_ID, fieldPairs, git } from './core.mjs';
+import { requiredCompletionPhases } from './completion.mjs';
 
 export const ARTIFACT_TYPES = new Set([
   'SCOPE', 'ARCHITECTURE', 'DEVELOPMENT', 'VERIFICATION', 'REVIEW', 'DOCUMENTATION', 'SYNCHRONIZATION',
@@ -46,6 +47,13 @@ export function fixedRecords(cycle) {
     { artifact: 'REVIEW', reviewKind: 'FINAL_DELIVERABLE', phase: 'REVIEWING_FINAL' },
     { artifact: 'SYNCHRONIZATION', reviewKind: null, phase: 'SYNCHRONIZING' },
   ].map((record) => ({ ...record, path: fixedPath(record.artifact, cycle, record.reviewKind) }));
+}
+
+// Presence/completion requirements are policy-dependent. Always use
+// fixedRecords for discovery so an omitted phase cannot hide an existing file.
+export function requiredCompletionRecords(cycle, cycleMode, policy) {
+  const phases = requiredCompletionPhases(cycleMode, policy);
+  return fixedRecords(cycle).filter((record) => phases?.includes(record.phase));
 }
 
 // A record's name in messages, e.g. "REVIEW IMPLEMENTATION".
@@ -198,18 +206,26 @@ export function bareIds(text, prefixes) {
   return [...new Set([...text.matchAll(pattern)].map((match) => match[1]))];
 }
 
+// Shared by record section parsing and review comment masking. Closing fences
+// use only the opening character and may have trailing whitespace, not an info
+// string. Backtick info strings cannot themselves contain backticks.
+export function fenceAfterLine(line, fence = null) {
+  const marker = /^ {0,3}(`{3,}|~{3,})([^\r\n]*)$/.exec(line);
+  if (fence === null) {
+    return marker && (marker[1][0] === '~' || !marker[2].includes('`')) ? marker[1] : null;
+  }
+  return marker && marker[1][0] === fence[0] && marker[1].length >= fence.length
+    && /^[ \t]*$/.test(marker[2]) ? null : fence;
+}
+
 // The lines of a Markdown file, each marked when it sits inside a fenced code
 // block, so a "## " line in an example is not read as a section heading.
 function markdownLines(text) {
   let fence = null;
   return text.split(/\r?\n/).map((line) => {
-    const marker = /^ {0,3}(`{3,}|~{3,})/.exec(line)?.[1];
-    if (fence === null) {
-      if (marker) fence = marker;
-      return { line, fenced: Boolean(marker) };
-    }
-    if (marker && marker[0] === fence[0] && marker.length >= fence.length && /^ {0,3}[`~]+\s*$/.test(line)) fence = null;
-    return { line, fenced: true };
+    const previous = fence;
+    fence = fenceAfterLine(line, fence);
+    return { line, fenced: previous !== null || fence !== null };
   });
 }
 
@@ -223,12 +239,19 @@ function sectionName({ line, fenced }) {
 
 // A record section, excluding fenced examples and stopping at the next H2.
 export function recordSection(text, name, { includeFenced = false } = {}) {
+  return recordSections(text, name, { includeFenced })[0] ?? '';
+}
+
+// Retain repeated sections so contracts requiring one assessment cannot silently
+// accept the first of two contradictory conclusions.
+export function recordSections(text, name, { includeFenced = false } = {}) {
   const lines = markdownLines(text);
-  const start = lines.findIndex((entry) => sectionName(entry) === name.toLowerCase());
-  if (start === -1) return '';
-  const next = lines.findIndex((entry, index) => index > start && sectionName(entry) !== null);
-  return lines.slice(start + 1, next === -1 ? undefined : next)
-    .map(({ line, fenced }) => (fenced && !includeFenced ? '' : line)).join('\n');
+  return lines.flatMap((entry, start) => {
+    if (sectionName(entry) !== name.toLowerCase()) return [];
+    const next = lines.findIndex((candidate, index) => index > start && sectionName(candidate) !== null);
+    return [lines.slice(start + 1, next === -1 ? undefined : next)
+      .map(({ line, fenced }) => (fenced && !includeFenced ? '' : line)).join('\n')];
+  });
 }
 
 // The first fields in each step are authoritative; later self-check prose may

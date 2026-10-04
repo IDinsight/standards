@@ -38,11 +38,11 @@ and [Your First Workflow](./getting-started/first-workflow/) for a walkthrough.
   works and when to use it.
 - [Your First Workflow](./getting-started/first-workflow/): follow an example
   from request to sign-off.
-- [Workflow map](./concepts/states-and-handoffs/#the-paths-at-a-glance): see the
-  standard and expedited paths at a glance.
+- [Workflow paths](./concepts/states-and-handoffs/): understand standard and
+  expedited work.
 - [Roles](./roles/overview/): find the right role for a task.
 - [Roadmap](./roadmap/): see the directions we are exploring each quarter.
-- [Guides](./guides/starting-a-cycle/): start, resume, or change ongoing work.
+- [Guides](./guides/overview/): follow the standard-cycle map and task guides.
 - [Reference](./reference/protocol/): look up exact rules and document formats.
 - [Skill eval report](./reference/skill-eval-report/): see how the role skills
   were tested and how they scored.

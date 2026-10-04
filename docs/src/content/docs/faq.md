@@ -342,14 +342,29 @@ also ask for changes or cancel instead. See
 
 ### Can I skip a role?
 
-Not one at a time. Expedited work leaves out a fixed set of roles for small
-changes to an existing project, and you can't pick and choose beyond that. A
-skipped role's job also doesn't move to another role. For example, Developer's
-own checks don't replace Tester's verification.
+There are two supported ways to shorten a cycle. For either new or existing
+projects, a standard cycle can
+[finish after implementation review](../guides/finishing-after-implementation-review/)
+if you choose that policy and Reviewer confirms that no required work remains.
+It keeps all earlier standard checks and omits the normal Documenter, final
+Reviewer, and Synchronizer phases.
+
+Expedited work leaves out more roles for eligible small changes to an existing
+project. Neither option lets you skip roles one at a time or transfer their jobs
+to someone else. Developer's own checks do not replace Tester's verification.
 
 If expedited work turns out to need a skipped role, the cycle is promoted to
 standard work and continues from Auditor. See
 [Promote an expedited cycle](../concepts/states-and-handoffs/#promote-an-expedited-cycle).
+
+### Can I finish a cycle if the project has no documentation?
+
+Yes. Ask to finish after implementation review when starting a standard cycle,
+or before normal documentation work begins. Having no documentation does not
+select this policy automatically. Any documentation required by the agreed scope
+still needs to be completed and checked. Reviewer explains the omitted checks,
+then you decide whether to sign off. See
+[Finishing After Implementation Review](../guides/finishing-after-implementation-review/).
 
 ### Why do I have to start each role myself?
 
@@ -406,9 +421,14 @@ role. See
 In standard work, Scoper writes each outcome that must be true as an
 **acceptance condition** with an ID, such as `AC-001`. The design, the
 implementation plan, and every assessment report refer to the same IDs. Tester
-records the evidence for each one, or why it can't be verified yet. Final review
-checks that every condition has enough evidence, and Synchronizer checks that
-the evidence still matches the files you're signing off.
+records the evidence for each one, or why it can't be verified yet.
+
+With `FULL_DELIVERABLE`, final Reviewer checks that every condition has enough
+evidence, and Synchronizer checks that the assessments still apply to the
+current files. With `IMPLEMENTATION_REVIEWED`, implementation Reviewer
+separately checks that every requirement has current evidence and no required
+work remains before the cycle can reach your sign-off decision. The shorter
+policy omits normal final review and synchronization.
 
 The workflow check also flags a finished report that leaves out a current ID. It
 can't judge whether the evidence is good; that's the job of Tester and Reviewer.

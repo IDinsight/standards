@@ -22,9 +22,9 @@ Their initials spell S.T.A.N.D.A.R.D.S.; this is not their running order. The
 is new or existing and whether the cycle uses standard or expedited work. A
 cycle is one request, ending in your sign-off or cancellation.
 
-Each role ships eval cases that check it follows the protocol. The
-[skill eval report](../../reference/skill-eval-report/) explains how they were
-run and how each role scored.
+Each role has eval cases describing expected behavior. The
+[skill eval report](../../reference/skill-eval-report/) covers an earlier run;
+the new completion-policy cases have not been run against a model.
 
 ## Run a role
 
@@ -51,6 +51,11 @@ A role's completion does not mean the whole change is accepted. You make the
 final [sign-off decision](../../concepts/human-decisions/). Expedited cycles run
 only Developer and implementation Reviewer; if they need a skipped role, the
 cycle must move to the standard workflow.
+
+Standard cycles can also
+[finish after implementation review](../../guides/finishing-after-implementation-review/)
+when you choose that policy and Reviewer confirms that no required work remains.
+This keeps all standard steps through full testing and implementation review.
 
 ## Files and setup
 

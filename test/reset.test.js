@@ -34,7 +34,11 @@ async function snapshot(root, prefix = '') {
 async function projectWithWork(root) {
   await installProject({ projectRoot: root });
   const state = await read(root, '.standards/STATE.md');
-  await write(root, '.standards/STATE.md', state.replace('`Id`: `UNSET`', '`Id`: `old-work-20260901T120000Z-1a2b3c4d`'));
+  await write(root, '.standards/STATE.md', state
+    .replace('`Id`: `UNSET`', '`Id`: `old-work-20260901T120000Z-1a2b3c4d`')
+    .replace('`Request`: `UNSET`', '`Request`: `Add project implementation.`')
+    .replace('`CycleMode`: `UNSET`', '`CycleMode`: `STANDARD`')
+    .replace('`CompletionPolicy`: `NONE`', '`CompletionPolicy`: `FULL_DELIVERABLE`'));
   await write(root, '.standards/CONTEXT.md', '# Project Context\n');
   await mkdir(path.join(root, '.standards/docs/scope'), { recursive: true });
   await write(root, '.standards/docs/scope/old-work-20260901T120000Z-1a2b3c4d.md', 'Scope record\n');

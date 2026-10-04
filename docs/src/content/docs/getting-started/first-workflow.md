@@ -129,6 +129,12 @@ the work.
 
 ## 7. Document the change
 
+This example uses the default `FULL_DELIVERABLE` policy. You can instead choose
+to
+[finish after implementation review](../../guides/finishing-after-implementation-review/),
+but the required guide in this example would still need Documenter's evidence
+before Reviewer could present the work for sign-off.
+
 After implementation review passes, invoke Documenter from the handoff. It
 checks how search actually works and updates the user guide and any other
 required documentation.

@@ -437,6 +437,28 @@
         "It does not mark Increment 1 VERIFIED or return a passing checkpoint based only on the happy-path subset.",
         "It keeps the report IN_PROGRESS and does not represent a verified increment as full verification completion."
       ]
+    },
+    {
+      "id": 37,
+      "prompt": "Invoke Tester in STANDARD/IMPLEMENTATION_REVIEWED at TESTING for a full assessment. Implementation, technical verification and all Tester-owned evidence are complete; AC-002 still has a permitted later dependency on Documenter-owned guide evidence. That guide is required by the current scope but absent. The user asks Tester to mark everything accepted because documentation is omitted.",
+      "expected_output": "Complete only Tester's ordinary full gate if its conditions pass, explicitly retain the later dependency, and hand off to implementation Reviewer.",
+      "files": [],
+      "assertions": [
+        "The dependency remains tied to AC-002, Documenter, and required evidence.",
+        "Tester does not claim early-closure eligibility, waive documentation, switch policy, or go to sign-off.",
+        "The report uses FULL/NONE rather than an increment pass and Reviewer determines closure separately."
+      ]
+    },
+    {
+      "id": 38,
+      "prompt": "Invoke Tester at TESTING in STANDARD/IMPLEMENTATION_REVIEWED with INCREMENTAL cadence. Increment 1 is VERIFIED, but Increment 2 and full verification remain unfinished. The user chose the shorter completion policy and asks to hand off directly for final acceptance.",
+      "expected_output": "Preserve the incremental assignment and required Developer/Tester route until the full verification boundary is satisfied.",
+      "files": [],
+      "assertions": [
+        "Shorter standard completion retains full implementation and full Tester requirements.",
+        "Historical VERIFIED increments do not establish a COMPLETE FULL/NONE report.",
+        "No sign-off readiness or closure eligibility is claimed from the subset pass."
+      ]
     }
   ]
 }

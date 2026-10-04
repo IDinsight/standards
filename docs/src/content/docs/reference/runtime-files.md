@@ -71,6 +71,26 @@ recorded work instead of relying on chat history.
 `Active Work` also stores the reason for promotion, any temporary audit target,
 and changes left by cancelled cycles that Auditor must check.
 
+`Active Work.CompletionPolicy` is required. It is `NONE` before a cycle starts
+and during expedited work. A standard cycle uses `FULL_DELIVERABLE` by default
+or `IMPLEMENTATION_REVIEWED` when you explicitly choose the shorter finish.
+Sign-off and retained cancellation keep that value as history; a new cycle
+chooses it afresh. Installation and reset initialize it to `NONE`.
+
+The checker uses the policy to determine which completed records are required
+before sign-off readiness. It still checks any existing records from omitted
+phases. For the shorter policy, it also requires an `ELIGIBLE` assessment in the
+implementation review report. Reviewer judges whether the evidence is sufficient
+and still applies; the tool checks the saved format and required fields. See
+[Finishing After Implementation Review](../../guides/finishing-after-implementation-review/).
+
+`Handoff.Kind: COMPLETION_CHANGE` records either a return from Documenter to
+implementation Reviewer to assess the shorter finish, or a withdrawal from
+sign-off readiness back to Documenter. A policy change that keeps the same state
+preserves the previous handoff, including checkpoints. The
+[policy-change rules](../protocol/#change-completion-policy) define when these
+actions are allowed.
+
 The pending request and question are a pair: the request is `UNSET` exactly when
 the question is `NONE`. A question about the next cycle belongs there, not in
 the current or previous cycle's `Active Work.BlockedOn`.

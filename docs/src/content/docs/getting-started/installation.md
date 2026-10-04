@@ -25,6 +25,14 @@ project; it does not add a package dependency or start a workflow cycle. It
 prints the installed version, project mode, coding agents, whether the hook is
 on, the number of changed paths, and any warnings.
 
+After installation, the command also reminds you to check `standards --version`
+in your terminal if you use a globally installed CLI. It should match the
+project's version in `.standards/VERSION.json`. If it differs or the command is
+unavailable, use `npx @idinsight/standards@<version> <command>` with that
+project's version; for example, `npx @idinsight/standards@<version> reset`. The
+installer prints the exact version to use. Different projects may need different
+CLI versions, so this reminder does not install or update a global CLI.
+
 ## Choose a branch for the first installation
 
 For a project using Git, we recommend creating a dedicated setup branch from

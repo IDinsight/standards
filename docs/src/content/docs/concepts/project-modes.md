@@ -48,8 +48,13 @@ expedited workflow instead.
 
 ## Choose the cycle mode
 
-**STANDARD** is the default. It uses the full workflow, including separate
-testing, documentation, final review, and synchronization.
+**STANDARD** is the default. It keeps requirements, design, an audit,
+implementation, full testing, and implementation review. By default it also
+includes documentation, final review, and synchronization. You can explicitly
+choose to
+[finish after implementation review](../../guides/finishing-after-implementation-review/)
+once Reviewer confirms that no required work remains. This completion policy
+works for both greenfield and brownfield cycles and does not change their mode.
 
 **EXPEDITED** uses Developer and implementation Reviewer before your sign-off
 decision. Developer still needs an approved plan. Use it only for a bounded

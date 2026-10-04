@@ -48,9 +48,11 @@ context is prior evidence, not an assumed refreshed baseline. Read the current
 cycle's review reports when present and relevant user/project documentation. For
 final review or documentation corrections, read Documenter's documentation
 record and inspect its evidence against the saved documents and actual behavior;
-a record's completion label alone is not sufficient. Inspect relevant source,
-tests, fixtures, configuration, established commands, dependencies, and
-version-control evidence directly.
+a record's completion label alone is not sufficient. For shorter standard
+completion, also inspect any already-produced documentation, final-review, and
+synchronization records and their unresolved work, including corrective work.
+Inspect relevant source, tests, fixtures, configuration, established commands,
+dependencies, and version-control evidence directly.
 
 ## Modes
 
@@ -245,6 +247,62 @@ is a valid outcome; there is no finding quota. A report with no established
 defects but insufficient material evidence is still incomplete. Reviewer defines
 severity and evidence details in its shared procedure and report template.
 
+## Implementation-Reviewed Closure
+
+In `STANDARD` implementation review with
+`Active Work.CompletionPolicy: IMPLEMENTATION_REVIEWED`, separately assess the
+protocol's **Standard Cycle Completion** and **Implementation-Reviewed Closure**
+requirements. This is part of implementation review, not a third kind or a
+substitute final review. Absence of documentation is neither authorization nor
+evidence of eligibility. Do not create omitted owners' evidence or waive
+acceptance conditions to make the shorter route pass.
+
+Use the report template's `Implementation-Reviewed Closure` section. Persist the
+explicit user choice and any stated reason from the saved request or available
+user instruction; do not invent a reason or rely on `Handoff.Reason` as durable
+authorization. Record the assessed policy, current input identities, evidence
+references, unmet requirements with owners, and omitted guarantees. The report's
+`Status` still describes the ordinary review gate:
+
+- `NOT_ASSESSED`: closure has not been assessed against current inputs, or an
+  earlier conclusion needs reconciliation. It never establishes readiness.
+- `INELIGIBLE`: record the specific unmet closure requirements and their owners.
+  Ordinary implementation review may still be `COMPLETE` if its own gate passes
+  with permitted later dependencies. Do not mislabel that review as failed
+  solely because the separate closure gate does not pass.
+- `ELIGIBLE`: every common completion requirement and early-closure requirement
+  has current sufficient evidence. No unresolved material work, dependency,
+  discrepancy, blocker, outstanding obligation, baseline reconciliation, or
+  pending verification-cadence request remains; recovery is complete at the
+  handoff. For the final recovery return, record eligibility as part of the same
+  handoff that closes the verified correction and pops the last frame. Do not
+  skip required reruns or leave an outer frame active.
+
+For each current AC and relevant technical criterion, identify the supporting
+evidence and independently assess its sufficiency. Resolve every earlier
+permitted later dependency before declaring eligibility. Required documentation
+or agent guidance needs owner-produced evidence; a no-documentation project does
+not waive that contract. Explain that normal Documenter completion, final review
+of the assembled deliverable, and independent Synchronizer reconciliation have
+been omitted, even if bounded corrective work by those owners occurred.
+
+If closure is ineligible, persist the unmet requirement before routing normal
+owner-directed correction or asking a blocking user question. If a choice is
+needed, explain the option to retain the shorter policy and resolve its unmet
+requirements or explicitly withdraw it for full completion. Do not silently
+switch policy, enter sign-off readiness, or invoke another role. Apply recovery
+first; an active recovery assignment cannot be bypassed by an eligibility claim.
+
+On resume, a policy return, or changed inputs, reconcile the closure assessment
+separately from the ordinary review. Before reassessing, move the superseded
+conclusion and its evidence to `## Closure Assessment History` and set current
+eligibility to `NOT_ASSESSED`. Recheck the current choice and all supporting
+inputs before restoring `ELIGIBLE`; legal coordination updates alone do not
+invalidate deliverable evidence. Keep only one current closure section. A
+withdrawal preserves the earlier report as history; its eligibility does not
+establish full-deliverable completion or authorize a later shorter-policy
+handoff without reassessment.
+
 ## Completion and Handoff
 
 Apply **Review Gates** above for the selected kind and cycle mode. Immediately
@@ -265,18 +323,28 @@ match current content; reconcile any intervening changes. Ensure:
 `COMPLETE` means this review gate passed, not that the whole cycle is complete.
 No material findings alone does not prove completion with missing assessment.
 
-On normal success without recovery, `STANDARD` implementation review hands off
-to Documenter; `STANDARD` final review hands off to Synchronizer. `EXPEDITED`
-implementation review enters `AWAITING_USER_SIGNOFF` only when the protocol's
-expedited completion requirements pass. Never fabricate final review there.
+On normal success without recovery, `STANDARD` implementation review with
+`FULL_DELIVERABLE` hands off to Documenter. With `IMPLEMENTATION_REVIEWED`,
+enter `AWAITING_USER_SIGNOFF` only after the ordinary review is `COMPLETE` and
+the separate closure assessment is `ELIGIBLE` for current inputs. Recheck both
+immediately before the handoff and persist the report first. Explain the omitted
+guarantees and request explicit user sign-off; policy selection and a passing
+review are not acceptance. Normal `STANDARD` final review with
+`FULL_DELIVERABLE` hands off to Synchronizer; final review under the shorter
+policy follows only its active recovery route. `EXPEDITED` implementation review
+enters `AWAITING_USER_SIGNOFF` only when the protocol's expedited completion
+requirements pass. Never fabricate final review there.
 
 During recovery, apply the canonical algorithm instead. Only if the current
 review state owns the active frame does Reviewer decide which completed
 downstream work its corrected review invalidates, such as documentation or final
 review relying on a withdrawn finding. As a rerun, preserve the frame and honor
 its `RerunThrough` boundary, returning to `ResumeAt` rather than blindly taking
-the normal next phase. Persist the report before the state transition; follow
-protocol handoff/session rules for any target and do not perform its work.
+the normal next phase. A recovery return to `AWAITING_USER_SIGNOFF` must also
+satisfy the selected completion contract, including a current `ELIGIBLE`
+assessment for shorter standard completion. Persist the report before the state
+transition; follow protocol handoff/session rules for any target and do not
+perform its work.
 
 ## Plain-Language Summary (ELI5)
 

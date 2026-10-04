@@ -111,6 +111,34 @@ The protocol defines these
 [corrective returns](../../reference/protocol/#corrective-returns); the
 Documenter and Synchronizer skills add each role's own conditions.
 
+## Corrections when finishing after implementation review
+
+The shorter standard policy omits normal documentation, final review, and
+synchronization. Their owners can still receive required corrections through
+recovery. The agent keeps the selected policy and repeats only work affected by
+the correction, including any existing reports from omitted phases.
+
+If a correction changes the evidence for early completion, implementation
+Reviewer must reassess it before the cycle returns to sign-off readiness. An old
+`ELIGIBLE` result is not enough for changed work.
+
+For example, Synchronizer may correct an existing evidence reference even though
+normal final review was omitted. If its full assessment cannot pass without that
+omitted review, its record stays incomplete. When returning to sign-off, it
+keeps the recovery frame and sends the work through implementation Reviewer
+first. It cannot mark synchronization complete just to close the frame.
+
+If a later upstream fix changes that same evidence, Synchronizer can recheck the
+earlier correction under another role's saved recovery plan. The narrow
+[corrective-rerun rule](../../reference/protocol/#synchronizer-corrective-reruns)
+allows its record to remain incomplete, preserves older frames, and still
+requires Reviewer reassessment before sign-off. Missing required implementation,
+testing, or documentation cannot use this exception.
+
+See
+[Finishing After Implementation Review](../../guides/finishing-after-implementation-review/)
+for the choice and the checks it retains.
+
 ## Outstanding obligations
 
 Promoting expedited work changes the route through the workflow. Its old

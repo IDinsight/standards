@@ -731,6 +731,50 @@
         "The review finding is referenced as .standards/docs/reviews/add-search-20260927T101500Z-1a2b3c4d/implementation.md#F-002",
         "The Scoper-owned decision is routed through a SCOPING failure rather than decided by Documenter"
       ]
+    },
+    {
+      "id": 71,
+      "prompt": "Only process the user's instruction to finish after implementation review. STANDARD/FULL_DELIVERABLE is at DOCUMENTING with FORWARD from REVIEWING_IMPLEMENTATION. Documenter has not begun any normal work; completed implementation review and COMPLETE FULL verification are current. Recovery, obligations and BlockedOn are empty. Reviewer is not invoked in this chat.",
+      "expected_output": "Select IMPLEMENTATION_REVIEWED and return to implementation Reviewer through COMPLETION_CHANGE, then stop.",
+      "files": [],
+      "assertions": [
+        "The explicit choice is persisted in Active Work.Request without revising the implementation contract.",
+        "No documentation edits, closure conclusions, recovery frames, or direct sign-off transition are created.",
+        "The handoff names IMPLEMENTATION review and the required independent session; policy choice does not invoke Reviewer."
+      ]
+    },
+    {
+      "id": 72,
+      "prompt": "Process a request to select IMPLEMENTATION_REVIEWED in STANDARD/FULL_DELIVERABLE at DOCUMENTING. Normal documentation edits have already been made in this cycle, but the documentation record has not yet been created. Recovery and obligations are inactive. The user argues that the missing record means Documenter has not begun.",
+      "expected_output": "Explain the unmet policy-change boundary and preserve the current policy and route.",
+      "files": [],
+      "assertions": [
+        "Saved edits and repository evidence establish that normal documentation began; record absence is insufficient.",
+        "No deferred shorter-policy choice is queued, no existing documentation is removed to simulate an untouched handoff, and no COMPLETION_CHANGE is recorded.",
+        "The response distinguishes a policy-only request from a material contract change requiring normal rework."
+      ]
+    },
+    {
+      "id": 73,
+      "prompt": "Invoke Documenter in STANDARD/IMPLEMENTATION_REVIEWED at DOCUMENTING. The active owned DOCUMENTATION frame was pushed from REVIEWING_IMPLEMENTATION and resumes there with RerunThrough NONE. AC-002 requires correcting an existing operations guide. All inputs and implementation/full verification needed for this correction are current; the saved guide correction and documentation evidence have been verified, all required documentation surfaces are assessed, and no owned blocker or obligation remains. No normal final review or synchronization is required.",
+      "expected_output": "Pass Documenter's applicable gate and RESUME implementation Reviewer under the saved recovery route.",
+      "files": [],
+      "assertions": [
+        "The policy remains IMPLEMENTATION_REVIEWED even if the full Documenter gate passes.",
+        "No normal handoff to final Reviewer or Synchronizer is taken.",
+        "Reviewer retains responsibility for assessing ordinary review and closure against the corrected documentation."
+      ]
+    },
+    {
+      "id": 74,
+      "prompt": "Invoke Documenter in STANDARD/IMPLEMENTATION_REVIEWED at DOCUMENTING during recovery from AWAITING_USER_SIGNOFF. The active owned frame has RerunThrough NONE. A verified correction to existing project guidance changes an input identified in the saved eligible closure assessment. All required documentation is now complete, no owned defect remains, and the corrected guidance requires implementation Reviewer reassessment.",
+      "expected_output": "Retain the frame, plan implementation Reviewer reassessment, and hand off there before readiness can resume.",
+      "files": [],
+      "assertions": [
+        "The changed input prevents reliance on the saved ELIGIBLE label.",
+        "RerunThrough is REVIEWING_IMPLEMENTATION and the frame resumes AWAITING_USER_SIGNOFF only after reassessment.",
+        "Documenter does not author closure eligibility or initiate the omitted normal final-review phase."
+      ]
     }
   ]
 }

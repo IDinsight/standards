@@ -1,8 +1,7 @@
 # STANDARDS skills eval suite results
 
 This report explains how the STANDARDS role skills were evaluated and what the
-evaluation found. It covers all 363 eval cases that ship with the skills, in
-`skills/<role>/evals/evals.json`.
+evaluation found. It covers the 363 cases included in that evaluation.
 
 - **Model under test:** Claude Sonnet 5.5 at high effort, run through Claude
   Code 2.1.283.

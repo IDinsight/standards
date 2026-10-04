@@ -101,10 +101,14 @@ work; do not claim it passed.
   and Documenter-specific, and, for each remaining documentation item, its
   unfinished prerequisite, owner, required evidence, and when to revisit it.
   Keep the record incomplete; reference current ACs when available without
-  inventing future artifacts/IDs.
+  inventing future artifacts/IDs. Record the selected completion policy and
+  distinguish intentionally omitted guarantees from unfinished required work;
+  the former have no invented future assignment.
 - Whether the selected target and full Documenter gate are each complete, and
   the resulting recovery/normal handoff. Reference state for authoritative
   routing. Full documentation completion is not cycle completion or sign-off.
+  Under `IMPLEMENTATION_REVIEWED`, a corrective handoff follows recovery and
+  does not start the normal final-review tail or establish closure eligibility.
 
 ---
 

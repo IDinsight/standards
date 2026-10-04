@@ -5,9 +5,9 @@
 
 ## Active Work
 
-`Id`: `UNSET` `Request`: `UNSET` `Scope`: `NONE` `Architecture`: `NONE`
-`Development`: `NONE` `PromotionReason`: `NONE` `AuditTarget`: `NONE`
-`BlockedOn`: `NONE` `PendingVerificationCadence`: `NONE`
+`CompletionPolicy`: `NONE` `Id`: `UNSET` `Request`: `UNSET` `Scope`: `NONE`
+`Architecture`: `NONE` `Development`: `NONE` `PromotionReason`: `NONE`
+`AuditTarget`: `NONE` `BlockedOn`: `NONE` `PendingVerificationCadence`: `NONE`
 
 `BaselineReconciliation`: `NONE`
 
