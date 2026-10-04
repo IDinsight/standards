@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.10.0](https://github.com/IDinsight/standards/compare/v0.9.1...v0.10.0) (2026-10-04)
+
+
+### Features
+
+* allow standard cycles to finish after implementation review ([#46](https://github.com/IDinsight/standards/issues/46)) ([002319d](https://github.com/IDinsight/standards/commit/002319d98ddce7b1cf856798185a5c37c82744d2))
+
 ## [0.9.1](https://github.com/IDinsight/standards/compare/v0.9.0...v0.9.1) (2026-10-03)
 
 
