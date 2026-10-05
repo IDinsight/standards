@@ -1,5 +1,19 @@
 # Guided Mode
 
+<!-- standards:invocation -->
+
+```json
+{
+  "schemaVersion": 1,
+  "kind": "mode",
+  "group": "collaboration",
+  "id": "GUIDED",
+  "label": "Guided",
+  "description": "Guide one user-applied step and inspect the saved result.",
+  "selection": "user"
+}
+```
+
 Use the shared Documenter procedure and completion gate. The user applies the
 project documentation edits; Documenter persists its record and legal workflow
 coordination normally.

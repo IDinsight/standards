@@ -1,5 +1,19 @@
 # Code With Me Mode
 
+<!-- standards:invocation -->
+
+```json
+{
+  "schemaVersion": 1,
+  "kind": "mode",
+  "group": "collaboration",
+  "id": "CODE_WITH_ME",
+  "label": "Code With Me",
+  "description": "Help the user implement approved work on request.",
+  "selection": "user"
+}
+```
+
 Use after the user approves the current development plan when the user wants to
 participate directly in implementation rather than delegating every approved
 step to Developer.

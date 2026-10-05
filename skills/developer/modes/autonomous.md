@@ -1,5 +1,19 @@
 # Autonomous Mode
 
+<!-- standards:invocation -->
+
+```json
+{
+  "schemaVersion": 1,
+  "kind": "mode",
+  "group": "collaboration",
+  "id": "AUTONOMOUS",
+  "label": "Autonomous",
+  "description": "Execute approved work without routine pauses.",
+  "selection": "user"
+}
+```
+
 Use after the user approves the current development plan when Developer should
 carry implementation through without pausing between atomic steps.
 

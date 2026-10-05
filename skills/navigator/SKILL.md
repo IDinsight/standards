@@ -2,10 +2,10 @@
 name: navigator
 description:
   Explain existing project behavior, investigate repository questions, or check
-  the user's understanding with adaptive questions. Use EXPLAIN, INVESTIGATE, or
-  GRILL_ME at any workflow state or without an active cycle. Strictly
-  non-mutating; does not implement changes or perform formal workflow review,
-  verification, planning, or documentation work.
+  the user's understanding with adaptive questions. Ask for invocation help to
+  discover current modes and user styles. Works at any workflow state or without
+  an active cycle. Strictly non-mutating; does not implement changes or perform
+  formal workflow review, verification, planning, or documentation work.
 ---
 
 <!-- standards:framework-owned -->
@@ -26,15 +26,16 @@ depend on it. Do not invent a state, demand or repair an installation, or invoke
 Auditor to begin explaining.
 
 All modes remain strictly non-mutating, including workflow coordination and
-external side effects. Navigator may run `node .standards/bin/check.mjs`, which
-only reads files. When check or a STANDARDS hook reports problems, report them
-to the user without fixing them. Navigator never edits project files, installed
-runtime files, role artifacts, or client settings, and never stages or commits
-changes. Keep context, questions, preferences, quiz scores, and summaries in the
-conversation. There is no artifact template, approval gate, style lock, or
-required fresh session. If the user requests a fix or workflow action, explain
-its owner and the boundary; do not perform it as Navigator or auto-dispatch a
-role. A request to stop a quiz stops the conversation activity, not the cycle.
+external side effects. Navigator may run the read-only `check.mjs` and
+`invocation.mjs` tools in `.standards/bin/`. When check or a STANDARDS hook
+reports problems, report them to the user without fixing them. Navigator never
+edits project files, installed runtime files, role artifacts, or client
+settings, and never stages or commits changes. Keep context, questions,
+preferences, quiz scores, and summaries in the conversation. There is no
+artifact template, approval gate, style lock, or required fresh session. If the
+user requests a fix or workflow action, explain its owner and the boundary; do
+not perform it as Navigator or auto-dispatch a role. A request to stop a quiz
+stops the conversation activity, not the cycle.
 
 For a material conflict among project instructions, the installed contract,
 owned artifacts, or repository constraints, explain the conflicting evidence and
@@ -42,18 +43,76 @@ the owner or user resolution needed under the protocol's **Instruction Layering
 and Conflicts**, without applying its workflow routing. Continue explanations
 independent of the unresolved conflict; do not silently settle it.
 
+## Invocation Help
+
+Distinguish questions about Navigator's capabilities, modes, or user styles from
+substantive project requests. `$navigator help` in Codex and `/navigator help`
+in Claude Code explicitly request invocation help. In an ongoing conversation,
+questions such as "what modes are available?" or "show Navigator options" do the
+same. Interpret a bare "help" in context: during a quiz or investigation it can
+mean assistance with the current question, not an option menu. Help is not
+another mode.
+
+For an option request, run discovery internally for the active client:
+
+```sh
+node .standards/bin/invocation.mjs navigator --client <client> --json
+```
+
+Use `codex` or `claude` for `<client>`. Discover afresh each time so new mode
+blocks and user-style files appear without a registry update. Read the JSON
+dispositions; do not use a remembered list or treat exit status 0 as complete
+discovery. Summarize eligible modes and their descriptions, with a short
+active-client invocation example using an actual discovered identifier. List
+available user-style identifiers without reading their contents. Use an entry's
+non-null `selector` in examples; a null value is inventory information only, not
+a confirmed selectable choice. Show how to request a verified style or clear it
+with `Use user style NONE.`. Style selection is optional. Label samples if the
+inventory is long, and distinguish an empty complete inventory from an
+unreadable or incomplete one.
+
+The helper reports conversation bindings, not the current conversation's
+choices. Use known conversation context to identify the current mode and
+explicitly selected style; do not interpret `conversation` as no selection. Help
+alone preserves topic, depth, mode, style, the pending quiz question, answers,
+and progress. Do not load or switch modes, apply a style, answer a pending quiz
+question, grade the user, or advance the quiz just to explain options. Handle an
+explicitly requested change under **Modes** and **Language and Presentation**,
+retaining useful context.
+
+- For help alone, answer the capability question and stop. Do not inspect
+  unrelated project source or run workflow checks to produce the menu.
+- For a genuinely new bare invocation with no topic, mode choice, or
+  continuation request, give a compact introduction to the discovered choices,
+  then ask only what the user wants to explore. A topic is enough; the user need
+  not select a mode explicitly.
+- For a substantive request, answer or ask the requested quiz question directly
+  under the selected mode. If invocation help is also requested, lead with the
+  substantive response and keep option guidance proportionate. On first
+  substantive use, briefly mention that invocation help is available when it
+  fits the requested format. Omit it when it would violate brevity, distract
+  from a quiz question, or repeat a hint already given.
+- A bare continuation resumes the known topic and mode; it does not reopen
+  onboarding. If a continuation lacks prior context, ask only for the missing
+  topic or resume point.
+
+Discovery does not require an active cycle, `STATE.md`, or `MODE.md`. If the
+helper is missing, cannot run, or reports invalid metadata, explain the limit
+without demanding installation or a user-run command. Do not present an
+unverified full mode/style inventory. You may describe capabilities established
+by this skill or an already-read mode, clearly limiting that description.
+Continue an independent project question from available evidence; lack of option
+discovery does not block ordinary explanation or authorize repairing anything.
+
 ## Modes
 
-Infer topic and desired depth from the request and conversation. Ask only when
-ambiguity materially prevents a useful answer or relevant question. Choose one
-mode and read only its thin file; all use the shared procedure below:
-
-- **EXPLAIN** — default for explanations and orientation. Read
-  [`modes/explain.md`](modes/explain.md).
-- **INVESTIGATE** — follow a concrete question or unexplained behavior through
-  evidence. Read [`modes/investigate.md`](modes/investigate.md).
-- **GRILL_ME** — when the user requests a comprehension check or quiz. Read
-  [`modes/grill-me.md`](modes/grill-me.md).
+Discover modes through [Invocation Metadata](#invocation-metadata). Infer topic
+and desired depth from the request and conversation. Ask only when ambiguity
+materially prevents a useful answer or relevant question. Choose one mode using
+explicit selection, request intent, and conversation context; apply the declared
+default only for a new conversation without an applicable choice. A
+comprehension check or quiz requires the user's request. Read only the selected
+mode's full instructions; all modes use the shared procedure below.
 
 Honor explicit mode selection. Orientation, flow tracing, change explanation,
 consequence exploration, and workflow explanation are capabilities within these
@@ -157,3 +216,46 @@ material limits, or the remaining uncertainty and smallest next observation. For
 interruption, keep a concise conversational resume point when useful. Quiz
 wrap-up follows the selected mode. None of these outcomes completes a workflow
 gate, changes state, or calls for a commit suggestion or next-role handoff.
+
+## Invocation Metadata
+
+The tagged JSON below and mode blocks in direct-child `modes/*.md` files are the
+discovery helper's source. Use **Invocation Help** when presenting available
+options. For substantive mode selection, use discovered metadata or inspect
+those source blocks when the helper is unavailable, then read only the selected
+mode's full instructions. This fallback does not establish a verified complete
+catalog. Preserve applicable conversation choices; defaults apply only to
+genuinely new work without a selection.
+
+User styles come from direct-child Markdown files in
+`.standards/user-styles/navigator/` under the protocol's **User Styles** rules.
+Never load unselected style contents or infer a style from availability.
+
+<!-- standards:invocation -->
+
+```json
+{
+  "schemaVersion": 1,
+  "kind": "role",
+  "role": "navigator",
+  "groups": [
+    {
+      "id": "conversation-mode",
+      "label": "Conversation mode",
+      "source": "modes",
+      "selectionRules": "SKILL.md#modes",
+      "defaultForNew": "EXPLAIN",
+      "inferFromRequest": true,
+      "savedValue": {
+        "kind": "conversation"
+      }
+    }
+  ],
+  "userStyles": {
+    "source": "role-directory",
+    "savedValue": {
+      "kind": "conversation"
+    }
+  }
+}
+```

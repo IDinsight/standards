@@ -195,8 +195,10 @@ preserve the request and recovery instead of routing to Developer or Tester.
 
 ## Mode Selection
 
-After reading protocol state and the existing context artifact, select and read
-one initial mode:
+Discover modes and target choices through
+[Invocation Metadata](#invocation-metadata). The user may request an audit area;
+Auditor assesses the baseline and selects the inspection mode. After reading
+protocol state and the existing context artifact, select one initial mode:
 
 - `modes/greenfield.md` — the scheduled initial `GREENFIELD` audit after Scope
   and Architecture are complete.
@@ -308,3 +310,60 @@ downstream rerun.
 If the audit itself exposes a defect owned by another role, do not repair that
 role's artifact. Complete the project-context correction first, then route to
 the owning state according to the protocol.
+
+## Invocation Metadata
+
+Discover options from the tagged JSON below and the metadata blocks in direct
+child `modes/*.md` files. Inspect only those blocks for discovery, then load the
+selected mode's full instructions. A `user` option is selectable; `state` and
+`assessment` options are determined under `selectionRules`. Preserve applicable
+saved choices and use defaults only for genuinely new work without a selection.
+Entry rules, protocol gates, and style restrictions still apply.
+
+For user-style discovery, list direct-child Markdown filenames in
+`.standards/user-styles/auditor/` using the protocol's **User Styles** rules.
+Never load unselected style contents or infer a style from availability.
+
+<!-- standards:invocation -->
+
+```json
+{
+  "schemaVersion": 1,
+  "kind": "role",
+  "role": "auditor",
+  "groups": [
+    {
+      "id": "inspection-mode",
+      "label": "Inspection mode",
+      "source": "modes",
+      "selectionRules": "SKILL.md#mode-selection"
+    },
+    {
+      "id": "target",
+      "label": "Audit target",
+      "source": "inline",
+      "selectionRules": "SKILL.md#mode-selection",
+      "options": [
+        {
+          "id": "AREA",
+          "label": "Target area",
+          "description": "Request focused inspection of a path or area.",
+          "selection": "user",
+          "argument": "area",
+          "requiresAssessment": true
+        }
+      ],
+      "savedArgument": {
+        "kind": "workflow",
+        "field": "Active Work.AuditTarget"
+      }
+    }
+  ],
+  "userStyles": {
+    "source": "role-directory",
+    "savedValue": {
+      "kind": "conversation"
+    }
+  }
+}
+```

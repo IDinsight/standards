@@ -74,6 +74,16 @@ try {
   assert.match(await readFile(path.join(project, '.claude/settings.json'), 'utf8'), /\.standards\/bin\/hook\.mjs/);
   const checked = await run(process.execPath, [path.join(project, '.standards/bin/check.mjs')]);
   assert.match(checked.stdout, /STANDARDS check passed/);
+  // Invocation discovery is installed ready to use, without registration,
+  // generation, or dependencies in the target project.
+  for (const client of ['codex', 'claude']) {
+    const invocation = JSON.parse((await run(process.execPath,
+      [path.join(project, '.standards/bin/invocation.mjs'), 'navigator', '--client', client, '--json'])).stdout);
+    assert.equal(invocation.catalogStatus, 'complete');
+    assert.equal(invocation.complete, true);
+    assert.equal(invocation.client, client);
+    assert.equal(invocation.groups[0].selected.status, 'conversation');
+  }
   const cycle = await run(process.execPath, [path.join(project, '.standards/bin/cycle.mjs'), 'new', '--request', 'Packed test']);
   assert.match(cycle.stdout, /^packed-test-\d{8}T\d{6}Z-[0-9a-f]{8}\n$/);
   const second = await run(process.execPath, [executable, 'install', '--project', project]);

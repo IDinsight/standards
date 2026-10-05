@@ -70,16 +70,13 @@ version-control evidence directly.
 
 ## Modes
 
-Persisted state selects exactly one canonical kind; read its thin mode file:
+Discover review kinds through [Invocation Metadata](#invocation-metadata).
+Persisted state selects the canonical kind through its metadata condition. Load
+only that mode's full instructions.
 
-- `REVIEWING_IMPLEMENTATION`: **IMPLEMENTATION**,
-  [`modes/implementation.md`](modes/implementation.md).
-- `REVIEWING_FINAL`: **FINAL_DELIVERABLE** in `STANDARD` or `DOCUMENTATION`,
-  [`modes/final-deliverable.md`](modes/final-deliverable.md).
-
-Both use the procedure, findings, ownership, and gate below. Re-review after
-corrections is part of that procedure, not a third mode. A requested kind that
-conflicts with persisted state does not authorize changing the state or
+All kinds use the procedure, findings, ownership, and gate below. Re-review
+after corrections is part of that procedure, not a third mode. A requested kind
+that conflicts with persisted state does not authorize changing the state or
 reviewing the other kind.
 
 Apply a user style only as the protocol's **User Styles** defines: the user
@@ -404,3 +401,43 @@ checked and what remains unvalidated, and distinguish passing this gate from
 finishing the cycle. If evidence is insufficient, lead with that blocker even
 when no defect is established. Follow protocol commit-suggestion and next-role
 invocation ordering after the summary, linking the persisted report.
+
+## Invocation Metadata
+
+Discover options from the tagged JSON below and the metadata blocks in direct
+child `modes/*.md` files. Inspect only those blocks for discovery, then load the
+selected mode's full instructions. A `user` option is selectable; `state` and
+`assessment` options are determined under `selectionRules`. Preserve applicable
+saved choices and use defaults only for genuinely new work without a selection.
+Entry rules, protocol gates, and style restrictions still apply.
+
+For user-style discovery, list direct-child Markdown filenames in
+`.standards/user-styles/reviewer/` using the protocol's **User Styles** rules.
+Never load unselected style contents or infer a style from availability.
+
+<!-- standards:invocation -->
+
+```json
+{
+  "schemaVersion": 1,
+  "kind": "role",
+  "role": "reviewer",
+  "groups": [
+    {
+      "id": "review-kind",
+      "label": "Review kind",
+      "source": "modes",
+      "selectionRules": "SKILL.md#modes"
+    }
+  ],
+  "userStyles": {
+    "source": "role-directory",
+    "savedValue": {
+      "kind": "record",
+      "artifact": "REVIEW",
+      "field": "User Style",
+      "reviewKindFromGroup": "review-kind"
+    }
+  }
+}
+```

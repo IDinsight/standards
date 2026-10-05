@@ -1,5 +1,19 @@
 # Gap-Fill Audit
 
+<!-- standards:invocation -->
+
+```json
+{
+  "schemaVersion": 1,
+  "kind": "mode",
+  "group": "inspection-mode",
+  "id": "GAPFILL",
+  "label": "Gap fill",
+  "description": "Refresh a usable baseline without a narrower target.",
+  "selection": "assessment"
+}
+```
+
 Use when a usable `.standards/CONTEXT.md` exists and needs verification or
 refresh for the active cycle, with no narrower subtree target. This includes
 cases where the baseline may be incomplete, stale, incorrect, or insufficiently

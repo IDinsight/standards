@@ -125,23 +125,14 @@ contract or silently change the contract to match the implementation.
 
 ## Collaboration and Target
 
-Choose collaboration independently of the target; persist both in the record.
-Load only the selected thin mode file. Both use the shared procedure and gate:
+Discover collaboration and target choices through
+[Invocation Metadata](#invocation-metadata). Choose collaboration independently
+of the target; persist both in the record. Load only the selected mode's full
+instructions; all modes use the shared procedure and gate.
 
-- **AUTONOMOUS** — default; apply documentation changes and appropriate checks.
-  Read [`modes/autonomous.md`](modes/autonomous.md).
-- **GUIDED** — provide one copy/paste step, wait for the user to apply it, then
-  inspect the actual saved result before continuing. Read
-  [`modes/guided.md`](modes/guided.md).
-
-Select one target, storing its concrete file, directory, capability, or cycle:
-
-- **FILE** — the specified file; a supplied file defaults to autonomous work
-  unless the user explicitly chooses guided interaction.
-- **FOLDER** — relevant documentation within the specified directory.
-- **VERTICAL_SLICE** — one capability across its related documentation surfaces.
-- **ACTIVE_CHANGE** — documentation affected by the active cycle; default when
-  no explicit target is supplied.
+Select one target, storing its concrete file, directory, capability, or cycle as
+`Target Detail`. A supplied file does not imply guided interaction: honor an
+explicit collaboration choice before applying the declared default.
 
 For a new documentation record, recover explicit choices from the saved request
 and scope before applying defaults. Entry through Auditor and Scoper must not
@@ -368,3 +359,94 @@ change was needed, what was checked, what remains unvalidated, and any blocker
 and its owner. Distinguish selected-target progress from full completion. Link
 the documentation record and useful changed documents; keep detailed evidence in
 the record. Follow protocol commit-suggestion and next-role invocation order.
+
+## Invocation Metadata
+
+Discover options from the tagged JSON below and the metadata blocks in direct
+child `modes/*.md` files. Inspect only those blocks for discovery, then load the
+selected mode's full instructions. A `user` option is selectable; `state` and
+`assessment` options are determined under `selectionRules`. Preserve applicable
+saved choices and use defaults only for genuinely new work without a selection.
+Entry rules, protocol gates, and style restrictions still apply.
+
+For user-style discovery, list direct-child Markdown filenames in
+`.standards/user-styles/documenter/` using the protocol's **User Styles** rules.
+Never load unselected style contents or infer a style from availability.
+
+<!-- standards:invocation -->
+
+```json
+{
+  "schemaVersion": 1,
+  "kind": "role",
+  "role": "documenter",
+  "groups": [
+    {
+      "id": "collaboration",
+      "label": "Collaboration",
+      "source": "modes",
+      "selectionRules": "SKILL.md#collaboration-and-target",
+      "defaultForNew": "AUTONOMOUS",
+      "savedValue": {
+        "kind": "record",
+        "artifact": "DOCUMENTATION",
+        "field": "Collaboration"
+      }
+    },
+    {
+      "id": "target",
+      "label": "Target",
+      "source": "inline",
+      "selectionRules": "SKILL.md#collaboration-and-target",
+      "defaultForNew": "ACTIVE_CHANGE",
+      "savedValue": {
+        "kind": "record",
+        "artifact": "DOCUMENTATION",
+        "field": "Target"
+      },
+      "savedArgument": {
+        "kind": "record",
+        "artifact": "DOCUMENTATION",
+        "field": "Target Detail"
+      },
+      "options": [
+        {
+          "id": "FILE",
+          "label": "File",
+          "description": "Focus on a named file within the editing boundary.",
+          "selection": "user",
+          "argument": "file"
+        },
+        {
+          "id": "FOLDER",
+          "label": "Folder",
+          "description": "Focus on documentation within a directory.",
+          "selection": "user",
+          "argument": "directory"
+        },
+        {
+          "id": "VERTICAL_SLICE",
+          "label": "Capability",
+          "description": "Follow one capability across its documentation.",
+          "selection": "user",
+          "argument": "capability"
+        },
+        {
+          "id": "ACTIVE_CHANGE",
+          "label": "Active change",
+          "description": "Cover documentation affected by the active cycle.",
+          "selection": "user"
+        }
+      ]
+    }
+  ],
+  "userStyles": {
+    "source": "role-directory",
+    "savedValue": {
+      "kind": "record",
+      "artifact": "DOCUMENTATION",
+      "field": "User Style"
+    }
+  }
+}
+```

@@ -1,5 +1,19 @@
 # REPLAN Mode
 
+<!-- standards:invocation -->
+
+```json
+{
+  "schemaVersion": 1,
+  "kind": "mode",
+  "group": "scope-mode",
+  "id": "REPLAN",
+  "label": "Replan",
+  "description": "Reconcile the active cycle's existing scope.",
+  "selection": "assessment"
+}
+```
+
 Use REPLAN when `Active Work.Scope` identifies an existing persisted scope for
 the active cycle and that scope must be corrected, revised, or reconciled with
 changed inputs.

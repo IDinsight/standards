@@ -1,5 +1,19 @@
 # REVERIFY Mode
 
+<!-- standards:invocation -->
+
+```json
+{
+  "schemaVersion": 1,
+  "kind": "mode",
+  "group": "verification-mode",
+  "id": "REVERIFY",
+  "label": "Reverify",
+  "description": "Reconcile an assessment after changes or a defect.",
+  "selection": "assessment"
+}
+```
+
 Reconcile an existing assessment after its inputs change or a verification
 defect is reported, even if the earlier pass was incomplete.
 

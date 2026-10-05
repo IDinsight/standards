@@ -115,10 +115,20 @@ canonical in `STATE.md`.
   conclusions; record implementation readiness in this plan.
 - Set `User Style` only from an explicit user selection or a previously
   persisted selection for this development plan, under the protocol's **User
-  Styles**. Store the identifier of
-  `.standards/user-styles/developer/<identifier>.md` only: for example, both
-  `tony` and `tony.md` persist as `tony`. Use `NONE` otherwise, and never store
-  a path as the identifier.
+  Styles**. Store an unambiguous accepted selector for the direct child file in
+  `.standards/user-styles/developer/`. For a new selection, prefer its stem only
+  when unique and usable as a record header value under **User Styles**;
+  otherwise use a unique, usable full filename. With only `tony.md` present,
+  both `tony` and `tony.md` persist as `tony`. With both `tony.md` and
+  `tony.md.md` present, the second file persists as `tony.md.md`; its display
+  identifier `tony.md` is ambiguous as a selector. `<formal>.md` persists as
+  `<formal>.md`, since `<formal>` is a placeholder. Neither name for
+  `team | compact.md` can be persisted; report this as a record-syntax
+  limitation, not filename ambiguity. Retain working saved selectors and never
+  shorten them into ambiguous or rejected names. If neither name is usable,
+  report the limitation under **User Styles** without automatically renaming
+  files or substituting a selection. Use `NONE` when no style is selected, and
+  never store a path.
 - Start a new plan with `User Style Locked: false`. Allow selecting, changing,
   or clearing `User Style` only before first approval, while the plan remains
   `PROPOSED`. First approval covers the selection, including `NONE`, and sets

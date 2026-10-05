@@ -32,7 +32,10 @@ shared terminology. Individual skills define role-specific behavior.
 - **Navigator** helps users understand the project through EXPLAIN (default),
   INVESTIGATE, and adaptive GRILL_ME questions. It uses repository evidence,
   stays strictly non-mutating, and works outside the workflow state machine
-  without requiring an active cycle.
+  without requiring an active cycle. Ask about Navigator's options before
+  invoking it, or use `$navigator help` / `/navigator help` to discover current
+  modes and user styles. See
+  [Navigator](docs/src/content/docs/roles/navigator.md#discover-your-options).
 - **Developer** turns the active contract into an approved atomic development
   plan, then implements it within established constraints using Autonomous,
   Stepwise, or Code With Me collaboration. In standard work, any of these modes
@@ -96,8 +99,9 @@ for examples, restrictions, and how to return to the full workflow.
    skills. Use `$skill-name` in Codex and `/skill-name` in Claude Code.
 7. When a handoff moves work to a different role, give the user a concise
    copy/paste invocation for that role using the active client's syntax. The
-   invocation points the next role back to persisted state rather than
-   duplicating workflow context.
+   invocation points the next role back to persisted state. Alongside it, show
+   discovered user choices separately from state-selected or assessed behavior,
+   preserving saved choices and locks. The agent performs discovery internally.
 8. In `STANDARD` and `DOCUMENTATION` cycles, give scope acceptance conditions
    stable identifiers and carry them through downstream design and evidence
    until every current condition is evidenced before user sign-off.

@@ -108,6 +108,24 @@ project context and role outputs, and any recovery record before proceeding.
 Claude Code uses `/architect`. A recovery handoff also directs the role to read
 the active recovery frame.
 
+### Choosing how the next role works
+
+The handoff also distinguishes options you can choose from behavior determined
+by saved state or the next role's assessment. For example, Developer's
+collaboration mode is a choice; Reviewer's review kind follows the saved state.
+
+Use the normal invocation to continue with applicable saved choices. To change
+an offered option, append the suggested text, such as
+`Use STEPWISE collaboration.` to a Developer invocation. A choice by itself does
+not invoke the role.
+
+The agent looks up current options internally, including user-style files for
+the next role. There is no extra setup command. The handoff can show available
+styles, while identifying any retained or locked selection. Developer's style
+locks at first plan approval, even though its collaboration mode can still
+change. If options cannot be verified, the handoff says so and keeps the normal
+invocation.
+
 ### Independent assessment chats
 
 Handoffs to Tester and Reviewer require separate conversations:

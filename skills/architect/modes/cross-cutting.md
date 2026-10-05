@@ -1,5 +1,26 @@
 # Cross-Cutting Architecture
 
+<!-- standards:invocation -->
+
+```json
+{
+  "schemaVersion": 1,
+  "kind": "mode",
+  "group": "design-mode",
+  "id": "CROSS_CUTTING",
+  "label": "Cross-cutting",
+  "description": "Design shared technical rules across project boundaries.",
+  "selection": "assessment",
+  "when": {
+    "fact": {
+      "kind": "workflow",
+      "field": "CycleMode"
+    },
+    "equals": "STANDARD"
+  }
+}
+```
+
 Use when the scope requires one technical mechanism, contract, or rule to apply
 consistently across multiple project boundaries.
 

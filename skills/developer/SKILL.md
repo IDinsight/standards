@@ -123,26 +123,19 @@ unchanged and identify the current owner.
 
 ## Mode Selection
 
-Select exactly one collaboration mode for the active development plan. The mode
-is Developer-local and does not change `WorkflowState` or `CycleMode`.
+Discover collaboration choices through
+[Invocation Metadata](#invocation-metadata). Select exactly one mode for the
+active development plan. The mode is Developer-local and does not change
+`WorkflowState` or `CycleMode`.
 
-- **AUTONOMOUS** — default. After user approval of the development plan, execute
-  approved work without routine pauses until an assignment handoff or blocker.
-  Read and follow [`modes/autonomous.md`](modes/autonomous.md).
-- **STEPWISE** — after plan approval, implement one atomic step at a time,
-  report the completed step and its self-check, then wait for the user before
-  continuing. Read and follow [`modes/stepwise.md`](modes/stepwise.md).
-- **CODE_WITH_ME** — the user actively participates in implementation. Developer
-  explains, reviews, assists, or takes over specific approved work only when the
-  user directs it. Read and follow
-  [`modes/code-with-me.md`](modes/code-with-me.md).
+For a new plan, honor an explicit choice retained in the request before applying
+the declared default. On resume, retain the plan's saved `Mode` unless the user
+explicitly changes it. The user may switch modes while `DEVELOPING`; persist the
+new mode in the development plan. Do not treat a mode switch as workflow rework
+when the implementation contract itself is unchanged.
 
-Default to `AUTONOMOUS` unless the user explicitly selects another mode. The
-user may switch modes while `DEVELOPING`; persist the new mode in the
-development plan. Do not treat a mode switch as workflow rework when the
-implementation contract itself is unchanged.
-
-Load only the selected mode file.
+Load only the selected mode's full instructions. Every mode retains the plan
+approval requirement and the assignment's execution boundaries.
 
 Verification cadence is independent of this mode. A checkpoint does not change
 the mode or grant permission to implement beyond its user-directed boundaries.
@@ -152,12 +145,25 @@ the mode or grant permission to implement beyond its user-directed boundaries.
 Always read and follow [`styles/universal.md`](styles/universal.md).
 
 Apply a user style only as the protocol's **User Styles** defines: the user
-explicitly selects `.standards/user-styles/developer/<identifier>.md` before
-first plan approval, and the plan persists its identifier, or `NONE` when none
-is selected. When resuming an existing plan, reload the persisted style without
-requiring the user to restate it. If a locked style's file is missing on resume,
-stop and report the inconsistency; restore the file before continuing this
-cycle, and do not clear or substitute the locked selection.
+explicitly selects a direct child Markdown file in
+`.standards/user-styles/developer/` before first plan approval. Persist an
+unambiguous accepted selector in `User Style`, or `NONE` when none is selected.
+The filename stem is the display identifier. For a new selection, prefer the
+stem only when it resolves uniquely and is usable as a record header value under
+**User Styles**; otherwise use a unique, usable full filename. For example, with
+both `tony.md` and `tony.md.md` present, the second file's display identifier is
+`tony.md`, but its selector is `tony.md.md`. A file named `<formal>.md` requires
+the full selector `<formal>.md`, since `<formal>` is placeholder syntax. Neither
+name for `team | compact.md` can be persisted: report the record-syntax
+limitation rather than describing it as ambiguity. If neither name is usable,
+follow **User Styles** without renaming files or substituting a selection
+automatically. Retain a working saved selector; never shorten it into an
+ambiguous or rejected display identifier.
+
+When resuming an existing plan, reload the persisted style without requiring the
+user to restate it. If a locked style's file is missing on resume, stop and
+report the inconsistency; restore the file before continuing this cycle, and do
+not clear or substitute the locked selection.
 
 Then load only the technology style files relevant to implementation Developer
 will materially create or modify:
@@ -213,17 +219,18 @@ Conflicts** whenever applicable authorities conflict.
 `User Style Locked: false`. The user may select, change, or clear the style only
 before first approval; keep the plan `PROPOSED` and present the updated
 selection for approval. First approval sets `User Style Locked: true`, locking
-the identifier, including `NONE`, for the remainder of the cycle.
+the persisted selector, including `NONE`, for the remainder of the cycle.
 
 Preserve this lock through collaboration-mode switches, recovery, rework,
 material revisions that return the plan to `PROPOSED`, and expedited promotion.
 Do not replace or recreate the active cycle's plan to bypass the lock. Repeating
-the same normalized identifier is not a change. A different selection requires a
-new cycle and its own development plan under the protocol's terminal-state and
-**Start a cycle** rules in `.standards/protocol/user-decisions.md`. Do not
-silently cancel, sign off, start a cycle, or restyle completed work; persist the
-blocking choice and ask whether to continue with the locked style or end this
-cycle through an allowed transition.
+the same selection with an unambiguous accepted name is not a change; retain the
+persisted selector. A different selection requires a new cycle and its own
+development plan under the protocol's terminal-state and **Start a cycle** rules
+in `.standards/protocol/user-decisions.md`. Do not silently cancel, sign off,
+start a cycle, or restyle completed work; persist the blocking choice and ask
+whether to continue with the locked style or end this cycle through an allowed
+transition.
 
 A plan missing `User Style Locked` is invalid. Report the inconsistency and
 block implementation until corrected; do not infer the lock from plan status.
@@ -504,3 +511,56 @@ recovery returns, follow **Independent Reviewer Session**. Persist the
 implementation claims, actual self-check evidence, limitations, and resume
 context in the development plan; name the review kind and request the fresh
 Reviewer chat with the advisory model recommendation.
+
+## Invocation Metadata
+
+Discover options from the tagged JSON below and the metadata blocks in direct
+child `modes/*.md` files. Inspect only those blocks for discovery, then load the
+selected mode's full instructions. A `user` option is selectable; `state` and
+`assessment` options are determined under `selectionRules`. Preserve applicable
+saved choices and use defaults only for genuinely new work without a selection.
+Entry rules, protocol gates, and style restrictions still apply.
+
+For user-style discovery, list direct-child Markdown filenames in
+`.standards/user-styles/developer/` using the protocol's **User Styles** rules.
+Never load unselected style contents or infer a style from availability.
+
+<!-- standards:invocation -->
+
+```json
+{
+  "schemaVersion": 1,
+  "kind": "role",
+  "role": "developer",
+  "groups": [
+    {
+      "id": "collaboration",
+      "label": "Collaboration",
+      "source": "modes",
+      "selectionRules": "SKILL.md#mode-selection",
+      "defaultForNew": "AUTONOMOUS",
+      "savedValue": {
+        "kind": "record",
+        "artifact": "DEVELOPMENT",
+        "field": "Mode"
+      }
+    }
+  ],
+  "userStyles": {
+    "source": "role-directory",
+    "savedValue": {
+      "kind": "record",
+      "artifact": "DEVELOPMENT",
+      "field": "User Style"
+    },
+    "lockedWhen": {
+      "fact": {
+        "kind": "record",
+        "artifact": "DEVELOPMENT",
+        "field": "User Style Locked"
+      },
+      "equals": "true"
+    }
+  }
+}
+```

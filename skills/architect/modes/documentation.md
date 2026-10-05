@@ -1,5 +1,26 @@
 # Documentation Architecture
 
+<!-- standards:invocation -->
+
+```json
+{
+  "schemaVersion": 1,
+  "kind": "mode",
+  "group": "design-mode",
+  "id": "DOCUMENTATION",
+  "label": "Documentation",
+  "description": "Establish existing technical contracts for documentation.",
+  "selection": "state",
+  "when": {
+    "fact": {
+      "kind": "workflow",
+      "field": "CycleMode"
+    },
+    "equals": "DOCUMENTATION"
+  }
+}
+```
+
 Use in Brownfield `DOCUMENTATION` after Scoper, including recovery reruns. Use
 the shared Architect ownership, gate, and `../template.md`; this mode changes
 technical emphasis, not artifact shape or routing.

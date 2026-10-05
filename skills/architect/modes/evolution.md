@@ -1,5 +1,26 @@
 # Evolution Architecture
 
+<!-- standards:invocation -->
+
+```json
+{
+  "schemaVersion": 1,
+  "kind": "mode",
+  "group": "design-mode",
+  "id": "EVOLUTION",
+  "label": "Evolution",
+  "description": "Design transitions and compatibility for existing systems.",
+  "selection": "assessment",
+  "when": {
+    "fact": {
+      "kind": "workflow",
+      "field": "CycleMode"
+    },
+    "equals": "STANDARD"
+  }
+}
+```
+
 Use when the scoped work materially changes, replaces, migrates, or restructures
 an existing technical design and the transition from current to target state
 matters.

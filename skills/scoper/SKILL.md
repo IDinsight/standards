@@ -75,7 +75,8 @@ guarantee uses **Expedited Promotion** in `.standards/protocol/expedited.md`.
 
 ## Mode Selection
 
-Select exactly one Scoper invocation mode before changing the scope. These modes
+Discover modes through [Invocation Metadata](#invocation-metadata). Assess the
+current-cycle scope to select exactly one mode before changing it. These modes
 are local execution paths for Scoper and are separate from `.standards/MODE.md`
 (`GREENFIELD` / `BROWNFIELD`).
 
@@ -169,3 +170,40 @@ When recovery is active, apply `.standards/PROTOCOL.md` **Recovery Mechanics**
 after the completion gate succeeds. Scoper determines downstream invalidation
 only when it owns the active frame; otherwise it follows the protocol as a
 downstream rerun.
+
+## Invocation Metadata
+
+Discover options from the tagged JSON below and the metadata blocks in direct
+child `modes/*.md` files. Inspect only those blocks for discovery, then load the
+selected mode's full instructions. A `user` option is selectable; `state` and
+`assessment` options are determined under `selectionRules`. Preserve applicable
+saved choices and use defaults only for genuinely new work without a selection.
+Entry rules, protocol gates, and style restrictions still apply.
+
+For user-style discovery, list direct-child Markdown filenames in
+`.standards/user-styles/scoper/` using the protocol's **User Styles** rules.
+Never load unselected style contents or infer a style from availability.
+
+<!-- standards:invocation -->
+
+```json
+{
+  "schemaVersion": 1,
+  "kind": "role",
+  "role": "scoper",
+  "groups": [
+    {
+      "id": "scope-mode",
+      "label": "Scope mode",
+      "source": "modes",
+      "selectionRules": "SKILL.md#mode-selection"
+    }
+  ],
+  "userStyles": {
+    "source": "role-directory",
+    "savedValue": {
+      "kind": "conversation"
+    }
+  }
+}
+```

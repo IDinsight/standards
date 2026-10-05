@@ -1,5 +1,19 @@
 # Grill Me Mode
 
+<!-- standards:invocation -->
+
+```json
+{
+  "schemaVersion": 1,
+  "kind": "mode",
+  "group": "conversation-mode",
+  "id": "GRILL_ME",
+  "label": "Grill Me",
+  "description": "Check comprehension when the user requests a quiz.",
+  "selection": "user"
+}
+```
+
 Use the shared Navigator procedure and boundaries. Test comprehension of
 existing work at the inferred or agreed topic and depth, not the user's ability
 to invent new scope or architecture decisions.

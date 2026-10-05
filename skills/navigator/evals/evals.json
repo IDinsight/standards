@@ -28,7 +28,8 @@
       "files": [],
       "assertions": [
         "Does not force a diagram, table, quiz, or clarification question.",
-        "Keeps necessary technical meaning without jargon or condescension."
+        "Keeps necessary technical meaning without jargon or condescension.",
+        "Does not append an options menu, onboarding, or extra help footer to the one-sentence answer."
       ]
     },
     {
@@ -662,6 +663,128 @@
         "Absence of documentation proves neither eligibility nor permission to waive a documentation acceptance condition.",
         "The explanation retains standard upstream gates and names the three omitted normal phases and guarantees.",
         "Policy selection, Reviewer eligibility, and explicit user sign-off are distinct actions."
+      ]
+    },
+    {
+      "id": 67,
+      "prompt": "Navigator has not been invoked. The installed AGENTS.md guidance applies. The user asks: What modes and user styles does Navigator offer? WorkflowState is TESTING. The helper is available, both client skill copies exist, and the active client is Claude Code.",
+      "expected_output": "Answer the capability question from fresh discovery for Claude without invoking Navigator or changing TESTING.",
+      "files": [
+        "templates/common/AGENTS.md"
+      ],
+      "assertions": [
+        "Uses the internal helper with navigator and --client claude; does not mix client catalogs or ask the user to run Node.",
+        "Shows selectable modes and discovered styles using /navigator examples without starting an explanation, investigation, or quiz.",
+        "Does not perform workflow entry, run check merely for this question, or write state or records."
+      ]
+    },
+    {
+      "id": 68,
+      "prompt": "Invoke Navigator with $navigator help in Codex. No cycle is active. The installed helper and metadata are usable. .standards/user-styles/navigator/ has tony.md and a nested folder containing alice.md. No style has been selected.",
+      "expected_output": "Show a compact current mode menu and tony as an optional discovered style, then stop.",
+      "files": [],
+      "assertions": [
+        "Discovers eligible modes from metadata and only direct-child style files; does not invent alice as an available identifier.",
+        "Uses $navigator examples, does not load style contents, and does not apply a default mode or a style just because help was requested.",
+        "Does not inspect unrelated application code, run workflow checks, start a quiz, or ask for mode approval."
+      ]
+    },
+    {
+      "id": 69,
+      "prompt": "Invoke Navigator with only $navigator in a new conversation. There is no topic, explicit mode choice, or continuation request. Current option discovery succeeds.",
+      "expected_output": "Introduce the available choices briefly and ask only what the user wants to explore.",
+      "files": [],
+      "assertions": [
+        "Does not begin an arbitrary repository tour or quiz.",
+        "Does not require the user to choose a mode and style before supplying a topic.",
+        "Uses current discovered options rather than a fixed menu."
+      ]
+    },
+    {
+      "id": 70,
+      "prompt": "Navigator is in GRILL_ME on retry behavior at beginner depth with user style tony. One question is pending and two earlier answers exist. The user asks show Navigator options. The helper returns conversation for both selections and a complete inventory including tony and alice.",
+      "expected_output": "Show invocation help while preserving the current quiz and explicit tony selection.",
+      "files": [],
+      "assertions": [
+        "Does not interpret conversation status as no current mode or style.",
+        "Does not reveal the pending answer, grade the user, advance the quiz, or reset answers, topic, depth, mode, or style.",
+        "Offers changes as optional choices and does not apply alice or the default mode."
+      ]
+    },
+    {
+      "id": 71,
+      "prompt": "Navigator is in GRILL_ME with an unanswered question about why validation happens before saving. The user replies: help me with this question. Relevant source evidence has already been inspected.",
+      "expected_output": "Give a targeted hint and wait for another attempt.",
+      "files": [],
+      "assertions": [
+        "Treats this as assistance with the quiz question, not invocation help.",
+        "Does not show a modes/styles menu, reveal the full answer, or advance to another question."
+      ]
+    },
+    {
+      "id": 72,
+      "prompt": "Navigator previously paused GRILL_ME on a known retry question to show its invocation options. No mode or style change was requested. The user now says continue. The relevant source has not changed.",
+      "expected_output": "Resume the pending quiz activity with its existing context.",
+      "files": [],
+      "assertions": [
+        "Does not show onboarding, ask again for the topic, or reset to EXPLAIN.",
+        "Keeps the pending question, prior answers, topic, depth, and explicit style; does not count the help exchange as a quiz answer."
+      ]
+    },
+    {
+      "id": 73,
+      "prompt": "Invoke Navigator and show options again. Since the earlier help, the user added alice.md beside tony.md and an annotated MAP mode in Navigator's modes folder. The fresh helper result validates MAP as a user option. No mode or style change was requested.",
+      "expected_output": "Include the newly discovered mode and style without changing the current selections.",
+      "files": [],
+      "assertions": [
+        "Runs discovery again instead of using a cached menu or updating a registry.",
+        "Uses metadata descriptions for MAP and labels any displayed style subset as examples.",
+        "Does not load unselected style contents or automatically select alice or MAP."
+      ]
+    },
+    {
+      "id": 74,
+      "prompt": "Invoke Navigator. Show your options, then explain how the readable parser handles empty input. The discovery helper is absent and there is no .standards runtime, but this skill and the relevant project source are available.",
+      "expected_output": "State the discovery limitation and answer the independent parser question from evidence.",
+      "files": [],
+      "assertions": [
+        "Limits any capability description to the skill or already-read mode; does not claim a verified full mode/style inventory.",
+        "Does not demand installation, ask the user to run Node, create runtime files, or start a cycle.",
+        "Does not let unavailable help block the supported explanation."
+      ]
+    },
+    {
+      "id": 75,
+      "prompt": "Invoke Navigator with /navigator help in Claude Code. The helper returns a complete mode catalog but an unknown style inventory because the style directory is unreadable. Existing conversation context selects INVESTIGATE.",
+      "expected_output": "Show usable mode choices, retain INVESTIGATE, and explain that available styles could not be verified.",
+      "files": [],
+      "assertions": [
+        "Does not report an unreadable inventory as no styles or invent selectable style names.",
+        "Does not treat complete:false as a reason to hide all verified mode choices.",
+        "Does not read style contents, repair permissions, or switch modes."
+      ]
+    },
+    {
+      "id": 76,
+      "prompt": "During Navigator GRILL_ME on retry behavior, the user says switch to INVESTIGATE, clear my user style, and show Navigator options. The helper is available and the current catalog includes INVESTIGATE.",
+      "expected_output": "Honor the explicit conversation-level changes and show current options without starting another quiz question.",
+      "files": [],
+      "assertions": [
+        "Distinguishes explicit changes from a help-only request; retains the useful retry topic and evidence context.",
+        "Clears the style to NONE without a workflow write, approval gate, or cycle change.",
+        "Does not infer another style or continue GRILL_ME after the requested switch."
+      ]
+    },
+    {
+      "id": 77,
+      "prompt": "Before invoking Navigator, the user asks for its modes and user styles in Codex. The installed Navigator style directory contains tony.md, tony.md.md, and tony.md.md.md. No style is currently selected. The helper and metadata are available.",
+      "expected_output": "Present verified invocation names and distinguish the ambiguous middle entry from selectable styles without starting Navigator work.",
+      "files": [],
+      "assertions": [
+        "Calls fresh discovery for the active client and uses its selector values in invocation examples.",
+        "The middle identifier tony.md is inventory information only because neither accepted name resolves uniquely; it is not advertised as a selectable example.",
+        "The first style can be invoked as tony and the third as tony.md.md.md; the latter is not shortened to the ambiguous tony.md.md.",
+        "No style contents are loaded, files renamed, selection applied, or workflow state changed merely to answer the question."
       ]
     }
   ]
