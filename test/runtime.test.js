@@ -11,8 +11,9 @@ import { slugFor } from '../runtime/cycle.mjs';
 import { stopMessage } from '../runtime/hook.mjs';
 import { runCheck } from '../runtime/check.mjs';
 import { resetProject } from '../lib/reset.js';
+import { uninstallProject } from '../lib/uninstaller.js';
 import { parseState } from '../runtime/lib/state.mjs';
-import { recordSection } from '../runtime/lib/records.mjs';
+import { fixedPath, provenanceBlock, recordSection } from '../runtime/lib/records.mjs';
 
 const read = (root, relative) => readFile(path.join(root, relative), 'utf8');
 async function write(root, relative, value) {
@@ -103,6 +104,604 @@ function hasProblem(result, pattern) {
   assert.ok(messages(result).some((line) => pattern.test(line)),
     `expected a problem matching ${pattern}, got:\n${messages(result).join('\n') || '(none)'}`);
 }
+
+// A documentation cycle establishes its own evidence without fabricating any
+// current-cycle Developer, Tester, or implementation Reviewer record.
+async function documentationCycle(root, through = 'AWAITING_USER_SIGNOFF') {
+  const id = await startCycle(root, { state: 'AUDITING', mode: 'DOCUMENTATION' });
+  await editStateFields(root, { Request: 'Document the existing greeting command.' });
+  await cleanBoundary(root);
+  if (through === 'AUDITING') return { id };
+  await write(root, '.standards/CONTEXT.md', '# Project Context\n\napp.py prints a greeting.\n');
+  await moveCycle(root, 'SCOPING');
+  await cleanBoundary(root);
+  const scope = await init(root, 'SCOPE');
+  await write(root, scope, `${await read(root, scope)}\n# Greeting guide\n\n`
+    + '- `AC-001`: Explain the command and its existing output.\n'
+    + '- `AC-002`: Explain the audience and limits.\n'
+    + '\n## Retired Acceptance Identifiers\n\n- `AC-003`: Retired old guide title.\n');
+  await editStateFields(root, { Scope: scope });
+  if (through === 'SCOPING') return { id, scope };
+  await moveCycle(root, 'ARCHITECTING');
+  await cleanBoundary(root);
+  const spec = await init(root, 'ARCHITECTURE');
+  await write(root, spec, `${await read(root, spec)}\n# Existing contracts\n\n## Acceptance Coverage\n\n`
+    + '- AC-001: app.py writes the greeting to stdout.\n'
+    + '- AC-002: No architectural impact; Documenter explains the audience and limits.\n');
+  await editStateFields(root, { Architecture: spec });
+  if (through === 'ARCHITECTING') return { id, scope, spec };
+  const records = {};
+  for (const [state, type, kind] of [
+    ['DOCUMENTING', 'DOCUMENTATION'], ['REVIEWING_FINAL', 'REVIEW', 'FINAL_DELIVERABLE'],
+    ['SYNCHRONIZING', 'SYNCHRONIZATION'],
+  ]) {
+    await moveCycle(root, state);
+    await cleanBoundary(root);
+    const file = await init(root, type, ...(kind ? ['--kind', kind] : []));
+    await fillHeader(root, file, { Status: 'COMPLETE', 'User Style': 'NONE', Collaboration: 'AUTONOMOUS',
+      Target: 'ACTIVE_CHANGE', 'Target Detail': 'greeting guide' });
+    await write(root, file, `${await read(root, file)}\n## Acceptance Evidence\n\n`
+      + 'AC-001: greeting command and output checked against app.py.\n'
+      + 'AC-002: audience and limits checked against the scoped guide.\n');
+    records[state] = file;
+    await cleanBoundary(root);
+    if (through === state) return { id, scope, spec, ...records };
+  }
+  await moveCycle(root, 'AWAITING_USER_SIGNOFF');
+  await cleanBoundary(root);
+  return { id, scope, spec, ...records };
+}
+
+test('documentation route reaches readiness without implementation records', () => project(async (root) => {
+  const cycle = await documentationCycle(root);
+  const all = await readdir(path.join(root, '.standards/docs'), { recursive: true });
+  assert.equal(all.some((file) => /verification|development|implementation\.md/.test(file)), false);
+  const saved = parseState(await read(root, '.standards/STATE.md'));
+  assert.equal(saved.active.development, 'NONE');
+  assert.equal(saved.active.completionPolicy, 'NONE');
+  assert.equal(saved.active.id, cycle.id);
+}));
+
+test('documentation lifecycle: an assessed no-change result signs off and starts a fresh cycle', () => project(async (root) => {
+  const guide = '# Greeting\n\nRun python3 app.py; it prints hi.\n';
+  await write(root, 'docs/usage.md', guide);
+  const cycle = await documentationCycle(root);
+  for (const file of [cycle.DOCUMENTING, cycle.REVIEWING_FINAL, cycle.SYNCHRONIZING]) {
+    await write(root, file, `${await read(root, file)}\nNo-change disposition: docs/usage.md already explains existing behavior; saved content inspected.\n`);
+  }
+  await cleanBoundary(root);
+  const records = await Promise.all([cycle.scope, cycle.spec, cycle.DOCUMENTING, cycle.REVIEWING_FINAL, cycle.SYNCHRONIZING]
+    .map(async (file) => [file, await read(root, file)]));
+  await moveCycle(root, 'SIGNED_OFF', { kind: 'SIGNOFF', CycleMode: 'UNSET', Reason: 'User explicitly accepted the assessed guide.' });
+  await cleanBoundary(root);
+  await commit(root);
+  const next = await startCycle(root, { state: 'AUDITING', mode: 'DOCUMENTATION' });
+  assert.notEqual(next, cycle.id);
+  await editStateFields(root, { Kind: 'NEW_CYCLE', From: 'SIGNED_OFF', Scope: 'NONE', Architecture: 'NONE' });
+  await cleanBoundary(root);
+  assert.equal(await read(root, 'docs/usage.md'), guide);
+  for (const [file, text] of records) assert.equal(await read(root, file), text);
+  const saved = parseState(await read(root, '.standards/STATE.md'));
+  assert.equal(saved.active.completionPolicy, 'NONE');
+  assert.equal(saved.active.development, 'NONE');
+  assert.equal(saved.recovery.active, false);
+}, { withGit: true }));
+
+test('documentation lifecycle: cancellation retains docs and carries source provenance into Auditor reconciliation', () => project(async (root) => {
+  const cycle = await documentationCycle(root, 'DOCUMENTING');
+  const guide = '# Greeting\n\nA partial guide retained after cancellation.\n';
+  await write(root, 'docs/usage.md', guide);
+  await moveCycle(root, 'CANCELLED', { kind: 'CANCEL', CycleMode: 'UNSET' });
+  await cleanBoundary(root);
+  await commit(root);
+  const next = await startCycle(root, { state: 'AUDITING', mode: 'DOCUMENTATION' });
+  await editStateFields(root, { Kind: 'NEW_CYCLE', From: 'CANCELLED', Scope: 'NONE', Architecture: 'NONE' });
+  const reconciliation = `\`BaselineReconciliation\`:\n\n- \`SourceCycle\`: \`${cycle.id}\`\n  \`Request\`: \`Document the existing greeting command.\``;
+  await editState(root, (text) => text.replace(/`BaselineReconciliation`:\s*`NONE`/, reconciliation));
+  await cleanBoundary(root);
+  assert.notEqual(next, cycle.id);
+  assert.equal(await read(root, 'docs/usage.md'), guide);
+  const saved = parseState(await read(root, '.standards/STATE.md'));
+  assert.deepEqual(saved.active.baseline.entries, [{ sourceCycle: cycle.id, request: 'Document the existing greeting command.' }]);
+  await editStateFields(root, { CycleMode: 'EXPEDITED', WorkflowState: 'DEVELOPING', Kind: 'NEW_CYCLE' });
+  hasProblem(await check(root), /EXPEDITED cycle cannot carry BaselineReconciliation/);
+}, { withGit: true }));
+
+test('documentation lifecycle: reinstall retains guided choices; reset and uninstall retain project docs', () => project(async (root) => {
+  const cycle = await documentationCycle(root, 'DOCUMENTING');
+  const request = 'Standalone Documenter: update docs/usage.md in GUIDED mode using style concise; edit only this file.';
+  await write(root, 'docs/usage.md', '# Existing guide\n');
+  await write(root, '.standards/user-styles/documenter/concise.md', '# Concise\n\nUse short paragraphs.\n');
+  await fillHeader(root, cycle.DOCUMENTING, { Status: 'BLOCKED', Collaboration: 'GUIDED', Target: 'FILE',
+    'Target Detail': 'docs/usage.md', 'User Style': 'concise' });
+  await editStateFields(root, { Request: request, BlockedOn: 'Apply the saved guided edit to docs/usage.md.' });
+  const state = await read(root, '.standards/STATE.md');
+  const record = await read(root, cycle.DOCUMENTING);
+  await installProject({ projectRoot: root });
+  assert.equal(await read(root, '.standards/STATE.md'), state);
+  assert.equal(await read(root, cycle.DOCUMENTING), record);
+  await cleanBoundary(root);
+  await resetProject({ projectRoot: root });
+  await cleanBoundary(root);
+  const fresh = parseState(await read(root, '.standards/STATE.md'));
+  assert.equal(fresh.CycleMode, 'UNSET');
+  assert.equal(fresh.active.id, 'UNSET');
+  assert.equal(fresh.PendingCycleRequest, 'UNSET');
+  await assert.rejects(read(root, cycle.DOCUMENTING), { code: 'ENOENT' });
+  assert.equal(await read(root, 'docs/usage.md'), '# Existing guide\n');
+  assert.equal(await read(root, '.standards/user-styles/documenter/concise.md'), '# Concise\n\nUse short paragraphs.\n');
+  await uninstallProject({ projectRoot: root });
+  assert.equal(await read(root, 'docs/usage.md'), '# Existing guide\n');
+  assert.equal(await read(root, 'app.py'), 'print("hi")\n');
+  await assert.rejects(read(root, '.standards/STATE.md'), { code: 'ENOENT' });
+}));
+
+test('documentation routes reject illegal states, skipped forward gates, and direct entry', () => project(async (root) => {
+  await documentationCycle(root, 'AUDITING');
+  const initial = await read(root, '.standards/STATE.md');
+  for (const state of ['DEVELOPING', 'TESTING', 'REVIEWING_IMPLEMENTATION']) {
+    await write(root, '.standards/STATE.md', setField(initial, 'WorkflowState', state));
+    hasProblem(await check(root), new RegExp(`${state} is not part of a DOCUMENTATION cycle`));
+  }
+  await write(root, '.standards/STATE.md', setField(initial, 'WorkflowState', 'DOCUMENTING'));
+  hasProblem(await check(root), /starts in AUDITING/);
+  await write(root, '.standards/STATE.md', initial);
+  await moveCycle(root, 'ARCHITECTING');
+  hasProblem(await check(root), /AUDITING -> ARCHITECTING skips/);
+}));
+
+test('documentation mode rejects standard completion policies and implementation scheduling', () => project(async (root) => {
+  await documentationCycle(root, 'AUDITING');
+  const initial = await read(root, '.standards/STATE.md');
+  for (const policy of ['FULL_DELIVERABLE', 'IMPLEMENTATION_REVIEWED']) {
+    await write(root, '.standards/STATE.md', setField(initial, 'CompletionPolicy', policy));
+    hasProblem(await check(root), /CompletionPolicy .* is not valid with CycleMode DOCUMENTATION/);
+  }
+  for (const [field, value] of [['Development', 'docs/plan.md'], ['PendingVerificationCadence', 'INCREMENTAL'], ['PromotionReason', 'Need tests']]) {
+    await write(root, '.standards/STATE.md', setField(initial, field, value));
+    hasProblem(await check(root), new RegExp(`DOCUMENTATION cycle keeps Active Work\\.${field} NONE`));
+  }
+  await write(root, '.standards/STATE.md', setField(initial, 'Kind', 'CHECKPOINT'));
+  hasProblem(await check(root), /CHECKPOINT requires a STANDARD/);
+}));
+
+test('greenfield cannot request or activate documentation mode', () => project(async (root) => {
+  await editStateFields(root, { PendingCycleMode: 'DOCUMENTATION' });
+  hasProblem(await check(root), /GREENFIELD project cannot use DOCUMENTATION/);
+  await editStateFields(root, { PendingCycleMode: 'UNSET' });
+  await startCycle(root, { state: 'AUDITING', mode: 'DOCUMENTATION' });
+  hasProblem(await check(root), /GREENFIELD project cannot use DOCUMENTATION/);
+}, { projectMode: 'GREENFIELD' }));
+
+test('documentation readiness requires context, scope, architecture, and every included record', () => project(async (root) => {
+  const cycle = await documentationCycle(root);
+  for (const file of ['.standards/CONTEXT.md', cycle.scope, cycle.spec,
+    cycle.DOCUMENTING, cycle.REVIEWING_FINAL, cycle.SYNCHRONIZING]) {
+    const text = await read(root, file);
+    await rm(path.join(root, file));
+    assert.ok((await check(root)).problems.some((problem) => problem.file === file || problem.message.includes(file)), file);
+    await write(root, file, text);
+  }
+  for (const field of ['Scope', 'Architecture']) {
+    await editStateFields(root, { [field]: 'NONE' });
+    hasProblem(await check(root), new RegExp(`Active Work\\.${field} is NONE`));
+    await editStateFields(root, { [field]: field === 'Scope' ? cycle.scope : cycle.spec });
+  }
+  await cleanBoundary(root);
+}));
+
+test('documentation forward gates require complete included records', () => project(async (root) => {
+  const cycle = await documentationCycle(root);
+  const saved = await read(root, '.standards/STATE.md');
+  for (const [owner, next, file] of [
+    ['DOCUMENTING', 'REVIEWING_FINAL', cycle.DOCUMENTING],
+    ['REVIEWING_FINAL', 'SYNCHRONIZING', cycle.REVIEWING_FINAL],
+    ['SYNCHRONIZING', 'AWAITING_USER_SIGNOFF', cycle.SYNCHRONIZING],
+  ]) {
+    await write(root, '.standards/STATE.md', setField(setField(saved, 'WorkflowState', next), 'From', owner));
+    for (const status of ['IN_PROGRESS', 'BLOCKED']) {
+      await fillHeader(root, file, { Status: status });
+      hasProblem(await check(root), new RegExp(`must be COMPLETE once the cycle has passed ${owner}`));
+    }
+    await fillHeader(root, file, { Status: 'COMPLETE' });
+    await cleanBoundary(root);
+  }
+}));
+
+test('documentation acceptance coverage is checked by each included evidence owner and after handoff', () => project(async (root) => {
+  const cycle = await documentationCycle(root);
+  const saved = await read(root, '.standards/STATE.md');
+  for (const [previous, owner, next, file] of [
+    ['ARCHITECTING', 'DOCUMENTING', 'REVIEWING_FINAL', cycle.DOCUMENTING],
+    ['DOCUMENTING', 'REVIEWING_FINAL', 'SYNCHRONIZING', cycle.REVIEWING_FINAL],
+    ['REVIEWING_FINAL', 'SYNCHRONIZING', 'AWAITING_USER_SIGNOFF', cycle.SYNCHRONIZING],
+  ]) {
+    const complete = await read(root, file);
+    await write(root, file, complete.replace('AC-002: audience and limits checked against the scoped guide.', 'Audience evidence missing.')
+      + '\n## Previous Cycles\n\nAC-002: historical mention is not current evidence.\n');
+    await write(root, '.standards/STATE.md', setField(setField(saved, 'WorkflowState', owner), 'From', previous));
+    hasProblem(await check(root), /is COMPLETE but does not account for AC-002/);
+    await write(root, '.standards/STATE.md', setField(setField(saved, 'WorkflowState', next), 'From', owner));
+    const hook = await runCheck(root, { atTurnEnd: true });
+    hasProblem(hook, /is COMPLETE but does not account for AC-002/);
+    await write(root, file, complete);
+  }
+}));
+
+test('documentation acceptance preserves identity and demands architecture coverage', () => project(async (root) => {
+  const cycle = await documentationCycle(root);
+  const spec = await read(root, cycle.spec);
+  await write(root, cycle.spec, spec.replace('- AC-002: No architectural impact; Documenter explains the audience and limits.', 'No other coverage.'));
+  hasProblem(await check(root), /does not account for AC-002.*design coverage/);
+  await write(root, cycle.spec, spec);
+  const scope = await read(root, cycle.scope);
+  for (const [append, pattern] of [
+    ['\n- AC-001: Duplicate.\n', /AC-001 is defined more than once/],
+    ['\n- AC-003: Current and retired.\n', /AC-003 is both current and retired/],
+  ]) {
+    await write(root, cycle.scope, scope.replace('## Retired Acceptance Identifiers', `${append}\n## Retired Acceptance Identifiers`));
+    hasProblem(await check(root), pattern);
+  }
+  await write(root, cycle.scope, scope.replaceAll('AC-001', 'ZZ-001').replaceAll('AC-002', 'ZZ-002'));
+  hasProblem(await check(root), /needs current acceptance conditions/);
+  await write(root, cycle.scope, scope);
+  await write(root, cycle.DOCUMENTING, `${await read(root, cycle.DOCUMENTING)}\nAC-999: Undefined claim.\n`);
+  hasProblem(await check(root), /AC-999.*not defined in the scope/);
+}));
+
+test('documentation readiness rejects substituted records and unresolved baseline or blockers', () => project(async (root) => {
+  const cycle = await documentationCycle(root);
+  const review = await read(root, cycle.REVIEWING_FINAL);
+  await write(root, cycle.REVIEWING_FINAL, review.replaceAll('FINAL_DELIVERABLE', 'IMPLEMENTATION'));
+  hasProblem(await check(root), /must hold.*REVIEW FINAL_DELIVERABLE.*holds REVIEW IMPLEMENTATION/);
+  await write(root, cycle.REVIEWING_FINAL, review);
+  const documentation = await read(root, cycle.DOCUMENTING);
+  await write(root, cycle.DOCUMENTING, documentation.replace(/^<!--[\s\S]*?-->\s*/, ''));
+  hasProblem(await check(root), /does not start with a STANDARDS provenance block.*DOCUMENTATION record/);
+  await write(root, cycle.DOCUMENTING, documentation.replaceAll(cycle.id, 'old-guide-20261001T120000Z-1234abcd'));
+  hasProblem(await check(root), /holds a DOCUMENTATION record for cycle.*not this cycle/);
+  await write(root, cycle.DOCUMENTING, documentation);
+  await editState(root, (text) => text.replace('`BaselineReconciliation`: `NONE`',
+    '`BaselineReconciliation`:\n\n- `SourceCycle`: `old-work-20261001T120000Z-1234abcd`\n  `Request`: `Old work.`'));
+  hasProblem(await check(root), /DOCUMENTATION cycle cannot await sign-off while BaselineReconciliation is unresolved/);
+  await editStateFields(root, { BlockedOn: 'Unresolved audience question.' });
+  hasProblem(await check(root), /AWAITING_USER_SIGNOFF requires Active Work.BlockedOn NONE/);
+}));
+
+test('documentation entry handoffs cannot bypass Auditor or carry failure routing', () => project(async (root) => {
+  await documentationCycle(root);
+  const readiness = await read(root, '.standards/STATE.md');
+  // These records otherwise satisfy readiness, isolating entry validation.
+  for (const from of ['SIGNED_OFF', 'CANCELLED']) {
+    await editStateFields(root, { Kind: 'NEW_CYCLE', From: from });
+    hasProblem(await check(root), /DOCUMENTATION cycle starts in AUDITING/);
+    await write(root, '.standards/STATE.md', readiness);
+  }
+  await editStateFields(root, { WorkflowState: 'AUDITING', Kind: 'INITIAL', From: 'SCOPING' });
+  hasProblem(await check(root), /DOCUMENTATION INITIAL handoff requires From NONE/);
+  await editStateFields(root, { Kind: 'NEW_CYCLE', From: 'SCOPING' });
+  hasProblem(await check(root), /DOCUMENTATION NEW_CYCLE handoff requires From SIGNED_OFF or CANCELLED/);
+  for (const kind of ['INITIAL', 'NEW_CYCLE']) {
+    await editStateFields(root, { Kind: kind, From: kind === 'INITIAL' ? 'NONE' : 'SIGNED_OFF', FailureType: 'DOCUMENTATION' });
+    hasProblem(await check(root), /DOCUMENTATION .* handoff requires FailureType NONE/);
+  }
+  await write(root, '.standards/STATE.md', readiness);
+  await editStateFields(root, { FailureType: 'DOCUMENTATION' });
+  hasProblem(await check(root), /DOCUMENTATION FORWARD handoff requires FailureType NONE/);
+}));
+
+test('documentation can start a fresh Auditor-first cycle after either terminal state', () => project(async (root) => {
+  await documentationCycle(root);
+  for (const terminal of ['SIGNED_OFF', 'CANCELLED']) {
+    await editStateFields(root, { WorkflowState: terminal, CycleMode: 'UNSET',
+      Kind: terminal === 'SIGNED_OFF' ? 'SIGNOFF' : 'CANCEL', From: 'AWAITING_USER_SIGNOFF' });
+    await cleanBoundary(root);
+    await startCycle(root, { state: 'AUDITING', mode: 'DOCUMENTATION' });
+    await editStateFields(root, { Kind: 'NEW_CYCLE', From: terminal, Scope: 'NONE', Architecture: 'NONE' });
+    await cleanBoundary(root);
+  }
+}));
+
+test('documentation acceptance validates references in a reused unmarked project design', () => project(async (root) => {
+  const cycle = await documentationCycle(root);
+  const canonical = 'docs/existing-design.md';
+  const design = (await read(root, cycle.spec)).replace(/^<!--[\s\S]*?-->\s*/, '');
+  const history = '\n## Previous Cycles\n\n- AC-900: Coverage from a different scope document.\n';
+  await write(root, canonical, `${design}${history}`);
+  await rm(path.join(root, cycle.spec));
+  await editStateFields(root, { Architecture: canonical });
+  await cleanBoundary(root);
+  await write(root, canonical, `${design}\n- AC-999: An invented requirement.\n${history}`);
+  hasProblem(await check(root), /existing-design\.md: mentions AC-999, which is not defined in the scope/);
+}));
+
+async function documentationFrames(root, frames) {
+  await editState(root, (text) => text.replace(/## Recovery[\s\S]*?(?=## Outstanding Obligations)/,
+    `## Recovery\n\n\`Active\`: \`${frames.length > 0}\`\n\n`
+    + frames.map((frame, i) => frameText(frame).replace('### Frame 1', `### Frame ${i + 1}`)).join('\n\n') + '\n\n'));
+}
+
+test('documentation same-state failures and rework still require the correct owner', () => project(async (root) => {
+  await documentationCycle(root);
+  const owners = [['AUDITING', 'PROJECT_CONTEXT'], ['SCOPING', 'SCOPING'],
+    ['ARCHITECTING', 'ARCHITECTURE'], ['DOCUMENTING', 'DOCUMENTATION'],
+    ['REVIEWING_FINAL', 'REVIEW'], ['SYNCHRONIZING', 'SYNCHRONIZATION']];
+  for (const kind of ['FAILURE', 'USER_REWORK']) {
+    for (const [index, [owner, type]] of owners.entries()) {
+      await editStateFields(root, { WorkflowState: owner, Kind: kind, From: owner, FailureType: type });
+      // A local correction needs no frame, but it still belongs to this role.
+      await cleanBoundary(root);
+      await editStateFields(root, { FailureType: owners[(index + 1) % owners.length][1] });
+      for (const atTurnEnd of [false, true]) {
+        hasProblem(await runCheck(root, { atTurnEnd }), /routes to .*not /);
+      }
+    }
+    await editStateFields(root, { WorkflowState: 'AWAITING_USER_SIGNOFF', Kind: kind,
+      From: 'AWAITING_USER_SIGNOFF', FailureType: 'DOCUMENTATION' });
+    for (const atTurnEnd of [false, true]) {
+      hasProblem(await runCheck(root, { atTurnEnd }), /routes to DOCUMENTING, not AWAITING_USER_SIGNOFF/);
+    }
+  }
+}));
+
+test('documentation recovery validates every saved frame against the included owners and reruns', () => project(async (root) => {
+  await documentationCycle(root);
+  const ready = await read(root, '.standards/STATE.md');
+  for (const [owner, type] of [['AUDITING', 'PROJECT_CONTEXT'], ['SCOPING', 'SCOPING'],
+    ['ARCHITECTING', 'ARCHITECTURE'], ['DOCUMENTING', 'DOCUMENTATION'], ['REVIEWING_FINAL', 'REVIEW'], ['SYNCHRONIZING', 'SYNCHRONIZATION']]) {
+    await documentationFrames(root, [{ From: 'AWAITING_USER_SIGNOFF', Owner: owner, FailureType: type, ResumeAt: 'AWAITING_USER_SIGNOFF' }]);
+    await editStateFields(root, { WorkflowState: owner, Kind: 'FAILURE', From: 'AWAITING_USER_SIGNOFF', FailureType: type });
+    await cleanBoundary(root);
+    await write(root, '.standards/STATE.md', ready);
+  }
+  for (const [fields, expected] of [
+    [{ From: 'TESTING', ResumeAt: 'TESTING' }, /From must be an included DOCUMENTATION state/],
+    [{ Owner: 'DEVELOPING', FailureType: 'IMPLEMENTATION' }, /Owner must be an included DOCUMENTATION role/],
+    [{ Owner: 'REVIEWING_IMPLEMENTATION', FailureType: 'REVIEW' }, /REVIEW cannot target this owner in DOCUMENTATION/],
+    [{ RerunThrough: 'TESTING' }, /RerunThrough must be a downstream included DOCUMENTATION role/],
+    [{ RerunThrough: 'AWAITING_USER_SIGNOFF' }, /RerunThrough must be a downstream included DOCUMENTATION role/],
+    [{ RerunThrough: 'AUDITING' }, /RerunThrough must be a downstream included DOCUMENTATION role/],
+    [{ From: 'AUDITING', ResumeAt: 'AUDITING' }, /same-state DOCUMENTATION correction does not push a recovery frame/],
+  ]) {
+    await documentationFrames(root, [{ From: 'REVIEWING_FINAL', Owner: 'AUDITING', FailureType: 'PROJECT_CONTEXT', ResumeAt: 'REVIEWING_FINAL', ...fields }]);
+    await editStateFields(root, { WorkflowState: fields.Owner ?? 'AUDITING', Kind: 'FAILURE', From: fields.From ?? 'REVIEWING_FINAL', FailureType: fields.FailureType ?? 'PROJECT_CONTEXT' });
+    hasProblem(await check(root), expected);
+    await write(root, '.standards/STATE.md', ready);
+  }
+}));
+
+test('documentation forbids fabricated implementation records but permits prior-cycle supporting records', () => project(async (root) => {
+  const { id } = await documentationCycle(root, 'AUDITING');
+  for (const [type, kind] of [['DEVELOPMENT'], ['VERIFICATION'], ['REVIEW', 'IMPLEMENTATION']]) {
+    const result = await tool(root, 'artifact', 'init', type, ...(kind ? ['--kind', kind] : []));
+    assert.equal(result.code, 1);
+    assert.match(result.stderr, /DOCUMENTATION omits/);
+    const file = fixedPath(type, id, kind);
+    await assert.rejects(read(root, file), { code: 'ENOENT' });
+    await write(root, file, `${provenanceBlock(type, id, kind)}\n\n# Record\n\n\`Cycle\`: \`${id}\`\n\`Status\`: \`IN_PROGRESS\`\n`);
+    hasProblem(await check(root), /current-cycle implementation record cannot be fabricated/);
+    await rm(path.join(root, file));
+    const previous = 'old-work-20261001T120000Z-1234abcd';
+    await write(root, fixedPath(type, previous, kind), `${provenanceBlock(type, previous, kind)}\n\n# Prior supporting evidence\n`);
+    await cleanBoundary(root);
+  }
+}));
+
+test('documentation rejects a gitignored current-cycle development record with Development NONE', () => project(async (root) => {
+  const { id } = await documentationCycle(root, 'AUDITING');
+  await write(root, '.gitignore', '.standards/docs/\n');
+  const file = fixedPath('DEVELOPMENT', id);
+  await write(root, file, `${provenanceBlock('DEVELOPMENT', id)}\n\n# Development Plan\n\n`
+    + `\`Cycle\`: \`${id}\`\n\`Status\`: \`IN_PROGRESS\`\n`);
+  assert.equal((await git(root, 'check-ignore', file)).code, 0);
+  assert.equal(parseState(await read(root, '.standards/STATE.md')).active.development, 'NONE');
+  hasProblem(await check(root), /current-cycle implementation record cannot be fabricated/);
+  hasProblem(await runCheck(root, { atTurnEnd: true }), /current-cycle implementation record cannot be fabricated/);
+  await rm(path.join(root, file));
+  await cleanBoundary(root);
+}, { withGit: true }));
+
+test('documentation omitted-owner decisions preserve work rather than invent promotion or failure routing', () => project(async (root) => {
+  await documentationCycle(root, 'DOCUMENTING');
+  await editStateFields(root, { BlockedOn: 'The requested example needs a behavior change; revise the documentation scope or explicitly cancel and start an implementation cycle.' });
+  await cleanBoundary(root);
+  const saved = parseState(await read(root, '.standards/STATE.md'));
+  assert.equal(saved.CycleMode, 'DOCUMENTATION');
+  assert.equal(saved.active.completionPolicy, 'NONE');
+  assert.equal(saved.recovery.active, false);
+  for (const type of ['IMPLEMENTATION', 'VERIFICATION']) {
+    await editStateFields(root, { Kind: 'FAILURE', From: 'DOCUMENTING', FailureType: type });
+    hasProblem(await check(root), /cannot route .* work to an omitted owner/);
+  }
+  await editStateFields(root, { Kind: 'PROMOTE', WorkflowState: 'AUDITING', PromotionReason: 'Need implementation' });
+  hasProblem(await check(root), /cannot be promoted in place/);
+}));
+
+test('committed documentation cycles cannot be converted in place', () => project(async (root) => {
+  await documentationCycle(root, 'AUDITING');
+  await commit(root);
+  await editStateFields(root, { CycleMode: 'STANDARD', CompletionPolicy: 'FULL_DELIVERABLE' });
+  hasProblem(await check(root), /DOCUMENTATION cycle cannot be converted in place/);
+}, { withGit: true }));
+
+test('documentation normal forward gates still hold during recovery', () => project(async (root) => {
+  const cycle = await documentationCycle(root);
+  const frame = { From: 'AWAITING_USER_SIGNOFF', Owner: 'SCOPING', FailureType: 'SCOPING',
+    ResumeAt: 'AWAITING_USER_SIGNOFF', RerunThrough: 'SYNCHRONIZING' };
+  await documentationFrames(root, [frame]);
+  await editStateFields(root, { WorkflowState: 'REVIEWING_FINAL', Kind: 'FORWARD', From: 'DOCUMENTING' });
+  await fillHeader(root, cycle.DOCUMENTING, { Status: 'IN_PROGRESS' });
+  hasProblem(await check(root), /must be COMPLETE once the cycle has passed DOCUMENTING/);
+  await fillHeader(root, cycle.DOCUMENTING, { Status: 'COMPLETE' });
+  await cleanBoundary(root);
+  await editStateFields(root, { From: 'ARCHITECTING' });
+  hasProblem(await check(root), /ARCHITECTING -> REVIEWING_FINAL skips/);
+  await editStateFields(root, { WorkflowState: 'DOCUMENTING', From: 'ARCHITECTING', Architecture: 'NONE' });
+  hasProblem(await check(root), /Active Work.Architecture is NONE/);
+  await editStateFields(root, { WorkflowState: 'ARCHITECTING', From: 'SCOPING', Architecture: cycle.spec });
+  await write(root, cycle.scope, '# Empty scope\n');
+  hasProblem(await check(root), /needs current acceptance conditions/);
+  await documentationFrames(root, [{ ...frame, Owner: 'ARCHITECTING', FailureType: 'ARCHITECTURE' }]);
+  await editStateFields(root, { WorkflowState: 'SCOPING', Kind: 'RESUME', From: 'DOCUMENTING' });
+  hasProblem(await check(root), /active DOCUMENTATION rerun must stay between ARCHITECTING and SYNCHRONIZING/);
+  await editStateFields(root, { From: 'AWAITING_USER_SIGNOFF' });
+  hasProblem(await check(root), /RESUME handoff must come from an included role/);
+}));
+
+test('documentation upstream RESUME requires owned artifacts and current acceptance coverage', () => project(async (root) => {
+  const cycle = await documentationCycle(root);
+  const ready = await read(root, '.standards/STATE.md');
+  const outer = { From: 'AWAITING_USER_SIGNOFF', Owner: 'SCOPING', FailureType: 'SCOPING',
+    ResumeAt: 'AWAITING_USER_SIGNOFF', RerunThrough: 'SYNCHRONIZING' };
+  for (const [from, target, frames, file, pointer, expected] of [
+    ['AUDITING', 'ARCHITECTING', [outer], '.standards/CONTEXT.md', null, /requires Auditor-owned context/],
+    ['SCOPING', 'AUDITING', [], cycle.scope, 'Scope', /Active Work.Scope is NONE/],
+    ['SCOPING', 'ARCHITECTING', [outer], cycle.scope, 'Scope', /Active Work.Scope is NONE/],
+    ['ARCHITECTING', 'AUDITING', [], cycle.spec, 'Architecture', /Active Work.Architecture is NONE/],
+    ['ARCHITECTING', 'DOCUMENTING', [outer], cycle.spec, 'Architecture', /Active Work.Architecture is NONE/],
+  ]) {
+    await write(root, '.standards/STATE.md', ready);
+    await documentationFrames(root, frames);
+    await editStateFields(root, { WorkflowState: target, Kind: 'RESUME', From: from });
+    const content = await read(root, file);
+    if (pointer) await editStateFields(root, { [pointer]: 'NONE' });
+    else await write(root, file, '');
+    for (const atTurnEnd of [false, true]) hasProblem(await runCheck(root, { atTurnEnd }), expected);
+    if (pointer) {
+      await editStateFields(root, { [pointer]: file });
+      await write(root, file, content.replaceAll(/AC-00[12]/g, 'missing coverage'));
+      for (const atTurnEnd of [false, true]) {
+        hasProblem(await runCheck(root, { atTurnEnd }), pointer === 'Scope'
+          ? /needs current acceptance conditions/ : /does not account for AC-001/);
+      }
+    }
+    await write(root, file, content);
+    await cleanBoundary(root);
+  }
+}));
+
+test('documentation final-review RESUME requires a full report after a return or nested recovery', () => project(async (root) => {
+  const cycle = await documentationCycle(root);
+  const report = await read(root, cycle.REVIEWING_FINAL);
+  const outer = { From: 'AWAITING_USER_SIGNOFF', Owner: 'SCOPING', FailureType: 'SCOPING',
+    ResumeAt: 'AWAITING_USER_SIGNOFF', RerunThrough: 'SYNCHRONIZING' };
+  for (const [target, frames] of [['DOCUMENTING', []], ['SYNCHRONIZING', [outer]]]) {
+    await documentationFrames(root, frames);
+    await editStateFields(root, { WorkflowState: target, Kind: 'RESUME', From: 'REVIEWING_FINAL' });
+    for (const status of ['IN_PROGRESS', 'BLOCKED']) {
+      await fillHeader(root, cycle.REVIEWING_FINAL, { Status: status });
+      hasProblem(await check(root), /must be COMPLETE for a successful RESUME handoff from REVIEWING_FINAL/);
+      hasProblem(await runCheck(root, { atTurnEnd: true }), /must be COMPLETE for a successful RESUME handoff from REVIEWING_FINAL/);
+    }
+    await rm(path.join(root, cycle.REVIEWING_FINAL));
+    hasProblem(await check(root), /must exist for a successful RESUME handoff from REVIEWING_FINAL/);
+    await write(root, cycle.REVIEWING_FINAL, report.replace('AC-002: audience and limits checked against the scoped guide.', 'Audience evidence missing.'));
+    hasProblem(await check(root), /is COMPLETE but does not account for AC-002/);
+    hasProblem(await runCheck(root, { atTurnEnd: true }), /is COMPLETE but does not account for AC-002/);
+    await write(root, cycle.REVIEWING_FINAL, report);
+    await cleanBoundary(root);
+  }
+}));
+
+test('documentation corrective returns preserve incomplete owned records but cannot use normal forward or direct readiness', () => project(async (root) => {
+  const cycle = await documentationCycle(root);
+  for (const [owner, file, type] of [['DOCUMENTING', cycle.DOCUMENTING, 'DOCUMENTATION'], ['SYNCHRONIZING', cycle.SYNCHRONIZING, 'SYNCHRONIZATION']]) {
+    await fillHeader(root, file, { Status: 'IN_PROGRESS' });
+    await fillHeader(root, cycle.REVIEWING_FINAL, { Status: 'IN_PROGRESS' });
+    await write(root, file, `${await read(root, file)}\nVerified the frame's specific correction against current inputs; remaining work depends on unfinished final review.\n`);
+    await documentationFrames(root, [{ From: 'REVIEWING_FINAL', Owner: owner, FailureType: type, ResumeAt: 'REVIEWING_FINAL' }]);
+    await editStateFields(root, { WorkflowState: owner, Kind: 'FAILURE', From: 'REVIEWING_FINAL', FailureType: type });
+    await cleanBoundary(root);
+    await documentationFrames(root, []);
+    await moveCycle(root, 'REVIEWING_FINAL', { kind: 'RESUME' });
+    await cleanBoundary(root);
+    const record = await read(root, file);
+    await rm(path.join(root, file));
+    hasProblem(await check(root), /must exist with current-cycle provenance for a corrective RESUME/);
+    await write(root, file, record);
+    await fillHeader(root, cycle.REVIEWING_FINAL, { Status: 'COMPLETE' });
+    await moveCycle(root, 'SYNCHRONIZING');
+    if (owner === 'DOCUMENTING') hasProblem(await check(root), /must be COMPLETE once the cycle has passed DOCUMENTING/);
+    else await cleanBoundary(root); // Synchronizer resumes its unfinished full assignment.
+    await editStateFields(root, { WorkflowState: 'AWAITING_USER_SIGNOFF', Kind: 'RESUME', From: owner });
+    hasProblem(await check(root), /must be COMPLETE once the cycle has passed/);
+    await fillHeader(root, file, { Status: 'COMPLETE' });
+  }
+}));
+
+test('documentation retains an incomplete corrective return through further recovery before review resumes', () => project(async (root) => {
+  const cycle = await documentationCycle(root);
+  await fillHeader(root, cycle.DOCUMENTING, { Status: 'IN_PROGRESS' });
+  await fillHeader(root, cycle.REVIEWING_FINAL, { Status: 'IN_PROGRESS' });
+  await write(root, cycle.DOCUMENTING, `${await read(root, cycle.DOCUMENTING)}\n`
+    + 'The saved guide correction is verified. The remaining disposition depends only on unfinished final review; revisit Documenter after that assessment.\n');
+  await editStateFields(root, { WorkflowState: 'REVIEWING_FINAL', Kind: 'RESUME', From: 'DOCUMENTING' });
+  await cleanBoundary(root);
+  const returned = await read(root, '.standards/STATE.md');
+  const documentation = await read(root, cycle.DOCUMENTING);
+  for (const kind of ['FAILURE', 'USER_REWORK']) {
+    await editStateFields(root, { Kind: kind, From: 'REVIEWING_FINAL', FailureType: 'REVIEW' });
+    await cleanBoundary(root);
+  }
+  for (const [owner, type] of [['AUDITING', 'PROJECT_CONTEXT'], ['SCOPING', 'SCOPING'],
+    ['ARCHITECTING', 'ARCHITECTURE'], ['SYNCHRONIZING', 'SYNCHRONIZATION']]) {
+    await write(root, '.standards/STATE.md', returned);
+    await fillHeader(root, cycle.REVIEWING_FINAL, { Status: 'IN_PROGRESS' });
+    await documentationFrames(root, [{ From: 'REVIEWING_FINAL', Owner: owner,
+      FailureType: type, ResumeAt: 'REVIEWING_FINAL' }]);
+    await moveCycle(root, owner, { kind: 'FAILURE', FailureType: type });
+    await cleanBoundary(root);
+    if (owner === 'SYNCHRONIZING') {
+      await fillHeader(root, cycle.SYNCHRONIZING, { Status: 'IN_PROGRESS' });
+      await write(root, cycle.SYNCHRONIZING, `${await read(root, cycle.SYNCHRONIZING)}\n`
+        + 'The reconciliation correction is verified; final review must finish before the full synchronization gate.\n');
+    }
+    await documentationFrames(root, []);
+    await moveCycle(root, 'REVIEWING_FINAL', { kind: 'RESUME' });
+    await cleanBoundary(root);
+    // The earlier incomplete return still needs its record, and cannot make a
+    // normal forward handoff or readiness assertion count as full completion.
+    await rm(path.join(root, cycle.DOCUMENTING));
+    hasProblem(await check(root), /must exist once the cycle has passed DOCUMENTING/);
+    await write(root, cycle.DOCUMENTING, documentation);
+    await fillHeader(root, cycle.REVIEWING_FINAL, { Status: 'COMPLETE' });
+    await moveCycle(root, 'SYNCHRONIZING');
+    hasProblem(await check(root), /must be COMPLETE once the cycle has passed DOCUMENTING/);
+    await editStateFields(root, { WorkflowState: 'AWAITING_USER_SIGNOFF', Kind: 'RESUME', From: 'SYNCHRONIZING' });
+    hasProblem(await check(root), /must be COMPLETE once the cycle has passed DOCUMENTING/);
+  }
+}));
+
+test('documentation nested recovery reruns the included evidence after a changed acceptance condition', () => project(async (root) => {
+  const cycle = await documentationCycle(root);
+  const outer = { From: 'AWAITING_USER_SIGNOFF', Owner: 'SCOPING', FailureType: 'SCOPING', ResumeAt: 'AWAITING_USER_SIGNOFF' };
+  await documentationFrames(root, [outer]);
+  await moveCycle(root, 'SCOPING', { kind: 'USER_REWORK', FailureType: 'SCOPING' });
+  const nested = { From: 'SCOPING', Owner: 'AUDITING', FailureType: 'PROJECT_CONTEXT', ResumeAt: 'SCOPING' };
+  await documentationFrames(root, [outer, nested]);
+  await moveCycle(root, 'AUDITING', { kind: 'FAILURE', FailureType: 'PROJECT_CONTEXT' });
+  await cleanBoundary(root);
+  await documentationFrames(root, [outer]);
+  await moveCycle(root, 'SCOPING', { kind: 'RESUME' });
+  assert.equal(parseState(await read(root, '.standards/STATE.md')).recovery.frames.length, 1);
+  await write(root, cycle.scope, (await read(root, cycle.scope)).replace('- `AC-002`: Explain the audience and limits.', '- `AC-004`: Explain the command limitations.')
+    + '\n- `AC-002`: Retired because its meaning changed.\n');
+  for (const file of [cycle.DOCUMENTING, cycle.REVIEWING_FINAL, cycle.SYNCHRONIZING]) await fillHeader(root, file, { Status: 'IN_PROGRESS' });
+  await documentationFrames(root, [{ ...outer, RerunThrough: 'SYNCHRONIZING' }]);
+  await moveCycle(root, 'ARCHITECTING');
+  await cleanBoundary(root);
+  await write(root, cycle.spec, `${await read(root, cycle.spec)}\nAC-004: Existing limitations are established; no architectural impact.\n`);
+  await moveCycle(root, 'DOCUMENTING');
+  await cleanBoundary(root);
+  for (const [state, next, file] of [['DOCUMENTING', 'REVIEWING_FINAL', cycle.DOCUMENTING], ['REVIEWING_FINAL', 'SYNCHRONIZING', cycle.REVIEWING_FINAL], ['SYNCHRONIZING', 'AWAITING_USER_SIGNOFF', cycle.SYNCHRONIZING]]) {
+    assert.equal(parseState(await read(root, '.standards/STATE.md')).WorkflowState, state);
+    await write(root, file, `${await read(root, file)}\nAC-004: Current limitations inspected and evidenced.\n`);
+    await fillHeader(root, file, { Status: 'COMPLETE' });
+    if (next === 'AWAITING_USER_SIGNOFF') await documentationFrames(root, []);
+    await moveCycle(root, next, { kind: next === 'AWAITING_USER_SIGNOFF' ? 'RESUME' : 'FORWARD' });
+    await cleanBoundary(root);
+  }
+}));
 
 // A STANDARD cycle at implementation review whose records all agree.
 async function standardCycle(root) {

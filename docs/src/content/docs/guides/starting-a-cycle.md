@@ -34,6 +34,19 @@ path.
 
 ## Choose a cycle mode only when needed
 
+For documentation of existing behavior, invoke Documenter with a standalone
+assignment while no cycle is active. It starts the Brownfield `DOCUMENTATION`
+route in Auditing before any documentation edits:
+
+```text
+$documenter Update docs/usage.md for the existing CLI.
+```
+
+Use `/documenter` in Claude Code. Missing guides can be created, but greenfield
+projects cannot use this mode. See
+[Updating Documentation on Its Own](../updating-documentation/) for the route,
+choices, and editing boundary.
+
 `STANDARD` is the default. You do not need to select it or set any state fields
 before giving the first role a request.
 
@@ -62,8 +75,9 @@ earlier standard checks remain required, and Reviewer must confirm that no
 required work remains before asking you to sign off.
 
 This choice applies to the request you give; it is not a saved preference for
-future cycles. If it conflicts with an explicit or saved expedited mode choice,
-the agent asks you to resolve that conflict before starting. See
+future cycles. If it conflicts with an explicit or saved expedited or
+documentation mode choice, the agent asks you to resolve that conflict before
+starting. See
 [Finishing After Implementation Review](../finishing-after-implementation-review/)
 for examples and when you can change the choice later.
 
@@ -71,7 +85,10 @@ for examples and when you can change the choice later.
 
 If your chosen mode cannot handle the request, the agent keeps the request and
 asks you to choose a supported mode, revise it, or abandon it. You do not need
-to repeat a saved request after making that decision.
+to repeat a saved request after making that decision. Standalone Documenter
+intent and choices remain saved while blocked; continuing or invoking another
+role does not silently withdraw them or select standard work. A separate
+assignment cannot overwrite a cycle already in progress.
 
 ## What the agent does automatically
 

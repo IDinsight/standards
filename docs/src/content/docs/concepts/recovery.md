@@ -81,7 +81,8 @@ steps are still pending. Tester verifies the correction and returns so Developer
 can continue those steps. The report remains incomplete. Nested corrections
 preserve each interrupted assignment, and ordinary incremental checkpoints
 resume only after recovery ends. Every return to Reviewer still requires full
-Developer and Tester completion. See the
+Developer and Tester completion in implementation cycles. Documentation cycles
+do not have those gates. See the
 [implementation and verification recovery gates](../../reference/protocol/#implementation-and-verification-recovery-gates).
 
 Documenter or Synchronizer may need to fix something for an earlier role that
@@ -110,6 +111,15 @@ for sign-off.
 The protocol defines these
 [corrective returns](../../reference/protocol/#corrective-returns); the
 Documenter and Synchronizer skills add each role's own conditions.
+
+In [documentation cycles](../../guides/updating-documentation/), failure and
+rework stay among Auditor, Scoper, Architect, Documenter, final Reviewer, and
+Synchronizer. Qualified Documenter/Synchronizer owned corrections may return to
+an interrupted included role with precise unfinished dependencies and incomplete
+records. Omitted implementation phases are not future dependencies; all six full
+gates and current evidence are still required before readiness. A required
+omitted-owner correction blocks for your decision without promotion or
+conversion in place.
 
 ## Corrections when finishing after implementation review
 

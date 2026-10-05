@@ -75,6 +75,9 @@ export default defineConfig({
               slug: "guides/starting-a-cycle",
             },
             {
+              slug: "guides/updating-documentation",
+            },
+            {
               slug: "guides/finishing-after-implementation-review",
             },
             {

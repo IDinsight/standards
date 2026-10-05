@@ -56,26 +56,27 @@ of the work. See the [tool rules](../protocol/#runtime-tools-and-hooks).
 `STATE.md` is saved with the project so another chat can resume from the
 recorded work instead of relying on chat history.
 
-| Field or section          | What it stores                                                          |
-| ------------------------- | ----------------------------------------------------------------------- |
-| `WorkflowState`           | The current step or an ended cycle's state.                             |
-| `CycleMode`               | `STANDARD`, `EXPEDITED`, or `UNSET` when no cycle is active.            |
-| `PendingCycleMode`        | An explicit preference for the next cycle, or `UNSET`.                  |
-| `PendingCycleRequest`     | A next-cycle request blocked by a user decision, or `UNSET`.            |
-| `PendingCycleBlockedOn`   | That unresolved decision, or `NONE`.                                    |
-| `Active Work`             | The cycle ID, request, document paths, and unresolved questions.        |
-| `Handoff`                 | The latest transition's kind, starting state, failure type, and reason. |
-| `Recovery`                | Corrections and return instructions, with the newest frame active.      |
-| `Outstanding Obligations` | Unfinished corrections preserved when promotion changes the route.      |
+| Field or section          | What it stores                                                                |
+| ------------------------- | ----------------------------------------------------------------------------- |
+| `WorkflowState`           | The current step or an ended cycle's state.                                   |
+| `CycleMode`               | `STANDARD`, `EXPEDITED`, `DOCUMENTATION`, or `UNSET` when no cycle is active. |
+| `PendingCycleMode`        | An explicit preference for the next cycle, or `UNSET`.                        |
+| `PendingCycleRequest`     | A next-cycle request blocked by a user decision, or `UNSET`.                  |
+| `PendingCycleBlockedOn`   | That unresolved decision, or `NONE`.                                          |
+| `Active Work`             | The cycle ID, request, document paths, and unresolved questions.              |
+| `Handoff`                 | The latest transition's kind, starting state, failure type, and reason.       |
+| `Recovery`                | Corrections and return instructions, with the newest frame active.            |
+| `Outstanding Obligations` | Unfinished corrections preserved when promotion changes the route.            |
 
 `Active Work` also stores the reason for promotion, any temporary audit target,
 and changes left by cancelled cycles that Auditor must check.
 
 `Active Work.CompletionPolicy` is required. It is `NONE` before a cycle starts
-and during expedited work. A standard cycle uses `FULL_DELIVERABLE` by default
-or `IMPLEMENTATION_REVIEWED` when you explicitly choose the shorter finish.
-Sign-off and retained cancellation keep that value as history; a new cycle
-chooses it afresh. Installation and reset initialize it to `NONE`.
+and during expedited or documentation work. A standard cycle uses
+`FULL_DELIVERABLE` by default or `IMPLEMENTATION_REVIEWED` when you explicitly
+choose the shorter finish. Sign-off and retained cancellation keep that value as
+history; a new cycle chooses it afresh. Installation and reset initialize it to
+`NONE`.
 
 The checker uses the policy to determine which completed records are required
 before sign-off readiness. It still checks any existing records from omitted

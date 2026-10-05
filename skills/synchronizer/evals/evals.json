@@ -586,6 +586,83 @@
         "The record stays incomplete and the selected policy is unchanged.",
         "The older frame cannot be discarded and no direct sign-off readiness is declared."
       ]
+    },
+    {
+      "id": 56,
+      "prompt": "Invoke Synchronizer. ProjectMode=BROWNFIELD, CycleMode=DOCUMENTATION, CompletionPolicy=NONE, Active Work.Id=guide-20261004T120000Z-1a2b3c4d. WorkflowState=SYNCHRONIZING. Auditor context, scope, technical coverage, COMPLETE documentation and independent final review identify current content and checks. Every current AC is supported, no discrepancies/blockers/baseline reconciliation/recovery/obligations exist. No omitted-owner record exists.",
+      "expected_output": "Reconcile the included assessments and current evidence, complete the record, and enter sign-off readiness.",
+      "files": [],
+      "assertions": [
+        "No current Developer/Tester/implementation-review artifact or guarantee is demanded or fabricated.",
+        "The record references applicable evidence under the existing AC IDs; no second acceptance ledger is created.",
+        "AWAITING_USER_SIGNOFF preserves policy NONE and is not user acceptance or SIGNED_OFF."
+      ]
+    },
+    {
+      "id": 57,
+      "prompt": "Invoke Synchronizer. ProjectMode=BROWNFIELD, CycleMode=DOCUMENTATION, CompletionPolicy=NONE, Active Work.Id=guide-20261004T120000Z-1a2b3c4d. WorkflowState=SYNCHRONIZING. Final Reviewer assessed docs/usage.md hash A. The saved guide now has hash B with a changed command; Documenter checks still identify A and no assessment covers B.",
+      "expected_output": "Persist both stale documentation evidence and final-review applicability and route the needed included owner.",
+      "files": [],
+      "assertions": [
+        "Old passes are not relabeled for B.",
+        "All known discrepancies remain before one is routed; the proper correction/reassessment route is saved.",
+        "No COMPLETE synchronization, readiness, or manufactured Documenter/Reviewer evidence occurs."
+      ]
+    },
+    {
+      "id": 58,
+      "prompt": "Invoke Synchronizer. ProjectMode=BROWNFIELD, CycleMode=DOCUMENTATION, CompletionPolicy=NONE, Active Work.Id=guide-20261004T120000Z-1a2b3c4d. WorkflowState=SYNCHRONIZING. Its owned frame returns to REVIEWING_FINAL with RerunThrough NONE. A mistaken reference has been corrected and verified with current evidence. Final Reviewer is waiting to reassess it; this and the preserved route's unfinished review are the only full-gate gaps. No independent defect or blocker exists.",
+      "expected_output": "Use a qualified owned corrective return with the record incomplete and final-review dependency explicit.",
+      "files": [],
+      "assertions": [
+        "Each dependency records its owner, required evidence, and revisit point.",
+        "The return goes to included final Reviewer, not normal FORWARD or direct sign-off.",
+        "No intentionally omitted implementation phase is described as unfinished work."
+      ]
+    },
+    {
+      "id": 59,
+      "prompt": "Invoke Synchronizer. ProjectMode=BROWNFIELD, CycleMode=DOCUMENTATION, CompletionPolicy=NONE, Active Work.Id=guide-20261004T120000Z-1a2b3c4d. WorkflowState=SYNCHRONIZING as a Documenter-owned rerun through SYNCHRONIZING resuming REVIEWING_FINAL. Synchronizer does not own the frame. Final review is incomplete and the full synchronization gate cannot pass; the user asks to use the shorter-standard corrective-rerun exception.",
+      "expected_output": "Preserve the frame and resolve the missing required assessment through canonical included ownership.",
+      "files": [],
+      "assertions": [
+        "The IMPLEMENTATION_REVIEWED Synchronizer Corrective Reruns exception is not applied to DOCUMENTATION.",
+        "The boundary is not popped on an incomplete full gate.",
+        "No implementation Reviewer or sign-off shortcut is introduced."
+      ]
+    },
+    {
+      "id": 60,
+      "prompt": "Process explicit user sign-off. ProjectMode=BROWNFIELD, CycleMode=DOCUMENTATION, CompletionPolicy=NONE, Active Work.Id=guide-20261004T120000Z-1a2b3c4d. WorkflowState=AWAITING_USER_SIGNOFF. All six full gates were passed and the records remain applicable to unchanged files. Recovery and obligations are inactive and all documentation-contract fields are NONE.",
+      "expected_output": "Revalidate the documentation completion contract and persist explicit acceptance.",
+      "files": [],
+      "assertions": [
+        "No omitted implementation artifacts are required.",
+        "WorkflowState becomes SIGNED_OFF, CycleMode UNSET, handoff SIGNOFF from AWAITING_USER_SIGNOFF; records and historical policy NONE remain.",
+        "The agent does not author replacement Reviewer evidence or change project mode."
+      ]
+    },
+    {
+      "id": 61,
+      "prompt": "Process user sign-off. ProjectMode=BROWNFIELD, CycleMode=DOCUMENTATION, CompletionPolicy=NONE, Active Work.Id=guide-20261004T120000Z-1a2b3c4d. WorkflowState=AWAITING_USER_SIGNOFF, but the saved documentation changed materially after final review and synchronization. No reassessment covers the current guide.",
+      "expected_output": "Withhold acceptance until owner-directed recovery re-establishes current evidence.",
+      "files": [],
+      "assertions": [
+        "Prior COMPLETE labels do not authorize sign-off for changed content.",
+        "The discrepancy and affected independent review/synchronization are preserved.",
+        "No omitted implementation route or replacement review authored by Synchronizer occurs."
+      ]
+    },
+    {
+      "id": 62,
+      "prompt": "Process explicit cancellation, then a new standalone documentation request. ProjectMode=BROWNFIELD, CycleMode=DOCUMENTATION, CompletionPolicy=NONE, Active Work.Id=guide-20261004T120000Z-1a2b3c4d. WorkflowState=DOCUMENTING. Current guide edits remain. The user cancels without requesting reversal, then asks to document another existing command.",
+      "expected_output": "Retain the cancelled cycle's work, start a fresh Auditor-first documentation cycle, and preserve source-cycle baseline reconciliation.",
+      "files": [],
+      "assertions": [
+        "Cancellation clears recovery and sets CycleMode UNSET without reverting guides.",
+        "A new generated ID is used; the old ID/request and unresolved reconciliation sources remain available.",
+        "Auditor establishes retained documentation status before Scoper; no silent adoption or EXPEDITED bypass occurs."
+      ]
     }
   ]
 }

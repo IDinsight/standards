@@ -5,7 +5,9 @@ description:
   deliverable while REVIEWING_IMPLEMENTATION or REVIEWING_FINAL. Reconstruct the
   change from persisted artifacts and repository evidence in an independent
   session, inspect relevant claims from all roles, persist actionable findings
-  and assessment limits, and follow protocol ownership and recovery rules.
+  and assessment limits, and follow protocol ownership and recovery rules. Final
+  review includes brownfield DOCUMENTATION cycles, assessing checked
+  documentation against existing behavior without omitted implementation gates.
 ---
 
 <!-- standards:framework-owned -->
@@ -28,12 +30,20 @@ cycle/state combination. Otherwise identify the current owner and apply only an
 authorized protocol control-plane transition, if any. Do not infer entry from a
 report or chat.
 
-For a successful handoff entering either review state, enforce the protocol's
-**Full Verification Boundary**, including when an outer recovery frame remains.
-Independently check current full Developer and, in `STANDARD`, Tester
-completion; an increment pass or scoped corrective return cannot substitute for
-it. Route defective claims or missing evidence to their owners before relying on
-them.
+In `STANDARD` or `EXPEDITED`, enforce the protocol's **Full Verification
+Boundary** for a successful handoff entering either review state, including when
+an outer recovery frame remains. Independently check current full Developer and,
+in `STANDARD`, Tester completion; an increment pass or scoped corrective return
+cannot substitute for it. Route defective claims or missing evidence to their
+owners before relying on them.
+
+In `DOCUMENTATION`, review only in `REVIEWING_FINAL` under **Documentation Cycle
+Contract**. For normal forward entry, require the full Documenter gate and its
+current-cycle record; a verified corrective return does not replace that gate.
+During canonical recovery, assess the available inputs for the assigned
+correction without requiring an interrupted Documenter/Synchronizer to finish
+work that depends on this review. No Developer, Tester, or implementation-review
+completion is required or may be fabricated.
 
 Apply the protocol's **Independent Assessment Sessions** and **Independent
 Reviewer Session** rules before formal assessment, including honest session
@@ -43,16 +53,20 @@ canonical in the protocol.
 Read the active request, project instructions, handoff, recovery stack,
 outstanding obligations, and blockers. In `STANDARD`, read the current scope,
 architecture, Auditor context, development plan, and Tester verification report.
-In `EXPEDITED`, read the bounded request and development plan; any existing
-context is prior evidence, not an assumed refreshed baseline. Read the current
-cycle's review reports when present and relevant user/project documentation. For
-final review or documentation corrections, read Documenter's documentation
-record and inspect its evidence against the saved documents and actual behavior;
-a record's completion label alone is not sufficient. For shorter standard
-completion, also inspect any already-produced documentation, final-review, and
-synchronization records and their unresolved work, including corrective work.
-Inspect relevant source, tests, fixtures, configuration, established commands,
-dependencies, and version-control evidence directly.
+In `DOCUMENTATION`, read the current scope, architecture, Auditor context, and
+documentation record, plus the saved documentation request and editing boundary.
+Use existing source, tests, and prior assessments as supporting evidence of
+behavior; do not treat them as formal current-cycle verification. In
+`EXPEDITED`, read the bounded request and development plan; any existing context
+is prior evidence, not an assumed refreshed baseline. Read the current cycle's
+review reports when present and relevant user/project documentation. For final
+review or documentation corrections, read Documenter's documentation record and
+inspect its evidence against the saved documents and actual behavior; a record's
+completion label alone is not sufficient. For shorter standard completion, also
+inspect any already-produced documentation, final-review, and synchronization
+records and their unresolved work, including corrective work. Inspect relevant
+source, tests, fixtures, configuration, established commands, dependencies, and
+version-control evidence directly.
 
 ## Modes
 
@@ -60,7 +74,7 @@ Persisted state selects exactly one canonical kind; read its thin mode file:
 
 - `REVIEWING_IMPLEMENTATION`: **IMPLEMENTATION**,
   [`modes/implementation.md`](modes/implementation.md).
-- `REVIEWING_FINAL`: **FINAL_DELIVERABLE** in `STANDARD` only,
+- `REVIEWING_FINAL`: **FINAL_DELIVERABLE** in `STANDARD` or `DOCUMENTATION`,
   [`modes/final-deliverable.md`](modes/final-deliverable.md).
 
 Both use the procedure, findings, ownership, and gate below. Re-review after
@@ -104,6 +118,14 @@ Conflicts**. In expedited work, an omitted owner or guarantee requires
 route into a skipped state. Planned implementation alone does not invalidate
 baseline context.
 
+In `DOCUMENTATION`, `REVIEW` routes only to final Reviewer and failures/rework
+stay among included owners. If an omitted owner's correction is necessary to
+satisfy the documentation contract, persist the finding or evidence gap and
+required user decision in `Active Work.BlockedOn`; preserve the request and
+recovery. Do not route to Developer/Tester, demand their current-cycle reports,
+silently change scope, or convert the cycle. Unrelated implementation
+observations alone do not block documentation review.
+
 ## Shared Assessment Procedure
 
 1. Reconstruct the active change from persisted intent and repository evidence.
@@ -121,11 +143,16 @@ baseline context.
    content descriptions sufficient to detect changes without copying source or
    logs. Record inspection scope, session/model visibility limits, and next
    work.
-3. Account for the applicable contract. In `STANDARD`, inventory every current
-   `AC-NNN` and relevant technical criterion using its design section/text under
-   the same AC. Check upstream consistency and evidence sufficiency. Retired IDs
-   are historical only. In `EXPEDITED`, assess the bounded request and Developer
-   evidence without inventing AC IDs or skipped guarantees.
+3. Account for the applicable contract. In `STANDARD` or `DOCUMENTATION`,
+   inventory every current `AC-NNN` and relevant technical criterion using its
+   design section/text under the same AC. Check upstream consistency and
+   evidence sufficiency. Retired IDs are historical only. In `EXPEDITED`, assess
+   the bounded request and Developer evidence without inventing AC IDs or
+   skipped guarantees. In `DOCUMENTATION`, independently assess each
+   documentation outcome against saved content, Documenter's checks, existing
+   behavior, and technical coverage. Check accuracy, examples, links, audience
+   coverage, and the permitted editing boundary where relevant; a documentation
+   record's labels are not evidence.
 4. Inspect relevant surrounding code, callers, dependencies, contracts, tests,
    and documentation, not only diff hunks. Prioritize correctness, security,
    failure handling, resource behavior, compatibility, and material
@@ -227,12 +254,24 @@ later-phase dependencies may remain only when satisfaction belongs to that later
 role; record the owner, required evidence, and the same AC ID. Pending is not
 evidence and cannot defer a present-phase defect or verification gap.
 
-`FINAL_DELIVERABLE` is available only in `STANDARD`. It assesses the assembled
-work after documentation: current acceptance evidence, documentation accuracy,
-unresolved findings, and consistency across artifacts. Every current acceptance
-condition and relevant technical criterion must have sufficient current
-evidence; unresolved dependencies or material evidence gaps cannot pass this
-gate.
+`FINAL_DELIVERABLE` is available in `STANDARD` and `DOCUMENTATION`. It assesses
+the assembled work after documentation: current acceptance evidence,
+documentation accuracy, unresolved findings, and consistency across artifacts.
+Every current acceptance condition and relevant technical criterion must have
+sufficient current evidence; unresolved dependencies or material evidence gaps
+cannot pass this gate.
+
+In `DOCUMENTATION`, this gate assesses **Documentation Cycle Contract**:
+documentation matches evidenced existing behavior and the scoped audiences and
+targets, every current AC and relevant technical criterion has sufficient
+current documentation evidence, and saved edits respect the permitted boundary.
+Independently inspect supporting source and check results as needed; distinguish
+Documenter evidence and Reviewer diagnostics from formal Tester acceptance.
+Missing current-cycle development, verification, or implementation-review
+artifacts are intentional omissions, not gaps. Missing evidence needed for
+documentation accuracy, an unresolved dependency, or required omitted-owner work
+still prevents this gate. A supported no-change documentation outcome can pass
+after the same assessment.
 
 In `EXPEDITED`, implementation review assesses the bounded `Active Work.Request`
 and Developer evidence under **Expedited Cycle Contract** in
@@ -334,6 +373,10 @@ review are not acceptance. Normal `STANDARD` final review with
 policy follows only its active recovery route. `EXPEDITED` implementation review
 enters `AWAITING_USER_SIGNOFF` only when the protocol's expedited completion
 requirements pass. Never fabricate final review there.
+
+Normal `DOCUMENTATION` final review hands off to Synchronizer after the full
+review gate passes, preserving `CompletionPolicy: NONE`. It does not select a
+standard completion policy or enter sign-off readiness directly.
 
 During recovery, apply the canonical algorithm instead. Only if the current
 review state owns the active frame does Reviewer decide which completed

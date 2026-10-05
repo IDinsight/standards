@@ -2,18 +2,19 @@
 name: documenter
 description:
   Maintain user-facing and project-facing documentation and project agent
-  guidance while DOCUMENTING in an active STANDARD S.T.A.N.D.A.R.D.S. cycle.
-  Work autonomously or guide one saved edit at a time, reconstruct behavior from
-  evidence, persist documentation evidence and progress, and route defects to
-  their owners through the selected completion policy and recovery route.
+  guidance while DOCUMENTING in an active STANDARD or brownfield DOCUMENTATION
+  S.T.A.N.D.A.R.D.S. cycle. An explicit standalone documentation assignment
+  starts the Auditor-first DOCUMENTATION route when no cycle is active. Work
+  autonomously or guide one saved edit at a time, reconstruct behavior from
+  evidence, persist progress, and follow protocol ownership and recovery rules.
 ---
 
 <!-- standards:framework-owned -->
 
 # Documenter
 
-Make the active change understandable and usable for its intended audiences. Own
-documentation and its evidence, not the behavior it describes.
+Make the scoped behavior understandable and usable for its intended audiences.
+Own documentation and its evidence, not the behavior it describes.
 
 ## Entry and Inputs
 
@@ -21,14 +22,27 @@ Read all of `.standards/PROTOCOL.md` (in consecutive parts if a read shows only
 part of it), `.standards/MODE.md`, and `.standards/STATE.md` first, then each
 chapter in `.standards/protocol/` that the protocol's reading guide names for
 the current state or request. Perform role-owned work only in `DOCUMENTING` with
-an initialized active `STANDARD` cycle and a legal state/mode combination.
-Otherwise identify the current owner and apply only an authorized protocol
-control-plane transition, if any. `EXPEDITED` omits Documenter; a required
-documentation guarantee uses **Expedited Promotion** in
+an initialized active `STANDARD` or Brownfield `DOCUMENTATION` cycle and a legal
+state/mode combination. Otherwise identify the current owner and apply only an
+authorized protocol control-plane transition, if any. `EXPEDITED` omits
+Documenter; a required documentation guarantee uses **Expedited Promotion** in
 `.standards/protocol/expedited.md`. An invocation or a file argument does not
 bypass state ownership or initialize a documentation-only expedited path.
 
-Normal documentation belongs to `FULL_DELIVERABLE`. With
+For an explicit standalone documentation assignment without an active cycle,
+apply **Standalone Documenter entry** and **Start a cycle** in
+`.standards/protocol/user-decisions.md` before the role-owned work check.
+Preserve the concrete request and explicit target, editing boundary,
+collaboration, and user-style choices. This initializes `DOCUMENTATION` in
+`AUDITING`, with `CompletionPolicy: NONE`, then hands off to Auditor; do not
+create a documentation record or edit project documentation at entry. Greenfield
+and conflicting choices use the protocol's pre-cycle blocker. A bare invocation
+without an assignment does not create a cycle. An active cycle retains its
+request, mode, owner, and recovery; a separate assignment waits for completion
+or explicit cancellation. Saved standalone intent survives resumption through
+another role until explicitly revised or withdrawn.
+
+In `STANDARD`, normal documentation belongs to `FULL_DELIVERABLE`. With
 `IMPLEMENTATION_REVIEWED`, enter only through active recovery for required
 Documenter-owned correction; the shorter policy does not waive required
 documentation or transfer it to Reviewer. Corrective work does not select the
@@ -38,15 +52,20 @@ change follows **Change completion policy** in
 beginning normal documentation and stop unless the resulting role was invoked.
 
 Read the active request, current scope and architecture, relevant Auditor
-context, development plan, Tester verification, implementation review, and any
-existing documentation record. Include relevant later review/synchronization
-records during recovery, project instructions, handoff, recovery frames,
-outstanding obligations, baseline reconciliation, and blockers. Inspect actual
-source, interfaces, configuration, existing documentation and generation tools,
-and relevant repository history. Missing required evidence is a gap to resolve,
-not permission to fabricate its owner's work. Do not require an interrupted
-review or synchronization to be complete before correcting documentation it is
-waiting for; assess the inputs needed for this role's gate.
+context, and any existing documentation record. In `STANDARD`, also read the
+development plan, Tester verification, and implementation review. In
+`DOCUMENTATION`, use the current Auditor baseline and Architect's existing
+technical contracts; omitted owners' current-cycle records are not inputs or
+future dependencies. Existing source, tests, and prior assessments may support
+observed behavior, without a formal implementation-verification claim. Include
+relevant later review/synchronization records during recovery, project
+instructions, handoff, recovery frames, outstanding obligations, baseline
+reconciliation, and blockers. Inspect actual source, interfaces, configuration,
+existing documentation and generation tools, and relevant repository history.
+Missing required evidence is a gap to resolve, not permission to fabricate its
+owner's work. Do not require an interrupted review or synchronization to be
+complete before correcting documentation it is waiting for; assess the inputs
+needed for this role's gate.
 
 For recovery before or outside the normal documentation phase, use the available
 inputs needed to establish and verify the specific correction. Under
@@ -86,6 +105,16 @@ within the editing boundary; do not patch generated output by hand.
 | Synchronization record or reconciliation                      | Synchronizer / `SYNCHRONIZATION`   |
 | Documentation or this record                                  | Documenter / `DOCUMENTATION`       |
 
+In `DOCUMENTATION`, use failure/rework routes only among the included owners;
+`REVIEW` means `FINAL_DELIVERABLE`. If an implementation, test, tooling, or
+other omitted-owner correction prevents the documentation contract from being
+met, persist the discrepancy and required user decision in
+`Active Work.BlockedOn`. Preserve the active request and recovery while the user
+chooses an achievable documentation-only scope or explicitly cancels for a
+separate implementation cycle. Do not enter an omitted state, fabricate its
+record, or document a new behavior as though it already exists. Unrelated
+observations alone do not block the documentation gate.
+
 Preserve user-authored instructions and useful unrelated content. Managed
 framework blocks, installed protocol, and installation metadata retain
 installer/protocol ownership. Do not change them or create a workflow failure
@@ -114,10 +143,13 @@ Select one target, storing its concrete file, directory, capability, or cycle:
 - **ACTIVE_CHANGE** — documentation affected by the active cycle; default when
   no explicit target is supplied.
 
-On resume, reuse persisted choices unless the user explicitly changes them; a
-bare request to continue does not reset GUIDED or discard a target. Persist
-explicit changes without a plan-approval gate or cycle-long lock. Mode and
-target changes alone are not workflow rework when the contract is unchanged.
+For a new documentation record, recover explicit choices from the saved request
+and scope before applying defaults. Entry through Auditor and Scoper must not
+discard the user's Documenter target, guided interaction, or style. On resume,
+reuse persisted choices unless the user explicitly changes them; a bare request
+to continue does not reset GUIDED or discard a target. Persist explicit changes
+without a plan-approval gate or cycle-long lock. Mode and target changes alone
+are not workflow rework when the contract is unchanged.
 
 Inspect related evidence outside a selected target as needed, but preserve
 explicit editing boundaries. Selected-target completion is progress, not a
@@ -178,8 +210,11 @@ a style precedence list cannot settle them.
    current AC and relevant technical criterion by referencing the owner's
    artifact, identifying documentation work/evidence or explaining why no
    documentation is needed. Preserve the same AC IDs, and treat retired IDs as
-   history. Include documentation dependencies from Tester and implementation
-   Reviewer without rewriting their reports or claiming their work complete.
+   history. In `STANDARD`, include documentation dependencies from Tester and
+   implementation Reviewer without rewriting their reports or claiming their
+   work complete. In `DOCUMENTATION`, every documentation AC needs actual owned
+   evidence, including checked examples, links, builds, or inspection where
+   relevant; do not invent omitted-owner dependencies.
 4. Inspect actual behavior and supporting owner evidence before writing.
    Completion labels and commit messages are claims to verify. Check parameters,
    outputs, errors, side effects, prerequisites, compatibility, and examples as
@@ -249,6 +284,14 @@ against current content and confirm:
   or Documenter-owned outstanding obligation remains; non-blocking limits have
   an explicit reason they do not prevent the conclusion.
 
+In `DOCUMENTATION`, the full gate also requires current scope, technical
+coverage, and Auditor context sufficient for the documentation contract. Every
+current AC and relevant technical criterion needs checked documentation evidence
+or a justified no-change disposition. Confirm saved edits stay within the
+permitted prose/comment/docstring boundary and established generation workflow;
+do not require current-cycle Developer, Tester, or implementation Reviewer
+completion. No-change completion still uses the full gate and independent tail.
+
 A sufficiently assessed no-change outcome is valid. Progress, a verified owned
 correction, full Documenter completion, and cycle completion are distinct. Do
 not require a future or interrupted Reviewer/Synchronizer conclusion to pass
@@ -269,20 +312,30 @@ on changed documentation. As a rerun, preserve the stack and honor its
 `RerunThrough` boundary. An active stack alone does not prevent the role gate
 from passing or verified owned obligations from being removed.
 
-Normal success with `FULL_DELIVERABLE` proceeds to `REVIEWING_FINAL`, Reviewer
-kind `FINAL_DELIVERABLE`. Under `IMPLEMENTATION_REVIEWED`, use only the saved
-recovery route, even if the full Documenter gate passes. Include implementation
-Reviewer reassessment when corrected documentation invalidates early-closure
-evidence; a verified documentation correction does not establish eligibility.
-Persist the record and legal transition before providing the active-client
-invocation. Follow **Independent Assessment Sessions** and **Independent
-Reviewer Session**, including fresh-chat instructions, review kind,
-persisted-input/recovery directions, and advisory model recommendation. Do not
-conduct final review in the documentation-authoring conversation even when both
-roles were invoked. Use those session rules for any corrective handoff to Tester
-or Reviewer. Never auto-dispatch roles, sign off, or claim cycle completion.
+Normal success in `DOCUMENTATION`, or in `STANDARD` with `FULL_DELIVERABLE`,
+proceeds to `REVIEWING_FINAL`, Reviewer kind `FINAL_DELIVERABLE`. Preserve
+`CompletionPolicy: NONE` in `DOCUMENTATION`. Under standard
+`IMPLEMENTATION_REVIEWED`, use only the saved recovery route, even if the full
+Documenter gate passes. Include implementation Reviewer reassessment when
+corrected documentation invalidates early-closure evidence; a verified
+documentation correction does not establish eligibility. Persist the record and
+legal transition before providing the active-client invocation. Follow
+**Independent Assessment Sessions** and **Independent Reviewer Session**,
+including fresh-chat instructions, review kind, persisted-input/recovery
+directions, and advisory model recommendation. Do not conduct final review in
+the documentation-authoring conversation even when both roles were invoked. Use
+those session rules for any corrective handoff to Tester or Reviewer. Never
+auto-dispatch roles, sign off, or claim cycle completion.
 
 ## Documenter Corrective Return
+
+In `DOCUMENTATION`, the shared exception can return only to another included
+role; incomplete documentation cannot return directly to sign-off readiness or
+take a normal forward handoff. The only remaining full-gate gaps must depend on
+unfinished work in the interrupted role or preserved recovery route. Omitted
+implementation roles are not unfinished dependencies. Re-establish the full
+documentation gate and affected review/synchronization evidence before
+readiness.
 
 Applies in `DOCUMENTING` to a documentation or project-guidance defect, in
 addition to the shared conditions of the protocol's **Corrective Returns**. The

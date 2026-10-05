@@ -3,7 +3,9 @@ title: Working on an Existing Project
 description: Plan a change around the code and behavior already in place.
 ---
 
-Use this guide when the project already has code the change must work with.
+Use this guide when the project already has code the change must work with. For
+documentation of existing behavior without an implementation change, see
+[Updating Documentation on Its Own](../updating-documentation/).
 
 ## Choose standard or expedited work
 

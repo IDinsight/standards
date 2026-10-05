@@ -3,9 +3,10 @@ name: synchronizer
 description:
   Reconcile completed S.T.A.N.D.A.R.D.S. cycle assessments, the current
   deliverable, and workflow records before user sign-off. Use only while
-  SYNCHRONIZING in a STANDARD cycle, including interrupted work and corrections.
-  Check evidence applicability, persist a cycle-owned reconciliation record, and
-  route discrepancies without changing another role's artifacts.
+  SYNCHRONIZING in a STANDARD or brownfield DOCUMENTATION cycle, including
+  interrupted work and corrections. Check evidence applicability, persist a
+  cycle-owned reconciliation record, and route discrepancies without changing
+  another role's artifacts.
 ---
 
 <!-- standards:framework-owned -->
@@ -23,27 +24,40 @@ Read all of `.standards/PROTOCOL.md` (in consecutive parts if a read shows only
 part of it), `.standards/MODE.md`, and `.standards/STATE.md` first, then each
 chapter in `.standards/protocol/` that the protocol's reading guide names for
 the current state or request. Perform role-owned work only in `SYNCHRONIZING`
-with an initialized active `STANDARD` cycle and a legal state/mode combination.
-Otherwise identify the current owner and apply only an authorized protocol
-control-plane transition, if any. Do not infer entry from chat or the existence
-of reports. `EXPEDITED` intentionally omits synchronization; a required
-guarantee uses **Expedited Promotion** in `.standards/protocol/expedited.md`,
-not an invented expedited synchronization path.
+with an initialized active `STANDARD` or Brownfield `DOCUMENTATION` cycle and a
+legal state/mode combination. Otherwise identify the current owner and apply
+only an authorized protocol control-plane transition, if any. Do not infer entry
+from chat or the existence of reports. `EXPEDITED` intentionally omits
+synchronization; a required guarantee uses **Expedited Promotion** in
+`.standards/protocol/expedited.md`, not an invented expedited synchronization
+path.
 
-Normal synchronization belongs to `FULL_DELIVERABLE`. With
+In `STANDARD`, normal synchronization belongs to `FULL_DELIVERABLE`. With
 `IMPLEMENTATION_REVIEWED`, enter only through active recovery for required
 Synchronizer-owned correction or its permitted corrective rerun. Preserve the
 policy and saved route; correcting reconciliation does not restore the omitted
 normal phases or substitute for Reviewer's early-closure assessment.
 
-Read the active request, scope, architecture, Auditor context, development plan,
-verification report, both review reports, Documenter's documentation record,
-relevant project documentation and agent instructions, and any existing
-synchronization record. Include handoff, recovery, outstanding obligations,
+Read the active request, scope, architecture, Auditor context, Documenter's
+documentation record, final-review report, relevant project documentation and
+agent instructions, and any existing synchronization record. In `STANDARD`, also
+read the development plan, verification report, and implementation review. In
+`DOCUMENTATION`, read the saved editing boundary and Architect's existing
+technical contracts; omitted owners' current-cycle records are not prerequisites
+or future dependencies. Existing source, tests, and prior assessments may
+support behavior evidence without establishing formal current-cycle
+implementation verification. Include handoff, recovery, outstanding obligations,
 baseline reconciliation, and blockers. Inspect relevant repository files,
 history, dependencies, and execution assumptions needed to reconcile these
 inputs. A missing required artifact is a gap to resolve, not permission to
 invent the owner's work.
+
+In `DOCUMENTATION`, normal synchronization is mandatory with policy `NONE`.
+Reconcile the included roles' full assessments and current documentation
+evidence under **Documentation Cycle Contract**. For a corrective return, an
+interrupted final Reviewer may still have work pending; verify the assigned
+correction with available evidence and preserve that dependency rather than
+demanding its completed assessment before correcting what it is waiting for.
 
 For corrective recovery, use the available inputs needed to verify the specific
 reconciliation correction. A future artifact not yet due is a dependency; a
@@ -81,6 +95,15 @@ never what counts as a discrepancy or whether the gate passes.
 | Project documentation or agent guidance      | Documenter / `DOCUMENTATION`       |
 | This record or reconciliation reasoning      | Synchronizer / `SYNCHRONIZATION`   |
 
+In `DOCUMENTATION`, failures and rework stay among included owners and `REVIEW`
+targets final Reviewer. If the documentation contract requires implementation,
+formal testing, or another omitted owner's correction, persist the discrepancy
+and required user decision in `Active Work.BlockedOn`, preserving the request
+and recovery. The user may keep an achievable documentation-only scope or
+explicitly cancel and start a separate implementation cycle. Do not enter an
+omitted state, convert the cycle, fabricate its evidence, or silently weaken
+scope. Unrelated observations alone do not block reconciliation.
+
 Detect stale guidance and route it. Do not rewrite scope/spec statuses,
 acceptance IDs, context, review findings, documentation, or another role's
 completion markers. Managed integration blocks, installed protocol, and
@@ -112,11 +135,15 @@ for contradictions. Planned implementation alone does not stale Auditor context.
    references to determine what evidence actually remains applicable; do not
    silently repair another owner's references or adopt a moved prior-cycle
    artifact. Check final review against the assembled current work and
-   supporting implementation review and verification, including intervening
-   changes. Presence, passing labels, and authors' resolved markers alone do not
-   establish applicability or close findings. During a corrective assignment,
-   reconcile the affected evidence and record missing full-gate inputs using the
-   entry rules above; do not fabricate omitted review conclusions.
+   supporting evidence, including intervening changes. Presence, passing labels,
+   and authors' resolved markers alone do not establish applicability or close
+   findings. During a corrective assignment, reconcile the affected evidence and
+   record missing full-gate inputs using the entry rules above; do not fabricate
+   omitted review conclusions. In `STANDARD`, include implementation review and
+   verification. In `DOCUMENTATION`, reconcile the documentation record and
+   final review against current documents, technical contracts, and evidenced
+   existing behavior; omitted implementation records are not missing evidence
+   for this topology.
 4. Account for every current `AC-NNN` and relevant technical criterion under the
    same identifiers, referring to existing evidence and design sections. Check
    the current inventory against the coverage in completed artifacts; retired
@@ -174,7 +201,8 @@ Synchronization passes when:
   assessed input identities, with references to the existing completion and
   evidence artifacts;
 - cycle identities, artifact references, current files, and completion claims
-  agree, and implementation and final review conclusions remain applicable;
+  agree; in `STANDARD`, implementation and final review conclusions remain
+  applicable; in `DOCUMENTATION`, final review remains applicable;
 - every current acceptance condition and relevant technical criterion has
   sufficient current evidence under **Acceptance Traceability**, including
   evidence resolving any earlier later-role dependencies under the same IDs;
@@ -182,6 +210,15 @@ Synchronization passes when:
   blocking user question or obligation owned by `SYNCHRONIZING` remains;
 - limitations, remaining work, and a concise conclusion with resume/handoff
   context are persisted. A sufficiently assessed no-change result is valid.
+
+In `DOCUMENTATION`, require current Auditor context, scope and technical
+coverage, a full Documenter pass, and independent final review applicable to the
+assembled current documents and checked evidence. Reconcile every current AC and
+relevant technical criterion, unresolved findings and dependencies, and the
+permitted editing boundary. No omitted-owner current-cycle record or formal
+implementation-verification claim is required. A no-change documentation result
+still needs the same reconciliation. The gate cannot pass on an incomplete
+Documenter or final-review dependency.
 
 The record references evidence; it is not another authoritative acceptance
 ledger. File presence or a `COMPLETE` label alone proves neither completion nor
@@ -194,6 +231,15 @@ not by itself prevent the Synchronizer gate from passing. A correction or rerun
 may need to return to `ResumeAt` instead of advancing toward sign-off.
 
 ## Synchronizer Corrective Return
+
+In `DOCUMENTATION`, a verified owned correction may return only to another
+included role while this record remains incomplete solely because that role or
+the preserved route has unfinished work. Record each dependency, owner, required
+evidence, and when reconciliation must resume. Intentionally omitted
+implementation phases are not unfinished work or missing full-gate guarantees
+for the documentation contract. The full gate applies to a downstream rerun,
+normal forward handoff, or return to sign-off readiness; the shorter-standard
+**Synchronizer Corrective Reruns** exception does not apply here.
 
 Applies in `SYNCHRONIZING` to a Synchronizer-owned reconciliation error, in
 addition to the shared conditions of the protocol's **Corrective Returns**. The
@@ -251,19 +297,30 @@ verified correction and remaining owner work; keep this record incomplete when
 the full gate is unmet. This permits only the canonical recovery route, not a
 completion claim or sign-off shortcut.
 
-Normal `FULL_DELIVERABLE` success enters `AWAITING_USER_SIGNOFF` only when the
-protocol's **Standard Cycle Completion** requirements hold after recovery
-routing. Under `IMPLEMENTATION_REVIEWED`, follow only the saved recovery route;
-a full Synchronizer pass alone does not authorize sign-off readiness. Any
-recovery return there must satisfy the selected policy's completion contract,
-including the current implementation-review closure assessment. The incomplete
-corrective-return exception never permits a direct return to user sign-off.
-Persist the record before the legal state transition. At sign-off readiness,
-present the user actions from the protocol; do not sign off, clear the cycle, or
-invoke another role. For corrective handoffs follow **Handoff Rules**, including
-the independent session instructions for Tester/Reviewer and the affected review
-kind. Do not automatically switch roles or models or add a Synchronizer approval
-gate.
+Normal `STANDARD`/`FULL_DELIVERABLE` success enters `AWAITING_USER_SIGNOFF` only
+when the protocol's **Standard Cycle Completion** requirements hold after
+recovery routing. Under `IMPLEMENTATION_REVIEWED`, follow only the saved
+recovery route; a full Synchronizer pass alone does not authorize sign-off
+readiness. Any recovery return there must satisfy the selected policy's
+completion contract, including the current implementation-review closure
+assessment. The incomplete corrective-return exception never permits a direct
+return to user sign-off. Normal `DOCUMENTATION` success enters
+`AWAITING_USER_SIGNOFF` only after **Documentation Cycle Contract** holds for
+current inputs: all six full gates, current evidence, no unresolved material
+finding, dependency or blocker, baseline reconciliation `NONE`, inactive
+obligations, and an empty recovery stack. Preserve `CompletionPolicy: NONE`,
+`Development: NONE`, `PromotionReason: NONE`, and
+`PendingVerificationCadence: NONE`. Recheck these requirements for a recovery
+return to readiness too; a local correction or stale completion label cannot
+substitute for them. Explicit user sign-off revalidates freshness under **Sign
+off** in `.standards/protocol/user-decisions.md`; cancellation and a new cycle
+follow that chapter and retain changed documentation for Auditor baseline
+reconciliation. Persist the record before the legal state transition. At
+sign-off readiness, present the user actions from the protocol; do not sign off,
+clear the cycle, or invoke another role. For corrective handoffs follow
+**Handoff Rules**, including the independent session instructions for
+Tester/Reviewer and the affected review kind. Do not automatically switch roles
+or models or add a Synchronizer approval gate.
 
 ## Plain-Language Summary
 

@@ -1,7 +1,7 @@
 // Parsing for `.standards/STATE.md` and `.standards/MODE.md`. The installer
 // imports the basic validators from here too, so installs, upgrades, and
 // `check` read these files the same way.
-import { COMPLETION_POLICIES, MODES, STATES, VERIFICATION_CADENCES, fieldPairs, withoutBom } from './core.mjs';
+import { COMPLETION_POLICIES, CYCLE_MODES, MODES, STATES, VERIFICATION_CADENCES, fieldPairs, withoutBom } from './core.mjs';
 
 // The one non-empty value of a field, or an error naming the field.
 export function field(text, name, relative) {
@@ -58,13 +58,13 @@ export function validateState(input) {
   const workflowState = field(head, 'WorkflowState', relative);
   const cycleMode = field(head, 'CycleMode', relative);
   if (!STATES.has(workflowState)) throw new Error(`Invalid WorkflowState in ${relative}`);
-  if (!new Set(['UNSET', 'STANDARD', 'EXPEDITED']).has(cycleMode)) {
+  if (!CYCLE_MODES.has(cycleMode)) {
     throw new Error(`Invalid CycleMode in ${relative}`);
   }
   const pendingMode = field(head, 'PendingCycleMode', relative);
   const pendingRequest = field(head, 'PendingCycleRequest', relative);
   const pendingBlockedOn = field(head, 'PendingCycleBlockedOn', relative);
-  if (!new Set(['UNSET', 'STANDARD', 'EXPEDITED']).has(pendingMode)
+  if (!CYCLE_MODES.has(pendingMode)
       || (pendingRequest === 'UNSET') !== (pendingBlockedOn === 'NONE')
       || (['SIGNED_OFF', 'CANCELLED'].includes(workflowState) && cycleMode !== 'UNSET')) {
     throw new Error(`Inconsistent cycle or pending fields in ${relative}`);

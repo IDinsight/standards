@@ -80,7 +80,11 @@ Before recording sign-off, the agent checks that the completion requirements
 still hold for the current files. No unresolved correction or blocking question
 can remain. Accepting shorter standard or expedited work covers the checks
 required by that choice; it does not mean the omitted roles completed their
-normal phases.
+normal phases. Accepting a documentation cycle requires all six included gates
+and current evidence. Standard completion-policy changes cannot shorten its
+route. Required implementation work needs an achievable documentation-only scope
+or explicit cancellation and a separate cycle; see
+[Updating Documentation on Its Own](../../guides/updating-documentation/).
 
 Cancellation does not undo project changes. What happens to the framework
 installation depends on whether implementation exists; see

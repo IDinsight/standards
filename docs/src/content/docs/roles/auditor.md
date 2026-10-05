@@ -12,7 +12,10 @@ called its **baseline**.
 
 Run Auditor in `AUDITING`: at the start of standard work in an existing project,
 after a new project's initial scope and design, or when project context needs
-correction. It also runs when expedited work moves to the standard workflow.
+correction. It also runs when expedited work moves to the standard workflow. It
+is also the first working role in a Brownfield
+[documentation cycle](../../guides/updating-documentation/), establishing
+existing behavior and relevant documentation/check conventions before scoping.
 
 ```text
 Codex:       $auditor Continue from .standards/STATE.md.
@@ -79,8 +82,8 @@ for the detailed rules.
 
 Auditor finishes when the context is reliable enough for later work, important
 unknowns are resolved, and required checks of earlier changes are complete. A
-standard brownfield audit normally goes to Scoper; the initial greenfield audit
-goes to Developer. Corrections follow the saved recovery route.
+standard or documentation brownfield audit normally goes to Scoper; the initial
+greenfield audit goes to Developer. Corrections follow the saved recovery route.
 
 Auditor records facts. It leaves requirements to Scoper, design to Architect,
 and implementation to Developer. Expected implementation changes do not, by

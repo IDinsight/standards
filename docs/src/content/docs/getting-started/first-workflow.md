@@ -3,6 +3,10 @@ title: Your First Workflow
 description: Follow a search feature from its request to your sign-off decision.
 ---
 
+This guide follows a standard implementation cycle. For a standalone request to
+document existing behavior, follow
+[Updating Documentation on Its Own](../../guides/updating-documentation/).
+
 This example adds **search by name and email to an existing user directory** and
 updates its user guide. It uses the standard workflow with the default
 `AFTER_IMPLEMENTATION` verification cadence.

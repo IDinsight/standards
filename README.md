@@ -22,7 +22,7 @@ shared terminology. Individual skills define role-specific behavior.
 
 ## Roles
 
-- **Scoper** defines what must be built and what counts as done.
+- **Scoper** defines what must be achieved and what counts as done.
 - **Tester** verifies implemented behavior and records traceability status for
   current scope acceptance conditions and technical acceptance criteria. It
   works in an independent chat reusable across increments and corrections,
@@ -48,7 +48,11 @@ shared terminology. Individual skills define role-specific behavior.
 - **Documenter** maintains user- and project-facing documentation and project
   agent guidance outside managed blocks. It works autonomously or guides one
   saved edit at a time, recording evidence and remaining work before final
-  review.
+  review. An explicit standalone assignment starts a Brownfield `DOCUMENTATION`
+  cycle through Auditor, Scoper, Architect, Documenter, final Reviewer, and
+  Synchronizer before user sign-off. It documents existing behavior and can
+  create missing guides. See
+  [Updating Documentation on Its Own](docs/src/content/docs/guides/updating-documentation.md).
 - **Synchronizer** reconciles completed assessments, the current deliverable,
   and workflow records before user sign-off. It records evidence applicability
   and discrepancies, routing corrections to their owners.
@@ -94,15 +98,16 @@ for examples, restrictions, and how to return to the full workflow.
    copy/paste invocation for that role using the active client's syntax. The
    invocation points the next role back to persisted state rather than
    duplicating workflow context.
-8. In `STANDARD` cycles, give scope acceptance conditions stable identifiers and
-   carry those identifiers through downstream design and verification evidence
+8. In `STANDARD` and `DOCUMENTATION` cycles, give scope acceptance conditions
+   stable identifiers and carry them through downstream design and evidence
    until every current condition is evidenced before user sign-off.
 9. Keep project baseline, active-cycle rigor, and next-cycle preference
    separate. `ProjectMode` describes whether the project is greenfield or
    brownfield; `CycleMode` is `UNSET` when no cycle is active and records the
-   active cycle's `STANDARD` or `EXPEDITED` topology; pending-cycle fields store
-   an explicit next-cycle preference and, only when cycle creation is blocked,
-   the pending request plus the user decision required to resolve it.
+   active cycle's `STANDARD`, `EXPEDITED`, or `DOCUMENTATION` topology.
+   Pending-cycle fields store an explicit next-cycle preference and, only when
+   cycle creation is blocked, the pending request plus the user decision
+   required to resolve it.
 10. Shorten the workflow by omitting roles, never by merging their ownership
     into another role. If an expedited change needs a skipped guarantee, promote
     the active cycle to `STANDARD` and run the owning roles.
@@ -230,9 +235,9 @@ the feature branch before merging. If you merge branches whose `.standards/`
 files both changed without a reset, resolve the merge conflict by keeping
 exactly one cycle in `STATE.md`. A role applies a user style from
 `.standards/user-styles/<role>/` only when you select it by name. Role
-ownership, standard and expedited forward transitions, promotion, recovery, user
-intervention, project-mode changes, cancellation/reset behavior, project
-context, and user styles are defined only in [`PROTOCOL.md`](PROTOCOL.md) and
-its chapters in [`protocol/`](protocol/), and installation ownership checks and
-client-setting preservation only in [`INSTALLER.md`](INSTALLER.md); they are
-intentionally not restated here.
+ownership, standard, expedited, and documentation forward transitions,
+promotion, recovery, user intervention, project-mode changes, cancellation/reset
+behavior, project context, and user styles are defined only in
+[`PROTOCOL.md`](PROTOCOL.md) and its chapters in [`protocol/`](protocol/), and
+installation ownership checks and client-setting preservation only in
+[`INSTALLER.md`](INSTALLER.md); they are intentionally not restated here.

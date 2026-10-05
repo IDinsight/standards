@@ -86,6 +86,33 @@ try {
   const reset = await run(process.execPath, [executable, 'reset', '--project', project]);
   assert.match(reset.stdout, /Reset STANDARDS/);
   await assert.rejects(stat(contextPath));
+  // A packed Brownfield install supports standalone documentation coordination
+  // in both clients, including its new architecture mode and omitted-owner guard.
+  const docsProject = path.join(temporary, 'documentation-project');
+  await mkdir(docsProject);
+  await writeFile(path.join(docsProject, 'app.py'), 'print("hello")\n');
+  await run(process.execPath, [executable, 'install', '--project', docsProject, '--yes']);
+  for (const base of ['.agents/skills', '.claude/skills']) {
+    for (const role of ['auditor', 'scoper', 'architect', 'documenter', 'reviewer', 'synchronizer']) {
+      assert.equal(await readFile(path.join(docsProject, base, role, 'SKILL.md'), 'utf8'),
+        await readFile(path.join(sourceRoot, 'skills', role, 'SKILL.md'), 'utf8'));
+    }
+    await stat(path.join(docsProject, base, 'architect/modes/documentation.md'));
+  }
+  const docsBin = path.join(docsProject, '.standards/bin');
+  const docsId = (await run(process.execPath, [path.join(docsBin, 'cycle.mjs'), 'new', '--request', 'Document greeting'])).stdout.trim();
+  const docsStatePath = path.join(docsProject, '.standards/STATE.md');
+  const docsState = (await readFile(docsStatePath, 'utf8'))
+    .replace('`Id`: `UNSET`', `\`Id\`: \`${docsId}\``)
+    .replace('`Request`: `UNSET`', '`Request`: `Standalone Documenter: document the existing greeting.`')
+    .replace('`CycleMode`: `UNSET`', '`CycleMode`: `DOCUMENTATION`');
+  await writeFile(docsStatePath, docsState);
+  assert.match((await run(process.execPath, [path.join(docsBin, 'check.mjs')])).stdout, /STANDARDS check passed/);
+  await assert.rejects(run(process.execPath, [path.join(docsBin, 'artifact.mjs'), 'init', 'DEVELOPMENT']),
+    (error) => error.code === 1 && /DOCUMENTATION omits DEVELOPMENT/.test(error.stderr));
+  assert.equal((await readdir(path.join(docsProject, '.standards'))).includes('docs'), false);
+  await run(process.execPath, [executable, 'uninstall', '--project', docsProject, '--yes']);
+  assert.equal(await readFile(path.join(docsProject, 'app.py'), 'utf8'), 'print("hello")\n');
   const context = '# Project Context\n';
   await writeFile(contextPath, context);
   // Simulate the next compatible package release without changing the source checkout.

@@ -1,6 +1,6 @@
 ---
 title: Scoper
-description: Decide what to build and what counts as done.
+description: Decide what must be achieved and what counts as done.
 ---
 
 Scoper turns your request into a clear, bounded scope: the outcome you want,
@@ -11,7 +11,11 @@ asks about choices that would change the result.
 
 Run Scoper in `SCOPING`: first in a new project's standard cycle, after Auditor
 in an existing project, or when requirements need correction. It does not run in
-expedited cycles.
+expedited cycles. In
+[documentation cycles](../../guides/updating-documentation/), Scoper defines
+audiences, targets, editing boundaries, and observable documentation outcomes
+from Auditor's baseline. It preserves your Documenter choices without adding
+implementation tasks or formal-testing dependencies.
 
 ```text
 Codex:       $scoper Continue from .standards/STATE.md.

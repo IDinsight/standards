@@ -7,6 +7,10 @@ How do you know the finished work meets the request? In a standard cycle, Scoper
 gives each checkable outcome an ID, such as `AC-001`. Later roles use that same
 ID in the design, implementation plan, and assessment reports. This connection
 between requirements and evidence is called **acceptance traceability**.
+Documentation cycles use the same stable identifiers for documentation outcomes.
+Architect establishes existing technical coverage, Documenter records checked
+evidence, and final Reviewer and Synchronizer independently assess its
+sufficiency and applicability; no current-cycle Tester record is required.
 
 Expedited work is checked against the saved request instead. If it
 [becomes standard work](../states-and-handoffs/#promote-an-expedited-cycle),

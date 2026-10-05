@@ -12,7 +12,11 @@ whether those earlier results still support the work you are about to accept.
 Run Synchronizer in `SYNCHRONIZING` during a standard cycle. With the default
 `FULL_DELIVERABLE` policy, it follows final review. With
 `IMPLEMENTATION_REVIEWED`, it runs only through recovery to correct or recheck
-affected reconciliation work. Expedited cycles skip this role.
+affected reconciliation work. Expedited cycles skip this role. In
+[documentation cycles](../../guides/updating-documentation/), it always follows
+independent final review and reconciles the six included roles. It requires
+current documentation evidence rather than omitted implementation or
+formal-testing reports.
 
 ```text
 Codex:       $synchronizer Continue from .standards/STATE.md.
@@ -70,6 +74,12 @@ upstream change later invalidates an earlier verified correction, a
 [limited rerun](../../concepts/recovery/#corrections-when-finishing-after-implementation-review)
 can recheck that evidence while the synchronization record stays incomplete.
 Neither route claims that the omitted normal phase passed.
+
+Documentation recovery stays among included roles. An owned correction can
+return to another interrupted role with its record incomplete only under the
+qualified corrective-return rules. The shorter-standard rerun exception does not
+apply. All six full gates and current evidence must hold before readiness;
+implementation requirements block for your decision rather than promotion.
 
 ## Who fixes disagreements
 

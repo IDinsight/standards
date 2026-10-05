@@ -155,6 +155,50 @@
         "It does not add a STANDARDS ARCHITECTURE provenance block solely because the project-owned document is used by the active cycle",
         "The normal Architect completion gate and handoff still apply"
       ]
+    },
+    {
+      "id": 12,
+      "prompt": "Invoke Architect. ProjectMode=BROWNFIELD, CycleMode=DOCUMENTATION, CompletionPolicy=NONE, Active Work.Id=guide-20261004T120000Z-1a2b3c4d. WorkflowState=ARCHITECTING. Current scope AC-001 requires accurate existing CLI arguments/errors and AC-002 an analyst audience guide. Auditor context is current, source and command help are available, no architecture artifact exists, and no omitted-owner record is present.",
+      "expected_output": "Persist existing technical contracts and every AC disposition, then hand off to Documenter.",
+      "files": [],
+      "assertions": [
+        "The DOCUMENTATION architecture mode is selected; CLI facts have concrete evidence references.",
+        "AC-002 may have an explicit no-architectural-impact disposition tied to Documenter work.",
+        "No Build Plan, behavior redesign, formal test claim, or Developer handoff is invented."
+      ]
+    },
+    {
+      "id": 13,
+      "prompt": "Invoke Architect. ProjectMode=BROWNFIELD, CycleMode=DOCUMENTATION, CompletionPolicy=NONE, Active Work.Id=guide-20261004T120000Z-1a2b3c4d. WorkflowState=ARCHITECTING. docs/architecture.md is the appropriate unmarked canonical design, containing useful current system design and previous-cycle AC coverage. The new documentation scope concerns current authentication error messages.",
+      "expected_output": "Use the canonical document without changing ownership and separate old acceptance coverage from current technical facts.",
+      "files": [],
+      "assertions": [
+        "No provenance block is added solely because this cycle uses the unmarked document.",
+        "Earlier acceptance coverage moves under the final Previous Cycles section; current ACs receive current dispositions.",
+        "Useful established design remains; historical implementation plans are not scheduled as documentation-cycle work."
+      ]
+    },
+    {
+      "id": 14,
+      "prompt": "Invoke Architect. ProjectMode=BROWNFIELD, CycleMode=DOCUMENTATION, CompletionPolicy=NONE, Active Work.Id=guide-20261004T120000Z-1a2b3c4d. WorkflowState=ARCHITECTING. Scope requires documenting a guaranteed cache lifetime, but current source does not enforce it. Guaranteeing it needs Developer work; the user has not revised the request.",
+      "expected_output": "Persist the required omitted-owner decision with current evidence.",
+      "files": [],
+      "assertions": [
+        "No implementation architecture or fake established guarantee is produced.",
+        "The request and recovery remain; no Developer frame or in-place conversion occurs.",
+        "Active Work.BlockedOn identifies the documentation-only scope or explicit cancellation decision."
+      ]
+    },
+    {
+      "id": 15,
+      "prompt": "Resume Architect. ProjectMode=BROWNFIELD, CycleMode=DOCUMENTATION, CompletionPolicy=NONE, Active Work.Id=guide-20261004T120000Z-1a2b3c4d. WorkflowState=ARCHITECTING in an Auditor-owned rerun through SYNCHRONIZING. Updated context corrected the documented output format and scope has a new current AC. Older recovery frames exist.",
+      "expected_output": "Re-establish technical coverage for the full current acceptance inventory and honor the saved rerun.",
+      "files": [],
+      "assertions": [
+        "Current source/context replace stale output assumptions, with retired IDs treated as history.",
+        "The active frame remains Auditor-owned and the older frames are preserved.",
+        "The rerun proceeds only through included roles; no implementation plan is created."
+      ]
     }
   ]
 }

@@ -2,12 +2,12 @@
 name: auditor
 description:
   Establish or refresh the Auditor-owned project context baseline for the active
-  workflow cycle. Use at the start of STANDARD brownfield work, after initial
-  greenfield architecture, after an EXPEDITED cycle is promoted to STANDARD, or
-  when any downstream role reports a PROJECT_CONTEXT failure. Inspect only the
-  repository, upstream workflow artifacts, and project constraints needed to
-  ground later work; write `.standards/CONTEXT.md`; do not make scope,
-  architecture, implementation, testing, review, documentation, or
+  workflow cycle. Use at the start of STANDARD or DOCUMENTATION brownfield work,
+  after initial greenfield architecture, after an EXPEDITED cycle is promoted to
+  STANDARD, or when any downstream role reports a PROJECT_CONTEXT failure.
+  Inspect only the repository, upstream workflow artifacts, and project
+  constraints needed to ground later work; write `.standards/CONTEXT.md`; do not
+  make scope, architecture, implementation, testing, review, documentation, or
   synchronization decisions. Then follow the protocol's forward or recovery
   handoff rules.
 ---
@@ -48,15 +48,21 @@ Read all of `.standards/PROTOCOL.md` (in consecutive parts if a read shows only
 part of it), `.standards/MODE.md`, and `.standards/STATE.md` first, then each
 chapter in `.standards/protocol/` that the protocol's reading guide names for
 the current state or request. Perform Auditor-owned work only in `AUDITING` with
-an initialized `STANDARD` cycle; when `Active Work` is `UNSET`, initialize the
-first cycle as the protocol describes (**Start a cycle** in
-`.standards/protocol/user-decisions.md`) before auditing. Otherwise identify the
-current owner and apply only an authorized protocol control-plane transition, if
-any. `EXPEDITED` omits Auditor; a required context guarantee uses **Expedited
-Promotion** in `.standards/protocol/expedited.md`.
+an initialized `STANDARD` or Brownfield `DOCUMENTATION` cycle; when
+`Active Work` is `UNSET`, initialize the first cycle as the protocol describes
+(**Start a cycle** in `.standards/protocol/user-decisions.md`) before auditing.
+Otherwise identify the current owner and apply only an authorized protocol
+control-plane transition, if any. `EXPEDITED` omits Auditor; a required context
+guarantee uses **Expedited Promotion** in `.standards/protocol/expedited.md`.
 
 - Brownfield initial audit: `Active Work.Request`, current repository, existing
   project instructions, and any prior `.standards/CONTEXT.md`.
+- Documentation audit: the saved documentation request and choices, existing
+  implementation, relevant docs and agent guidance, documentation generation
+  conventions, and available behavior evidence. No current-cycle Developer,
+  Tester, or implementation Reviewer artifact is expected. Select an existing
+  audit mode by baseline usability and target, not by documentation existence. A
+  project with implementation but no guide still needs a baseline audit.
 - Post-cancellation brownfield audit: when `Active Work.BaselineReconciliation`
   is not `NONE`, use its persisted source cycle IDs and brief request summaries
   together with the current repository, version-control evidence, explicit user
@@ -84,6 +90,16 @@ Promotion** in `.standards/protocol/expedited.md`.
   as required by the normal audit gate and preserve the active recovery frame.
 
 ## Invariants
+
+For `DOCUMENTATION`, ground the behavior, public contracts, examples,
+prerequisites, and documentation checks relevant to the request in current
+repository evidence. Distinguish claims in existing guides from established
+implementation behavior. Record documentation locations, generation workflows,
+and known evidence limits as facts; Scoper selects the audience, targets, and
+editing boundary, and Architect establishes the technical coverage. Do not start
+their work or update documentation during audit. A necessary omitted-owner
+correction uses the blocking user decision in **Documentation Cycle Contract**;
+preserve the request and recovery instead of routing to Developer or Tester.
 
 1. Record facts and constraints, not proposed solutions. Auditor describes the
    project's relevant current state; Scoper owns what changes, Architect owns
@@ -219,13 +235,13 @@ the active audit focus, clear it before continuing.
    `.standards/STATE.md` first. Read the existing `.standards/CONTEXT.md` if
    present.
 2. Identify why `AUDITING` is active: initial brownfield audit, initial
-   greenfield audit, a standard cycle with non-`NONE`
-   `Active Work.BaselineReconciliation`, an expedited-to-standard `PROMOTE`
-   handoff, ownership of the active `PROJECT_CONTEXT` recovery frame, or a
-   downstream rerun while another state owns the active frame. Preserve the full
-   recovery stack in all recovery cases. A promotion is not recovery; do not
-   expect or create a recovery frame merely because the prior expedited topology
-   was insufficient.
+   greenfield audit, a documentation baseline audit, a standard or documentation
+   cycle with non-`NONE` `Active Work.BaselineReconciliation`, an
+   expedited-to-standard `PROMOTE` handoff, ownership of the active
+   `PROJECT_CONTEXT` recovery frame, or a downstream rerun while another state
+   owns the active frame. Preserve the full recovery stack in all recovery
+   cases. A promotion is not recovery; do not expect or create a recovery frame
+   merely because the prior expedited topology was insufficient.
 3. Select and read the applicable file under `modes/` using the rules above. If
    a subtree target was supplied only through direct user instruction during
    `AUDITING`, persist it in `Active Work.AuditTarget` before substantive
@@ -244,10 +260,11 @@ the active audit focus, clear it before continuing.
    reconciled into an established, reverted, or otherwise safely resolved
    baseline status. Then clear `Active Work.AuditTarget` when the targeted audit
    is complete, abandoned, or no longer needs separate persistence. If the audit
-   exposes a new defect owned elsewhere, create the appropriate failure handoff.
-   Otherwise apply the normal forward handoff or `.standards/PROTOCOL.md`
-   **Recovery Mechanics**, as applicable, and persist the resulting transition
-   in `.standards/STATE.md`.
+   exposes a new defect owned elsewhere, follow the active mode's ownership
+   boundary: route to an included owner, or persist the required omitted-owner
+   user decision under **Documentation Cycle Contract**. Otherwise apply the
+   normal forward handoff or `.standards/PROTOCOL.md` **Recovery Mechanics**, as
+   applicable, and persist the resulting transition in `.standards/STATE.md`.
 
 ## Completion Gate
 
@@ -277,6 +294,7 @@ Auditing is complete when:
 On success with no active recovery:
 
 - `BROWNFIELD` initial audit hands off to **Scoper** (`AUDITING -> SCOPING`);
+  this includes `DOCUMENTATION` and preserves its fixed mode and `NONE` policy;
 - an expedited-to-standard promotion audit hands off to **Scoper**
   (`AUDITING -> SCOPING`);
 - `GREENFIELD` initial audit hands off to **Developer**

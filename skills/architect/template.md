@@ -11,6 +11,18 @@ unresolved architecture while coding.
 Omit empty sections. Add detail only when it materially reduces implementation
 ambiguity.
 
+In `DOCUMENTATION`, use this same shape to establish existing technical
+contracts and constraints for Documenter. Context and Decision identify the
+current behavior and its repository evidence; Acceptance Coverage accounts for
+every current AC with relevant facts or an explicit no-architectural-impact
+disposition. Include components, interfaces, flow, and technical criteria only
+where they affect the scoped documentation. Record evidence paths and material
+uncertainty without claiming Tester verification. Omit Build Plan and proposed
+implementation changes. Preserve useful established design in a reused canonical
+document; do not convert its historical implementation plan into current-cycle
+work. The documentation mode's contract takes precedence over the
+implementation-oriented guidance below.
+
 When Architect creates a new STANDARDS-owned technical-design artifact, create
 it with `node .standards/bin/artifact.mjs init ARCHITECTURE`, which writes this
 block with the active cycle ID:
