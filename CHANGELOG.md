@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.12.0](https://github.com/IDinsight/standards/compare/v0.11.0...v0.12.0) (2026-10-05)
+
+
+### Features
+
+* add invocation option discovery to handoffs and Navigator ([#50](https://github.com/IDinsight/standards/issues/50)) ([0dab98a](https://github.com/IDinsight/standards/commit/0dab98a1e58401246f9cabf00b7266523ea07456))
+
 ## [0.11.0](https://github.com/IDinsight/standards/compare/v0.10.0...v0.11.0) (2026-10-05)
 
 
