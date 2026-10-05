@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.12.1](https://github.com/IDinsight/standards/compare/v0.12.0...v0.12.1) (2026-10-05)
+
+
+### Bug Fixes
+
+* **deps:** override vulnerable docs selector parser ([#52](https://github.com/IDinsight/standards/issues/52)) ([f2cbe59](https://github.com/IDinsight/standards/commit/f2cbe5956fb017499f221104e2b8bf98e6ce8773))
+
 ## [0.12.0](https://github.com/IDinsight/standards/compare/v0.11.0...v0.12.0) (2026-10-05)
 
 
