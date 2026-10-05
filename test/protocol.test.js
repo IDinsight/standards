@@ -4,7 +4,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
 import test from 'node:test';
-import { COMPLETION_POLICIES, HANDOFF_KINDS, STATES } from '../runtime/lib/core.mjs';
+import { COMPLETION_POLICIES, CYCLE_MODES, HANDOFF_KINDS, STATES } from '../runtime/lib/core.mjs';
 
 const repo = new URL('../', import.meta.url);
 const source = (relative) => readFileSync(new URL(relative, repo), 'utf8');
@@ -56,6 +56,12 @@ function firstColumnValues(section) {
   return [...section.matchAll(/^\|\s*`([A-Z_]+)`\s*\|/gm)].map((match) => match[1]);
 }
 
+test('cycle mode vocabulary matches shared state validation', () => {
+  const values = [...coreSection('Cycle Modes').matchAll(/^- ([A-Z_]+)$/gm)]
+    .map((match) => match[1]);
+  assert.deepEqual(values, [...CYCLE_MODES]);
+});
+
 test('completion policy vocabulary, gate table, and persisted state agree', () => {
   const policies = coreSection('Completion Policies');
   const values = [...policies.matchAll(/^- ([A-Z_]+)$/gm)].map((match) => match[1]);
@@ -80,7 +86,7 @@ test('completion policy vocabulary, gate table, and persisted state agree', () =
   }
 });
 
-test('standard completion routes retain upstream phases and a user sign-off boundary', () => {
+test('forward routes retain their required phases and a user sign-off boundary', () => {
   const forward = coreSection('Forward Transitions');
   const routes = new Map([...forward.matchAll(/### ([^\n]+)\n([\s\S]*?)(?=\n### |$)/g)]
     .map(([, title, body]) => {
@@ -100,6 +106,9 @@ test('standard completion routes retain upstream phases and a user sign-off boun
   }
   assert.deepEqual(routes.get('Expedited Brownfield'),
     ['DEVELOPING', 'REVIEWING_IMPLEMENTATION', 'AWAITING_USER_SIGNOFF']);
+  assert.deepEqual(routes.get('Documentation Brownfield'),
+    ['AUDITING', 'SCOPING', 'ARCHITECTING', 'DOCUMENTING', 'REVIEWING_FINAL',
+      'SYNCHRONIZING', 'AWAITING_USER_SIGNOFF']);
 });
 
 test('runtime handoff kinds match the protocol vocabulary', () => {

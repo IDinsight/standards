@@ -73,8 +73,9 @@ for that new request. The earlier shorter choice does not carry over.
 After cancellation, the agent checks whether any project changes from that cycle
 remain. It may ask you to confirm that no changes were made or that they were
 reverted. If changes remain or their status is unresolved, the next cycle uses
-standard work and starts with Auditor so it can establish the baseline. An
-earlier cancelled cycle's unresolved changes still need checking even if the
+standard work or an eligible documentation cycle and starts with Auditor so it
+can establish the baseline. Retained documentation edits also need this check.
+An earlier cancelled cycle's unresolved changes still need checking even if the
 most recent cancellation changed nothing. Auditor uses the saved cycle records,
 repository evidence, and your answers to decide what is established baseline,
 what was reverted, and what remains uncertain.

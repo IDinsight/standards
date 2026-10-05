@@ -40,7 +40,8 @@ Apply the Scoper skill's shared **Inputs**, **Ownership**, and **Invariants**.
 ## Result
 
 PLAN succeeds only when the active cycle now has one clear persisted scope that
-defines what must be built and what counts as done.
+defines what must be achieved and what counts as done, including documentation
+outcomes when the active cycle is `DOCUMENTATION`.
 
 After success, follow the shared Scoper completion, recovery, and handoff rules
 in `SKILL.md` and the protocol. PLAN does not independently choose the next

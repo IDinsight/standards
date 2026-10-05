@@ -27,11 +27,11 @@ Three chapters in `.standards/protocol/` hold rules that apply only in some
 situations. Read a chapter before acting whenever its condition holds. If a
 chapter is missing, stop and report an incomplete runtime.
 
-| Chapter             | Sections                                                                                                                                                                                                       | Read when                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `user-decisions.md` | Choose the next cycle's mode, Start a cycle, Change completion policy, Switch verification cadence, Promote an expedited cycle, Sign off, Cancel an active cycle, Greenfield Bootstrap Cancellation, Cycle IDs | No cycle is active (`Active Work.Id` is `UNSET`, or `WorkflowState` is `SIGNED_OFF` or `CANCELLED`), or the user asks to choose the next cycle's mode, select or withdraw a completion policy, switch verification cadence, or start, promote, sign off, or cancel a cycle, or `Handoff.Kind` is `COMPLETION_CHANGE`, or `Active Work.PendingVerificationCadence` is not `NONE`, or `Active Work.BlockedOn` holds a pending approval to reset the workflow for a greenfield bootstrap cancellation |
-| `expedited.md`      | Expedited Cycle Contract, Expedited Promotion, Outstanding Obligations                                                                                                                                         | `CycleMode` or `PendingCycleMode` is `EXPEDITED`, `EXPEDITED` is requested or being considered, `Active Work.PromotionReason` is not `NONE`, or `Outstanding Obligations` is active                                                                                                                                                                                                                                                                                                                |
-| `installation.md`   | Installed Runtime Contract, Running the CLI, Project Reset, Project Uninstallation                                                                                                                             | Before running the `standards` CLI, including for a greenfield bootstrap cancellation, or when the user asks about installing, upgrading, resetting, or uninstalling                                                                                                                                                                                                                                                                                                                               |
+| Chapter             | Sections                                                                                                                                                                                                                                    | Read when                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `user-decisions.md` | Choose the next cycle's mode, Standalone Documenter entry, Start a cycle, Change completion policy, Switch verification cadence, Promote an expedited cycle, Sign off, Cancel an active cycle, Greenfield Bootstrap Cancellation, Cycle IDs | No cycle is active (`Active Work.Id` is `UNSET`, or `WorkflowState` is `SIGNED_OFF` or `CANCELLED`), or the user invokes Documenter for a standalone documentation request, asks to choose the next cycle's mode, select or withdraw a completion policy, switch verification cadence, or start, promote, sign off, or cancel a cycle, or `Handoff.Kind` is `COMPLETION_CHANGE`, or `Active Work.PendingVerificationCadence` is not `NONE`, or `Active Work.BlockedOn` holds a pending approval to reset the workflow for a greenfield bootstrap cancellation |
+| `expedited.md`      | Expedited Cycle Contract, Expedited Promotion, Outstanding Obligations                                                                                                                                                                      | `CycleMode` or `PendingCycleMode` is `EXPEDITED`, `EXPEDITED` is requested or being considered, `Active Work.PromotionReason` is not `NONE`, or `Outstanding Obligations` is active                                                                                                                                                                                                                                                                                                                                                                           |
+| `installation.md`   | Installed Runtime Contract, Running the CLI, Project Reset, Project Uninstallation                                                                                                                                                          | Before running the `standards` CLI, including for a greenfield bootstrap cancellation, or when the user asks about installing, upgrading, resetting, or uninstalling                                                                                                                                                                                                                                                                                                                                                                                          |
 
 ## Roles
 
@@ -111,6 +111,7 @@ CycleMode
 - UNSET
 - STANDARD
 - EXPEDITED
+- DOCUMENTATION
 ```
 
 `ProjectMode` describes the persistent implementation baseline. `CycleMode`
@@ -128,9 +129,14 @@ active cycle. All are persisted in `.standards/STATE.md`.
 - `CycleMode: EXPEDITED`: the active cycle uses the bounded brownfield path that
   intentionally omits Scoping, Architecture, Auditing, Testing, Documentation,
   Final Review, and Synchronization unless promoted.
+- `CycleMode: DOCUMENTATION`: the active cycle uses the brownfield documentation
+  path under **Documentation Cycle Contract**, retaining Auditing, Scoping,
+  Architecture, Documentation, Final Review, and Synchronization while omitting
+  Development, Testing, and Implementation Review.
 - `PendingCycleMode: UNSET`: no explicit next-cycle preference is persisted.
-- `PendingCycleMode: STANDARD | EXPEDITED`: explicit user preference for the
-  next cycle. It is not an active topology and must be validated when consumed.
+- `PendingCycleMode: STANDARD | EXPEDITED | DOCUMENTATION`: explicit user
+  preference for the next cycle. It is not an active topology and must be
+  validated when consumed.
 - `PendingCycleRequest: UNSET | <request>`: normally `UNSET`; stores the actual
   next-cycle request only while a pre-cycle decision blocks cycle creation.
 - `PendingCycleBlockedOn: NONE | <question>`: unresolved pre-cycle user decision
@@ -150,14 +156,24 @@ Cycle-mode rules:
    cycle** in `.standards/protocol/user-decisions.md`; the user sets a pending
    preference under **Choose the next cycle's mode** in
    `.standards/protocol/user-decisions.md`.
-3. `GREENFIELD` supports only `STANDARD`. A pending `EXPEDITED` preference is
-   invalid in `GREENFIELD` and must not be persisted.
-4. `BROWNFIELD` supports both execution modes. Without a pending preference,
+3. `GREENFIELD` supports only `STANDARD`. Pending `EXPEDITED` and
+   `DOCUMENTATION` preferences are invalid in `GREENFIELD` and must not be
+   persisted. Documentation existence does not determine project mode.
+4. `BROWNFIELD` supports all three execution modes. A standalone Documenter
+   request asks for `DOCUMENTATION` before eligibility and preference checks,
+   under **Standalone Documenter entry** in
+   `.standards/protocol/user-decisions.md`. Ineligible or conflicting entry
+   requires a pre-cycle decision, including in `GREENFIELD`; it never defaults
+   to `STANDARD`. Otherwise, without an explicit or pending mode choice,
    `STANDARD` is the default, except that an explicit Developer invocation for a
    sufficiently bounded brownfield implementation change may select `EXPEDITED`.
 5. The rules for keeping, promoting, and completing an expedited cycle are in
    **Expedited Cycle Contract** and **Expedited Promotion**, both in
    `.standards/protocol/expedited.md`.
+6. A documentation cycle has one fixed completion contract and no promotion or
+   in-place mode conversion. Work requiring an omitted role follows
+   **Documentation Cycle Contract**; selecting a mode for the next cycle never
+   changes an active cycle.
 
 ## Completion Policies
 
@@ -175,7 +191,7 @@ cadence; it does not change `CycleMode` or the ownership of any work.
 
 | Policy                    | Meaning                                                                                                                                                          |
 | ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `NONE`                    | No standard completion policy applies: no cycle has started, or the cycle is expedited. It is invalid for an active standard cycle.                              |
+| `NONE`                    | No standard completion policy applies: no cycle has started, or the cycle is expedited or documentation-only. It is invalid for an active standard cycle.        |
 | `FULL_DELIVERABLE`        | Complete the standard workflow through documentation, final review, and synchronization before user sign-off.                                                    |
 | `IMPLEMENTATION_REVIEWED` | Complete all standard upstream work and the implementation review, then satisfy the early-closure gate under **Standard Cycle Completion** before user sign-off. |
 
@@ -194,6 +210,9 @@ Policy lifecycle:
 - Each expedited cycle uses `NONE` and retains its existing completion contract.
   Promotion to standard initializes `FULL_DELIVERABLE`; promotion itself never
   authorizes the shorter completion boundary.
+- Each documentation cycle uses `NONE` and must satisfy **Documentation Cycle
+  Contract** through Synchronizer. Standard completion policies cannot shorten
+  or extend this route; `NONE` does not waive its required gates.
 - Only an explicit user choice authorizes selecting or withdrawing
   `IMPLEMENTATION_REVIEWED`. A policy choice does not revise acceptance
   conditions, resolve findings, clear blockers, or discharge recovery and
@@ -213,6 +232,72 @@ boundary.
 Selection, withdrawal, and permitted policy-change routes follow **Change
 completion policy** in `.standards/protocol/user-decisions.md`. A policy choice
 alone is not user sign-off or an invocation of a workflow role.
+
+## Documentation Cycle Contract
+
+`DOCUMENTATION` is valid only with `ProjectMode: BROWNFIELD` for a request to
+document existing implementation. It may update existing documentation or create
+missing documentation. No existing guide or prior cycle record is required for
+entry. A greenfield request cannot enter this mode merely because documentation
+files exist; do not change project mode to make it eligible.
+
+The fixed forward route is **Documentation Brownfield** under **Forward
+Transitions**. Auditor establishes relevant existing behavior and project
+constraints; Scoper defines audiences, documentation targets, editing
+boundaries, and acceptance conditions; Architect records the existing technical
+contracts and constraints needed to document them accurately. Architect accounts
+for each acceptance condition with relevant technical coverage or an explicit
+no-architectural-impact disposition, without inventing implementation work.
+Documenter produces documentation and checked evidence. Final Reviewer assesses
+its accuracy and acceptance coverage independently. Synchronizer reconciles the
+current deliverable and the applicability of those assessments before sign-off
+readiness. Existing state ownership, explicit role invocation, handoff, artifact
+provenance, and independent Reviewer session rules still apply.
+
+Permitted project edits are Documenter-owned prose, guides, project agent
+guidance outside managed framework blocks, and ordinary comments and docstrings.
+Examples must describe evidenced existing behavior. Comments interpreted as
+tooling directives, runtime metadata, or executable logic are outside this
+boundary. Respect established documentation generation workflows and verify
+their outputs; a documentation request does not authorize changing behavior,
+tests, fixtures, configuration, or tooling to make documentation or checks pass.
+Other roles retain their existing artifact ownership and protocol coordination
+permissions.
+
+Development, Testing, and Implementation Review are intentionally omitted, not
+pending work. Their plans, reports, and completion claims are not prerequisites
+for documentation-cycle gates. Existing source, tests, and prior assessments may
+be inspected as supporting evidence, but do not fabricate current-cycle records
+or claim formal implementation verification. Documentation checks provide
+Documenter-owned evidence; final review and synchronization assess and reconcile
+it without manufacturing another role's evidence.
+
+Before entering `AWAITING_USER_SIGNOFF`, all six included roles must have passed
+their applicable full gates for the current work. The scope and architecture
+references, current Auditor context, documentation record, `FINAL_DELIVERABLE`
+review report, and synchronization record must be present and applicable. Every
+current `AC-NNN` and relevant technical criterion must have sufficient current
+evidence. No unresolved material finding, documentation gap, dependency, or
+blocking user question may remain. `CompletionPolicy`, `Development`,
+`PromotionReason`, `PendingVerificationCadence`, and `BaselineReconciliation`
+must all be `NONE`; recovery must be inactive with an empty stack and
+outstanding obligations inactive. An assessed no-change documentation result is
+valid; it does not skip final review or synchronization. Readiness still
+requires user acceptance, with evidence freshness rechecked at sign-off.
+
+Failure and rework within this boundary use **Recovery Mechanics** among the
+included states only; `REVIEW` targets `REVIEWING_FINAL`. Corrections must
+re-establish affected downstream evidence before readiness. A defect or changed
+request requiring implementation, formal testing, or implementation review does
+not authorize entry into an omitted state or automatic promotion. Persist the
+evidence and required user decision in `Active Work.BlockedOn` when it prevents
+the documentation contract from being met. The user may keep an achievable
+documentation-only scope, or explicitly cancel this cycle and start a separate
+implementation cycle. Preserve the active cycle, request, and recovery while
+that decision is unresolved; unrelated observations do not alone block
+documentation completion. Cancellation retains changed project documentation for
+later Auditor baseline reconciliation under **Start a cycle** in
+`.standards/protocol/user-decisions.md`.
 
 ## Workflow States
 
@@ -611,6 +696,24 @@ Completion**, not just a passing implementation review. Unmet closure
 requirements block this handoff and follow normal ownership and failure rules.
 User acceptance is still required to reach `SIGNED_OFF`.
 
+### Documentation Brownfield
+
+```text
+AUDITING
+-> SCOPING
+-> ARCHITECTING
+-> DOCUMENTING
+-> REVIEWING_FINAL
+-> SYNCHRONIZING
+-> AWAITING_USER_SIGNOFF
+```
+
+This topology is valid only for `ProjectMode: BROWNFIELD` with
+`CycleMode: DOCUMENTATION` and `CompletionPolicy: NONE`, under **Documentation
+Cycle Contract**. Architecture requires valid current-cycle project context
+before handing off to Documenter. User acceptance is still required to reach
+`SIGNED_OFF`.
+
 ### Expedited Brownfield
 
 ```text
@@ -747,11 +850,16 @@ next-role invocation are emitted, present the commit suggestion first.
 
 ## Acceptance Traceability
 
-These obligations apply only to `STANDARD` cycles and do not create a shared
-traceability artifact or add acceptance data to `STATE.md`. `EXPEDITED` cycles
-do not fabricate Scoper-owned acceptance conditions or substitute identifiers.
-If an expedited cycle is promoted, Scoper establishes them when the standard
-topology reaches `SCOPING`.
+These obligations apply to `STANDARD` and `DOCUMENTATION` cycles and do not
+create a shared traceability artifact or add acceptance data to `STATE.md`.
+`EXPEDITED` cycles do not fabricate Scoper-owned acceptance conditions or
+substitute identifiers. If an expedited cycle is promoted, Scoper establishes
+them when the standard topology reaches `SCOPING`.
+
+In `DOCUMENTATION`, apply the ownership and identity rules below to the included
+roles under **Documentation Cycle Contract**. Tester-specific scheduling and
+evidence obligations do not apply; Documenter supplies documentation evidence,
+final Reviewer assesses it, and Synchronizer reconciles it under the same ACs.
 
 1. Scoper represents every verifiable in-scope completion obligation as one or
    more acceptance conditions with stable, unique `AC-NNN` identifiers for the
@@ -825,9 +933,13 @@ kind.
 ### Review Gates
 
 Reviewer's skill defines the gate for each review kind. `FINAL_DELIVERABLE` is
-available only in `STANDARD`; in `EXPEDITED`, implementation review assesses the
-bounded `Active Work.Request` and Developer evidence under **Expedited Cycle
-Contract** in `.standards/protocol/expedited.md`.
+available in `STANDARD` and `DOCUMENTATION`; in `EXPEDITED`, implementation
+review assesses the bounded `Active Work.Request` and Developer evidence under
+**Expedited Cycle Contract** in `.standards/protocol/expedited.md`.
+
+In `DOCUMENTATION`, final review assesses **Documentation Cycle Contract**
+without requiring current-cycle Development, Testing, or Implementation Review
+artifacts. It still requires independent assessment and a full applicable gate.
 
 Passing a review gate does not complete the cycle. Apply **Recovery Mechanics**
 when active; otherwise follow **Forward Transitions**. Before entering
@@ -843,14 +955,21 @@ implementation review, not a third review kind or a substitute final review.
 ## Synchronization Gate
 
 Synchronizer reconciles completed assessments, the current deliverable, and
-workflow records in `SYNCHRONIZING` during `STANDARD` only. Reviewer owns the
-assessment of soundness; Synchronizer establishes whether that assessment and
-its supporting evidence still apply to the work being offered for sign-off.
-Synchronizer's skill defines the gate; passing it is not cycle completion or
-user acceptance. Its normal phase belongs to `FULL_DELIVERABLE`. Under
-`IMPLEMENTATION_REVIEWED`, required reconciliation corrections use **Recovery
-Mechanics** and, when applicable, **Corrective Returns**; they do not replace
-Reviewer's closure assessment or restore the omitted normal tail.
+workflow records in `SYNCHRONIZING` during `STANDARD` or `DOCUMENTATION`.
+Reviewer owns the assessment of soundness; Synchronizer establishes whether that
+assessment and its supporting evidence still apply to the work being offered for
+sign-off. Synchronizer's skill defines the gate; passing it is not cycle
+completion or user acceptance. In `STANDARD`, its normal phase belongs to
+`FULL_DELIVERABLE`. Under `IMPLEMENTATION_REVIEWED`, required reconciliation
+corrections use **Recovery Mechanics** and, when applicable, **Corrective
+Returns**; they do not replace Reviewer's closure assessment or restore the
+omitted normal tail.
+
+In `DOCUMENTATION`, normal synchronization is mandatory with
+`CompletionPolicy: NONE`; reconcile the included roles' assessments and evidence
+under **Documentation Cycle Contract**. Intentionally omitted implementation
+phases are not missing prerequisites or incomplete synchronization guarantees
+for that contract.
 
 Project-facing documentation and agent guidance are Documenter-owned, including
 project instructions outside managed framework blocks. Their completion evidence
@@ -1008,6 +1127,11 @@ states exist in the expedited topology. A defect or guarantee owned by a skipped
 role requires **Expedited Promotion** in `.standards/protocol/expedited.md`, not
 a failure transition into a skipped state.
 
+In `DOCUMENTATION`, only owners included in **Documentation Cycle Contract** are
+valid failure targets, with `REVIEW` targeting `REVIEWING_FINAL`. A required
+omitted role follows that contract's blocking user-decision rule instead of a
+failure handoff into a skipped state.
+
 If routing changes state, apply **Recovery Mechanics**. A same-state failure
 records the handoff but does not create a recovery frame.
 
@@ -1022,6 +1146,25 @@ expedited states; a newly required skipped role or guarantee triggers
 **Expedited Promotion** in `.standards/protocol/expedited.md`, which preserves
 unresolved corrective obligations as `Outstanding Obligations` and clears only
 the now-obsolete expedited recovery routing.
+
+Documentation recovery uses only its included states under **Documentation Cycle
+Contract**, including qualifying **Corrective Returns** to an interrupted role
+whose unfinished work prevents the correcting role's full gate. Standard
+implementation/checkpoint and shorter-policy corrective exceptions do not add
+skipped states or guarantees to that topology.
+
+Every documentation frame's `From` and `ResumeAt` must be included states;
+`Owner` is an included role, with `REVIEW` owned by `REVIEWING_FINAL`.
+`RerunThrough` is `NONE` or a downstream included role, never
+`AWAITING_USER_SIGNOFF`. Use `RESUME` for a recovery-directed jump that skips an
+unaffected phase; a normal `FORWARD` still follows the fixed route and requires
+the full gate, even with frames active. A qualifying Documenter or Synchronizer
+return retains its valid current-cycle record and verified correction evidence
+while leaving unfinished full-gate work explicit. The saved return does not
+establish full completion or waive readiness requirements. Do not create
+expedited-promotion obligations or current-cycle artifacts for omitted owners;
+preserve the existing cycle and recovery and use the contract's blocking user
+decision instead.
 
 In `STANDARD`, both completion policies retain all failure owners and the same
 recovery algorithm. `IMPLEMENTATION_REVIEWED` omits only the normal forward
@@ -1177,8 +1320,9 @@ An interrupted role may need a documentation or reconciliation defect corrected
 before it can finish its own work, and requiring the correcting role to finish
 its full gate first would stop both. Documenter and Synchronizer may therefore
 plan resumption without passing their full gate. This is a narrow recovery
-outcome in `STANDARD`, not another mode or a passing completion conclusion, and
-it applies only when:
+outcome in `STANDARD` or `DOCUMENTATION`, not a passing completion conclusion.
+Every corrective, rerun, and resume state must be legal for the active cycle's
+topology. It applies only when:
 
 - the correcting role owns the active recovery frame, whose `RerunThrough` is
   `NONE`, and `ResumeAt` is another workflow role's state, or is
@@ -1189,8 +1333,8 @@ it applies only when:
   Corrective Return** or **Synchronizer Corrective Return**;
 - every remaining full-gate gap exists only because work or assessment already
   assigned to the interrupted role or the preserved recovery route is
-  unfinished, or because a normal phase is intentionally omitted by
-  `IMPLEMENTATION_REVIEWED` and its guarantee is not required by the active
+  unfinished, or, in `STANDARD`, because a normal phase is intentionally omitted
+  by `IMPLEMENTATION_REVIEWED` and its guarantee is not required by the active
   contract. Record each unfinished item, its owner, and the evidence still
   required; distinguish intentionally omitted guarantees from pending work.
   Omission cannot excuse evidence needed for the correction, an acceptance
@@ -1207,10 +1351,25 @@ strength of the correction. A same-state correction, a downstream rerun that
 does not own the active frame, or a direct return to `AWAITING_USER_SIGNOFF`
 cannot use this exception. **Synchronizer Corrective Reruns** separately defines
 the narrow non-owner rerun case. The full gate still applies before a normal
-forward handoff, and **Standard Cycle Completion** still requires every gate
-applicable to the selected completion policy before sign-off readiness. A
-corrective return does not itself establish early-closure eligibility or waive
-remaining owner work.
+forward handoff. **Standard Cycle Completion** or **Documentation Cycle
+Contract**, as applicable, still requires every full gate applicable to the mode
+and completion policy before sign-off readiness. A corrective return does not
+itself establish early-closure eligibility or waive remaining owner work.
+
+In `DOCUMENTATION`, this exception may return a verified Documenter or
+Synchronizer correction to another included role while the correction record
+stays incomplete solely because that interrupted role or preserved route has
+unfinished work. For example, final Reviewer may find an error in an existing
+current-cycle synchronization record during re-review. Synchronizer verifies the
+correction with available evidence, persists the unfinished final-review
+dependency, and uses the active frame to return to Reviewer without claiming
+full synchronization. After the review gate passes, the preserved route must
+re-establish any affected synchronization before readiness. This exception does
+not waive evidence needed to verify the correction, permit entry into an omitted
+phase, allow an incomplete normal forward handoff, or return directly to
+`AWAITING_USER_SIGNOFF` on an incomplete gate. Reaching sign-off readiness still
+requires all full documentation-cycle gates, an empty recovery stack, and no
+outstanding obligations.
 
 If `ResumeAt` is `AWAITING_USER_SIGNOFF` under `IMPLEMENTATION_REVIEWED`, a
 verified corrective return must keep the frame and rerun implementation Reviewer
@@ -1317,6 +1476,11 @@ contract, then apply **Expedited Promotion** in
 `.standards/protocol/expedited.md` instead of routing to `DEVELOPING`. Record
 `Handoff.Kind: PROMOTE`, not `USER_REWORK`, and push no rework frame.
 
+In `DOCUMENTATION`, apply rework only within **Documentation Cycle Contract**.
+If the proposed request needs an omitted role, resolve its blocking user
+decision before replacing the active request or routing; it does not authorize
+mode conversion or implementation work.
+
 ## Workflow State Reference
 
 This section defines the fields of `.standards/STATE.md` and the rules for
@@ -1344,7 +1508,8 @@ Promotion** adds entries. When it is active, read **Outstanding Obligations** in
   must persist their artifact path before their normal completion gate passes.
   In expedited work `Scope` and `Architecture` normally remain `NONE` unless the
   cycle is promoted; `Development` is still Developer-owned and is created
-  before implementation begins.
+  before implementation begins. In documentation work, Scoper and Architect
+  still persist their paths; `Development` remains `NONE` throughout the cycle.
 - `PromotionReason`: durable reason an expedited cycle was promoted, otherwise
   `NONE`. Preserve it for the remainder of the cycle; it is workflow context,
   not a user requirement, scope decision, architecture decision, or baseline
@@ -1364,14 +1529,16 @@ Promotion** adds entries. When it is active, read **Outstanding Obligations** in
   separate persistence.
 - `BlockedOn`: unresolved user question preventing completion, otherwise `NONE`.
   Do not use it for a defect another role owns; route that as **Failure Types**
-  describes.
+  describes, except for the omitted-role user decision required by
+  **Documentation Cycle Contract**.
 - `PendingVerificationCadence`: `NONE`, `INCREMENTAL`, or
   `AFTER_IMPLEMENTATION`; a user-requested cadence change awaiting application
   by Developer under **Switch verification cadence** in
   `.standards/protocol/user-decisions.md`. It is coordination, not the effective
   cadence or an acceptance ledger. This field is required; a missing, invalid,
   or repeated value is an inconsistency. Initialize and clear it under the cycle
-  lifecycle rules; never carry it into a new cycle.
+  lifecycle rules; never carry it into a new cycle. Documentation cycles keep it
+  `NONE` because they schedule no implementation or Tester assessments.
 
 Installation initializes `Id` and `Request` as `UNSET`; **Start a cycle** (in
 `.standards/protocol/user-decisions.md`) sets them for every cycle.
@@ -1563,10 +1730,10 @@ active cycle are referred to without a path.
 
 `.standards/CONTEXT.md` is the canonical Auditor-owned project-context artifact.
 Installation does not fabricate it; Auditor creates or refreshes it when
-`AUDITING` runs. In a `STANDARD` cycle, refreshed context is the project
-baseline for downstream roles, subject to ownership and freshness rules. In an
-`EXPEDITED` cycle, existing context is prior evidence only and is not presumed
-refreshed.
+`AUDITING` runs. In a `STANDARD` or `DOCUMENTATION` cycle, refreshed context is
+the project baseline for downstream roles, subject to ownership and freshness
+rules. In an `EXPEDITED` cycle, existing context is prior evidence only and is
+not presumed refreshed.
 
 Any **Active-Cycle Non-Baseline Work** entry is scoped to the `Active Work.Id`
 that produced it and applies only while that same cycle is nonterminal; it is

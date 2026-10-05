@@ -92,9 +92,9 @@ from `node .standards/bin/cycle.mjs new` when the cycle starts and saves it in
 
 ## Cycle mode
 
-The workflow chosen for one cycle: `STANDARD` or `EXPEDITED`. `UNSET` means no
-cycle is active, so workflow work cannot begin. Navigator can still explain
-available project evidence.
+The workflow chosen for one cycle: `STANDARD`, `EXPEDITED`, or `DOCUMENTATION`.
+`UNSET` means no cycle is active, so workflow work cannot begin. Navigator can
+still explain available project evidence.
 
 ## Development plan
 
@@ -108,6 +108,13 @@ revisions need approval before implementation. See
 One implementation outcome in the plan, identified by `DEV-NNN`, with
 dependencies, progress, and a way to check the result. Step IDs are distinct
 from Scoper's `AC-NNN` requirement IDs.
+
+## Documentation cycle
+
+A Brownfield workflow for documentation of existing behavior: Auditor, Scoper,
+Architect, Documenter, final Reviewer, and Synchronizer before user sign-off. It
+omits implementation and formal testing, and cannot convert in place. See
+[Updating Documentation on Its Own](../../guides/updating-documentation/).
 
 ## Documentation record
 

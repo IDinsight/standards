@@ -19,12 +19,14 @@ STANDARDS divides work among nine roles. Each has a clear responsibility:
 
 Their initials spell S.T.A.N.D.A.R.D.S.; this is not their running order. The
 [workflow](../../concepts/states-and-handoffs/) depends on whether the project
-is new or existing and whether the cycle uses standard or expedited work. A
-cycle is one request, ending in your sign-off or cancellation.
+is new or existing and whether the cycle uses standard, expedited, or
+documentation work. A cycle is one request, ending in your sign-off or
+cancellation.
 
 Each role has eval cases describing expected behavior. The
 [skill eval report](../../reference/skill-eval-report/) covers an earlier run;
-the new completion-policy cases have not been run against a model.
+the new completion-policy and documentation-cycle cases have not been run
+against a model.
 
 ## Run a role
 
@@ -38,7 +40,10 @@ automatically run it. Tester and Reviewer require
 [separate assessment conversations](../../reference/protocol/#independent-assessment-sessions).
 
 Navigator is available at any point, even without an active cycle. It explains
-existing work without changing files or workflow state.
+existing work without changing files or workflow state. For a standalone
+documentation assignment, Documenter can initialize the Brownfield route before
+handing off to Auditor; see
+[Updating Documentation on Its Own](../../guides/updating-documentation/).
 
 ## Know what completion means
 

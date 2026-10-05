@@ -28,6 +28,10 @@ Cycle: <Active Work.Id>
 
 - Active contract/context and supporting implementation, verification, review,
   and documentation paths with assessed content identities.
+- In `DOCUMENTATION`, identify the Auditor baseline, scope, Architect's existing
+  contracts, and inspected behavior sources. Omitted owners' current-cycle
+  records are not required; distinguish existing tests or prior assessments used
+  as support from formal current-cycle verification.
 - Baseline/comparison range and its basis; relevant committed, staged, unstaged,
   untracked, moved/deleted, and affected unchanged content.
 - Relevant dependencies, configuration, generation sources, and environment
@@ -109,6 +113,9 @@ work; do not claim it passed.
   routing. Full documentation completion is not cycle completion or sign-off.
   Under `IMPLEMENTATION_REVIEWED`, a corrective handoff follows recovery and
   does not start the normal final-review tail or establish closure eligibility.
+  In `DOCUMENTATION`, full completion hands off to final Reviewer with policy
+  `NONE`; an incomplete corrective return goes only to an included role under
+  canonical recovery, never directly to readiness.
 
 ---
 
@@ -123,7 +130,9 @@ edit. `COMPLETE` means the full Documenter gate passed for current inputs.
 Persist normalized mode, target, and explicit user-style choices; default to
 AUTONOMOUS, ACTIVE_CHANGE, and NONE for new work without selections. Resume
 persisted choices unless explicitly changed. A supplied file defaults new work
-to FILE/AUTONOMOUS. Do not add approval status or a style-lock field.
+to FILE/AUTONOMOUS. Recover explicit standalone-entry choices from the saved
+request/scope before applying defaults when first creating this record. Do not
+add approval status or a style-lock field.
 
 Keep useful superseded evidence, reopen unsupported conclusions, and avoid
 cosmetic rewrites or duplicate entries. A fully assessed no-change result uses

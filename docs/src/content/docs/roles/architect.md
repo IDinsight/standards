@@ -12,7 +12,9 @@ remain with Developer.
 
 Run Architect in `ARCHITECTING`, usually after Scoper or when the design needs
 correction. Expedited cycles skip this role; needing a consequential design
-decision is a reason to move to the standard workflow.
+decision is a reason to move to the standard workflow. In `DOCUMENTATION`,
+Architect runs after Scoper to establish existing technical facts and
+constraints for the documentation; it hands off to Documenter.
 
 ```text
 Codex:       $architect Continue from .standards/STATE.md.
@@ -67,12 +69,23 @@ problem when existing clients must keep working during the transition.
 
 Define a shared technical rule across several components.
 
+### DOCUMENTATION
+
+Establish evidenced existing interfaces, commands, outputs, errors, and other
+contracts needed for the scoped documentation. Account for every current
+acceptance condition with technical facts or an explicit no-architectural-impact
+disposition. Do not invent a build plan or new behavior. See the
+[documentation workflow](../../guides/updating-documentation/).
+
 ## Completion and handoff
 
 Architect finishes when the saved design covers the current requirements and
 resolves the important technical decisions. Initial greenfield design normally
 goes to Auditor; brownfield design with valid context goes to Developer.
-Corrections follow the saved recovery route.
+Corrections follow the saved recovery route. Documentation architecture goes to
+Documenter instead of Developer. If the documentation outcome requires
+implementation, it blocks for a user decision rather than designing changes
+inside this cycle.
 
 Architect does not change what you asked for or write the implementation. If
 requirements are unclear, it returns them to Scoper. If required project facts

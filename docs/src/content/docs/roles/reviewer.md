@@ -38,8 +38,15 @@ that all required behavior is correct.
 The [review reports](../../reference/templates/reviewer/) are saved under
 `.standards/docs/reviews/<Active Work.Id>/`:
 
-- `implementation.md` assesses the implementation in both cycle modes.
-- `final-deliverable.md` assesses the assembled work in standard cycles only.
+- `implementation.md` assesses implementation in standard and expedited cycles.
+- `final-deliverable.md` assesses assembled work in standard and documentation
+  cycles.
+
+In [documentation cycles](../../guides/updating-documentation/), final Reviewer
+independently checks saved documentation and Documenter's evidence against
+scope, technical contracts, and existing behavior. Missing current-cycle
+Developer/Tester/implementation-review reports are intentional omissions;
+missing evidence needed for accuracy still blocks. Success goes to Synchronizer.
 
 Each report records the work inspected, evidence, findings, unanswered
 questions, and whether this review can pass.
@@ -65,9 +72,9 @@ review checks the bounded request and Developer's evidence.
 
 ### FINAL_DELIVERABLE
 
-In `REVIEWING_FINAL`, Reviewer checks the assembled standard deliverable after
-documentation, including whether earlier evidence still applies and all required
-outcomes are supported.
+In `REVIEWING_FINAL`, Reviewer checks the assembled standard or documentation
+deliverable after documentation, including whether earlier evidence still
+applies and all required outcomes are supported.
 
 ## Understanding findings
 

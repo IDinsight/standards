@@ -16,6 +16,13 @@ documentation corrections. The shorter policy does not waive documentation
 required by the current scope. Expedited cycles skip this role; requiring its
 work means moving to the standard workflow.
 
+For a new documentation-only assignment in an existing project, invoke
+Documenter while no cycle is active. It starts `DOCUMENTATION` at Auditor, then
+Scoper and Architect establish context before Documenter edits. Final Reviewer
+and Synchronizer remain mandatory. The route can create missing guides and is
+not available in Greenfield. See
+[Updating Documentation on Its Own](../../guides/updating-documentation/).
+
 ```text
 Codex:       $documenter Continue from .standards/STATE.md.
 Claude Code: /documenter Continue from .standards/STATE.md.
@@ -25,7 +32,10 @@ Claude Code: /documenter Continue from .standards/STATE.md.
 
 Documenter reads the requirements, design, relevant project context, code,
 verification and review results, and existing documentation. It checks what the
-project actually does before describing it.
+project actually does before describing it. In documentation cycles, it uses
+current scope, existing technical contracts, Auditor context and source
+evidence; no current-cycle Developer, Tester, or implementation-review record is
+required.
 
 Alongside the updated documentation, it saves a
 [documentation record](../../reference/templates/documenter/) at
@@ -64,7 +74,9 @@ $documenter Document the export feature as a VERTICAL_SLICE.
 ```
 
 Use `/documenter` in Claude Code. A file request defaults to autonomous editing
-unless you choose guided work.
+unless you choose guided work. Explicit choices in the standalone request remain
+saved through the earlier roles and are reused when Documenter creates its
+record.
 
 Documenter respects your editing boundary. If other required documentation
 remains outside it, it records that work and asks how to proceed. Finishing one
@@ -109,6 +121,12 @@ route. Under `IMPLEMENTATION_REVIEWED`, even a complete documentation record
 follows that return route rather than starting normal final review. Changed
 evidence for early completion must return to implementation Reviewer for
 reassessment before sign-off.
+
+In `DOCUMENTATION`, full completion likewise goes to independent final Reviewer,
+then Synchronizer. Corrective returns stay among included roles and cannot skip
+full gates before readiness. An implementation or formal-testing requirement
+blocks for your decision; the agent does not change behavior or convert the
+cycle to satisfy it.
 
 Documenter sends code, test, design, and other problems to their owners. It
 updates the source of generated documentation rather than patching generated

@@ -14,6 +14,52 @@ sessions until a cycle consumes it or the user replaces or clears it. While a
 blocked `PendingCycleRequest` exists, a mode change or clear revalidates that
 request under **Start a cycle** without asking the user to repeat it.
 
+`DOCUMENTATION` is a supported preference only in `BROWNFIELD`. Validate the
+request against **Documentation Cycle Contract** when consuming it; a pending
+preference does not authorize implementation work or overwrite an active cycle.
+Reject unsupported Greenfield preferences without persisting them. A request
+already blocked before cycle creation remains governed by **Start a cycle**.
+
+## Standalone Documenter entry
+
+An explicit Documenter invocation with a new documentation-only assignment
+requests `DOCUMENTATION` while no cycle is active. Classify that intent before
+applying project-mode eligibility, pending preferences, completion-policy
+choices, or default mode selection. Use **Start a cycle**, including
+cancelled-cycle baseline reconciliation and ID generation. In `GREENFIELD`, or
+with an incompatible mode preference or standard completion-policy choice, use
+its pre-cycle blocking decision; never substitute `STANDARD` automatically.
+
+Persist the standalone Documenter entry instruction alongside the concrete
+documentation request and any explicit target, editing boundary, collaboration
+choice, or user style in `PendingCycleRequest` when blocked, or
+`Active Work.Request` when starting. Recover that intent from the saved request
+on resumption even when the user invokes another role or only says to continue.
+Only an explicit user decision to revise or withdraw standalone entry permits a
+different mode; preserve the documentation goal and other unchanged choices. A
+conflicting completion-policy choice alone does not withdraw that intent. Do not
+create a premature documentation record or invent missing choices. A bare
+invocation or request to continue without an available assignment does not
+invent a new cycle request.
+
+The resulting state is `AUDITING`, not `DOCUMENTING`. Initializing coordination
+does not authorize Documenter to audit, scope, design, or edit documentation
+early. Persist the transition and provide the Auditor invocation under the
+protocol's **Handoff Rules**. Auditor may continue immediately only when the
+same user instruction explicitly invoked Auditor too. Subsequent roles likewise
+require explicit invocation and ownership; never auto-dispatch the full route.
+
+When a cycle is active, its saved mode and state remain authoritative. An
+invocation to continue the active documentation assignment follows the current
+owner and existing recovery. Documenter may perform its owned work only in
+`DOCUMENTING`; otherwise identify the owner and apply only an authorized
+coordination action. A materially changed active request uses the protocol's
+**Rework an active cycle**, including documentation-boundary limits. A separate
+standalone request must wait until the active cycle is finished or explicitly
+cancelled. Do not overwrite its ID, request, artifacts, blockers, recovery, or
+pending fields to start another cycle, and do not infer cancellation from a
+Documenter invocation.
+
 ## Start a cycle
 
 A cycle starts from the installed state, where `Active Work.Id`,
@@ -30,19 +76,32 @@ it without asking the user to restate it, and let a revised request replace it.
    they were reverted, adds a `SourceCycle`/`Request` entry for that cycle under
    **Baseline Reconciliation Format** if its exact cycle ID is not already
    listed.
-2. **Choose the mode before changing any state.** A pending preference must be
-   valid for the request, the current `ProjectMode`, and the reconciliation
-   obligation; a pending `STANDARD` preference also prevents Developer from
-   inferring `EXPEDITED`. Without a pending preference, `STANDARD` is the
-   default, except that in `BROWNFIELD` an explicit Developer invocation with a
-   sufficiently bounded implementation request may select `EXPEDITED`.
-   `GREENFIELD` supports only `STANDARD`, and unresolved reconciliation requires
-   `STANDARD`. A pending `EXPEDITED` preference does not bypass the **Expedited
-   Cycle Contract** in `.standards/protocol/expedited.md`: validate eligibility
-   before consuming it. An explicit `FULL_DELIVERABLE` or
+2. **Choose the mode before changing any state.** First identify standalone
+   Documenter intent from the current invocation or the saved request under
+   **Standalone Documenter entry**, incorporating any explicit user resolution.
+   While that intent remains, the requested mode is `DOCUMENTATION`, including
+   in `GREENFIELD` or with a standard completion-policy choice. Conflicting
+   explicit or pending mode choices and incompatible policies use step 3 before
+   cycle creation; none changes this request into inferred `STANDARD` work. A
+   pending preference must also be valid for the request, the current
+   `ProjectMode`, and the reconciliation obligation. Honor explicit and pending
+   choices; never silently replace a conflicting preference. Without standalone
+   intent or an explicit or pending mode choice, `STANDARD` is the default,
+   except that in `BROWNFIELD` an explicit Developer invocation with a
+   sufficiently bounded implementation request may select `EXPEDITED`. A pending
+   `STANDARD` preference prevents inferred expedited entry. `GREENFIELD`
+   supports only `STANDARD`. Unresolved reconciliation requires an Auditor-first
+   `STANDARD` or `DOCUMENTATION` cycle, never `EXPEDITED`. Documentation entry
+   must satisfy **Documentation Cycle Contract**, including preserving
+   reconciliation for Auditor; a request requiring implementation or another
+   omitted role is ineligible. A pending `EXPEDITED` preference does not bypass
+   the **Expedited Cycle Contract** in `.standards/protocol/expedited.md`:
+   validate eligibility before consuming it. An explicit `FULL_DELIVERABLE` or
    `IMPLEMENTATION_REVIEWED` selection requires `STANDARD` and prevents inferred
-   expedited entry. It does not override an explicit or pending `EXPEDITED` mode
-   choice; conflicting choices require resolution in step 3.
+   expedited entry. It conflicts with standalone documentation intent and does
+   not override an explicit or pending `EXPEDITED` or `DOCUMENTATION` mode
+   choice; resolve conflicts in step 3. Documentation cycles use
+   `CompletionPolicy: NONE`.
 3. **Block instead of starting when the mode is not legal**, whether because of
    an invalid pending preference or an explicitly requested mode the current
    `ProjectMode` does not support. Never silently reinterpret the mode as
@@ -53,10 +112,13 @@ it without asking the user to restate it, and let a revised request replace it.
    choose a supported mode, replace or clear the preference, revise the request,
    or abandon it. Abandoning clears `PendingCycleRequest` and
    `PendingCycleBlockedOn` without modifying `Active Work` or starting a cycle.
-   Apply the same rule to an incompatible completion-policy choice. Keep any
-   explicit policy instruction and stated reason in the saved request text so
-   resolving the mode conflict does not lose them; there is no separate pending
-   completion-policy field.
+   Apply the same rule to an incompatible completion-policy choice. Keep the
+   standalone entry instruction, explicit mode and policy choices, and stated
+   reasons in the saved request text so resumption does not lose them; there is
+   no separate pending completion-policy field. When the user explicitly revises
+   or withdraws standalone entry to use another mode, update that instruction in
+   the saved request before revalidating it. Merely resuming or clearing a
+   conflicting preference does not withdraw standalone intent.
 4. **Generate the ID** as **Cycle IDs** describes. If the tool refuses, leave
    the state unchanged and do not start the cycle.
 5. **Persist the cycle** in one state update:
@@ -64,8 +126,8 @@ it without asking the user to restate it, and let a revised request replace it.
      `Development`, `PromotionReason`, `AuditTarget`, and `BlockedOn` set to
      `NONE`; `PendingVerificationCadence: NONE`; and `BaselineReconciliation`
      from step 1.
-   - `Active Work.CompletionPolicy`: `NONE` for `EXPEDITED`; `FULL_DELIVERABLE`
-     for `STANDARD` unless the user explicitly selected
+   - `Active Work.CompletionPolicy`: `NONE` for `EXPEDITED` or `DOCUMENTATION`;
+     `FULL_DELIVERABLE` for `STANDARD` unless the user explicitly selected
      `IMPLEMENTATION_REVIEWED` for this request. Preserve any explicit choice
      and stated reason in `Active Work.Request` as a workflow instruction,
      distinct from implementation requirements. Do not inherit the prior cycle's
@@ -75,15 +137,16 @@ it without asking the user to restate it, and let a revised request replace it.
    - `Handoff`: for the first cycle, keep `Kind: INITIAL` with `From: NONE` and
      `FailureType: NONE`; from a terminal state, record `Kind: NEW_CYCLE`,
      `From` set to that state, `FailureType: NONE`, and a concise reason. An
-     expedited first cycle records a concise expedited-entry reason. Mention an
-     unresolved reconciliation obligation concisely, without copying its
-     source-cycle provenance.
+     expedited or documentation first cycle records a concise mode-entry reason.
+     Mention an unresolved reconciliation obligation concisely, without copying
+     its source-cycle provenance.
    - Recovery and outstanding obligations inactive.
    - `WorkflowState`: `AUDITING` when reconciliation is unresolved or
-     cancelled-cycle changes are being retained or adopted, so Auditor
-     establishes baseline status first. Otherwise `DEVELOPING` for an allowed
-     `EXPEDITED` cycle, or the standard entry state for the current
-     `ProjectMode`: `SCOPING` for `GREENFIELD` or `AUDITING` for `BROWNFIELD`.
+     cancelled-cycle changes are being retained or adopted, or the chosen mode
+     is `DOCUMENTATION`, so Auditor establishes baseline status first. Otherwise
+     `DEVELOPING` for an allowed `EXPEDITED` cycle, or the standard entry state
+     for the current `ProjectMode`: `SCOPING` for `GREENFIELD` or `AUDITING` for
+     `BROWNFIELD`.
 
 `CycleMode` never remains `UNSET` once a cycle has started.
 
@@ -104,6 +167,10 @@ implementation review to sign-off. A standard policy requires authorization for
 Promotion first initializes `FULL_DELIVERABLE`, after which a separately
 authorized policy selection must satisfy the rules below. Both instructions may
 be given together, but selection must not bypass promotion obligations.
+
+With an active `DOCUMENTATION` cycle, preserve `CompletionPolicy: NONE` and its
+fixed route through final review and synchronization. Explain that standard
+policy selection does not convert this cycle or omit its required phases.
 
 1. **Check whether this changes the policy.** An instruction matching the saved
    policy is a no-op: preserve state, handoff, and records. It does not reassert
@@ -184,6 +251,10 @@ for the active cycle under **Verification Cadence**. Record and apply it as
 follows, preserving collaboration-mode permissions and pauses. The coordination
 rules in **State-update rules** apply throughout.
 
+`DOCUMENTATION` has no implementation or Tester scheduling. Keep
+`PendingVerificationCadence: NONE`; a cadence request does not add those phases
+or convert the cycle. Explain that it requires a separate implementation cycle.
+
 1. **Promote when needed.** `EXPEDITED` supports only `AFTER_IMPLEMENTATION`. An
    explicit `INCREMENTAL` request authorizes **Expedited Promotion** in
    `.standards/protocol/expedited.md`. Preserve the request as pending during
@@ -242,11 +313,13 @@ completion contract: **Standard Cycle Completion**, including every standard
 gate applicable to `Active Work.CompletionPolicy` and the
 acceptance-traceability obligations, or, for `EXPEDITED`, only the narrower
 **Expedited Cycle Contract** in `.standards/protocol/expedited.md`; skipped
-standard phases must not be represented as completed. For
-`IMPLEMENTATION_REVIEWED`, inspect the implementation report's separate closure
-assessment, its recorded user choice, evidence references, and assessed input
-identities. Require a `COMPLETE` ordinary review and current `ELIGIBLE` closure,
-with the omitted guarantees made clear. Compare current inputs rather than
+standard phases must not be represented as completed. For `DOCUMENTATION`,
+revalidate **Documentation Cycle Contract**, including current final review and
+synchronization evidence, without demanding omitted implementation artifacts.
+For `IMPLEMENTATION_REVIEWED`, inspect the implementation report's separate
+closure assessment, its recorded user choice, evidence references, and assessed
+input identities. Require a `COMPLETE` ordinary review and current `ELIGIBLE`
+closure, with the omitted guarantees made clear. Check current inputs instead of
 trusting the saved label alone. If evidence or eligibility is invalidated, use
 owner-directed recovery and Reviewer reassessment under **Recovery Mechanics**;
 the agent recording sign-off does not author a replacement review conclusion. An

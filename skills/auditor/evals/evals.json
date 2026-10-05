@@ -154,6 +154,50 @@
         "Auditor does not infer a SourceCycle from Active Work.Id, the current request, chat history, or a guessed relationship, and does not invent replacement reconciliation entries",
         "BaselineReconciliation is not cleared to NONE or reduced to only the valid entry; dependent work resumes only after the malformed state is corrected"
       ]
+    },
+    {
+      "id": 12,
+      "prompt": "Invoke Auditor. ProjectMode=BROWNFIELD, CycleMode=DOCUMENTATION, CompletionPolicy=NONE, Active Work.Id=guide-20261004T120000Z-1a2b3c4d. WorkflowState=AUDITING. The saved standalone request is to create docs/usage.md for an existing CLI with no documentation. Source defines --format, an output path, and error exits; established checks are in package.json. No current-cycle Developer, Tester, or implementation review exists. No recovery or blockers exist.",
+      "expected_output": "Establish the relevant existing-behavior baseline and documentation conventions, then hand off to Scoper when the audit gate passes.",
+      "files": [],
+      "assertions": [
+        "Missing guides do not make the Brownfield project ineligible.",
+        "Context identifies evidenced CLI behavior, commands, and limits without new design or documentation edits.",
+        "No omitted-owner record or formal verification claim is created; mode DOCUMENTATION and policy NONE are preserved."
+      ]
+    },
+    {
+      "id": 13,
+      "prompt": "Invoke Auditor. ProjectMode=BROWNFIELD, CycleMode=DOCUMENTATION, CompletionPolicy=NONE, Active Work.Id=guide-20261004T120000Z-1a2b3c4d. WorkflowState=AUDITING. BaselineReconciliation lists a cancelled documentation cycle and its exact request. Its README edits remain in the working tree and the user has not accepted them as baseline.",
+      "expected_output": "Assess the retained documentation against source and source-cycle evidence; preserve unresolved decisions before advancing.",
+      "files": [],
+      "assertions": [
+        "Prior documentation is distinguished from evidenced existing behavior.",
+        "The exact source cycle and request remain until reconciliation is resolved; prior cancellation is not acceptance.",
+        "No silent revert, implementation cycle conversion, or premature Scoper handoff occurs."
+      ]
+    },
+    {
+      "id": 14,
+      "prompt": "Invoke Auditor. ProjectMode=BROWNFIELD, CycleMode=DOCUMENTATION, CompletionPolicy=NONE, Active Work.Id=guide-20261004T120000Z-1a2b3c4d. WorkflowState=AUDITING. The request requires a documented --json option; inspection establishes that no such option exists and providing it would require implementation. The active request has not been revised.",
+      "expected_output": "Persist the unsupported request and required user decision, preserving the documentation cycle.",
+      "files": [],
+      "assertions": [
+        "No Developer or Tester failure frame, automatic promotion, or invented option is produced.",
+        "Active Work.BlockedOn explains the achievable documentation scope or explicit cancellation/separate implementation decision.",
+        "Existing request and recovery information are preserved."
+      ]
+    },
+    {
+      "id": 15,
+      "prompt": "Resume Auditor. ProjectMode=BROWNFIELD, CycleMode=DOCUMENTATION, CompletionPolicy=NONE, Active Work.Id=guide-20261004T120000Z-1a2b3c4d. WorkflowState=AUDITING. An outer frame returns DOCUMENTING to final Reviewer; Auditor owns a nested PROJECT_CONTEXT frame returning to DOCUMENTING. The requested context correction has been established from current source, and saved Documenter target FILE docs/usage.md and collaboration GUIDED remain in Active Work.Request.",
+      "expected_output": "Correct context and apply canonical nested recovery without losing the outer assignment or Documenter choices.",
+      "files": [],
+      "assertions": [
+        "Only the completed nested frame is removed when its recovery assignment is satisfied.",
+        "The outer recovery route and explicit Documenter choices remain intact.",
+        "No documentation edit or omitted-state rerun is performed."
+      ]
     }
   ]
 }

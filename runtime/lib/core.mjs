@@ -9,6 +9,7 @@ import { fileURLToPath } from 'node:url';
 
 export const MARKER = '<!-- standards:framework-owned -->';
 export const MODES = new Set(['GREENFIELD', 'BROWNFIELD']);
+export const CYCLE_MODES = new Set(['UNSET', 'STANDARD', 'EXPEDITED', 'DOCUMENTATION']);
 export const COMPLETION_POLICIES = ['NONE', 'FULL_DELIVERABLE', 'IMPLEMENTATION_REVIEWED'];
 export const VERIFICATION_CADENCES = ['AFTER_IMPLEMENTATION', 'INCREMENTAL'];
 export const STATES = new Set([

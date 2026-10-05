@@ -3,7 +3,7 @@
 This file is the authoritative artifact shape and authoring contract for the
 persisted scope owned by Scoper.
 
-The scope defines **what must be built, why it matters, what is excluded, and
+The scope defines **what must be achieved, why it matters, what is excluded, and
 what counts as done**. It must remain implementation-agnostic except where a
 technology or implementation constraint is already established by the user
 request or by pre-existing project context independent of the active technical
@@ -15,6 +15,16 @@ preserve valid existing content and revise only what the new information
 invalidates.
 
 Omit empty sections. Add detail only when it materially reduces ambiguity.
+
+In `DOCUMENTATION`, use this same shape for documentation outcomes. Identify
+audiences and documentation targets in Goal and Work, permitted editing in
+Constraints, and excluded behavior changes in Non-goals. Preserve the request's
+explicit Documenter choices without inventing defaults. Acceptance conditions
+describe verifiable documentation accuracy, coverage, or usability of existing
+behavior; they do not require new implementation or formal Tester reports. An
+assessed no-change result may satisfy the requested documentation outcome, but
+does not omit final review or synchronization. Apply the documentation
+contract's blocking decision when an outcome needs an omitted role.
 
 When Scoper creates a new STANDARDS-owned scope artifact, create it with
 `node .standards/bin/artifact.mjs init SCOPE`, which writes this block with the

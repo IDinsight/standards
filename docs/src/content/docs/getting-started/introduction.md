@@ -45,6 +45,12 @@ uses Developer and implementation Reviewer before your sign-off decision. It
 provides fewer checks and must move to standard work if a skipped role becomes
 necessary.
 
+**Documentation work** covers existing behavior in a Brownfield project. Start
+with a standalone Documenter assignment and follow Auditor, Scoper, Architect,
+Documenter, final Reviewer, and Synchronizer before sign-off. It omits
+implementation and formal testing; see
+[Updating Documentation on Its Own](../../guides/updating-documentation/).
+
 See [project and cycle modes](../../concepts/project-modes/) for the choices and
 the [standard-cycle map](../../guides/overview/#standard-cycle) for its two
 completion paths.

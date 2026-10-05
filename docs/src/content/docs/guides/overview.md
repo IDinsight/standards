@@ -114,6 +114,83 @@ but full verification is still required before implementation review. Tester and
 Reviewer need
 [independent chats](../../concepts/states-and-handoffs/#independent-assessment-chats).
 
+## Documentation cycle
+
+Use this route to document existing behavior in a Brownfield project, including
+creating missing guides. Start with a standalone Documenter assignment while no
+cycle is active.
+
+<!-- markdownlint-disable MD033 -->
+<figure
+  class="workflow-map workflow-map--cycle"
+  aria-labelledby="documentation-cycle-caption"
+>
+  <div class="workflow-map__panel workflow-map__panel--standard">
+    <p class="workflow-map__stage-label">Existing behavior · Brownfield only</p>
+    <div class="workflow-map__gate">
+      Invoke Documenter with a standalone documentation assignment
+    </div>
+    <div class="workflow-map__join workflow-map__join--stacked">
+      <span aria-hidden="true">↓</span>
+      Start with Auditor before documentation edits
+    </div>
+    <ol class="workflow-map__steps workflow-map__steps--vertical">
+      <li>
+        <a href="../../roles/auditor/">Auditor</a>
+        <span class="workflow-map__detail">
+          Establish existing behavior and project constraints
+        </span>
+      </li>
+      <li>
+        <a href="../../roles/scoper/">Scoper</a>
+        <span class="workflow-map__detail">
+          Define audiences, targets, boundaries, and outcomes
+        </span>
+      </li>
+      <li>
+        <a href="../../roles/architect/">Architect</a>
+        <span class="workflow-map__detail">
+          Establish existing technical contracts and coverage
+        </span>
+      </li>
+      <li>
+        <a href="../../roles/documenter/">Documenter</a>
+        <span class="workflow-map__detail">Save documentation and checked evidence</span>
+      </li>
+      <li>
+        <a href="../../roles/reviewer/">Final Reviewer</a>
+        <span class="workflow-map__detail">
+          Independently assess accuracy and acceptance coverage
+        </span>
+      </li>
+      <li>
+        <a href="../../roles/synchronizer/">Synchronizer</a>
+        <span class="workflow-map__detail">
+          Reconcile the current documents, assessments, and evidence
+        </span>
+      </li>
+    </ol>
+    <div class="workflow-map__finish">
+      <div class="workflow-map__down" aria-hidden="true">↓</div>
+      <div class="workflow-map__decision">Your sign-off decision</div>
+    </div>
+    <a class="workflow-map__guide" href="../updating-documentation/">
+      Follow the documentation workflow
+    </a>
+  </div>
+  <figcaption id="documentation-cycle-caption">
+    You invoke each role explicitly. Final Reviewer needs a fresh, independent
+    chat. All six roles must pass their full checks before your sign-off decision,
+    including when the assessed documentation needs no changes.
+  </figcaption>
+</figure>
+<!-- markdownlint-enable MD033 -->
+
+This cycle covers prose, guides, project guidance outside managed blocks, and
+ordinary comments or docstrings. It omits Development, Testing, and
+implementation review. Required behavior, test, configuration, or tooling changes
+need your decision about scope or a separate implementation cycle.
+
 ## Expedited cycle
 
 Use expedited work for a clearly defined change in an existing project that
@@ -589,7 +666,9 @@ rebuild the workflow from chat history or edit the state files.
   aria-labelledby="resume-work-caption"
 >
   <div class="workflow-map__panel workflow-map__panel--standard">
-    <p class="workflow-map__stage-label">Standard or expedited · Saved active cycle</p>
+    <p class="workflow-map__stage-label">
+      Standard, expedited, or documentation · Saved active cycle
+    </p>
     <ol class="workflow-map__steps workflow-map__steps--vertical">
       <li>
         Open the checkout with the saved work
@@ -770,7 +849,7 @@ cycle; it does not reopen the old one.
           <span class="workflow-map__eyebrow">Cancelled work remains or is uncertain</span>
           <h3 id="next-cycle-audit">Start with Auditor</h3>
         </div>
-        <div class="workflow-map__gate">Standard work is required</div>
+        <div class="workflow-map__gate">Standard or eligible documentation work</div>
         <p class="workflow-map__detail">
           Auditor establishes which changes belong in the project's baseline.
           Earlier unresolved cancellations still count.
@@ -788,6 +867,8 @@ cycle; it does not reopen the old one.
         <p class="workflow-map__detail">
           For standard work, Scoper starts a new project; Auditor starts work in
           an existing project. Developer starts an eligible expedited change.
+          A standalone Documenter assignment starts the documentation route with
+          Auditor.
         </p>
         <a class="workflow-map__guide" href="../starting-a-cycle/">
           Choose how to start the next cycle

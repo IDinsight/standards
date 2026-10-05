@@ -15,6 +15,7 @@
 import { TERMINAL_STATES, UsageError, isMain, printProblem, projectRootFor, readText, writeNew } from './lib/core.mjs';
 import { ARTIFACT_TYPES, REVIEW_KINDS, TEMPLATE_ROLE, defaultPath, parseProvenance, provenanceBlock } from './lib/records.mjs';
 import { validateState } from './lib/state.mjs';
+import { omittedDocumentationRecord } from './lib/completion.mjs';
 
 const USAGE = 'Usage: node .standards/bin/artifact.mjs init <TYPE> [--kind IMPLEMENTATION|FINAL_DELIVERABLE]';
 
@@ -66,9 +67,12 @@ async function main(args) {
   const root = await projectRootFor(import.meta.url);
   const stateText = await readText(root, '.standards/STATE.md');
   if (stateText === null) throw new UsageError('.standards/STATE.md is missing; the runtime is incomplete.');
-  const { id, workflowState } = validateState(stateText);
+  const { id, workflowState, cycleMode } = validateState(stateText);
   if (id === 'UNSET' || TERMINAL_STATES.has(workflowState)) {
     throw new UsageError('There is no active cycle. Start one before creating its records.');
+  }
+  if (cycleMode === 'DOCUMENTATION' && omittedDocumentationRecord(options.type, options.kind)) {
+    throw new UsageError(`DOCUMENTATION omits ${options.type}${options.kind ? `/${options.kind}` : ''}; do not create a current-cycle record for an omitted owner.`);
   }
   const relative = defaultPath(options.type, id, options.kind);
   const existing = await readText(root, relative);

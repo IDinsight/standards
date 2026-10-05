@@ -25,6 +25,10 @@ Cycle: <Active Work.Id>
 
 - Contract, context, development, verification, both review reports, and
   documentation paths with content identities and cycle/kind checks.
+- In `DOCUMENTATION`, use current Auditor context, scope, technical contracts,
+  documentation record and final review. Include the editing boundary and saved
+  documents/checks; distinguish supporting existing source/tests/prior
+  assessments from omitted owners' current-cycle evidence.
 - Baseline/comparison range and its basis; committed, staged, unstaged,
   untracked, moved/deleted, and affected unchanged content relevant to the work.
 - Relevant dependencies/configuration and evidence execution assumptions.
@@ -47,7 +51,8 @@ acceptance text, reports, or an authoritative pass/fail ledger here.
 - Evidence/completion reference, the ACs and technical criteria it supports, and
   why it remains applicable to the assessed current content.
 - Final review's applicability to this assembled deliverable and its supporting
-  implementation review, verification, and documentation evidence.
+  documentation evidence, plus implementation review and verification in
+  `STANDARD`. Omitted implementation records are not documentation-cycle gaps.
 - Earlier pending dependencies and the owner's evidence resolving them under the
   same IDs, or a discrepancy reference when still unresolved.
 - Reconciliation inspections/checks actually performed, their results and
@@ -101,6 +106,12 @@ invent future assignments for them. Under `IMPLEMENTATION_REVIEWED`, describe
 the saved recovery return and whether implementation Reviewer must reassess
 closure. Neither the correction nor this record replaces that assessment.
 Reference current state for routing. Readiness is not user acceptance.
+
+In `DOCUMENTATION`, record the full documentation-contract reconciliation and
+resulting readiness or recovery route with policy `NONE`. An incomplete owned
+corrective return goes only to an included role; record its unfinished
+prerequisites and when to revisit them. All six full gates and current evidence
+are required before readiness, including after a supported no-change result.
 
 For **Synchronizer Corrective Reruns** under the protocol, also identify the
 active frame and its reason, the prior verified correction and content

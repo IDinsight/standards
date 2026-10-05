@@ -596,6 +596,61 @@
         "Closure is INELIGIBLE with an owner and evidence requirement, independently of ordinary review status.",
         "Recovery targets SYNCHRONIZING and returns for implementation Reviewer reassessment; no normal final-review tail is invented."
       ]
+    },
+    {
+      "id": 54,
+      "prompt": "Invoke Reviewer in a fresh independent session. ProjectMode=BROWNFIELD, CycleMode=DOCUMENTATION, CompletionPolicy=NONE, Active Work.Id=guide-20261004T120000Z-1a2b3c4d. WorkflowState=REVIEWING_FINAL. Current scope, architecture, Auditor context, and COMPLETE documentation record identify the current saved guide and successful actual checks; no Developer/Tester/implementation-review records exist. No recovery or blockers exist.",
+      "expected_output": "Independently assess documentation accuracy, AC coverage and boundary, then hand off to Synchronizer if the full gate passes.",
+      "files": [],
+      "assertions": [
+        "Omitted records are not treated as missing prerequisites or manufactured.",
+        "The final report assesses saved content against existing source and checks rather than inheriting COMPLETE.",
+        "No implementation closure assessment or direct readiness is created; policy stays NONE."
+      ]
+    },
+    {
+      "id": 55,
+      "prompt": "Invoke Reviewer in an independent session. ProjectMode=BROWNFIELD, CycleMode=DOCUMENTATION, CompletionPolicy=NONE, Active Work.Id=guide-20261004T120000Z-1a2b3c4d. WorkflowState=REVIEWING_FINAL. Documenter marked COMPLETE and recorded a link check, but AC-001 requires a documented example's real output; the record supplies no source inspection or execution evidence for it. The example differs from the current source.",
+      "expected_output": "Record the established documentation defect and route DOCUMENTATION recovery.",
+      "files": [],
+      "assertions": [
+        "An empty finding list or COMPLETE label cannot establish sufficient evidence.",
+        "The smallest correction belongs to Documenter with ResumeAt REVIEWING_FINAL.",
+        "No Tester report is demanded solely because formal verification is omitted."
+      ]
+    },
+    {
+      "id": 56,
+      "prompt": "Invoke Reviewer in an independent session. ProjectMode=BROWNFIELD, CycleMode=DOCUMENTATION, CompletionPolicy=NONE, Active Work.Id=guide-20261004T120000Z-1a2b3c4d. WorkflowState=REVIEWING_FINAL. The documentation diff includes a changed executable default and a test fixture edit, outside the agreed prose-only boundary. The requested outcome depends on the changed default and no cancellation is authorized.",
+      "expected_output": "Persist the boundary breach and required omitted-owner user decision without entering implementation states.",
+      "files": [],
+      "assertions": [
+        "Saved current evidence and the request are preserved while BlockedOn names the choice.",
+        "The changed code is not approved as documentation-only behavior.",
+        "No automatic mode conversion, omitted-state frame, or passing final review occurs."
+      ]
+    },
+    {
+      "id": 57,
+      "prompt": "Invoke Reviewer in the same chat that authored the documentation. ProjectMode=BROWNFIELD, CycleMode=DOCUMENTATION, CompletionPolicy=NONE, Active Work.Id=guide-20261004T120000Z-1a2b3c4d. WorkflowState=REVIEWING_FINAL. The user says to review here because this is only a docs cycle.",
+      "expected_output": "Apply the independent Reviewer session requirement before formal assessment.",
+      "files": [],
+      "assertions": [
+        "Final review is not conducted in the documentation authoring chat.",
+        "The response provides the final-review invocation and persisted-input directions for an independent chat.",
+        "No final COMPLETE claim or Synchronizer handoff is produced here."
+      ]
+    },
+    {
+      "id": 58,
+      "prompt": "Resume final Reviewer independently. ProjectMode=BROWNFIELD, CycleMode=DOCUMENTATION, CompletionPolicy=NONE, Active Work.Id=guide-20261004T120000Z-1a2b3c4d. WorkflowState=REVIEWING_FINAL after a valid Synchronizer corrective return. The synchronization record is IN_PROGRESS; its corrected reference and precise pending-review dependency are saved. Current documentation evidence and technical coverage are available.",
+      "expected_output": "Reassess the returned correction and the full final-review contract, then use recovery or normal Synchronizer handoff as appropriate.",
+      "files": [],
+      "assertions": [
+        "An interrupted Synchronizer's dependent unfinished work is not required before reassessing what it returned for.",
+        "Reviewer resolves only its own findings after independent checks.",
+        "A passing final review does not certify synchronization or skip its full re-entry gate."
+      ]
     }
   ]
 }

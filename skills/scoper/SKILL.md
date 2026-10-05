@@ -3,11 +3,11 @@ name: scoper
 description:
   Define or revise the scope for a project or change before architecture or
   implementation. Use for greenfield planning, post-audit brownfield planning,
-  or when a downstream phase reports a scoping problem. Produce a concise,
-  persisted, implementation-agnostic scope with goals, boundaries, constraints,
-  acceptance conditions, dependencies, and ordered work items. Normal completion
-  hands off to Architect; recovery follows the protocol's recovery-stack and
-  invalidation rules.
+  documentation-only brownfield work, or when a downstream phase reports a
+  scoping problem. Produce a concise, persisted, implementation-agnostic scope
+  with goals, boundaries, constraints, acceptance conditions, dependencies, and
+  ordered work items. Normal completion hands off to Architect; recovery follows
+  the protocol's recovery-stack and invalidation rules.
 ---
 
 <!-- standards:framework-owned -->
@@ -15,7 +15,7 @@ description:
 # Scoper
 
 Turn an idea or requested change into a clear, bounded statement of **what must
-be built and what counts as done**.
+be achieved and what counts as done**.
 
 Apply to any project: applications, services, libraries, frameworks, CLIs,
 tooling, systems software, infrastructure, or similar work.
@@ -47,12 +47,12 @@ Read all of `.standards/PROTOCOL.md` (in consecutive parts if a read shows only
 part of it), `.standards/MODE.md`, and `.standards/STATE.md` first, then each
 chapter in `.standards/protocol/` that the protocol's reading guide names for
 the current state or request. Perform Scoper-owned work only in `SCOPING` with
-an initialized `STANDARD` cycle; when `Active Work` is `UNSET`, initialize the
-first cycle as the protocol describes (**Start a cycle** in
-`.standards/protocol/user-decisions.md`) before scoping. Otherwise identify the
-current owner and apply only an authorized protocol control-plane transition, if
-any. `EXPEDITED` omits Scoper; a required scoping guarantee uses **Expedited
-Promotion** in `.standards/protocol/expedited.md`.
+an initialized `STANDARD` or Brownfield `DOCUMENTATION` cycle; when
+`Active Work` is `UNSET`, initialize the first cycle as the protocol describes
+(**Start a cycle** in `.standards/protocol/user-decisions.md`) before scoping.
+Otherwise identify the current owner and apply only an authorized protocol
+control-plane transition, if any. `EXPEDITED` omits Scoper; a required scoping
+guarantee uses **Expedited Promotion** in `.standards/protocol/expedited.md`.
 
 - Always: `Active Work.Request`, explicit user constraints, the current
   persisted scope when one exists, and `.standards/CONTEXT.md` when it exists
@@ -101,6 +101,25 @@ shape or the form of acceptance conditions.
 
 ## Invariants
 
+For `DOCUMENTATION`, use Auditor's current baseline to scope documentation of
+existing behavior under **Documentation Cycle Contract**. Persist the intended
+audiences, documents or areas, editing boundary, required accuracy and coverage,
+and any explicit target, collaboration, or user-style choices already saved in
+the request. Preserve those choices for Documenter without applying its style to
+Scoper's own artifact. Missing documentation can be a target; it is not an
+eligibility blocker. Define observable documentation outcomes with current
+`AC-NNN` identifiers; checked examples, links, rendering, and content inspection
+may establish Documenter-owned evidence where relevant. Do not invent behavior,
+implementation tasks, formal Tester evidence, or implementation-review
+dependencies. Final Reviewer and Synchronizer still independently assess the
+included evidence.
+
+If the requested outcome requires an omitted owner's work, follow the blocking
+user decision in **Documentation Cycle Contract** before revising the active
+request or scope. Do not silently remove a requested outcome, add implementation
+work, or convert the cycle. Recovery and AC invalidation stay within the
+included roles; Architect remains the normal next owner.
+
 1. Ask only questions that materially change scope. Resolve blocking ambiguity
    before advancing. Persist any blocking user question in
    `Active Work.BlockedOn` before asking and clear it after incorporating the
@@ -139,6 +158,8 @@ Scoping is complete when:
 - every current scope-level acceptance condition has a unique, stable `AC-NNN`
   identifier, and retired identifiers remain recorded and unreused;
 - no blocking scope question remains unresolved;
+- in `DOCUMENTATION`, the scope describes an achievable documentation outcome
+  within the permitted editing boundary, with no required omitted-owner work;
 - `Active Work.Scope` points to the completed persisted scope.
 
 On normal success, the scope is a **completed scope**. Hand off to

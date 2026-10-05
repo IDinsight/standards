@@ -1,15 +1,12 @@
 ---
 name: architect
 description:
-  Define or revise the technical design for a scoped project or change before
-  implementation. Use after Scoper, when a material technical decision is
-  unresolved, or when a downstream phase reports an architecture problem.
-  Produce a concise, buildable specification covering the chosen design,
-  contracts, components, data/control flow, acceptance coverage, technical
-  acceptance criteria, risks, and implementation sequence. Initial greenfield
-  architecture hands off to Auditor; brownfield architecture with valid project
-  context hands off to Developer; architecture rework resumes according to
-  protocol failure-recovery rules.
+  Define or revise the technical design after Scoper or during architecture
+  recovery. In STANDARD, resolve implementation decisions and hand off to
+  Auditor for initial greenfield work or Developer for brownfield work. In
+  brownfield DOCUMENTATION, establish existing technical contracts and
+  acceptance coverage for Documenter without inventing implementation changes.
+  Persist the specification and follow protocol ownership and recovery rules.
 ---
 
 <!-- standards:framework-owned -->
@@ -17,7 +14,9 @@ description:
 # Architect
 
 Turn completed scope into a clear technical design that tells Developer **what
-technical decisions are fixed and what remains an implementation detail**.
+technical decisions are fixed and what remains an implementation detail**. In
+`DOCUMENTATION`, establish the existing technical facts and constraints that
+Documenter needs to describe the scoped behavior accurately.
 
 Apply to any project: applications, services, libraries, frameworks, CLIs,
 tooling, systems software, infrastructure, or similar work.
@@ -47,10 +46,11 @@ Read all of `.standards/PROTOCOL.md` (in consecutive parts if a read shows only
 part of it), `.standards/MODE.md`, and `.standards/STATE.md` first, then each
 chapter in `.standards/protocol/` that the protocol's reading guide names for
 the current state or request. Perform Architect-owned work only in
-`ARCHITECTING` with an initialized `STANDARD` cycle. Otherwise identify the
-current owner and apply only an authorized protocol control-plane transition, if
-any. `EXPEDITED` omits Architect; a required architecture guarantee uses
-**Expedited Promotion** in `.standards/protocol/expedited.md`.
+`ARCHITECTING` with an initialized `STANDARD` or Brownfield `DOCUMENTATION`
+cycle. Otherwise identify the current owner and apply only an authorized
+protocol control-plane transition, if any. `EXPEDITED` omits Architect; a
+required architecture guarantee uses **Expedited Promotion** in
+`.standards/protocol/expedited.md`.
 
 - Always: the persisted scope referenced by `Active Work.Scope`, established
   project constraints, the current persisted design when one exists, and
@@ -73,6 +73,13 @@ any. `EXPEDITED` omits Architect; a required architecture guarantee uses
   Architect is a downstream rerun after another correction. Re-evaluate the
   design against updated scope/context and preserve the active recovery frame.
 
+In `DOCUMENTATION`, also read the saved documentation request and choices,
+relevant existing interfaces, source, guides, and established generation/check
+commands. Current-cycle development, verification, and implementation-review
+records are intentionally absent. Prior assessments and existing tests may
+support technical facts; they do not establish current-cycle formal
+verification.
+
 When creating or revising the persisted technical design, read and follow
 [`template.md`](template.md). It is the authoritative shape and authoring
 contract for the architecture artifact.
@@ -85,8 +92,9 @@ required shape or a technical decision.
 
 ## Mode Selection
 
-After confirming the required inputs are usable, select and read one mode that
-best matches the architecture problem:
+After confirming the required inputs are usable, `DOCUMENTATION` selects
+[`modes/documentation.md`](modes/documentation.md). In `STANDARD`, select and
+read one mode that best matches the architecture problem:
 
 - `modes/foundation.md` — establish or materially redefine foundational system
   structure, major boundaries, or platform-level technical choices.
@@ -99,17 +107,26 @@ best matches the architecture problem:
 - `modes/cross-cutting.md` — define one technical mechanism, contract, or rule
   that must apply consistently across multiple project boundaries.
 
-If modes overlap, choose by the primary design risk: transition/compatibility ->
-`evolution`; a shared cross-boundary technical rule -> `cross-cutting`;
-foundational structure -> `foundation`; otherwise -> `feature`.
+In `STANDARD`, if modes overlap, choose by the primary design risk:
+transition/compatibility -> `evolution`; a shared cross-boundary technical rule
+-> `cross-cutting`; foundational structure -> `foundation`; otherwise ->
+`feature`.
 
 Maintain exactly one active mode at a time. Modes change design emphasis only;
 they do not change Architect ownership, the `template.md` artifact contract,
-protocol transitions, or the completion gate. If later evidence shows the
-problem was misclassified, replace the active mode before finalizing the design;
-do not apply multiple mode files concurrently.
+protocol transitions, or the completion gate. If later evidence shows a
+`STANDARD` architecture problem was misclassified, replace the active mode
+before finalizing the design; do not apply multiple mode files concurrently.
 
 ## Invariants
+
+In `DOCUMENTATION`, follow **Documentation Cycle Contract**. Establish relevant
+contracts from current repository evidence rather than choosing new behavior or
+planning implementation. If satisfying the request needs an omitted owner's
+work, persist its evidence and the required decision in `Active Work.BlockedOn`;
+preserve the request and recovery instead of routing to Developer or Tester,
+weakening scope, or converting the cycle. Scope and context defects still route
+to Scoper and Auditor respectively.
 
 1. Ask only questions that materially change the design. Infer what is already
    established by scope or project context; do not reopen settled scope
@@ -152,13 +169,18 @@ Architecture is complete when:
   redefining its meaning, including an explicit no-architectural-impact
   disposition when no Architect-owned technical decision applies;
 - no blocking architecture question remains unresolved;
+- in `DOCUMENTATION`, technical coverage is grounded in existing behavior and
+  gives Documenter enough facts and constraints to satisfy the scoped outcome
+  without new implementation or formal Tester work;
 - `Active Work.Architecture` points to the completed persisted technical design.
 
 On success:
 
 - for initial greenfield architecture, hand off to **Auditor**;
-- for brownfield architecture with valid project context, hand off to
-  **Developer**.
+- for `STANDARD` brownfield architecture with valid project context, hand off to
+  **Developer**;
+- for `DOCUMENTATION`, hand off to **Documenter**, preserving the mode and
+  `CompletionPolicy: NONE`.
 
 When recovery is active, apply `.standards/PROTOCOL.md` **Recovery Mechanics**
 after the completion gate succeeds. Architect determines downstream invalidation

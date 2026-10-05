@@ -27,12 +27,18 @@ ReviewKind: IMPLEMENTATION | FINAL_DELIVERABLE
 ## Assessed Inputs and Scope
 
 - Contract paths and content identities; cycle mode, selected completion policy,
-  and current acceptance set in STANDARD, or bounded request in EXPEDITED.
+  and current acceptance set in STANDARD or DOCUMENTATION, or bounded request in
+  EXPEDITED.
 - Repository baseline/comparison range and its basis, committed and dirty-tree
   content (including untracked/deleted paths), affected unchanged boundaries.
 - Development, verification, context, prior reviews, documentation, relevant
   dependencies/configuration, and environment identities used in this
   assessment.
+- In DOCUMENTATION, include the documentation boundary, current Auditor context,
+  technical contracts, saved documents, and Documenter checks. Identify existing
+  source/tests/prior assessments used as support without requiring omitted
+  owners' current-cycle artifacts or claiming formal implementation
+  verification.
 - Included/excluded areas and why; session/model visibility limitations under
   the protocol, without invented identity, capability, or freshness
   attestations.
@@ -43,11 +49,14 @@ ReviewKind: IMPLEMENTATION | FINAL_DELIVERABLE
 | ------------------------------------------- | ------------------------ | ------------------------------------------------ |
 | AC-NNN / design section, or bounded request | Artifact/check reference | Supported, finding, gap, or permitted dependency |
 
-Account for every current AC and relevant technical criterion in STANDARD.
-Separate criteria sharing an ID when evidence differs. In EXPEDITED, assess the
-request without inventing IDs or requiring skipped artifacts. Retired IDs are
-historical only. Distinguish Developer self-checks, Tester formal evidence, and
-Reviewer diagnostics; explain what each result actually supports.
+Account for every current AC and relevant technical criterion in STANDARD or
+DOCUMENTATION. Separate criteria sharing an ID when evidence differs. In
+EXPEDITED, assess the request without inventing IDs or requiring skipped
+artifacts. Retired IDs are historical only. Distinguish Developer self-checks,
+Tester formal evidence, and Reviewer diagnostics; explain what each result
+actually supports. In DOCUMENTATION, independently assess documentation evidence
+and observed existing behavior; no omitted-owner evidence or later
+implementation dependency is invented.
 
 ## Checks and Results
 

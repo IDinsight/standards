@@ -6,11 +6,11 @@ description:
 
 STANDARDS uses three kinds of mode:
 
-| Mode         | What it describes                      | Examples                  |
-| ------------ | -------------------------------------- | ------------------------- |
-| Project mode | Whether implementation already exists. | Greenfield, brownfield    |
-| Cycle mode   | Which workflow one change follows.     | Standard, expedited       |
-| Role mode    | How an individual role works.          | Developer's STEPWISE mode |
+| Mode         | What it describes                      | Examples                           |
+| ------------ | -------------------------------------- | ---------------------------------- |
+| Project mode | Whether implementation already exists. | Greenfield, brownfield             |
+| Cycle mode   | Which workflow one change follows.     | Standard, expedited, documentation |
+| Role mode    | How an individual role works.          | Developer's STEPWISE mode          |
 
 A **cycle** is one piece of work, from its saved request to sign-off or
 cancellation. Project mode can span many cycles; choosing a role mode does not
@@ -44,7 +44,9 @@ brownfield work.
 
 Standard work starts with Auditor so the requirements and design can build on
 reliable project facts. A sufficiently bounded implementation change may use the
-expedited workflow instead.
+expedited workflow instead. For documentation of existing behavior, you can
+invoke Documenter to start the
+[documentation workflow](../../guides/updating-documentation/).
 
 ## Choose the cycle mode
 
@@ -61,6 +63,13 @@ decision. Developer still needs an approved plan. Use it only for a bounded
 brownfield change that can be completed safely without the skipped roles;
 skipping them does not transfer their responsibilities to Developer.
 
+**DOCUMENTATION** keeps Auditor, Scoper, Architect, Documenter, final Reviewer,
+and Synchronizer before sign-off. It is Brownfield only and documents existing
+behavior, including creating missing guides. It omits implementation and formal
+testing, and always includes final review and synchronization. An explicit
+standalone Documenter assignment starts this route when no cycle is active; see
+[Updating Documentation on Its Own](../../guides/updating-documentation/).
+
 **UNSET** means no cycle is active. It is the saved value before work starts and
 after a retained cycle ends, not a way to run work without checks.
 
@@ -71,14 +80,16 @@ A saved standard preference prevents that inference.
 
 See [Starting a Cycle](../../guides/starting-a-cycle/) for choosing a mode and
 resolving an incompatible request. Leftover changes from a cancelled cycle may
-require Auditor and standard work; see
+require Auditor-first standard or eligible documentation work; see
 [starting the next cycle](../../guides/cancelling-and-new-cycles/#start-the-next-cycle).
 
 If an active role finds that expedited work needs a skipped role, the agent
 [promotes the cycle to standard work](../states-and-handoffs/#promote-an-expedited-cycle)
 and gives you the next role to invoke. At sign-off, your request for a change
 that needs a skipped role authorizes the same promotion. The change is one-way:
-an active standard cycle cannot become expedited.
+an active standard cycle cannot become expedited. Documentation cycles cannot
+convert in place. Required implementation work needs an explicit cancellation
+and separate cycle, or a revised achievable documentation-only scope.
 
 ## The project mode changes once
 

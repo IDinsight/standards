@@ -13,17 +13,17 @@ import { FAILURE_TYPES, GENERATED_CYCLE_ID, HANDOFF_KINDS, STATES, TERMINAL_STAT
 import { LOCAL_PREFIX, QUALIFIED_PREFIXES, acceptanceInventory, acceptanceMentions, bareIds, developmentSteps, fixedPath, fixedRecords, headerFields, headingIds, parseProvenance, qualifiedReferences, recordName, recordSection, requiredCompletionRecords, scanArtifacts, withoutLinkLabels, withoutPreviousCycles } from './lib/records.mjs';
 import { modeFromFile, parseState, validateState } from './lib/state.mjs';
 import { checkVerificationWorkflow } from './lib/verification.mjs';
-import { FULL_DELIVERABLE_PHASES, completionChangeRoute, requiredCompletionPhases } from './lib/completion.mjs';
+import { DOCUMENTATION_PHASES, FULL_DELIVERABLE_PHASES, completionChangeRoute, omittedDocumentationRecord, requiredCompletionPhases } from './lib/completion.mjs';
 import { checkClosureAssessment } from './lib/review.mjs';
 
 const RUNTIME_FILES = ['PROTOCOL.md', 'VERSION.json', 'INSTALLATION.json', 'MODE.md', 'STATE.md'];
 const STATE_FILE = '.standards/STATE.md';
-// Order of the standard states from implementation onward. Earlier states
-// (scoping, architecture, audit) all rank 0.
+// Shared ordering from implementation onward; documentation uses only the
+// final four states. Earlier states (scoping, architecture, audit) rank 0.
 const TAIL = ['DEVELOPING', 'TESTING', 'REVIEWING_IMPLEMENTATION', 'DOCUMENTING', 'REVIEWING_FINAL',
   'SYNCHRONIZING', 'AWAITING_USER_SIGNOFF'];
 const rank = (state) => TAIL.indexOf(state) + 1;
-// Whether a STANDARD cycle has moved past ARCHITECTING. Greenfield audits after
+// Whether a scoped cycle has moved past ARCHITECTING. Greenfield audits after
 // the design; brownfield audits before scoping, when there is no design yet.
 const pastArchitecture = (state, mode) => rank(state) > 0 || (state === 'AUDITING' && mode === 'GREENFIELD');
 // The state that completes each record. From that state on, a COMPLETE record
@@ -67,7 +67,7 @@ function checkState(state, { committed, mode, report }) {
   const requiredPhases = requiredCompletionPhases(cycleMode, policy);
 
   if (requiredPhases === null) {
-    problem(`CompletionPolicy ${policy} is not valid with CycleMode ${cycleMode}. STANDARD requires FULL_DELIVERABLE or IMPLEMENTATION_REVIEWED; EXPEDITED requires NONE.`);
+    problem(`CompletionPolicy ${policy} is not valid with CycleMode ${cycleMode}. STANDARD requires FULL_DELIVERABLE or IMPLEMENTATION_REVIEWED; EXPEDITED and DOCUMENTATION require NONE.`);
   }
   if (id === 'UNSET' && policy !== 'NONE') {
     problem('No cycle has started, so Active Work.CompletionPolicy must be NONE.');
@@ -85,9 +85,13 @@ function checkState(state, { committed, mode, report }) {
   if (committed && TERMINAL_STATES.has(committed.workflowState) && !terminal && committed.id === id) {
     problem(`Active Work.Id \`${id}\` belongs to the cycle the last commit ended in ${committed.workflowState}; a new cycle needs a new ID. ${NEW_ID}`);
   }
+  if (committed && !terminal && committed.id === id && committed.cycleMode !== cycleMode
+      && [committed.cycleMode, cycleMode].includes('DOCUMENTATION')) {
+    problem('A DOCUMENTATION cycle cannot be converted in place. Explicitly cancel it and start a separate cycle with a new ID.');
+  }
   if (id === 'UNSET' && cycleMode !== 'UNSET') problem('CycleMode is set, but no cycle has started (Active Work.Id is UNSET).');
   if (id !== 'UNSET' && !terminal && cycleMode === 'UNSET') {
-    problem(`Cycle \`${id}\` is active, but CycleMode is UNSET. Record STANDARD or EXPEDITED when the cycle starts.`);
+    problem(`Cycle \`${id}\` is active, but CycleMode is UNSET. Record STANDARD, EXPEDITED, or DOCUMENTATION when the cycle starts.`);
   }
   const { Kind: kind, From: from, FailureType: failureType } = state.handoff;
   if (kind === 'COMPLETION_CHANGE') {
@@ -130,8 +134,53 @@ function checkState(state, { committed, mode, report }) {
       }
     }
   }
-  if (mode === 'GREENFIELD' && (cycleMode === 'EXPEDITED' || state.PendingCycleMode === 'EXPEDITED')) {
-    problem('A GREENFIELD project cannot use EXPEDITED cycles.');
+  for (const restricted of ['EXPEDITED', 'DOCUMENTATION']) {
+    if (mode === 'GREENFIELD' && (cycleMode === restricted || state.PendingCycleMode === restricted)) {
+      problem(`A GREENFIELD project cannot use ${restricted} cycles.`);
+    }
+  }
+  if (cycleMode === 'DOCUMENTATION') {
+    const route = [...DOCUMENTATION_PHASES, 'AWAITING_USER_SIGNOFF'];
+    if (!route.includes(workflowState) && !terminal) {
+      problem(`${workflowState} is not part of a DOCUMENTATION cycle.`);
+    }
+    if (['INITIAL', 'NEW_CYCLE'].includes(kind)) {
+      if (workflowState !== 'AUDITING') {
+        problem(`A DOCUMENTATION cycle starts in AUDITING for ${kind} entry.`);
+      }
+      if (kind === 'INITIAL' && from !== 'NONE') {
+        problem('A DOCUMENTATION INITIAL handoff requires From NONE.');
+      }
+      if (kind === 'NEW_CYCLE' && !TERMINAL_STATES.has(from)) {
+        problem('A DOCUMENTATION NEW_CYCLE handoff requires From SIGNED_OFF or CANCELLED.');
+      }
+    }
+    if (['INITIAL', 'NEW_CYCLE', 'FORWARD'].includes(kind) && failureType !== 'NONE') {
+      problem(`A DOCUMENTATION ${kind} handoff requires FailureType NONE.`);
+    }
+    if (kind === 'FORWARD') {
+      const index = route.indexOf(from);
+      if (index < 0 || route[index + 1] !== workflowState) {
+        problem(`Normal DOCUMENTATION forward handoffs follow ${route.join(' -> ')}; ${from} -> ${workflowState} skips or leaves that route.`);
+      }
+    }
+    if (['FAILURE', 'USER_REWORK', 'RESUME'].includes(kind)
+        && ![...DOCUMENTATION_PHASES, 'AWAITING_USER_SIGNOFF'].includes(from)) {
+      problem(`A DOCUMENTATION ${kind} handoff cannot originate in omitted state ${from}.`);
+    }
+    if (kind === 'RESUME' && failureType !== 'NONE') problem('A DOCUMENTATION RESUME handoff requires FailureType NONE.');
+    if (kind === 'RESUME' && !DOCUMENTATION_PHASES.includes(from)) {
+      problem('A DOCUMENTATION RESUME handoff must come from an included role that completed its recovery assignment.');
+    }
+    if (['FAILURE', 'USER_REWORK'].includes(kind)
+        && ['IMPLEMENTATION', 'VERIFICATION'].includes(failureType)) {
+      problem(`DOCUMENTATION cannot route ${failureType} work to an omitted owner; preserve the cycle and record the required user decision in Active Work.BlockedOn.`);
+    }
+    if (['FAILURE', 'USER_REWORK'].includes(kind) && failureType === 'REVIEW'
+        && workflowState !== 'REVIEWING_FINAL') problem('A DOCUMENTATION REVIEW failure or rework targets REVIEWING_FINAL.');
+    if (state.active.development !== 'NONE') problem('A DOCUMENTATION cycle keeps Active Work.Development NONE.');
+    if (state.active.pendingVerificationCadence !== 'NONE') problem('A DOCUMENTATION cycle keeps Active Work.PendingVerificationCadence NONE.');
+    if (state.active.promotionReason !== 'NONE') problem('A DOCUMENTATION cycle keeps Active Work.PromotionReason NONE; it cannot be promoted in place.');
   }
   if (cycleMode === 'EXPEDITED'
       && !['DEVELOPING', 'REVIEWING_IMPLEMENTATION', 'AWAITING_USER_SIGNOFF'].includes(workflowState)) {
@@ -186,17 +235,45 @@ function checkState(state, { committed, mode, report }) {
     if (!frame.fields.Reason?.trim()) problem(`${where}: \`Reason\` is missing.`);
     const rerun = frame.fields.RerunThrough;
     if (rerun !== 'NONE' && !STATES.has(rerun)) problem(`${where}: \`RerunThrough\` must be NONE or a workflow state.`);
+    if (cycleMode === 'DOCUMENTATION') {
+      if (frameFrom === owner) problem(`${where}: a same-state DOCUMENTATION correction does not push a recovery frame.`);
+      for (const name of ['From', 'ResumeAt']) {
+        if (![...DOCUMENTATION_PHASES, 'AWAITING_USER_SIGNOFF'].includes(frame.fields[name])) {
+          problem(`${where}: ${name} must be an included DOCUMENTATION state.`);
+        }
+      }
+      if (!DOCUMENTATION_PHASES.includes(owner)) problem(`${where}: Owner must be an included DOCUMENTATION role.`);
+      if (['IMPLEMENTATION', 'VERIFICATION'].includes(frameType)
+          || (frameType === 'REVIEW' && owner !== 'REVIEWING_FINAL')) {
+        problem(`${where}: ${frameType} cannot target this owner in DOCUMENTATION; REVIEW belongs to REVIEWING_FINAL and omitted owners require a blocking user decision.`);
+      }
+      if (rerun !== 'NONE' && (!DOCUMENTATION_PHASES.includes(rerun)
+          || DOCUMENTATION_PHASES.indexOf(rerun) <= DOCUMENTATION_PHASES.indexOf(owner))) {
+        problem(`${where}: RerunThrough must be a downstream included DOCUMENTATION role, or NONE.`);
+      }
+    }
   }
   // Until its owner finishes the correction (RerunThrough still NONE), the
   // active frame's owner holds the workflow state.
   const activeFrame = frames.at(-1);
+  if (cycleMode === 'DOCUMENTATION' && activeFrame && activeFrame.fields.RerunThrough !== 'NONE') {
+    const ownerRank = DOCUMENTATION_PHASES.indexOf(activeFrame.fields.Owner);
+    const boundaryRank = DOCUMENTATION_PHASES.indexOf(activeFrame.fields.RerunThrough);
+    const currentRank = DOCUMENTATION_PHASES.indexOf(workflowState);
+    if (ownerRank >= 0 && boundaryRank > ownerRank
+        && (currentRank < ownerRank || currentRank > boundaryRank)) {
+      problem(`Recovery frame ${activeFrame.label}: the active DOCUMENTATION rerun must stay between ${activeFrame.fields.Owner} and ${activeFrame.fields.RerunThrough} until its boundary returns to ResumeAt.`);
+    }
+  }
   if (activeFrame && activeFrame.fields.RerunThrough === 'NONE' && STATES.has(activeFrame.fields.Owner)
       && workflowState !== activeFrame.fields.Owner) {
     problem(`Recovery frame ${activeFrame.label} is still being corrected (RerunThrough is NONE), so WorkflowState must be its Owner, ${activeFrame.fields.Owner}.`);
   }
-  // A failure or rework that changed state pushes a frame recording it.
-  if (['FAILURE', 'USER_REWORK'].includes(kind) && STATES.has(from) && from !== workflowState) {
-    if (!activeFrame || activeFrame.fields.From !== from || activeFrame.fields.Owner !== workflowState) {
+  // All corrections belong to their failure owner. Only a state-changing
+  // correction pushes a frame; staying put does not waive ownership.
+  if (['FAILURE', 'USER_REWORK'].includes(kind) && STATES.has(from)) {
+    if (from !== workflowState
+        && (!activeFrame || activeFrame.fields.From !== from || activeFrame.fields.Owner !== workflowState)) {
       problem(`Handoff.Kind is ${kind} from ${from} to ${workflowState}, so the last recovery frame must record \`From\`: \`${from}\` and \`Owner\`: \`${workflowState}\`.`);
     }
     if (FAILURE_TYPES.has(failureType) && !ownersOf(failureType).includes(workflowState)) {
@@ -208,6 +285,9 @@ function checkState(state, { committed, mode, report }) {
     problem(`Outstanding Obligations.Active is \`${state.obligations.active}\` but there ${items.length === 1 ? 'is 1 obligation' : `are ${items.length} obligations`}.`);
   }
   numbered(items, 'Obligation', 'Outstanding Obligations');
+  if (cycleMode === 'DOCUMENTATION' && (state.obligations.active || items.length)) {
+    problem('DOCUMENTATION has no expedited promotion obligations; preserve recovery and use Active Work.BlockedOn for an omitted-owner decision.');
+  }
   for (const item of items) {
     const where = `Obligation ${item.label}`;
     if (!STATES.has(item.fields.Owner)) problem(`${where}: \`Owner\` must be a workflow state.`);
@@ -239,10 +319,10 @@ function checkState(state, { committed, mode, report }) {
     }
   }
   if (cycleMode === 'EXPEDITED' && baseline.entries?.length) {
-    problem('An EXPEDITED cycle cannot carry BaselineReconciliation; unresolved reconciliation requires STANDARD.');
+    problem('An EXPEDITED cycle cannot carry BaselineReconciliation; unresolved reconciliation requires STANDARD or DOCUMENTATION.');
   }
-  if (workflowState === 'AWAITING_USER_SIGNOFF' && cycleMode === 'STANDARD' && baseline.entries?.length) {
-    problem('A STANDARD cycle cannot await sign-off while BaselineReconciliation is unresolved.');
+  if (workflowState === 'AWAITING_USER_SIGNOFF' && ['STANDARD', 'DOCUMENTATION'].includes(cycleMode) && baseline.entries?.length) {
+    problem(`A ${cycleMode} cycle cannot await sign-off while BaselineReconciliation is unresolved.`);
   }
 }
 
@@ -316,6 +396,11 @@ async function checkAcceptance(root, context) {
     if (previous.has(id)) problem(`${id} is both current and listed under Previous Cycles.`);
   }
   const workflowState = state.WorkflowState;
+  if (state.CycleMode === 'DOCUMENTATION' && !current.size
+      && (context.resumeSource === 'SCOPING' || (workflowState !== 'AUDITING'
+        && workflowState !== 'SCOPING' && (!state.recovery.active || state.handoff.Kind === 'FORWARD')))) {
+    problem('A DOCUMENTATION cycle needs current acceptance conditions after SCOPING completes.');
+  }
   // Numbering continues across cycles, so every earlier cycle's ID is lower
   // than every ID this cycle defined. A higher ID under Previous Cycles, or
   // earlier cycles with no current conditions once scoping is done, means this
@@ -351,9 +436,17 @@ async function checkAcceptance(root, context) {
     if (!known.has(id)) problem(`${id} appears in the scope but is not defined as a condition. ${DEFINE_CONDITION}`);
   }
   const inScope = new Set(acceptanceMentions(scope));
-  for (const artifact of mine) {
+  // Canonical project designs may be unmarked. Their acceptance references
+  // obey the same scope identity rules as cycle-owned design records.
+  const referencing = [...mine];
+  const architecturePath = path.posix.normalize(state.active.architecture);
+  if (context.architecture !== null && !referencing.some((artifact) => artifact.path === architecturePath)) {
+    referencing.push({ path: architecturePath, text: context.architecture });
+  }
+  for (const artifact of referencing) {
     if (artifact.path === scopePath) continue;
-    for (const id of bareIds(artifact.text, ['AC'])) {
+    const references = artifact.path === architecturePath ? withoutPreviousCycles(artifact.text) : artifact.text;
+    for (const id of bareIds(references, ['AC'])) {
       if (known.has(id)) continue;
       report(artifact.path, inScope.has(id)
         ? `mentions ${id}, which appears in the scope ${scopePath} but is not defined there as a condition. ${DEFINE_CONDITION}`
@@ -380,11 +473,14 @@ async function checkAcceptance(root, context) {
   // The design has no Status, so it is held once Architect has handed off:
   // outside recovery, in any state after ARCHITECTING; during recovery, while
   // the last handoff is a FORWARD or RESUME from ARCHITECTING, which Architect
-  // makes only after passing its gate. A FAILURE from ARCHITECTING interrupts
-  // the design, so it is not held then.
-  const designDone = context.fullBoundary || (recovering
-    ? handedOffBy(['FORWARD', 'RESUME']) === 'ARCHITECTING'
-    : pastArchitecture(workflowState, context.mode));
+  // makes only after passing its gate. A documentation RESUME still holds that
+  // design after the last frame is popped. A FAILURE from ARCHITECTING
+  // interrupts the design, so it is not held then.
+  const designDone = context.fullBoundary
+    || (context.resumeSource === 'ARCHITECTING' && workflowState !== 'SCOPING')
+    || (recovering
+      ? handedOffBy(['FORWARD', 'RESUME']) === 'ARCHITECTING'
+      : pastArchitecture(workflowState, context.mode));
   if (designDone && context.architecture !== null) {
     for (const id of missing(withoutPreviousCycles(context.architecture))) {
       report(path.posix.normalize(state.active.architecture), `does not account for ${id}. Every current acceptance condition needs design coverage or "No architectural impact".`);
@@ -400,6 +496,10 @@ async function checkAcceptance(root, context) {
   const held = (phase) => {
     if (context.fullBoundary && phase === 'TESTING') return true;
     if (context.atTurnEnd && phase === workflowState) return false;
+    // A completed documentation-cycle assessment still owes current coverage
+    // when RESUME returns to an earlier role, even after the last frame is gone.
+    if (state.CycleMode === 'DOCUMENTATION' && state.handoff.Kind === 'RESUME'
+        && phase === justLeft && phase !== workflowState) return true;
     if (recovering) return phase === (context.atTurnEnd ? justLeft : workflowState);
     return rank(workflowState) >= rank(phase);
   };
@@ -407,13 +507,15 @@ async function checkAcceptance(root, context) {
     const key = artifact.provenance.artifact === 'REVIEW'
       ? `REVIEW:${artifact.provenance.reviewKind}` : artifact.provenance.artifact;
     const phase = COMPLETED_IN[key];
+    if (state.CycleMode === 'DOCUMENTATION' && !DOCUMENTATION_PHASES.includes(phase)) continue;
     const fields = headerFields(artifact.text);
     const partialAssessment = phase === 'TESTING' && ['INCREMENT', 'CORRECTION'].includes(fields['Assessment Purpose'])
       && (context.atTurnEnd ? justLeft === phase : workflowState === phase);
     if (!phase || !((fields.Status === 'COMPLETE' && held(phase)) || partialAssessment)) continue;
     // Increment history and suspended assignments do not establish current
     // acceptance coverage, whether the assessment is partial or full.
-    const coverage = phase === 'TESTING' ? recordSection(artifact.text, 'Acceptance Evidence') : artifact.text;
+    const coverage = phase === 'TESTING' ? recordSection(artifact.text, 'Acceptance Evidence')
+      : state.CycleMode === 'DOCUMENTATION' ? withoutPreviousCycles(artifact.text) : artifact.text;
     for (const id of missing(coverage)) {
       report(artifact.path, `${partialAssessment ? 'the partial assessment' : 'is COMPLETE but'} does not account for ${id}.`);
     }
@@ -479,6 +581,17 @@ async function checkActiveCycle(root, state, mode, artifacts, report, { atTurnEn
   if (id === 'UNSET' || TERMINAL_STATES.has(state.WorkflowState)) return;
   const recovering = state.recovery.active;
   const workflowState = state.WorkflowState;
+  const documentation = state.CycleMode === 'DOCUMENTATION';
+  // A successful recovery handoff still owes the source role's owned output,
+  // including after its last frame is popped. The receiving role may reopen
+  // its own work, so a same-state return does not assert its current completion.
+  const resumeSource = documentation && state.handoff.Kind === 'RESUME'
+    && workflowState !== state.handoff.From ? state.handoff.From : null;
+  // This recognizes the saved return shape, not the sufficiency of correction
+  // evidence. The returning owner must establish the protocol's qualified gate.
+  const correctiveReturn = documentation && state.handoff.Kind === 'RESUME'
+    && ['DOCUMENTING', 'SYNCHRONIZING'].includes(state.handoff.From)
+    && DOCUMENTATION_PHASES.includes(workflowState) && workflowState !== state.handoff.From;
   // Active Work paths, normalized so `./docs/x.md` and `docs/x.md` match.
   const active = Object.fromEntries(['scope', 'architecture', 'development'].map((name) => [name,
     state.active[name] === 'NONE' ? 'NONE' : path.posix.normalize(state.active[name])]));
@@ -487,7 +600,11 @@ async function checkActiveCycle(root, state, mode, artifacts, report, { atTurnEn
   // gitignored, or whose provenance block is missing or belongs to another
   // cycle, is still examined.
   const byPathAll = new Map(artifacts.map((artifact) => [artifact.path, artifact]));
-  for (const record of fixedRecords(id)) {
+  const discovery = fixedRecords(id);
+  // Documentation keeps Development NONE, so its forbidden plan cannot rely
+  // on an Active Work pointer or Git's non-ignored file inventory for discovery.
+  if (documentation) discovery.push({ artifact: 'DEVELOPMENT', reviewKind: null, path: fixedPath('DEVELOPMENT', id) });
+  for (const record of discovery) {
     let artifact = byPathAll.get(record.path);
     if (!artifact) {
       const { text, error } = await readRecord(root, record.path);
@@ -551,6 +668,9 @@ async function checkActiveCycle(root, state, mode, artifacts, report, { atTurnEn
   const seen = new Map();
   for (const artifact of mine) {
     const { artifact: type, reviewKind } = artifact.provenance;
+    if (documentation && omittedDocumentationRecord(type, reviewKind)) {
+      report(artifact.path, 'DOCUMENTATION omits this owner; a current-cycle implementation record cannot be fabricated or adopted as documentation evidence.');
+    }
     const key = `${type}:${reviewKind ?? ''}`;
     if (seen.has(key)) {
       report(artifact.path, `is a second ${recordName(type, reviewKind)} record for this cycle; ${seen.get(key)} is the first.`);
@@ -625,7 +745,8 @@ async function checkActiveCycle(root, state, mode, artifacts, report, { atTurnEn
     }
     texts[name] = text;
   }
-  const fullBoundary = rank(workflowState) >= rank('REVIEWING_IMPLEMENTATION')
+  // The full implementation boundary never applies to a documentation cycle.
+  const fullBoundary = !documentation && rank(workflowState) >= rank('REVIEWING_IMPLEMENTATION')
     && (!recovering || ['FORWARD', 'RESUME'].includes(state.handoff.Kind));
   const verification = mine.find((artifact) => artifact.path === fixedPath('VERIFICATION', id)
     && artifact.provenance.artifact === 'VERIFICATION');
@@ -633,7 +754,7 @@ async function checkActiveCycle(root, state, mode, artifacts, report, { atTurnEn
     state, planText: ownPlan ? planText : null, verificationText: verification?.text ?? null,
     report, atTurnEnd, fullBoundary,
   });
-  const pastDevelopment = rank(workflowState) > rank('DEVELOPING')
+  const pastDevelopment = !documentation && rank(workflowState) > rank('DEVELOPING')
     && (!recovering || fullBoundary || workflowState === 'TESTING');
   if (planPath && planText !== null && (state.active.development === 'NONE' || texts.Development !== undefined)) {
     await checkDevelopmentPlan(root, planPath, planText, { mustBeComplete: pastDevelopment && !workflow.partialDevelopment, report });
@@ -643,17 +764,30 @@ async function checkActiveCycle(root, state, mode, artifacts, report, { atTurnEn
   }
 
   const standard = state.CycleMode === 'STANDARD';
-  if (standard && (!recovering || fullBoundary)) {
-    if ((workflowState === 'ARCHITECTING' || pastArchitecture(workflowState, mode)) && state.active.scope === 'NONE') {
-      report(STATE_FILE, `Active Work.Scope is NONE, but this STANDARD cycle is already in ${workflowState}.`);
-    }
-    if (pastArchitecture(workflowState, mode) && state.active.architecture === 'NONE') {
-      report(STATE_FILE, `Active Work.Architecture is NONE, but this STANDARD cycle is already in ${workflowState}.`);
+  const requirePrior = (standard || documentation)
+    && (!recovering || fullBoundary || (documentation && state.handoff.Kind === 'FORWARD'));
+  if (state.active.scope === 'NONE' && (resumeSource === 'SCOPING'
+      || (requirePrior && (workflowState === 'ARCHITECTING' || pastArchitecture(workflowState, mode))))) {
+    report(STATE_FILE, `Active Work.Scope is NONE, but ${resumeSource === 'SCOPING'
+      ? 'a successful RESUME from SCOPING requires its completed scope'
+      : `this ${state.CycleMode} cycle is already in ${workflowState}`}.`);
+  }
+  if (state.active.architecture === 'NONE' && (resumeSource === 'ARCHITECTING'
+      || (requirePrior && pastArchitecture(workflowState, mode)))) {
+    report(STATE_FILE, `Active Work.Architecture is NONE, but ${resumeSource === 'ARCHITECTING'
+      ? 'a successful RESUME from ARCHITECTING requires its completed design'
+      : `this ${state.CycleMode} cycle is already in ${workflowState}`}.`);
+  }
+  if (documentation && ((!recovering && !correctiveReturn && workflowState !== 'AUDITING')
+      || resumeSource === 'AUDITING' || (state.handoff.Kind === 'FORWARD' && workflowState !== 'AUDITING'))) {
+    const { text, error } = await readRecord(root, '.standards/CONTEXT.md');
+    if (error || !text?.trim()) {
+      report('.standards/CONTEXT.md', `${error ?? 'is missing or empty'}; a DOCUMENTATION cycle requires Auditor-owned context after AUDITING.`);
     }
   }
   // Require only this policy's records. Discovery and validation above still
   // examine all existing records, including those owned by omitted phases.
-  if ((!recovering || fullBoundary) && ['STANDARD', 'EXPEDITED'].includes(state.CycleMode)) {
+  if ((!recovering || fullBoundary || documentation) && ['STANDARD', 'EXPEDITED', 'DOCUMENTATION'].includes(state.CycleMode)) {
     const required = requiredCompletionRecords(id, state.CycleMode, state.active.completionPolicy);
     // An incomplete downstream corrective gate may return through Reviewer,
     // but cannot pop directly to sign-off, even when its normal phase is omitted.
@@ -665,14 +799,23 @@ async function checkActiveCycle(root, state, mode, artifacts, report, { atTurnEn
     for (const record of required) {
       // Recovery's later-role exceptions remain intact; Reviewer entry still
       // holds the verification record to full completion.
-      if (recovering && record.phase !== 'TESTING') continue;
+      const correctionSource = correctiveReturn && record.phase === state.handoff.From;
+      const recoveryForward = documentation && state.handoff.Kind === 'FORWARD' && record.phase === state.handoff.From;
+      const recoveryResume = documentation && state.handoff.Kind === 'RESUME'
+        && record.phase === state.handoff.From && workflowState !== record.phase
+        && workflowState !== 'AWAITING_USER_SIGNOFF';
+      if (recovering && (documentation
+        ? !correctionSource && !recoveryForward && !recoveryResume && workflowState !== 'AWAITING_USER_SIGNOFF'
+        : record.phase !== 'TESTING')) continue;
       const policyReturn = state.handoff.Kind === 'COMPLETION_CHANGE' && record.reviewKind === 'IMPLEMENTATION';
-      if (!policyReturn && rank(workflowState) <= rank(record.phase)) continue;
+      if (!policyReturn && !correctionSource && !recoveryForward && !recoveryResume && rank(workflowState) <= rank(record.phase)) continue;
       const artifact = mine.find((candidate) => candidate.path === record.path
         && candidate.provenance.artifact === record.artifact && candidate.provenance.reviewKind === record.reviewKind);
       if (!artifact) {
         if (!(await exists(root, record.path))) {
           report(record.path, record === directReturn ? 'must exist and be COMPLETE for a direct recovery return to sign-off.'
+            : correctionSource ? 'must exist with current-cycle provenance for a corrective RESUME handoff.'
+            : recoveryResume ? `must exist for a successful RESUME handoff from ${record.phase}.`
             : policyReturn ? 'must exist for a COMPLETION_CHANGE handoff, but it does not.'
             : `must exist once the cycle has passed ${record.phase}, but it does not.`);
         }
@@ -682,24 +825,30 @@ async function checkActiveCycle(root, state, mode, artifacts, report, { atTurnEn
       // remains. Its prior report must exist, but current work need not already
       // pass the gate. Other roles still require that review to be COMPLETE.
       if (policyReturn && workflowState === record.phase) continue;
-      // A Documenter Corrective Return may leave this required record unfinished
-      // while a later role resumes; require COMPLETE only at sign-off. Omitted
-      // records are outside this list unless making a direct recovery return.
-      if (record.artifact === 'DOCUMENTATION' && workflowState !== 'AWAITING_USER_SIGNOFF') continue;
+      if (correctionSource) continue;
+      // A qualified incomplete Documenter return can survive further recovery
+      // before the interrupted role finishes. The latest handoff may be a
+      // local correction or a RESUME from another owner. Its record still has
+      // to exist; normal forward gates and readiness require full completion.
+      // STANDARD retains its existing incomplete-return allowance.
+      if (record.artifact === 'DOCUMENTATION' && workflowState !== 'AWAITING_USER_SIGNOFF'
+          && (!documentation || (['RESUME', 'FAILURE', 'USER_REWORK'].includes(state.handoff.Kind)
+            && DOCUMENTATION_PHASES.includes(workflowState)))) continue;
       const status = headerFields(artifact.text).Status;
       // A missing, unfilled, or invalid Status is already reported with the
       // record's header, so only a valid but unfinished one is reported here.
       if (['IN_PROGRESS', 'BLOCKED'].includes(status)) {
         report(record.path, record === directReturn ? `must be COMPLETE for a direct recovery return to sign-off; its Status is \`${status}\`. An incomplete corrective return must rerun implementation Reviewer.`
+          : recoveryResume ? `must be COMPLETE for a successful RESUME handoff from ${record.phase}; its Status is \`${status}\`.`
           : policyReturn ? `must be COMPLETE for a COMPLETION_CHANGE handoff; its Status is \`${status}\`.`
           : `must be COMPLETE once the cycle has passed ${record.phase}; its Status is \`${status}\`.`);
       }
     }
   }
-  if (standard && texts.Scope !== undefined) {
+  if ((standard || documentation) && texts.Scope !== undefined) {
     await checkAcceptance(root, {
       state, mode, scope: texts.Scope, architecture: texts.Architecture ?? null, mine, report, atTurnEnd,
-      fullBoundary,
+      fullBoundary, resumeSource,
     });
   }
   if (state.CycleMode === 'EXPEDITED') {

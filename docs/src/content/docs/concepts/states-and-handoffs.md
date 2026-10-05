@@ -40,6 +40,15 @@ implementation begins.
 See the [state reference](../../reference/protocol/#workflow-states) for exact
 saved names such as `DEVELOPING` and `REVIEWING_IMPLEMENTATION`.
 
+## Documentation forward path
+
+An explicit standalone Documenter assignment in an existing project starts with
+Auditor, Scoper, Architect, Documenter, final Reviewer, and Synchronizer before
+your sign-off decision. Each handoff still needs the next role's invocation;
+final Reviewer needs an independent chat. All six full gates are mandatory,
+including for an assessed no-change result. See
+[Updating Documentation on Its Own](../../guides/updating-documentation/).
+
 ## Expedited forward path
 
 Eligible brownfield work follows Developer, implementation Reviewer, and your
@@ -131,8 +140,10 @@ requirement needs sufficient evidence. Required project context must be valid,
 including any checks of changes left by cancelled cycles.
 
 Expedited work needs Developer and implementation Reviewer to complete its
-narrower checks. In either mode, recovery must be finished, no outstanding
-obligations may remain, and no unanswered question may block completion.
+narrower checks. Documentation work needs all six included gates and sufficient
+current evidence, including final review and synchronization. In every mode,
+recovery must be finished, no outstanding obligations may remain, and no
+unanswered question may block completion.
 
 A report labelled “complete” is not enough on its own. If files or requirements
 have changed, the relevant roles must establish whether their earlier

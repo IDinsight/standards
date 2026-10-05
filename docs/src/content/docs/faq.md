@@ -357,6 +357,20 @@ If expedited work turns out to need a skipped role, the cycle is promoted to
 standard work and continues from Auditor. See
 [Promote an expedited cycle](../concepts/states-and-handoffs/#promote-an-expedited-cycle).
 
+### Can I ask for just a documentation update?
+
+Yes. With no active cycle in an existing project, invoke Documenter with the
+assignment. It starts a Brownfield `DOCUMENTATION` cycle through Auditor,
+Scoper, Architect, Documenter, independent final Reviewer, and Synchronizer
+before your sign-off decision. Missing guides can be created; no implementation
+or formal-testing phase is added. The agent preserves your target, editing
+boundary, guided choice, and selected style. See
+[Updating Documentation on Its Own](../guides/updating-documentation/).
+
+It cannot replace an active cycle, enter this mode in Greenfield, or convert the
+cycle to implementation work. If implementation is required, you choose an
+achievable documentation scope or explicitly cancel for a separate cycle.
+
 ### Can I finish a cycle if the project has no documentation?
 
 Yes. Ask to finish after implementation review when starting a standard cycle,

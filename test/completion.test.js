@@ -19,11 +19,19 @@ test('completion requirements never infer a policy for invalid combinations', ()
   for (const [mode, policy] of [
     ['STANDARD', 'NONE'], ['STANDARD', undefined], ['STANDARD', 'UNKNOWN'],
     ['EXPEDITED', 'FULL_DELIVERABLE'], ['EXPEDITED', 'IMPLEMENTATION_REVIEWED'],
+    ['DOCUMENTATION', 'FULL_DELIVERABLE'], ['DOCUMENTATION', 'IMPLEMENTATION_REVIEWED'],
     ['UNKNOWN', 'FULL_DELIVERABLE'],
   ]) {
     assert.equal(requiredCompletionPhases(mode, policy), null, `${mode}/${policy}`);
   }
   for (const policy of COMPLETION_POLICIES) assert.deepEqual(requiredCompletionPhases('UNSET', policy), []);
+});
+
+test('documentation completion requires its six gates without implementation phases', () => {
+  const phases = requiredCompletionPhases('DOCUMENTATION', 'NONE');
+  assert.deepEqual(phases, ['AUDITING', 'SCOPING', 'ARCHITECTING', 'DOCUMENTING', 'REVIEWING_FINAL', 'SYNCHRONIZING']);
+  phases.pop();
+  assert.equal(requiredCompletionPhases('DOCUMENTATION', 'NONE').at(-1), 'SYNCHRONIZING');
 });
 
 test('policy-dependent required records do not change the inventory used to discover existing records', () => {
@@ -36,6 +44,9 @@ test('policy-dependent required records do not change the inventory used to disc
   assert.deepEqual(short.map(({ artifact, reviewKind }) => [artifact, reviewKind]),
     [['VERIFICATION', null], ['REVIEW', 'IMPLEMENTATION']]);
   assert.deepEqual(expedited, short.filter(({ artifact }) => artifact === 'REVIEW'));
+  assert.deepEqual(requiredCompletionRecords(id, 'DOCUMENTATION', 'NONE'),
+    all.filter(({ artifact, reviewKind }) => artifact === 'DOCUMENTATION'
+      || artifact === 'SYNCHRONIZATION' || reviewKind === 'FINAL_DELIVERABLE'));
   assert.deepEqual(fixedRecords(id), all);
   assert.equal(all.length, 5);
 });

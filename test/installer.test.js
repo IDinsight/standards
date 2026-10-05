@@ -6,7 +6,7 @@ import test from 'node:test';
 
 import { installProject } from '../lib/install.js';
 import { applyOperations } from '../lib/install-files.js';
-import { checkUpgrade } from '../lib/installer.js';
+import { checkUpgrade, inspectInstallTarget } from '../lib/installer.js';
 import { runCli } from '../lib/cli.js';
 
 const packageVersion = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8')).version;
@@ -229,6 +229,44 @@ test('interrupted installer backups and malformed state block reinstall', () => 
   await assert.rejects(installProject({ projectRoot: root }), /Inconsistent cycle or pending fields/);
   assert.match(await read(root, '.standards/STATE.md'), /`PendingCycleMode`: `INVALID`/);
 }));
+
+for (const cycleMode of ['EXPEDITED', 'DOCUMENTATION']) {
+  for (const field of ['CycleMode', 'PendingCycleMode']) {
+    test(`Greenfield inspection and reinstall reject ${field}: ${cycleMode}`, () => fixture(async (root) => {
+      await installProject({ projectRoot: root, mode: 'GREENFIELD', clients: ['codex'], hooks: false });
+      const initial = await read(root, '.standards/STATE.md');
+      const fields = field === 'CycleMode'
+        ? { CycleMode: cycleMode, WorkflowState: cycleMode === 'EXPEDITED' ? 'DEVELOPING' : 'AUDITING',
+          Id: 'update-guide-20261004T120000Z-1234abcd', Request: 'Update the guide.' }
+        : { PendingCycleMode: cycleMode };
+      const state = Object.entries(fields).reduce((text, [name, value]) =>
+        text.replace(new RegExp('`' + name + '`:\\s*`[^`]*`'), `\`${name}\`: \`${value}\``), initial);
+      await write(root, '.standards/STATE.md', state);
+      const protocol = await read(root, '.standards/PROTOCOL.md');
+      await assert.rejects(inspectInstallTarget(root), /GREENFIELD/);
+      await assert.rejects(installProject({ projectRoot: root }), /GREENFIELD/);
+      assert.equal(await read(root, '.standards/STATE.md'), state);
+      assert.equal(await read(root, '.standards/PROTOCOL.md'), protocol);
+    }));
+  }
+}
+
+for (const field of ['CycleMode', 'PendingCycleMode']) {
+  test(`Brownfield inspection and reinstall preserve ${field}: DOCUMENTATION`, () => fixture(async (root) => {
+    await installProject({ projectRoot: root, mode: 'BROWNFIELD', clients: ['codex'], hooks: false });
+    const initial = await read(root, '.standards/STATE.md');
+    const fields = field === 'CycleMode'
+      ? { CycleMode: 'DOCUMENTATION', Id: 'update-guide-20261004T120000Z-1234abcd',
+        Request: 'Standalone Documenter: update the guide in GUIDED mode.' }
+      : { PendingCycleMode: 'DOCUMENTATION' };
+    const state = Object.entries(fields).reduce((text, [name, value]) =>
+      text.replace(new RegExp('`' + name + '`:\\s*`[^`]*`'), `\`${name}\`: \`${value}\``), initial);
+    await write(root, '.standards/STATE.md', state);
+    assert.equal((await inspectInstallTarget(root)).mode, 'BROWNFIELD');
+    assert.equal((await installProject({ projectRoot: root })).mode, 'BROWNFIELD');
+    assert.equal(await read(root, '.standards/STATE.md'), state);
+  }));
+}
 
 test('compatible releases can upgrade, while downgrades and cross-major changes stop', () => {
   assert.doesNotThrow(() => checkUpgrade('1.2.3', '1.2.3'));
