@@ -387,6 +387,27 @@ test('parser ignores fenced examples and rejects malformed, repeated, missing an
   assert.throws(() => compileInvocationSchema({ ...schema, inventedKeyword: true }), /Unsupported/);
 });
 
+const commentSeparators = [
+  ['LF', '\n'], ['CRLF', '\r\n'], ['CR', '\r'], ['line separator', '\u2028'], ['paragraph separator', '\u2029'],
+];
+
+for (const [label, separator] of commentSeparators) {
+  test('parser ignores commented metadata containing ' + label, () => {
+    const hidden = '<!-- outer comment' + separator + 'still hidden\n' + sourceBlock({ ...mode, id: 'HIDDEN' });
+    assert.throws(() => parseInvocationBlock(hidden + '-->\n', validate), /expected exactly one invocation metadata block/);
+    assert.deepEqual(parseInvocationBlock(hidden + '-->\n\n' + sourceBlock(mode), validate), mode);
+    assert.throws(() => parseInvocationBlock(hidden, validate), /expected exactly one invocation metadata block/);
+  });
+}
+
+for (const [label, separator] of commentSeparators.slice(2)) {
+  test('parser preserves literal comment markers in code spans containing ' + label, () => {
+    // The comment opener belongs to a closed code span, not an HTML comment.
+    const literal = tick + 'literal' + separator + '<!-- still code' + tick;
+    assert.deepEqual(parseInvocationBlock(literal + '\n\n' + sourceBlock(mode), validate), mode);
+  });
+}
+
 for (const [label, mutate] of [
   ['duplicate groups', (value) => { value.groups.push(value.groups[0]); }],
   ['missing default option', (value) => { value.groups[0].defaultForNew = 'ABSENT'; }],
@@ -549,6 +570,29 @@ test('visible record fields survive inline comments while commented values stay 
   assert.equal(result.complete, true, JSON.stringify(result.diagnostics));
   assert.equal(result.groups[0].selected.value, 'STEPWISE');
   assert.equal(result.userStyles.locked, 'false');
+}));
+
+test('comments with line separators preserve visible choices and locks without exposing hidden fields', () => fixture(async (root) => {
+  await state(root);
+  const file = await record(root, 'DEVELOPMENT', { ...plan, 'User Style Locked': 'true' });
+  const original = await read(root, file);
+  for (const [label, separator] of commentSeparators) {
+    const text = original
+      .replace(tick + 'Mode' + tick + ': ' + tick + 'STEPWISE' + tick,
+        tick + 'Mode' + tick + ': ' + tick + 'STEPWISE' + tick
+          + ' <!-- old choice' + separator + tick + 'Mode' + tick + ': ' + tick + 'AUTONOMOUS' + tick + ' -->')
+      .replace(tick + 'User Style Locked' + tick + ': ' + tick + 'true' + tick,
+        '<!-- old lock' + separator + tick + 'User Style Locked' + tick + ': ' + tick + 'false' + tick + ' --> '
+          + tick + 'User Style Locked' + tick + ': ' + tick + 'true' + tick);
+    await write(root, file, text);
+    const before = await snapshot(root);
+    const result = await discoverInvocation(root, 'developer');
+    assert.equal(result.complete, true, label + ': ' + JSON.stringify(result.diagnostics));
+    assert.equal(group(result, 'collaboration').selected.value, 'STEPWISE', label);
+    assert.equal(result.userStyles.selected.value, 'NONE', label);
+    assert.equal(result.userStyles.locked, 'true', label);
+    assert.deepEqual(await snapshot(root), before, label);
+  }
 }));
 
 test('comment-like text in a code-span style identifier remains literal', () => fixture(async (root) => {

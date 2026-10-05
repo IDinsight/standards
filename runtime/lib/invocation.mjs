@@ -70,7 +70,7 @@ function visibleLines(text) {
     }
     // Preserve code spans, including comment-looking text in field values.
     // Strip only comments, not the visible fields beside them.
-    return line.replace(/(`+)(?!`).*?(?<!`)\1(?!`)|<!--.*?(?:-->|$)/g, (match, code) => {
+    return line.replace(/(`+)(?!`).*?(?<!`)\1(?!`)|<!--.*?(?:-->|$)/gs, (match, code) => {
       if (code) return match;
       if (!match.endsWith('-->')) comment = true;
       return '';
