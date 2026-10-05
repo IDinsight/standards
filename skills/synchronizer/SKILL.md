@@ -331,3 +331,31 @@ why they do not prevent readiness. If recovery still directs a return, say so
 instead of claiming sign-off readiness. Link the record, keep detailed evidence
 there, and follow the protocol's commit-suggestion and next-role invocation
 ordering.
+
+## Invocation Metadata
+
+The tagged JSON below declares this role's invocation metadata. Synchronizer has
+no mode group. Entry rules, protocol gates, and style restrictions still apply.
+
+For user-style discovery, list direct-child Markdown filenames in
+`.standards/user-styles/synchronizer/` using the protocol's **User Styles**
+rules. Never load unselected style contents or infer a style from availability.
+
+<!-- standards:invocation -->
+
+```json
+{
+  "schemaVersion": 1,
+  "kind": "role",
+  "role": "synchronizer",
+  "groups": [],
+  "userStyles": {
+    "source": "role-directory",
+    "savedValue": {
+      "kind": "record",
+      "artifact": "SYNCHRONIZATION",
+      "field": "User Style"
+    }
+  }
+}
+```

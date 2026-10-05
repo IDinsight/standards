@@ -52,7 +52,9 @@ A role owns decisions or artifacts; it is not necessarily a workflow state.
 Workflow role skills are invoked explicitly by the user. `WorkflowState`
 determines whether an invoked role may perform role-owned workflow work; it does
 not dispatch a skill automatically. Where supported, client installation must
-prevent implicit model invocation of workflow role skills.
+prevent implicit model invocation of workflow role skills. Read-only discovery
+of a role's invocation options does not invoke that role, authorize role-owned
+work, or change workflow state.
 
 `NAVIGATOR` is explicitly invoked, strictly non-mutating, and outside the
 workflow state machine. Its **Navigator Boundary** below applies instead of
@@ -472,14 +474,16 @@ conflict-resolution semantics locally.
 ## Runtime Tools and Hooks
 
 Installation places these tools in `.standards/bin/`. They run with Node.js.
-Roles use them instead of doing these steps by hand:
+Agents call them internally; users do not need an extra post-install command or
+setup step. Roles use them instead of doing these steps by hand:
 
-| Command                                                       | Purpose                                                                                                               |
-| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| `node .standards/bin/cycle.mjs new --request "<request>"`     | Generate a new cycle ID (see **Cycle IDs** in `.standards/protocol/user-decisions.md`).                               |
-| `node .standards/bin/artifact.mjs init <TYPE>`                | Create one of the active cycle's records with its provenance block and header (see **Workflow Artifact Provenance**). |
-| `node .standards/bin/id.mjs next <AC\|DEV\|F\|D\|DOC> <file>` | Print the next free identifier for a record.                                                                          |
-| `node .standards/bin/check.mjs`                               | Check the runtime files and the active cycle's records. It only reads files.                                          |
+| Command                                                              | Purpose                                                                                                               |
+| -------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `node .standards/bin/cycle.mjs new --request "<request>"`            | Generate a new cycle ID (see **Cycle IDs** in `.standards/protocol/user-decisions.md`).                               |
+| `node .standards/bin/artifact.mjs init <TYPE>`                       | Create one of the active cycle's records with its provenance block and header (see **Workflow Artifact Provenance**). |
+| `node .standards/bin/id.mjs next <AC\|DEV\|F\|D\|DOC> <file>`        | Print the next free identifier for a record.                                                                          |
+| `node .standards/bin/check.mjs`                                      | Check the runtime files and the active cycle's records. It only reads files.                                          |
+| `node .standards/bin/invocation.mjs <role> --client <client> --json` | Discover a role's invocation options without changing files (see **Next-Role Invocation Options**).                   |
 
 A workflow role runs `check` before its first substantive work and again before
 every state-changing handoff. For each problem it reports:
@@ -493,7 +497,8 @@ A forward handoff requires that `check` reports no problem in files the current
 role owns. `check` finds mechanical errors such as malformed cycle IDs, broken
 provenance, or missing acceptance coverage; it does not replace a role's
 completion gate. If a tool is missing or fails, stop and report it; do not do
-its step by hand.
+its step by hand. Invocation discovery is the presentation-only exception:
+follow **Next-Role Invocation Options** for unavailable or incomplete results.
 
 A user instruction not to run commands covers tests, builds, scripts, package
 managers, git (including read-only git commands) and any other command, with
@@ -521,9 +526,9 @@ may have changed the acceptance conditions since that handoff. The checker must
 allow legitimate partial records during an increment assessment or scoped
 correction while preserving full completion checks at Reviewer entry.
 
-Navigator may run `check`, because it changes nothing. When `check` or a hook
-reports problems during Navigator work, Navigator reports them and changes
-nothing.
+Navigator may run `check` and `invocation`, because they change nothing.
+Discovery needs no active cycle. When a tool or hook reports problems during
+Navigator work, Navigator reports the relevant limits and changes nothing.
 
 ## Verification Cadence
 
@@ -748,11 +753,11 @@ This topology is valid only for `ProjectMode: BROWNFIELD` with
    `Outstanding Obligations` changes before further role work and before
    presenting any next-role invocation.
 7. After a legal transition to a different workflow role, provide a concise
-   copy/paste invocation for that role unless the same user instruction already
-   explicitly invoked it and it will continue immediately. Do not emit one when
-   the workflow remains with the same role, a blocking question is unresolved,
-   the result is `AWAITING_USER_SIGNOFF`, `SIGNED_OFF`, or `CANCELLED`, or
-   Navigator is used.
+   copy/paste invocation for that role with **Next-Role Invocation Options**,
+   unless the same user instruction already explicitly invoked it and it will
+   continue immediately. Do not emit one when the workflow remains with the same
+   role, a blocking question is unresolved, the result is
+   `AWAITING_USER_SIGNOFF`, `SIGNED_OFF`, or `CANCELLED`, or Navigator is used.
 8. The invocation is convenience only; `STATE.md` and role-owned artifacts
    remain authoritative. Use the active client's syntax and avoid duplicating
    authoritative workflow content unless needed for disambiguation:
@@ -774,6 +779,95 @@ active recovery frame.
 
 At `AWAITING_USER_SIGNOFF`, present the applicable user actions rather than a
 next-role invocation.
+
+### Next-Role Invocation Options
+
+When a next-role invocation is required under **Handoff Rules**, the current
+role runs the read-only discovery helper after persisting the transition and
+before presenting the message:
+
+```sh
+node .standards/bin/invocation.mjs <role> --client <client> --json
+```
+
+Use the destination skill identifier for `<role>` and the active client, `codex`
+or `claude`, for `<client>`. This is an internal agent operation, not a user
+setup step or a command to include in the copy/paste invocation. Installation
+includes the helper and its schema. It discovers the installed role/mode
+metadata and current user-style filenames on each call. Do not keep a second
+mode/style catalog, infer styles from identity, or load unselected style
+contents.
+
+Read the JSON dispositions, including `catalogStatus`, group selections, option
+`selectability`, saved values/arguments, style inventory and lock, and
+diagnostics. Exit status 0 does not establish that every option is selectable or
+that a workflow gate passed. Read a referenced `selectionRules` section only
+when needed to explain an option's restrictions; this does not invoke the next
+role or authorize performing its assessment or procedure. The detailed output
+contract is in `.standards/bin/schemas/invocation-metadata.md`.
+
+Keep the base invocation from **Handoff Rules** unchanged, including its
+persisted-input directions, recovery wording, and any independent-session prefix
+and review kind. Put a compact summary beside it, separating:
+
+- **You can choose:** options whose `selectability` is `user`, with a short
+  description and optional text the user can append to the invocation. Name the
+  group when needed to distinguish collaboration from a target, and supply a
+  placeholder for any required file, directory, capability, or area argument. An
+  `assessment-required` user option is a request subject to the receiving role's
+  assessment, not a promise that the requested boundary is eligible.
+- **What happens next:** known current selections, applicable saved target
+  details, and any assessment the receiving role still needs to make. Never
+  present state or assessment modes as user switches, or an assessed candidate
+  as a decided outcome. A saved value cannot override a state-selected value or
+  a current condition. A saved assessed mode is resume context only.
+
+Use the discovered identifiers and descriptions. For example, a discovered
+`STEPWISE` collaboration choice may be expressed as an optional addition
+`Use STEPWISE collaboration.`; do not append it to the base invocation on the
+user's behalf. A bare continuation preserves applicable choices, including
+intent retained in the active request/scope. Mention a `defaultForNew` only as a
+fallback for genuinely new work with no applicable choice; missing records do
+not establish new work. If a saved choice is unresolved or invalid, describe
+that uncertainty instead of replacing it with the default.
+
+Include a few discovered user-style identifiers when the inventory is complete
+and the selection is unlocked; label samples as examples if more exist. Use the
+helper's non-null `selector` for copy/paste examples such as
+`Use user style <selector>.`, or clear an unlocked selection with
+`Use user style NONE.`. An entry with a null `selector` is inventory information
+only, not a confirmed selectable choice; use `selectorReason` to distinguish
+ambiguous names, record-syntax restrictions, and an unverified inventory. Style
+files are role-specific; never carry a style from the current role into the next
+role automatically. For conversation bindings, use only an explicit choice for
+that role still present in the conversation; a different conversation needs the
+user to name it again.
+
+If a style is locked, report the retained identifier, including `NONE`, and omit
+change/clear suggestions. Developer's style stays locked after first plan
+approval even during recovery or a revised plan; collaboration modes remain
+separately selectable. If a lock is unknown, report that change eligibility is
+unresolved. Discovered filenames may be named as inventory information, but not
+as confirmed selectable styles. Only the receiving role can establish that a
+missing record belongs to genuinely new work. A missing locked style requires
+restoration under **User Styles**, not substitution or clearing.
+
+Omit empty categories and irrelevant alternatives. Keep small groups of
+selectable choices complete; for a long inventory, label the displayed choices
+as examples and point to the discovered role/style location for the rest. Do not
+dump metadata, diagnostics, all mode procedures, or a configuration
+questionnaire. Optional choices do not add an approval gate, revise scope, waive
+remaining required work, or invoke a role on their own. Do not pause an
+already-authorized immediate continuation to solicit choices; **Independent
+Assessment Sessions** still takes precedence.
+
+If the helper cannot run or its catalog is unavailable, provide the normal
+invocation with a brief note that optional choices could not be verified. Do not
+invent an option list or ask the user to run the helper. With a complete catalog
+but unresolved context, present only independently verified choices and qualify
+the affected values; `complete: false` need not hide usable parts of the result.
+Genuine workflow blockers still follow their existing rules. Discovery neither
+repairs framework files nor changes a selection.
 
 ### Independent Assessment Sessions
 
@@ -1777,6 +1871,20 @@ A role uses a user style only when the user explicitly selects one:
   `.standards/user-styles/<role>/tony.md`. Only a direct child Markdown file of
   that role's folder can be selected; reject paths, separators, traversal, and
   symlinks that leave the folder. `NONE` is reserved and means no user style.
+  When a filename overlaps another style's identifier, use an unambiguous
+  accepted name in invocations and saved `User Style` fields; do not shorten it
+  into an ambiguous name. If neither the stem nor the full filename resolves
+  uniquely, the user must disambiguate the filenames before selecting that file.
+- For roles that persist styles in records, the selector must also be a concrete
+  header value: it must be nonblank and must neither contain `|` nor be entirely
+  enclosed in `<...>`. Prefer the stem only when it is unique and usable;
+  otherwise use a unique, usable full filename. For example, `<formal>.md`
+  persists as `<formal>.md`, never `<formal>`. Neither name for
+  `team | compact.md` can be saved in a record. Report this syntax limitation
+  separately from filename ambiguity. Retain a working saved selector on resume;
+  do not rename user files or rewrite locked selections to work around a
+  limitation. Conversation-only styles do not have record-field syntax
+  restrictions.
 - Never infer a style from the user's identity, repository ownership, prior
   usage, another role's selection, or the mere presence of a file.
 - If a selection does not resolve to exactly one available file, stop and ask

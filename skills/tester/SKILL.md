@@ -106,8 +106,10 @@ required handoff or recovery route.
 
 ## Modes and Styles
 
-Choose and read one thin mode file; both use the procedure and assignment gates
-below, independently of assessment purpose or Developer's collaboration mode:
+Discover modes through [Invocation Metadata](#invocation-metadata). Assess the
+current evidence to choose one mode; all modes use the procedure and assignment
+gates below, independently of assessment purpose or Developer's collaboration
+mode:
 
 - **VERIFY** — establish initial verification, including resuming an interrupted
   initial pass whose assessed inputs remain unchanged. Read
@@ -333,3 +335,47 @@ Persist the report before each transition and follow **Handoff Rules**. For any
 handoff entering either review state, follow **Independent Reviewer Session**,
 name the review kind, and provide the advisory model recommendation. Do not
 perform the next role's work.
+
+## Invocation Metadata
+
+Discover options from the tagged JSON below and the metadata blocks in direct
+child `modes/*.md` files. Inspect only those blocks for discovery, then load the
+selected mode's full instructions. A `user` option is selectable; `state` and
+`assessment` options are determined under `selectionRules`. Preserve applicable
+saved choices and use defaults only for genuinely new work without a selection.
+Entry rules, protocol gates, and style restrictions still apply.
+
+For user-style discovery, list direct-child Markdown filenames in
+`.standards/user-styles/tester/` using the protocol's **User Styles** rules.
+Never load unselected style contents or infer a style from availability.
+
+<!-- standards:invocation -->
+
+```json
+{
+  "schemaVersion": 1,
+  "kind": "role",
+  "role": "tester",
+  "groups": [
+    {
+      "id": "verification-mode",
+      "label": "Verification mode",
+      "source": "modes",
+      "selectionRules": "SKILL.md#modes-and-styles",
+      "savedValue": {
+        "kind": "record",
+        "artifact": "VERIFICATION",
+        "field": "Mode"
+      }
+    }
+  ],
+  "userStyles": {
+    "source": "role-directory",
+    "savedValue": {
+      "kind": "record",
+      "artifact": "VERIFICATION",
+      "field": "User Style"
+    }
+  }
+}
+```

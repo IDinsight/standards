@@ -188,8 +188,8 @@ cycle is active.
 
 This cycle covers prose, guides, project guidance outside managed blocks, and
 ordinary comments or docstrings. It omits Development, Testing, and
-implementation review. Required behavior, test, configuration, or tooling changes
-need your decision about scope or a separate implementation cycle.
+implementation review. Required behavior, test, configuration, or tooling
+changes need your decision about scope or a separate implementation cycle.
 
 ## Expedited cycle
 

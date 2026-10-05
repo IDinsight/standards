@@ -1,5 +1,19 @@
 # Greenfield Audit
 
+<!-- standards:invocation -->
+
+```json
+{
+  "schemaVersion": 1,
+  "kind": "mode",
+  "group": "inspection-mode",
+  "id": "GREENFIELD",
+  "label": "Greenfield",
+  "description": "Audit after initial greenfield scope and architecture.",
+  "selection": "assessment"
+}
+```
+
 Use only for the scheduled initial audit while `ProjectMode` is `GREENFIELD`,
 after Scope and Architecture are complete.
 

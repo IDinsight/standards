@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { execFile, spawn } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
-import { chmod, mkdtemp, readFile, readdir, realpath, rm, symlink, writeFile, mkdir } from 'node:fs/promises';
+import { chmod, mkdtemp, readFile, readdir, realpath, rm, stat, symlink, writeFile, mkdir } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
@@ -41,11 +41,11 @@ async function commit(root) {
 }
 
 // An installed project in a fresh temporary folder; brownfield by default.
-async function project(body, { withGit = false, projectMode = 'BROWNFIELD' } = {}) {
+async function project(body, { withGit = false, projectMode = 'BROWNFIELD', clients = ['claude'] } = {}) {
   const root = await realpath(await mkdtemp(path.join(os.tmpdir(), 'standards-runtime-test-')));
   try {
     if (projectMode === 'BROWNFIELD') await write(root, 'app.py', 'print("hi")\n');
-    await installProject({ projectRoot: root, clients: ['claude'] });
+    await installProject({ projectRoot: root, clients });
     if (withGit) {
       await git(root, 'init', '-q', '-b', 'main');
       await commit(root);
@@ -1804,6 +1804,152 @@ test('Active Work paths written with ./ name the same files', () => project(asyn
     .reduce((current, [name, value]) => setField(current, name, value), text));
   assert.deepEqual(messages(await check(root)), []);
 }));
+
+test('invocation discovery agrees with checker on normalized Development references', () => project(async (root) => {
+  const { plan } = await standardCycle(root);
+  await fillHeader(root, plan, { Mode: 'STEPWISE' });
+  const references = [plan, './' + plan, plan.replace('/development/', '/development/../development/')];
+  const observed = [];
+  for (const reference of references) {
+    await editStateFields(root, { Development: reference });
+    const checked = await check(root);
+    assert.equal(checked.code, 0, JSON.stringify(messages(checked)));
+    assert.deepEqual(messages(checked), []);
+    const before = await Promise.all([read(root, '.standards/STATE.md'), read(root, plan)]);
+    const invocation = await tool(root, 'invocation', 'developer', '--client', 'claude', '--json');
+    assert.equal(invocation.code, 0, invocation.stderr);
+    const result = JSON.parse(invocation.stdout);
+    observed.push({
+      reference, complete: result.complete,
+      mode: result.groups.find((item) => item.id === 'collaboration').selected.value,
+      style: result.userStyles.savedValue.value, locked: result.userStyles.locked,
+    });
+    assert.deepEqual(await Promise.all([read(root, '.standards/STATE.md'), read(root, plan)]), before);
+  }
+  assert.deepEqual(observed, references.map((reference) => ({
+    reference, complete: true, mode: 'STEPWISE', style: 'NONE', locked: 'true',
+  })));
+}));
+
+for (const client of ['codex', 'claude']) {
+  for (const cycleMode of ['STANDARD', 'EXPEDITED']) {
+    test('record style selectors round-trip through discovery and checker: ' + cycleMode + '/' + client, () => project(async (root) => {
+      let plan;
+      if (cycleMode === 'STANDARD') {
+        const cycle = await standardCycle(root);
+        plan = cycle.plan;
+        await rm(path.join(root, cycle.report));
+        await editStateFields(root, { WorkflowState: 'DEVELOPING', Kind: 'FORWARD', From: 'ARCHITECTING',
+          Reason: 'Architecture completed' });
+        await write(root, plan, (await read(root, plan)).replaceAll('`Status`: `DONE`', '`Status`: `PENDING`'));
+      } else {
+        await startCycle(root, { state: 'DEVELOPING', mode: cycleMode });
+        plan = await init(root, 'DEVELOPMENT');
+        await write(root, plan, await read(root, plan) + '\n## Build Steps\n\n### DEV-001 — Fix\n\n'
+          + '`Status`: `PENDING` `Depends On`: `NONE`\n`Acceptance`: `EXPEDITED_REQUEST`\n');
+        await editStateFields(root, { Development: plan });
+      }
+      await fillHeader(root, plan, { Mode: 'STEPWISE', Status: 'PROPOSED', 'User Style': 'NONE', 'User Style Locked': 'false' });
+      const baseline = await read(root, plan);
+      const valid = await check(root);
+      assert.equal(valid.code, 0, JSON.stringify(messages(valid)));
+      assert.deepEqual(messages(valid), []);
+
+      const directory = '.standards/user-styles/developer/';
+      const files = ['<formal>.md', 'team | compact.md', 'alice.md', 'tony.md', 'tony.md.md', 'team|compact.md', ' .md'];
+      for (const file of files) await write(root, directory + file, 'PRIVATE STYLE CONTENT: ' + file);
+      const inspected = ['.standards/STATE.md', plan, ...files.map((file) => directory + file)];
+      const snapshot = () => Promise.all(inspected.map(async (file) => [
+        file, (await stat(path.join(root, file))).mtimeMs, await read(root, file),
+      ]));
+      const discover = async () => {
+        const before = await snapshot();
+        const invocation = await tool(root, 'invocation', 'developer', '--client', client, '--json');
+        assert.equal(invocation.code, 0, invocation.stderr);
+        assert.doesNotMatch(invocation.stdout, /PRIVATE STYLE CONTENT/);
+        const result = JSON.parse(invocation.stdout);
+        assert.equal(result.client, client);
+        assert.deepEqual(await snapshot(), before);
+        return result;
+      };
+      const save = async (style, status = 'PROPOSED', locked = 'false') => {
+        await write(root, plan, baseline);
+        await fillHeader(root, plan, { 'User Style': style, Status: status, 'User Style Locked': locked });
+      };
+      const inventory = await discover();
+      assert.equal(inventory.complete, true, JSON.stringify(inventory.diagnostics));
+      assert.equal(inventory.userStyles.savedValue.value, 'NONE');
+      assert.equal(inventory.userStyles.locked, 'false');
+
+      // Persist every advertised choice, then validate with both installed tools.
+      const failures = [];
+      for (const option of inventory.userStyles.options.filter((item) => item.selector !== null)) {
+        await save(option.selector);
+        const checked = await check(root);
+        const resumed = await discover();
+        if (checked.code !== 0 || !resumed.complete || resumed.userStyles.selected.value !== option.id
+            || resumed.userStyles.savedValue.value !== option.selector) {
+          failures.push({ selector: option.selector, problems: messages(checked), selected: resumed.userStyles.selected });
+        }
+      }
+      assert.deepEqual(failures, []);
+      const option = (id) => inventory.userStyles.options.find((item) => item.id === id);
+      assert.equal(option('<formal>').selector, '<formal>.md');
+      assert.equal(option(' ').selector, ' .md');
+      assert.equal(option('team | compact').selector, null);
+      assert.equal(option('team | compact').selectorReason, 'no record-compatible name');
+      assert.equal(option('alice').selector, 'alice');
+      assert.equal(option('tony').selector, 'tony');
+      assert.equal(option('tony.md').selector, 'tony.md.md');
+      assert.equal(option('team|compact').selector, 'team|compact');
+
+      // Approval/resume reads must retain the working selector, including on reapproval.
+      for (const [selector, display] of [['<formal>.md', '<formal>'], ['tony.md.md', 'tony.md'], ['NONE', 'NONE']]) {
+        for (const status of ['APPROVED', 'IN_PROGRESS', 'PROPOSED']) {
+          await save(selector, status, 'true');
+          const before = await snapshot();
+          const checked = await check(root);
+          assert.equal(checked.code, 0, JSON.stringify(messages(checked)));
+          const resumed = await discover();
+          assert.equal(resumed.complete, true, JSON.stringify(resumed.diagnostics));
+          assert.equal(resumed.userStyles.savedValue.value, selector);
+          assert.equal(resumed.userStyles.selected.value, display);
+          assert.equal(resumed.userStyles.locked, 'true');
+          assert.deepEqual(await snapshot(), before);
+        }
+      }
+
+      // Existing unusable or genuinely unfilled values are rejected, never rewritten.
+      for (const selector of ['<formal>', 'team | compact', 'team | compact.md', '<identifier>', 'NONE | <identifier>']) {
+        await save(selector, 'APPROVED', 'true');
+        const before = await snapshot();
+        const checked = await check(root);
+        hasProblem(checked, /field `User Style` still shows the template's choices/);
+        assert.equal(checked.code, 1);
+        const resumed = await discover();
+        assert.equal(resumed.complete, false);
+        assert.equal(resumed.userStyles.selected.status, 'unknown');
+        assert.equal(resumed.userStyles.locked, 'true');
+        assert.deepEqual(await snapshot(), before);
+      }
+      await save('NONE');
+      for (const mode of ['<mode>', 'AUTONOMOUS | STEPWISE | CODE_WITH_ME']) {
+        await fillHeader(root, plan, { Mode: mode });
+        hasProblem(await check(root), /field `Mode` still shows the template's choices/);
+        const unresolved = await discover();
+        assert.equal(unresolved.groups[0].selected.status, 'unknown');
+      }
+      await save('NONE');
+      const before = await snapshot();
+      const summary = await tool(root, 'invocation', 'developer', '--client', client);
+      assert.equal(summary.code, 0, summary.stderr);
+      assert.match(summary.stdout, /<formal> \(invoke as <formal>\.md\)/);
+      assert.match(summary.stdout, /team \| compact \(no record-compatible name\)/);
+      assert.doesNotMatch(summary.stdout, /team \| compact \(ambiguous name\)/);
+      assert.deepEqual(await snapshot(), before);
+    }, { clients: [client] }));
+  }
+}
 
 test('a gitignored plan still gets its record checks', () => project(async (root) => {
   const { plan } = await standardCycle(root);

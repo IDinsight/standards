@@ -1,5 +1,26 @@
 # FINAL_DELIVERABLE Mode
 
+<!-- standards:invocation -->
+
+```json
+{
+  "schemaVersion": 1,
+  "kind": "mode",
+  "group": "review-kind",
+  "id": "FINAL_DELIVERABLE",
+  "label": "Final deliverable review",
+  "description": "Assess the assembled deliverable and current evidence.",
+  "selection": "state",
+  "when": {
+    "fact": {
+      "kind": "workflow",
+      "field": "WorkflowState"
+    },
+    "equals": "REVIEWING_FINAL"
+  }
+}
+```
+
 Use only in `REVIEWING_FINAL` during `STANDARD` or `DOCUMENTATION`. Assess the
 assembled deliverable after documentation: current acceptance evidence,
 documentation accuracy, unresolved findings, and consistency across relevant

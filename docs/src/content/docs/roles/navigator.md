@@ -14,12 +14,40 @@ You can use Navigator at any time, including during expedited work or after a
 cycle ends. It does not require an active cycle or a complete installed runtime
 to explain available project files.
 
+## Discover your options
+
+Before invoking Navigator, you can ask in an installed project's chat, "What
+modes and user styles does Navigator offer?" The agent checks the installed
+options without starting Navigator's project work or changing the workflow.
+
+You can also invoke help directly:
+
+| Client      | Prompt            |
+| ----------- | ----------------- |
+| Codex       | `$navigator help` |
+| Claude Code | `/navigator help` |
+
+Help shows the current mode choices and any available user styles with example
+invocations. The agent performs the lookup internally; there is no extra setup
+or shell command for you to run. A new mode's metadata or a new style file is
+picked up on the next help request. If the current inventory cannot be verified,
+the answer explains that limit.
+
+After starting Navigator, ask "show Navigator options" whenever you need them.
+Help keeps your current topic, mode, selected style, and quiz progress. During a
+quiz, "help me with this question" asks for assistance with the question; it
+does not open the options menu.
+
+A bare first invocation gives a short introduction and asks what you want to
+explore. If you already supplied a question, Navigator answers it directly.
+Continuing an existing conversation resumes its current activity.
+
 ## Modes
 
-Navigator uses one of three separate modes at a time. You can select a mode
-explicitly or let Navigator choose from your request. Use `$navigator` in Codex
-or `/navigator` in Claude Code. You can change the topic, depth, or mode at any
-time.
+The modes below ship with STANDARDS; help reflects the current installation.
+Navigator uses one mode at a time. You can select a mode explicitly or let
+Navigator choose from your request. Use `$navigator` in Codex or `/navigator` in
+Claude Code. You can change the topic, depth, or mode at any time.
 
 ### EXPLAIN
 
@@ -66,7 +94,9 @@ Answers, questions, and quiz progress stay in the conversation. Navigator
 creates no saved report or score and needs no fresh assessment session. If you
 select a [user style](../../reference/runtime-files/#user-styles) from
 `.standards/user-styles/navigator/`, Navigator applies it for the rest of the
-conversation; name it again in a new chat.
+conversation; name it again in a new chat. For example, if help lists `alice`,
+append `Use user style alice.` to your request. Use `Use user style NONE.` to
+clear a selection. Merely listing a style does not select or apply it.
 
 ## What stays unchanged
 

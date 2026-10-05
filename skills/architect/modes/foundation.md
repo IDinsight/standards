@@ -1,5 +1,26 @@
 # Foundation Architecture
 
+<!-- standards:invocation -->
+
+```json
+{
+  "schemaVersion": 1,
+  "kind": "mode",
+  "group": "design-mode",
+  "id": "FOUNDATION",
+  "label": "Foundation",
+  "description": "Design foundational structure and major boundaries.",
+  "selection": "assessment",
+  "when": {
+    "fact": {
+      "kind": "workflow",
+      "field": "CycleMode"
+    },
+    "equals": "STANDARD"
+  }
+}
+```
+
 Use when the scope requires establishing or materially redefining the project's
 foundational technical structure, major system boundaries, or platform-level
 choices.

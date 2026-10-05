@@ -1,5 +1,19 @@
 # Investigate Mode
 
+<!-- standards:invocation -->
+
+```json
+{
+  "schemaVersion": 1,
+  "kind": "mode",
+  "group": "conversation-mode",
+  "id": "INVESTIGATE",
+  "label": "Investigate",
+  "description": "Trace a concrete repository question through evidence.",
+  "selection": "user"
+}
+```
+
 Use the shared Navigator procedure and boundaries. Define the concrete question,
 follow the relevant evidence, and test possible explanations against it. Seek an
 observation that distinguishes plausible causes instead of listing guesses as

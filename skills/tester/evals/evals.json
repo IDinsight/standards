@@ -459,6 +459,18 @@
         "Historical VERIFIED increments do not establish a COMPLETE FULL/NONE report.",
         "No sign-off readiness or closure eligibility is claimed from the subset pass."
       ]
+    },
+    {
+      "id": 39,
+      "prompt": "Tester completed full verification and persisted a legal transition to REVIEWING_IMPLEMENTATION in STANDARD. The user asks for the next-role handoff in Claude Code. Both Reviewer mode files exist, and the current implementation review record retains User Style=tony. A final-deliverable review record from the same cycle retains alice. Both style files exist.",
+      "expected_output": "Provide an independent implementation-review invocation with the state-selected kind and correct saved style.",
+      "files": [],
+      "assertions": [
+        "The invocation uses /reviewer, includes IMPLEMENTATION and the prescribed fresh-chat prefix, and retains persisted-input directions.",
+        "IMPLEMENTATION is determined by workflow state; FINAL_DELIVERABLE is not offered as a user switch.",
+        "The retained style comes from the implementation review record, not the final review record.",
+        "Different-model advice remains advisory without guessed model identities, a routine confirmation gate, or automatic assessment."
+      ]
     }
   ]
 }

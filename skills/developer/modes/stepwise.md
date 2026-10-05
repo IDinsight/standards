@@ -1,5 +1,19 @@
 # Stepwise Mode
 
+<!-- standards:invocation -->
+
+```json
+{
+  "schemaVersion": 1,
+  "kind": "mode",
+  "group": "collaboration",
+  "id": "STEPWISE",
+  "label": "Stepwise",
+  "description": "Implement one approved step, then wait for the user.",
+  "selection": "user"
+}
+```
+
 Use after the user approves the current development plan when Developer should
 implement one atomic step at a time and let the user control progression.
 

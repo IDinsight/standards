@@ -1,5 +1,19 @@
 # VERIFY Mode
 
+<!-- standards:invocation -->
+
+```json
+{
+  "schemaVersion": 1,
+  "kind": "mode",
+  "group": "verification-mode",
+  "id": "VERIFY",
+  "label": "Verify",
+  "description": "Establish verification or resume with unchanged inputs.",
+  "selection": "assessment"
+}
+```
+
 Establish initial verification for the active cycle. Resume this mode after an
 interruption when its assessed inputs are unchanged; a partial report alone is
 not a reason to select REVERIFY.

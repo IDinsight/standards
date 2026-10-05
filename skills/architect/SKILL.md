@@ -92,7 +92,9 @@ required shape or a technical decision.
 
 ## Mode Selection
 
-After confirming the required inputs are usable, `DOCUMENTATION` selects
+Discover modes through [Invocation Metadata](#invocation-metadata). Mode
+selection follows cycle state and assessment of the design problem. After
+confirming the required inputs are usable, `DOCUMENTATION` selects
 [`modes/documentation.md`](modes/documentation.md). In `STANDARD`, select and
 read one mode that best matches the architecture problem:
 
@@ -187,3 +189,40 @@ after the completion gate succeeds. Architect determines downstream invalidation
 only when it owns the active frame; otherwise it follows the protocol as a
 downstream rerun. If the problem is actually scope or project context, route it
 to **Scoper** or **Auditor** instead of fixing outside Architect ownership.
+
+## Invocation Metadata
+
+Discover options from the tagged JSON below and the metadata blocks in direct
+child `modes/*.md` files. Inspect only those blocks for discovery, then load the
+selected mode's full instructions. A `user` option is selectable; `state` and
+`assessment` options are determined under `selectionRules`. Preserve applicable
+saved choices and use defaults only for genuinely new work without a selection.
+Entry rules, protocol gates, and style restrictions still apply.
+
+For user-style discovery, list direct-child Markdown filenames in
+`.standards/user-styles/architect/` using the protocol's **User Styles** rules.
+Never load unselected style contents or infer a style from availability.
+
+<!-- standards:invocation -->
+
+```json
+{
+  "schemaVersion": 1,
+  "kind": "role",
+  "role": "architect",
+  "groups": [
+    {
+      "id": "design-mode",
+      "label": "Design mode",
+      "source": "modes",
+      "selectionRules": "SKILL.md#mode-selection"
+    }
+  ],
+  "userStyles": {
+    "source": "role-directory",
+    "savedValue": {
+      "kind": "conversation"
+    }
+  }
+}
+```

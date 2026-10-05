@@ -1,5 +1,19 @@
 # Whole-Repository Audit
 
+<!-- standards:invocation -->
+
+```json
+{
+  "schemaVersion": 1,
+  "kind": "mode",
+  "group": "inspection-mode",
+  "id": "WHOLE_REPO",
+  "label": "Whole repository",
+  "description": "Establish a baseline when existing context is unusable.",
+  "selection": "assessment"
+}
+```
+
 Use whenever no usable project-context baseline exists, except for the scheduled
 initial `GREENFIELD` audit after Scope and Architecture are complete. This
 includes the initial `BROWNFIELD` audit and an early `GREENFIELD`

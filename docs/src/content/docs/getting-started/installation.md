@@ -161,6 +161,12 @@ settings edits are needed for this setup. See
 [Claude Code skills](https://code.claude.com/docs/en/skills) and
 [hooks](https://code.claude.com/docs/en/hooks#workspace-trust).
 
+To see Navigator's options, ask "What modes and user styles does Navigator
+offer?" before invoking it, or use `$navigator help` in Codex or
+`/navigator help` in Claude Code. The agent looks them up internally; no
+additional setup command is needed. See
+[Navigator](../../roles/navigator/#discover-your-options).
+
 ## What the installer adds
 
 The installed project has these framework files:
@@ -186,12 +192,13 @@ project/
 For Claude Code, it also sets the installed roles to user-invocable-only in
 `.claude/settings.json` and adds the Claude Code hook there. Codex skill
 adapters disable implicit invocation. `.standards/bin/` holds the tools the
-agent uses to generate cycle IDs, create records, number entries, and check the
-workflow files. `.standards/protocol/` holds the protocol chapters that agents
-read only when a situation calls for them, such as starting or cancelling a
-cycle. The roles keep their cycle records in `.standards/docs/`. The installer
-maintains a marked section in `AGENTS.md` and connects `CLAUDE.md` to it,
-keeping project-owned text and an existing `@AGENTS.md` import. The
+agent uses to discover invocation options, generate cycle IDs, create records,
+number entries, and check the workflow files. `.standards/protocol/` holds the
+protocol chapters that agents read only when a situation calls for them, such as
+starting or cancelling a cycle. The roles keep their cycle records in
+`.standards/docs/`. The installer maintains a marked section in `AGENTS.md` and
+connects `CLAUDE.md` to it, keeping project-owned text and an existing
+`@AGENTS.md` import. The
 [runtime file reference](../../reference/runtime-files/) explains what each file
 does.
 

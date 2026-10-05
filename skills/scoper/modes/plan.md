@@ -1,5 +1,19 @@
 # PLAN Mode
 
+<!-- standards:invocation -->
+
+```json
+{
+  "schemaVersion": 1,
+  "kind": "mode",
+  "group": "scope-mode",
+  "id": "PLAN",
+  "label": "Plan",
+  "description": "Establish the active cycle's first persisted scope.",
+  "selection": "assessment"
+}
+```
+
 Use PLAN when the active workflow cycle does not yet have a persisted scope for
 `Active Work`.
 

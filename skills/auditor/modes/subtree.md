@@ -1,5 +1,19 @@
 # Subtree Audit
 
+<!-- standards:invocation -->
+
+```json
+{
+  "schemaVersion": 1,
+  "kind": "mode",
+  "group": "inspection-mode",
+  "id": "SUBTREE",
+  "label": "Subtree",
+  "description": "Inspect an explicit area with a usable project baseline.",
+  "selection": "assessment"
+}
+```
+
 Use when a usable project-level `.standards/CONTEXT.md` already exists and the
 audit has an explicitly identified target area whose local facts require deeper
 inspection or refresh.

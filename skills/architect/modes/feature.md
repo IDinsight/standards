@@ -1,5 +1,26 @@
 # Feature Architecture
 
+<!-- standards:invocation -->
+
+```json
+{
+  "schemaVersion": 1,
+  "kind": "mode",
+  "group": "design-mode",
+  "id": "FEATURE",
+  "label": "Feature",
+  "description": "Design a bounded capability when it is the primary concern.",
+  "selection": "assessment",
+  "when": {
+    "fact": {
+      "kind": "workflow",
+      "field": "CycleMode"
+    },
+    "equals": "STANDARD"
+  }
+}
+```
+
 Use when the scope adds or changes a bounded capability and the capability
 itself—not foundational structure, transition/compatibility, or a shared
 cross-boundary rule—is the primary design concern.

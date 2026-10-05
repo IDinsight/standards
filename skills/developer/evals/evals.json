@@ -6,11 +6,11 @@
       "prompt": "Continue the active STANDARDS workflow as Developer. ProjectMode is BROWNFIELD, CycleMode is STANDARD, WorkflowState is DEVELOPING, recovery is inactive, Active Work.Scope and Active Work.Architecture point to completed artifacts, valid project context exists, and Active Work.Development is NONE. The feature adds a profile nickname field and the architecture defines the persistence field, API contract, and affected service/component boundaries. The user has not approved a Developer plan yet. Implement it.",
       "expected_output": "A persisted PROPOSED development plan in default AUTONOMOUS mode with atomic DEV-NNN steps mapped to the current AC-NNN identifiers, followed by a blocking request for user approval and no project implementation changes.",
       "files": [],
-    "assertions": [
-      "The response reads the active scope, architecture, project context, and only the relevant implementation areas before planning",
-      "It creates a Developer-owned development plan, records its repository-relative path in Active Work.Development, and uses stable DEV-NNN identifiers",
-      "The plan is Status PROPOSED and Mode AUTONOMOUS because the user did not select another collaboration mode",
-      "With no explicit cadence selection, the new plan records Verification Cadence AFTER_IMPLEMENTATION and Current Increment NONE",
+      "assertions": [
+        "The response reads the active scope, architecture, project context, and only the relevant implementation areas before planning",
+        "It creates a Developer-owned development plan, records its repository-relative path in Active Work.Development, and uses stable DEV-NNN identifiers",
+        "The plan is Status PROPOSED and Mode AUTONOMOUS because the user did not select another collaboration mode",
+        "With no explicit cadence selection, the new plan records Verification Cadence AFTER_IMPLEMENTATION and Current Increment NONE",
         "Each step has a coherent goal, acceptance mapping, dependencies when needed, observable expected outcome, and implementation-level self-check",
         "The response persists Active Work.BlockedOn as a concise Developer-plan approval request",
         "It stops before changing project implementation even though the user originally said to implement the feature"
@@ -418,7 +418,7 @@
     },
     {
       "id": 32,
-      "prompt": "Continue as Developer in DEVELOPING with a PROPOSED plan that has never been approved and User Style Locked false. The user explicitly says: use tony.md as my development style. .standards/user-styles/developer/tony.md exists and the implementation will modify Python. Create or update the development plan safely.",
+      "prompt": "Continue as Developer in DEVELOPING with a PROPOSED plan that has never been approved and User Style Locked false. The user explicitly says: use tony.md as my development style. The only available Developer user-style file is .standards/user-styles/developer/tony.md and the implementation will modify Python. Create or update the development plan safely.",
       "expected_output": "Developer resolves the explicit selection only to the direct child .standards/user-styles/developer/tony.md, persists the canonical User Style identifier as tony rather than tony.md or a path, loads universal, tony, and Python styles, and follows the normal approval rules.",
       "files": [],
       "assertions": [
@@ -773,6 +773,78 @@
         "Same-state selection still requires inactive recovery and no obligations.",
         "No frame, obligation, blocker, or pending cadence is cleared by the request.",
         "The policy choice cannot discharge required corrective work or become deferred intent."
+      ]
+    },
+    {
+      "id": 62,
+      "prompt": "Developer has completed its assigned work and persisted the legal transition to TESTING in STANDARD. The current verification report retains Mode=REVERIFY and User Style=NONE from earlier work. Tester modes VERIFY and REVERIFY have assessment selection metadata, and alice.md is an available Tester style. The user requests the next-role handoff in Codex from Developer's implementation chat.",
+      "expected_output": "Hand off to an independent Tester session with optional style guidance and an outstanding mode assessment.",
+      "files": [],
+      "assertions": [
+        "The prescribed independent Tester chat prefix and persisted-input directions remain in the invocation.",
+        "VERIFY and REVERIFY are explained as assessed behavior, not user switches; saved REVERIFY is resume context rather than a decided new assessment.",
+        "Available unlocked Tester styles are optional, and Developer's own style is not carried over.",
+        "No formal verification begins in Developer's chat and no metadata result is treated as evidence of a passed workflow gate."
+      ]
+    },
+    {
+      "id": 63,
+      "prompt": "Developer has completed all required handoff work and legally transitioned to TESTING. The installed invocation helper cannot assemble Tester's catalog because a mode's metadata is malformed. All workflow handoff evidence is otherwise valid. The user asks for the Tester handoff in Claude Code.",
+      "expected_output": "Provide the normal independent Tester invocation with a brief limitation about unverified optional choices.",
+      "files": [],
+      "assertions": [
+        "The optional discovery failure does not cancel the valid handoff or suppress the independent-session prefix.",
+        "No cached mode/style menu, runtime repair, registry generation, or user-run node command is proposed.",
+        "The message preserves persisted-input and recovery directions without invoking Tester in the implementation chat."
+      ]
+    },
+    {
+      "id": 64,
+      "prompt": "Continue as Developer in a STANDARD cycle at DEVELOPING. The current plan is PROPOSED, has never been approved, and records User Style NONE and User Style Locked false. Both .standards/user-styles/developer/tony.md and .standards/user-styles/developer/tony.md.md exist. The user says: use tony.md.md for this plan; I will review the updated plan before approving it. Make only the requested style-selection update.",
+      "expected_output": "Developer selects the second file, persists its unambiguous selector tony.md.md, and presents the still-PROPOSED, unlocked plan for approval.",
+      "files": [],
+      "assertions": [
+        "The saved User Style is tony.md.md, not its ambiguous display identifier tony.md or a path.",
+        "The display identifier tony.md remains distinct from the invocation and persistence selector tony.md.md.",
+        "Developer loads only the explicitly selected user-style file and applicable role guidance; it does not load the unselected tony.md preferences.",
+        "Status remains PROPOSED and User Style Locked remains false; the style-selection request does not count as approval or authorize implementation."
+      ]
+    },
+    {
+      "id": 65,
+      "prompt": "Resume Developer in a new session at DEVELOPING. The STEPWISE plan is PROPOSED and has never been approved. It records User Style tony.md.md and User Style Locked false. Both tony.md and tony.md.md exist in .standards/user-styles/developer/. Required upstream work and the implementation sufficiency gate are satisfied. The user says: I approve the current plan and its saved style selection; implement the first approved step.",
+      "expected_output": "Developer reloads the saved second-file selection, preserves tony.md.md, locks it on first approval, and implements only the first STEPWISE step.",
+      "files": [],
+      "assertions": [
+        "The persisted selector resolves to .standards/user-styles/developer/tony.md.md without asking the user to repeat the selection.",
+        "First approval sets User Style Locked true while preserving User Style tony.md.md; implementation begins only after approval is recorded.",
+        "The display identifier tony.md is never written over the selector, and the other user-style file is not substituted or read as the selected style.",
+        "STEPWISE boundaries and all existing approval and verification obligations remain in force."
+      ]
+    },
+    {
+      "id": 66,
+      "prompt": "Resume Developer in a new session in a STANDARD cycle at DEVELOPING. The active plan was approved earlier and now has Status PROPOSED after a material revision; its saved User Style is tony.md.md and User Style Locked is true. Both tony.md and tony.md.md remain in .standards/user-styles/developer/. The user says: switch collaboration to CODE_WITH_ME, use the tony.md.md style again, and show me the revised plan before I decide whether to approve it.",
+      "expected_output": "Developer reloads the saved second-file style, retains its selector and lock through the collaboration switch and reapproval boundary, and presents the revised plan.",
+      "files": [],
+      "assertions": [
+        "Developer resolves tony.md.md to the same saved style and does not mistake repeating that unambiguous selector for a new selection.",
+        "User Style remains tony.md.md and User Style Locked remains true even though Status is PROPOSED and collaboration changes.",
+        "The persisted selector is not shortened to the ambiguous display identifier tony.md, cleared to NONE, or replaced with another style.",
+        "No plan is recreated to bypass the lock, no new cycle is silently started, and implementation waits for the revised plan's approval."
+      ]
+    },
+    {
+      "id": 67,
+      "prompt": "Continue as Developer in a checker-valid STANDARD cycle at DEVELOPING. The current plan is PROPOSED, has never been approved, and records User Style NONE and User Style Locked false. Available Developer user-style files are <formal>.md, team | compact.md, and tony.md. The user says: use <formal>.md for this plan and show me the updated plan before I approve it. Also explain how I could select the team | compact style.",
+      "expected_output": "Developer persists the usable full selector <formal>.md while keeping the plan proposed and unlocked, and explains that neither accepted name for team | compact.md is compatible with the record-field syntax.",
+      "files": [],
+      "assertions": [
+        "User Style is saved as <formal>.md and is not normalized to the rejected placeholder <formal>.",
+        "The saved selection passes installed discovery and the checker without relaxing placeholder validation.",
+        "The response distinguishes the team | compact record-syntax limitation from filename ambiguity and does not advertise either unusable name as a selectable option.",
+        "No user file is renamed, no style is substituted automatically, and unselected style contents are not loaded.",
+        "User Style Locked remains false and Status remains PROPOSED until explicit plan approval; the style request alone does not authorize implementation."
       ]
     }
   ]

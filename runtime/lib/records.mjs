@@ -97,6 +97,12 @@ export function parseProvenance(text) {
   return { artifact: values.Artifact, cycle: values.Cycle, reviewKind: values.ReviewKind ?? null };
 }
 
+// Header values still showing template choices, e.g. `A | B` or `<name>`.
+// Shared by the checker and invocation discovery, including style selectors.
+export function isUnfilledHeaderValue(value) {
+  return value.includes(' | ') || /^<.*>$/.test(value);
+}
+
 // The `Name`: `value` fields between a record's `# Title` and its first `##`
 // section, e.g. `Cycle`, `Status`, `Mode`.
 export function headerFields(text) {

@@ -10,7 +10,7 @@ import { readdir } from 'node:fs/promises';
 import path from 'node:path';
 
 import { FAILURE_TYPES, GENERATED_CYCLE_ID, HANDOFF_KINDS, STATES, TERMINAL_STATES, UsageError, committedText, exists, git, isMain, printProblem, projectRootFor, readText } from './lib/core.mjs';
-import { LOCAL_PREFIX, QUALIFIED_PREFIXES, acceptanceInventory, acceptanceMentions, bareIds, developmentSteps, fixedPath, fixedRecords, headerFields, headingIds, parseProvenance, qualifiedReferences, recordName, recordSection, requiredCompletionRecords, scanArtifacts, withoutLinkLabels, withoutPreviousCycles } from './lib/records.mjs';
+import { LOCAL_PREFIX, QUALIFIED_PREFIXES, acceptanceInventory, acceptanceMentions, bareIds, developmentSteps, fixedPath, fixedRecords, headerFields, headingIds, isUnfilledHeaderValue, parseProvenance, qualifiedReferences, recordName, recordSection, requiredCompletionRecords, scanArtifacts, withoutLinkLabels, withoutPreviousCycles } from './lib/records.mjs';
 import { modeFromFile, parseState, validateState } from './lib/state.mjs';
 import { checkVerificationWorkflow } from './lib/verification.mjs';
 import { DOCUMENTATION_PHASES, FULL_DELIVERABLE_PHASES, completionChangeRoute, omittedDocumentationRecord, requiredCompletionPhases } from './lib/completion.mjs';
@@ -328,7 +328,7 @@ function checkState(state, { committed, mode, report }) {
 
 // Header values still showing the template's choices, e.g. `A | B` or `<name>`.
 function unfilledFields(fields) {
-  return Object.entries(fields).filter(([, value]) => value.includes(' | ') || /^<.*>$/.test(value));
+  return Object.entries(fields).filter(([, value]) => isUnfilledHeaderValue(value));
 }
 
 async function checkDevelopmentPlan(root, relative, text, { mustBeComplete, report }) {
