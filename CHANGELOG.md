@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.11.0](https://github.com/IDinsight/standards/compare/v0.10.0...v0.11.0) (2026-10-05)
+
+
+### Features
+
+* add standalone Brownfield documentation cycles ([#48](https://github.com/IDinsight/standards/issues/48)) ([8cc5405](https://github.com/IDinsight/standards/commit/8cc54054776795ec5bceadc72b638b78d0da57e5))
+
 ## [0.10.0](https://github.com/IDinsight/standards/compare/v0.9.1...v0.10.0) (2026-10-04)
 
 
