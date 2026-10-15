@@ -10,6 +10,10 @@
   cover only their detected rules; record manual or browser gaps.
 - Use a real browser when layout, navigation, hydration, browser APIs, or actual
   focus behavior is the contract. A simulated DOM cannot prove those properties.
+- In Next.js App Router projects, component runners such as Vitest or Jest do
+  not render async Server Components. Verify those through a browser-level test,
+  such as Playwright, or test their data functions directly. For deeper
+  patterns, read `../references/nextjs-testing.md`.
 - For security behavior, test the server or data boundary as well as any
   relevant UI outcome. Hidden controls cannot prove authorization or data
   isolation.

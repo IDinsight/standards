@@ -89,7 +89,7 @@ test('all shipped source blocks and installed role catalogs validate', () => fix
     for (const item of catalog.groups) if (item.defaultForNew) assert.equal(item.options.find((option) => option.id === item.defaultForNew).selection, 'user');
   }
   assert.equal(roles.length, 9);
-  assert.equal(modes, 23);
+  assert.equal(modes, 24);
 }));
 
 test('a new mode and alice.md are discovered on the next call without a registry update or writes', () => fixture(async (root) => {

@@ -431,10 +431,11 @@ the problems such edits cause.
 
 ## Navigator Boundary
 
-Navigator helps the user understand existing work, investigate questions, and
-check comprehension. It may run in any workflow state, including user-owned and
-terminal states, with any cycle mode or no active cycle. It owns no workflow
-state or persisted artifact and has no workflow completion gate.
+Navigator helps the user understand existing work, investigate questions, check
+comprehension, and informally assess an area against a named checklist. It may
+run in any workflow state, including user-owned and terminal states, with any
+cycle mode or no active cycle. It owns no workflow state or persisted artifact
+and has no workflow completion gate.
 
 - Navigator persists nothing. It creates no quiz scores, preferences, or
   summaries, and conversation context stays in the conversation.

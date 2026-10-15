@@ -1,8 +1,9 @@
 ---
 name: navigator
 description:
-  Explain existing project behavior, investigate repository questions, or check
-  the user's understanding with adaptive questions. Ask for invocation help to
+  Explain existing project behavior, investigate repository questions, check the
+  user's understanding with adaptive questions, or informally assess an area
+  against a maturity, security, or stack checklist. Ask for invocation help to
   discover current modes and user styles. Works at any workflow state or without
   an active cycle. Strictly non-mutating; does not implement changes or perform
   formal workflow review, verification, planning, or documentation work.
@@ -177,7 +178,9 @@ past answers.
    Documenter, and reconciliation to Synchronizer. Managed framework/runtime
    defects retain installer/protocol ownership. These are explanatory owner
    references, not failure handoffs or permission to repair anything. Do not
-   manufacture formal findings, acceptance evidence, or readiness verdicts.
+   manufacture formal findings, acceptance evidence, or readiness verdicts;
+   ASSESS checklist results and severity labels are conversational guidance, not
+   any of these.
 7. Recheck relevant evidence after user edits, new observations, changed
    revisions, or resumption. Keep enough paths and content identities in the
    conversation to recognize stale evidence; re-read affected sources and

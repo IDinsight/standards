@@ -30,11 +30,12 @@ shared terminology. Individual skills define role-specific behavior.
   the active change's test budget.
 - **Architect** defines consequential technical decisions and contracts.
 - **Navigator** helps users understand the project through EXPLAIN (default),
-  INVESTIGATE, and adaptive GRILL_ME questions. It uses repository evidence,
-  stays strictly non-mutating, and works outside the workflow state machine
-  without requiring an active cycle. Ask about Navigator's options before
-  invoking it, or use `$navigator help` / `/navigator help` to discover current
-  modes and user styles. See
+  INVESTIGATE, adaptive GRILL_ME questions, and ASSESS, an informal check of an
+  area against a maturity, security, or stack checklist. It uses repository
+  evidence, stays strictly non-mutating, and works outside the workflow state
+  machine without requiring an active cycle. Ask about Navigator's options
+  before invoking it, or use `$navigator help` / `/navigator help` to discover
+  current modes and user styles. See
   [Navigator](docs/src/content/docs/roles/navigator.md#discover-your-options).
 - **Developer** turns the active contract into an approved atomic development
   plan, then implements it within established constraints using Autonomous,

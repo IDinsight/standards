@@ -42,6 +42,22 @@ conditions, it moves them under a "Previous Cycles" heading at the end of the
 document and continues numbering from the highest ID, so an ID never changes
 meaning.
 
+## Target maturity levels
+
+You can describe how finished the work should be with a maturity level from 1
+(spike) to 5 (public production), for example "Build the survey API at Level 3".
+Scoper records the level as a constraint, turns the expectations that apply to
+your request into acceptance conditions, and lists higher-level capabilities you
+might assume, such as rate limiting at Level 4, as non-goals. If you name no
+level and the expected rigor would change the scope, Scoper infers one and notes
+the assumption, or asks when it cannot safely assume.
+
+The level only shapes the scope. Later roles work from the acceptance
+conditions, so the level never adds hidden requirements. To check where an
+existing project stands first, use [Navigator](../navigator/)'s ASSESS mode.
+
+## User styles
+
 You can select a [user style](../../reference/runtime-files/#user-styles) you
 keep at `.standards/user-styles/scoper/<name>.md`. Scoper has no record for it,
 so the selection lasts for the current chat; name it again when you resume. A

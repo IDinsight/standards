@@ -53,7 +53,13 @@ Architect chooses one mode based on the main design problem.
 
 ### FOUNDATION
 
-Establish or substantially change the system's structure.
+Establish or substantially change the system's structure. When you, the scope,
+and the project's existing constraints leave a foundational choice open, such as
+the API framework, database, or hosting platform, Architect proposes the
+framework's default stack (FastAPI with PostgreSQL, Next.js, Jetpack Compose,
+GitHub Actions, and Railway or Google Cloud) and records each choice in the
+design. Your explicit choices and an existing project's stack always take
+precedence.
 
 ### FEATURE
 

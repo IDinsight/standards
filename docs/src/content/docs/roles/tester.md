@@ -54,6 +54,10 @@ Tester reconstructs the assignment from the saved handoff and records. You do
 not need to choose these fields. For incremental work, see the
 [two-chat workflow](../../guides/working-with-developer/#alternate-between-two-chats).
 
+Tester also loads testing styles for the affected boundary: rendered web
+behavior, data and services, FastAPI services, and Android apps. They follow the
+project's established test tools and stay within the test budget below.
+
 You can select a [user style](../../reference/runtime-files/#user-styles) you
 keep at `.standards/user-styles/tester/<name>.md`, such as how you like tests
 named. The report saves the selection, Tester reloads it when it resumes, and

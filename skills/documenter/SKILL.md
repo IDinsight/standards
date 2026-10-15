@@ -171,6 +171,12 @@ materially changed, including examples and documented interfaces:
 - HTML -> [`styles/html.md`](styles/html.md)
 - CSS -> [`styles/css.md`](styles/css.md)
 
+Read [`references/readme.md`](references/readme.md) when creating or
+substantially restructuring a README, when a change affects an API contract or
+specification, or when inventorying which documents a change affects. Prefer the
+project's established documentation structure; the reference is a fallback and
+never expands the editing boundary.
+
 Within discretionary style guidance, use universal > selected user style >
 applicable technology styles. These styles concern documentation, not
 implementation preferences. They never override correctness, ownership, the
