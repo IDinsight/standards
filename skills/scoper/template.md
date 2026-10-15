@@ -151,6 +151,10 @@ not current obligations.
   pre-existing project constraints. Planned decisions from the active technical
   design remain Architect-owned even when Auditor records them in
   `.standards/CONTEXT.md`.
+- When the request names a target maturity level, record it under Constraints,
+  write the expectations that apply to this work as acceptance conditions, and
+  list higher-level capabilities a reader might assume under Non-goals. The
+  level label alone is not an acceptance condition.
 - Distinguish constraints, non-goals, and assumptions clearly.
 - Record only non-blocking assumptions. Resolve blocking scope questions before
   Scoper completes.

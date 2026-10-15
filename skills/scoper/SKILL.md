@@ -100,6 +100,18 @@ no record for the selection, so it lasts for the current conversation, and the
 user names it again when resuming. A style never changes the template's required
 shape or the form of acceptance conditions.
 
+## Maturity Levels
+
+When the request names a target maturity level, such as "Level 3", "spike", or
+"production-ready", or when the expected rigor materially changes scope and is
+not otherwise established, read
+[`references/maturity-levels.md`](references/maturity-levels.md). Record the
+level as a constraint, express its applicable expectations as acceptance
+conditions, and list assumed higher-level capabilities as non-goals. The level
+is scope vocabulary, not a protocol field: do not add it to `STATE.md` or treat
+it as a substitute for acceptance conditions. Downstream roles act on the
+persisted scope.
+
 ## Invariants
 
 For `DOCUMENTATION`, use Auditor's current baseline to scope documentation of

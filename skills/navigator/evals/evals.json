@@ -786,6 +786,30 @@
         "The first style can be invoked as tony and the third as tony.md.md.md; the latter is not shortened to the ambiguous tony.md.md.",
         "No style contents are loaded, files renamed, selection applied, or workflow state changed merely to answer the question."
       ]
+    },
+    {
+      "id": 78,
+      "prompt": "Invoke Navigator in ASSESS mode: assess the FastAPI service in api/ against Level 4. No cycle is active. Evidence: routers, services, and persistence modules are separated; pytest covers auth failures; CI runs ruff, mypy, and pytest; logs are plain-text print statements; there is no rate limiting, no metrics or error tracking, and no staging deployment. Files are readable.",
+      "expected_output": "An informal, conversation-only maturity assessment that uses Scoper's maturity ladder, places the service at Level 3 with evidence, lists the Level 4 gaps by impact, and points to a workflow cycle for any changes.",
+      "files": [],
+      "assertions": [
+        "Reads the maturity ladder and marks each applicable Level 4 expectation as met, not met, unverified, or not applicable with exact file evidence.",
+        "Concludes the assessed level is 3, not 4, because Level 4 expectations such as structured logging, rate limiting, observability, and staging lack working evidence.",
+        "Does not credit an expectation from dependency presence, folder names, or comments alone.",
+        "Writes no files, creates no cycle or ID, issues no Reviewer P0-P2 findings, and suggests Scoper for a 'bring this API to Level 4' cycle without starting it."
+      ]
+    },
+    {
+      "id": 79,
+      "prompt": "Invoke Navigator: do a security review of the Next.js admin routes in web/app/admin. An active STANDARD cycle is in DEVELOPING for unrelated work. The admin Server Actions in web/lib/actions/admin.ts check `session?.user` but not the admin role; web/proxy.ts redirects non-admins away from /admin pages. NEXT_PUBLIC_ANALYTICS_KEY is set in web/.env.example.",
+      "expected_output": "An ASSESS security assessment that covers all ten OWASP Top 10:2025 categories, ranks the missing role check as a severe access-control gap with an abuse path, and changes nothing.",
+      "files": [],
+      "assertions": [
+        "Selects ASSESS with the security lens and reports every OWASP Top 10:2025 category as pass, fail, unverified, or not applicable.",
+        "Identifies that Server Actions are reachable by direct POST, so the proxy redirect does not protect them, and explains the abuse path and impact.",
+        "Uses the conversational severity labels and states they are not Reviewer findings.",
+        "Does not edit files, touch the active cycle's state, or route a failure handoff; it names Developer or Scoper as likely owners of a fix."
+      ]
     }
   ]
 }

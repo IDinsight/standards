@@ -471,6 +471,18 @@
         "The retained style comes from the implementation review record, not the final review record.",
         "Different-model advice remains advisory without guessed model identities, a routine confirmation gate, or automatic assessment."
       ]
+    },
+    {
+      "id": 40,
+      "prompt": "Invoke Tester in a fresh chat. ProjectMode=BROWNFIELD, CycleMode=STANDARD, WorkflowState=TESTING. The change adds POST /surveys/{id}/responses to a FastAPI service backed by PostgreSQL. AC-001: authenticated owners can submit a response (201). AC-002: other users receive 403. AC-003: submissions missing required answers receive 422. The existing suite uses app.dependency_overrides and a PostgreSQL test container; one source file, app/surveys/router.py, carries the change.",
+      "expected_output": "VERIFY that loads the FastAPI testing style, reuses the existing overrides and test database, and selects scenarios within the five-per-file budget.",
+      "files": [],
+      "assertions": [
+        "Loads styles/fastapi.md and data-and-services.md.",
+        "Uses dependency overrides and the PostgreSQL test database rather than SQLite or patched internals.",
+        "Asserts status codes and error body shape for the selected outcomes, including the cross-user 403.",
+        "Allocates at most five new scenarios to app/surveys/router.py and records the allocation instead of building a full status-code matrix."
+      ]
     }
   ]
 }

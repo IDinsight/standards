@@ -13,9 +13,15 @@
 
 - `<path>` — responsibility or boundary relevant to this cycle.
 
+## Nearest Analogues
+
+- `<path>` — closest existing implementation of similar behavior, the
+  conventions and tests it shows, and how the requested work differs.
+
 ## Commands
 
-- `<command>` — what it does and when to use it.
+- `<command>` — what it does and when to use it. Name any needed command that
+  could not be established rather than inventing one.
 
 ## Conventions and Constraints
 

@@ -93,6 +93,9 @@ Include lifecycle or state transitions when they materially affect behavior.
 1. Coarse implementation step, dependency order, or migration sequence.
 2. Keep the plan implementation-oriented without turning it into a line-by-line
    coding task list.
+3. When naming paths, mark each as `CREATE`, `MODIFY`, `DELETE`, or `CANDIDATE`
+   (an unresolved location Developer may settle). Name an existing path only
+   after observing it.
 
 ## Risks and Follow-up
 
@@ -144,7 +147,15 @@ history, not current coverage or criteria.
   invented technical acceptance criterion.
 - Keep rationale brief. Preserve only decisions and tradeoffs that help
   implementation or future maintenance.
-- Keep the build plan coarse and dependency-aware.
+- Keep the build plan coarse and dependency-aware. Order steps by real
+  dependencies; a common order is contracts, then persistence and security
+  model, then server behavior, then client integration and UI states, then
+  observability. Identify the critical path when steps could otherwise proceed
+  independently. When steps must change together to keep the project buildable
+  or a contract intact, keep them in one step.
+- When the completed scope records a target maturity level, size the design to
+  the acceptance conditions it produced. Do not add components, layers, or
+  tooling the scope does not require.
 - Do not include production code, test implementation, verification results,
   audit findings, reviews, or user documentation.
 - Keep the artifact concise. Add sections or detail only when they prevent

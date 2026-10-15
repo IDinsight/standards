@@ -223,6 +223,28 @@
         "Only Developer may establish new-work style eligibility; the message does not promise that styles can already be switched or cleared.",
         "No extra confirmation, user-run helper step, plan creation, or automatic Developer invocation is introduced."
       ]
+    },
+    {
+      "id": 18,
+      "prompt": "Continue the active STANDARDS workflow as Architect. ProjectMode is GREENFIELD, CycleMode is STANDARD, WorkflowState is ARCHITECTING, recovery is inactive, and no CONTEXT.md exists yet. The completed scope records 'Target maturity: Level 3' and ACs for a new API that stores survey responses, requires authenticated field staff, and is deployable to a shared staging environment. Neither the user nor the scope names any language, framework, database, or hosting platform.",
+      "expected_output": "A FOUNDATION-mode design that proposes the default stack from the architect reference, records each adopted choice and its rationale in the Decision section, and sizes the design to the scope's acceptance conditions.",
+      "files": [],
+      "assertions": [
+        "Selects FOUNDATION and reads references/default-stack.md because foundational choices are open.",
+        "Records FastAPI, PostgreSQL with migrations, the auth approach, GitHub Actions, and a deployment target such as Railway as explicit design decisions with brief rationale.",
+        "Does not add components the ACs do not need, such as Redis, pgvector, or a repository layer.",
+        "Marks named paths in the Build Plan as CREATE or CANDIDATE and orders steps by dependency."
+      ]
+    },
+    {
+      "id": 19,
+      "prompt": "Continue the active STANDARDS workflow as Architect. ProjectMode is BROWNFIELD, CycleMode is STANDARD, WorkflowState is ARCHITECTING, recovery is inactive, and valid Auditor context records an established Django REST Framework service on MySQL deployed to AWS ECS. The completed scope adds a bulk-import endpoint for beneficiary records.",
+      "expected_output": "A FEATURE-mode design that extends the established Django, MySQL, and ECS stack and does not propose the default stack.",
+      "files": [],
+      "assertions": [
+        "Keeps Django REST Framework, MySQL, and ECS as established constraints.",
+        "Does not propose FastAPI, PostgreSQL, Railway, or other default-stack components, or a migration toward them."
+      ]
     }
   ]
 }
