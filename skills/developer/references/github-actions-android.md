@@ -33,7 +33,7 @@ distribution or release; then split by purpose.
 
 | Workflow         | Trigger                      | Purpose                                          |
 | ---------------- | ---------------------------- | ------------------------------------------------ |
-| `ci.yml`         | `push`, `pull_request`       | Lint, static analysis, unit tests, debug build   |
+| `ci.yml`         | `push`, `pull_request`, call | Lint, static analysis, unit tests, debug build   |
 | `distribute.yml` | `push` to the default branch | When the design adds pre-release tester builds   |
 | `release.yml`    | `release` or manual          | When the design adds Play Store release          |
 | `security.yml`   | `schedule`, `pull_request`   | When the design adds dependency or SAST scanning |
@@ -60,10 +60,18 @@ for Gradle. By default it writes cache entries only from the default branch and
 restores them read-only elsewhere, so the first pull request run after a
 dependency change can be slow.
 
-## Baseline CI: Lint and Unit Test
+## Baseline CI: Parallel Verification
 
 Every workflow declares read-only permissions and cancels superseded runs on the
-same ref. Jobs without `needs:` run in parallel.
+same ref. Keep independent verification jobs, such as lint, static analysis,
+unit tests, and dependency checks, without `needs:` so they run in parallel.
+Only build or deployment jobs need to wait for the checks whose success they
+require.
+
+Declare `workflow_call` when release or distribution workflows reuse `ci.yml`.
+Use a fixed `ci-` concurrency prefix rather than `github.workflow`: a called
+workflow receives the caller's workflow name, which can otherwise collide with
+the caller's concurrency group.
 
 ```yaml
 name: CI
@@ -73,13 +81,14 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_call:
 
 permissions:
   contents: read
 
 concurrency:
   # Cancel superseded CI runs on the same ref. Never reuse this for releases.
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ci-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -340,13 +349,16 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # lint, detekt, and test jobs as in ci.yml, or call ci.yml as a reusable
-  # workflow (it then needs an `on: workflow_call` trigger).
+  verify:
+    # The lint, detekt, test, and other selected CI jobs run in parallel inside
+    # the called workflow. This caller can depend only on `verify`, not on those
+    # internal job IDs.
+    uses: ./.github/workflows/ci.yml
 
   build-aab:
     runs-on: ubuntu-latest
     timeout-minutes: 25
-    needs: [lint, detekt, test]
+    needs: [verify]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4

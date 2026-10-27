@@ -13,11 +13,6 @@ Sections run from first adoption to production hardening. The maturity levels in
 `../../scoper/references/maturity-levels.md` indicate when each is commonly
 expected, but the completed scope decides what the design needs.
 
-> **Driver note:** Motor is deprecated as of May 2025. Use the native PyMongo
-> Async API (`AsyncMongoClient` from `pymongo`). Beanie already uses
-> `AsyncMongoClient` under the hood — no breaking change if you only interact
-> via Beanie, but update any direct Motor imports.
-
 ---
 
 ## Naming
@@ -79,9 +74,9 @@ DB_CONNECT_RETRIES=5
 DB_CONNECT_RETRY_INTERVAL_SECONDS=2
 ```
 
-**Driver.** The default-stack choice for Python is PyMongo Async with the Beanie
-ODM. Motor is deprecated (EOL May 2026) — `AsyncMongoClient` is the official
-replacement and Beanie already uses it under the hood:
+**ODM and driver.** The default-stack choice for Python is Beanie, an async
+Pydantic-based ODM that uses PyMongo Async. Install PyMongo explicitly because
+the application owns and imports its `AsyncMongoClient`:
 
 ```bash
 uv add pymongo beanie
@@ -93,35 +88,67 @@ uv add pymongo beanie
 
 ```python
 # utils/database.py
+from beanie import init_beanie
 from pymongo import AsyncMongoClient
 
-async def connect_with_retry(retries: int = 5, interval: float = 2.0):
+async def connect_with_retry(
+    retries: int = 5, interval: float = 2.0
+) -> AsyncMongoClient:
+    client = AsyncMongoClient(settings.mongodb_url)
     for attempt in range(1, retries + 1):
         try:
-            client = AsyncMongoClient(settings.mongodb_url)
             await client.admin.command("ping")
             await init_beanie(
                 database=client[settings.mongodb_db_name],
                 document_models=all_document_models,
             )
-            return
+            return client
         except Exception as exc:
             logger.warning("MongoDB not ready (%d/%d): %s", attempt, retries, exc)
             if attempt == retries:
+                await client.close()
                 raise
             await asyncio.sleep(interval * attempt)
 ```
 
 <!-- markdownlint-enable MD013 -->
 
-Wire into the application lifespan — connect on startup, close on shutdown.
+Create one client for the application process and reuse its connection pool.
+Wire it into the FastAPI lifespan so shutdown always awaits cleanup:
+
+```python
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+    client = await connect_with_retry()
+    app.state.mongodb_client = client
+    try:
+        yield
+    finally:
+        await client.close()
+```
+
+Do not create a client per request or close the shared client before application
+shutdown.
+
+**Document design.** Start from the application's read and write access
+patterns, not from relational entities. Store data that is usually read or
+updated together in the same document. Use references when related data is
+accessed independently, relationships are many-to-many, or an embedded array
+could grow without bound. MongoDB documents have a hard 16 MB limit. For
+established collection shapes, consider server-side `$jsonSchema` validation in
+addition to Beanie's Pydantic validation.
 
 **Document model pattern:**
 
 ```python
+from typing import Annotated
+
+from beanie import Document, Indexed
+
+
 class Order(Document):
-    customer_id: Indexed(str)
-    status: Indexed(str) = "pending"
+    customer_id: Annotated[str, Indexed()]
+    status: str = "pending"
 
     class Settings:
         name = "orders"
@@ -130,13 +157,18 @@ class Order(Document):
 
 Register all document models in a list passed to `init_beanie`.
 
-**Schema migrations.** MongoDB has no Alembic equivalent:
+**Schema migrations.** Beanie supplies forward and backward migrations:
 
 - Additive changes (new optional fields, new collections): safe to deploy with
-  no script
-- Renames or removals: write a migration script in `migrations/`; run manually
-  before deploying
-- Never use `auto_create_indexes=True` in production
+  no data migration when old and new application versions remain compatible.
+- Renames, removals, and data transformations: create an ordered migration with
+  `beanie new-migration`, review both directions, and run `beanie migrate` as a
+  deployment step.
+- Beanie migrations use transactions by default and therefore require a replica
+  set. `--no-use-transaction` removes rollback protection and needs an explicit
+  operational decision.
+- `init_beanie` creates declared indexes. Keep `allow_index_dropping=False` and
+  handle destructive index changes through a reviewed deployment procedure.
 
 ---
 
@@ -147,8 +179,11 @@ Commonly expected from maturity Level 3.
 **Indexes.** Review all `Indexed()` fields and compound `Settings.indexes`
 entries. Index the fields that frequent queries filter or sort on when the
 access pattern justifies the write cost, and check query plans with `explain()`
-rather than indexing reflexively. Dropping an index on a large collection takes
-time — schedule it in a maintenance window.
+rather than indexing reflexively. Check existing indexes first, use
+`queryPlanner` to detect collection scans and in-memory sorts, then use
+`executionStats` to compare documents and keys examined with documents returned.
+Prioritize query shapes that are both frequent and slow. Dropping an index on a
+large collection takes time — schedule it in a maintenance window.
 
 **Test databases.** Point tests at a separate, disposable database, such as the
 `db-test` service above, and drop it after the run. Tester owns the fixtures.
@@ -163,13 +198,17 @@ runs a local replica set.
 
 Commonly expected from maturity Level 4 (pre-production).
 
-**Connection pool configuration:**
+**Connection pool configuration.** Do not copy fixed pool values between
+services. Derive them from deployment type, application instance count,
+topology, peak concurrent operations, and observed operation latency. Start with
+driver defaults unless measurements justify tuning, then monitor pool wait time,
+connection count, and server capacity.
 
 ```dotenv
-DB_MIN_POOL_SIZE=5
-DB_MAX_POOL_SIZE=20
-DB_CONNECT_TIMEOUT_MS=5000
-DB_SERVER_SELECTION_TIMEOUT_MS=5000
+DB_MIN_POOL_SIZE=[MEASURED_MIN_POOL_SIZE]
+DB_MAX_POOL_SIZE=[MEASURED_MAX_POOL_SIZE]
+DB_CONNECT_TIMEOUT_MS=[CONNECT_TIMEOUT_MS]
+DB_SERVER_SELECTION_TIMEOUT_MS=[SERVER_SELECTION_TIMEOUT_MS]
 DB_SLOW_QUERY_MS=500
 ```
 
@@ -190,6 +229,9 @@ client = AsyncMongoClient(
 **Slow query detection.** MongoDB's `explain()` and server-side slow query log
 (`slowOpThresholdMs` in `mongod.conf`) are the primary tools. Log warnings in
 the application for operations that exceed `DB_SLOW_QUERY_MS` where measurable.
+On Atlas, use Performance Advisor alongside slow-query logs; validate suggested
+indexes against existing indexes and the actual query shape before applying
+them.
 
 **Health check:**
 
@@ -257,6 +299,5 @@ schedule, with a tested restoration procedure.
 - [MongoDB documentation](https://www.mongodb.com/docs/manual/)
 - [MongoDB release notes](https://www.mongodb.com/docs/manual/release-notes/)
 - [PyMongo AsyncMongoClient](https://pymongo.readthedocs.io/en/latest/api/pymongo/asynchronous/mongo_client.html)
-- [Motor deprecation — migration to PyMongo Async](https://www.mongodb.com/docs/languages/python/pymongo-driver/current/reference/migration/)
 - [Beanie ODM documentation](https://beanie-odm.dev/)
-- [Motor documentation (deprecated, EOL May 2026)](https://motor.readthedocs.io/en/stable/)
+- [MongoDB Agent Skills](https://github.com/mongodb/agent-skills)

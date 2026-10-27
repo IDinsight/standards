@@ -165,11 +165,11 @@ Each list adds to the levels below it.
 - Level 2: type checks and an artifact build are added; dependency installs are
   cached; pull requests cannot merge without a passing pipeline; coverage is
   reported.
-- Level 3: dependency vulnerability scanning; merges to the default branch
-  deploy to staging and pass a health check; branch protection requires the
+- Level 3: dependency vulnerability scanning; branch protection requires the
   checks; workflow permissions are least-privilege; superseded runs are
   cancelled; workflow files are validated.
-- Level 4: production deployment behind an approval gate with a staging to
+- Level 4: merges to the default branch deploy to staging and pass a health
+  check; production deployment behind an approval gate with a staging to
   production promotion path; versioned artifacts; failure notifications; secret
   scanning and static analysis on pull requests.
 - Level 5: production smoke tests with automatic rollback on failure;

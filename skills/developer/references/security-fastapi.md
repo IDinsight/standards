@@ -407,6 +407,7 @@ Router endpoints in `app/auth/router.py`:
 
 ```python
 from fastapi import Cookie, Depends, HTTPException, Response
+from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import Session
 
@@ -442,15 +443,19 @@ def refresh(
     response: Response,
     refresh_token: str | None = Cookie(default=None, alias=COOKIE_NAME),
     session: Session = Depends(get_session),
-) -> TokenResponse:
+) -> TokenResponse | JSONResponse:
     if refresh_token is None:
         raise HTTPException(status_code=401, detail="Missing refresh token")
     result = rotate_refresh_token(session, refresh_token)
     if result is None:
-        response.delete_cookie(COOKIE_NAME, path="/auth/refresh")
-        raise HTTPException(
-            status_code=401, detail="Invalid or expired refresh token"
+        # Raising HTTPException discards cookies set on `response`, so
+        # return the 401 directly to make the deletion reach the browser.
+        rejected = JSONResponse(
+            status_code=401,
+            content={"detail": "Invalid or expired refresh token"},
         )
+        rejected.delete_cookie(COOKIE_NAME, path="/auth/refresh")
+        return rejected
     user_id, new_raw = result
     response.set_cookie(
         COOKIE_NAME, new_raw, max_age=COOKIE_MAX_AGE, **COOKIE_OPTS
@@ -514,10 +519,10 @@ def is_locked(redis: Redis, identifier: str) -> bool:
     try:
         count = redis.get(_key(identifier))
     except RedisError:
-        # Fails open so a Redis outage does not block every login. Whether
-        # to fail open or closed is a design decision.
-        logger.warning("Lockout check failed; allowing request")
-        return False
+        # Fail closed: a Redis outage blocks logins rather than silently
+        # disabling brute-force protection.
+        logger.error("Lockout check failed; denying login")
+        return True
     return int(count or 0) >= settings.auth_lockout_max_attempts
 
 
@@ -593,6 +598,9 @@ if user is None:
 - Never let lockout reveal whether an account exists: count failures for every
   submitted identifier and use the same messages for existing and unknown
   accounts.
+- `is_locked` fails closed, so a counter-store outage blocks every login.
+  Monitor the store's availability. Failing open instead is an exception to the
+  fail-closed principle and needs an explicit, recorded design decision.
 
 ## Audit Logging
 
@@ -705,8 +713,10 @@ audit_log(
   dependency failure and continue. Roll back partial transactions.
 - When the project runs dependency audits, such as `uv run pip-audit` in CI,
   findings rated high or critical block the build.
-- The default-stack guidance pins exact versions of security-critical libraries
-  such as JWT, password hashing, and cryptography.
+- Like `default-stack.md`, this guidance does not pin versions. Use currently
+  supported releases of security-critical libraries such as JWT, password
+  hashing, and cryptography, and record any version constraint that matters in
+  the design.
 
 ## Controls by Delivery Stage
 

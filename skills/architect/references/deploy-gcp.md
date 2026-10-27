@@ -95,10 +95,13 @@ The `google-github-actions/auth` action documentation has the full setup steps.
 - uses: google-github-actions/setup-gcloud@v2
 
 - name: Build and push
+  env:
+    GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+    IMAGE: ${{ vars.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/app/${{ github.event.repository.name }}:${{ github.sha }}
   run: |
     gcloud builds submit \
-      --tag ${{ vars.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/app/${{ github.event.repository.name }}:${{ github.sha }} \
-      --project ${{ secrets.GCP_PROJECT_ID }}
+      --tag "$IMAGE" \
+      --project "$GCP_PROJECT_ID"
 ```
 
 <!-- markdownlint-enable MD013 -->
@@ -116,8 +119,9 @@ requires GCP-internal resources or when GitHub runners are too slow.
     gcloud auth configure-docker ${{ vars.GCP_REGION }}-docker.pkg.dev --quiet
 
 - name: Build and push
+  env:
+    IMAGE: ${{ vars.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/app/${{ github.event.repository.name }}:${{ github.sha }}
   run: |
-    IMAGE="${{ vars.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/app/${{ github.event.repository.name }}:${{ github.sha }}"
     docker build -t "$IMAGE" .
     docker push "$IMAGE"
 ```
@@ -130,7 +134,7 @@ requires GCP-internal resources or when GitHub runners are too slow.
 
 ### Staging Deployment
 
-Commonly expected from maturity Level 3, when merges to the default branch
+Commonly expected from maturity Level 4, when merges to the default branch
 deploy to staging.
 
 <!-- markdownlint-disable MD013 -->
@@ -154,6 +158,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     environment: staging
+    env:
+      # Pass secrets and context values through env, never ${{ }} in run.
+      GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+      GCP_REGION: ${{ vars.GCP_REGION }}
+      SERVICE: ${{ github.event.repository.name }}
+      IMAGE: ${{ vars.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/app/${{ github.event.repository.name }}:${{ github.sha }}
     steps:
       - uses: actions/checkout@v4
 
@@ -167,22 +177,23 @@ jobs:
       - name: Build and push
         run: |
           gcloud builds submit \
-            --tag ${{ vars.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/app/${{ github.event.repository.name }}:${{ github.sha }} \
-            --project ${{ secrets.GCP_PROJECT_ID }}
+            --tag "$IMAGE" \
+            --project "$GCP_PROJECT_ID"
 
       - name: Deploy to Cloud Run
         run: |
-          gcloud run deploy ${{ github.event.repository.name }} \
-            --image ${{ vars.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/app/${{ github.event.repository.name }}:${{ github.sha }} \
-            --region ${{ vars.GCP_REGION }} \
+          gcloud run deploy "$SERVICE" \
+            --image "$IMAGE" \
+            --port 8000 \
+            --region "$GCP_REGION" \
             --platform managed \
-            --project ${{ secrets.GCP_PROJECT_ID }}
+            --project "$GCP_PROJECT_ID"
 
       - name: Health check
         run: |
-          SERVICE_URL=$(gcloud run services describe ${{ github.event.repository.name }} \
-            --region ${{ vars.GCP_REGION }} \
-            --project ${{ secrets.GCP_PROJECT_ID }} \
+          SERVICE_URL=$(gcloud run services describe "$SERVICE" \
+            --region "$GCP_REGION" \
+            --project "$GCP_PROJECT_ID" \
             --format 'value(status.url)')
           for i in $(seq 1 12); do
             STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$SERVICE_URL/health" 2>/dev/null || echo "000")
@@ -225,6 +236,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     environment: production
+    env:
+      # Pass secrets and context values through env, never ${{ }} in run.
+      GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+      GCP_REGION: ${{ vars.GCP_REGION }}
+      SERVICE: ${{ github.event.repository.name }}
+      IMAGE: ${{ vars.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/app/${{ github.event.repository.name }}:${{ github.sha }}
     steps:
       - uses: actions/checkout@v4
 
@@ -238,29 +255,30 @@ jobs:
       - name: Build and push
         run: |
           gcloud builds submit \
-            --tag ${{ vars.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/app/${{ github.event.repository.name }}:${{ github.sha }} \
-            --project ${{ secrets.GCP_PROJECT_ID }}
+            --tag "$IMAGE" \
+            --project "$GCP_PROJECT_ID"
 
       - name: Deploy to Cloud Run
         run: |
-          gcloud run deploy ${{ github.event.repository.name }} \
-            --image ${{ vars.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/app/${{ github.event.repository.name }}:${{ github.sha }} \
-            --region ${{ vars.GCP_REGION }} \
+          gcloud run deploy "$SERVICE" \
+            --image "$IMAGE" \
+            --port 8000 \
+            --region "$GCP_REGION" \
             --platform managed \
-            --project ${{ secrets.GCP_PROJECT_ID }} \
+            --project "$GCP_PROJECT_ID" \
             --no-traffic
 
       - name: Verify new revision
         run: |
-          SERVICE_URL=$(gcloud run services describe ${{ github.event.repository.name }} \
-            --region ${{ vars.GCP_REGION }} \
-            --project ${{ secrets.GCP_PROJECT_ID }} \
+          SERVICE_URL=$(gcloud run services describe "$SERVICE" \
+            --region "$GCP_REGION" \
+            --project "$GCP_PROJECT_ID" \
             --format 'value(status.url)')
           # Test the new revision directly using its tag
           REVISION_URL=$(gcloud run revisions list \
-            --service ${{ github.event.repository.name }} \
-            --region ${{ vars.GCP_REGION }} \
-            --project ${{ secrets.GCP_PROJECT_ID }} \
+            --service "$SERVICE" \
+            --region "$GCP_REGION" \
+            --project "$GCP_PROJECT_ID" \
             --sort-by '~metadata.creationTimestamp' \
             --limit 1 \
             --format 'value(status.url)')
@@ -272,9 +290,9 @@ jobs:
 
       - name: Route traffic to new revision
         run: |
-          gcloud run services update-traffic ${{ github.event.repository.name }} \
-            --region ${{ vars.GCP_REGION }} \
-            --project ${{ secrets.GCP_PROJECT_ID }} \
+          gcloud run services update-traffic "$SERVICE" \
+            --region "$GCP_REGION" \
+            --project "$GCP_PROJECT_ID" \
             --to-latest
 
       - name: Notify on failure
@@ -307,17 +325,21 @@ revision:
 ```yaml
 - name: Rollback on failure
   if: failure()
+  env:
+    GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+    GCP_REGION: ${{ vars.GCP_REGION }}
+    SERVICE: ${{ github.event.repository.name }}
   run: |
     PREV_REVISION=$(gcloud run revisions list \
-      --service ${{ github.event.repository.name }} \
-      --region ${{ vars.GCP_REGION }} \
-      --project ${{ secrets.GCP_PROJECT_ID }} \
+      --service "$SERVICE" \
+      --region "$GCP_REGION" \
+      --project "$GCP_PROJECT_ID" \
       --sort-by '~metadata.creationTimestamp' \
       --limit 2 \
       --format 'value(metadata.name)' | tail -1)
-    gcloud run services update-traffic ${{ github.event.repository.name }} \
-      --region ${{ vars.GCP_REGION }} \
-      --project ${{ secrets.GCP_PROJECT_ID }} \
+    gcloud run services update-traffic "$SERVICE" \
+      --region "$GCP_REGION" \
+      --project "$GCP_PROJECT_ID" \
       --to-revisions "$PREV_REVISION=100"
     echo "Rolled back to revision: $PREV_REVISION"
 ```
@@ -332,8 +354,9 @@ Replace the Cloud Run deploy step:
 
 ```yaml
 - name: Deploy to App Engine
-  run:
-    gcloud app deploy app.yaml --project ${{ secrets.GCP_PROJECT_ID }} --quiet
+  env:
+    GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  run: gcloud app deploy app.yaml --project "$GCP_PROJECT_ID" --quiet
 ```
 
 App Engine deployments are slower (2–5 minutes) and don't support the

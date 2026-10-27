@@ -29,8 +29,10 @@ When the project uses the default stack:
 - Run project commands through `uv run`, for example `uv run pytest` or
   `uv run alembic upgrade head`.
 
-When the approved design selects MongoDB instead of a relational database, Motor
-and Beanie replace SQLModel and Alembic. The layer rules below still apply.
+When the approved design selects MongoDB instead of a relational database,
+Beanie, backed by PyMongo Async, replaces SQLModel and Alembic. The layer rules
+below still apply. See `../../architect/references/mongodb.md` for setup,
+lifespan, modeling, migration, and index guidance.
 
 ## Layer Responsibilities
 
@@ -148,6 +150,9 @@ uv add "fastapi[standard]"
 # Relational persistence, settings, and migrations
 uv add sqlmodel pydantic-settings "pydantic[email]" alembic "psycopg[binary]"
 
+# MongoDB persistence and migrations, instead of the relational dependencies
+uv add beanie pymongo pydantic-settings "pydantic[email]"
+
 # Authentication, rate limiting, form login, and structured logging
 uv add pyjwt "pwdlib[argon2]" slowapi python-multipart loguru
 
@@ -241,8 +246,10 @@ def get_session() -> Iterator[Session]:
 ## Models
 
 Use `SQLModel` with `table=True`. The primary key is `int | None` defaulting to
-`None`. Set an explicit `__tablename__`. Index foreign keys and every column
-used in a `WHERE`, `JOIN`, or `ORDER BY`.
+`None`. Set an explicit `__tablename__`. Index by access pattern: index the
+columns that frequent `WHERE`, `JOIN`, and `ORDER BY` clauses depend on when the
+access pattern justifies the write cost, and check the query plan for
+performance-sensitive queries rather than indexing reflexively.
 
 ```python
 from datetime import datetime, timezone
@@ -350,9 +357,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 
 class OrderBase(BaseModel):
-    customer_id: int
     delivery_address: str = Field(max_length=500)
-    status: str = "pending"
 
 
 class OrderCreate(OrderBase):
@@ -361,19 +366,24 @@ class OrderCreate(OrderBase):
 
 class OrderUpdate(BaseModel):
     delivery_address: str | None = Field(default=None, max_length=500)
-    status: str | None = None
 
 
 class OrderRead(OrderBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
+    customer_id: int
+    status: str
     total: float
     created_at: datetime
 ```
 
 - `OrderCreate` is the request body for `POST`.
 - `OrderUpdate` makes every field optional for partial updates.
+- Create and Update schemas carry only client-settable fields. The service sets
+  the owner from the authenticated user, and status changes go through dedicated
+  service operations that check the transition, so neither appears in a request
+  body. See `security-fastapi.md`.
 - `OrderRead` is the `response_model` and always includes the primary key. Use
   `ConfigDict(from_attributes=True)`, not the Pydantic v1 `class Config`.
 - Never expose sensitive fields such as password hashes, tokens, or internal
@@ -414,7 +424,7 @@ def read_orders(
     session: Session = Depends(get_session),
     current_user: User = Depends(get_current_user),
 ) -> list[Order]:
-    return list_orders(session, offset=offset, limit=limit)
+    return list_orders(session, current_user.id, offset=offset, limit=limit)
 
 
 @router.get("/{order_id}", response_model=OrderRead)
@@ -423,7 +433,9 @@ def read_order(
     session: Session = Depends(get_session),
     current_user: User = Depends(get_current_user),
 ) -> Order:
-    order = get_order(session, order_id)
+    # None covers both a missing order and another user's order, so the
+    # response does not reveal which orders exist.
+    order = get_order(session, current_user.id, order_id)
     if order is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Order not found"
@@ -439,7 +451,7 @@ def create_new_order(
     session: Session = Depends(get_session),
     current_user: User = Depends(get_current_user),
 ) -> Order:
-    order = create_order(session, order_in)
+    order = create_order(session, current_user.id, order_in)
     if order is None:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT, detail="Order already exists"
@@ -468,8 +480,8 @@ def remove_order(
   `dependencies=[Depends(get_current_user)]` to `APIRouter` when every route in
   the router needs it.
 - Authentication alone does not authorize access to a particular object. When
-  orders belong to users, the service filters or checks by owner. See
-  `security-fastapi.md`.
+  orders belong to users, the router passes `current_user.id` and the service
+  filters by owner in the query. See `security-fastapi.md`.
 - Register each new router in `app/main.py`:
 
   ```python
@@ -499,18 +511,33 @@ from app.orders.schema import OrderCreate, OrderUpdate
 
 
 def list_orders(
-    session: Session, offset: int = 0, limit: int = 50
+    session: Session, customer_id: int, offset: int = 0, limit: int = 50
 ) -> list[Order]:
-    statement = select(Order).order_by(Order.id).offset(offset).limit(limit)
+    statement = (
+        select(Order)
+        .where(Order.customer_id == customer_id)
+        .order_by(Order.id)
+        .offset(offset)
+        .limit(limit)
+    )
     return list(session.exec(statement).all())
 
 
-def get_order(session: Session, order_id: int) -> Order | None:
-    return session.get(Order, order_id)
+def get_order(
+    session: Session, customer_id: int, order_id: int
+) -> Order | None:
+    # Scope by owner in the query so another user's order looks missing.
+    statement = select(Order).where(
+        Order.id == order_id, Order.customer_id == customer_id
+    )
+    return session.exec(statement).first()
 
 
-def create_order(session: Session, order_in: OrderCreate) -> Order | None:
-    order = Order.model_validate(order_in)
+def create_order(
+    session: Session, customer_id: int, order_in: OrderCreate
+) -> Order | None:
+    # The owner comes from the authenticated user, never the request body.
+    order = Order.model_validate(order_in, update={"customer_id": customer_id})
     session.add(order)
     session.commit()
     session.refresh(order)
@@ -518,9 +545,9 @@ def create_order(session: Session, order_in: OrderCreate) -> Order | None:
 
 
 def update_order(
-    session: Session, order_id: int, order_in: OrderUpdate
+    session: Session, customer_id: int, order_id: int, order_in: OrderUpdate
 ) -> Order | None:
-    order = session.get(Order, order_id)
+    order = get_order(session, customer_id, order_id)
     if order is None:
         return None
     # exclude_unset applies only the fields the client actually sent.
@@ -609,10 +636,13 @@ from app.orders.model import Order
 from app.orders.schema import OrderCreate
 
 
-def create_order(session: Session, order_in: OrderCreate) -> Order | None:
-    if order_repo.get_active_for_customer(session, order_in.customer_id):
+def create_order(
+    session: Session, customer_id: int, order_in: OrderCreate
+) -> Order | None:
+    if order_repo.get_active_for_customer(session, customer_id):
         return None  # the router maps this to 409
-    return order_repo.save(session, Order.model_validate(order_in))
+    order = Order.model_validate(order_in, update={"customer_id": customer_id})
+    return order_repo.save(session, order)
 ```
 
 ## Responses and Errors
@@ -761,6 +791,9 @@ includes:
   `{"detail": "Internal server error"}` without a stack trace.
 - Database lifecycle and `setup_logging()` run in the `lifespan` context
   manager.
+- For MongoDB, initialize Beanie once during lifespan startup and await the
+  shared `AsyncMongoClient.close()` during shutdown. Follow
+  `../../architect/references/mongodb.md`; do not create a client per request.
 
 ```python
 from collections.abc import AsyncIterator
@@ -1093,7 +1126,8 @@ Depending on the change, also confirm that:
 - primary-key lookups use `session.get`, and filtering, sorting, and slicing
   happen in the query;
 - no N+1 query patterns remain;
-- foreign keys and filter columns are indexed;
+- indexes follow the access patterns, with query plans checked for
+  performance-sensitive queries;
 - no response schema exposes sensitive fields;
 - every protected route has its auth dependency;
 - no new file contains hard-coded secrets or credentials.
@@ -1109,6 +1143,7 @@ Do not add or rewrite formal tests. Tester owns them.
 - [FastAPI: CORS](https://fastapi.tiangolo.com/tutorial/cors/)
 - [FastAPI: SQL databases (SQLModel)](https://fastapi.tiangolo.com/tutorial/sql-databases/)
 - [SQLModel documentation](https://sqlmodel.tiangolo.com/)
+- [Beanie ODM documentation](https://beanie-odm.dev/)
 - [Pydantic v2 documentation](https://docs.pydantic.dev/latest/)
 - [Pydantic v2 migration guide](https://docs.pydantic.dev/latest/migration/),
   covering `model_validate`, `model_dump`, and

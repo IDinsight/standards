@@ -789,12 +789,12 @@
     },
     {
       "id": 78,
-      "prompt": "Invoke Navigator in ASSESS mode: assess the FastAPI service in api/ against Level 4. No cycle is active. Evidence: routers, services, and persistence modules are separated; pytest covers auth failures; CI runs ruff, mypy, and pytest; logs are plain-text print statements; there is no rate limiting, no metrics or error tracking, and no staging deployment. Files are readable.",
-      "expected_output": "An informal, conversation-only maturity assessment that uses Scoper's maturity ladder, places the service at Level 3 with evidence, lists the Level 4 gaps by impact, and points to a workflow cycle for any changes.",
+      "prompt": "Invoke Navigator in ASSESS mode: assess the FastAPI service in api/ against Level 4. No cycle is active. Evidence: routers, services, and persistence modules are separated; pytest covers auth failures; CI runs ruff, mypy, and pytest with cached installs, builds the container image, reports coverage, and must pass before merge, but has no dependency vulnerability scanning; logs are plain-text print statements; there is no rate limiting, no metrics or error tracking, and no staging deployment. Files are readable.",
+      "expected_output": "An informal, conversation-only maturity assessment that uses Scoper's maturity ladder, places the service at Level 2 with evidence, lists the Level 3 and Level 4 gaps by impact, and points to a workflow cycle for any changes.",
       "files": [],
       "assertions": [
         "Reads the maturity ladder and marks each applicable Level 4 expectation as met, not met, unverified, or not applicable with exact file evidence.",
-        "Concludes the assessed level is 3, not 4, because Level 4 expectations such as structured logging, rate limiting, observability, and staging lack working evidence.",
+        "Concludes the assessed level is 2, not 3 or 4, because the CI/CD area lacks Level 3 evidence such as dependency vulnerability scanning, and Level 4 expectations such as structured logging, rate limiting, observability, and staging deployment lack working evidence.",
         "Does not credit an expectation from dependency presence, folder names, or comments alone.",
         "Writes no files, creates no cycle or ID, issues no Reviewer P0-P2 findings, and suggests Scoper for a 'bring this API to Level 4' cycle without starting it."
       ]

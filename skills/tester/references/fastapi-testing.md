@@ -144,7 +144,7 @@ test keeps failures readable. An example selection for an orders router:
 def test_create_order_success(client, auth_headers):
     response = client.post(
         "/orders/",
-        json={"customer_id": 1, "delivery_address": "123 Main St"},
+        json={"delivery_address": "123 Main St"},
         headers=auth_headers(),
     )
     assert response.status_code == 201
@@ -160,14 +160,14 @@ def test_create_order_missing_required_field(client, auth_headers):
 
 
 def test_create_order_unauthenticated(client):
-    response = client.post("/orders/", json={"customer_id": 1, "delivery_address": "A"})
+    response = client.post("/orders/", json={"delivery_address": "A"})
     assert response.status_code == 401
 
 
 def test_get_order_of_another_user_forbidden(client, auth_headers):
     owner = auth_headers(email="owner@example.test")
     order_id = client.post(
-        "/orders/", json={"customer_id": 1, "delivery_address": "A"}, headers=owner
+        "/orders/", json={"delivery_address": "A"}, headers=owner
     ).json()["id"]
     other = auth_headers(email="other@example.test")
     assert client.get(f"/orders/{order_id}", headers=other).status_code in (403, 404)
@@ -197,13 +197,13 @@ from app.orders.service import create_order, update_order
 
 
 def test_create_order_conflict_returns_none(session):
-    create_order(session, OrderCreate(customer_id=1, delivery_address="A"))
-    assert create_order(session, OrderCreate(customer_id=1, delivery_address="B")) is None
+    create_order(session, 1, OrderCreate(delivery_address="A"))
+    assert create_order(session, 1, OrderCreate(delivery_address="B")) is None
 
 
 def test_update_order_partial_leaves_unset_fields(session):
-    order = create_order(session, OrderCreate(customer_id=1, delivery_address="Old"))
-    updated = update_order(session, order.id, OrderUpdate(delivery_address="New"))
+    order = create_order(session, 1, OrderCreate(delivery_address="Old"))
+    updated = update_order(session, 1, order.id, OrderUpdate(delivery_address="New"))
     assert updated.delivery_address == "New"
     assert updated.status == "pending"
 ```

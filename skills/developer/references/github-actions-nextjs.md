@@ -69,7 +69,7 @@ Use the package manager the lockfile names: `pnpm-lock.yaml` means pnpm,
 
 ```yaml
 - uses: actions/checkout@v4
-# Reads the pnpm version from package.json "packageManager" when set.
+# Reads the pnpm version from package.json "packageManager".
 - uses: pnpm/action-setup@v4
 - uses: actions/setup-node@v4
   with:
@@ -77,6 +77,12 @@ Use the package manager the lockfile names: `pnpm-lock.yaml` means pnpm,
     cache: "pnpm" # caches the pnpm store, keyed on the lockfile
 - run: pnpm install --frozen-lockfile
 ```
+
+Every pnpm example in this file assumes `package.json` sets `packageManager`,
+such as `"packageManager": "pnpm@<version>"`, or `devEngines.packageManager`.
+Without one of them, `pnpm/action-setup` fails with "No pnpm version is
+specified". Set the version in one place only: either in `package.json` or with
+`with: version:` on the action. Setting both fails when the versions differ.
 
 `pnpm/action-setup` must run before `setup-node` so the `pnpm` cache option can
 find pnpm.
@@ -338,6 +344,7 @@ sast:
   timeout-minutes: 10
   permissions:
     contents: read
+    actions: read # required by upload-sarif in private repositories
     security-events: write # upload SARIF to code scanning
   container:
     image: semgrep/semgrep # pin per project policy, e.g. by digest

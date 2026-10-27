@@ -20,7 +20,7 @@ commonly expected, but the completed scope decides what the design needs.
 
 ## Signals by Maturity
 
-### Structured Logging (commonly from Level 3)
+### Structured Logging (commonly from Level 4)
 
 **What to check:**
 
@@ -154,8 +154,8 @@ evidence found.
 
 | Signal                      | Commonly expected from | Evidence to look for                              |
 | --------------------------- | ---------------------- | ------------------------------------------------- |
-| Structured JSON logs        | 3                      | Log format in middleware or logging config        |
-| Request ID on every line    | 3                      | Middleware generating and propagating UUID        |
+| Structured JSON logs        | 4                      | Log format in middleware or logging config        |
+| Request ID on every line    | 4                      | Middleware generating and propagating UUID        |
 | No secrets in logs          | 3                      | Log statements reviewed for token/password fields |
 | Global error handler        | 3                      | Exception handler registered at app level         |
 | RED metrics exposed         | 4                      | Metrics endpoint + instrumentation library        |

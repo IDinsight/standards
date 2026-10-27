@@ -52,7 +52,7 @@ Optional:
 
 ### Staging Deployment
 
-Commonly expected from maturity Level 3, when merges to the default branch
+Commonly expected from maturity Level 4, when merges to the default branch
 deploy to staging.
 
 <!-- markdownlint-disable MD013 -->
