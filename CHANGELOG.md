@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.15.0](https://github.com/IDinsight/standards/compare/v0.14.1...v0.15.0) (2026-10-28)
+
+
+### Features
+
+* add example user styles and Tester guidance for LLM provider APIs ([#81](https://github.com/IDinsight/standards/issues/81)) ([67e0dde](https://github.com/IDinsight/standards/commit/67e0ddec8353a7cf832a5e4d1ea078ce8ccaa344))
+* add project references that roles load on demand ([#86](https://github.com/IDinsight/standards/issues/86)) ([e0543f9](https://github.com/IDinsight/standards/commit/e0543f9528a2e76c074cd08b2c5c64fed4b50841))
+
 ## [0.14.1](https://github.com/IDinsight/standards/compare/v0.14.0...v0.14.1) (2026-10-28)
 
 
