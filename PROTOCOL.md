@@ -24,8 +24,9 @@ Terms**, the last section, defines terms this protocol uses in a specific sense;
 consult it whenever a term is load-bearing.
 
 Three chapters in `.standards/protocol/` hold rules that apply only in some
-situations. Read a chapter before acting whenever its condition holds. If a
-chapter is missing, stop and report an incomplete runtime.
+situations. Read a chapter before acting whenever its condition holds; a
+help-only request under **Role Invocation Help** needs none. If a chapter is
+missing, stop and report an incomplete runtime.
 
 | Chapter             | Sections                                                                                                                                                                                                                                    | Read when                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -449,6 +450,82 @@ The Navigator skill defines the full operating boundary, including its
 non-mutation rules, diagnostic safety requirements, explanation standards, and
 interaction modes.
 
+## Role Invocation Help
+
+Every role answers invocation help: `/<role> help` in Claude Code,
+`$<role> help` in Codex, or a question to an invoked role about its own modes,
+options, targets, or user styles, such as "what modes do you have?". A question
+about a role's options asked without invoking that role follows the same rules
+and does not invoke it. Help is not a mode or a workflow request. Interpret a
+bare "help" in context: in the middle of a role's work, such as while Developer
+waits for plan approval or Navigator waits for a quiz answer, it asks for help
+with the current question; give that help and leave the question pending.
+Otherwise, a bare "help" asks for the option summary.
+
+Help needs only this section and the sections it names, not the full protocol
+read or the chapters that substantive role work requires. A request that
+combines help with substantive work, or with an explicit change of mode, target,
+or style, is an ordinary invocation for that part: the role's own entry rules
+apply to it, the substantive response comes first, and option guidance stays
+proportionate.
+
+For each help request, run the discovery helper from **Next-Role Invocation
+Options** afresh, with the role's skill identifier and the active client
+(`codex` or `claude`). Do not answer from a remembered list; new mode and
+user-style files appear on the next call. Read the result as that section
+describes, including that exit status 0 does not establish complete discovery,
+and apply its rules for saved values, defaults, selectors, and locks. Its
+handoff summary does not apply; summarize the options by kind instead, omitting
+empty kinds:
+
+- **You can choose:** options whose `selectability` is `user` or
+  `assessment-required`, each with its description and a short example request
+  in the active client's syntax that uses the discovered identifier. An
+  `assessment-required` option is a request the role still assesses.
+- **Set by the workflow or the role:** values that state selects and options the
+  role chooses by its own assessment, which the helper reports as
+  `informational`. Label them as not user switches, and do not present an
+  assessed candidate as decided.
+- **Targets and arguments:** the targets or arguments the role accepts, with a
+  placeholder for each required file, directory, capability, or area, and any
+  saved target.
+
+Options reported as `unavailable`, `locked`, `state-controlled`, or `unknown`
+are not free choices; state the restriction briefly when it matters. Report
+known current and saved selections, qualifying unknown, invalid, or conflicting
+ones. The helper reports choices kept in the conversation as `conversation`,
+which does not mean no selection: use the conversation's explicit choices for
+that role.
+
+List the discovered user-style identifiers without reading their contents,
+labelling a displayed subset of a long inventory as examples. Show any lock, and
+show how to select a style and how to clear an unlocked selection, under the
+selector, clearing, and lock rules in **Next-Role Invocation Options** and
+**User Styles**. Distinguish an empty complete inventory from an unknown one.
+
+A workflow role may add a short "if invoked now" note from a read of
+`.standards/STATE.md`: whether this role owns the current `WorkflowState` and,
+if not, which role or the user does under **Workflow States**, or that no cycle
+is active. The note is orientation, not entry validation or a gate check.
+Navigator, which owns no workflow state, adds none.
+
+Help alone answers and stops. It never writes or initializes `STATE.md` or a
+record; starts, resumes, or reworks a cycle; applies a default; selects or locks
+a style; loads an unselected mode's procedure or a user style's contents; runs
+`check`, project checks, or tests; inspects unrelated project source; asks for
+mode approval; or consumes a pending handoff, approval, or user decision. The
+role keeps its current progress and choices, so a later bare continuation
+resumes the pending work. When a tool or hook reports problems during help,
+report them and change nothing.
+
+Help works with no active cycle and without `STATE.md` or `MODE.md`; a missing
+file limits only the facts that depend on it. If the helper is missing, cannot
+run, or reports an unavailable catalog, say that the current options could not
+be verified. Do not invent options, present an unverified full inventory, repair
+the installation, or ask the user to run the helper or install anything. A
+description limited to what the role's skill states is allowed, and a result
+with `complete: false` still supports its verified parts.
+
 ## Instruction Layering and Conflicts
 
 Role-specific precedence may order **compatible** guidance, such as applying a
@@ -484,7 +561,7 @@ setup step. Roles use them instead of doing these steps by hand:
 | `node .standards/bin/artifact.mjs init <TYPE>`                       | Create one of the active cycle's records with its provenance block and header (see **Workflow Artifact Provenance**). |
 | `node .standards/bin/id.mjs next <AC\|DEV\|F\|D\|DOC> <file>`        | Print the next free identifier for a record.                                                                          |
 | `node .standards/bin/check.mjs`                                      | Check the runtime files and the active cycle's records. It only reads files.                                          |
-| `node .standards/bin/invocation.mjs <role> --client <client> --json` | Discover a role's invocation options without changing files (see **Next-Role Invocation Options**).                   |
+| `node .standards/bin/invocation.mjs <role> --client <client> --json` | Discover a role's options without changing files (see **Role Invocation Help** and **Next-Role Invocation Options**). |
 
 A workflow role runs `check` before its first substantive work and again before
 every state-changing handoff. For each problem it reports:
@@ -499,7 +576,8 @@ role owns. `check` finds mechanical errors such as malformed cycle IDs, broken
 provenance, or missing acceptance coverage; it does not replace a role's
 completion gate. If a tool is missing or fails, stop and report it; do not do
 its step by hand. Invocation discovery is the presentation-only exception:
-follow **Next-Role Invocation Options** for unavailable or incomplete results.
+follow **Next-Role Invocation Options** or **Role Invocation Help** for
+unavailable or incomplete results.
 
 A user instruction not to run commands covers tests, builds, scripts, package
 managers, git (including read-only git commands) and any other command, with
@@ -529,7 +607,8 @@ correction while preserving full completion checks at Reviewer entry.
 
 Navigator may run `check` and `invocation`, because they change nothing.
 Discovery needs no active cycle. When a tool or hook reports problems during
-Navigator work, Navigator reports the relevant limits and changes nothing.
+Navigator work or **Role Invocation Help**, the role reports the relevant limits
+and changes nothing.
 
 ## Verification Cadence
 

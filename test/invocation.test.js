@@ -556,6 +556,36 @@ test('Navigator option help refreshes its installed catalog without workflow fil
   assert.deepEqual(await snapshot(root), before);
 }));
 
+// Role Invocation Help in PROTOCOL.md: any shipped role's help discovers options
+// for the active client with no cycle or workflow files, and changes nothing.
+const shippedRoles = (await readdir(new URL('../skills/', import.meta.url), { withFileTypes: true }))
+  .filter((entry) => entry.isDirectory()).map((entry) => entry.name).sort();
+for (const role of shippedRoles) {
+  test('invocation help for ' + role + ' works for either client without workflow files or writes', () => fixture(async (root) => {
+    for (const file of ['STATE.md', 'MODE.md']) await rm(path.join(root, '.standards', file));
+    await write(root, '.standards/user-styles/' + role + '/tony.md', 'PRIVATE TONY PREFERENCES');
+    const before = await snapshot(root);
+    for (const client of ['codex', 'claude']) {
+      const { stdout } = await exec(process.execPath, [path.join(root, '.standards/bin/invocation.mjs'), role, '--client', client, '--json']);
+      const result = JSON.parse(stdout);
+      assert.equal(result.catalogStatus, 'complete', JSON.stringify(result.diagnostics));
+      assert.deepEqual([result.role, result.client], [role, client]);
+      assert.deepEqual(result.userStyles.options.map((item) => item.id), ['tony']);
+      assert.doesNotMatch(stdout, /PRIVATE/);
+    }
+    assert.deepEqual(await snapshot(root), before);
+  }, ['codex', 'claude']));
+}
+
+test('every role skill sends invocation help to the shared protocol rule', async () => {
+  assert.match(await readFile(new URL('../PROTOCOL.md', import.meta.url), 'utf8'), /^## Role Invocation Help$/m);
+  for (const role of shippedRoles) {
+    const text = (await readFile(new URL('../skills/' + role + '/SKILL.md', import.meta.url), 'utf8')).replace(/\s+/g, ' ');
+    assert.match(text, /## Invocation Help .*\*\*Role Invocation Help\*\*/, role);
+    assert.ok(text.includes('`/' + role + ' help`, `$' + role + ' help`'), role);
+  }
+});
+
 test('visible record fields survive inline comments while commented values stay hidden', () => fixture(async (root) => {
   await state(root);
   const file = await record(root, 'DEVELOPMENT', plan);

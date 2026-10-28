@@ -22,6 +22,20 @@ Codex:       $auditor Continue from .standards/STATE.md.
 Claude Code: /auditor Continue from .standards/STATE.md.
 ```
 
+## Discover your options
+
+Ask Auditor for help to see what you can choose:
+
+| Client      | Prompt          |
+| ----------- | --------------- |
+| Codex       | `$auditor help` |
+| Claude Code | `/auditor help` |
+
+The answer lists Auditor's modes, which Auditor chooses itself, shows how to ask
+it to look at one part of the project, and lists your user styles. Asking for
+help changes nothing. See
+[Ask a role for help](../overview/#ask-a-role-for-help) for how it works.
+
 ## Inputs and output
 
 Auditor uses the saved request, project instructions, repository files and

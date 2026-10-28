@@ -20,6 +20,15 @@ be achieved and what counts as done**.
 Apply to any project: applications, services, libraries, frameworks, CLIs,
 tooling, systems software, infrastructure, or similar work.
 
+## Invocation Help
+
+A help-only request, such as `/scoper help`, `$scoper help`, or a question only
+about this role's modes, options, targets, or user styles, is not workflow work.
+Follow **Role Invocation Help** in `.standards/PROTOCOL.md`, reading only that
+section and the sections it names, and skip the entry and input steps below. If
+the protocol cannot be read, say that the current options could not be verified
+and change nothing.
+
 ## Ownership
 
 Own the project scope. The completed scope must be persisted under the

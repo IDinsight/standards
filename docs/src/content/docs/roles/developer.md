@@ -18,6 +18,19 @@ Codex:       $developer Continue from .standards/STATE.md in STEPWISE mode.
 Claude Code: /developer Continue from .standards/STATE.md in STEPWISE mode.
 ```
 
+## Discover your options
+
+Ask Developer for help to see what you can choose:
+
+| Client      | Prompt            |
+| ----------- | ----------------- |
+| Codex       | `$developer help` |
+| Claude Code | `/developer help` |
+
+The answer lists the ways you can work with Developer, your user styles, and
+whether your style is locked. Asking for help changes nothing. See
+[Ask a role for help](../overview/#ask-a-role-for-help) for how it works.
+
 ## Inputs and output
 
 In standard work, Developer uses the completed scope, design, and valid Auditor

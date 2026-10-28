@@ -97,7 +97,9 @@ The `google-github-actions/auth` action documentation has the full setup steps.
 - name: Build and push
   env:
     GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-    IMAGE: ${{ vars.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/app/${{ github.event.repository.name }}:${{ github.sha }}
+    IMAGE:
+      ${{ vars.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID
+      }}/app/${{ github.event.repository.name }}:${{ github.sha }}
   run: |
     gcloud builds submit \
       --tag "$IMAGE" \
@@ -120,7 +122,9 @@ requires GCP-internal resources or when GitHub runners are too slow.
 
 - name: Build and push
   env:
-    IMAGE: ${{ vars.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/app/${{ github.event.repository.name }}:${{ github.sha }}
+    IMAGE:
+      ${{ vars.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID
+      }}/app/${{ github.event.repository.name }}:${{ github.sha }}
   run: |
     docker build -t "$IMAGE" .
     docker push "$IMAGE"
@@ -163,7 +167,9 @@ jobs:
       GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
       GCP_REGION: ${{ vars.GCP_REGION }}
       SERVICE: ${{ github.event.repository.name }}
-      IMAGE: ${{ vars.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/app/${{ github.event.repository.name }}:${{ github.sha }}
+      IMAGE:
+        ${{ vars.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID
+        }}/app/${{ github.event.repository.name }}:${{ github.sha }}
     steps:
       - uses: actions/checkout@v4
 
@@ -241,7 +247,9 @@ jobs:
       GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
       GCP_REGION: ${{ vars.GCP_REGION }}
       SERVICE: ${{ github.event.repository.name }}
-      IMAGE: ${{ vars.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/app/${{ github.event.repository.name }}:${{ github.sha }}
+      IMAGE:
+        ${{ vars.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID
+        }}/app/${{ github.event.repository.name }}:${{ github.sha }}
     steps:
       - uses: actions/checkout@v4
 

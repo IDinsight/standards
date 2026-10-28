@@ -161,11 +161,11 @@ settings edits are needed for this setup. See
 [Claude Code skills](https://code.claude.com/docs/en/skills) and
 [hooks](https://code.claude.com/docs/en/hooks#workspace-trust).
 
-To see Navigator's options, ask "What modes and user styles does Navigator
-offer?" before invoking it, or use `$navigator help` in Codex or
-`/navigator help` in Claude Code. The agent looks them up internally; no
-additional setup command is needed. See
-[Navigator](../../roles/navigator/#discover-your-options).
+To see what a role offers, ask it for help: `$developer help` in Codex or
+`/developer help` in Claude Code, using any role's name. You can also ask a
+question such as "What modes does Developer have?" The agent looks this up for
+you; there is nothing to set up. See
+[Ask a role for help](../../roles/overview/#ask-a-role-for-help).
 
 ## What the installer adds
 

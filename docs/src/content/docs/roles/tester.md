@@ -28,6 +28,19 @@ it states that limit and works from saved evidence; it does not pretend to erase
 history. See the
 [session rules](../../reference/protocol/#independent-tester-session).
 
+## Discover your options
+
+Ask Tester for help to see what you can choose:
+
+| Client      | Prompt         |
+| ----------- | -------------- |
+| Codex       | `$tester help` |
+| Claude Code | `/tester help` |
+
+The answer lists Tester's modes, which Tester chooses itself, and your user
+styles. Asking for help changes nothing. See
+[Ask a role for help](../overview/#ask-a-role-for-help) for how it works.
+
 ## Inputs and output
 
 Tester reads the scope, design, Auditor context, development plan, relevant

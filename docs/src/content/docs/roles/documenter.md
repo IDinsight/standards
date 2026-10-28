@@ -28,6 +28,20 @@ Codex:       $documenter Continue from .standards/STATE.md.
 Claude Code: /documenter Continue from .standards/STATE.md.
 ```
 
+## Discover your options
+
+Ask Documenter for help to see what you can choose:
+
+| Client      | Prompt             |
+| ----------- | ------------------ |
+| Codex       | `$documenter help` |
+| Claude Code | `/documenter help` |
+
+The answer lists the ways you can work with Documenter, what you can ask it to
+focus on, such as a file or a folder, and your user styles. Asking for help
+changes nothing. See [Ask a role for help](../overview/#ask-a-role-for-help) for
+how it works.
+
 ## Inputs and output
 
 Documenter reads the requirements, design, relevant project context, code,

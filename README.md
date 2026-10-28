@@ -33,10 +33,7 @@ shared terminology. Individual skills define role-specific behavior.
   INVESTIGATE, adaptive GRILL_ME questions, and ASSESS, an informal check of an
   area against a maturity, security, or stack checklist. It uses repository
   evidence, stays strictly non-mutating, and works outside the workflow state
-  machine without requiring an active cycle. Ask about Navigator's options
-  before invoking it, or use `$navigator help` / `/navigator help` to discover
-  current modes and user styles. See
-  [Navigator](docs/src/content/docs/roles/navigator.md#discover-your-options).
+  machine without requiring an active cycle.
 - **Developer** turns the active contract into an approved atomic development
   plan, then implements it within established constraints using Autonomous,
   Stepwise, or Code With Me collaboration. In standard work, any of these modes
@@ -60,6 +57,11 @@ shared terminology. Individual skills define role-specific behavior.
 - **Synchronizer** reconciles completed assessments, the current deliverable,
   and workflow records before user sign-off. It records evidence applicability
   and discrepancies, routing corrections to their owners.
+
+Every role answers `help`. For example, `$developer help` in Codex or
+`/developer help` in Claude Code lists what you can choose for Developer and
+your user styles, without changing anything. See
+[Ask a role for help](docs/src/content/docs/roles/overview.md#ask-a-role-for-help).
 
 Each role has eval cases in `skills/<role>/evals/evals.json`. See
 [`SKILL_EVAL_REPORT.md`](SKILL_EVAL_REPORT.md) for an earlier evaluation and its

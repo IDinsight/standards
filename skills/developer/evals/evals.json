@@ -870,6 +870,29 @@
         "Pins any newly added third-party action to a full commit SHA with a version comment because no pinning policy is established, and does not rewrite unrelated existing steps.",
         "Does not add deployment jobs, new scanning tools, or branch-protection changes, treating them as architecture."
       ]
+    },
+    {
+      "id": 70,
+      "prompt": "Developer is in DEVELOPING in a STANDARD cycle. It has presented a PROPOSED development plan and is waiting for the user's approval. The user replies only: help.",
+      "expected_output": "Help with the pending plan approval, such as how to approve, change, or ask about the plan, and keep waiting for approval.",
+      "files": [],
+      "assertions": [
+        "Treats the reply as a request for help with the pending approval, not as a request for the summary of modes and user styles.",
+        "Does not treat the reply as approval: the plan stays PROPOSED and no implementation starts.",
+        "Does not change STATE.md, the development plan, or any other file."
+      ]
+    },
+    {
+      "id": 71,
+      "prompt": "Invoke Developer with /developer help in Claude Code. WorkflowState is TESTING in a STANDARD cycle. The approved development plan records Mode STEPWISE, User Style tony, and User Style Locked true. The discovery helper is available; it reports the AUTONOMOUS, CODE_WITH_ME, and STEPWISE collaboration modes, a complete style inventory containing alice and tony, and the locked tony selection.",
+      "expected_output": "Show the collaboration modes and the locked tony style from fresh discovery, then stop without Developer work or workflow changes.",
+      "files": [],
+      "assertions": [
+        "Runs the discovery helper for developer with --client claude and shows the collaboration modes with /developer examples.",
+        "Reports tony as the current, locked style and does not suggest switching to alice or clearing the style.",
+        "Does not start or resume Developer work, run check or project tests, or claim that Developer owns TESTING.",
+        "Does not change STATE.md, the development plan, or any other file."
+      ]
     }
   ]
 }
