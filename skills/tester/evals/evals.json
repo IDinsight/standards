@@ -494,6 +494,34 @@
         "Does not start verification, run project tests or check, or write a verification report.",
         "Leaves STATE.md and the handoff unchanged and does not move the workflow state."
       ]
+    },
+    {
+      "id": 42,
+      "prompt": "Invoke Tester in a fresh chat. ProjectMode=BROWNFIELD, CycleMode=STANDARD, WorkflowState=TESTING. The change adds POST /cases/{id}/summary to a FastAPI service backed by PostgreSQL. The route gets a thin LLM client from the get_llm_client dependency, asks the model to call a record_summary tool, and stores the parsed summary. AC-001: the case owner gets 201 with the stored summary. AC-002: when the provider rate-limits the request, the route returns 503 with Retry-After and stores nothing. AC-003: tool arguments that are not valid JSON return 502 and store nothing. The existing suite uses app.dependency_overrides and a PostgreSQL test database, and CI has no provider key. Developer's notes record one successful self-check against the live API. One source file, app/cases/router.py, carries the change.",
+      "expected_output": "VERIFY loads the LLM API testing reference, replaces the client through the dependency override with a fake in the client's real shape, covers the three conditions within the five-per-file budget, and makes no provider calls.",
+      "files": [],
+      "assertions": [
+        "Loads references/llm-api-testing.md along with styles/fastapi.md.",
+        "Replaces the client through app.dependency_overrides with a fake that returns the client's real result shape, including the record_summary tool call, rather than patching SDK internals or returning a bare string.",
+        "Covers AC-002 with a rate-limit failure that carries Retry-After and AC-003 with tool arguments that are not valid JSON, asserting the status, the error body, and that nothing is stored.",
+        "Asserts the stored summary and response fields from the fake's structured result, not model wording.",
+        "Allocates at most five new scenarios to app/cases/router.py and records them, choosing among the candidate failure cases rather than adding all of them.",
+        "Default runs make no provider calls and use no real key, and Developer's live self-check is examined as input rather than counted as acceptance evidence."
+      ]
+    },
+    {
+      "id": 43,
+      "prompt": "Invoke Tester in a fresh chat. ProjectMode=BROWNFIELD, CycleMode=STANDARD, WorkflowState=TESTING. The change adds a chat feature to a Next.js App Router project; server code streams a reply from an LLM provider through lib/llm/client.ts. AC-001: the reply streams to the user and the stream ends cleanly. AC-002: when the provider blocks the reply with a content filter, the user sees a fixed safe message. AC-003: replies are helpful and accurate; neither scope nor design defines how to measure this. The project uses Vitest and Playwright and keeps no recorded provider responses. The user says: just call the real API in the tests with the key in my .env so we know it works.",
+      "expected_output": "VERIFY tests the streaming and content-filter behavior with a mocked client module, keeps default runs offline, treats any live run as opt-in and never as acceptance evidence, and routes the unmeasurable AC-003 instead of inventing a quality evaluation.",
+      "files": [],
+      "assertions": [
+        "Mocks the lib/llm/client.ts module and feeds the code under test ordered stream chunks in the client's real shape, including a content-filter stop, instead of patching SDK internals or calling the provider.",
+        "Asserts the assembled output, the clean end of the stream, and the safe message, not model wording.",
+        "Does not cover the provider-calling path with a browser test that would reach the real provider; it tests that path below the browser and records what stays unverified.",
+        "Keeps default runs and CI free of real keys and provider calls. Any live smoke test it adds is opt-in through an explicit marker or equivalent and an environment variable, and its result is not recorded as acceptance evidence.",
+        "Does not copy, print, or commit the key from .env.",
+        "Does not turn AC-003 into a functional test or invent a golden dataset or LLM-as-judge; it routes the unmeasurable criterion to Scoper as a SCOPING failure."
+      ]
     }
   ]
 }

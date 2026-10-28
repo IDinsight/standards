@@ -202,7 +202,9 @@ the cycle from the project as it existed beforehand. See
 A user style is a Markdown file of your personal preferences for one role, such
 as how you like docstrings or test names written. Add it at
 `.standards/user-styles/<role>/<name>.md`, where `<role>` is the role's skill
-name, such as `developer` or `tester`. STANDARDS ships none.
+name, such as `developer` or `tester`. STANDARDS ships none; see
+[Writing User Styles](../../guides/writing-user-styles/) for an example for each
+role.
 
 A role uses a style only when you name it, for example:
 

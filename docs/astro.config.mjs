@@ -84,6 +84,9 @@ export default defineConfig({
               slug: "guides/working-with-developer",
             },
             {
+              slug: "guides/writing-user-styles",
+            },
+            {
               slug: "guides/revising-scope-or-design",
             },
             {
