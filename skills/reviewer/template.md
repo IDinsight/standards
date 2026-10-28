@@ -34,6 +34,7 @@ ReviewKind: IMPLEMENTATION | FINAL_DELIVERABLE
 - Development, verification, context, prior reviews, documentation, relevant
   dependencies/configuration, and environment identities used in this
   assessment.
+- Project references loaded, by path, or `NONE`.
 - In DOCUMENTATION, include the documentation boundary, current Auditor context,
   technical contracts, saved documents, and Documenter checks. Identify existing
   source/tests/prior assessments used as support without requiring omitted

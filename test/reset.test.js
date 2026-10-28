@@ -30,7 +30,8 @@ async function snapshot(root, prefix = '') {
   return files;
 }
 
-// An installed project partway through a cycle, with context, records, and a user style.
+// An installed project partway through a cycle, with context, records, a user
+// style, and a project reference.
 async function projectWithWork(root) {
   await installProject({ projectRoot: root });
   const state = await read(root, '.standards/STATE.md');
@@ -44,12 +45,15 @@ async function projectWithWork(root) {
   await write(root, '.standards/docs/scope/old-work-20260901T120000Z-1a2b3c4d.md', 'Scope record\n');
   await mkdir(path.join(root, '.standards/user-styles/developer'), { recursive: true });
   await write(root, '.standards/user-styles/developer/alex.md', '# Alex\n');
+  await mkdir(path.join(root, '.standards/project-references/developer'), { recursive: true });
+  await write(root, '.standards/project-references/developer/internal-auth.md', '# Internal Auth\n');
   await write(root, 'app.py', 'print("hello")\n');
 }
 
-test('reset deletes workflow data, keeps the installation and user styles, and chooses the mode again', () => fixture(async (root) => {
+test('reset deletes workflow data, keeps the installation, user styles, and project references, and chooses the mode again', () => fixture(async (root) => {
   await projectWithWork(root);
-  const kept = ['PROTOCOL.md', 'VERSION.json', 'INSTALLATION.json', 'bin/check.mjs', 'user-styles/developer/alex.md'];
+  const kept = ['PROTOCOL.md', 'VERSION.json', 'INSTALLATION.json', 'bin/check.mjs', 'user-styles/developer/alex.md',
+    'project-references/developer/internal-auth.md'];
   const before = Object.fromEntries(await Promise.all(kept.map(async (name) => [name, await read(root, `.standards/${name}`)])));
   const outside = await snapshot(root, '.claude');
   const result = await resetProject({ projectRoot: root });

@@ -94,6 +94,9 @@ report persists its identifier as `User Style`, `NONE` by default, and reloads
 it on resume. A style shapes how findings and summaries are written, never
 severity, evidence requirements, or whether a gate passes.
 
+Load project references from `.standards/project-references/reviewer/` as the
+protocol's **Project References** defines.
+
 ## Ownership
 
 Own the review reports and correction of Reviewer findings. Use
@@ -158,7 +161,9 @@ observations alone do not block documentation review.
    documentation outcome against saved content, Documenter's checks, existing
    behavior, and technical coverage. Check accuracy, examples, links, audience
    coverage, and the permitted editing boundary where relevant; a documentation
-   record's labels are not evidence.
+   record's labels are not evidence. Where a record lists project references,
+   check that the work used them only as the protocol's **Project References**
+   allows.
 4. Inspect relevant surrounding code, callers, dependencies, contracts, tests,
    and documentation, not only diff hunks. Prioritize correctness, security,
    failure handling, resource behavior, compatibility, and material

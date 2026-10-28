@@ -39,6 +39,10 @@ your project's instructions and tooling, and correctness. The
 [user style rules](../../reference/runtime-files/#user-styles) explain which
 roles save your choice and when Developer locks it.
 
+A style is personal. For knowledge your whole team shares, such as the
+conventions for an internal service, add a
+[project reference](../../reference/runtime-files/#project-references) instead.
+
 ## Examples
 
 Each example is a complete file. Copy one into `.standards/user-styles/<role>/`,

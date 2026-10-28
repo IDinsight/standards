@@ -17,18 +17,19 @@ This page describes the required layout installed by the CLI. See
 
 ## Files at a glance
 
-| File                           | Purpose                                                                                            |
-| ------------------------------ | -------------------------------------------------------------------------------------------------- |
-| `.standards/bin/`              | Tools the agent runs; see [Runtime tools](#runtime-tools).                                         |
-| `.standards/CONTEXT.md`        | Auditor's record of the existing project, created when an audit runs.                              |
-| `.standards/docs/`             | Cycle records the roles create; see [Plans, reports, and Navigator](#plans-reports-and-navigator). |
-| `.standards/INSTALLATION.json` | Client settings and paths created by the installer.                                                |
-| `.standards/MODE.md`           | The project's greenfield or brownfield mode.                                                       |
-| `.standards/PROTOCOL.md`       | Shared workflow rules, aligned with the installed skills.                                          |
-| `.standards/protocol/`         | Protocol chapters the agent reads only when a situation calls for them.                            |
-| `.standards/STATE.md`          | Current workflow step, request, handoff, and recovery.                                             |
-| `.standards/user-styles/`      | Optional personal styles you add for a role; see [User styles](#user-styles).                      |
-| `.standards/VERSION.json`      | Installed framework version and upgrade compatibility check.                                       |
+| File                             | Purpose                                                                                            |
+| -------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `.standards/bin/`                | Tools the agent runs; see [Runtime tools](#runtime-tools).                                         |
+| `.standards/CONTEXT.md`          | Auditor's record of the existing project, created when an audit runs.                              |
+| `.standards/docs/`               | Cycle records the roles create; see [Plans, reports, and Navigator](#plans-reports-and-navigator). |
+| `.standards/INSTALLATION.json`   | Client settings and paths created by the installer.                                                |
+| `.standards/MODE.md`             | The project's greenfield or brownfield mode.                                                       |
+| `.standards/project-references/` | Optional team knowledge you add for a role; see [Project references](#project-references).         |
+| `.standards/PROTOCOL.md`         | Shared workflow rules, aligned with the installed skills.                                          |
+| `.standards/protocol/`           | Protocol chapters the agent reads only when a situation calls for them.                            |
+| `.standards/STATE.md`            | Current workflow step, request, handoff, and recovery.                                             |
+| `.standards/user-styles/`        | Optional personal styles you add for a role; see [User styles](#user-styles).                      |
+| `.standards/VERSION.json`        | Installed framework version and upgrade compatibility check.                                       |
 
 ## Runtime tools
 
@@ -236,6 +237,59 @@ Install and reset keep your styles. Uninstall deletes them with `.standards/`,
 and its preview warns how many it will delete. See the
 [style rules](../protocol/#user-styles).
 
+## Project references
+
+A project reference is a Markdown file of your team's knowledge for one role,
+such as the conventions for an internal service or how your tests fake calls to
+an AI model. Add it at `.standards/project-references/<role>/<name>.md`, where
+`<role>` is the role's skill name, such as `developer` or `tester`, and commit
+it so everyone on the project gets it. STANDARDS ships none. Create the folder
+after installing STANDARDS; the installer won't set up over a `.standards/`
+folder it didn't create.
+
+Start each file with a `Read when` line that says when it applies:
+
+```markdown
+# Internal Auth Service
+
+Read when work calls the internal auth service or handles its tokens.
+```
+
+You don't select a project reference. When a role starts or resumes work, it
+reads the `Read when` line of each file directly inside its folder. It loads a
+file only when the work matches that line, a style points to it, the design
+names it, or you ask for it. A file without a `Read when` line is never picked
+up on its own; the role tells you so you can add one.
+
+A project reference is guidance. It never overrides the protocol, the agreed
+requirements and design, your project's instructions or tooling, or correctness.
+It can't add requirements, raise Tester's limit on new tests, or settle a major
+choice the design left open, such as which library or service to use. When it
+disagrees with the role's own style files or references, or with another project
+reference, the role asks you, or the role responsible for that choice, instead
+of quietly picking one. A user style you select wins over it on choices the role
+makes itself.
+
+Developer, Tester, Reviewer, Documenter, and Synchronizer list the project
+references they loaded in their record, so Reviewer can check how they were used
+and the role reloads them when it resumes.
+
+Install, upgrade, and reset keep your project references. Uninstall deletes them
+with `.standards/`, and its preview warns how many it will delete. See the
+[project reference rules](../protocol/#project-references).
+
+### Which to use
+
+| You want                                                | Use                                                                               |
+| ------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| A rule every agent follows in every task                | Project instructions in `AGENTS.md` or `CLAUDE.md`, outside the STANDARDS section |
+| Team knowledge a role loads only when the work needs it | A project reference                                                               |
+| Your own preferences for choices a role makes itself    | A [user style](#user-styles), selected by name                                    |
+
+Project instructions rank above both. Don't add your own files to the installed
+skill folders: no role loads them, each client keeps its own copy, and uninstall
+removes them.
+
 ## Installation and client integration
 
 `AGENTS.md` contains the framework's marked section alongside project
@@ -252,15 +306,15 @@ With the hook on, the Claude Code stop hook is in `.claude/settings.json` and
 the Codex stop hook in `.codex/hooks.json`. The installer recognizes its hook by
 the script it runs, `.standards/bin/hook.mjs`, and never changes other hooks.
 
-The installer keeps project mode, workflow state, cycle records, and user styles
-during a reinstall. On upgrade, it updates the protocol, skills, and tools
-together without resetting progress. It keeps files you added inside installed
-skill folders, and it puts back settings and the hook it added if they were
-changed or removed. It accepts newer minor and patch versions within the same
-major version and rejects downgrades. There is no migration between major
-versions: moving to one means uninstalling and installing again, which deletes
-`.standards/`. If required information is missing or a setting it never added
-conflicts, it reports the problem instead of guessing. See
+The installer keeps project mode, workflow state, cycle records, user styles,
+and project references during a reinstall. On upgrade, it updates the protocol,
+skills, and tools together without resetting progress. It keeps files you added
+inside installed skill folders, and it puts back settings and the hook it added
+if they were changed or removed. It accepts newer minor and patch versions
+within the same major version and rejects downgrades. There is no migration
+between major versions: moving to one means uninstalling and installing again,
+which deletes `.standards/`. If required information is missing or a setting it
+never added conflicts, it reports the problem instead of guessing. See
 [the installer contract](../installer/).
 
 `standards reset` deletes `CONTEXT.md` and `.standards/docs/`, writes a fresh
@@ -268,12 +322,13 @@ conflicts, it reports the problem instead of guessing. See
 [Reset the workflow](../../getting-started/installation/#reset-the-workflow).
 
 Uninstalling STANDARDS from a project deletes all of `.standards/`, including
-context, every cycle record, and user styles; the preview warns how many records
-and styles it will delete. It preserves project work outside the runtime and
-installed skills, removes only managed instruction blocks and the STANDARDS
-hook, and reverses only matching recorded settings. It removes recorded client
-directories when they become empty and a recorded Claude settings file when only
-its generated defaults remain. Unverified files or directories remain. See
+context, every cycle record, user styles, and project references; the preview
+warns how many of each it will delete. It preserves project work outside the
+runtime and installed skills, removes only managed instruction blocks and the
+STANDARDS hook, and reverses only matching recorded settings. It removes
+recorded client directories when they become empty and a recorded Claude
+settings file when only its generated defaults remain. Unverified files or
+directories remain. See
 [Uninstall from a project](../../getting-started/installation/#uninstall-from-a-project)
 for the preview and approval steps.
 

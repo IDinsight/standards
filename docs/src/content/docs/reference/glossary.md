@@ -172,6 +172,14 @@ or not yet (`GREENFIELD`). Developer permanently changes greenfield to
 brownfield when it verifies that implementation has been created or materially
 changed. See [project modes](../../concepts/project-modes/).
 
+## Project reference
+
+A Markdown file of team knowledge for one role, kept at
+`.standards/project-references/<role>/<name>.md`. You don't select it; a role
+loads it when the work matches the file's `Read when` line. It is guidance and
+never overrides the agreed requirements and design. See
+[project references](../runtime-files/#project-references).
+
 ## Project reset
 
 `standards reset`, which returns an installed project's workflow to the state of

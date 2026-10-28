@@ -103,6 +103,10 @@ conditions. When the completed scope records a target maturity level, Scoper's
 [`maturity-levels.md`](../scoper/references/maturity-levels.md) describes the
 technical depth commonly expected at that level.
 
+Load project references from `.standards/project-references/architect/` as the
+protocol's **Project References** defines, and name in the design any project
+reference that a downstream role should load.
+
 Apply a user style only as the protocol's **User Styles** defines: the user
 explicitly selects `.standards/user-styles/architect/<identifier>.md`. Architect
 has no record for the selection, so it lasts for the current conversation, and

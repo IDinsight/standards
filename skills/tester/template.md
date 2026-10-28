@@ -33,6 +33,7 @@ Cycle: <Active Work.Id>
   limitation when applicable. Do not claim a machine-certified fresh session.
 - Current assessment purpose and target, the relevant increment definition or
   corrective assignment, and the exact implemented outcome being assessed.
+- Project references loaded, by path, or `NONE`.
 
 ## Acceptance Evidence
 

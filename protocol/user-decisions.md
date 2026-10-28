@@ -368,7 +368,7 @@ CLI**, both in `.standards/protocol/installation.md`:
 2. Preview it with `--dry-run`, which may run before approval. Also warn that
    the reset deletes the saved workflow state, the Auditor's project context,
    and every cycle record under `.standards/docs/`, and that the skills, hooks,
-   client settings, and user styles stay installed.
+   client settings, user styles, and project references stay.
 3. Ask for explicit approval to run the exact command with `--yes`. A generic
    cancellation request does not grant it. Record the target, command, and
    pending approval in `Active Work.BlockedOn`, preserving any other unresolved

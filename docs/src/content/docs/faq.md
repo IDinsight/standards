@@ -181,12 +181,12 @@ change that needs a skipped role moves the cycle to standard work. See
 
 ### How do I stop, start over, upgrade, or remove STANDARDS? What does each delete?
 
-| To                          | Do this                    | It deletes                                                                                                                                                                                          | It keeps                                                                             |
-| --------------------------- | -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| Stop the current cycle      | Ask the agent to cancel it | Nothing. The cycle is recorded as cancelled.                                                                                                                                                        | Everything, including the cycle's records.                                           |
-| Start the workflow over     | Reset                      | The saved workflow state, the Auditor's project context, and every cycle record in `.standards/docs/`.                                                                                              | STANDARDS itself: the protocol, tools, skills, hook, settings, and your user styles. |
-| Get a newer release         | Reinstall                  | Nothing. It updates STANDARDS's own files: the protocol, tools, skills, and its sections of `AGENTS.md` and `CLAUDE.md`.                                                                            | Workflow state, project context, cycle records, user styles, and the project mode.   |
-| Remove STANDARDS completely | Uninstall                  | All of `.standards/`, including workflow state, cycle records, and user styles; the role skills; the STANDARDS sections of `AGENTS.md` and `CLAUDE.md`; the hook; and settings the installer added. | Your project files, and any installer-added settings you have since changed.         |
+| To                          | Do this                    | It deletes                                                                                                                                                                                                              | It keeps                                                                                                    |
+| --------------------------- | -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| Stop the current cycle      | Ask the agent to cancel it | Nothing. The cycle is recorded as cancelled.                                                                                                                                                                            | Everything, including the cycle's records.                                                                  |
+| Start the workflow over     | Reset                      | The saved workflow state, the Auditor's project context, and every cycle record in `.standards/docs/`.                                                                                                                  | STANDARDS itself: the protocol, tools, skills, hook, settings, and your user styles and project references. |
+| Get a newer release         | Reinstall                  | Nothing. It updates STANDARDS's own files: the protocol, tools, skills, and its sections of `AGENTS.md` and `CLAUDE.md`.                                                                                                | Workflow state, project context, cycle records, user styles, project references, and the project mode.      |
+| Remove STANDARDS completely | Uninstall                  | All of `.standards/`, including workflow state, cycle records, user styles, and project references; the role skills; the STANDARDS sections of `AGENTS.md` and `CLAUDE.md`; the hook; and settings the installer added. | Your project files, and any installer-added settings you have since changed.                                |
 
 In a new project where the cycle hasn't created any implementation yet,
 cancelling runs a reset instead, after you approve it.
@@ -300,7 +300,8 @@ files while working so the branch's cycle can be resumed or shared. Finish and
 sign off or cancel the cycle before preparing the pull request.
 
 Before opening the pull request, stop active agent work and save any cycle
-records or user styles you want to keep outside `.standards/`. Preview
+records, user styles, or project references you want to keep outside
+`.standards/`. Preview
 [`standards uninstall`](../getting-started/installation/#uninstall-from-a-project)
 with `--dry-run`, then run it on the feature branch and commit the removal.
 Review the pull request diff to confirm that no STANDARDS installation files
@@ -317,7 +318,8 @@ the work, tell the agent what you want instead. If you edit them anyway, you're
 responsible for the result. The workflow check catches many of the problems hand
 edits cause, but not all of them.
 
-Your user styles are the exception: they're yours to write and edit.
+Your user styles and project references are the exception: they're yours to
+write and edit.
 
 ### Does it work without git?
 
@@ -467,6 +469,17 @@ Developer keeps the same style for the whole cycle once you approve its plan.
 With Scoper, Architect, Auditor, and Navigator, name the style again in each new
 chat. See [User styles](../reference/runtime-files/#user-styles) for the rules
 and [Writing User Styles](../guides/writing-user-styles/) for examples.
+
+### Can the roles use our team's own guides?
+
+Yes, with a **project reference**: a Markdown file of team knowledge for one
+role, such as the conventions for an internal service. Save it at
+`.standards/project-references/<role>/<name>.md`, start it with a `Read when`
+line, and commit it. You don't select it; the role loads it when the work
+matches that line. It's guidance, so it can't override the agreed requirements
+and design or settle a major choice the design left open. See
+[Project references](../reference/runtime-files/#project-references) for the
+rules and for when to use project instructions or a user style instead.
 
 ### Can I add, remove, or rename a role?
 

@@ -93,6 +93,9 @@ the record persists its identifier as `User Style`, `NONE` by default, and
 reloads it on resume. A style shapes how the record and summary are written,
 never what counts as a discrepancy or whether the gate passes.
 
+Load project references from `.standards/project-references/synchronizer/` as
+the protocol's **Project References** defines.
+
 | Discrepancy concerns                         | Owner / failure type               |
 | -------------------------------------------- | ---------------------------------- |
 | Code or Developer plan/claims                | Developer / `IMPLEMENTATION`       |

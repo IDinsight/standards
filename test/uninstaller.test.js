@@ -78,6 +78,22 @@ test('uninstall deletes user styles and warns with their count', () => fixture(a
   assert.equal(await read(root, '.standards/user-styles/developer/alex.md'), '# Alex\n');
 }));
 
+test('uninstall deletes project references and warns with their count', () => fixture(async (root) => {
+  await installProject({ projectRoot: root });
+  assert.equal((await uninstallProject({ projectRoot: root, dryRun: true })).warnings.some((line) => /project reference/.test(line)), false);
+  await mkdir(path.join(root, '.standards/project-references/developer'), { recursive: true });
+  await mkdir(path.join(root, '.standards/project-references/tester'), { recursive: true });
+  await write(root, '.standards/project-references/developer/internal-auth.md', '# Internal Auth\n');
+  await write(root, '.standards/project-references/tester/llm-fakes.md', '# LLM Fakes\n');
+  const warning = 'Deletes 2 project references in .standards/project-references/; copy any you want to keep first.';
+  const preview = await uninstallProject({ projectRoot: root, dryRun: true });
+  assert.ok(preview.warnings.includes(warning), preview.warnings.join('\n'));
+  assert.equal(await read(root, '.standards/project-references/developer/internal-auth.md'), '# Internal Auth\n');
+  const result = await uninstallProject({ projectRoot: root });
+  assert.ok(result.warnings.includes(warning));
+  assert.equal((await readdir(root)).includes('.standards'), false);
+}));
+
 test('uninstall preserves exact text outside managed blocks and an existing Claude import', () => fixture(async (root) => {
   await write(root, 'AGENTS.md', '# Project\r\nKeep me\r\n');
   await write(root, 'CLAUDE.md', '# Personal guidance\r\n@AGENTS.md\r\n');

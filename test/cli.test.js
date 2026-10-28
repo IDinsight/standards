@@ -182,6 +182,7 @@ test('interactive uninstall previews full removal and preserves files when decli
   assert.match(preview[2], /remove: \.standards/);
   assert.match(preview[2], /Clients: codex, claude/);
   assert.match(preview[2], /user styles/);
+  assert.match(preview[2], /project references/);
   assert.match(preview[2], /cycle records/);
   assert.deepEqual(decline.calls.filter(([name]) => name === 'confirm').length, 1);
 
@@ -219,6 +220,7 @@ test('uninstall help explains deletion before resolving any project', async () =
   }), 0);
   assert.match(stdout.read(), /entire .standards/);
   assert.match(stdout.read(), /user styles/);
+  assert.match(stdout.read(), /project references/);
   assert.match(stdout.read(), /every cycle record in \.standards\/docs\//);
   assert.match(stdout.read(), /global CLI stays installed/);
   assert.equal(stderr.read(), '');
@@ -239,7 +241,7 @@ test('interactive reset asks for the mode, previews, and changes nothing when de
   const preview = decline.calls.find(([name]) => name === 'note');
   assert.match(preview[2], /Mode: BROWNFIELD/);
   assert.match(preview[2], /remove: \.standards\/CONTEXT\.md/);
-  assert.match(preview[2], /user styles stay/);
+  assert.match(preview[2], /project references, and user styles stay/);
   assert.equal(decline.calls.find(([name]) => name === 'confirm')[1].initialValue, false);
   assert.equal((await readdir(path.join(root, '.standards'))).includes('CONTEXT.md'), true);
 

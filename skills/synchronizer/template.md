@@ -32,6 +32,7 @@ Cycle: <Active Work.Id>
 - Baseline/comparison range and its basis; committed, staged, unstaged,
   untracked, moved/deleted, and affected unchanged content relevant to the work.
 - Relevant dependencies/configuration and evidence execution assumptions.
+- Project references loaded, by path, or `NONE`.
 - Workflow context used: completion policy, handoff, recovery, obligations,
   baseline reconciliation, and blockers. State remains authoritative for
   routing; do not copy its stack.

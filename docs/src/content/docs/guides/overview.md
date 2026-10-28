@@ -898,8 +898,9 @@ rather than a request to start another.
 A greenfield reset removes the saved workflow state, Auditor context, and all
 cycle records under `.standards/docs/`. It leaves no cancelled cycle record.
 Project files outside `.standards/`, installed skills, hooks, client settings,
-and user styles remain. Asking to cancel alone does not approve this reset. If
-you decline or the reset fails, the cycle has not ended. See the
+user styles, and project references remain. Asking to cancel alone does not
+approve this reset. If you decline or the reset fails, the cycle has not ended.
+See the
 [cancellation guide](../cancelling-and-new-cycles/#what-happens-when-you-cancel)
 for the full procedure.
 

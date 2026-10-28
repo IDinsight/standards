@@ -18,10 +18,10 @@ missing lines in consecutive parts before acting.
 
 The sections run from foundations (roles, modes, states, the persisted state
 record, and the runtime tools) through handoffs, gates, failure and recovery,
-user decisions, record formats, and user styles. The order is for orientation
-only: a role applies every applicable rule wherever it appears. **Canonical
-Terms**, the last section, defines terms this protocol uses in a specific sense;
-consult it whenever a term is load-bearing.
+user decisions, record formats, user styles, and project references. The order
+is for orientation only: a role applies every applicable rule wherever it
+appears. **Canonical Terms**, the last section, defines terms this protocol uses
+in a specific sense; consult it whenever a term is load-bearing.
 
 Three chapters in `.standards/protocol/` hold rules that apply only in some
 situations. Read a chapter before acting whenever its condition holds; a
@@ -511,12 +511,12 @@ Navigator, which owns no workflow state, adds none.
 
 Help alone answers and stops. It never writes or initializes `STATE.md` or a
 record; starts, resumes, or reworks a cycle; applies a default; selects or locks
-a style; loads an unselected mode's procedure or a user style's contents; runs
-`check`, project checks, or tests; inspects unrelated project source; asks for
-mode approval; or consumes a pending handoff, approval, or user decision. The
-role keeps its current progress and choices, so a later bare continuation
-resumes the pending work. When a tool or hook reports problems during help,
-report them and change nothing.
+a style; loads an unselected mode's procedure, a user style's contents, or a
+project reference; runs `check`, project checks, or tests; inspects unrelated
+project source; asks for mode approval; or consumes a pending handoff, approval,
+or user decision. The role keeps its current progress and choices, so a later
+bare continuation resumes the pending work. When a tool or hook reports problems
+during help, report them and change nothing.
 
 Help works with no active cycle and without `STATE.md` or `MODE.md`; a missing
 file limits only the facts that depend on it. If the helper is missing, cannot
@@ -1990,12 +1990,67 @@ selection when the user first approves the development plan. If a persisted
 selection's file is missing on resume, stop and ask the user to restore it or,
 when the selection is not locked, to choose another or clear it.
 
+## Project References
+
+A project reference is a Markdown file of project knowledge for one role, such
+as a team's conventions for an internal service or its guide to faking an LLM
+provider in tests, kept at `.standards/project-references/<role>/<name>.md`,
+where `<role>` is the role's skill name, such as `developer` or `tester`. Users
+add, maintain, and commit these files; STANDARDS ships none. Installation and
+**Project Reset** keep them, and **Project Uninstallation** deletes them with
+`.standards/` (both in `.standards/protocol/installation.md`).
+
+A role's project references are the direct child Markdown files of its own
+folder. Files anywhere else, including another role's folder, are not its
+references; reject a path, traversal, or symlink that leaves the folder. Each
+file opens, after an optional title, with a line that begins `Read when` and
+says when the file applies, as the shipped references in a role's `references/`
+folder do.
+
+Project references need no selection. When a role starts or resumes work, it
+reads the `Read when` line of each file in its folder. It loads a file only when
+the work in hand matches that line, a loaded style points to it, the technical
+design names it, the user asks for it, or its record lists it as loaded, and it
+checks the lines again when its task changes. It does not load or apply the rest
+of any other file. A file without a `Read when` line never matches; tell the
+user so they can add the line.
+
+A project reference is guidance. It never overrides the protocol, role
+ownership, explicit user constraints, the active contract, the required shape of
+a role's artifacts, project instructions, repository-enforced constraints, or
+correctness. It is not evidence: its statements about the project do not
+establish facts. It never authorizes a consequential choice that the active
+contract has not made, adds an acceptance condition, or expands Tester's test
+budget. The role that owns such a choice may weigh a reference as input; any
+other role routes the open choice to its owner under **Failure Types** instead
+of adopting the reference's choice. A technical design names any project
+reference that a downstream role should load and states any material decision
+drawn from it; naming a reference does not make its contents part of the design.
+
+In the order under **User Styles**, a project reference ranks with the role's
+other applicable style files and references, after `styles/universal.md` and a
+selected user style, so a selected user style governs a discretionary choice on
+which the two differ. That order never settles a disagreement between a project
+reference and a shipped style or reference, or between two project references:
+neither wins silently, and the role resolves it under **Instruction Layering and
+Conflicts**, routing a choice that another workflow role owns to that owner and
+otherwise asking the user.
+
+Developer's development plan, Tester's verification report, Reviewer's review
+reports, Documenter's documentation record, and Synchronizer's synchronization
+record list by path the project references the role loaded, or `NONE`, so
+Reviewer can check how they were used and a resumed role reloads them. A listed
+reference that is now missing is noted, not a defect, and a later edit to a
+reference does not by itself make recorded evidence stale. Scoper, Architect,
+Auditor, and Navigator keep no such list.
+
 ## Canonical Terms
 
 Use these terms consistently across all skills, and likewise the names defined
 in other sections, such as the handoff kinds (failure, forward, resume, and
 promotion handoffs), expedited cycle, recovery frame, outstanding obligation,
-active work, cycle mode, user style, runtime tools, and project reset:
+active work, cycle mode, user style, project reference, runtime tools, and
+project reset:
 
 - **completed scope**: scope artifact that passed Scoper's completion gate; it
   does not imply separate user approval unless the project adds such a gate.
