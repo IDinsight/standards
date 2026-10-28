@@ -28,4 +28,5 @@ services.
   stack trace.
 
 For setup fixtures and worked examples, read `../references/fastapi-testing.md`
-when the assignment needs that depth.
+when the assignment needs that depth. When the service calls an LLM or embedding
+provider, also read `../references/llm-api-testing.md`.

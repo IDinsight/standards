@@ -465,7 +465,8 @@ requirements and design, or correctness. Developer, Tester, Reviewer,
 Documenter, and Synchronizer save your choice and reload it when they resume;
 Developer keeps the same style for the whole cycle once you approve its plan.
 With Scoper, Architect, Auditor, and Navigator, name the style again in each new
-chat. See [User styles](../reference/runtime-files/#user-styles).
+chat. See [User styles](../reference/runtime-files/#user-styles) for the rules
+and [Writing User Styles](../guides/writing-user-styles/) for examples.
 
 ### Can I add, remove, or rename a role?
 

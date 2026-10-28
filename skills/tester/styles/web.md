@@ -13,7 +13,8 @@
 - In Next.js App Router projects, component runners such as Vitest or Jest do
   not render async Server Components. Verify those through a browser-level test,
   such as Playwright, or test their data functions directly. For deeper
-  patterns, read `../references/nextjs-testing.md`.
+  patterns, read `../references/nextjs-testing.md`; when server code calls an
+  LLM or embedding provider, also read `../references/llm-api-testing.md`.
 - For security behavior, test the server or data boundary as well as any
   relevant UI outcome. Hidden controls cannot prove authorization or data
   isolation.

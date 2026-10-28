@@ -69,7 +69,9 @@ not need to choose these fields. For incremental work, see the
 
 Tester also loads testing styles for the affected boundary: rendered web
 behavior, data and services, FastAPI services, and Android apps. They follow the
-project's established test tools and stay within the test budget below.
+project's established test tools and stay within the test budget below. When the
+change calls an LLM or embedding provider API, Tester also reads guidance on
+testing those calls with fakes instead of live requests.
 
 You can select a [user style](../../reference/runtime-files/#user-styles) you
 keep at `.standards/user-styles/tester/<name>.md`, such as how you like tests

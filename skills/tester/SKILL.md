@@ -141,10 +141,12 @@ persistence or service boundaries. Also load
 [`styles/fastapi.md`](styles/fastapi.md) when testing FastAPI services and
 [`styles/android.md`](styles/android.md) when testing Android apps. Techniques
 can be combined within either mode. Files under [`references/`](references/)
-hold deeper stack testing patterns; load one only when a loaded style points to
-it and the assignment needs that depth. A reference never expands the test
-budget or overrides the contract. Apply a user style only as the protocol's
-**User Styles** defines: the user explicitly selects
+hold deeper testing patterns; load one only when this file or a loaded style
+points to it and the assignment needs that depth. When the active change calls
+an LLM or embedding provider API, read
+[`references/llm-api-testing.md`](references/llm-api-testing.md). A reference
+never expands the test budget or overrides the contract. Apply a user style only
+as the protocol's **User Styles** defines: the user explicitly selects
 `.standards/user-styles/tester/<identifier>.md`, and the report persists its
 identifier as `User Style`, `NONE` by default, and reloads it on resume. The
 user may change it during the cycle. Repository-enforced tooling and established
