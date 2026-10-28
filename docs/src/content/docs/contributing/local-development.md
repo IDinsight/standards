@@ -190,8 +190,9 @@ The repository runs these checks for pull requests:
 
 - **Documentation:** builds with Node.js 24 and runs the local link checker.
 - **Tests:** runs `make test` (the CLI, installer, runtime-tool, and
-  release-check tests, and the pnpm tarball check) on Node.js 22.12 and 24, for
-  pull requests to `main` and for pushes to any branch.
+  release-check tests, and the pnpm tarball check) on Node.js 24 for pull
+  requests to `main`, and on Node.js 22.12 and 24 for pushes to `main` and
+  manual runs. A new push to a pull request cancels its in-progress test run.
 - **Release Checks:** compares a release pull request with the previous release,
   as described in [Release versions](#release-versions).
 - **Linting:** runs the Markdown and JavaScript checks.

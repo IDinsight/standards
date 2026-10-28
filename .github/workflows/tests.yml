@@ -1,16 +1,23 @@
 name: Tests
 
-# Runs every test in test/ for pull requests to main and for pushes to any
-# branch, including main. A push to a branch with an open pull request runs both
-# triggers.
+# Runs every test in test/ for pull requests to main and for pushes to main.
+# Pushes to other branches don't run tests; their pull request does. Run the
+# workflow by hand to test a branch with no pull request.
 on:
   pull_request:
     branches: [main]
   push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: read
+
+# A new push to a pull request cancels its in-progress run. Other runs get a
+# group of their own, so no push to main is cancelled or skipped.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   test:
@@ -19,8 +26,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # The oldest supported version (package.json engines) and the current one.
-        node-version: ['22.12', '24']
+        # Pull requests test the current version. Main and manual runs also test
+        # the oldest supported version (package.json engines).
+        node-version: ${{ fromJSON(github.event_name == 'pull_request' && '["24"]' || '["22.12", "24"]') }}
     steps:
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
