@@ -221,14 +221,15 @@ STANDARDS has no migration between major versions. To move an existing project
 to a new major version, sign off or cancel the active cycle,
 [uninstall](#uninstall-from-a-project), and install again. Uninstalling deletes
 `.standards/`, including workflow state, Auditor context, every cycle record,
-and your user styles. Your project files stay.
+your user styles, and your project references. Your project files stay.
 
 The installer checks that existing framework files belong to STANDARDS before
 replacing them. It preserves project-owned instructions, the saved project mode,
-active workflow state, cycle records, Auditor context, and your
-[user styles](../../reference/runtime-files/#user-styles). It also keeps files
-you added inside installed skill folders. It does not take ownership of
-compatible Claude Code settings that were already present.
+active workflow state, cycle records, Auditor context, your
+[user styles](../../reference/runtime-files/#user-styles), and your
+[project references](../../reference/runtime-files/#project-references). It also
+keeps files you added inside installed skill folders. It does not take ownership
+of compatible Claude Code settings that were already present.
 
 If a setting or hook that the installer added was changed or removed, a
 reinstall puts it back and lists it under "Restores" in the preview. If the
@@ -267,9 +268,9 @@ and every cycle record in `.standards/docs/`; the preview warns how many records
 it will delete. It then writes a fresh `.standards/STATE.md` and
 `.standards/MODE.md`, as a first install would. Everything else stays: the
 protocol and its chapters, the tools in `.standards/bin/`, the version and
-installation records, your user styles, the installed skills, the stop hook,
-client settings, and the managed sections of `AGENTS.md` and `CLAUDE.md`. Reset
-does not undo changes to your project files.
+installation records, your user styles and project references, the installed
+skills, the stop hook, client settings, and the managed sections of `AGENTS.md`
+and `CLAUDE.md`. Reset does not undo changes to your project files.
 
 Reset is yours to run. An agent runs it only when you ask, or to
 [cancel a greenfield cycle](../../guides/cancelling-and-new-cycles/) that has no
@@ -283,7 +284,8 @@ To start the workflow over and keep STANDARDS installed,
 [reset](#reset-the-workflow) instead.
 
 Stop active coding-agent work before removal, and save anything you want to keep
-from `.standards/` or the installed role directories, such as your user styles.
+from `.standards/` or the installed role directories, such as your user styles
+and project references.
 
 Run `npx @idinsight/standards@latest uninstall` in a terminal to choose a
 project, see the removal preview, and confirm. It always removes the complete
@@ -307,8 +309,10 @@ It removes:
 
 - The entire `.standards/` directory, including saved workflow state, Auditor
   context, every cycle record in `.standards/docs/`, your user styles in
-  `.standards/user-styles/`, and any files you added there. The preview warns
-  how many cycle records and user styles it will delete.
+  `.standards/user-styles/`, your project references in
+  `.standards/project-references/`, and any files you added there. The preview
+  warns how many cycle records, user styles, and project references it will
+  delete.
 - Verified STANDARDS role directories for Codex and Claude Code, including local
   edits inside them. If both clients are installed, both are removed.
 - The marked STANDARDS sections of `AGENTS.md` and `CLAUDE.md`, with the blank

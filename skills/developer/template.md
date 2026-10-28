@@ -98,9 +98,10 @@ Increments**. Reference acceptance conditions without redefining them.
 ## Plan Notes
 
 Record only cross-step sequencing or resume information that cannot be expressed
-on an individual step. Store suspended assignments here under the protocol's
-**Implementation and Verification Recovery Gates**. State and routing remain
-canonical in `STATE.md`.
+on an individual step, and list the project references loaded, by path, or
+`NONE`. Store suspended assignments here under the protocol's **Implementation
+and Verification Recovery Gates**. State and routing remain canonical in
+`STATE.md`.
 
 ---
 

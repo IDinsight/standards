@@ -108,11 +108,13 @@ test('skills are installed without the evals used to develop them', () => fixtur
   assert.equal((await installProject({ projectRoot: root })).action, 'Verified');
 }));
 
-test('reinstall and upgrade preserve workflow state, auditor context, and user styles', () => fixture(async (root) => {
+test('reinstall and upgrade preserve workflow state, auditor context, user styles, and project references', () => fixture(async (root) => {
   await installProject({ projectRoot: root });
   await write(root, '.standards/CONTEXT.md', 'Auditor-owned context\n');
   await mkdir(path.join(root, '.standards/user-styles/developer'), { recursive: true });
   await write(root, '.standards/user-styles/developer/alex.md', '# Alex\n');
+  await mkdir(path.join(root, '.standards/project-references/developer'), { recursive: true });
+  await write(root, '.standards/project-references/developer/internal-auth.md', '# Internal Auth\n');
   const state = await read(root, '.standards/STATE.md');
   const unchanged = await installProject({ projectRoot: root });
   assert.equal(unchanged.action, 'Verified');
@@ -126,6 +128,7 @@ test('reinstall and upgrade preserve workflow state, auditor context, and user s
   assert.equal(await read(root, '.standards/STATE.md'), state);
   assert.equal(await read(root, '.standards/CONTEXT.md'), 'Auditor-owned context\n');
   assert.equal(await read(root, '.standards/user-styles/developer/alex.md'), '# Alex\n');
+  assert.equal(await read(root, '.standards/project-references/developer/internal-auth.md'), '# Internal Auth\n');
 }));
 
 test('unmarked runtime and skill collisions leave project files untouched', () => fixture(async (root) => {

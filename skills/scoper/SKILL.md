@@ -109,6 +109,9 @@ no record for the selection, so it lasts for the current conversation, and the
 user names it again when resuming. A style never changes the template's required
 shape or the form of acceptance conditions.
 
+Load project references from `.standards/project-references/scoper/` as the
+protocol's **Project References** defines.
+
 ## Maturity Levels
 
 When the request names a target maturity level, such as "Level 3", "spike", or

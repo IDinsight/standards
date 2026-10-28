@@ -190,12 +190,12 @@ npx @idinsight/standards@latest uninstall --project /absolute/path/to/project --
 Use `--yes` with `uninstall` to skip confirmation in scripts. Uninstall deletes
 the installed skills and the entire `.standards/` directory, including saved
 workflow history, context, every cycle record in `.standards/docs/`, user
-styles, and any files you added there. The preview warns how many cycle records
-and user styles it will delete. It also removes managed instruction blocks, the
-STANDARDS stop hook, and matching installer-added settings. Project work outside
-the removed directories is preserved. Installer-created client directories are
-removed when empty. Existing files and directories stay. A globally installed
-CLI stays installed.
+styles, project references, and any files you added there. The preview warns how
+many cycle records, user styles, and project references it will delete. It also
+removes managed instruction blocks, the STANDARDS stop hook, and matching
+installer-added settings. Project work outside the removed directories is
+preserved. Installer-created client directories are removed when empty. Existing
+files and directories stay. A globally installed CLI stays installed.
 
 The installer supports greenfield and brownfield projects. The authoritative
 installer requirements live in [`INSTALLER.md`](INSTALLER.md), which stays in
@@ -208,9 +208,9 @@ protocol and workflow skills for the chosen coding agent, applies explicit-only
 invocation controls, merges the managed `AGENTS.md` / `CLAUDE.md` integration
 without overwriting project-owned instructions, and initializes runtime
 coordination files only when needed. Reinstallation preserves active workflow
-state, user styles, and project-owned artifacts. STANDARDS has no migration
-between major versions: moving a project to a new major version means
-uninstalling and installing again, which deletes `.standards/`.
+state, user styles, project references, and project-owned artifacts. STANDARDS
+has no migration between major versions: moving a project to a new major version
+means uninstalling and installing again, which deletes `.standards/`.
 
 A typical installed project will contain:
 
@@ -221,6 +221,7 @@ project/
 ├── .standards/
 │   ├── bin/              # tools the agent runs, including check.mjs
 │   ├── docs/             # cycle records, created as roles work
+│   ├── project-references/  # optional team knowledge you add, per role
 │   ├── protocol/         # protocol chapters, read when a situation needs them
 │   ├── user-styles/      # optional personal styles you add, per role
 │   ├── INSTALLATION.json
@@ -241,10 +242,12 @@ keeps a fresh installation. If main has no installation, uninstall STANDARDS on
 the feature branch before merging. If you merge branches whose `.standards/`
 files both changed without a reset, resolve the merge conflict by keeping
 exactly one cycle in `STATE.md`. A role applies a user style from
-`.standards/user-styles/<role>/` only when you select it by name. Role
-ownership, standard, expedited, and documentation forward transitions,
-promotion, recovery, user intervention, project-mode changes, cancellation/reset
-behavior, project context, and user styles are defined only in
-[`PROTOCOL.md`](PROTOCOL.md) and its chapters in [`protocol/`](protocol/), and
-installation ownership checks and client-setting preservation only in
-[`INSTALLER.md`](INSTALLER.md); they are intentionally not restated here.
+`.standards/user-styles/<role>/` only when you select it by name, and loads a
+project reference from `.standards/project-references/<role>/` when the work
+matches the file's `Read when` line. Role ownership, standard, expedited, and
+documentation forward transitions, promotion, recovery, user intervention,
+project-mode changes, cancellation/reset behavior, project context, user styles,
+and project references are defined only in [`PROTOCOL.md`](PROTOCOL.md) and its
+chapters in [`protocol/`](protocol/), and installation ownership checks and
+client-setting preservation only in [`INSTALLER.md`](INSTALLER.md); they are
+intentionally not restated here.

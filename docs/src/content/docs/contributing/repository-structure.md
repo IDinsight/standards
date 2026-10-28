@@ -43,9 +43,11 @@ Other files depend on the role:
 | `styles/`         | Shared and technology-specific guidance for Developer, Tester, and Documenter.            |
 | `references/`     | Deeper material a role reads only when its skill, styles, mode, or design point to it.    |
 
-Role packages ship no user styles. Users add their own in a project under
-`.standards/user-styles/<role>/`; see
-[User styles](../../reference/runtime-files/#user-styles).
+Role packages ship no user styles or project references. Users add their own in
+a project under `.standards/user-styles/<role>/` and
+`.standards/project-references/<role>/`; see
+[User styles](../../reference/runtime-files/#user-styles) and
+[Project references](../../reference/runtime-files/#project-references).
 
 Evaluation scenarios describe intended role behavior. Checking their JSON,
 linting Markdown, or building the site does not run those evaluations or show

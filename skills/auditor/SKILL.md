@@ -51,6 +51,9 @@ no record for the selection, so it lasts for the current conversation, and the
 user names it again when resuming. A style never changes the context template's
 shape or what counts as established fact.
 
+Load project references from `.standards/project-references/auditor/` as the
+protocol's **Project References** defines.
+
 ## Inputs
 
 Read all of `.standards/PROTOCOL.md` (in consecutive parts if a read shows only

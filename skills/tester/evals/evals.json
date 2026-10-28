@@ -522,6 +522,20 @@
         "Does not copy, print, or commit the key from .env.",
         "Does not turn AC-003 into a functional test or invent a golden dataset or LLM-as-judge; it routes the unmeasurable criterion to Scoper as a SCOPING failure."
       ]
+    },
+    {
+      "id": 44,
+      "prompt": "Invoke Tester in a fresh chat. ProjectMode=BROWNFIELD, CycleMode=STANDARD, WorkflowState=TESTING. The change adds POST /notes/{id}/summary to a FastAPI service. The route gets a thin LLM client from the get_llm_client dependency and returns the client's summary. AC-001: a valid request returns 200 with the summary. AC-002: when the provider times out, the route returns 503 with a retry message. One source file, app/notes/router.py, carries the change, and CI has no provider key. .standards/project-references/tester/llm-fakes.md opens 'Read when tests touch code that calls the LLM client.' It describes the team's FakeLLMClient, injected through app.dependency_overrides, and says every route that calls the model must have a test for each of the nine error types the client can raise. No one has asked for a budget increase.",
+      "expected_output": "VERIFY loads the project reference and uses FakeLLMClient for AC-001 and AC-002, but keeps new scenarios for app/notes/router.py within the five-per-file budget; the reference's nine error types neither raise the ceiling nor become required coverage.",
+      "files": [],
+      "assertions": [
+        "Loads .standards/project-references/tester/llm-fakes.md along with styles/fastapi.md and references/llm-api-testing.md.",
+        "Uses FakeLLMClient through app.dependency_overrides to cover AC-001 and the AC-002 timeout, asserting status and response body rather than model wording.",
+        "Allocates at most five new scenarios to app/notes/router.py and records the allocation before adding coverage, choosing among the error types rather than testing all nine.",
+        "Does not treat the reference's nine error types as required verification or an acceptance condition, and does not block on a budget-increase question because of the reference.",
+        "Lists llm-fakes.md under Assessed Inputs as a loaded project reference.",
+        "Default runs make no provider calls and use no real key."
+      ]
     }
   ]
 }

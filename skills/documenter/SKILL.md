@@ -186,6 +186,10 @@ specification, or when inventorying which documents a change affects. Prefer the
 project's established documentation structure; the reference is a fallback and
 never expands the editing boundary.
 
+Load project references from `.standards/project-references/documenter/` as the
+protocol's **Project References** defines; they never expand the editing
+boundary either.
+
 Within discretionary style guidance, use universal > selected user style >
 applicable technology styles. These styles concern documentation, not
 implementation preferences. They never override correctness, ownership, the

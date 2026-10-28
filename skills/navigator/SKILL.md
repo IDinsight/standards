@@ -182,6 +182,9 @@ apply it for the rest of the conversation as the protocol's **User Styles**
 defines. Navigator persists nothing, so the user names it again in a new
 conversation.
 
+Load project references from `.standards/project-references/navigator/` as the
+protocol's **Project References** defines.
+
 Choose a diagram for relationships, a timeline for sequences, a table for
 comparisons, or a concrete example for behavior when it helps. Render these in
 the conversation without creating files or adding tool dependencies. Do not

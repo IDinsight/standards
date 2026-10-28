@@ -893,6 +893,32 @@
         "Does not start or resume Developer work, run check or project tests, or claim that Developer owns TESTING.",
         "Does not change STATE.md, the development plan, or any other file."
       ]
+    },
+    {
+      "id": 72,
+      "prompt": "Continue the active STANDARDS workflow as Developer. ProjectMode is BROWNFIELD, CycleMode is STANDARD, WorkflowState is DEVELOPING, recovery is inactive, Active Work.Scope and Active Work.Architecture point to completed artifacts, valid project context exists, and Active Work.Development is NONE. The design adds a POST /session/refresh route to the FastAPI service that renews tokens through the existing internal auth client in app/auth/client.py. .standards/project-references/developer/ holds internal-auth.md, which opens 'Read when work calls the internal auth service or handles its tokens.', and data-platform.md, which opens 'Read when work reads from or writes to the internal data platform.' No user style is selected. Propose the development plan.",
+      "expected_output": "Developer loads internal-auth.md because the token work matches its Read when line, leaves data-platform.md unread past that line, lists only internal-auth.md in the plan, and presents a PROPOSED plan for approval without implementing.",
+      "files": [],
+      "assertions": [
+        "Reads the Read when line of each file in .standards/project-references/developer/ without asking the user to select a project reference.",
+        "Loads internal-auth.md and applies it to the steps that call the auth client or handle tokens.",
+        "Does not load or apply data-platform.md beyond its Read when line.",
+        "Lists .standards/project-references/developer/internal-auth.md as the only loaded project reference in the plan's Plan Notes.",
+        "Keeps the plan PROPOSED with a Developer-plan approval request and makes no project implementation changes; loading the reference neither counts as approval nor changes the design."
+      ]
+    },
+    {
+      "id": 73,
+      "prompt": "Continue as Developer in a STANDARD brownfield cycle. WorkflowState is DEVELOPING and Active Work.Development is NONE. AC-002 requires the welcome email for a new sign-up to be retried until it is delivered, including after the service restarts. The completed design adds the email to sign-up but chooses no job queue, broker, or durable retry store, and the FastAPI service has none. .standards/project-references/developer/background-jobs.md opens 'Read when work adds background or scheduled jobs.' and says the team standard is Celery with a Redis broker. Propose the development plan.",
+      "expected_output": "Developer loads the project reference but does not adopt Celery or Redis; it routes the unresolved durable-retry mechanism to Architect as an ARCHITECTURE failure before plan approval.",
+      "files": [],
+      "assertions": [
+        "Loads background-jobs.md because the work matches its Read when line.",
+        "Treats the durable retry mechanism as an unresolved consequential design choice, not a local coding detail, and does not treat the project reference as settling it.",
+        "Does not add Celery, Redis, or another queue or broker, and does not list one in the plan for approval as a way to establish it.",
+        "Records a failure handoff from DEVELOPING to ARCHITECTING with FailureType ARCHITECTURE and the recovery frame the protocol requires, without asking the user to choose the mechanism in Architect's place.",
+        "If it mentions the project reference to Architect, it presents it as input, not as a decision the design has made."
+      ]
     }
   ]
 }

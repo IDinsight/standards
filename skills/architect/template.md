@@ -45,7 +45,9 @@ remains project-owned.
 ## Context
 
 Summarize the relevant scope item, established project constraints, existing
-architecture, and project context that materially shape the design.
+architecture, and project context that materially shape the design. Name, by
+path, any project reference that a downstream role should load, and state in
+this design any material decision drawn from one.
 
 ## Decision
 

@@ -38,6 +38,7 @@ Cycle: <Active Work.Id>
   assumptions. HEAD alone cannot identify dirty content.
 - Editing boundary and exclusions, with remaining cycle work beyond the target.
 - Applicable style files and identities; selection changes and affected work.
+- Project references loaded, by path, or `NONE`.
 - Relevant workflow context; refer to state for recovery and obligations rather
   than copying its stack. Separate self-authored progress/coordination from
   deliverable input identities.

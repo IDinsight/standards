@@ -38,8 +38,8 @@ terminal prompt. The reset deletes the saved workflow state, Auditor context,
 and every cycle record in `.standards/docs/`; the agent warns you about the
 records before asking for approval. It writes a fresh workflow state and keeps
 the project greenfield, so no `CANCELLED` state remains. The skills, stop hook,
-client settings, and your user styles stay installed, and project work outside
-`.standards/` remains.
+client settings, and your user styles and project references stay, and project
+work outside `.standards/` remains.
 
 While approval is pending, the agent saves the question, pauses, and keeps the
 active cycle in place. If you decline, cancellation is not completed; tell the

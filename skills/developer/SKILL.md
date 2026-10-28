@@ -207,6 +207,13 @@ consequential choice the active contract has not made, and when it disagrees
 with the installed version or that version's official documentation, follow the
 installed version.
 
+Load project references from `.standards/project-references/developer/` as the
+protocol's **Project References** defines, not by the rule above. A loaded
+project reference sits in the Developer style layer with the technology styles.
+A selected user style overrides it on a discretionary preference, but the
+precedence below never settles a disagreement between it and a file under
+`styles/` or `references/`.
+
 Within the Developer style layer, use this precedence for style guidance:
 
 1. `styles/universal.md`;
@@ -215,8 +222,8 @@ Within the Developer style layer, use this precedence for style guidance:
 
 When two Developer style files disagree only about a discretionary coding
 preference, apply the higher-precedence style. Therefore `universal.md` always
-wins within the style layer, and an explicitly selected user style overrides a
-conflicting preference from an applicable technology style.
+wins among Developer style files, and an explicitly selected user style
+overrides a conflicting preference from an applicable technology style.
 
 This precedence applies only to discretionary style guidance. A selected user
 style does not override protocol ownership, the active implementation contract,

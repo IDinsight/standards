@@ -30,11 +30,11 @@ workflow data and update the recorded version with the framework assets. Reject
 older versions and cross-major upgrades. A major release may be installed into a
 fresh project. STANDARDS provides no migration between major versions: the only
 route for an existing project is `standards uninstall`, which deletes
-`.standards/` (including workflow state, Auditor context, cycle records, and
-user styles), followed by a fresh installation. The framework maintainer chooses
-the release version. Adding, removing, or renaming a role is a major change, and
-so is any change to the runtime files or record formats that an existing
-installation's files would no longer pass.
+`.standards/` (including workflow state, Auditor context, cycle records, user
+styles, and project references), followed by a fresh installation. The framework
+maintainer chooses the release version. Adding, removing, or renaming a role is
+a major change, and so is any change to the runtime files or record formats that
+an existing installation's files would no longer pass.
 
 ## Installer File Preservation
 
@@ -109,6 +109,7 @@ After ownership checks:
 - Preserve `.standards/docs/` and every cycle record in it; the records are
   role-owned, not installer-owned.
 - Preserve `.standards/user-styles/`; its files are user-owned.
+- Preserve `.standards/project-references/`; its files are project-owned.
 - Preserve project-level instructions. When they materially conflict with the
   protocol, integration contract, workflow artifacts, or other authoritative
   constraints, follow **Instruction Layering and Conflicts**.
@@ -130,9 +131,11 @@ revert project work. The globally installed CLI is unaffected.
   project directory. Offer `--dry-run` to report every planned path removal or
   shared-file update without writing files. Help and preview output must explain
   that removing `.standards/` deletes saved workflow state, Auditor context,
-  cycle records, user styles, and any other content in that directory. When
-  `.standards/docs/` holds cycle records or `.standards/user-styles/` holds user
-  styles, the preview must warn with their counts.
+  cycle records, user styles, project references, and any other content in that
+  directory. When `.standards/docs/` holds cycle records,
+  `.standards/user-styles/` holds user styles, or
+  `.standards/project-references/` holds project references, the preview must
+  warn with their counts.
 - Require the runtime ownership marker and a valid, supported
   `.standards/INSTALLATION.json` before removal. Do not infer settings ownership
   from current values. Unknown ownership records require an uninstaller that
