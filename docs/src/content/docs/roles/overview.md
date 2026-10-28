@@ -45,6 +45,37 @@ documentation assignment, Documenter can initialize the Brownfield route before
 handing off to Auditor; see
 [Updating Documentation on Its Own](../../guides/updating-documentation/).
 
+## Ask a role for help
+
+Any role can tell you what you can choose, at any point. Ask it for help:
+
+| Client      | Prompt            |
+| ----------- | ----------------- |
+| Codex       | `$developer help` |
+| Claude Code | `/developer help` |
+
+Use the name of the role you want in place of `developer`. You can also ask a
+question such as "What modes does Developer have?"
+
+The answer shows:
+
+- the choices you can make, with an example of how to ask for each one;
+- the choices the role or the workflow makes for you, so you don't need to set
+  them;
+- anything the role can focus on, such as a file or a folder;
+- your user styles for that role, and whether your choice is locked.
+
+Asking for help doesn't change any files, start or continue work, or count as an
+answer to a question the role asked you. It works even when no cycle is running.
+It always checks what is installed right now, with nothing for you to set up, so
+a new mode or style file shows up the next time you ask. If it can't check, it
+tells you so instead of guessing.
+
+If you type just "help" while a role is waiting for your answer, such as when
+Developer is waiting for you to approve its plan, the role helps you with that
+question instead. To see its options then, use the full command, such as
+`/developer help`.
+
 ## Know what completion means
 
 Each workflow role saves its work and checks it before moving on. These checks

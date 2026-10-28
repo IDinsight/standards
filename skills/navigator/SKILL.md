@@ -46,64 +46,38 @@ independent of the unresolved conflict; do not silently settle it.
 
 ## Invocation Help
 
-Distinguish questions about Navigator's capabilities, modes, or user styles from
-substantive project requests. `$navigator help` in Codex and `/navigator help`
-in Claude Code explicitly request invocation help. In an ongoing conversation,
-questions such as "what modes are available?" or "show Navigator options" do the
-same. Interpret a bare "help" in context: during a quiz or investigation it can
-mean assistance with the current question, not an option menu. Help is not
-another mode.
+A help-only request, such as `/navigator help`, `$navigator help`, or a question
+only about Navigator's modes or user styles, follows **Role Invocation Help** in
+`.standards/PROTOCOL.md` when it is installed. Navigator adds these rules:
 
-For an option request, run discovery internally for the active client:
+- Help alone keeps the topic, depth, mode, style, pending quiz question,
+  answers, and progress. Do not answer the pending question, grade the user, or
+  advance the quiz just to explain options. Handle an explicitly requested
+  change under **Modes** and **Language and Presentation**, retaining useful
+  context.
+- For a genuinely new bare invocation with no topic, mode choice, or
+  continuation request, give a compact introduction to the discovered choices,
+  then ask only what the user wants to explore. A topic is enough; the user need
+  not select a mode explicitly.
+- On first substantive use, briefly mention that invocation help is available
+  when it fits the requested format. Omit it when it would violate brevity,
+  distract from a quiz question, or repeat a hint already given.
+- A bare continuation does not reopen onboarding; it resumes as **Modes**
+  describes.
+
+When `.standards/PROTOCOL.md` is not installed, still discover options
+internally if the helper exists:
 
 ```sh
 node .standards/bin/invocation.mjs navigator --client <client> --json
 ```
 
-Use `codex` or `claude` for `<client>`. Discover afresh each time so new mode
-blocks and user-style files appear without a registry update. Read the JSON
-dispositions; do not use a remembered list or treat exit status 0 as complete
-discovery. Summarize eligible modes and their descriptions, with a short
-active-client invocation example using an actual discovered identifier. List
-available user-style identifiers without reading their contents. Use an entry's
-non-null `selector` in examples; a null value is inventory information only, not
-a confirmed selectable choice. Show how to request a verified style or clear it
-with `Use user style NONE.`. Style selection is optional. Label samples if the
-inventory is long, and distinguish an empty complete inventory from an
-unreadable or incomplete one.
-
-The helper reports conversation bindings, not the current conversation's
-choices. Use known conversation context to identify the current mode and
-explicitly selected style; do not interpret `conversation` as no selection. Help
-alone preserves topic, depth, mode, style, the pending quiz question, answers,
-and progress. Do not load or switch modes, apply a style, answer a pending quiz
-question, grade the user, or advance the quiz just to explain options. Handle an
-explicitly requested change under **Modes** and **Language and Presentation**,
-retaining useful context.
-
-- For help alone, answer the capability question and stop. Do not inspect
-  unrelated project source or run workflow checks to produce the menu.
-- For a genuinely new bare invocation with no topic, mode choice, or
-  continuation request, give a compact introduction to the discovered choices,
-  then ask only what the user wants to explore. A topic is enough; the user need
-  not select a mode explicitly.
-- For a substantive request, answer or ask the requested quiz question directly
-  under the selected mode. If invocation help is also requested, lead with the
-  substantive response and keep option guidance proportionate. On first
-  substantive use, briefly mention that invocation help is available when it
-  fits the requested format. Omit it when it would violate brevity, distract
-  from a quiz question, or repeat a hint already given.
-- A bare continuation resumes the known topic and mode; it does not reopen
-  onboarding. If a continuation lacks prior context, ask only for the missing
-  topic or resume point.
-
-Discovery does not require an active cycle, `STATE.md`, or `MODE.md`. If the
-helper is missing, cannot run, or reports invalid metadata, explain the limit
-without demanding installation or a user-run command. Do not present an
-unverified full mode/style inventory. You may describe capabilities established
-by this skill or an already-read mode, clearly limiting that description.
-Continue an independent project question from available evidence; lack of option
-discovery does not block ordinary explanation or authorize repairing anything.
+Use `codex` or `claude` for `<client>`. List the reported modes and user-style
+identifiers without reading style contents, and change nothing. If discovery is
+unavailable, say that the current options could not be verified and limit any
+description to this skill or an already-read mode. Either way, missing option
+discovery does not block ordinary explanation or authorize repairing anything;
+continue an independent project question from available evidence.
 
 ## Modes
 

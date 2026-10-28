@@ -21,6 +21,19 @@ Codex:       $architect Continue from .standards/STATE.md.
 Claude Code: /architect Continue from .standards/STATE.md.
 ```
 
+## Discover your options
+
+Ask Architect for help to see what you can choose:
+
+| Client      | Prompt            |
+| ----------- | ----------------- |
+| Codex       | `$architect help` |
+| Claude Code | `/architect help` |
+
+The answer lists Architect's modes, which Architect or the workflow chooses for
+you, and your user styles. Asking for help changes nothing. See
+[Ask a role for help](../overview/#ask-a-role-for-help) for how it works.
+
 ## Inputs and output
 
 Architect reads the scope, established project constraints, existing design, and

@@ -29,6 +29,19 @@ own assessment conversation. Unknown session or model details are disclosed
 rather than guessed; see the
 [independent-session rules](../../reference/protocol/#independent-reviewer-session).
 
+## Discover your options
+
+Ask Reviewer for help to see what you can choose:
+
+| Client      | Prompt           |
+| ----------- | ---------------- |
+| Codex       | `$reviewer help` |
+| Claude Code | `/reviewer help` |
+
+The answer shows the kinds of review, which the workflow chooses for you, and
+your user styles. Asking for help changes nothing. See
+[Ask a role for help](../overview/#ask-a-role-for-help) for how it works.
+
 ## Inputs and output
 
 Reviewer checks saved requirements and role reports against the actual files,

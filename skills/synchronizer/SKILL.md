@@ -18,6 +18,15 @@ still describe the same work and are ready for user sign-off. Reviewer assesses
 soundness; Synchronizer reconciles the applicability and consistency of those
 assessments. There are no separate modes.
 
+## Invocation Help
+
+A help-only request, such as `/synchronizer help`, `$synchronizer help`, or a
+question only about this role's modes, options, targets, or user styles, is not
+workflow work. Follow **Role Invocation Help** in `.standards/PROTOCOL.md`,
+reading only that section and the sections it names, and skip the entry and
+input steps below. If the protocol cannot be read, say that the current options
+could not be verified and change nothing.
+
 ## Entry and Inputs
 
 Read all of `.standards/PROTOCOL.md` (in consecutive parts if a read shows only

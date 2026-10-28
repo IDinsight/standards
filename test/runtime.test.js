@@ -1594,6 +1594,11 @@ test('the stop message lists at most 15 problems', () => {
   assert.match(message, /\.\.\.and 5 more/);
 });
 
+test('the stop message keeps Navigator and help-only turns from repairing', () => {
+  assert.match(stopMessage([{ file: 'f.md', message: 'bad.' }]),
+    /If you are not sure, you are Navigator, or you are only answering a help request, report the problems/);
+});
+
 // The hook commands must work as written: Codex runs them from the session's
 // folder (possibly a subfolder) and they walk up to the project, Claude Code
 // sets CLAUDE_PROJECT_DIR.

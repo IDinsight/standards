@@ -22,6 +22,19 @@ Codex:       $scoper Continue from .standards/STATE.md.
 Claude Code: /scoper Continue from .standards/STATE.md.
 ```
 
+## Discover your options
+
+Ask Scoper for help to see what you can choose:
+
+| Client      | Prompt         |
+| ----------- | -------------- |
+| Codex       | `$scoper help` |
+| Claude Code | `/scoper help` |
+
+The answer lists Scoper's modes, which Scoper chooses itself after reading your
+request, and your user styles. Asking for help changes nothing. See
+[Ask a role for help](../overview/#ask-a-role-for-help) for how it works.
+
 ## Inputs and output
 
 Scoper uses your saved request, constraints, any existing scope, and relevant

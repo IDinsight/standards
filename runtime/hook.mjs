@@ -81,8 +81,8 @@ export function stopMessage(problems) {
     ...(more > 0 ? [`- ...and ${more} more. Run \`node .standards/bin/check.mjs\` to see them all.`] : []),
     '',
     'Do not guess a repair. If a problem is in work your current role owns, fix it now. If another role '
-      + 'owns it, route it as .standards/PROTOCOL.md describes. If you are not sure, or you are Navigator, '
-      + 'report the problems to the user and stop.',
+      + 'owns it, route it as .standards/PROTOCOL.md describes. If you are not sure, you are Navigator, or '
+      + 'you are only answering a help request, report the problems to the user and stop.',
   ].join('\n');
 }
 
