@@ -79,10 +79,10 @@ Use the package manager the lockfile names: `pnpm-lock.yaml` means pnpm,
 ```
 
 Every pnpm example in this file assumes `package.json` sets `packageManager`,
-such as `"packageManager": "pnpm@<version>"`, or `devEngines.packageManager`.
-Without one of them, `pnpm/action-setup` fails with "No pnpm version is
-specified". Set the version in one place only: either in `package.json` or with
-`with: version:` on the action. Setting both fails when the versions differ.
+such as `"packageManager": "pnpm@<version>"`. Without it, `pnpm/action-setup`
+fails with "No pnpm version is specified". Set the version in one place only:
+either in `package.json` or with `with: version:` on the action. Setting both
+fails when the versions differ.
 
 `pnpm/action-setup` must run before `setup-node` so the `pnpm` cache option can
 find pnpm.
