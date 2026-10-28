@@ -5,9 +5,17 @@ updates:
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 5
+    # One pull request for all action updates.
+    groups:
+      github-actions:
+        patterns: ["*"]
 
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 5
+    # One pull request for minor and patch updates. Major updates stay separate.
+    groups:
+      npm-minor-patch:
+        update-types: ["minor", "patch"]
