@@ -51,6 +51,12 @@ Use service account keys only when Workload Identity Federation cannot be
 configured (e.g., the GCP org restricts WIF). Rotate keys regularly and scope
 the service account to the minimum required permissions.
 
+Both deploy workflows below read the same secret names. Store them as
+environment secrets on the `staging` and `production` GitHub environments, with
+a separate project for each. With one repository-level `GCP_PROJECT_ID`, both
+workflows deploy the same Cloud Run service, so every merge to the default
+branch reaches production without the approval gate.
+
 ---
 
 ## Authentication
@@ -71,7 +77,11 @@ One-time setup in GCP:
 2. Grant the provider's principal set the `roles/iam.workloadIdentityUser` role
    on the deploy service account.
 3. Grant the service account the minimum roles: `roles/run.developer`,
-   `roles/artifactregistry.writer`, and `roles/iam.serviceAccountUser`.
+   `roles/artifactregistry.writer`, and `roles/iam.serviceAccountUser`. The
+   workflows below build with Cloud Build, which also needs
+   `roles/cloudbuild.builds.editor` and project-level Cloud Storage permissions
+   to create, get, and list buckets and upload objects, because
+   `gcloud builds submit` stages the source in `gs://<project>_cloudbuild`.
 
 The `google-github-actions/auth` action documentation has the full setup steps.
 
@@ -274,23 +284,19 @@ jobs:
             --region "$GCP_REGION" \
             --platform managed \
             --project "$GCP_PROJECT_ID" \
-            --no-traffic
+            --no-traffic \
+            --tag candidate
 
       - name: Verify new revision
         run: |
-          SERVICE_URL=$(gcloud run services describe "$SERVICE" \
+          # Revisions have no URL of their own. The candidate tag gives the new
+          # revision a dedicated URL without sending it production traffic.
+          CANDIDATE_URL=$(gcloud run services describe "$SERVICE" \
             --region "$GCP_REGION" \
             --project "$GCP_PROJECT_ID" \
-            --format 'value(status.url)')
-          # Test the new revision directly using its tag
-          REVISION_URL=$(gcloud run revisions list \
-            --service "$SERVICE" \
-            --region "$GCP_REGION" \
-            --project "$GCP_PROJECT_ID" \
-            --sort-by '~metadata.creationTimestamp' \
-            --limit 1 \
-            --format 'value(status.url)')
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$REVISION_URL/health" 2>/dev/null || echo "000")
+            --format json |
+            jq -r '.status.traffic[] | select(.tag == "candidate") | .url')
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$CANDIDATE_URL/health" 2>/dev/null || echo "000")
           if [ "$STATUS" != "200" ]; then
             echo "New revision health check failed: $STATUS"
             exit 1
@@ -317,9 +323,11 @@ jobs:
 
 <!-- markdownlint-enable MD013 -->
 
-The `--no-traffic` + traffic split pattern deploys the new revision without
-routing traffic to it, verifies it, then shifts traffic. This enables
-zero-downtime deployments.
+The `--no-traffic` and `--tag` pattern deploys the new revision without routing
+traffic to it, verifies it at the tag's URL, then shifts traffic. This enables
+zero-downtime deployments. `--no-traffic` fails when the service does not exist
+yet, so create the production service once with a `gcloud run deploy` that omits
+it before the first release.
 
 ---
 
@@ -403,10 +411,14 @@ Consult the project's Kubernetes documentation.
   request after idle incurs a cold start (1–10 seconds depending on the image
   size and startup time). Set `--min-instances=1` for production services that
   need consistent latency.
-- **`--no-traffic` requires `--allow-unauthenticated` or IAM.** If the service
-  requires authentication, the health check step must use an identity token. Add
-  `--set-env-vars` to bypass auth for the health endpoint, or use
-  `gcloud run services proxy` for the check.
+- **Health checks need invoker access.** Both workflows call the service with
+  plain `curl`, but neither passes `--allow-unauthenticated`, so a service they
+  create requires authentication and the check fails with `403`. Allow
+  unauthenticated invocations for a public service. For a private service, send
+  an identity token from an account with invoker access, or run the check
+  through `gcloud run services proxy`. The production check must proxy with
+  `--tag candidate`; without it, the proxy reaches the revision that is still
+  serving traffic.
 - **`id-token: write` permission.** Workload Identity Federation requires the
   `id-token: write` permission in the workflow. Without it, the auth step
   silently falls back to looking for a credentials JSON and fails.
