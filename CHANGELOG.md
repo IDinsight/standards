@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.13.0](https://github.com/IDinsight/standards/compare/v0.12.1...v0.13.0) (2026-10-28)
+
+
+### Features
+
+* port the agent skills to the standards repo ([cf1db27](https://github.com/IDinsight/standards/commit/cf1db27900f2ede5683182df4de1fe6835147a91))
+
 ## [0.12.1](https://github.com/IDinsight/standards/compare/v0.12.0...v0.12.1) (2026-10-05)
 
 
