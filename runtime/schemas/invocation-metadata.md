@@ -595,9 +595,9 @@ conversation:
 }
 ```
 
-Its three mode files contribute EXPLAIN, INVESTIGATE, and GRILL_ME as user
-options. `selectionRules` retains the requirement that a quiz be requested. The
-helper supplies capabilities; Navigator handles intent, help, and resumption
+Its four mode files contribute EXPLAIN, INVESTIGATE, GRILL_ME, and ASSESS as
+user options. `selectionRules` retains the requirement that a quiz be requested.
+The helper supplies capabilities; Navigator handles intent, help, and resumption
 without starting a cycle or depending on a persisted record.
 
 Synchronizer declares `groups: []` and a user-style binding to the

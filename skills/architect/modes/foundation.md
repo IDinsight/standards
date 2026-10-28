@@ -39,3 +39,8 @@ than one bounded capability.
 4. Identify foundational constraints that future features must inherit without
    turning the design into a general style guide.
 5. Keep reversible local implementation choices with Developer.
+6. When the scope, the user, and established project constraints leave a
+   foundational technology choice open, propose the defaults in
+   [`../references/default-stack.md`](../references/default-stack.md) and record
+   each adopted choice and its rationale in the design. Never apply them to
+   replace an established stack.

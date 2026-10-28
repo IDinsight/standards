@@ -84,6 +84,13 @@ selection, including no user style, for the rest of the cycle. A different
 selection requires a new cycle. If a locked style's file goes missing, it must
 be restored before implementation continues.
 
+Developer also loads the technology styles for the code it changes: Python,
+TypeScript, React, Next.js, HTML, CSS, SQL, FastAPI, Android (Kotlin and Jetpack
+Compose), and GitHub Actions. Some styles point to reference files with setup
+recipes, patterns, and examples, which Developer reads only when the work needs
+that depth. Styles and references follow the project's established conventions
+first; they never choose a stack, library, or deployment target for you.
+
 Developer makes local coding choices within the agreed design. Requirements,
 consequential design decisions, and project context stay with their owners. It
 may run existing tests for feedback; Tester writes formal tests and verifies the

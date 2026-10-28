@@ -40,7 +40,8 @@ Other files depend on the role:
 | ----------------- | ----------------------------------------------------------------------------------------- |
 | `modes/`          | Instructions for a selected mode; Synchronizer uses one procedure without separate modes. |
 | `template.md`     | The required output format; Navigator has no saved output or template.                    |
-| `styles/`         | Shared and topic-specific guidance for Developer, Tester, and Documenter.                 |
+| `styles/`         | Shared and technology-specific guidance for Developer, Tester, and Documenter.            |
+| `references/`     | Deeper material a role reads only when its styles, mode, or design point to it.           |
 
 Role packages ship no user styles. Users add their own in a project under
 `.standards/user-styles/<role>/`; see

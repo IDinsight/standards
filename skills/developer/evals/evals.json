@@ -846,6 +846,30 @@
         "No user file is renamed, no style is substituted automatically, and unselected style contents are not loaded.",
         "User Style Locked remains false and Status remains PROPOSED until explicit plan approval; the style request alone does not authorize implementation."
       ]
+    },
+    {
+      "id": 68,
+      "prompt": "Continue the active STANDARDS workflow as Developer. ProjectMode is BROWNFIELD, CycleMode is STANDARD, WorkflowState is DEVELOPING, recovery is inactive, the development plan is APPROVED with User Style NONE locked, and the next step DEV-002 adds GET /surveys/{id}/responses to an existing FastAPI service with routers, services, and SQLModel models. The design requires an authenticated owner check and returns a paginated list. pytest, ruff, and mypy commands are established.",
+      "expected_output": "Implementation of DEV-002 that loads the FastAPI, Python, and SQL styles, keeps HTTP concerns in the router, and runs existing checks without writing formal tests.",
+      "files": [],
+      "assertions": [
+        "Loads styles/fastapi.md and python.md, plus sql.md because a query changes.",
+        "Keeps HTTPException out of the service, applies auth through the project's dependency, and checks ownership server-side.",
+        "Bounds the list with a validated maximum page size and avoids per-item queries.",
+        "Runs the established pytest, ruff, and mypy commands as self-checks and does not add or rewrite formal tests."
+      ]
+    },
+    {
+      "id": 69,
+      "prompt": "Continue the active STANDARDS workflow as Developer. ProjectMode is BROWNFIELD, CycleMode is EXPEDITED, WorkflowState is DEVELOPING, the approved plan's step DEV-001 adds a lint job to .github/workflows/ci.yml. The existing workflow uses `actions/checkout@v4`, has no permissions block, and the repository has no documented action-pinning policy.",
+      "expected_output": "A workflow change that follows the GitHub Actions style: least-privilege permissions, a job timeout, superseded-run cancellation, and SHA pinning for new third-party actions.",
+      "files": [],
+      "assertions": [
+        "Loads styles/github-actions.md for the workflow change.",
+        "Adds an explicit read-only permissions block and timeout-minutes on the new job.",
+        "Pins any newly added third-party action to a full commit SHA with a version comment because no pinning policy is established, and does not rewrite unrelated existing steps.",
+        "Does not add deployment jobs, new scanning tools, or branch-protection changes, treating them as architecture."
+      ]
     }
   ]
 }

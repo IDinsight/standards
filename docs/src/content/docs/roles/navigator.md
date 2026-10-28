@@ -1,12 +1,14 @@
 ---
 title: Navigator
 description:
-  Understand the project, investigate a question, or test your understanding.
+  Understand the project, investigate a question, test your understanding, or
+  assess an area.
 ---
 
 Navigator helps you understand existing work without changing it. Ask for a
-project introduction, an explanation of a function, help tracing a problem, or a
-quiz on something you want to learn.
+project introduction, an explanation of a function, help tracing a problem, a
+quiz on something you want to learn, or an informal assessment against a
+maturity, security, or stack checklist.
 
 ## When to use Navigator
 
@@ -83,6 +85,28 @@ Navigator adapts to what you have demonstrated. It ends with a brief account of
 what you understand and what remains untested. That feedback concerns the chosen
 topic; it does not approve project work.
 
+### ASSESS
+
+Check an area against a named checklist before deciding what to build. Navigator
+can assess:
+
+- maturity, against the Level 1-5 ladder Scoper uses;
+- security, covering every OWASP Top 10:2025 category with severity labels;
+- stack conventions, against Developer's technology styles;
+- a checklist you describe.
+
+```text
+$navigator ASSESS the API against Level 4.
+$navigator ASSESS the admin routes for security.
+```
+
+Navigator marks each item as met, not met, unverified, or not applicable, with
+file evidence, and lists the gaps by impact. It credits an item only when there
+is evidence that it works, not because a folder or dependency exists. The result
+stays in the conversation. It is not a Reviewer finding or a sign-off, and it
+does not start any work. To act on it, start a cycle, for example by asking
+Scoper to bring the API to Level 4.
+
 ## What to expect
 
 Navigator reads relevant code, documentation, configuration, history, and saved
@@ -90,9 +114,10 @@ workflow records. It cites files and explains the difference between intended
 behavior, what the evidence supports, and what is still uncertain. If files
 change, it rechecks affected explanations.
 
-Answers, questions, and quiz progress stay in the conversation. Navigator
-creates no saved report or score and needs no fresh assessment session. If you
-select a [user style](../../reference/runtime-files/#user-styles) from
+Answers, questions, quiz progress, and assessments stay in the conversation.
+Navigator creates no saved report or score and needs no fresh assessment
+session. If you select a
+[user style](../../reference/runtime-files/#user-styles) from
 `.standards/user-styles/navigator/`, Navigator applies it for the rest of the
 conversation; name it again in a new chat. For example, if help lists `alice`,
 append `Use user style alice.` to your request. Use `Use user style NONE.` to

@@ -128,7 +128,14 @@ preserve the request and recovery instead of routing to Developer or Tester.
    locations may be recorded when useful; values must not be.
 8. Inspect repository structure, manifests, build/configuration files, relevant
    source, tests, docs, and version-control history only as needed to establish
-   the baseline. Do not perform an exhaustive repository dump.
+   the baseline. Do not perform an exhaustive repository dump. Search from high
+   signal to narrow detail: project instructions and manifests, entry points,
+   domain terms, the nearest implemented analogue, call sites, tests,
+   configuration and CI, then history only when current code does not explain a
+   decision. For the requested work, trace the adjacent execution path through
+   each affected layer and record the nearest analogue with its tests, so
+   downstream roles can reuse its conventions without rescanning. Tie each
+   finding to exact paths or symbols rather than vague summaries.
 9. For monorepos, capture global conventions plus the target workspace and
    shared packages it depends on. Do not deep-audit unrelated workspaces merely
    because they exist.

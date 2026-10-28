@@ -84,6 +84,16 @@ When creating or revising the persisted technical design, read and follow
 [`template.md`](template.md). It is the authoritative shape and authoring
 contract for the architecture artifact.
 
+Files under [`references/`](references/) hold deeper decision material: the
+default stack for new projects, data stores, deployment platforms,
+observability, and Android data layers with offline sync. Load one only when the
+design must choose, configure, or change what it covers. A reference informs
+Architect-owned decisions; it never overrides the completed scope, established
+project constraints, or explicit user choices, and it never adds acceptance
+conditions. When the completed scope records a target maturity level, Scoper's
+[`maturity-levels.md`](../scoper/references/maturity-levels.md) describes the
+technical depth commonly expected at that level.
+
 Apply a user style only as the protocol's **User Styles** defines: the user
 explicitly selects `.standards/user-styles/architect/<identifier>.md`. Architect
 has no record for the selection, so it lasts for the current conversation, and

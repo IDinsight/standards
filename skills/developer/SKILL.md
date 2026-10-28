@@ -178,9 +178,25 @@ will materially create or modify:
 - HTML -> [`styles/html.md`](styles/html.md)
 - CSS -> [`styles/css.md`](styles/css.md)
 - SQL -> [`styles/sql.md`](styles/sql.md)
+- FastAPI -> [`styles/fastapi.md`](styles/fastapi.md), plus Python; also load
+  SQL when queries, persistence models, or migrations materially change
+- Android, Kotlin, or Jetpack Compose ->
+  [`styles/android.md`](styles/android.md); also load SQL when Room queries or
+  migrations materially change
+- GitHub Actions workflows, composite actions, or reusable workflows ->
+  [`styles/github-actions.md`](styles/github-actions.md)
 
 Load multiple applicable technology files when the change spans those
 technologies. Do not load unrelated style files or unselected user styles.
+
+Files under [`references/`](references/) hold deeper stack material: setup
+recipes, patterns, examples, and version notes. Load a reference only when a
+loaded style file or the approved design points to it and the affected work
+needs that depth. A loaded reference sits in the Developer style layer at the
+same precedence as the technology style it supplements. It never authorizes a
+consequential choice the active contract has not made, and when it disagrees
+with the installed version or that version's official documentation, follow the
+installed version.
 
 Within the Developer style layer, use this precedence for style guidance:
 
