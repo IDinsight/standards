@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.14.1](https://github.com/IDinsight/standards/compare/v0.14.0...v0.14.1) (2026-10-28)
+
+
+### Bug Fixes
+
+* correct Cloud Run deploy verification and setup guidance ([#79](https://github.com/IDinsight/standards/issues/79)) ([e602f7b](https://github.com/IDinsight/standards/commit/e602f7bb8b3ed9599875eb46bdd3b209a959e525))
+
 ## [0.14.0](https://github.com/IDinsight/standards/compare/v0.13.0...v0.14.0) (2026-10-28)
 
 
