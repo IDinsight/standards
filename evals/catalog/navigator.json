@@ -3079,6 +3079,626 @@
           "note": "report and STATE.md unchanged; check still reports AC-004"
         }
       ]
+    },
+    {
+      "id": 66,
+      "utterance": "Remain Navigator. Explain the active cycle. There's no project documentation, so select IMPLEMENTATION_REVIEWED now. Does that also sign the cycle off?",
+      "grader_only_facts": [
+        "The active STANDARD cycle is at REVIEWING_IMPLEMENTATION with CompletionPolicy FULL_DELIVERABLE",
+        "No normal documentation, final-review, or synchronization work has begun in this cycle"
+      ],
+      "fixture": {
+        "project_mode": "UNSPECIFIED",
+        "workflow_state": "REVIEWING_IMPLEMENTATION",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "file",
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "STATE.md byte-identical (CompletionPolicy still FULL_DELIVERABLE); no files changed; no Skill call; judge: says the policy change needs an explicit instruction outside Navigator (for example to the role that owns the current state)"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "Give the scope a documentation-related AC (for example a README usage note) so the point is concrete; judge: missing docs are not treated as eligibility or as waiving that AC"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "judge: the upstream gates through implementation review stay required; Documenter, final Reviewer, and Synchronizer phases and their guarantees are named as omitted"
+        },
+        {
+          "i": 3,
+          "graders": [
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "policy choice (user), early-closure eligibility (Reviewer), and sign-off (user, from AWAITING_USER_SIGNOFF) kept apart"
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 70,
+      "utterance": "Show Navigator options.",
+      "grader_only_facts": [
+        "Navigator is in GRILL_ME on retry behavior at beginner depth with user style tony",
+        "One quiz question is pending and two earlier answers exist",
+        "The helper reports conversation status for the mode and style selections and a complete style inventory including tony and alice"
+      ],
+      "fixture": {
+        "project_mode": "UNSPECIFIED",
+        "workflow_state": "UNSPECIFIED",
+        "cycle_mode": "UNSPECIFIED",
+        "recovery": "none",
+        "records": [
+          "user-style"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": true,
+      "history_note": "Prior turns: /navigator GRILL_ME on retry behavior at beginner depth with user style tony; two answered questions with feedback; the last assistant turn asks a third question that is still pending.",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "reply names GRILL_ME and tony as current; judge: conversation status not read as no selection"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "pending question not answered, no grading, no new question, nothing reset"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "trace: alice.md never read; judge: alice and the EXPLAIN default offered only as optional changes"
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 71,
+      "utterance": "help me with this question",
+      "grader_only_facts": [
+        "GRILL_ME has an unanswered question about why validation happens before saving",
+        "Relevant source evidence was already inspected"
+      ],
+      "fixture": {
+        "project_mode": "UNSPECIFIED",
+        "workflow_state": "UNSPECIFIED",
+        "cycle_mode": "UNSPECIFIED",
+        "recovery": "none",
+        "records": [],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": true,
+      "history_note": "Prior GRILL_ME turns: the assistant cites the validation and save code with file:line and asks why validation happens before saving; the question is unanswered.",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "ambiguous",
+          "detail": "The harness sends `/navigator help me with this question`, which begins with the `/navigator help` invocation-help form, so the run tests a harder message than the plain in-quiz reply the case describes."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "trace shows whether invocation.mjs ran (evidence, not a hard check); judge: a hint about the pending question, not an option summary"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "reply has no mode or style menu; judge: no full answer and no new question"
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 72,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Navigator paused GRILL_ME on a known retry question to show its invocation options",
+        "No mode or style change was requested",
+        "The relevant source has not changed"
+      ],
+      "fixture": {
+        "project_mode": "UNSPECIFIED",
+        "workflow_state": "UNSPECIFIED",
+        "cycle_mode": "UNSPECIFIED",
+        "recovery": "none",
+        "records": [
+          "user-style"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": true,
+      "history_note": "Prior turns: /navigator GRILL_ME on retry behavior with an explicit user style and depth; at least one answered question with feedback; a pending retry question; then the user asked for options and the assistant showed them and left the question pending.",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "the same pending retry question is re-presented or awaited; the help exchange is not graded as an answer"
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 73,
+      "utterance": "Show your options again.",
+      "grader_only_facts": [
+        "Since the earlier help, alice.md was added beside tony.md and an annotated MAP mode was added to the installed Navigator modes folder",
+        "The helper validates MAP as a user option",
+        "No mode or style change was requested"
+      ],
+      "fixture": {
+        "project_mode": "UNSPECIFIED",
+        "workflow_state": "UNSPECIFIED",
+        "cycle_mode": "UNSPECIFIED",
+        "recovery": "none",
+        "records": [
+          "user-style"
+        ],
+        "code": "small",
+        "git": [
+          "committed",
+          "untracked"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": true,
+      "history_note": "Prior turns: a Navigator conversation with a current mode (and tony, if the history selects it), then an earlier help reply listing EXPLAIN, INVESTIGATE, GRILL_ME, ASSESS and only tony; alice.md and modes/map.md appear after that reply.",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "trace"
+          ],
+          "deterministic_complete": true,
+          "note": "trace: invocation.mjs navigator runs in this turn; file: nothing created or changed (no registry or cache)"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "reply names MAP; judge: its description comes from the metadata block, and a displayed style subset is labeled as examples"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "trace: alice.md never read (tony.md only if the history selected tony); judge: current selections unchanged, alice and MAP not selected"
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 74,
+      "utterance": "Show your options, then explain how the readable parser handles empty input.",
+      "grader_only_facts": [
+        "The discovery helper is absent and there is no .standards runtime",
+        "The navigator skill and the parser source are available"
+      ],
+      "fixture": {
+        "project_mode": "UNSPECIFIED",
+        "workflow_state": "UNSPECIFIED",
+        "cycle_mode": "UNSPECIFIED",
+        "recovery": "none",
+        "records": [],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "options described only from the skill or an already-read mode, with a note that current options could not be verified"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "file: no .standards/ or other file created; trace: no install or standards command; judge: no request to run Node or install, no cycle demand"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "the parser's empty-input behavior is explained with file:line evidence; the fixture needs a module a user would call the readable parser"
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 75,
+      "utterance": "help",
+      "grader_only_facts": [
+        "The helper returns a complete mode catalog but an unknown style inventory because .standards/user-styles/navigator/ is unreadable",
+        "Earlier conversation context selects INVESTIGATE"
+      ],
+      "fixture": {
+        "project_mode": "UNSPECIFIED",
+        "workflow_state": "UNSPECIFIED",
+        "cycle_mode": "UNSPECIFIED",
+        "recovery": "none",
+        "records": [
+          "user-style"
+        ],
+        "code": "small",
+        "git": [
+          "committed",
+          "untracked"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": true,
+      "history_note": "Prior turns: /navigator INVESTIGATE on a concrete question and a completed answer with no question pending, so the bare help asks for the option summary.",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "Make the style directory unreadable with runtime.unreadable and keep its files untracked so git cannot list them; reply names none of them; judge: inventory reported as unverified, not empty"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "reply"
+          ],
+          "deterministic_complete": true,
+          "note": "reply names the four modes (EXPLAIN, INVESTIGATE, GRILL_ME, ASSESS; id or label, case-insensitive)"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "trace: no chmod or sudo, no read inside the style directory; file: nothing changed; judge: INVESTIGATE retained"
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 76,
+      "utterance": "Switch to INVESTIGATE, clear my user style, and show Navigator options.",
+      "grader_only_facts": [
+        "Navigator is in GRILL_ME on retry behavior with a user style selected",
+        "The helper is available and its catalog includes INVESTIGATE"
+      ],
+      "fixture": {
+        "project_mode": "UNSPECIFIED",
+        "workflow_state": "UNSPECIFIED",
+        "cycle_mode": "UNSPECIFIED",
+        "recovery": "none",
+        "records": [
+          "user-style"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": true,
+      "history_note": "Prior turns: /navigator GRILL_ME on retry behavior with an explicit user style (for example tony), at least one answered question, and a pending question.",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "mode and style changed as asked; retry topic and inspected evidence kept"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "STATE.md unchanged and no files changed; judge: style reported as NONE with no approval request"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "no other style applied; no quiz question after the switch"
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 78,
+      "utterance": "ASSESS mode: assess the FastAPI service in api/ against Level 4.",
+      "grader_only_facts": [
+        "No cycle is active",
+        "api/ separates routers, services, and persistence modules",
+        "pytest covers auth failures",
+        "CI runs ruff, mypy, and pytest with cached installs, builds the container image, reports coverage, and must pass before merge",
+        "CI has no dependency vulnerability scanning",
+        "Logging is plain-text print statements",
+        "There is no rate limiting, no metrics or error tracking, and no staging deployment"
+      ],
+      "fixture": {
+        "project_mode": "UNSPECIFIED",
+        "workflow_state": "UNSPECIFIED",
+        "cycle_mode": "UNSET",
+        "recovery": "none",
+        "records": [],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "prompt-leaks-answer",
+          "detail": "The prompt's evidence list states the gaps assertion 1 grades (no dependency scanning, print logging, no rate limiting, metrics, error tracking, or staging); dropped from the utterance."
+        },
+        {
+          "kind": "underspecified",
+          "detail": "Level 2 needs working evidence for every applicable Level 1-2 expectation (for example managed migrations, separate dev and test databases, environment-based configuration, setup docs), which the prompt does not list; plant them, or Level 1 or 'unverified' becomes a correct answer."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "trace",
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "trace: reads .claude/skills/scoper/references/maturity-levels.md; judge: each applicable Level 4 item marked met, not met, unverified, or not applicable with file evidence"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "judge: service-wide Level 2; a per-area report counts when its lowest area (CI/CD) is Level 2 and the service is not placed at 3 or 4"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "Plant a dependency or folder name that suggests a missing Level 4 control (for example an unused rate-limit package) so this can fail"
+        },
+        {
+          "i": 3,
+          "graders": [
+            "state",
+            "file",
+            "trace",
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "no files changed, STATE.md unchanged, no Skill call; judge: no P0-P2 findings issued, Scoper suggested without starting a cycle"
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 79,
+      "utterance": "Do a security review of the Next.js admin routes in web/app/admin.",
+      "grader_only_facts": [
+        "An active STANDARD cycle is in DEVELOPING for unrelated work",
+        "The admin Server Actions in web/lib/actions/admin.ts check session?.user but not the admin role",
+        "web/proxy.ts redirects non-admins away from /admin pages",
+        "web/.env.example sets NEXT_PUBLIC_ANALYTICS_KEY (placeholder value)"
+      ],
+      "fixture": {
+        "project_mode": "UNSPECIFIED",
+        "workflow_state": "DEVELOPING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "prompt-leaks-answer",
+          "detail": "The prompt states the missing admin-role check and that proxy.ts only redirects pages, which assertion 1 grades; dropped from the utterance."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "trace",
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "trace: reads modes/assess.md and references/security-assessment.md; reply names A01 to A10; judge: each has a status with rationale"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "The proxy must guard only page navigation so the claim holds in the code; judge: a direct POST to the Server Action bypasses it, with abuse path and impact"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "reply uses Critical/High/Medium/Low; judge: says they are not Reviewer findings"
+        },
+        {
+          "i": 3,
+          "graders": [
+            "state",
+            "file",
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "STATE.md byte-identical, no files changed, no Skill call; judge: names Developer or Scoper as likely fix owner"
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
     }
   ],
   "summary": {

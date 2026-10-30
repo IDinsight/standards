@@ -3987,6 +3987,864 @@
           "note": "FAILURE SCOPING deterministic; README not decided needs judge."
         }
       ]
+    },
+    {
+      "id": 71,
+      "utterance": "Let's finish this cycle after implementation review.",
+      "grader_only_facts": [
+        "Documenter has not begun any normal documentation work in this cycle: no documentation record and no documentation edits exist",
+        "The implementation review is COMPLETE and current, and the FULL verification report is COMPLETE and current"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "DOCUMENTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "state: CompletionPolicy IMPLEMENTATION_REVIEWED and Request still holds the original implementation request plus the policy instruction; file: scope and design unchanged; judge: the addition reads as a workflow instruction, not a contract change."
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "Recovery inactive with an empty stack; WorkflowState not AWAITING_USER_SIGNOFF; no documentation record; project docs and the implementation review report, including its closure section, unchanged."
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "file",
+            "reply"
+          ],
+          "deterministic_complete": true,
+          "note": "REVIEWING_IMPLEMENTATION with Handoff COMPLETION_CHANGE From DOCUMENTING, FailureType NONE; implementation review report unchanged (no review ran); reply has the fresh-chat prefix, IMPLEMENTATION kind and a Reviewer invocation line. Seed Handoff FORWARD From REVIEWING_IMPLEMENTATION."
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 72,
+      "utterance": "Switch this cycle to IMPLEMENTATION_REVIEWED so it finishes after implementation review. Documenter hasn't begun, since there's no documentation record yet.",
+      "grader_only_facts": [
+        "Normal documentation edits for this cycle's change are already saved in the project docs",
+        "Every other DOCUMENTING-route precondition holds: FORWARD from REVIEWING_IMPLEMENTATION, a current passing implementation review, COMPLETE full verification, BlockedOn NONE"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "DOCUMENTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation"
+        ],
+        "code": "small",
+        "git": [
+          "committed",
+          "unstaged"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "state: CompletionPolicy stays FULL_DELIVERABLE, no COMPLETION_CHANGE; judge: the reply cites the saved doc edits as evidence that normal documentation began. The unstaged doc edits must plainly cover this cycle's AC and every other precondition must hold, so begun documentation is the only reason to refuse."
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "state: no COMPLETION_CHANGE, policy FULL_DELIVERABLE, Request unchanged; file: the doc edits are still present (same diff); judge: no deferred switch is noted in BlockedOn, a record, or the reply. Going on with normal documentation, even a FORWARD to REVIEWING_FINAL, is not a failure."
+        },
+        {
+          "i": 2,
+          "graders": [
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 73,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "The saved operations-guide correction and its documentation evidence are verified against current inputs",
+        "All required documentation surfaces are assessed and no Documenter-owned blocker or obligation remains",
+        "No final review or synchronization work exists, so nothing needs a rerun before ResumeAt"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "DOCUMENTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "one-frame",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "documentation"
+        ],
+        "code": "small",
+        "git": [
+          "committed",
+          "unstaged"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": "CompletionPolicy still IMPLEMENTATION_REVIEWED; Request unchanged."
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "reply"
+          ],
+          "deterministic_complete": true,
+          "note": "Frame popped; REVIEWING_IMPLEMENTATION with Handoff RESUME, never REVIEWING_FINAL, SYNCHRONIZING or FORWARD; reply names IMPLEMENTATION review, not FINAL_DELIVERABLE. Seed the frame From/ResumeAt REVIEWING_IMPLEMENTATION, Owner DOCUMENTING, FailureType DOCUMENTATION, RerunThrough NONE, and a COMPLETE FULL verification report so the RESUME is legal."
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "file: implementation review report (open finding on the guide, closure section) unchanged; judge: the record and reply leave ordinary review and closure reassessment to Reviewer and claim no eligibility."
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 74,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "The guidance correction is verified in saved content",
+        "All required documentation is complete and no Documenter-owned defect remains",
+        "The corrected guidance file is an assessed input of the saved ELIGIBLE closure assessment in the implementation review report",
+        "The correction requires implementation Reviewer reassessment before sign-off readiness"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "DOCUMENTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "one-frame",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "documentation"
+        ],
+        "code": "small",
+        "git": [
+          "committed",
+          "unstaged"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "prompt-leaks-answer",
+          "detail": "'the corrected guidance requires implementation Reviewer reassessment' states the routing outcome the case grades; moved to grader_only_facts."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "state: not AWAITING_USER_SIGNOFF; file: implementation review report (Eligibility ELIGIBLE) unchanged; judge: the record or reply says the changed input means the saved ELIGIBLE conclusion cannot be relied on. The closure section must list the guidance file with its pre-correction identity."
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": "Frame kept with ResumeAt AWAITING_USER_SIGNOFF and RerunThrough REVIEWING_IMPLEMENTATION; REVIEWING_IMPLEMENTATION with Handoff RESUME. Seed the frame From AWAITING_USER_SIGNOFF, Owner DOCUMENTING, RerunThrough NONE."
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "state: never REVIEWING_FINAL; file: review report unchanged, no final-deliverable or synchronization record; judge: no eligibility claim in the documentation record or reply."
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 75,
+      "utterance": "Update docs/usage.md in GUIDED mode using user style concise, and edit only that file.",
+      "grader_only_facts": [],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "AUDITING",
+        "cycle_mode": "UNSET",
+        "recovery": "none",
+        "records": [
+          "user-style"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "S"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "check",
+            "trace"
+          ],
+          "deterministic_complete": true,
+          "note": "state: CycleMode DOCUMENTATION, CompletionPolicy NONE, new Active Work.Id; check: the Id has the generated form; trace: cycle.mjs new ran before the Id was written."
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "state: Request names docs/usage.md, GUIDED and concise; judge: it also keeps the standalone Documenter entry and the edit-only-that-file boundary."
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "file",
+            "reply"
+          ],
+          "deterministic_complete": true,
+          "note": "WorkflowState AUDITING (same as the installed brownfield state) with Handoff INITIAL and a mode-entry reason; no documentation record, scope record, CONTEXT.md, or docs/usage.md change; reply has an Auditor invocation line. Plant .standards/user-styles/documenter/concise.md."
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 76,
+      "utterance": "Update README.md.",
+      "grader_only_facts": [],
+      "fixture": {
+        "project_mode": "GREENFIELD",
+        "workflow_state": "SCOPING",
+        "cycle_mode": "UNSET",
+        "recovery": "none",
+        "records": [],
+        "code": "none",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "S"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": "MODE.md still GREENFIELD; CycleMode UNSET, so no DOCUMENTATION cycle. The fixture has a README.md and no meaningful implementation."
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": "Active Work.Id and Request UNSET, CycleMode UNSET, PendingCycleMode UNSET, WorkflowState SCOPING."
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "state: PendingCycleRequest names the standalone Documenter entry and README.md, PendingCycleBlockedOn is not NONE, Active Work.BlockedOn unchanged; judge: the saved question asks for a real decision (revise to a supported mode or abandon)."
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 77,
+      "utterance": "Document the existing CLI.",
+      "grader_only_facts": [],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "AUDITING",
+        "cycle_mode": "UNSET",
+        "recovery": "none",
+        "records": [],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "S"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "state: no cycle started and PendingCycleRequest holds the standalone Documenter request; judge: the saved question treats it as a DOCUMENTATION request that conflicts with the pending STANDARD preference."
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": "Active Work fields unchanged, PendingCycleMode still STANDARD, CycleMode UNSET."
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "state: PendingCycleBlockedOn not NONE, CycleMode UNSET; judge: the reply asks the user to resolve the conflict (clear or replace the preference, revise, or abandon) instead of defaulting to STANDARD."
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 79,
+      "utterance": "Document the import command; it's a separate feature from the current work.",
+      "grader_only_facts": [
+        "The active cycle's request does not cover the import command"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "TESTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "nested",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": "STATE.md byte-identical: Id, CycleMode, Request, BlockedOn, both frames, pending-cycle fields. Seed a non-NONE Active Work.BlockedOn and two legal frames."
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "No project documentation changed and no documentation record created."
+        },
+        {
+          "i": 2,
+          "graders": [
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "Reply names Tester as the current owner and says the new request waits until this cycle finishes or is explicitly cancelled, without treating the invocation as cancellation."
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 80,
+      "utterance": "Continue.",
+      "grader_only_facts": [],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "AUDITING",
+        "cycle_mode": "UNSET",
+        "recovery": "none",
+        "records": [],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "S"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "duplicate",
+          "detail": "Same starting state and expectation as case 53 (installed brownfield, no request, nothing inferred from existing files); only the README detail differs."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "STATE.md unchanged (Id, Request and PendingCycleRequest still UNSET); no record created and no project file changed."
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "state: no PendingCycleRequest naming the README; judge: the reply asks for an assignment instead of treating the README as one."
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 81,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Scope, Architect's technical coverage and Auditor context are current for the documentation contract"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "DOCUMENTING",
+        "cycle_mode": "DOCUMENTATION",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "user-style"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "Record at .standards/docs/documentation/guide-20261004T120000Z-1a2b3c4d.md with Target FILE, Target Detail docs/usage.md, Collaboration GUIDED, User Style concise. Seed CycleMode DOCUMENTATION (the fixture enum has no such value), Handoff FORWARD From ARCHITECTING, the saved request with those choices, and .standards/user-styles/documenter/concise.md."
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "state: BlockedOn not NONE; file: record BLOCKED or IN_PROGRESS with one pending step, docs/usage.md unchanged; judge: BlockedOn matches the pending step and nothing claims the edit applied or verified."
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "file",
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "state: Development NONE, no FAILURE handoff; file: no development, verification or implementation-review record; trace: source inspected; judge: the record cites source and existing evidence and does not list omitted-owner reports as missing."
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 82,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "The current guides already satisfy AC-001 (accurate usage) and AC-002 (audience limits)",
+        "The project's established documentation checks run and pass"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "DOCUMENTING",
+        "cycle_mode": "DOCUMENTATION",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "An offline established documentation check (for example a link or example checker script in package.json) that passes on the current guides.",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "No project file outside .standards/ changed. The guides must be accurate and clean so no legitimate fix exists."
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "check",
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "file: record COMPLETE and references AC-001 and AC-002; check: no coverage problem; trace: the checks actually ran; judge: recorded commands, results and limits match what ran."
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "reply"
+          ],
+          "deterministic_complete": true,
+          "note": "REVIEWING_FINAL with Handoff FORWARD From DOCUMENTING and CompletionPolicy NONE; reply has the fresh-chat prefix, FINAL_DELIVERABLE and a Reviewer invocation line. Seed CycleMode DOCUMENTATION."
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 83,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "The documentation build fails because a plugin is missing, and fixing it needs package configuration changes",
+        "A current documentation AC needs the build result",
+        "No alternate sufficient evidence exists"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "DOCUMENTING",
+        "cycle_mode": "DOCUMENTATION",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "Offline documentation build command that fails deterministically on the missing plugin, with no network to install it.",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "file: package.json, lockfile, build config, tests and installed packages unchanged; state: no FAILURE to DEVELOPING or TESTING, Development NONE, no frame. Seed CycleMode DOCUMENTATION."
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "state: Request and Recovery unchanged, Active Work.BlockedOn not NONE, still DOCUMENTING; judge: the question offers a documentation-only scope or cancellation for a separate implementation cycle."
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "file: record not COMPLETE and its checks section has the failing command and exit status; judge: the failure is not called a pass or waived because development and testing are omitted."
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 84,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "The saved guide correction has sufficient current check evidence",
+        "The only remaining documentation disposition depends on the interrupted final review's unfinished assessment",
+        "No independent actionable gap or blocker remains"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "DOCUMENTING",
+        "cycle_mode": "DOCUMENTATION",
+        "recovery": "one-frame",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "documentation",
+          "review-final"
+        ],
+        "code": "small",
+        "git": [
+          "committed",
+          "unstaged"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "underspecified",
+          "detail": "The prompt does not say what remaining disposition can depend solely on the unfinished final review, so the fixture must plant one that is not an actionable documentation gap, or the correct route becomes case 85's."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "Documentation record Status IN_PROGRESS or BLOCKED."
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "state: frame popped, REVIEWING_FINAL with Handoff RESUME, never AWAITING_USER_SIGNOFF or an omitted state; judge: the reply claims neither documentation completion nor readiness. Seed CycleMode DOCUMENTATION and the frame From/ResumeAt REVIEWING_FINAL, Owner DOCUMENTING, RerunThrough NONE."
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "reply: fresh-chat prefix and FINAL_DELIVERABLE; judge: the record names the remaining item, its dependency on final review, the evidence still required, and that the full Documenter gate and affected evidence must be re-established."
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 85,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "One corrected paragraph is verified",
+        "A required example has not been checked against source and can be checked now from the available source"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "DOCUMENTING",
+        "cycle_mode": "DOCUMENTATION",
+        "recovery": "one-frame",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "documentation",
+          "review-final",
+          "synchronization"
+        ],
+        "code": "small",
+        "git": [
+          "committed",
+          "unstaged"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": "WorkflowState never AWAITING_USER_SIGNOFF. Seed CycleMode DOCUMENTATION and the frame From/ResumeAt AWAITING_USER_SIGNOFF, Owner DOCUMENTING, RerunThrough NONE."
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "trace: the example was checked against source; judge: the record does not list the example as a dependency on another owner. The fixture decides whether the example is correct and says so in grader facts."
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "state: the frame stays with the same From, Owner and ResumeAt (RerunThrough may become SYNCHRONIZING if the full gate passes and the role starts the rerun at REVIEWING_FINAL); file: the record keeps the verified paragraph's evidence; judge: that evidence is not dropped or rewritten as unchecked."
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
     }
   ],
   "summary": {

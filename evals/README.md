@@ -115,12 +115,12 @@ A fixture must pass four gates before any case runs on it. The gates make sure
 that the fixture builds, that it matches its case, and that it does not give
 away the answer.
 
-| Gate                   | What it checks                                                                                                                                                                                                                                                                                                    | Cost             | Code                                                          |
-| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- | ------------------------------------------------------------- |
-| 1. Build and structure | The spec has all its fields and one check for each assertion. The project builds, and STANDARDS installs. `check.mjs` gives the result the spec expects: no problems, or the exact problems of a fixture that is broken on purpose. The fixture's own self-checks pass in Docker (for example, "the tests pass"). | None             | `lib/spec.mjs`, `build-fixture.mjs`, `lib/selfcheck.mjs`      |
-| 2. Stated facts        | Each fact in the case prompt is true in the built project. If the prompt says `WorkflowState` is `DEVELOPING`, `STATE.md` must say `DEVELOPING`. If the prompt names `AC-003`, a record must define it. If the prompt says a file is staged, git must show it staged.                                             | None             | `extract-facts.mjs`, `validate-fixture.mjs`                   |
-| 3. Model review        | The reviewer (Opus 5.5 by default) reads the case, the spec, and the built project. It looks for anything that is not realistic, for hints that give away the answer, and for checks that could fail a correct run.                                                                                               | About $0.34 each | `review-fixture.mjs`, `prompts/reviewer.md`                   |
-| 4. Your decision       | Gate 3 flags a fixture when it finds a problem. You then decide what to do: run it as it is, fix it, write it again, mark an assertion N/A, or leave the case out.                                                                                                                                                | None             | `flags.mjs` (lists what needs you), `decide.mjs` (records it) |
+| Gate                   | What it checks                                                                                                                                                                                                                                                                                                    | Code                                                          |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| 1. Build and structure | The spec has all its fields and one check for each assertion. The project builds, and STANDARDS installs. `check.mjs` gives the result the spec expects: no problems, or the exact problems of a fixture that is broken on purpose. The fixture's own self-checks pass in Docker (for example, "the tests pass"). | `lib/spec.mjs`, `build-fixture.mjs`, `lib/selfcheck.mjs`      |
+| 2. Stated facts        | Each fact in the case prompt is true in the built project. If the prompt says `WorkflowState` is `DEVELOPING`, `STATE.md` must say `DEVELOPING`. If the prompt names `AC-003`, a record must define it. If the prompt says a file is staged, git must show it staged.                                             | `extract-facts.mjs`, `validate-fixture.mjs`                   |
+| 3. Model review        | The reviewer (Opus 5.5 by default) reads the case, the spec, and the built project. It looks for anything that is not realistic, for hints that give away the answer, and for checks that could fail a correct run.                                                                                               | `review-fixture.mjs`, `prompts/reviewer.md`                   |
+| 4. Your decision       | Gate 3 flags a fixture when it finds a problem. You then decide what to do: run it as it is, fix it, write it again, mark an assertion N/A, or leave the case out.                                                                                                                                                | `flags.mjs` (lists what needs you), `decide.mjs` (records it) |
 
 When the gates run:
 
@@ -195,7 +195,7 @@ the reason for each one that is not ready. `run`, `generate --needed`,
 | `deferred`         | left out of runs (by `catalog/deferred.json` or by you)          | none                         |
 
 Then write and review what is missing. Without `--execute` each command only
-lists what it would do and what it would cost:
+lists what it would do:
 
 ```bash
 pnpm evals fixtures generate --needed --execute
@@ -235,20 +235,19 @@ pnpm evals fixtures generate <case> --execute \
 ```
 
 Carried-over fixtures skip gate 3. To have the reviewer review them again at the
-current release (an estimated $0.34 each with Opus 5.5), run
-`pnpm evals fixtures review --carried-over --execute`.
+current release, run `pnpm evals fixtures review --carried-over --execute`.
 
 ## Run the evals
 
 Check once that your key can call every model the harness calls through the API:
-the judge, the second judge, the fixture writer, and the reviewer (a few cents):
+the judge, the second judge, the fixture writer, and the reviewer:
 
 ```bash
 pnpm evals preflight --execute
 ```
 
 Try one role first. Without `--execute`, `run` builds each fixture and prints
-the `docker` command it would run, which costs nothing:
+the `docker` command it would run, and calls no model:
 
 ```bash
 pnpm evals run --role navigator
@@ -260,10 +259,10 @@ pnpm evals pipeline --role navigator --execute
 
 `pipeline` runs the cases, judges the open assertions, runs the judge checks,
 and writes the report, under one run id that it prints first. If it stops early
-(a spend limit, Ctrl+C, a closed laptop), run the same command with
-`--run-id <id>`: finished runs and verdicts are kept and not paid for again.
-Ctrl+C also stops the run containers, so nothing keeps calling the model. The
-same steps run one at a time:
+(an API limit, Ctrl+C, a closed laptop), run the same command with
+`--run-id <id>`: finished runs and verdicts are kept and not run again. Ctrl+C
+also stops the run containers, so nothing keeps calling the model. The same
+steps run one at a time:
 
 ```bash
 pnpm evals run --role navigator --run-id nav-1 --execute
@@ -285,8 +284,8 @@ Select cases with `--role <role>`, `--all`, or `--cases developer-5,tester-12`.
 `--reps 3` repeats each case. Running a command again with the same `--run-id`
 keeps every finished run and retries only the ones that hit an infrastructure
 error. Without `--run-id`, `run --execute` starts a new run and prints its id.
-`judge` takes `--mode batch` for the Batch API (half price, results within 24
-hours) and `--retry-errors` to resend verdicts that came back as grader errors.
+`judge` takes `--mode batch` for the Batch API (results within 24 hours) and
+`--retry-errors` to resend verdicts that came back as grader errors.
 
 The judge checks need a "different case" wrong answer for each role: a reply
 from another role's run (from these runs or any other run under `evals/runs/`),
@@ -319,22 +318,6 @@ never counted as a model failure. A run that hits the 20-minute limit is
 TIMEOUT. Claude Code's `--max-budget-usd 50` stops a stuck run, which is graded
 as OVER_BUDGET.
 
-## Cost
-
-These are only estimates:
-
-| Item                                   | Estimate                                        |
-| -------------------------------------- | ----------------------------------------------- |
-| One role run (Sonnet 5.5, high effort) | $0.14 (Navigator) to $0.97 (Tester), mean $0.63 |
-| One judged assertion, Opus 5.5 at high | $0.19                                           |
-| One new fixture, written and reviewed  | about $1.30                                     |
-
-For one full pass of 469 cases, that is about $290 for runs and about $200 for
-judging (if about 70% of the 1,579 assertions need the judge). Release 0.15.0's
-protocol and skill files are large, and each run reads them, so runs may cost
-more. Start with one role and check `pnpm evals spend` before running
-everything.
-
 An organization spend limit (HTTP 429) stops calls; affected runs are recorded
 as infrastructure errors. After raising the limit, rerun the same command with
 the `--run-id` it printed to pick up where it stopped.
@@ -362,20 +345,20 @@ the `--run-id` it printed to pick up where it stopped.
 
 ## Harness layout
 
-| Path                                                 | Purpose                                                    |
-| ---------------------------------------------------- | ---------------------------------------------------------- |
-| `cli.mjs`                                            | the `pnpm evals` commands                                  |
-| `harness/lib/config.mjs`                             | every setting and its default, `.env` loading              |
-| `harness/run.mjs`                                    | builds fixtures, runs containers, grades with exact checks |
-| `harness/grade.mjs`                                  | exact checks and judge requests                            |
-| `harness/judge*.mjs`                                 | the judge, its runner, its checks, and the preflight       |
-| `harness/generate-fixture.mjs`, `review-fixture.mjs` | fixture writing and gate-3 review                          |
-| `harness/migrate-fixtures.mjs`, `lib/migrate.mjs`    | carrying fixtures to a newer release                       |
-| `harness/lib/readiness.mjs`                          | whether each fixture can run, and why not                  |
-| `harness/build-fixture.mjs`, `validate-fixture.mjs`  | gates 1 and 2                                              |
-| `harness/container/`, `Dockerfile*`, `image.mjs`     | the runner images and what runs inside them                |
-| `harness/summarize.mjs`, `spend.mjs`                 | reports and spend                                          |
-| `catalog/`                                           | a review of each case, used by the fixture writer          |
+| Path                                                 | Purpose                                                                 |
+| ---------------------------------------------------- | ----------------------------------------------------------------------- |
+| `cli.mjs`                                            | the `pnpm evals` commands                                               |
+| `harness/lib/config.mjs`                             | every setting and its default, `.env` loading                           |
+| `harness/run.mjs`                                    | builds fixtures, runs containers, grades with exact checks              |
+| `harness/grade.mjs`                                  | exact checks and judge requests                                         |
+| `harness/judge*.mjs`                                 | the judge, its runner, its checks, and the preflight                    |
+| `harness/generate-fixture.mjs`, `review-fixture.mjs` | fixture writing and gate-3 review                                       |
+| `harness/migrate-fixtures.mjs`, `lib/migrate.mjs`    | carrying fixtures to a newer release                                    |
+| `harness/lib/readiness.mjs`                          | whether each fixture can run, and why not                               |
+| `harness/build-fixture.mjs`, `validate-fixture.mjs`  | gates 1 and 2                                                           |
+| `harness/container/`, `Dockerfile*`, `image.mjs`     | the runner images and what runs inside them                             |
+| `harness/summarize.mjs`, `spend.mjs`                 | reports and spend                                                       |
+| `catalog/`                                           | notes on each case for the fixture writer ([README](catalog/README.md)) |
 
 `pnpm evals selftest` runs the harness's own tests (129 checks, no model and no
 Docker): fixture builds, gates, git-command classification, grading of scripted
@@ -384,11 +367,13 @@ and the fixture migration.
 
 ## Known gaps
 
-- Cases added after the catalog was written have no entry. The fixture writer
-  and reviewer work from the case text alone, so whether an assertion depends on
-  what the role read or ran is left to them rather than to the catalog's tags.
+- Catalog entries are written by hand or by an agent, and nothing warns when one
+  is out of date. A case added or changed later needs its entry added or updated
+  before its fixture is written (see [`catalog/README.md`](catalog/README.md)).
+  Without one, the fixture writer and reviewer work from the case text alone.
 - Carried-over fixtures keep their earlier review. Gates 1 and 2 confirm they
   build, pass `check.mjs`, and match their prompts at the current release, but
   only a new review would catch a fixture that newer protocol rules make
   unrealistic.
-- Codex is not supported; the runner drives Claude Code only.
+- Codex is not supported; the runner drives Claude Code only. Cases that needed
+  Codex were removed from the suite (see `catalog/README.md`).

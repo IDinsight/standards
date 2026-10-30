@@ -3135,6 +3135,882 @@
           "note": ""
         }
       ]
+    },
+    {
+      "id": 51,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "CompletionPolicy IMPLEMENTATION_REVIEWED; Active Work.Id export-20260924T090000Z-a7f3c1d2",
+        "The current-cycle synchronization record is IN_PROGRESS from an earlier verified corrective return and preserves its correction evidence, assessed identities, and the intentionally omitted final-review guarantee",
+        "A later Developer correction changed the implementation inputs that evidence assessed",
+        "Only frame: From REVIEWING_IMPLEMENTATION, Owner DEVELOPING, FailureType IMPLEMENTATION, ResumeAt REVIEWING_IMPLEMENTATION, RerunThrough SYNCHRONIZING; its saved rerun plan includes revalidating the synchronization evidence",
+        "Implementation and full Tester evidence are current, and rechecking every affected prior corrective evidence against them succeeds",
+        "No material defect, required evidence gap, owned obligation, or blocking question remains; only the omitted final review and implementation Reviewer reassessment on resume keep the full gate from passing"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SYNCHRONIZING",
+        "cycle_mode": "STANDARD",
+        "recovery": "one-frame",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "synchronization"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "state: the only frame popped, RESUME From SYNCHRONIZING to REVIEWING_IMPLEMENTATION, no new frame; file: no final-deliverable review or documentation record created and no new D entry routes final review"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "file: earlier D entries and correction evidence still present; judge the new revalidation, frame reason, and limitation content. Fixture: entry handoff RESUME From TESTING; the record's identities name pre-correction content and the verification report names current content; implementation review IN_PROGRESS with the finding that pushed the frame"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "file",
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "state: not AWAITING_USER_SIGNOFF; file: record Status IN_PROGRESS or BLOCKED and implementation review unchanged; reply: Reviewer line with IMPLEMENTATION kind and fresh-chat prefix; judge prose claims of completion or eligibility"
+        },
+        {
+          "i": 3,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": "CompletionPolicy still IMPLEMENTATION_REVIEWED; frame popped only at its RerunThrough SYNCHRONIZING with RESUME to its ResumeAt"
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 52,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "CompletionPolicy IMPLEMENTATION_REVIEWED",
+        "The current-cycle synchronization record is IN_PROGRESS and preserves an earlier verified corrective return and the intentionally omitted final-review guarantee",
+        "An upstream correction invalidated that record's corrective evidence",
+        "Only frame: From AWAITING_USER_SIGNOFF, Owner DEVELOPING, FailureType IMPLEMENTATION, ResumeAt AWAITING_USER_SIGNOFF, RerunThrough REVIEWING_IMPLEMENTATION; the saved plan runs Synchronizer revalidation before the implementation Reviewer reassessment",
+        "All required implementation and full Tester evidence is current",
+        "Revalidating the affected reconciliation evidence with current identities and actual results succeeds; no owned defect or obligation remains",
+        "The only full-gate gaps are the omitted final review and the pending Reviewer reassessment",
+        "The implementation review report still carries its earlier Eligibility ELIGIBLE closure"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SYNCHRONIZING",
+        "cycle_mode": "STANDARD",
+        "recovery": "one-frame",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "synchronization"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": "frame kept with RerunThrough REVIEWING_IMPLEMENTATION unchanged; WorkflowState REVIEWING_IMPLEMENTATION, not AWAITING_USER_SIGNOFF"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "file",
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "state: hands off to REVIEWING_IMPLEMENTATION; file: implementation review (COMPLETE, ELIGIBLE) unchanged; reply: Reviewer line with IMPLEMENTATION kind and fresh-chat prefix; judge that the record does not treat the old closure as current"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "file: no final-deliverable review created, no new D entry owned by Reviewer; state: no REVIEW failure or new frame; judge the record's wording about the omission"
+        },
+        {
+          "i": 3,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "file: record IN_PROGRESS or BLOCKED and earlier evidence kept; judge the content"
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 53,
+      "utterance": "Use the scoped corrective-rerun exception and send this back to Reviewer.",
+      "grader_only_facts": [
+        "CompletionPolicy IMPLEMENTATION_REVIEWED",
+        "The current-cycle synchronization record is IN_PROGRESS and preserves an earlier verified corrective return and the omitted final-review guarantees",
+        "Only frame: From REVIEWING_IMPLEMENTATION, Owner DEVELOPING, FailureType IMPLEMENTATION, ResumeAt REVIEWING_IMPLEMENTATION, RerunThrough SYNCHRONIZING; its plan includes rerunning the existing correction after the implementation change",
+        "The old evidence reference now resolves",
+        "The required authorization test has not run against the changed implementation, so AC-002 lacks current evidence",
+        "This is an independent verification gap, not merely pending Reviewer reassessment"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SYNCHRONIZING",
+        "cycle_mode": "STANDARD",
+        "recovery": "one-frame",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "synchronization"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "prompt-leaks-answer",
+          "detail": "\"This is an independent verification gap, not merely pending Reviewer reassessment\" states assertion 2's distinction; kept out of the utterance."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "state: FAILURE VERIFICATION From SYNCHRONIZING to TESTING with a new frame (Owner TESTING, ResumeAt SYNCHRONIZING); file: a D entry owned by Tester names AC-002 and the authorization test. Fixture: the verification report's authorization result names pre-change implementation content"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": "the Developer frame is unchanged and stays beneath the new Tester frame"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "state: FailureType VERIFICATION, not REVIEW; file: the omitted final review is not a D entry; judge the record's separation"
+        },
+        {
+          "i": 3,
+          "graders": [
+            "state",
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "file: record IN_PROGRESS or BLOCKED; state: not AWAITING_USER_SIGNOFF; judge the reply for readiness claims"
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 54,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "CompletionPolicy IMPLEMENTATION_REVIEWED",
+        "Only frame: From AWAITING_USER_SIGNOFF, Owner SYNCHRONIZING, FailureType SYNCHRONIZATION, ResumeAt AWAITING_USER_SIGNOFF, RerunThrough NONE (pushed by user rework at sign-off)",
+        "The existing current-cycle synchronization record has a reconciliation error whose correction can be verified against current implementation and full Tester evidence",
+        "No other Synchronizer-owned work remains",
+        "Full synchronization cannot pass only because the normal final review was intentionally omitted and the active contract does not require it"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SYNCHRONIZING",
+        "cycle_mode": "STANDARD",
+        "recovery": "one-frame",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "synchronization"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "underspecified",
+          "detail": "Does not describe the reconciliation error or its correction, so the fixture must plant both (for example a record reference to the wrong verification result whose correct target is checkable)."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": "frame kept with RerunThrough REVIEWING_IMPLEMENTATION; WorkflowState REVIEWING_IMPLEMENTATION, not AWAITING_USER_SIGNOFF"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "file: record IN_PROGRESS or BLOCKED and no final-deliverable review created; judge that the correction and the omitted guarantee are recorded separately"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "state: frame retained, not AWAITING_USER_SIGNOFF; reply: Reviewer line with IMPLEMENTATION kind and fresh-chat prefix; judge the explanation in the record and reply"
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 55,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "CompletionPolicy IMPLEMENTATION_REVIEWED",
+        "Recovery has an older frame beneath the active frame From REVIEWING_IMPLEMENTATION, Owner DEVELOPING, FailureType IMPLEMENTATION, ResumeAt REVIEWING_IMPLEMENTATION, RerunThrough SYNCHRONIZING",
+        "The active frame's saved plan includes revalidating a synchronization record left IN_PROGRESS by an earlier verified corrective return",
+        "All affected corrective evidence revalidates against current full implementation and Tester evidence",
+        "Only the omitted final review and the pending Reviewer reassessment limit the full gate; no independent gap or blocker exists"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SYNCHRONIZING",
+        "cycle_mode": "STANDARD",
+        "recovery": "nested",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "synchronization"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "underspecified",
+          "detail": "The older frame's fields are not given; a coherent choice is the earlier Synchronizer corrective frame (From AWAITING_USER_SIGNOFF, Owner SYNCHRONIZING, ResumeAt AWAITING_USER_SIGNOFF, RerunThrough REVIEWING_IMPLEMENTATION) beneath the Developer frame."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "file: earlier correction evidence kept; judge the new revalidation, frame association, and limitation content"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "file: record IN_PROGRESS or BLOCKED; state: CompletionPolicy IMPLEMENTATION_REVIEWED"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "state: only the active frame popped, older frame unchanged, RESUME to REVIEWING_IMPLEMENTATION; judge the reply for readiness claims"
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 56,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "CompletionPolicy NONE; Active Work.Id guide-20261004T120000Z-1a2b3c4d",
+        "Auditor context, scope, technical coverage, a COMPLETE documentation record, and an independent COMPLETE final review identify the current content and checks",
+        "Every current AC has supporting evidence",
+        "No discrepancies, blockers, baseline reconciliation, recovery, or obligations exist",
+        "No development, verification, or implementation-review record exists for this cycle"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SYNCHRONIZING",
+        "cycle_mode": "DOCUMENTATION",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "review-final",
+          "documentation"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "check",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "file: no development, verification, or implementation-review record created; check reports any; judge that the record and reply demand none"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "check",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "file+check: the COMPLETE record mentions every current AC; judge that it copies no acceptance text or pass/fail ledger"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "check",
+            "reply"
+          ],
+          "deterministic_complete": true,
+          "note": "state: AWAITING_USER_SIGNOFF via FORWARD From SYNCHRONIZING, CompletionPolicy NONE, not SIGNED_OFF; check: readiness requirements; reply: user actions, no invocation line"
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 57,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "CompletionPolicy NONE; Active Work.Id guide-20261004T120000Z-1a2b3c4d",
+        "Final review assessed docs/usage.md at hash A",
+        "docs/usage.md is now at hash B with a changed command",
+        "The documentation record's checks still identify hash A; no assessment covers hash B"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SYNCHRONIZING",
+        "cycle_mode": "DOCUMENTATION",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "review-final",
+          "documentation"
+        ],
+        "code": "small",
+        "git": [
+          "committed",
+          "unstaged"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "ambiguous",
+          "detail": "The expected output says \"route the needed included owner\" without naming it; Documenter, whose evidence is stale, is the earliest owner, but the case does not say so."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "file: documentation record and final review unchanged; judge that the record does not apply hash A results to B. Fixture: both records name hash A; the working tree holds B"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "file: D entries for stale documentation evidence and for final-review applicability; state: one FAILURE handoff to an included owner with a frame; judge the chosen owner and saved route"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "state: not AWAITING_USER_SIGNOFF; file: record not COMPLETE, documentation record and final review unchanged"
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 58,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "CompletionPolicy NONE; Active Work.Id guide-20261004T120000Z-1a2b3c4d",
+        "Active frame: From REVIEWING_FINAL, Owner SYNCHRONIZING, FailureType SYNCHRONIZATION, ResumeAt REVIEWING_FINAL, RerunThrough NONE",
+        "A mistaken reference in the synchronization record has been corrected and can be verified with current evidence",
+        "Final Reviewer is waiting to reassess the correction; that and the preserved route's unfinished review are the only full-gate gaps",
+        "No independent defect or blocker exists"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SYNCHRONIZING",
+        "cycle_mode": "DOCUMENTATION",
+        "recovery": "nested",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "review-final",
+          "documentation",
+          "synchronization"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "underspecified",
+          "detail": "Final review can examine an existing synchronization record only after recovery returns to it, so one frame is unreachable: build an outer REVIEW frame (From SYNCHRONIZING, Owner REVIEWING_FINAL, ResumeAt SYNCHRONIZING, RerunThrough NONE) under the stated Synchronizer frame."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "file: record names the Reviewer dependency; judge that it gives owner, required evidence, and when reconciliation resumes"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "reply"
+          ],
+          "deterministic_complete": true,
+          "note": "state: RESUME From SYNCHRONIZING to REVIEWING_FINAL, active frame popped, outer frame kept; reply: Reviewer line with FINAL_DELIVERABLE and fresh-chat prefix"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "check",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "file: no development, verification, or implementation-review record; check reports any; judge the record's wording"
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 59,
+      "utterance": "Use the shorter-standard corrective-rerun exception and hand this back to final review.",
+      "grader_only_facts": [
+        "CompletionPolicy NONE; Active Work.Id guide-20261004T120000Z-1a2b3c4d",
+        "Only frame: From REVIEWING_FINAL, Owner DOCUMENTING, FailureType DOCUMENTATION, ResumeAt REVIEWING_FINAL, RerunThrough SYNCHRONIZING; Synchronizer is a downstream rerun and does not own it",
+        "Final review is incomplete, so the full synchronization gate cannot pass"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SYNCHRONIZING",
+        "cycle_mode": "DOCUMENTATION",
+        "recovery": "one-frame",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "review-final",
+          "documentation",
+          "synchronization"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "ambiguous",
+          "detail": "\"Resolve the missing required assessment through canonical included ownership\" does not say whether to keep the record blocked, push a nested REVIEW frame to REVIEWING_FINAL, or route the Documenter's rerun plan back, so only the negative assertions are decidable."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "state: no pop and no RESUME to REVIEWING_FINAL on the incomplete gate; file: record not COMPLETE; judge that the record and reply decline the exception for DOCUMENTATION"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "state: the Documenter frame unchanged; file: record not COMPLETE"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "check",
+            "reply"
+          ],
+          "deterministic_complete": true,
+          "note": "state: never REVIEWING_IMPLEMENTATION or AWAITING_USER_SIGNOFF; check: DOCUMENTATION states and frames; reply: no IMPLEMENTATION review kind"
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 60,
+      "utterance": "I've read the guide and accept it. Please sign off.",
+      "grader_only_facts": [
+        "CompletionPolicy NONE; Active Work.Id guide-20261004T120000Z-1a2b3c4d",
+        "All six included roles passed their full gates and their records apply to the unchanged current files",
+        "Recovery and outstanding obligations are inactive; Development, PromotionReason, PendingVerificationCadence, BaselineReconciliation, and BlockedOn are NONE"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "AWAITING_USER_SIGNOFF",
+        "cycle_mode": "DOCUMENTATION",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "review-final",
+          "documentation",
+          "synchronization"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "state: SIGNED_OFF reached; file: no development, verification, or implementation-review record created"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "file",
+            "check"
+          ],
+          "deterministic_complete": true,
+          "note": "state: SIGNED_OFF, CycleMode UNSET, Handoff SIGNOFF From AWAITING_USER_SIGNOFF FailureType NONE, CompletionPolicy NONE, recovery inactive; file: cycle records unchanged; check passes"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "final review report and MODE.md unchanged; no new review record"
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 61,
+      "utterance": "Looks good to me. Sign off.",
+      "grader_only_facts": [
+        "CompletionPolicy NONE; Active Work.Id guide-20261004T120000Z-1a2b3c4d",
+        "The saved guide changed materially after final review and synchronization",
+        "No reassessment covers the current guide"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "AWAITING_USER_SIGNOFF",
+        "cycle_mode": "DOCUMENTATION",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "review-final",
+          "documentation",
+          "synchronization"
+        ],
+        "code": "small",
+        "git": [
+          "committed",
+          "unstaged"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "ambiguous",
+          "detail": "Does not say whether the run should push owner-directed recovery itself (a DOCUMENTATION failure from AWAITING_USER_SIGNOFF to DOCUMENTING) or only withhold sign-off and explain, which changes how assertion 1 is graded."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": "WorkflowState not SIGNED_OFF and CycleMode still DOCUMENTATION"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "file: final review, synchronization, and documentation records unchanged; state: any pushed frame's Reason names the changed guide; judge the reply's account of the discrepancy and affected assessments"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "file",
+            "check"
+          ],
+          "deterministic_complete": true,
+          "note": "state: no DEVELOPING, TESTING, or REVIEWING_IMPLEMENTATION and any failure targets an included owner; file: final review unchanged, no new review or implementation record; check passes"
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 62,
+      "utterance": "Cancel this cycle. Then start a new documentation-only cycle to document the existing `validate` command.",
+      "grader_only_facts": [
+        "CompletionPolicy NONE; Active Work.Id guide-20261004T120000Z-1a2b3c4d",
+        "This cycle's guide edits remain in the working tree",
+        "The user does not ask to revert the edits or confirm that the cycle left no changes",
+        "`validate` is an existing command with no usage guide (fixture's choice of the other command)"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "DOCUMENTING",
+        "cycle_mode": "DOCUMENTATION",
+        "recovery": "one-frame",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "documentation"
+        ],
+        "code": "small",
+        "git": [
+          "committed",
+          "unstaged"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "ambiguous",
+          "detail": "Synchronizer, not Documenter, is invoked, so Standalone Documenter entry does not apply and the new cycle is DOCUMENTATION only if the user's words choose it; the utterance states that choice."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "file",
+            "trace"
+          ],
+          "deterministic_complete": true,
+          "note": "trace: a STATE.md write with CANCELLED, CycleMode UNSET, Handoff CANCEL From DOCUMENTING, and recovery cleared, before `cycle.mjs new`; state: final Handoff NEW_CYCLE From CANCELLED, recovery inactive; file: guide bytes unchanged. Fixture: the case states no recovery, so plant an active frame (for example From REVIEWING_FINAL, Owner DOCUMENTING) or the recovery part is vacuous"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "file",
+            "check",
+            "trace"
+          ],
+          "deterministic_complete": true,
+          "note": "state: new Active Work.Id differs from the old one, and BaselineReconciliation lists the old ID as SourceCycle with its Request; check: generated ID form and baseline format; trace: `cycle.mjs new` runs; file: the cancelled cycle's records unchanged"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "file",
+            "reply"
+          ],
+          "deterministic_complete": true,
+          "note": "state: WorkflowState AUDITING, CycleMode DOCUMENTATION (never EXPEDITED), CompletionPolicy NONE, BaselineReconciliation not NONE; file: CONTEXT.md unchanged and no scope created; reply: Auditor invocation line"
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
     }
   ],
   "summary": {

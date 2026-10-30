@@ -355,6 +355,471 @@
         {"i": 2, "graders": ["file"], "deterministic_complete": true, "note": "docs/architecture.md does not start with a STANDARDS block"},
         {"i": 3, "graders": ["state", "check", "reply"], "deterministic_complete": true, "note": "DEVELOPING, check clean, Developer invocation"}
       ]
+    },
+    {
+      "id": 12,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Auditor context is current for this cycle, and current source plus the CLI's help output establish the existing arguments and error messages AC-001 needs.",
+        "Neither AC needs implementation or formal testing; AC-002 (the analyst guide) depends on Documenter-owned work."
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "ARCHITECTING",
+        "cycle_mode": "DOCUMENTATION",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "context"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "The CLI's runtime (for example Python) so its --help output can be produced offline; reading the argument parser in source is an acceptable alternative.",
+      "issues": [
+        {
+          "kind": "ambiguous",
+          "detail": "Assertion 1 is permissive ('may'): it fails only when AC-002 is unaccounted for or given a no-architectural-impact disposition not tied to Documenter work, so non-invented technical coverage for the guide also passes."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "trace: modes/documentation.md read (other mode files at most their metadata blocks); file: the design cites at least one existing CLI source path or help command; judge: each documented argument and error has concrete evidence. Fixture: Active Work.Id guide-20261004T120000Z-1a2b3c4d, CompletionPolicy NONE, Architecture, Development, and BlockedOn NONE"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "check",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "check after the handoff reports no uncovered AC; file: AC-002 has an Acceptance Coverage line; judge: a no-architectural-impact disposition must name Documenter work, and technical coverage must not be invented (see issues)"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "state: WorkflowState not DEVELOPING and Development NONE (expected DOCUMENTING via FORWARD from ARCHITECTING); file: no ## Build Plan heading in the design, project source and tests unchanged; judge: no behavior redesign or formal-test claim"
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 13,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "docs/architecture.md is the appropriate unmarked canonical design for this cycle.",
+        "Its acceptance coverage and technical acceptance criteria belong to a previous cycle; its system-design sections are still accurate."
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "ARCHITECTING",
+        "cycle_mode": "DOCUMENTATION",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "context"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "prompt-leaks-answer",
+          "detail": "'docs/architecture.md is the appropriate unmarked canonical design' settles the design-location choice SKILL.md Ownership leaves to Architect; moved to grader_only_facts."
+        },
+        {
+          "kind": "ambiguous",
+          "detail": "SKILL.md Ownership says an appropriate unmarked document 'may remain' canonical, so a new .standards/docs/specs record is also legal; the fixture must make docs/architecture.md the evident home (for example via project instructions or the README) or assertions 1 and 2 can fail a correct run."
+        },
+        {
+          "kind": "underspecified",
+          "detail": "The prompt does not say docs/architecture.md holds a previous-cycle implementation plan; the fixture must include one or the second half of assertion 2 is vacuous."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "docs/architecture.md does not start with a STANDARDS provenance block after the run"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "file",
+            "check",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "precondition: Active Work.Architecture is docs/architecture.md; file: ## Previous Cycles is the last H2 and holds the earlier coverage text; check flags an earlier AC ID left above it when the current scope does not define it, so give the earlier coverage at least one such ID; judge: moved content unchanged and current ACs given current dispositions"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "file: established design sections survive (the diff removes no design content beyond the coverage move); judge: the historical Build Plan is not turned into current-cycle work"
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 14,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Current source does not enforce the cache lifetime the scope asks the documentation to state as guaranteed.",
+        "Guaranteeing that lifetime needs Developer work, which the DOCUMENTATION cycle omits; the user has not revised the request."
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "ARCHITECTING",
+        "cycle_mode": "DOCUMENTATION",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "context"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "prompt-leaks-answer",
+          "detail": "'current source does not enforce it' and 'Guaranteeing it needs Developer work' give the finding and the omitted-owner classification Architect must reach; moved to grader_only_facts."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "file: project source unchanged and any design record has no ## Build Plan; judge: no implementation design and no claim that the lifetime is guaranteed today"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": "Active Work.Request unchanged; Recovery inactive with no frames; CycleMode DOCUMENTATION; PromotionReason NONE; WorkflowState not DEVELOPING. Fixture: CONTEXT.md must not claim the lifetime is enforced and the scope must state the guarantee plainly, so neither a PROJECT_CONTEXT nor a SCOPING route is correct"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "state: BlockedOn not NONE; judge: it names the choice between keeping an achievable documentation-only scope and explicitly cancelling for a separate implementation cycle, with the evidence"
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 15,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Updated Auditor context corrects the output format that the existing design still documents.",
+        "The scope gained a new current AC after the design was written; an AC it replaced is retired.",
+        "The active recovery frame is Owner AUDITING with RerunThrough SYNCHRONIZING, over older frames."
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "ARCHITECTING",
+        "cycle_mode": "DOCUMENTATION",
+        "recovery": "nested",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "documentation",
+          "review-final",
+          "synchronization"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "underspecified",
+          "detail": "The prompt gives no From/ResumeAt for the Auditor frame or the older frames, and a frame from AWAITING_USER_SIGNOFF (the natural source of a rerun through SYNCHRONIZING) cannot sit on older frames; the fixture must build a check-valid DOCUMENTATION stack whose active frame is Owner AUDITING with RerunThrough SYNCHRONIZING and ARCHITECTING between them."
+        },
+        {
+          "kind": "underspecified",
+          "detail": "Assertion 0 refers to retired IDs but the prompt mentions only a new AC; the fixture must retire an AC the existing design covers or that half is vacuous."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "check",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "check after the handoff reports no uncovered current AC, including the new one; file: the stale output-format statement is gone and the retired ID is absent from Acceptance Coverage and Technical Acceptance Criteria; judge: current source and context now ground the output facts"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": "every frame byte-identical before and after; the active frame is still Owner AUDITING with RerunThrough SYNCHRONIZING"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "WorkflowState an included DOCUMENTATION state (expected DOCUMENTING via FORWARD from ARCHITECTING), never DEVELOPING, TESTING, or REVIEWING_IMPLEMENTATION; Development NONE; no development record; no current ## Build Plan in the design"
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 17,
+      "utterance": "Give me the handoff for the next role.",
+      "grader_only_facts": [
+        "Active Work.Request and the scope explicitly ask for STEPWISE collaboration.",
+        "No development plan exists, so discovery reports the saved collaboration mode and the style lock as unknown.",
+        "Developer user styles alice.md and tony.md exist."
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "DEVELOPING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "user-style"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "S"
+      },
+      "needs_history": false,
+      "history_note": "The first handoff is persisted (Handoff FORWARD from ARCHITECTING, Development NONE); a fresh session asked only for the message needs no seeded turns.",
+      "client_specific": "claude",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "reply: '/developer Continue the active workflow from `.standards/STATE.md`. ...' base line with nothing appended; judge: AUTONOMOUS is not presented as selected or in force, and the STEPWISE intent is not overridden"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "permissive: omitting the choices passes; fails only if the AUTONOMOUS default (defaultForNew) is shown as already selected"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "reply: no 'Use user style ...' offered as a confirmed choice; judge: style eligibility is left unresolved for Developer, with alice and tony at most named as inventory"
+        },
+        {
+          "i": 3,
+          "graders": [
+            "state",
+            "file",
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "state and files unchanged, no development plan created; reply: no invocation.mjs or other command for the user to run; judge: no added confirmation question and no Developer work"
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 18,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Neither the user nor the scope names a language, framework, database, or hosting platform, so foundational technology choices are open."
+      ],
+      "fixture": {
+        "project_mode": "GREENFIELD",
+        "workflow_state": "ARCHITECTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope"
+        ],
+        "code": "none",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "S"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "trace"
+          ],
+          "deterministic_complete": true,
+          "note": "modes/foundation.md and references/default-stack.md read; no other mode file read in full (metadata-block reads for discovery are allowed)"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "file: the Decision section names FastAPI, PostgreSQL, a migration tool, and GitHub Actions; judge: an auth approach and a deployment target (Railway or another justified one) are recorded as decisions with brief rationale. Fixture: no manifest, code, project instructions, or architect project reference may name a stack"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "no keyword check: Redis, pgvector, or a repository layer may appear as rejected alternatives; fail only if one is adopted without an AC that needs it"
+        },
+        {
+          "i": 3,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "file: every path named in the Build Plan is marked CREATE or CANDIDATE (the repo has no existing paths to MODIFY or DELETE); judge: steps follow dependency order"
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 19,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Valid Auditor context records an established Django REST Framework service on MySQL deployed to AWS ECS; the bulk-import endpoint is a bounded FEATURE design."
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "ARCHITECTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "context"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "ambiguous",
+          "detail": "'other default-stack components' also covers tools a Django service may legitimately use or add (Redis as a Celery broker, pytest, GitHub Actions), so the fixture's context should record the established queue, test, and CI tooling and the judge should fail only a stack replacement or a migration toward the defaults."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "file: the design names Django REST Framework, MySQL, and ECS; judge: they are treated as established constraints the endpoint builds on. Fixture: settings, requirements, and an ECS task definition must match the context"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "a mention as a rejected alternative is allowed; see issues for tooling a Django service may already share with the default stack"
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
     }
   ],
   "summary": {

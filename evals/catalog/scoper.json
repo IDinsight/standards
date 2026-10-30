@@ -1570,6 +1570,572 @@
           "note": ""
         }
       ]
+    },
+    {
+      "id": 21,
+      "utterance": "Build a small web app where our field coordinators log daily household visit counts and see a weekly total per district. Finish the cycle after implementation review; we don't need any project documentation for this.",
+      "grader_only_facts": [
+        "No cycle is active: installed GREENFIELD state with Active Work.Id and Request UNSET, CycleMode UNSET, CompletionPolicy NONE",
+        "PendingCycleMode UNSET; no pending cycle request"
+      ],
+      "fixture": {
+        "project_mode": "GREENFIELD",
+        "workflow_state": "SCOPING",
+        "cycle_mode": "UNSET",
+        "recovery": "none",
+        "records": [],
+        "code": "none",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "S"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "ambiguous",
+          "detail": "Scoper initializes the cycle and then scopes in the same run (SKILL.md Inputs), so the final Handoff may be FORWARD to ARCHITECTING, and \"the initial handoff remains INITIAL\" is then visible only in the initialization write."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "check",
+            "trace"
+          ],
+          "deterministic_complete": true,
+          "note": "trace: `cycle.mjs new` runs and the initialization write records Handoff INITIAL From NONE; check: Active Work.Id has the generated form; state: Handoff stays INITIAL unless scoping completes (then FORWARD From SCOPING)"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "state: CycleMode STANDARD, CompletionPolicy IMPLEMENTATION_REVIEWED, Request keeps the choice and reason apart from the product request; judge that the reply and Request omit only documentation, final review, and synchronization"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "state: no sign-off state; file: any scope written has AC-NNN conditions; judge for acceptance waivers or advance sign-off claims"
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 22,
+      "utterance": "Add a date-range filter to the survey results export.",
+      "grader_only_facts": [
+        "The previous BROWNFIELD cycle ended SIGNED_OFF; CycleMode UNSET; Active Work keeps its CompletionPolicy IMPLEMENTATION_REVIEWED",
+        "The prior cycle's review reports keep their closure evidence and omitted-guarantee explanation",
+        "The user does not select a completion policy and does not invoke Auditor"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SIGNED_OFF",
+        "cycle_mode": "UNSET",
+        "recovery": "none",
+        "records": [
+          "context",
+          "other-cycle-records"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": "CompletionPolicy FULL_DELIVERABLE, not the retained IMPLEMENTATION_REVIEWED"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "the prior cycle's review reports, with their closure sections, and other records are byte-identical"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "file",
+            "check",
+            "trace",
+            "reply"
+          ],
+          "deterministic_complete": true,
+          "note": "state: Handoff NEW_CYCLE From SIGNED_OFF FailureType NONE, WorkflowState AUDITING, CycleMode STANDARD; check: new ID differs from the committed SIGNED_OFF ID; trace: `cycle.mjs new`; file: CONTEXT.md unchanged, no scope; reply: Auditor invocation line. Fixture: commit the SIGNED_OFF state"
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 23,
+      "utterance": "Add a CSV download of survey results to the admin page. Finish after implementation review; we don't need documentation or a final review for this one.",
+      "grader_only_facts": [
+        "No cycle is active (installed state with Active Work UNSET, or a terminal state); CycleMode UNSET",
+        "PendingCycleMode EXPEDITED; PendingCycleRequest UNSET; PendingCycleBlockedOn NONE",
+        "The user has not resolved the conflict or authorized replacing the saved mode preference"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "UNSPECIFIED",
+        "cycle_mode": "UNSET",
+        "recovery": "none",
+        "records": [],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "S"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": "WorkflowState, all of Active Work (Id, BlockedOn included), CycleMode UNSET, and PendingCycleMode EXPEDITED unchanged"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "state: PendingCycleRequest set and PendingCycleBlockedOn not NONE; judge that the request keeps the CSV request, the IMPLEMENTATION_REVIEWED choice, and its reason, and that the blocker names the EXPEDITED conflict"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "check"
+          ],
+          "deterministic_complete": true,
+          "note": "state: Active Work.Id unchanged, CycleMode UNSET, no field beyond the protocol's; check: STATE.md stays valid. Running `cycle.mjs new` alone changes no file and does not fail this"
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 24,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "CompletionPolicy NONE; Active Work.Id guide-20261004T120000Z-1a2b3c4d; Scope NONE; Handoff FORWARD From AUDITING",
+        "Active Work.Request: standalone Documenter entry; create a missing usage guide for analysts; target FILE docs/usage.md; collaboration GUIDED; user style concise; no other project edits",
+        "CONTEXT.md establishes the existing export CLI and the project's docs generation convention",
+        "docs/usage.md does not exist; .standards/user-styles/documenter/concise.md exists"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SCOPING",
+        "cycle_mode": "DOCUMENTATION",
+        "recovery": "none",
+        "records": [
+          "context",
+          "user-style"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "file: scope names analysts, docs/usage.md, the editing boundary, and the existing export CLI; judge completeness. Fixture: keep the docs convention compatible with editing only docs/usage.md (for example a generator that picks up every file under docs/)"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "file: no implementation work items, Tester report, or implementation-review dependency in the scope; judge"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "file",
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "state: Request keeps GUIDED, FILE docs/usage.md, and style concise; file: scope preserves them for Documenter; trace: Scoper does not read concise.md; judge that the scope is not written in that style. Fixture: make concise.md distinctive"
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 25,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "CompletionPolicy NONE; Active Work.Id guide-20261004T120000Z-1a2b3c4d; Scope NONE",
+        "Active Work.Request holds an explicit standalone Documenter assignment moved from PendingCycleRequest (for example: document how analysts run the export command)",
+        "Auditor context and the existing guide show the requested usage is already accurately documented"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SCOPING",
+        "cycle_mode": "DOCUMENTATION",
+        "recovery": "none",
+        "records": [
+          "context"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "check",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "file+check: current AC-NNN conditions defined; judge that they state accuracy and coverage the existing guide can meet without edits"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "check",
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "state: FORWARD SCOPING -> ARCHITECTING; check: DOCUMENTATION route; reply: Architect line; judge that nothing says final review or synchronization can be skipped"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "file: project source unchanged; judge that the scope adds no new behavior"
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 26,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "CompletionPolicy NONE; Active Work.Id guide-20261004T120000Z-1a2b3c4d",
+        "The scope holds current AC-001 (CSV usage) and AC-002 (audience), and retired AC-003",
+        "The user explicitly replaced the CSV instructions with instructions for the already-existing JSON output; the change is saved in Active Work.Request with a USER_REWORK frame to SCOPING",
+        "An older recovery frame is saved beneath that frame"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SCOPING",
+        "cycle_mode": "DOCUMENTATION",
+        "recovery": "nested",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "review-final",
+          "documentation"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "underspecified",
+          "detail": "Neither frame is described and it is unclear whether the replacement is already saved or arrives in this turn; a coherent choice is an outer REVIEW frame (From SYNCHRONIZING, Owner REVIEWING_FINAL) under a USER_REWORK SCOPING frame From REVIEWING_FINAL, with the change saved in Active Work.Request."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "check"
+          ],
+          "deterministic_complete": true,
+          "note": "AC-002 line unchanged; AC-001 under Retired Acceptance Identifiers; the JSON condition is AC-004 (from `id.mjs next AC`); check flags reuse or deletion"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "file",
+            "check"
+          ],
+          "deterministic_complete": true,
+          "note": "file+check: AC-003 still only under Retired; state: the older frame unchanged"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "check",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "state: the Scoper frame gets a documentation-route RerunThrough (DOCUMENTING with the suggested frames) and the next state is ARCHITECTING, never DEVELOPING or TESTING; check: DOCUMENTATION frame rules; judge that the reply or frame names the affected Architect, Documenter, final Reviewer, and Synchronizer work"
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 27,
+      "utterance": "Along with the API docs, also implement the missing `GET /reports/{id}/summary` endpoint before I sign off.",
+      "grader_only_facts": [
+        "CompletionPolicy NONE; Active Work.Id guide-20261004T120000Z-1a2b3c4d; Scope NONE",
+        "Active Work.Request: document the existing reports API",
+        "GET /reports/{id}/summary does not exist in the code",
+        "The user has not authorized cancellation or a revised documentation-only request"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SCOPING",
+        "cycle_mode": "DOCUMENTATION",
+        "recovery": "none",
+        "records": [
+          "context"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "state: BlockedOn names the endpoint and the omitted-owner decision; file: no scope presents the endpoint as existing; judge"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "check"
+          ],
+          "deterministic_complete": true,
+          "note": "CycleMode stays DOCUMENTATION, no DEVELOPING state or IMPLEMENTATION failure; check reports in-place conversion and omitted-owner routing"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "state: Request and recovery unchanged, BlockedOn set, still SCOPING; reply asks the question; judge that the options are a documentation-only scope or explicit cancellation for a separate implementation cycle. With no recovery in the fixture, only the request part is graded"
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 29,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Active Work.Scope NONE; recovery inactive",
+        "Active Work.Request: build the survey submission API at Level 3 so the field team can test it internally",
+        "CONTEXT.md shows an existing FastAPI service with no survey features"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SCOPING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "context"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "trace"
+          ],
+          "deterministic_complete": true,
+          "note": "trace: reads references/maturity-levels.md under the installed scoper skill; file: the Constraints section names Level 3"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "check",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "file+check: AC-NNN list items defined; judge that applicable Level 3 expectations (for example unauthenticated rejection, runnable from docs) are observable outcomes"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "judge: no new framework, library, or layering requirement (naming the existing FastAPI service as context is fine) and no frontend expectations"
+        },
+        {
+          "i": 3,
+          "graders": [
+            "state",
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "file: Non-goals lists Level 4 capabilities as deferred (judge wording); state: no level field added and only Scope and handoff change (the saved Request already says \"Level 3\")"
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 30,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Active Work.Scope NONE",
+        "Active Work.Request: put together a quick clickable mockup of the household registration flow to show the client next week; it will be thrown away"
+      ],
+      "fixture": {
+        "project_mode": "GREENFIELD",
+        "workflow_state": "SCOPING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [],
+        "code": "none",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "S"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "file",
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "file: Assumptions and Constraints name Level 1; state: BlockedOn NONE and FORWARD to ARCHITECTING; reply: Architect line; judge that the reply asks no maturity question"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "file: AC-NNN conditions exist; judge that they cover the clickable flow and a disposable-prototype label, and none requires persistence, authentication, or CI"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "file: Non-goals section exists; judge that it names real persistence, authentication, and automated tests"
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
     }
   ],
   "summary": {

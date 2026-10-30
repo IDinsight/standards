@@ -4196,6 +4196,979 @@
         }
       ],
       "catalog_note": "added for release 0.8.0 (incremental verification); written by the main session, not the original review agents"
+    },
+    {
+      "id": 58,
+      "utterance": "Change the completion policy to IMPLEMENTATION_REVIEWED.",
+      "grader_only_facts": [
+        "No normal documentation, final-review, or synchronization work has begun in this cycle."
+      ],
+      "fixture": {
+        "project_mode": "UNSPECIFIED",
+        "workflow_state": "TESTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "underspecified",
+          "detail": "Assertion 1 needs an earlier policy instruction in Active Work.Request to replace, but the prompt gives only the default FULL_DELIVERABLE, so the fixture must record an earlier explicit policy instruction (for example a withdrawal of IMPLEMENTATION_REVIEWED)."
+        },
+        {
+          "kind": "underspecified",
+          "detail": "At TESTING with a CHECKPOINT for Increment 2, full check.mjs reports 'The assigned checkpoint requires Assessment Purpose INCREMENT and target Increment 2' unless the verification report already targets Increment 2; the prompt does not say whether Tester began, so either open that Increment 2 assessment in the report (check-valid, preferred) or set expectCheck to that problem."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "state: WorkflowState TESTING, the whole Handoff (CHECKPOINT, From DEVELOPING, FailureType NONE, Reason naming Increment 2), PendingVerificationCadence, BlockedOn, Recovery, and Outstanding Obligations identical to the fixture; only CompletionPolicy and Request may change. file: plan (INCREMENTAL, Current Increment 2), verification report, scope, architecture, and CONTEXT.md unchanged."
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "state: CompletionPolicy IMPLEMENTATION_REVIEWED and the planted earlier policy instruction's text gone from Request; file: scope record unchanged (no AC edits); judge: Request keeps the implementation request and records the new choice as a workflow instruction."
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "file",
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "state: BlockedOn unchanged and no REVIEWING_* state; file: plan Status and step statuses unchanged, no verification-record or test edits; trace: no Tester or Reviewer skill loaded and no project tests run; judge: the reply does not present the switch as completion or as permission for another role to verify."
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 59,
+      "utterance": "Use IMPLEMENTATION_REVIEWED for this cycle.",
+      "grader_only_facts": [
+        "Nothing in the request requires an omitted standard guarantee, so the cycle does not need promotion, and the user has not authorized it."
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "DEVELOPING",
+        "cycle_mode": "EXPEDITED",
+        "recovery": "none",
+        "records": [
+          "development"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "underspecified",
+          "detail": "The plan's state is not given, and with an approved plan and pending steps an explicitly invoked Developer could legitimately keep implementing, so the fixture should hold a PROPOSED plan awaiting approval for 'leave the active cycle unchanged' to be gradable."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": "CycleMode EXPEDITED, WorkflowState DEVELOPING, PromotionReason NONE, and no PROMOTE handoff after the run."
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "state: CompletionPolicy NONE and Request has no added policy or closure-assessment instruction; file: no scope, architecture, verification, review, or documentation record created, and the PROPOSED plan unchanged."
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "state: no promotion recorded; judge: the reply explains the expedited path through implementation review to sign-off and presents promotion as a separate decision the user would have to authorize."
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 60,
+      "utterance": "Promote this cycle to the standard workflow and use IMPLEMENTATION_REVIEWED.",
+      "grader_only_facts": [],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "DEVELOPING",
+        "cycle_mode": "EXPEDITED",
+        "recovery": "one-frame",
+        "records": [
+          "development",
+          "review-implementation"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "check"
+          ],
+          "deterministic_complete": true,
+          "note": "state: same Id and Request; CycleMode STANDARD, WorkflowState AUDITING, CompletionPolicy FULL_DELIVERABLE, Handoff PROMOTE From DEVELOPING FailureType NONE, PromotionReason not NONE; Recovery Active false with no frames; Obligation 1 keeps the frame's Owner DEVELOPING, FailureType IMPLEMENTATION, and exact Reason. check: no STATE.md problem. Fixture: one frame From REVIEWING_IMPLEMENTATION, Owner DEVELOPING, ResumeAt REVIEWING_IMPLEMENTATION, RerunThrough NONE (the prompt omits WorkflowState; use DEVELOPING)."
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "state: CompletionPolicy FULL_DELIVERABLE after the run; judge: the reply says the outstanding obligation blocks the shorter policy now and that promotion did not satisfy it."
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "file",
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "state: no deferred IMPLEMENTATION_REVIEWED instruction added to Request; file: no project source, CONTEXT.md, or plan changes; trace: Auditor skill not loaded and no project tests run; judge: the reply does not promise to apply the shorter policy later."
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 61,
+      "utterance": "Keep us in DEVELOPING and switch to IMPLEMENTATION_REVIEWED so we can get past this correction.",
+      "grader_only_facts": [],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "DEVELOPING",
+        "cycle_mode": "STANDARD",
+        "recovery": "one-frame",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "underspecified",
+          "detail": "A STANDARD outstanding obligation exists only after Expedited Promotion (expedited.md Outstanding Obligations), and assertion 1 names a blocker and pending cadence the prompt never sets, so the fixture needs a promoted BROWNFIELD cycle (PromotionReason set), a BlockedOn, and a pending cadence, and must keep the correction from being finishable in this run (for example a PROPOSED corrective plan revision awaiting approval)."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "state: CompletionPolicy FULL_DELIVERABLE; judge: the reply names active recovery and the outstanding obligation as the unmet same-state boundary (user-decisions.md Change completion policy step 2)."
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": "Recovery frame, Outstanding Obligations entries, BlockedOn, and PendingVerificationCadence identical to the fixture. Fixture: frame From TESTING, Owner DEVELOPING, FailureType IMPLEMENTATION, ResumeAt TESTING, RerunThrough NONE; one DEVELOPING obligation from promotion."
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "state: Request has no queued policy instruction; judge: the reply does not treat the policy as discharging the correction or promise to switch once it is done."
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 63,
+      "utterance": "Give me the handoff to Tester.",
+      "grader_only_facts": [
+        "Apart from the malformed Tester mode metadata, all workflow handoff evidence is valid."
+      ],
+      "fixture": {
+        "project_mode": "UNSPECIFIED",
+        "workflow_state": "TESTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "Assertion 2 refers to the implementation chat; a fresh Developer session suffices because the prefix and the no-assessment rule apply either way.",
+      "client_specific": "claude",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "reply"
+          ],
+          "deterministic_complete": true,
+          "note": "state: WorkflowState TESTING and Handoff unchanged; reply: the Tester independent-session prefix plus the `/tester Continue the active workflow from ...` line. Fixture: a post-install layer breaks the metadata JSON in one .claude/skills/tester/modes/*.md (helper catalogStatus unavailable); check.mjs does not scan client skill folders, so the starting check stays ok."
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "file: nothing changed under .claude/skills/ or .standards/bin/ and no catalog or registry file created; reply: no `node ` command for the user to run; judge: no mode or style list presented as current options, only a brief note that options could not be verified."
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "trace",
+            "reply"
+          ],
+          "deterministic_complete": true,
+          "note": "reply: the base line keeps 'Read the persisted Active Work, relevant project context and owned artifacts, and recovery context'; trace: Tester skill not loaded and no project tests run; file: no verification record created."
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 64,
+      "utterance": "use tony.md.md for this plan; I will review the updated plan before approving it.",
+      "grader_only_facts": [],
+      "fixture": {
+        "project_mode": "UNSPECIFIED",
+        "workflow_state": "DEVELOPING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "user-style"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "prompt-leaks-answer",
+          "detail": "'Make only the requested style-selection update.' states assertion 3's no-implementation boundary; kept out of the utterance."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "plan header User Style `tony.md.md`."
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "file: same as assertion 0; judge: if the reply names the display identifier tony.md, it does not offer it as the selector. Largely overlaps assertion 0."
+        },
+        {
+          "i": 2,
+          "graders": [
+            "trace"
+          ],
+          "deterministic_complete": true,
+          "note": "No read of .standards/user-styles/developer/tony.md contents (listing the folder is fine; match the exact path, since tony.md.md contains it), and among Developer style files only universal.md and the plan's technology styles. Fixture: the two style files hold different preferences."
+        },
+        {
+          "i": 3,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "plan Status PROPOSED and User Style Locked false; BlockedOn still the approval request; no project source changes."
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 65,
+      "utterance": "I approve the current plan and its saved style selection; implement the first approved step.",
+      "grader_only_facts": [
+        "Required upstream work is complete and the implementation sufficiency gate passes; no upstream defect exists."
+      ],
+      "fixture": {
+        "project_mode": "UNSPECIFIED",
+        "workflow_state": "DEVELOPING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "user-style"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "Offline toolchain (for example Python and pytest) so DEV-001's self-check runs.",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "trace"
+          ],
+          "deterministic_complete": true,
+          "note": "trace: reads .standards/user-styles/developer/tony.md.md; file: DEV-001 implemented, so the run did not stop to ask for the style."
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "trace"
+          ],
+          "deterministic_complete": true,
+          "note": "header Status APPROVED or IN_PROGRESS, User Style Locked true, User Style tony.md.md; trace: that plan edit precedes the first project-source edit."
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "trace"
+          ],
+          "deterministic_complete": true,
+          "note": "no plan write ever sets User Style to tony.md; no read of .standards/user-styles/developer/tony.md contents (exact path)."
+        },
+        {
+          "i": 3,
+          "graders": [
+            "state",
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "file: only DEV-001 DONE, later steps PENDING, Mode STEPWISE, no verification record; state: WorkflowState DEVELOPING with BlockedOn asking to continue to the next step; judge: the rest of 'approval and verification obligations'. Fixture: at least two DEV steps."
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 66,
+      "utterance": "switch collaboration to CODE_WITH_ME, use the tony.md.md style again, and show me the revised plan before I decide whether to approve it.",
+      "grader_only_facts": [],
+      "fixture": {
+        "project_mode": "UNSPECIFIED",
+        "workflow_state": "DEVELOPING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "user-style"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "file",
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "file: User Style unchanged; trace: reloads tony.md.md; state: BlockedOn is the plan-approval request, not a continue-or-new-cycle choice; judge: the reply does not treat the repeated selector as a style change that needs a new cycle."
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "header User Style tony.md.md, User Style Locked true, Status PROPOSED, Mode CODE_WITH_ME."
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "User Style is exactly tony.md.md at the end (not tony.md, NONE, or another style)."
+        },
+        {
+          "i": 3,
+          "graders": [
+            "state",
+            "file",
+            "check"
+          ],
+          "deterministic_complete": true,
+          "note": "state: same Active Work.Id and Development path, BlockedOn the approval request; file: same plan file with its provenance and DEV-NNN identities and statuses, no other development record, no project source changes; check: ok."
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 67,
+      "utterance": "use <formal>.md for this plan and show me the updated plan before I approve it. Also explain how I could select the team | compact style.",
+      "grader_only_facts": [],
+      "fixture": {
+        "project_mode": "UNSPECIFIED",
+        "workflow_state": "DEVELOPING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "user-style"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "plan header User Style `<formal>.md`. Fixture: literal files `<formal>.md`, `team | compact.md`, and `tony.md` in .standards/user-styles/developer/."
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "check"
+          ],
+          "deterministic_complete": true,
+          "note": "check: no unfilled-header problem for User Style; file: .standards/bin/** and other framework files unchanged, and `node .standards/bin/invocation.mjs developer --json` on the final files reports the saved style as `<formal>.md`."
+        },
+        {
+          "i": 2,
+          "graders": [
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "reply: no copy/paste selection of `team | compact` or `team | compact.md`; judge: the reply names a record-syntax limitation, not ambiguity."
+        },
+        {
+          "i": 3,
+          "graders": [
+            "file",
+            "trace"
+          ],
+          "deterministic_complete": true,
+          "note": "file: the three style files exist unchanged under their names; trace: no read of `team | compact.md` or `tony.md` contents (listing is fine)."
+        },
+        {
+          "i": 4,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "plan Status PROPOSED and User Style Locked false; BlockedOn the approval request; no project source changes."
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 68,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "The design fully specifies the endpoint, the owner check, and pagination; no upstream defect exists."
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "DEVELOPING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "Python with FastAPI, SQLModel, pytest, ruff, and mypy installed offline so the self-checks run.",
+      "issues": [
+        {
+          "kind": "underspecified",
+          "detail": "Collaboration mode and DEV-001's status are not given, and a plan whose next step is DEV-002 should be IN_PROGRESS if DEV-001 is DONE, so make DEV-002 the last pending step (or use STEPWISE) so the run's work is DEV-002."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "trace"
+          ],
+          "deterministic_complete": true,
+          "note": "reads styles/fastapi.md, python.md, and sql.md under the installed developer skill. Fixture: the endpoint needs a new query over responses."
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "file: no HTTPException in the service module, and the route uses the project's existing auth dependency; judge: ownership checked server-side against the authenticated user, not a client-supplied ID. Fixture: an existing auth dependency and an owner field on surveys."
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "file: page-size parameter with a validated maximum (for example Query(le=...)); judge: one query or a batched load rather than per-item queries."
+        },
+        {
+          "i": 3,
+          "graders": [
+            "file",
+            "trace"
+          ],
+          "deterministic_complete": true,
+          "note": "trace: the established pytest, ruff, and mypy commands run; file: nothing added or changed under the tests directory. Fixture: the commands are named in CONTEXT.md or the project config."
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 69,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "A lint job alone satisfies DEV-001; no deployment, scanning, or branch-protection change is needed."
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "DEVELOPING",
+        "cycle_mode": "EXPEDITED",
+        "recovery": "none",
+        "records": [
+          "development"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "Resolving a full commit SHA for a newly added action needs GitHub access; offline, a run can only pin a SHA it can verify or report the pin as unverified.",
+      "issues": [
+        {
+          "kind": "ambiguous",
+          "detail": "The existing job's `actions/checkout@v4` may read as established tag-pinning practice, so it is unclear whether the new job's checkout counts as a 'newly added third-party action' that needs a SHA (styles/github-actions.md says to follow the existing pinning policy first)."
+        },
+        {
+          "kind": "underspecified",
+          "detail": "expected_output requires superseded-run cancellation (a concurrency group), but no assertion checks it."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "trace"
+          ],
+          "deterministic_complete": true,
+          "note": "reads styles/github-actions.md under the installed developer skill."
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "parsed .github/workflows/ci.yml: a permissions block (workflow or job level) with only read or none scopes covering the new job, and timeout-minutes on the new job."
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "file: each action reference new in the diff uses a 40-hex SHA with a version comment, and existing steps are unchanged; judge: whether the SHA is genuine or reported as unverified, and the checkout question in issues."
+        },
+        {
+          "i": 3,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "the diff adds only the lint job (plus permissions and concurrency), with no deploy job, new scanner, or branch-protection file. Vacuous unless something tempts it."
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 71,
+      "utterance": "help",
+      "grader_only_facts": [],
+      "fixture": {
+        "project_mode": "UNSPECIFIED",
+        "workflow_state": "TESTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "user-style"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "claude",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "trace",
+            "reply"
+          ],
+          "deterministic_complete": true,
+          "note": "trace: `node .standards/bin/invocation.mjs developer --client claude` (with --json) runs; reply: AUTONOMOUS, CODE_WITH_ME, and STEPWISE each appear, with `/developer ` examples and no `$developer`."
+        },
+        {
+          "i": 1,
+          "graders": [
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "reply: tony and a lock statement present, with no `Use user style alice` or `Use user style NONE` suggestion; judge: alice at most listed as inventory. Fixture: plan Mode STEPWISE, User Style tony, Locked true; alice.md and tony.md in .standards/user-styles/developer/."
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "trace: no check.mjs, no project tests, and no reads of user-style contents; file: no changes; judge: any 'if invoked now' note names Tester, not Developer, as owner of TESTING."
+        },
+        {
+          "i": 3,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "git status clean."
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 72,
+      "utterance": "Propose the development plan.",
+      "grader_only_facts": [
+        "internal-auth.md matches the token-refresh work; data-platform.md does not."
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "DEVELOPING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "trace: each file in .standards/project-references/developer/ opened at least through its Read when line (grep, head, or a bounded Read); judge: no question asking the user which reference to use. Fixture: the design names neither reference, so loading depends only on the Read when match."
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "trace: internal-auth.md read in full; file: the plan's auth-client and token steps reflect its guidance; judge: applied appropriately. Fixture: internal-auth.md holds concrete, checkable conventions."
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "trace: data-platform.md read no further than its opening lines; file: the plan shows none of its guidance; judge: borderline bounded reads. Fixture: the Read when line directly after the title and distinctive guidance well below it."
+        },
+        {
+          "i": 3,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "Plan Notes list .standards/project-references/developer/internal-auth.md and do not list data-platform.md."
+        },
+        {
+          "i": 4,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "plan Status PROPOSED and User Style Locked false; BlockedOn a Developer-plan approval request; WorkflowState DEVELOPING; no project source or architecture-record changes."
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+    },
+    {
+      "id": 73,
+      "utterance": "Propose the development plan.",
+      "grader_only_facts": [
+        "The completed design leaves the durable retry mechanism unresolved; it is consequential architecture owned by Architect, and the project reference does not settle it."
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "DEVELOPING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "trace"
+          ],
+          "deterministic_complete": true,
+          "note": "reads .standards/project-references/developer/background-jobs.md in full after its Read when line."
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "state: an ARCHITECTURE failure is recorded; judge: the reasoning treats the mechanism as consequential design that the reference does not settle."
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "file: no celery, redis, or other queue or broker dependency or import added, and no plan step naming one; judge: other queue or broker forms."
+        },
+        {
+          "i": 3,
+          "graders": [
+            "state",
+            "check",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "state: WorkflowState ARCHITECTING; Handoff FAILURE From DEVELOPING FailureType ARCHITECTURE; Recovery Active true with Frame 1 From DEVELOPING, Owner ARCHITECTING, FailureType ARCHITECTURE, ResumeAt DEVELOPING, RerunThrough NONE; check: ok; judge: the reply does not ask the user to pick the mechanism."
+        },
+        {
+          "i": 4,
+          "graders": [
+            "state",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "state: Handoff and frame Reason text; judge: any mention of Celery or Redis is framed as the team reference for Architect to weigh, not as a design decision. Passes trivially when not mentioned."
+        }
+      ],
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
     }
   ],
   "summary": {
