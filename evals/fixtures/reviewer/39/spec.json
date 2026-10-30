@@ -1,0 +1,322 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-core",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add record store and CSV helpers"
+    },
+    {
+      "dir": "layers/52-transfer",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add CSV import and export over a shared transfer helper"
+    },
+    {
+      "dir": "layers/60-context",
+      "action": "commit",
+      "message": "Record project context for export timeout"
+    },
+    {
+      "dir": "layers/61-scope",
+      "action": "commit",
+      "message": "Define export timeout scope"
+    },
+    {
+      "dir": "layers/62-design",
+      "action": "commit",
+      "message": "Design export timeout"
+    },
+    {
+      "dir": "layers/63-plan",
+      "action": "commit",
+      "message": "Plan export timeout implementation"
+    },
+    {
+      "dir": "layers/64-impl",
+      "action": "commit",
+      "message": "Add timeout to export transfers"
+    },
+    {
+      "dir": "layers/65-complete",
+      "action": "commit",
+      "message": "Mark export timeout plan complete"
+    },
+    {
+      "dir": "layers/66-tests",
+      "action": "commit",
+      "message": "Add export timeout tests"
+    },
+    {
+      "dir": "layers/67-verification",
+      "action": "commit",
+      "message": "Record export timeout verification"
+    },
+    {
+      "dir": "layers/68-review",
+      "action": "commit",
+      "message": "Record implementation review findings"
+    },
+    {
+      "dir": "layers/69-fix",
+      "action": "commit",
+      "message": "Destroy transfer streams when a timeout fires"
+    },
+    {
+      "dir": "layers/70-plan-fix",
+      "action": "commit",
+      "message": "Record transfer cleanup correction"
+    },
+    {
+      "dir": "layers/71-retest",
+      "action": "commit",
+      "message": "Add stream cleanup and slow import tests"
+    },
+    {
+      "dir": "layers/72-reverify",
+      "action": "commit",
+      "message": "Record export timeout reverification"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "reviewer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "Developer's cleanup fix in src/io/transfer.js is correct: on timeout it aborts the pipeline through an AbortSignal, which destroys both the source and the destination stream, rejects with TransferTimeoutError, and clears the timer in finally; the no-timeout path is still a plain pipeline(source, destination).",
+    "Re-running F-002's original failure case (non-ending source, stalled destination, timeoutMs 20) against the current src/io/transfer.js now prints source.destroyed true and destination.destroyed true; against the transfer.js of commit 'Add timeout to export transfers' it prints false for both.",
+    "Tester reverified the original timeout and the shared import/export boundaries: npm test passes 15 tests at HEAD, including the new stream-teardown test and a slow-source import test; the verification record is a COMPLETE FULL REVERIFY assessment citing the fix commit.",
+    "src/import.js, src/csv.js, and src/store.js are unchanged since the pre-cycle commit; src/export.js is unchanged since 'Add timeout to export transfers'.",
+    "F-001 in the review report was legitimately withdrawn (import timeouts are a scope non-goal and AC-003 keeps imports unchanged).",
+    "All other current obligations remain satisfied: AC-001, AC-002, and AC-003 have current evidence, there is no other material defect, no later-role dependency, no blocker, and no outstanding obligation; the correct outcome is a COMPLETE implementation review with F-002 RESOLVED and a FORWARD handoff to DOCUMENTING."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "export-20260924T090000Z-a7f3c1d2",
+    "REVIEW": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md",
+    "VERIFICATION": ".standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md",
+    "DEV": ".standards/docs/development/export-20260924T090000Z-a7f3c1d2.md",
+    "FIX_COMMIT": "${COMMIT:Destroy transfer streams when a timeout fires}"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "provenance": {
+            "path": "${REVIEW}",
+            "artifact": "REVIEW",
+            "cycle": "${ID}",
+            "kind": "IMPLEMENTATION"
+          },
+          "why": "the existing implementation review report keeps its provenance"
+        },
+        {
+          "contains": {
+            "path": "${REVIEW}",
+            "regex": "^### F-001\\b",
+            "flags": "m"
+          },
+          "why": "the withdrawn finding keeps its identity"
+        },
+        {
+          "contains": {
+            "path": "${REVIEW}",
+            "regex": "^### F-002\\b",
+            "flags": "m"
+          },
+          "why": "F-002 keeps its identity"
+        },
+        {
+          "contains": {
+            "path": "${REVIEW}",
+            "regex": "### F-002(?:(?!\\n#{2,3} )[\\s\\S])*?`Status`:\\s*`RESOLVED`"
+          },
+          "why": "F-002 is marked RESOLVED within its own entry"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "DOCUMENTING"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FORWARD"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "REVIEWING_IMPLEMENTATION"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "NONE"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "false"
+        },
+        {
+          "field": {
+            "path": "${REVIEW}",
+            "name": "Status",
+            "equals": "COMPLETE"
+          }
+        },
+        {
+          "reply_matches": "/documenter",
+          "why": "Claude Code next-role invocation for Documenter"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "Reviewer suggests commits but does not make them"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Reviewer must not change the assessed identity"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "package.json",
+        "README.md"
+      ],
+      "why": "Reviewer does not edit implementation, tests, or project documentation"
+    },
+    {
+      "unchanged": [
+        ".standards/CONTEXT.md",
+        ".standards/docs/scope/**",
+        ".standards/docs/specs/**",
+        ".standards/docs/development/**",
+        ".standards/docs/verification/**"
+      ],
+      "why": "Reviewer does not change other roles' records"
+    }
+  ],
+  "runtime": null,
+  "selfChecks": [
+    {
+      "cmd": "npm test",
+      "expect": "pass",
+      "why": "the established test command passes at HEAD"
+    },
+    {
+      "cmd": "npm test 2>&1 | grep -qE 'pass 15$'",
+      "expect": "pass",
+      "why": "15 tests run: 10 pre-cycle, 3 from the first Tester round, 2 from reverification"
+    },
+    {
+      "cmd": "d=$(mktemp -d) && c=$(git log --format=%H -1 --fixed-strings --grep='Add timeout to export transfers') && git show $c:src/io/transfer.js > $d/transfer.mjs && node --input-type=module -e \"import { transfer, TransferTimeoutError } from '$d/transfer.mjs'; import { Readable, Writable } from 'node:stream'; const s = new Readable({ read() {} }); s.push('id,title,owner'); const w = new Writable({ write() {} }); let e; try { await transfer(s, w, { timeoutMs: 20 }); } catch (x) { e = x; } if (!(e instanceof TransferTimeoutError) || s.destroyed || w.destroyed) process.exit(1); console.log('streams left open');\"",
+      "expect": "pass",
+      "why": "the original implementation reviewed in F-002 rejected on timeout but left both streams undestroyed"
+    },
+    {
+      "cmd": "node --input-type=module -e \"const { transfer, TransferTimeoutError } = await import('./src/io/transfer.js'); const { Readable, Writable } = await import('node:stream'); const s = new Readable({ read() {} }); s.push('id,title,owner'); const w = new Writable({ write() {} }); let e; try { await transfer(s, w, { timeoutMs: 20 }); } catch (x) { e = x; } if (!(e instanceof TransferTimeoutError) || !s.destroyed || !w.destroyed) process.exit(1); console.log('both destroyed');\"",
+      "expect": "pass",
+      "why": "the corrected transfer destroys both streams on the original failure case"
+    },
+    {
+      "cmd": "c=$(git log --format=%H -1 --fixed-strings --grep='Add CSV import and export over a shared transfer helper') && git diff --quiet $c HEAD -- src/import.js src/csv.js src/store.js && i=$(git log --format=%H -1 --fixed-strings --grep='Add timeout to export transfers') && git diff --quiet $i HEAD -- src/export.js",
+      "expect": "pass",
+      "why": "import and CSV code are unchanged by the cycle; export.js unchanged by the correction"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the state and records are valid"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && git diff --quiet HEAD",
+      "expect": "pass",
+      "why": "everything is committed"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `REVIEWING_IMPLEMENTATION` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Kind`: `RESUME` `From`: `TESTING` `FailureType`: `NONE`' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md && grep -q '^`PromotionReason`: `NONE` `AuditTarget`: `NONE` `BlockedOn`: `NONE`$' .standards/STATE.md && grep -q 'ProjectMode`: `BROWNFIELD' .standards/MODE.md",
+      "expect": "pass",
+      "why": "recovery returned to implementation review; no frames, obligations, or blockers"
+    },
+    {
+      "cmd": "f=.standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md && grep -q '`Status`: `BLOCKED`' $f && grep -A2 '^### F-002' $f | grep -q '`Status`: `OPEN`' && grep -A2 '^### F-001' $f | grep -q '`Status`: `WITHDRAWN`' && ! grep -qE 'COMMIT:|BLOB:' $f",
+      "expect": "pass",
+      "why": "the review report holds F-002 OPEN and F-001 WITHDRAWN"
+    },
+    {
+      "cmd": "f=.standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md && grep -q '`Mode`: `REVERIFY` `Status`: `COMPLETE`' $f && grep -q '`Assessment Purpose`: `FULL` `Assessment Target`: `NONE`' $f && grep -q $(git log --format=%H -1 --fixed-strings --grep='Destroy transfer streams when a timeout fires') $f && ! grep -qE 'COMMIT:|BLOB:|AWAITING_IMPLEMENTATION' $f && grep -q '`Status`: `COMPLETE`' .standards/docs/development/export-20260924T090000Z-a7f3c1d2.md",
+      "expect": "pass",
+      "why": "Tester's full reverification is COMPLETE and cites the fix commit; the plan is COMPLETE"
+    }
+  ],
+  "notes": "Standalone brownfield fixture (the export-* bases have no streams, timeouts, or import path, so F-002's timeout stream leak and the shared import/export boundary could not be planted there). Two pre-install commits build records-transfer: plain JS ESM, no dependencies, RecordStore, RFC 4180 csv helpers, and a shared transfer(source, destination) wrapping stream/promises pipeline used by importRecords and exportRecords. Post-install commits walk cycle export-20260924T090000Z-a7f3c1d2 through the brownfield order: 60 context (SCOPING), 61 scope with AC-001 (timeout error, caller-set, 30 s default), AC-002 (same CSV), AC-003 (imports unchanged, no timeout) (ARCHITECTING), 62 design with a technical criterion that both streams are destroyed and the timer cleared on timeout (DEVELOPING), 63 APPROVED plan, 64 implementation whose transfer races the pipeline against a timer and leaves streams open, 65 plan COMPLETE (TESTING), 66 Tester's timeout tests, 67 COMPLETE VERIFY report (REVIEWING_IMPLEMENTATION), 68 BLOCKED implementation review with F-001 WITHDRAWN and F-002 OPEN (P1, timed-out transfers leave streams open) and FAILURE to DEVELOPING with frame 1, 69 the fix (AbortSignal to pipeline), 70 plan with DEV-001 correction notes, frame RerunThrough TESTING, FORWARD to TESTING, 71 Tester's stream-teardown and slow-import tests, 72 COMPLETE FULL REVERIFY report citing the fix commit and superseding round-1 evidence, frame popped, RESUME From TESTING into REVIEWING_IMPLEMENTATION with recovery inactive. Everything is committed. F-002 is still OPEN because only Reviewer may resolve it. Assertion 2 is left complete:false because 'does not bypass the rest of the gate' needs judging beyond the end state.",
+  "case": "reviewer-39",
+  "caseHash": "785fdd36c1bef721",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T23:31:46.198Z",
+    "verdict": "pass",
+    "fixtureHash": "f69505f8f9cb9aed",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "5c9f1be60b136b4a",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:27:43.894Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T23:03:29.087Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/60-context/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/61-scope/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/62-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/63-plan/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/65-complete/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/67-verification/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/68-review/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/70-plan-fix/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/72-reverify/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:27:43.894Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

@@ -1,0 +1,217 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial TallyHub API, web app, and report worker"
+    },
+    {
+      "dir": "layers/60-context",
+      "action": "commit",
+      "message": "Record project context for access-token migration"
+    },
+    {
+      "dir": "layers/70-scope",
+      "action": "commit",
+      "message": "Define access-token migration scope"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "architect",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The repository has no existing architecture or design document, so a correct run creates the technical design at .standards/docs/specs/replace-session-cookie-authentication-20260923T141022Z-5b8e2f17.md with artifact init.",
+    "The scope and project context establish everything a design needs without a blocking user question: separate release schedules for the API, web app, and worker; the 14-day sliding session TTL; HMAC signing with SESSION_SECRET via node:crypto; the file-backed session store; and the rule that the project uses only Node.js built-in modules.",
+    "Established behavior that the design should keep unchanged includes role-based route permissions (member, admin, service), the login rate limit of 5 failures per 15 minutes, the audit event names, the { error } JSON error shape, and the worker's sign-in-again-on-401 behavior.",
+    "The case's primary design risk is transition and compatibility (staged rollout, mixed component versions, rollback), so EVOLUTION is the expected mode even though the new token contract spans the API, web app, and worker."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "replace-session-cookie-authentication-20260923T141022Z-5b8e2f17",
+    "SCOPE": ".standards/docs/scope/replace-session-cookie-authentication-20260923T141022Z-5b8e2f17.md",
+    "DESIGN": ".standards/docs/specs/replace-session-cookie-authentication-20260923T141022Z-5b8e2f17.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 4,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 5,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.Architecture",
+          "equals": "${DESIGN}",
+          "why": "no project design document exists, so the design is a new record at its fixed path"
+        },
+        {
+          "provenance": {
+            "path": "${DESIGN}",
+            "artifact": "ARCHITECTURE",
+            "cycle": "${ID}"
+          }
+        },
+        {
+          "contains": {
+            "path": "${DESIGN}",
+            "regex": "^## Acceptance Coverage\\s*$(?:(?!^## )[\\s\\S])*AC-001",
+            "flags": "mi"
+          }
+        },
+        {
+          "contains": {
+            "path": "${DESIGN}",
+            "regex": "^## Acceptance Coverage\\s*$(?:(?!^## )[\\s\\S])*AC-002",
+            "flags": "mi"
+          }
+        },
+        {
+          "contains": {
+            "path": "${DESIGN}",
+            "regex": "^## Acceptance Coverage\\s*$(?:(?!^## )[\\s\\S])*AC-003",
+            "flags": "mi"
+          }
+        },
+        {
+          "contains": {
+            "path": "${DESIGN}",
+            "regex": "^## Acceptance Coverage\\s*$(?:(?!^## )[\\s\\S])*AC-004",
+            "flags": "mi"
+          }
+        },
+        {
+          "check_ok": true
+        }
+      ]
+    },
+    {
+      "assertion": 6,
+      "complete": false,
+      "all": [
+        {
+          "contains": {
+            "path": "${DESIGN}",
+            "regex": "^## Technical Acceptance Criteria\\s*$(?:(?!^## )[\\s\\S])*AC-00[1-4]",
+            "flags": "mi"
+          },
+          "why": "technical acceptance criteria cite at least one current AC"
+        }
+      ]
+    },
+    {
+      "assertion": 7,
+      "complete": false,
+      "all": []
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "api/**",
+        "web/**",
+        "worker/**",
+        "shared/**",
+        "test/**",
+        "package.json",
+        "README.md",
+        ".standards/CONTEXT.md",
+        ".standards/docs/scope/**"
+      ],
+      "why": "Architect writes no production code, tests, user documentation, project context, or scope"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/sessions.test.js test/auth.test.js test/api.test.js test/web-client.test.js test/worker.test.js",
+      "expect": "pass",
+      "why": "the established test suite passes on the committed session-cookie implementation, as the context states"
+    },
+    {
+      "cmd": "npm test",
+      "expect": "pass",
+      "why": "the documented test command works offline"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. Layer 50-project (pre-install) commits TallyHub: a plain-JS API (api/src: signed tally_sid session cookie, file-backed SessionStore with 14-day sliding TTL, CSRF token per session, roles, login rate limit, audit log), a static web app (web/src/api-client.js uses credentials:'include' and X-CSRF-Token), a nightly report worker (worker/src/api-session.js signs in with the report-worker service account, stores the cookie, re-signs-in on 401), shared cookie/HMAC helpers, and node:test tests. Layer 60-context commits the Auditor's .standards/CONTEXT.md for the active cycle and STATE in SCOPING (FORWARD from AUDITING). Layer 70-scope commits the completed scope (AC-001..AC-004 as stated in the case, AC-001 adding a 15-minute maximum lifetime) and STATE in ARCHITECTING, STANDARD, recovery inactive, Architecture/Development NONE, Handoff FORWARD from SCOPING. No project design document exists, so the design path is deterministic. check.mjs is ok: brownfield ARCHITECTING is not yet past architecture.",
+  "case": "architect-2",
+  "caseHash": "728a577258460c25",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-01T18:33:38.728Z",
+    "verdict": "pass",
+    "fixtureHash": "9d843a9c63ee0444",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "73b8dafeb2a6f4d0",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:05:20.319Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-01T17:46:46.999Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/60-context/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/70-scope/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:05:20.319Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

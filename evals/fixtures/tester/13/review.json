@@ -1,0 +1,91 @@
+{
+  "conditions": [
+    {
+      "condition": "Invoked in a fresh chat (no prior Developer history)",
+      "where": "spec history: null; utterance 'Continue.'",
+      "status": "realized"
+    },
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (brownfield install)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState TESTING, entered by FORWARD from DEVELOPING",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id = export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md Active Work.Id",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, Architecture and Development reference current-cycle artifacts",
+      "where": ".standards/docs/scope|specs|development/export-20260924T090000Z-a7f3c1d2.md with matching provenance; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "Valid Auditor context exists",
+      "where": ".standards/CONTEXT.md (commit 'Record project context for streaming export'), with accurate pre-cycle test counts",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery inactive, no obligations, BlockedOn NONE",
+      "where": ".standards/STATE.md Recovery/Outstanding Obligations Active false",
+      "status": "realized"
+    },
+    {
+      "condition": "`pnpm --filter export test:integration` exits 1 because the local database is unavailable",
+      "where": "packages/export/test/integration/*.test.js connect to 127.0.0.1:5432; selfCheck shows exit 1, ECONNREFUSED in all 3 tests",
+      "status": "realized"
+    },
+    {
+      "condition": "Unit checks pass",
+      "where": "pnpm --filter export test (13 pass) and pnpm --filter @records/db test (3 pass) selfChecks",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-001 requires real streaming and rollback that mocks cannot establish",
+      "where": "scope AC-001 (batched cursor reads, export_jobs row, rollback leaving no job row); design Technical Acceptance Criteria; unit/export.test.js uses a fakeDb that only records statement order",
+      "status": "realized"
+    },
+    {
+      "condition": "No verification report exists yet; implementation committed, clean tree",
+      "where": "selfCheck 'test ! -e .standards/docs/verification ... git status' passes; git status clean",
+      "status": "realized"
+    },
+    {
+      "condition": "No known implementation defect (unavailability is environmental)",
+      "where": "packages/export/src/export.js follows design flow and failure path; cleanup rm calls now swallow their own errors so ROLLBACK always runs",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "runtime",
+      "assertion": 2,
+      "detail": "runtime.blockHosts blocks npm/pypi registries but not Debian apt mirrors (deb.debian.org, security.debian.org). The run user appears to be non-root ('/home/runner' in npm log), so `apt-get install postgresql` should fail, but no selfCheck proves that. If the role could install PostgreSQL, it could produce real integration evidence the case says is unavailable.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally add deb.debian.org and security.debian.org to runtime.blockHosts and a selfCheck such as `apt-get install -y postgresql` expected to fail with 'Permission denied|could not open lock|Temporary failure resolving'."
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 3,
+      "detail": "Assertion 3 is complete:true on Handoff.Kind FORWARD / From DEVELOPING. A correct run that found and routed a real implementation defect would change the handoff, but the fixture has no such defect (the unplanted one was fixed per the owner decision), so remaining in TESTING with the handoff unchanged is the only correct outcome here.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is in the files: a brownfield STANDARD cycle in TESTING with current-cycle scope, design, complete plan and context; unit and client tests pass, and the integration command fails with ECONNREFUSED in all three tests because no database exists. AC-001 needs real cursor streaming and rollback that only the fake-client unit tests touch. The checks are necessary conditions for a correct blocked-in-TESTING run, the invariants fit Tester, and nothing in the repository leaks the expected answer; the only notes are a missing apt-host block and the strictness of assertion 3's handoff check, which is acceptable here.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-01T23:55:23.554Z",
+  "costUsd": 0.948202,
+  "ms": 58393,
+  "fixtureHash": "b8716c9a29003318"
+}

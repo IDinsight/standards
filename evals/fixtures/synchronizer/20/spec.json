@@ -1,0 +1,309 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Build weekly partner export from the billing dump"
+    },
+    {
+      "dir": "layers/05-cli",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add command-line entry point"
+    },
+    {
+      "dir": "layers/50-context",
+      "action": "commit",
+      "message": "Record project context for the accounts feed migration"
+    },
+    {
+      "dir": "layers/52-scope",
+      "action": "commit",
+      "message": "Define accounts feed migration scope"
+    },
+    {
+      "dir": "layers/54-design",
+      "action": "commit",
+      "message": "Design accounts feed source"
+    },
+    {
+      "dir": "layers/56-plan",
+      "action": "commit",
+      "message": "Plan accounts feed migration"
+    },
+    {
+      "action": "delete",
+      "paths": [
+        "data/legacy/accounts.tsv",
+        "tests/test_tsv_source.py"
+      ],
+      "stage": true
+    },
+    {
+      "dir": "layers/60-feed",
+      "action": "commit",
+      "message": "Read partner export accounts from the JSON Lines feed"
+    },
+    {
+      "dir": "layers/62-complete",
+      "action": "commit",
+      "message": "Mark feed migration plan complete"
+    },
+    {
+      "dir": "layers/64-verification",
+      "action": "commit",
+      "message": "Record feed migration verification"
+    },
+    {
+      "dir": "layers/66-review",
+      "action": "commit",
+      "message": "Record feed migration implementation review"
+    },
+    {
+      "dir": "layers/68-guide",
+      "action": "commit",
+      "message": "Document the accounts feed in the operations guide"
+    },
+    {
+      "dir": "layers/70-documentation",
+      "action": "commit",
+      "message": "Record feed migration documentation"
+    },
+    {
+      "dir": "layers/72-final-review",
+      "action": "commit",
+      "message": "Record feed migration final review"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "synchronizer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "CONTEXT.md was written by Auditor at the start of the cycle, before any scope, design, or implementation. It accurately describes the pre-cycle source (make_source() returning TsvDumpSource over data/legacy/accounts.tsv) and explicitly marks the move to the accounts feed as planned active-cycle work that the cycle's scope and design define, not baseline.",
+    "The current implementation uses the planned new provider: JsonlFeedSource over data/feed/accounts.jsonl; TsvDumpSource, its test, and the sample dump were removed as the design planned. Verification, both reviews, and the documentation record all assess the feed implementation.",
+    "The only differences between CONTEXT.md and the current tree are the planned migration itself, so the context is not stale and no PROJECT_CONTEXT failure or audit is warranted; the context remains valid baseline evidence for this nonterminal cycle.",
+    "No material discrepancy exists among the records, implementation, tests, and documentation; all cited commit hashes and blob identities match the current tree. Synchronization can pass and the cycle can move to AWAITING_USER_SIGNOFF."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "export-20260924T090000Z-a7f3c1d2",
+    "SCOPE": ".standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md",
+    "ARCH": ".standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md",
+    "DEV": ".standards/docs/development/export-20260924T090000Z-a7f3c1d2.md",
+    "VERIFICATION": ".standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md",
+    "REVIEW_IMPL": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md",
+    "REVIEW_FINAL": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md",
+    "DOC": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md",
+    "SYNC": ".standards/docs/synchronization/export-20260924T090000Z-a7f3c1d2.md",
+    "CONTEXT": ".standards/CONTEXT.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "not": "AUDITING",
+          "why": "treating the context as stale would route to Auditor"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "not": "PROJECT_CONTEXT",
+          "why": "no PROJECT_CONTEXT failure handoff"
+        },
+        {
+          "state": "Obligations.Active",
+          "equals": "false",
+          "why": "no obligation is created for the context"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            ".standards/CONTEXT.md"
+          ],
+          "why": "Auditor-owned context is not rewritten"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "not": "PROJECT_CONTEXT",
+          "why": "no invented PROJECT_CONTEXT failure is routed"
+        },
+        {
+          "state": "WorkflowState",
+          "not": "AUDITING",
+          "why": "no recovery frame owned by Auditor"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "partner_export/**",
+        "tests/**",
+        "data/**",
+        "docs/**",
+        "README.md",
+        "pyproject.toml",
+        ".gitignore",
+        ".standards/docs/scope/**",
+        ".standards/docs/specs/**",
+        ".standards/docs/development/**",
+        ".standards/docs/verification/**",
+        ".standards/docs/reviews/**",
+        ".standards/docs/documentation/**"
+      ],
+      "why": "Synchronizer owns only its synchronization record and does not repair other roles' work"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "python3 -m pytest -q",
+      "expect": "pass",
+      "why": "the established test command passes offline"
+    },
+    {
+      "cmd": "python3 -m pytest -q 2>&1 | tail -n 1 | grep -qE '^14 passed'",
+      "expect": "pass",
+      "why": "the suite runs the 14 tests the records cite"
+    },
+    {
+      "cmd": "python3 -m pytest -q tests/test_cli.py -k 'export_from_the_feed or bad_feed or missing_feed or default_source'",
+      "expect": "pass",
+      "why": "the CLI reads the feed by default, produces the expected partner file, and fails with exit 1 and no output for a bad or missing feed"
+    },
+    {
+      "cmd": "d=$(mktemp -d) && python3 -m partner_export $d/partners.csv && grep -q 'Café Sol, Lda' $d/partners.csv && test $(wc -l < $d/partners.csv) -eq 4",
+      "expect": "pass",
+      "why": "a real run on the committed sample feed writes the header and three active accounts"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the SYNCHRONIZING state and records are valid"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && test ! -e data/legacy && test -f data/feed/accounts.jsonl && ! grep -rqE 'TsvDumpSource|accounts.tsv' partner_export tests docs README.md",
+      "expect": "pass",
+      "why": "tree is clean and the current implementation, tests, and docs use only the feed"
+    },
+    {
+      "cmd": "b=$(git log --format=%H -1 --fixed-strings --grep='Add command-line entry point') && git show $b:partner_export/settings.py | grep -q TsvDumpSource && git show $b:data/legacy/accounts.tsv | grep -q Lindqvist",
+      "expect": "pass",
+      "why": "the pre-cycle baseline used the TSV dump source"
+    },
+    {
+      "cmd": "grep -q 'TsvDumpSource' .standards/CONTEXT.md && grep -q 'data/legacy/accounts.tsv' .standards/CONTEXT.md && grep -q 'planned active-cycle work' .standards/CONTEXT.md && ! grep -q 'JsonlFeedSource' .standards/CONTEXT.md && test $(git log --format=%s -- .standards/CONTEXT.md | wc -l) -eq 1",
+      "expect": "pass",
+      "why": "context describes the pre-cycle provider, distinguishes the planned migration, and was written once at the start of the cycle"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `SYNCHRONIZING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Id`: `export-20260924T090000Z-a7f3c1d2`$' .standards/STATE.md && grep -q '^`Kind`: `FORWARD` `From`: `REVIEWING_FINAL` `FailureType`: `NONE`' .standards/STATE.md && grep -q '^`PromotionReason`: `NONE` `AuditTarget`: `NONE` `BlockedOn`: `NONE`$' .standards/STATE.md && grep -q '^`PendingVerificationCadence`: `NONE`$' .standards/STATE.md && grep -q '^`BaselineReconciliation`: `NONE`$' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md && grep -q 'ProjectMode`: `BROWNFIELD' .standards/MODE.md",
+      "expect": "pass",
+      "why": "SYNCHRONIZING after final review, nothing blocked, recovery and obligations inactive"
+    },
+    {
+      "cmd": "v=.standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md && r=.standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md && f=.standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md && d=.standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md && p=.standards/docs/development/export-20260924T090000Z-a7f3c1d2.md && grep -q '`Mode`: `VERIFY` `Status`: `COMPLETE`' $v && grep -q 'Assessment Purpose`: `FULL` `Assessment Target`: `NONE`' $v && ! grep -q AWAITING_IMPLEMENTATION $v && grep -q '^`Status`: `COMPLETE` `User Style`: `NONE`$' $r && grep -q '^`Status`: `COMPLETE` `User Style`: `NONE`$' $f && ! grep -qE '^### F-' $r $f && grep -q '`Status`: `COMPLETE`$' $d && ! grep -qE '^### DOC-' $d && grep -q '`Status`: `COMPLETE`$' $p && test $(grep -c '^`Status`: `DONE`' $p) -eq 3",
+      "expect": "pass",
+      "why": "complete plan, full verification, finding-free reviews, and complete documentation record"
+    },
+    {
+      "cmd": "test ! -e .standards/docs/synchronization && test ! -e .standards/user-styles",
+      "expect": "pass",
+      "why": "no synchronization record or user styles exist yet"
+    },
+    {
+      "cmd": "v=.standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md && r=.standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md && f=.standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md && d=.standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md && grep -q $(git log --format=%H -1 --fixed-strings --grep='Mark feed migration plan complete') $v && grep -q $(git log --format=%H -1 --fixed-strings --grep='Record feed migration verification') $r && grep -q $(git log --format=%H -1 --fixed-strings --grep='Document the accounts feed in the operations guide') $d && grep -q $(git log --format=%H -1 --fixed-strings --grep='Record feed migration documentation') $f && grep -q $(git rev-parse HEAD:docs/operations.md) $f && grep -q $(git rev-parse HEAD:partner_export/sources.py) $f && grep -q $(git rev-parse HEAD:.standards/CONTEXT.md) $f && ! grep -rqE 'COMMIT:|BLOB:' .standards/docs .standards/CONTEXT.md",
+      "expect": "pass",
+      "why": "records cite real revisions and content identities that match HEAD"
+    },
+    {
+      "cmd": "grep -q 'data/feed/accounts.jsonl' docs/operations.md && grep -q 'no longer read' docs/operations.md && grep -q 'When the export fails' docs/operations.md",
+      "expect": "pass",
+      "why": "the operations guide describes the feed and failure behavior"
+    },
+    {
+      "cmd": "! grep -rqE 'AC-[0-9]' partner_export tests docs README.md .standards/CONTEXT.md",
+      "expect": "pass",
+      "why": "project files and context cite no acceptance identifiers"
+    },
+    {
+      "cmd": "git log -10 --format=%s | paste -s -d '|' - | grep -qx 'Record feed migration final review|Record feed migration documentation|Document the accounts feed in the operations guide|Record feed migration implementation review|Record feed migration verification|Mark feed migration plan complete|Read partner export accounts from the JSON Lines feed|Plan accounts feed migration|Design accounts feed source|Define accounts feed migration scope'",
+      "expect": "pass",
+      "why": "commit history follows the brownfield order"
+    }
+  ],
+  "notes": "Standalone fixture (the export bases have no provider to migrate). A small Python stdlib tool, partner-export, builds the weekly partner CSV of active accounts. Pre-install 00-project and 05-cli: the pre-cycle provider is TsvDumpSource reading data/legacy/accounts.tsv, chosen in settings.make_source(); 4 pytest tests. Then brownfield install. 50-context: Auditor CONTEXT.md written at cycle start describing that baseline and explicitly marking the requested feed migration as planned active-cycle work (one bullet in Project Baseline); STATE SCOPING. 52-scope: AC-001 (feed source, same partner file), AC-002 (missing or bad feed: error naming file and line, exit 1, no output), AC-003 (operations guide). 54-design: JsonlFeedSource, FeedError, read-before-write, removal of the dump source; AC-003 no architectural impact. 56-plan: APPROVED plan with DEV-001..003. Delete layer stages removal of the sample dump and its test. 60-feed: new provider, settings, export, CLI, sample feed, 14 tests. 62: plan COMPLETE, STATE TESTING. 64: COMPLETE FULL verification (AC-003 pending Documenter). 66: COMPLETE implementation review, no findings. 68: guide and README updated for the feed. 70: COMPLETE documentation record. 72: COMPLETE final review; STATE SYNCHRONIZING, FORWARD from REVIEWING_FINAL. Cycle id export-20260924T090000Z-a7f3c1d2 as the case requires (the tool is an export tool). No synchronization record exists. Records cite COMMIT and BLOB placeholders that match the final tree; no record comments on whether the context is still applicable, so that judgment is left to the role.",
+  "case": "synchronizer-20",
+  "caseHash": "f026aa2969e65af4",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T14:34:47.933Z",
+    "verdict": "pass",
+    "fixtureHash": "25428864e45d47dc",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "c871a05bd45b7143",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:33:41.619Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T13:25:34.371Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-context/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/52-scope/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/54-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/56-plan/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/62-complete/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/64-verification/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/66-review/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/70-documentation/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/72-final-review/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:33:41.619Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

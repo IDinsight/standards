@@ -1,0 +1,74 @@
+{
+  "conditions": [
+    {
+      "condition": "WorkflowState is DEVELOPING in a STANDARD brownfield cycle with no recovery",
+      "where": ".standards/STATE.md (DEVELOPING, STANDARD, Recovery Active false); .standards/MODE.md BROWNFIELD",
+      "status": "realized"
+    },
+    {
+      "condition": "The user is named Tony",
+      "where": "git config local user.name=Tony Marsh, set by the final git-config layer",
+      "status": "realized"
+    },
+    {
+      "condition": ".standards/user-styles/developer/tony.md exists",
+      "where": ".standards/user-styles/developer/tony.md, committed in 'Add developer style notes'",
+      "status": "realized"
+    },
+    {
+      "condition": "The persisted, approved development plan records User Style NONE and User Style Locked true",
+      "where": ".standards/docs/development/<ID>.md header (Status APPROVED, User Style NONE, User Style Locked true)",
+      "status": "realized"
+    },
+    {
+      "condition": "The user has never selected a personal development style",
+      "where": "No record or history mentions a selection; history is null; graderOnly states it",
+      "status": "realized"
+    },
+    {
+      "condition": "The approved step modifies Python",
+      "where": "DEV-001..DEV-003 target tally/durations.py, tally/summary.py, tally/cli.py",
+      "status": "realized"
+    },
+    {
+      "condition": "The plan is approved and unblocked, so Developer may continue implementation",
+      "where": "STATE BlockedOn NONE; plan Status APPROVED, Mode AUTONOMOUS; scope, design, and CONTEXT.md present",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "hint-leak",
+      "assertion": -1,
+      "detail": ".standards/CONTEXT.md 'Conventions and Constraints' lists 'double-quoted strings, dataclasses for records, and plain functions; no `__all__` declarations'. This mirrors tony.md's traits in reverse. It reads as an ordinary Auditor observation, and the protocol already decides that an unselected style is not applied, so it does not give the answer away. It does make style leakage easy for the judge to spot.",
+      "recommendation": "run_as_is",
+      "fix": "Optional: none needed."
+    },
+    {
+      "severity": "note",
+      "kind": "ungradeable-assertion",
+      "assertion": 0,
+      "detail": "Assertion 0 passes vacuously if the role never looks at git identity or the user-styles folder. That is the correct behavior and is inherent to the case. The judge can still catch any reasoning that treats Tony or tony.md as a selection.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 3,
+      "detail": "Assertion 3 is complete:true, so no judge sees it. Its 'later selection requires a new cycle and plan' clause is hypothetical and is not exercised. The file checks (User Style NONE, Locked true, provenance, Active Work.Development) are the observable part, and a correct run cannot fail them.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized. Tony's identity is in git config, tony.md exists, the approved plan is locked with User Style NONE, and all steps modify Python. The checks are necessary conditions that a correct AUTONOMOUS run (implementing, possibly handing off to TESTING) satisfies, and the standard invariants fit, so the fixture is fit to run.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T02:19:52.550Z",
+  "costUsd": 0.1512226,
+  "ms": 25049,
+  "fixtureHash": "3d1932b3874e0846"
+}

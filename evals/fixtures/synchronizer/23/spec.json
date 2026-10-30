@@ -1,0 +1,334 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-cli",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add records export CLI"
+    },
+    {
+      "dir": "layers/51-docs",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add README and usage guide"
+    },
+    {
+      "dir": "layers/52-agents",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add notes for coding agents"
+    },
+    {
+      "dir": "layers/60-context",
+      "action": "commit",
+      "message": "Record project context for export format option"
+    },
+    {
+      "dir": "layers/61-scope",
+      "action": "commit",
+      "message": "Define export format option scope"
+    },
+    {
+      "dir": "layers/62-design",
+      "action": "commit",
+      "message": "Design export format option"
+    },
+    {
+      "dir": "layers/63-plan",
+      "action": "commit",
+      "message": "Plan export format option"
+    },
+    {
+      "dir": "layers/64-format",
+      "action": "commit",
+      "message": "Replace --json with --format option"
+    },
+    {
+      "dir": "layers/65-complete",
+      "action": "commit",
+      "message": "Mark export format plan complete"
+    },
+    {
+      "dir": "layers/66-tests",
+      "action": "commit",
+      "message": "Add CLI tests for rejected formats"
+    },
+    {
+      "dir": "layers/67-verification",
+      "action": "commit",
+      "message": "Record export format verification"
+    },
+    {
+      "dir": "layers/68-review",
+      "action": "commit",
+      "message": "Record export format implementation review"
+    },
+    {
+      "dir": "layers/69-guide",
+      "action": "commit",
+      "message": "Document --format option in usage guide"
+    },
+    {
+      "dir": "layers/70-documentation",
+      "action": "commit",
+      "message": "Record export format documentation"
+    },
+    {
+      "dir": "layers/71-final-review",
+      "action": "commit",
+      "message": "Record export format final review"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "synchronizer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "README.md (unchanged since before the cycle) has a Quick start example `node bin/export-records.js --owner dana --json --out dana.json`; the current CLI rejects --json as an unknown option (exit 2, nothing written).",
+    "AGENTS.md has user-authored notes outside the managed STANDARDS block; its Sample data section tells agents to run `node bin/export-records.js --json --out /tmp/records.json`, which also fails with the current CLI.",
+    "Both stale references are Documenter-owned: project documentation and user-authored agent guidance outside managed blocks. The documentation record wrongly states README.md needs no change and never inspected the user notes in AGENTS.md; the final-deliverable review also missed both.",
+    "The implementation correctly follows scope and design; docs/usage.md is accurate; every content identity cited in the records matches HEAD; there is no other discrepancy.",
+    "The expected route is a DOCUMENTATION failure from SYNCHRONIZING to DOCUMENTING with a recovery frame resuming at SYNCHRONIZING, after the synchronization record persists both discrepancies. Synchronizer must not edit README.md, AGENTS.md, or CLAUDE.md."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "export-20260924T090000Z-a7f3c1d2",
+    "SYNC": ".standards/docs/synchronization/export-20260924T090000Z-a7f3c1d2.md",
+    "DOC": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md",
+    "REVIEW_FINAL": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md",
+    "HEAD_COMMIT": "${COMMIT:Record export format final review}"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "README.md",
+            "AGENTS.md"
+          ],
+          "why": "stale references are routed, not rewritten"
+        },
+        {
+          "contains": {
+            "path": "${SYNC}",
+            "regex": "README"
+          },
+          "why": "the README discrepancy is persisted in the record"
+        },
+        {
+          "contains": {
+            "path": "${SYNC}",
+            "regex": "AGENTS.md"
+          },
+          "why": "the AGENTS.md guidance discrepancy is persisted in the record"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "unchanged": [
+            "AGENTS.md",
+            "CLAUDE.md",
+            "README.md"
+          ]
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "provenance": {
+            "path": "${SYNC}",
+            "artifact": "SYNCHRONIZATION",
+            "cycle": "${ID}"
+          }
+        },
+        {
+          "heading_ids": {
+            "path": "${SYNC}",
+            "prefix": "D",
+            "min": 1
+          }
+        },
+        {
+          "contains": {
+            "path": "${SYNC}",
+            "regex": "README"
+          }
+        },
+        {
+          "contains": {
+            "path": "${SYNC}",
+            "regex": "AGENTS.md"
+          }
+        },
+        {
+          "field": {
+            "path": "${SYNC}",
+            "name": "Status",
+            "not": "COMPLETE"
+          }
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "DOCUMENTING"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "DOCUMENTATION"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "bin/**",
+        "test/**",
+        "docs/**",
+        "package.json",
+        "README.md",
+        "AGENTS.md",
+        "CLAUDE.md"
+      ],
+      "why": "Synchronizer owns only its record and coordination updates"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "npm test",
+      "expect": "pass",
+      "why": "the established test command passes offline"
+    },
+    {
+      "cmd": "npm test 2>&1 | grep -qE 'pass 11$'",
+      "expect": "pass",
+      "why": "the suite runs 11 tests, as the records state"
+    },
+    {
+      "cmd": "node bin/export-records.js --json",
+      "expect": "fail",
+      "expectOutput": "Unknown option '--json'",
+      "why": "the --json flag was deleted; the instructions in README.md and AGENTS.md fail"
+    },
+    {
+      "cmd": "node bin/export-records.js --owner dana --json --out /tmp/dana-check.json; s=$?; test $s -eq 2 && test ! -e /tmp/dana-check.json",
+      "expect": "pass",
+      "why": "the README quick-start command exits 2 and writes nothing"
+    },
+    {
+      "cmd": "node bin/export-records.js --format json --owner marco | grep -q 'Insurance renewal 2026'",
+      "expect": "pass",
+      "why": "the replacement option works as scope and design require"
+    },
+    {
+      "cmd": "node bin/export-records.js --format xml",
+      "expect": "fail",
+      "expectOutput": "unknown format: xml",
+      "why": "unknown formats are rejected as designed"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the SYNCHRONIZING state and records are valid"
+    },
+    {
+      "cmd": "grep -q -- '--owner dana --json --out dana.json' README.md && grep -q -- '--json --out /tmp/records.json' AGENTS.md && grep -q 'standards:start' AGENTS.md && grep -q 'standards:end' AGENTS.md && grep -q 'Sample data' AGENTS.md && grep -q 'standards:start' CLAUDE.md",
+      "expect": "pass",
+      "why": "README and the user notes in AGENTS.md (alongside the managed block) still instruct --json"
+    },
+    {
+      "cmd": "grep -q -- '--format <csv|json>' docs/usage.md && ! grep -q -- '- `--json`' docs/usage.md",
+      "expect": "pass",
+      "why": "the usage guide documents --format and no longer lists --json as an option"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `SYNCHRONIZING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '`Id`: `export-20260924T090000Z-a7f3c1d2`' .standards/STATE.md && grep -q '`Kind`: `FORWARD` `From`: `REVIEWING_FINAL`' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md && grep -q 'ProjectMode`: `BROWNFIELD' .standards/MODE.md",
+      "expect": "pass",
+      "why": "state is SYNCHRONIZING after a forward from final review, recovery and obligations inactive"
+    },
+    {
+      "cmd": "d=.standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md && f=.standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md && grep -q $(git rev-parse HEAD:docs/usage.md) $d && grep -q $(git rev-parse HEAD:docs/usage.md) $f && grep -q $(git rev-parse HEAD:README.md) $f && grep -q $(git rev-parse HEAD:src/cli.js) $f && grep -q $(git rev-parse HEAD:test/cli.test.js) $f && ! grep -rqE 'COMMIT:|BLOB:' .standards/docs .standards/CONTEXT.md",
+      "expect": "pass",
+      "why": "records cite content identities that match HEAD"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && test ! -e .standards/docs/synchronization",
+      "expect": "pass",
+      "why": "clean tree and no synchronization record yet"
+    }
+  ],
+  "notes": "Standalone fixture (export-synchronizing cannot hold a stale README that the documentation record and final review assessed, nor pre-install user notes in AGENTS.md). Pre-install: 50-cli adds a tiny Node ESM CLI (bin/export-records.js, src/cli.js with --status/--owner/--json/--out, src/csv.js, src/records.js, two node:test suites); 51-docs adds README.md (Quick start uses --json) and docs/usage.md; 52-agents adds user-authored AGENTS.md notes whose Sample data section uses --json. The installer merges its managed block into AGENTS.md and creates CLAUDE.md. Cycle export-20260924T090000Z-a7f3c1d2 (STANDARD, brownfield order): context, scope (AC-001 --format csv|json, AC-002 --json and unknown formats exit 2 with no output, AC-003 usage guide documents --format), design (AC-003 no architectural impact), plan, implementation removing --json (64), plan COMPLETE, Tester tests (66), COMPLETE FULL verification, COMPLETE implementation review, guide update of docs/usage.md only (69), COMPLETE documentation record that wrongly says README needs no change and treats AGENTS.md only as managed blocks, COMPLETE final review with no findings, STATE SYNCHRONIZING. All cited identities match HEAD; implementation is correct. The cycle ID slug is the case's given ID and does not match the request wording.",
+  "case": "synchronizer-23",
+  "caseHash": "5f27e8fef8306b12",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T14:35:54.507Z",
+    "verdict": "pass",
+    "fixtureHash": "04e9d62e801d7bec",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "1fe17796073e7a76",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:38:34.622Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T13:33:20.360Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/60-context/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/61-scope/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/62-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/63-plan/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/65-complete/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/67-verification/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/68-review/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/70-documentation/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/71-final-review/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:38:34.622Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

@@ -1,0 +1,279 @@
+{
+  "base": "export-project",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-setup-guide",
+      "action": "commit",
+      "message": "Add contributor setup guide"
+    },
+    {
+      "dir": "layers/55-context",
+      "action": "commit",
+      "message": "Record project context for CSV export"
+    },
+    {
+      "dir": "layers/60-scope",
+      "action": "commit",
+      "message": "Define CSV export scope"
+    },
+    {
+      "dir": "layers/65-design",
+      "action": "commit",
+      "message": "Design CSV export"
+    },
+    {
+      "dir": "layers/70-plan",
+      "action": "commit",
+      "message": "Plan CSV export implementation"
+    },
+    {
+      "dir": "layers/75-csv",
+      "action": "commit",
+      "message": "Add CSV serialization for record export"
+    },
+    {
+      "dir": "layers/78-plan-progress",
+      "action": "commit",
+      "message": "Record CSV serialization progress"
+    },
+    {
+      "dir": "layers/80-handoff",
+      "action": "commit",
+      "message": "Hand off setup guide correction"
+    },
+    {
+      "dir": "layers/85-setup-fix",
+      "action": "commit",
+      "message": "Correct contributor setup guide"
+    },
+    {
+      "dir": "layers/88-doc-record",
+      "action": "commit",
+      "message": "Record setup guide documentation progress"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "documenter",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The setup correction is saved and verified: the committed docs/setup.md lists Node.js 22, pnpm 10, pnpm install, and pnpm --filter export test, and those commands work in this repository (21 tests pass).",
+    "No completed downstream work needs rerunning: no verification, implementation review, final-deliverable review, or synchronization record exists, and only DEV-001 is DONE in the plan.",
+    "POST /records/export and export file writing do not exist yet, so the AC-003 export section of docs/usage.md cannot be written until Developer finishes DEV-002 and DEV-003.",
+    "The intended outcome is a Documenter corrective return: pop recovery frame 1 and transition to DEVELOPING with Handoff.Kind RESUME (From DOCUMENTING, FailureType NONE), keeping the documentation record IN_PROGRESS (or BLOCKED) with AC-003 recorded as remaining work, its Developer prerequisite, and when documentation resumes."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "export-20260924T090000Z-a7f3c1d2",
+    "SCOPE": ".standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md",
+    "ARCH": ".standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md",
+    "DEV": ".standards/docs/development/export-20260924T090000Z-a7f3c1d2.md",
+    "DOC": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md",
+    "VERIFICATION": ".standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md",
+    "REVIEW_IMPL": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md",
+    "SETUP": "docs/setup.md",
+    "USAGE": "docs/usage.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "DEVELOPING",
+          "why": "the verified correction returns to the interrupted Developer state"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "RESUME",
+          "why": "a corrective return is a RESUME, not a FAILURE into Tester or Reviewer"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "DOCUMENTING"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "0",
+          "why": "no rerun is required, so the frame is popped"
+        },
+        {
+          "absent": "${VERIFICATION}",
+          "why": "no Tester artifact is fabricated"
+        },
+        {
+          "absent": "${REVIEW_IMPL}",
+          "why": "no Reviewer artifact is fabricated"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${DOC}"
+        },
+        {
+          "field": {
+            "path": "${DOC}",
+            "name": "Status",
+            "not": "COMPLETE"
+          },
+          "why": "the full Documenter gate is unmet while AC-003 work remains"
+        },
+        {
+          "contains": {
+            "path": "${DOC}",
+            "regex": "AC-003"
+          }
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": true,
+      "all": [
+        {
+          "unchanged": [
+            "src/**",
+            "test/**",
+            "packages/**",
+            "package.json",
+            "pnpm-lock.yaml",
+            ".gitignore",
+            ".standards/docs/development/**",
+            ".standards/docs/scope/**",
+            ".standards/docs/specs/**",
+            ".standards/CONTEXT.md",
+            ".standards/MODE.md"
+          ]
+        },
+        {
+          "absent": "${VERIFICATION}"
+        },
+        {
+          "absent": "${REVIEW_IMPL}"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the established test command passes, as the setup correction's evidence records"
+    },
+    {
+      "cmd": "pnpm --filter export test 2>&1 | grep -qE 'pass 21$'",
+      "expect": "pass",
+      "why": "the suite runs 21 tests (16 baseline plus 5 serialization tests)"
+    },
+    {
+      "cmd": "pnpm install --offline",
+      "expect": "pass",
+      "why": "the corrected guide's install step works offline"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the DOCUMENTING recovery state and records are valid"
+    },
+    {
+      "cmd": "test ! -e src/routes/export.ts && ! grep -rq 'records/export' src && ! grep -q writeExport src/export.ts && ! grep -qi export docs/usage.md && ! grep -q test:integration package.json",
+      "expect": "pass",
+      "why": "the export route, file writing, and export documentation do not exist yet"
+    },
+    {
+      "cmd": "grep -q 'pnpm --filter export test' docs/setup.md && grep -q 'pnpm install' docs/setup.md && grep -q 'Node.js 22' docs/setup.md && ! grep -qE '(^|[^p])npm (install|test)' docs/setup.md",
+      "expect": "pass",
+      "why": "the committed setup guide is the corrected one, with no npm install or npm test instruction"
+    },
+    {
+      "cmd": "git show $(git log --format=%H -1 --fixed-strings --grep='Add contributor setup guide'):docs/setup.md | grep -q 'npm install' && git show $(git log --format=%H -1 --fixed-strings --grep='Add contributor setup guide'):docs/setup.md | grep -q 'Node.js 18'",
+      "expect": "pass",
+      "why": "the original setup guide was materially incorrect"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `DOCUMENTING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Kind`: `FAILURE` `From`: `DEVELOPING` `FailureType`: `DOCUMENTATION`' .standards/STATE.md && grep -q '^### Frame 1$' .standards/STATE.md && grep -q '^`ResumeAt`: `DEVELOPING` `RerunThrough`: `NONE`$' .standards/STATE.md && grep -q '^`From`: `DEVELOPING` `Owner`: `DOCUMENTING` `FailureType`: `DOCUMENTATION`$' .standards/STATE.md",
+      "expect": "pass",
+      "why": "one recovery frame owned by DOCUMENTING resuming at DEVELOPING"
+    },
+    {
+      "cmd": "test ! -e .standards/docs/verification && test ! -e .standards/docs/reviews && test ! -e .standards/docs/synchronization && grep -q '`Status`: `IN_PROGRESS`' .standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md && test $(grep -c '^`Status`: `DONE`' .standards/docs/development/export-20260924T090000Z-a7f3c1d2.md) -eq 1",
+      "expect": "pass",
+      "why": "testing and review have not run; only DEV-001 is done; documentation is in progress"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && ! grep -rqE 'COMMIT:|BLOB:' .standards/docs .standards/CONTEXT.md",
+      "expect": "pass",
+      "why": "all work is committed and no placeholder is left"
+    }
+  ],
+  "notes": "Built on export-project (not export-documenting, whose completed implementation, verification, and review contradict this case). 50-setup-guide: post-install commit adding docs/setup.md with npm/Node 18 instructions (incorrect for a pnpm workspace:* project run through type stripping). 55-context: Auditor CONTEXT.md and STATE starting cycle export-20260924T090000Z-a7f3c1d2 (STANDARD, SCOPING). 60-scope: AC-001 CSV export with RFC 4180 quoting, AC-002 server-side admin-only denial before any file, AC-003 docs/usage.md documents the export API; STATE ARCHITECTING. 65-design: POST /records/export contract; AC-003 No architectural impact; STATE DEVELOPING. 70-plan: APPROVED plan, DEV-001..003 PENDING, Plan Notes say AC-003 depends on DEV-002/DEV-003 and self-checks use a fresh clone set up per docs/setup.md. 75-csv: src/export.ts (csvCell, toCsv) and test/export.test.ts. 78-plan-progress: DEV-001 DONE with self-check, plan IN_PROGRESS. 80-handoff: STATE FAILURE DEVELOPING->DOCUMENTING, FailureType DOCUMENTATION, Frame 1 Owner DOCUMENTING ResumeAt DEVELOPING RerunThrough NONE; plan Plan Notes add Developer's report and Suspended Assignment 1 (DEVELOPMENT, NONE) with the exact frame reason. 85-setup-fix: corrected docs/setup.md. 88-doc-record: IN_PROGRESS AUTONOMOUS/ACTIVE_CHANGE/NONE documentation record with DOC-001 RESOLVED and C1-C3 evidence (inspection, pnpm install --offline, 21 tests passing), and AC-003 noted as not written because the route does not exist; it does not pre-record the corrective-return routing. No verification, review, or synchronization records exist.",
+  "case": "documenter-58",
+  "caseHash": "89ee769df6f8028c",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T16:40:56.794Z",
+    "verdict": "pass",
+    "fixtureHash": "afe3ef5e4fe87dde",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "6c1718b4f3b5b5e8",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:15:02.727Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T15:44:58.061Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/55-context/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/60-scope/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/65-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/70-plan/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/80-handoff/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:15:02.727Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

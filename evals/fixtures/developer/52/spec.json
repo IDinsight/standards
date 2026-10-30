@@ -1,0 +1,233 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add task list CLI with add, done, and list"
+    },
+    {
+      "dir": "layers/10-audit",
+      "action": "commit",
+      "message": "Record project context for task tags"
+    },
+    {
+      "dir": "layers/20-scope",
+      "action": "commit",
+      "message": "Define scope for task tags"
+    },
+    {
+      "dir": "layers/30-design",
+      "action": "commit",
+      "message": "Add technical design for task tags"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "developer",
+    "utterance": "Prepare the plan."
+  },
+  "graderOnly": [
+    "Active Work.PendingVerificationCadence is INCREMENTAL, selected explicitly by the user during scoping; no development plan exists yet.",
+    "The user has not approved any development plan or implementation; a correct run leaves src/, bin/, and test/ unchanged.",
+    "Scope work items 2 (AC-003) and 3 (AC-004) each depend on work item 1 (AC-001, AC-002); the design's build plan orders the store model, then filtering, then CLI parsing and output."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "let-users-tag-tasks-and-filter-the-task-20260923T141200Z-5c9e2a71",
+    "DEV": ".standards/docs/development/let-users-tag-tasks-and-filter-the-task-20260923T141200Z-5c9e2a71.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "provenance": {
+            "path": "${DEV}",
+            "artifact": "DEVELOPMENT",
+            "cycle": "${ID}"
+          },
+          "why": "the plan exists as this cycle's development record"
+        },
+        {
+          "field": {
+            "path": "${DEV}",
+            "name": "Verification Cadence",
+            "equals": "INCREMENTAL"
+          },
+          "why": "the pending explicit selection is applied, not the AFTER_IMPLEMENTATION default"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "field": {
+            "path": "${DEV}",
+            "name": "Current Increment",
+            "equals": "1"
+          },
+          "why": "the first assignment is selected"
+        },
+        {
+          "contains": {
+            "path": "${DEV}",
+            "regex": "^### Increment 1 *$",
+            "flags": "m"
+          },
+          "why": "increments are numbered from 1"
+        },
+        {
+          "contains": {
+            "path": "${DEV}",
+            "regex": "^### Increment 2 *$",
+            "flags": "m"
+          },
+          "why": "dependent work items give more than one testable outcome"
+        },
+        {
+          "heading_ids": {
+            "path": "${DEV}",
+            "prefix": "DEV",
+            "min": 2
+          }
+        },
+        {
+          "check_ok": true,
+          "why": "increment DEV references and the Current Increment definition are validated by check"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.PendingVerificationCadence",
+          "equals": "NONE"
+        },
+        {
+          "field": {
+            "path": "${DEV}",
+            "name": "Verification Cadence",
+            "equals": "INCREMENTAL"
+          }
+        },
+        {
+          "state": "ActiveWork.Development",
+          "equals": "${DEV}"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "field": {
+            "path": "${DEV}",
+            "name": "Status",
+            "equals": "PROPOSED"
+          }
+        },
+        {
+          "field": {
+            "path": "${DEV}",
+            "name": "User Style Locked",
+            "equals": "false"
+          },
+          "why": "no approval has happened yet"
+        },
+        {
+          "state": "ActiveWork.BlockedOn",
+          "not": "NONE",
+          "why": "the approval request is persisted"
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "DEVELOPING"
+        },
+        {
+          "unchanged": [
+            "src/**",
+            "bin/**",
+            "test/**",
+            "package.json",
+            "README.md"
+          ],
+          "why": "no implementation before plan approval"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/store.test.js test/cli.test.js",
+      "expect": "pass",
+      "why": "CONTEXT.md states the existing 7 tests pass at the audited commit"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 00-project (pre-install): a small dependency-free Node ESM task-list CLI (src/store.js pure functions + JSON persistence, src/cli.js positional parsing, bin/tasks.js) with 7 node:test tests. 10-audit: Auditor CONTEXT.md and STATE at SCOPING (FORWARD from AUDITING). 20-scope: scope record with AC-001..AC-004 in three work items (2 and 3 depend on 1) and STATE at ARCHITECTING with PendingVerificationCadence INCREMENTAL, recorded during scoping. 30-design: technical design covering all ACs with a 3-step build plan, and final STATE at DEVELOPING, STANDARD, Development NONE, BlockedOn NONE, PendingVerificationCadence INCREMENTAL, Handoff FORWARD from ARCHITECTING, no recovery. No development plan exists. The cycle id uses the slug cycle.mjs would derive from the request.",
+  "case": "developer-52",
+  "caseHash": "f5774f5b2657f44f",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T02:24:34.408Z",
+    "verdict": "pass",
+    "fixtureHash": "436b8a6c3f439022",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "5df90a4c0e8949b4",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:08:51.697Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T02:00:35.306Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/10-audit/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/20-scope/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/30-design/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:08:51.697Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

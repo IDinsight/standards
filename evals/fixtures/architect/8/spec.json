@@ -1,0 +1,244 @@
+{
+  "base": null,
+  "date": "2026-09-26T09:00:00Z",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial ledgerctl CLI"
+    },
+    {
+      "dir": "layers/50-expedited",
+      "action": "commit",
+      "message": "Plan login token persistence"
+    },
+    {
+      "dir": "layers/51-login",
+      "action": "commit",
+      "message": "Add login command with local credential store"
+    },
+    {
+      "dir": "layers/52-promote",
+      "action": "commit",
+      "message": "Promote credential persistence cycle to standard"
+    },
+    {
+      "dir": "layers/53-context",
+      "action": "commit",
+      "message": "Record project context for credential persistence"
+    },
+    {
+      "dir": "layers/54-scope",
+      "action": "commit",
+      "message": "Define credential persistence scope"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "architect",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The tentative expedited code (ledgerctl/credstore.py, a SQLite database credentials.sqlite3 in the config directory keyed by base_url, plus the login subcommand and stored-token fallback in ledgerctl/cli.py) chose a new persistence pattern that is not established by project context or scope.",
+    "The pre-cycle baseline keeps local state only as JSON in the config directory, written by save_config through tempfile.mkstemp plus os.replace, which yields files with mode 0600; the baseline has no sqlite3 usage and stores no credentials.",
+    "The tentative SQLite store does not restrict file permissions (the database is created with the default umask), there is no logout, and no tests cover login or stored tokens.",
+    "No specific persistence design is mandated. A design may still choose SQLite, but only with rationale grounded in the scope and established constraints, not because the tentative code exists; the design should say how the tentative code is to be reconciled (kept, changed, or replaced).",
+    "Project context in .standards/CONTEXT.md is valid for the active cycle, so a normal brownfield handoff to DEVELOPING is expected."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "credential-persistence-20260925T090000Z-2b3c4d5e",
+    "SPEC": ".standards/docs/specs/credential-persistence-20260925T090000Z-2b3c4d5e.md",
+    "SCOPE": ".standards/docs/scope/credential-persistence-20260925T090000Z-2b3c4d5e.md",
+    "DEV": ".standards/docs/development/credential-persistence-20260925T090000Z-2b3c4d5e.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.PromotionReason",
+          "unchanged": true,
+          "why": "PromotionReason is durable for the rest of the cycle"
+        },
+        {
+          "unchanged": [
+            ".standards/CONTEXT.md"
+          ],
+          "why": "Architect does not edit Auditor-owned context"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            ".standards/CONTEXT.md",
+            ".standards/docs/scope/**"
+          ],
+          "why": "scope and context are inputs Architect must not rewrite"
+        },
+        {
+          "provenance": {
+            "path": "${SPEC}",
+            "artifact": "ARCHITECTURE",
+            "cycle": "${ID}"
+          },
+          "why": "no project design document exists, so the design is created with artifact init at the fixed path"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "ledgerctl/**",
+            "tests/**"
+          ],
+          "why": "Architect reconciles code in the design; it does not edit code"
+        }
+      ]
+    },
+    {
+      "assertion": 4,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "DEVELOPING"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FORWARD"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "ARCHITECTING"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "NONE"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "false"
+        },
+        {
+          "state": "ActiveWork.Architecture",
+          "not": "NONE"
+        },
+        {
+          "reply_matches": "/developer",
+          "why": "Claude Code next-role invocation"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "ledgerctl/**",
+        "tests/**",
+        "README.md",
+        "pyproject.toml"
+      ],
+      "why": "Architect writes no production code, tests, or user documentation"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "python3 -m pytest -q | tail -n 1 | grep -q '^12 passed'",
+      "expect": "pass",
+      "why": "the established test command passes on the built tree with the tentative code present (12 tests, as the context and plan record)"
+    },
+    {
+      "cmd": "[ $(git log --format=%s -- ledgerctl/credstore.py | wc -l) -eq 1 ] && git log --format=%s -- ledgerctl/credstore.py | grep -qx 'Add login command with local credential store'",
+      "expect": "pass",
+      "why": "the SQLite credential store exists only from the expedited cycle commit"
+    },
+    {
+      "cmd": "! git grep -q sqlite3 $(git rev-list --max-parents=0 HEAD) -- ledgerctl",
+      "expect": "pass",
+      "why": "the pre-cycle baseline has no SQLite persistence"
+    },
+    {
+      "cmd": "python3 -m ledgerctl --help | grep -q login",
+      "expect": "pass",
+      "why": "the tentative login subcommand is present in the working tree"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the starting state is valid"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 00-project (pre-install): stdlib-only Python CLI ledgerctl with JSON config.json written atomically via mkstemp+os.replace, token only from --token or LEDGERCTL_TOKEN, 12 pytest tests run with python3 -m pytest -q. 50-expedited: first cycle started EXPEDITED in DEVELOPING with an approved plan (Acceptance EXPEDITED_REQUEST). 51-login: tentative implementation adds ledgerctl/credstore.py (SQLite credentials.sqlite3 keyed by base_url) and a login subcommand plus stored-token fallback in cli.py; plan marks DEV-001 DONE with self-check evidence. 52-promote: STATE promoted to STANDARD/AUDITING with Handoff PROMOTE and Active Work.PromotionReason naming the consequential persistence decision; plan gets a Plan Notes pause entry. 53-context: Auditor CONTEXT.md describing the pre-cycle baseline and an Active-Cycle Non-Baseline Work section with entries labeled Cycle: credential-persistence-20260925T090000Z-2b3c4d5e (uses COMMIT substitutions); STATE to SCOPING. 54-scope: completed scope AC-001..AC-007, implementation-agnostic; STATE to ARCHITECTING, FORWARD from SCOPING, Architecture NONE, recovery inactive. Commit date set to 2026-09-26 so the cycle id timestamp (2026-09-25) precedes the commits. Utterance is the catalog's Continue.; the case prompt's instruction about not treating tentative code as a constraint is left out. Project docs and records use python3 because the runner image has no python command.",
+  "case": "architect-8",
+  "caseHash": "9823d0984d37a110",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T00:30:29.291Z",
+    "verdict": "pass",
+    "fixtureHash": "6ad44d77bfef3a68",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "d15772e0f0ce1dc2",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:05:28.312Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T00:28:31.551Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-expedited/.standards/STATE.md: NONE",
+        "layers/52-promote/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/53-context/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/54-scope/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:05:28.312Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

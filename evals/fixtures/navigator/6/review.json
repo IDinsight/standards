@@ -1,0 +1,56 @@
+{
+  "conditions": [
+    {
+      "condition": "A batch size setting exists that the user could double",
+      "where": "config/default.json `batchSize: 500`, overridable through `INGEST_BATCH_SIZE` in src/config.js",
+      "status": "realized"
+    },
+    {
+      "condition": "Source shows bounded concurrency",
+      "where": "src/batcher.js `#dispatch`: a `while (this.inFlight.size >= this.maxInFlight)` loop, with `maxInFlight: 4` in config",
+      "status": "realized"
+    },
+    {
+      "condition": "Source shows in-memory buffering",
+      "where": "src/batcher.js `this.buffer` collects records until `batchSize` is reached or `flushIntervalMs` passes; failed batches are kept in `this.failed`",
+      "status": "realized"
+    },
+    {
+      "condition": "No measurements exist (no benchmarks, metrics, or recorded throughput)",
+      "where": "No bench, perf, or metric files exist; README and src have no performance figures (confirmed by selfChecks 3 and 4)",
+      "status": "realized"
+    },
+    {
+      "condition": "Small committed project; workflow state is not relevant",
+      "where": "Two pre-install commits, a clean tree, the default installed brownfield STATE.md; check.mjs ok",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 0,
+      "detail": "graderOnly says peak memory is 'about maxInFlight+1 to maxInFlight+2 batches' worth'. In src/batcher.js, timer-triggered flushes (inside the setTimeout callback in add()) are not awaited, so add() gets no backpressure from them. Partial batches can therefore pile up in `this.queue` when the sink is slow. Batches that exhaust their retries also stay in `this.failed` for the whole run. A correct run that points out this weaker bound could be marked down by a judge anchored on the stated figure.",
+      "recommendation": "fix_file",
+      "fix": "In navigator-6/spec.json graderOnly, rewrite the memory sentence as: 'records held in memory at peak grow roughly in proportion to batch size (typically about maxInFlight+1 batches' worth under size-triggered flushes; timer-triggered flushes are not awaited, so queued partial batches and batches kept in `failed` can raise this further)'."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The comment at the top of src/batcher.js and the README describe the backpressure behavior plainly. This is ordinary documentation, it is accurate to the code, and it does not hint at the expected answer.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes the case: a small ingest worker whose source shows a bounded `maxInFlight` concurrency loop and in-memory buffering, a configurable `batchSize`, and no measurements anywhere. The checks and invariants fit Navigator: `unchanged **`, HEAD unchanged, and no mutating git command, with no `check_ok` as the spec format prescribes for Navigator. The only issue is a note suggesting a softer graderOnly memory estimate.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T01:35:12.039Z",
+  "costUsd": 0.1302842,
+  "ms": 35712,
+  "fixtureHash": "7e65acf1634e6af7"
+}

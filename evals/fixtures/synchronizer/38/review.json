@@ -1,0 +1,99 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed, `ProjectMode`: `BROWNFIELD`)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState SYNCHRONIZING",
+      "where": ".standards/STATE.md header",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md Active Work; all record provenance blocks",
+      "status": "realized"
+    },
+    {
+      "condition": "Cycle was promoted from EXPEDITED",
+      "where": "STATE.md PromotionReason; commits 'Plan CSV export implementation' (EXPEDITED) through 'Promote CSV export cycle to standard' (Handoff PROMOTE); CONTEXT.md Active-Cycle Non-Baseline Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, architecture, and context are current, with valid ownership and content identities",
+      "where": ".standards/docs/scope/…, .standards/docs/specs/…, .standards/CONTEXT.md; blob ids cited in later records match",
+      "status": "realized"
+    },
+    {
+      "condition": "Development plan, verification report, and both review reports have valid ownership and say COMPLETE",
+      "where": ".standards/docs/development/…, verification/…, reviews/<id>/implementation.md and final-deliverable.md; selfCheck confirms every Status is COMPLETE",
+      "status": "realized"
+    },
+    {
+      "condition": "Documentation evidence is available and the record is COMPLETE",
+      "where": ".standards/docs/documentation/<id>.md; docs/usage.md; README.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery is inactive and no user question is blocked",
+      "where": "STATE.md Recovery `Active`: `false`; BlockedOn NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Outstanding Obligations keeps a DEVELOPING correction for unescaped CSV formula prefixes",
+      "where": "STATE.md Obligation 1 (Owner DEVELOPING, FailureType IMPLEMENTATION, Reason about =, +, -, @); added by the promotion commit and carried unchanged",
+      "status": "realized"
+    },
+    {
+      "condition": "Current code still shows the defect",
+      "where": "src/export.ts csvCell quotes only on [\",\\r\\n]; selfCheck shows =1+2, +41, -7, @SUM(A1) are written unchanged",
+      "status": "realized"
+    },
+    {
+      "condition": "No synchronization record exists yet",
+      "where": "selfCheck: test ! -e .standards/docs/synchronization",
+      "status": "realized"
+    },
+    {
+      "condition": "check.mjs is clean on the starting state",
+      "where": "gate checkMjs ok:true",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "case-defect",
+      "assertion": -1,
+      "detail": "The case premise requires every role after promotion (Developer, Tester, both Reviewer kinds, Documenter) to have taken a forward handoff while an unresolved DEVELOPING obligation existed. Developer's gate forbids that ('no unresolved obligation owned by its current state'). The plan notes say 'no step was reopened'. The fixture builds the premise as the case states it. The catalog's grader-only facts (a DOCUMENTING obligation for usage examples) disagree with the prompt; the fixture correctly follows the prompt.",
+      "recommendation": "run_as_is",
+      "fix": "None needed; the case states this state explicitly."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "The current ACs (AC-001 RFC 4180 quoting) do not mention formula prefixes. A correct Synchronizer might reason that the obligation also implicates scope, and route to Scoper or ask the user rather than go straight to Developer. The checks only require that the obligation is retained and that the state is not AWAITING_USER_SIGNOFF or SIGNED_OFF, so such a run still passes them; the judge weighs routing for assertion 0.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "The vars PROMOTE_COMMIT, IMPL_COMMIT, and HEAD_COMMIT are defined but no check uses them. This is harmless.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally remove the unused vars from spec.json."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The history of an expedited cycle promoted to standard is coherent, and every stated condition is realized. A DEVELOPING obligation is carried in STATE.md, every record is COMPLETE, and src/export.ts still writes formula-prefixed cells unescaped (shown by a selfCheck); nothing leaks the answer. The state checks (obligation retained unchanged, no sign-off) hold for any correct route, including a FAILURE handoff to DEVELOPING that pushes a frame, which still passes the turn-end check, and the invariants correctly confine Synchronizer to its own record.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T15:57:08.777Z",
+  "costUsd": 1.02426,
+  "ms": 41896,
+  "fixtureHash": "4c84358bfe2bf5f9"
+}

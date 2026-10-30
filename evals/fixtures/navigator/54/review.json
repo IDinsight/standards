@@ -1,0 +1,61 @@
+{
+  "conditions": [
+    {
+      "condition": "Navigator is invoked in a STANDARDS-installed repository (any workflow state is allowed)",
+      "where": "Installer default brownfield .standards/STATE.md (AUDITING, Id UNSET, CycleMode UNSET); prompt.skill navigator; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "A GRILL_ME quiz is in progress in the same conversation when the user asks to switch",
+      "where": "spec history: '/navigator Grill me on loadConfig…', Questions 1–2 answered with feedback, Question 3 asked and unanswered",
+      "status": "realized"
+    },
+    {
+      "condition": "'This function' resolves to a specific function discussed in the earlier turns",
+      "where": "history names loadConfig in src/config.js throughout; src/config.js defines loadConfig",
+      "status": "realized"
+    },
+    {
+      "condition": "The function has error handling to explain from current evidence",
+      "where": "src/config.js: ENOENT returns defaults, other read errors and invalid JSON become ConfigError with cause, out-of-range port throws, invalid logLevel falls back silently; src/cli.js catches ConfigError and exits 1; selfChecks confirm",
+      "status": "realized"
+    },
+    {
+      "condition": "The earlier quiz feedback matches the code",
+      "where": "history cites `{ ...DEFAULTS, ...raw }` and DEFAULTS host 127.0.0.1, port 8080, logLevel info, as in src/config.js",
+      "status": "realized"
+    },
+    {
+      "condition": "The project is committed with a clean working tree",
+      "where": "git status clean on main; commits 'Add config loader with defaults and CLI' and 'Install STANDARDS'",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 0,
+      "detail": "`reply_not_matches: \"Question 4\"` is a necessary condition. A correct run is very unlikely to write that literal text, but one could, for example 'instead of Question 4, here is the full picture'. The risk is low.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally drop this check and leave assertion 0 entirely to the judge."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "The open Question 3 (missing file) is itself part of the error-handling answer. The judge must not read Navigator explaining the ENOENT path as 'revealing the quiz answer'. That is the correct EXPLAIN behavior after the switch, and graderOnly gives the judge enough context to see this.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition: a live GRILL_ME history about loadConfig with an unanswered question, real and varied error handling in src/config.js and src/cli.js, and a valid installed state with no cycle. The checks are sound: `unchanged **`, the state fields, HEAD, and no mutating git fully decide assertion 1, and the Navigator invariants are correct. The only notes are a low-risk literal 'Question 4' reply check and judge context around the overlapping Question 3.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T15:41:11.636Z",
+  "costUsd": 0.094888,
+  "ms": 18244,
+  "fixtureHash": "87071d442e24535f"
+}

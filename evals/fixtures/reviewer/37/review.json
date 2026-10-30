@@ -1,0 +1,76 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState REVIEWING_IMPLEMENTATION, Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Entered by a FORWARD handoff from TESTING; recovery and outstanding obligations inactive",
+      "where": ".standards/STATE.md Handoff/Recovery/Outstanding Obligations",
+      "status": "realized"
+    },
+    {
+      "condition": "Current scope, architecture, context, development plan and Tester report exist with valid provenance",
+      "where": ".standards/docs/scope|specs|development|verification/export-20260924T090000Z-a7f3c1d2.md, .standards/CONTEXT.md; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "A recorded diagnostic exited 0 but collected zero tests",
+      "where": "package.json test:access glob test/integration/access/*.test.ts matches nothing; verification report E3 'tests 0, suites 0, pass 0'; selfCheck confirms",
+      "status": "realized"
+    },
+    {
+      "condition": "Another required runtime test passed only on its third retry after two unexplained failures",
+      "where": "verification report E2 runs 1-2 exit 1 (ENOENT), run 3 exit 0, 'treated as transient'",
+      "status": "realized"
+    },
+    {
+      "condition": "Tester reported both as verified",
+      "where": "verification report Acceptance Evidence: AC-002 Verified on E3; AC-001 end-to-end criteria Verified on E2 run 3; Status COMPLETE",
+      "status": "realized"
+    },
+    {
+      "condition": "Code correctness is not otherwise established by formal evidence",
+      "where": "only E1 unit tests and I1 inspection besides E2/E3; implementation unchanged and correct (graderOnly)",
+      "status": "realized"
+    },
+    {
+      "condition": "All work committed, no review report yet",
+      "where": "git status clean; no .standards/docs/reviews",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The report's I1 inspection (requireAdmin first) and the plan's Developer self-checks (test:integration passed once) give partial non-formal support for the code. This does not make it correct to pass the review. Developer self-checks are not Tester evidence, and inspection does not show at runtime that no folder is created, and the E2 flake remains either way. A correct Reviewer still routes VERIFICATION to Tester.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 2,
+      "detail": "The complete:true routing checks assume the Reviewer attributes the unexplained ENOENT flake to Tester-owned evidence, not to an IMPLEMENTATION defect. The skill requires a concrete failure case before asserting a defect, and a rerun passes in this fixture, so no implementation defect can be established. VERIFICATION to TESTING is the only well-supported route. The turn-end check after that route was traced through check.mjs: the review report is not COMPLETE, the plan stays COMPLETE, and the frame is consistent, so check_ok holds.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized: the zero-test test:access diagnostic is real and reproducible, the third-retry pass is recorded in E2, and Tester marks both Verified in a COMPLETE FULL report, with no hints in names, commits or records. The checks are necessary conditions under the skill: the review report exists and is not COMPLETE, the run does not move to DOCUMENTING, and it makes a FAILURE/VERIFICATION route to TESTING with one frame while tests and Tester's report stay unchanged. The invariants are standard and fit the case.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T23:31:20.723Z",
+  "costUsd": 0.27486879999999997,
+  "ms": 53610,
+  "fixtureHash": "6d4d45ac68a63b23"
+}

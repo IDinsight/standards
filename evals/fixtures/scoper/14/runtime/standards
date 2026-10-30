@@ -1,0 +1,69 @@
+#!/usr/bin/env node
+// S.T.A.N.D.A.R.D.S. command-line installer.
+import { existsSync, readFileSync } from 'node:fs';
+import path from 'node:path';
+
+const VERSION = '0.7.0';
+const USAGE = [
+  'Usage: standards <command> [options]',
+  '',
+  'Commands:',
+  '  install     Install STANDARDS into a project',
+  '  upgrade     Upgrade an installed project to this version',
+  '  reset       Return the workflow to the state of a fresh installation',
+  '  uninstall   Remove STANDARDS from a project',
+  '',
+  'Options:',
+  '  --project <path>   Project folder (default: current folder)',
+  '  --mode <mode>      greenfield or brownfield',
+  '  --dry-run          Report every planned change without writing files',
+  '  --yes              Apply without asking for confirmation',
+  '  --version          Print the CLI version',
+].join('\n');
+const VALUE_OPTIONS = new Set(['--project', '--mode', '--client']);
+
+function fail(message) {
+  process.stderr.write('standards: ' + message + '\n');
+  process.exit(1);
+}
+
+const args = process.argv.slice(2);
+if (args.includes('--version') || args.includes('-v')) {
+  process.stdout.write(VERSION + '\n');
+  process.exit(0);
+}
+let command = null;
+let project = null;
+for (let index = 0; index < args.length; index += 1) {
+  const [name, inline] = args[index].split(/=(.*)/s, 2);
+  if (VALUE_OPTIONS.has(name)) {
+    const value = inline ?? args[(index += 1)];
+    if (name === '--project') project = value;
+  } else if (!name.startsWith('-') && command === null) {
+    command = name;
+  }
+}
+if (command === null || args.includes('--help') || args.includes('-h')) {
+  process.stdout.write(USAGE + '\n');
+  process.exit(0);
+}
+if (!['install', 'upgrade', 'reset', 'uninstall'].includes(command)) fail('unknown command ' + command + '.\n\n' + USAGE);
+
+let root = project ? path.resolve(project) : process.cwd();
+if (!project) {
+  let dir = root;
+  while (!existsSync(path.join(dir, '.standards')) && path.dirname(dir) !== dir) dir = path.dirname(dir);
+  if (existsSync(path.join(dir, '.standards'))) root = dir;
+}
+let installed = null;
+try {
+  installed = JSON.parse(readFileSync(path.join(root, '.standards', 'VERSION.json'), 'utf8')).version ?? null;
+} catch {
+  installed = null;
+}
+if (installed === null) fail('No STANDARDS installation found at ' + root + '.');
+if (installed !== VERSION) {
+  fail('This project has STANDARDS ' + installed + ' installed, but this CLI is ' + VERSION + '. '
+    + command + ' needs matching versions. No files were changed.');
+}
+fail(command + ' must be run from an interactive terminal.');

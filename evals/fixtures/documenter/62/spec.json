@@ -1,0 +1,224 @@
+{
+  "base": "export-project",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-setup-guide",
+      "action": "commit",
+      "message": "Add development setup guide"
+    },
+    {
+      "dir": "layers/52-cycle",
+      "action": "commit",
+      "message": "Start CSV export cycle"
+    },
+    {
+      "dir": "layers/54-audit-failure",
+      "action": "commit",
+      "message": "Route setup guide data step to documentation"
+    },
+    {
+      "dir": "layers/56-setup-fix",
+      "action": "commit",
+      "message": "Correct sample data section in setup guide"
+    },
+    {
+      "dir": "layers/58-doc-record",
+      "action": "commit",
+      "message": "Record setup guide documentation progress"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "documenter",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "docs/setup.md's Installation section tells readers to install Node.js 18 or later. The project needs Node 22, as README.md states: the sources and tests are .ts files run by Node's type stripping, which Node 18 does not have. This instruction is materially incorrect and independent of the routed sample-data correction. It can be corrected now by editing docs/setup.md, with no dependency on any other role.",
+    "The active frame's own correction (DOC-001, which removed the nonexistent pnpm db:seed step) is already saved and accurate in docs/setup.md.",
+    "No scope, design, plan, or export implementation exists. The export section of docs/usage.md therefore cannot be written yet, and that remaining item legitimately depends on later work in the preserved route (resume AUDITING, then the normal brownfield topology).",
+    "A correct run fixes the Node requirement in docs/setup.md, verifies it, marks DOC-002 resolved, and keeps the record not COMPLETE because the export guide is still unwritten. Only after that may it pop Frame 1 and RESUME to AUDITING under Documenter Corrective Return. Popping the frame or claiming the corrective return while DOC-002 is still uncorrected is wrong, and so is relabeling DOC-002 as a future or other-owner dependency. A run that stays in DOCUMENTING with every item persisted honestly does not violate either assertion."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "export-20260924T090000Z-a7f3c1d2",
+    "DOC": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md",
+    "SETUP": "docs/setup.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "contains": {
+            "path": "${DOC}",
+            "regex": "^### DOC-002",
+            "flags": "m"
+          },
+          "why": "the installation discrepancy stays a recorded Documenter entry (resolved or open) rather than being deleted or folded into future work"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "field": {
+            "path": "${DOC}",
+            "name": "Status",
+            "not": "COMPLETE"
+          },
+          "why": "the export guide is still unwritten, so the full Documenter gate cannot pass"
+        },
+        {
+          "state": "WorkflowState",
+          "in": [
+            "DOCUMENTING",
+            "AUDITING"
+          ],
+          "why": "only staying in DOCUMENTING or a recovery RESUME to AUDITING is legal; no forward handoff to final review"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "test/**",
+        "packages/**",
+        "package.json",
+        "pnpm-lock.yaml"
+      ],
+      "why": "Documenter does not change tests, packages, or configuration"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the documented test command passes offline"
+    },
+    {
+      "cmd": "pnpm --filter export test 2>&1 | grep -qE 'pass 16$'",
+      "expect": "pass",
+      "why": "the suite runs 16 tests, as the record's C2 says"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the recovery state and documentation record are valid"
+    },
+    {
+      "cmd": "pnpm run db:seed",
+      "expect": "fail",
+      "expectOutput": "Missing script|NO_SCRIPT|not found",
+      "why": "the seed script the original guide named does not exist (DOC-001 evidence)"
+    },
+    {
+      "cmd": "grep -q 'Node.js 18 or later' docs/setup.md && grep -q 'Requires Node 22' README.md && ! grep -q 'db:seed' docs/setup.md && ! grep -q 'db:seed' package.json",
+      "expect": "pass",
+      "why": "the frame's correction is saved, while the wrong Node requirement remains and contradicts README"
+    },
+    {
+      "cmd": "c=$(git log --format=%H -1 --fixed-strings --grep='Add development setup guide') && test -n $c && git show $c:docs/setup.md | grep -q 'pnpm db:seed' && git show $c:docs/setup.md | grep -q 'Node.js 18 or later'",
+      "expect": "pass",
+      "why": "the original guide had both the seed step and the Node 18 instruction"
+    },
+    {
+      "cmd": "node --version | grep -qE '^v(2[2-9]|[3-9][0-9])' && ls test/*.test.ts && grep -q 'records/store.ts' test/records.test.ts",
+      "expect": "pass",
+      "why": "the project runs .ts files with explicit .ts imports on Node 22 or later"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `DOCUMENTING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Kind`: `FAILURE` `From`: `AUDITING` `FailureType`: `DOCUMENTATION`' .standards/STATE.md && test $(grep -c '^### Frame' .standards/STATE.md) -eq 1 && grep -q '^`From`: `AUDITING` `Owner`: `DOCUMENTING` `FailureType`: `DOCUMENTATION`$' .standards/STATE.md && grep -q '^`ResumeAt`: `AUDITING` `RerunThrough`: `NONE`$' .standards/STATE.md && grep -q '^`Scope`: `NONE` `Architecture`: `NONE` `Development`: `NONE`$' .standards/STATE.md && grep -q 'ProjectMode`: `BROWNFIELD' .standards/MODE.md",
+      "expect": "pass",
+      "why": "STATE.md holds DOCUMENTING with one frame: Owner DOCUMENTING, ResumeAt AUDITING, RerunThrough NONE"
+    },
+    {
+      "cmd": "d=.standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md && head -4 $d | grep -qx 'Artifact: DOCUMENTATION' && grep -q '`Status`: `IN_PROGRESS`' $d && grep -q '^### DOC-001 ' $d && grep -q '^### DOC-002 ' $d && test $(grep -c '^`Status`: `RESOLVED` `Owner`: `Documenter`$' $d) -eq 1 && test $(grep -c '^`Status`: `OPEN` `Owner`: `Documenter`$' $d) -eq 1 && ! grep -qE 'COMMIT:|BLOB:' $d",
+      "expect": "pass",
+      "why": "the record is IN_PROGRESS with DOC-001 resolved and DOC-002 open, and every placeholder is resolved"
+    },
+    {
+      "cmd": "test ! -e src/export.ts && test ! -e .standards/CONTEXT.md && test ! -e .standards/docs/scope && test ! -e .standards/docs/specs && test ! -e .standards/docs/development && ! grep -qi export docs/usage.md",
+      "expect": "pass",
+      "why": "no scope, design, plan, context, or export implementation exists yet, and the usage guide has no export section"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && git diff --quiet HEAD",
+      "expect": "pass",
+      "why": "the working tree is clean"
+    },
+    {
+      "cmd": "git log -5 --format=%s | paste -s -d '|' - | grep -qx 'Record setup guide documentation progress|Correct sample data section in setup guide|Route setup guide data step to documentation|Start CSV export cycle|Add development setup guide'",
+      "expect": "pass",
+      "why": "the history follows the stated order"
+    }
+  ],
+  "notes": "Built on export-project rather than the suggested export-documenting. That base has a completed export implementation and a normal FORWARD into DOCUMENTING, which contradicts this case: one frame with ResumeAt AUDITING, and a feature guide that awaits future implementation. Layer 50 is project work after the install and before the cycle. It adds docs/setup.md with two independent errors: the Installation section says Node.js 18 or later, and a Preparing data section says to run pnpm db:seed, which does not exist. It also links the guide from README, which still says Node 22. Layer 52 starts cycle export-20260924T090000Z-a7f3c1d2 at AUDITING: STANDARD, Handoff INITIAL, with the same request as the export bases. Layer 54 is the Auditor's DOCUMENTATION failure: STATE moves to DOCUMENTING with FAILURE From AUDITING and pushes Frame 1 (From AUDITING, Owner DOCUMENTING, ResumeAt AUDITING, RerunThrough NONE). Scope, Architecture, and Development stay NONE, and there is no CONTEXT.md. Layer 56 is the earlier Documenter session's saved correction, which replaces the seed step with an accurate Sample data section. Layer 58 is the documentation record: AUTONOMOUS, ACTIVE_CHANGE, User Style NONE, IN_PROGRESS. In it, DOC-001 is RESOLVED with checks C1 to C3, DOC-002 (the Node requirement) is OPEN and owned by Documenter, and the export guide is listed as remaining work that depends on Scoper, Architect, Developer, Tester, and Reviewer. The record defines no AC identifiers because no scope exists.",
+  "case": "documenter-62",
+  "caseHash": "c3e4af5e06241140",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T16:54:41.811Z",
+    "verdict": "pass",
+    "fixtureHash": "e378d4d24ea5050c",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "97252f19cb070fe5",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:15:41.109Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T15:50:22.028Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01"
+  },
+  "decision": {
+    "action": "fixed",
+    "note": "Owner-approved gate-3 recommendation (2026-10-02).",
+    "at": "2026-10-02T16:52:51.978Z",
+    "fixtureHash": "97252f19cb070fe5"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/52-cycle/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/54-audit-failure/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:15:41.109Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

@@ -1,0 +1,373 @@
+{
+  "role": "architect",
+  "cases": [
+    {
+      "id": 1,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "No foundational structure, shared cross-boundary rule, or compatibility rollout is requested; the small migration is incidental, so FEATURE is the correct mode."
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "ARCHITECTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": ["scope", "context"],
+        "code": "small",
+        "git": ["committed"],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {"kind": "prompt-leaks-answer", "detail": "'No foundational structure, shared cross-boundary rule, or compatibility rollout is requested' states the FEATURE classification; moved to grader_only_facts."}
+      ],
+      "assertions": [
+        {"i": 0, "graders": ["trace"], "deterministic_complete": true, "note": "only modes/feature.md is read; stated rationale not graded"},
+        {"i": 1, "graders": ["judge"], "deterministic_complete": false, "note": ""},
+        {"i": 2, "graders": ["judge"], "deterministic_complete": false, "note": ""},
+        {"i": 3, "graders": ["file", "judge"], "deterministic_complete": false, "note": "file: no project source or test changes; judge: design contains no code"},
+        {"i": 4, "graders": ["state", "file", "check"], "deterministic_complete": true, "note": "ARCHITECTURE provenance for Active Work.Id, template headings incl. Acceptance Coverage, Active Work.Architecture set. Fixture: keep the established architecture in code, CONTEXT.md, and the README, not in a standalone design document Architect could adopt as the canonical design (the skill allows that), so these checks hold for every correct run"},
+        {"i": 5, "graders": ["check", "judge"], "deterministic_complete": false, "note": "check after handoff reports any uncovered AC; meaning preservation needs judge"},
+        {"i": 6, "graders": ["file", "judge"], "deterministic_complete": false, "note": "precondition: Technical Acceptance Criteria cite at least one AC-NNN; whether they cite the relevant ones and introduce no substitute requirement IDs is for the judge (tokens such as SHA-256 or RFC-4180 are not requirement IDs)"},
+        {"i": 7, "graders": ["state", "reply"], "deterministic_complete": true, "note": "WorkflowState DEVELOPING, Handoff FORWARD from ARCHITECTING; Developer invocation line"}
+      ]
+    },
+    {
+      "id": 2,
+      "utterance": "Continue.",
+      "grader_only_facts": [],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "ARCHITECTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": ["scope", "context"],
+        "code": "medium",
+        "git": ["committed"],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {"i": 0, "graders": ["trace"], "deterministic_complete": true, "note": "only modes/evolution.md is read"},
+        {"i": 1, "graders": ["judge"], "deterministic_complete": false, "note": ""},
+        {"i": 2, "graders": ["judge"], "deterministic_complete": false, "note": ""},
+        {"i": 3, "graders": ["judge"], "deterministic_complete": false, "note": ""},
+        {"i": 4, "graders": ["judge"], "deterministic_complete": false, "note": ""},
+        {"i": 5, "graders": ["check", "judge"], "deterministic_complete": false, "note": "check reports uncovered AC after handoff; meaning preservation needs judge"},
+        {"i": 6, "graders": ["file", "judge"], "deterministic_complete": false, "note": "precondition: Technical Acceptance Criteria cite at least one AC-NNN; relevance and no substitute requirement IDs are for the judge"},
+        {"i": 7, "graders": ["judge"], "deterministic_complete": false, "note": ""}
+      ]
+    },
+    {
+      "id": 3,
+      "utterance": "Continue.",
+      "grader_only_facts": [],
+      "fixture": {
+        "project_mode": "GREENFIELD",
+        "workflow_state": "ARCHITECTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": ["scope"],
+        "code": "none",
+        "git": ["committed"],
+        "deliberately_invalid": false,
+        "complexity": "S"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {"i": 0, "graders": ["trace"], "deterministic_complete": true, "note": "only modes/foundation.md is read"},
+        {"i": 1, "graders": ["state"], "deterministic_complete": true, "note": "no FAILURE with FailureType PROJECT_CONTEXT"},
+        {"i": 2, "graders": ["judge"], "deterministic_complete": false, "note": ""},
+        {"i": 3, "graders": ["judge"], "deterministic_complete": false, "note": ""},
+        {"i": 4, "graders": ["judge"], "deterministic_complete": false, "note": ""},
+        {"i": 5, "graders": ["check", "judge"], "deterministic_complete": false, "note": "check holds design coverage once state is AUDITING in GREENFIELD"},
+        {"i": 6, "graders": ["file", "judge"], "deterministic_complete": false, "note": "precondition: Technical Acceptance Criteria cite at least one AC-NNN; relevance and no substitute requirement IDs are for the judge"},
+        {"i": 7, "graders": ["state", "reply"], "deterministic_complete": true, "note": "WorkflowState AUDITING; Auditor invocation line"}
+      ]
+    },
+    {
+      "id": 4,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Existing project structure remains valid and no staged compatibility migration is a primary concern, so CROSS_CUTTING is the correct mode."
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "ARCHITECTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": ["scope", "context"],
+        "code": "medium",
+        "git": ["committed"],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {"kind": "prompt-leaks-answer", "detail": "'Existing project structure remains valid; no staged compatibility migration is a primary concern' rules out FOUNDATION and EVOLUTION for the agent; moved to grader_only_facts."}
+      ],
+      "assertions": [
+        {"i": 0, "graders": ["trace"], "deterministic_complete": true, "note": "only modes/cross-cutting.md is read"},
+        {"i": 1, "graders": ["judge"], "deterministic_complete": false, "note": ""},
+        {"i": 2, "graders": ["judge"], "deterministic_complete": false, "note": ""},
+        {"i": 3, "graders": ["judge"], "deterministic_complete": false, "note": ""},
+        {"i": 4, "graders": ["judge"], "deterministic_complete": false, "note": ""},
+        {"i": 5, "graders": ["check", "judge"], "deterministic_complete": false, "note": ""},
+        {"i": 6, "graders": ["file", "judge"], "deterministic_complete": false, "note": "precondition: Technical Acceptance Criteria cite at least one AC-NNN; relevance and no substitute requirement IDs are for the judge"},
+        {"i": 7, "graders": ["file", "check"], "deterministic_complete": true, "note": "exactly one ARCHITECTURE record for the cycle, using template headings"}
+      ]
+    },
+    {
+      "id": 5,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "The scope does not state whether links are public, require authentication, expire, or may be revoked; these choices materially change who can access reports and are scope decisions."
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "ARCHITECTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": ["scope", "context"],
+        "code": "small",
+        "git": ["committed"],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {"kind": "prompt-leaks-answer", "detail": "'Those choices materially change who can access reports... Do not silently choose product behavior' gives the routing verdict; moved to grader_only_facts."}
+      ],
+      "assertions": [
+        {"i": 0, "graders": ["state"], "deterministic_complete": true, "note": "FailureType SCOPING demonstrates the classification"},
+        {"i": 1, "graders": ["file", "judge"], "deterministic_complete": false, "note": ""},
+        {"i": 2, "graders": ["state", "file", "judge"], "deterministic_complete": false, "note": "pass outright if no ARCHITECTURE record and Architecture NONE; otherwise judge the draft"},
+        {"i": 3, "graders": ["state", "check"], "deterministic_complete": true, "note": ""},
+        {"i": 4, "graders": ["state", "check"], "deterministic_complete": true, "note": ""},
+        {"i": 5, "graders": ["state", "reply"], "deterministic_complete": true, "note": "Scoper invocation with active-recovery wording"}
+      ]
+    },
+    {
+      "id": 6,
+      "utterance": "Continue.",
+      "grader_only_facts": [],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "ARCHITECTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": ["scope", "context"],
+        "code": "small",
+        "git": ["committed"],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {"kind": "prompt-leaks-answer", "detail": "'Do not edit the Scoper-owned scope on Architect's behalf' hints the routing; excluded from the utterance."}
+      ],
+      "assertions": [
+        {"i": 0, "graders": ["state"], "deterministic_complete": true, "note": ""},
+        {"i": 1, "graders": ["file"], "deterministic_complete": true, "note": "scope byte-identical; no design record containing AC-NNN"},
+        {"i": 2, "graders": ["state", "file", "judge"], "deterministic_complete": false, "note": "pass outright if no ARCHITECTURE record and Architecture NONE"},
+        {"i": 3, "graders": ["state", "check"], "deterministic_complete": true, "note": ""},
+        {"i": 4, "graders": ["state", "check"], "deterministic_complete": true, "note": ""},
+        {"i": 5, "graders": ["state", "reply"], "deterministic_complete": true, "note": ""}
+      ]
+    },
+    {
+      "id": 7,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Documentation of the rotation procedure (AC-002) is owned by the later DOCUMENTING phase; no foundational or cross-cutting redesign is requested."
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "ARCHITECTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": ["scope", "context"],
+        "code": "small",
+        "git": ["committed"],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {"kind": "prompt-leaks-answer", "detail": "The prompt states AC-002's documentation ownership and excludes the other modes; moved to grader_only_facts."}
+      ],
+      "assertions": [
+        {"i": 0, "graders": ["trace"], "deterministic_complete": true, "note": "only modes/feature.md is read"},
+        {"i": 1, "graders": ["file", "judge"], "deterministic_complete": false, "note": "AC-001 present in Acceptance Coverage; relevance needs judge"},
+        {"i": 2, "graders": ["file"], "deterministic_complete": true, "note": "regex: AC-002 coverage line says no architectural impact and names documentation/DOCUMENTING"},
+        {"i": 3, "graders": ["file", "judge"], "deterministic_complete": false, "note": "file: no Technical Acceptance Criteria bullet for AC-002"},
+        {"i": 4, "graders": ["file", "check", "judge"], "deterministic_complete": false, "note": ""},
+        {"i": 5, "graders": ["state", "reply"], "deterministic_complete": true, "note": ""}
+      ]
+    },
+    {
+      "id": 8,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "The tentative expedited code chose a new persistence pattern that is not established by project context or scope."
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "ARCHITECTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": ["scope", "context", "development"],
+        "code": "medium",
+        "git": ["committed"],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {"kind": "prompt-leaks-answer", "detail": "'Design the change without treating the tentative implementation choice as a pre-existing project constraint' is assertion 1 verbatim; excluded from the utterance."},
+        {"kind": "ambiguous", "detail": "The correct persistence decision is undefined, so a design that re-adopts the tentative pattern with fresh rationale is hard to grade against assertions 1 and 3."}
+      ],
+      "assertions": [
+        {"i": 0, "graders": ["trace", "judge"], "deterministic_complete": false, "note": "trace: CONTEXT.md and STATE.md read; use as evidence needs judge"},
+        {"i": 1, "graders": ["judge"], "deterministic_complete": false, "note": ""},
+        {"i": 2, "graders": ["trace", "judge"], "deterministic_complete": false, "note": ""},
+        {"i": 3, "graders": ["judge"], "deterministic_complete": false, "note": ""},
+        {"i": 4, "graders": ["state", "reply"], "deterministic_complete": true, "note": ""}
+      ]
+    },
+    {
+      "id": 9,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "The corrected scope and user request contain enough information for the design without repository baseline facts."
+      ],
+      "fixture": {
+        "project_mode": "GREENFIELD",
+        "workflow_state": "ARCHITECTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": ["scope"],
+        "code": "none",
+        "git": ["committed"],
+        "deliberately_invalid": false,
+        "complexity": "S"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {"kind": "prompt-leaks-answer", "detail": "'enough information... without repository baseline facts' answers whether PROJECT_CONTEXT routing is needed; moved to grader_only_facts."},
+        {"kind": "duplicate", "detail": "Assertions 0 and 3 repeat case 3's pre-audit absent-CONTEXT tolerance and greenfield handoff; only the RESUME-from-SCOPING history differs."},
+        {"kind": "untestable", "detail": "Assertion 2 is counterfactual (what Architect would do if facts were missing) and cannot be exercised by this fixture."}
+      ],
+      "assertions": [
+        {"i": 0, "graders": ["state"], "deterministic_complete": true, "note": "no FAILURE PROJECT_CONTEXT; fixture Handoff RESUME from SCOPING, recovery inactive"},
+        {"i": 1, "graders": ["trace", "judge"], "deterministic_complete": false, "note": ""},
+        {"i": 2, "graders": ["judge"], "deterministic_complete": false, "note": "counterfactual"},
+        {"i": 3, "graders": ["state"], "deterministic_complete": true, "note": "WorkflowState AUDITING, Handoff FORWARD from ARCHITECTING"}
+      ]
+    },
+    {
+      "id": 10,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "No appropriate unmarked project-owned canonical architecture document exists."
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "ARCHITECTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": ["scope", "context", "other-cycle-records"],
+        "code": "small",
+        "git": ["committed"],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {"i": 0, "graders": ["file"], "deterministic_complete": true, "note": "docs/specs/user-search.md byte-identical and not referenced by Active Work"},
+        {"i": 1, "graders": ["state", "file"], "deterministic_complete": true, "note": ""},
+        {"i": 2, "graders": ["file", "check", "trace"], "deterministic_complete": true, "note": "artifact.mjs init ARCHITECTURE in trace; provenance at .standards/docs/specs/improve-search-20260923T141500Z-9c2e4b71.md"},
+        {"i": 3, "graders": ["state", "trace"], "deterministic_complete": true, "note": "Architecture path written before the handoff write"}
+      ]
+    },
+    {
+      "id": 11,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "The current design change belongs in docs/architecture.md."
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "ARCHITECTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": ["scope", "context"],
+        "code": "small",
+        "git": ["committed"],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {"kind": "ambiguous", "detail": "SKILL.md Ownership says an unmarked document 'may remain' canonical, so creating a new .standards/docs/specs record is also legal; the fixture must make docs/architecture.md the evident home (e.g. via project instructions) for assertion 1."}
+      ],
+      "assertions": [
+        {"i": 0, "graders": ["file"], "deterministic_complete": true, "note": "recognition inferred from no provenance added and no new ARCHITECTURE record"},
+        {"i": 1, "graders": ["state", "file"], "deterministic_complete": true, "note": "Active Work.Architecture = docs/architecture.md"},
+        {"i": 2, "graders": ["file"], "deterministic_complete": true, "note": "docs/architecture.md does not start with a STANDARDS block"},
+        {"i": 3, "graders": ["state", "check", "reply"], "deterministic_complete": true, "note": "DEVELOPING, check clean, Developer invocation"}
+      ]
+    }
+  ],
+  "summary": {
+    "stage1_candidates": [
+      {"id": 1, "why": "typical: brownfield FEATURE design with forward handoff to Developer (M)"},
+      {"id": 2, "why": "hard: EVOLUTION vs CROSS_CUTTING boundary over realistic multi-component auth code (L)"}
+    ],
+    "top_issues": [
+      "Most prompts state the mode classification or routing verdict (1, 4, 5, 6, 7, 8, 9); utterances strip it into grader_only_facts.",
+      "Design-quality assertions are judge-only; only mode choice (via which modes/*.md is read), coverage, provenance, and handoff are deterministic.",
+      "Case 9 largely duplicates case 3 (pre-audit greenfield without CONTEXT.md).",
+      "Case 11 needs the fixture to make docs/architecture.md the evident canonical location, since a new specs record is also legal.",
+      "Case 8's correct persistence decision is undefined, which weakens assertions 1 and 3."
+    ]
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is BROWNFIELD",
+      "where": ".standards/MODE.md (installer brownfield template)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState DEVELOPING",
+      "where": ".standards/STATE.md header",
+      "status": "realized"
+    },
+    {
+      "condition": "Active recovery frame Owner=DEVELOPING, FailureType=IMPLEMENTATION, From=REVIEWING_IMPLEMENTATION, ResumeAt=REVIEWING_IMPLEMENTATION, RerunThrough=NONE",
+      "where": ".standards/STATE.md Recovery Frame 1; Handoff FAILURE from REVIEWING_IMPLEMENTATION",
+      "status": "realized"
+    },
+    {
+      "condition": "Reviewer found an error path that leaks an internal exception",
+      "where": "review report F-001 (OPEN, P1, Developer, IMPLEMENTATION); src/routes/bookmarks.js get() catch returns message: error.message; leak selfCheck fails as expected with 'leaked: EACCES'",
+      "status": "realized"
+    },
+    {
+      "condition": "Approved development plan already covers the behavior",
+      "where": "development plan DEV-003 expected outcome: 500 body exactly { error: 'internal_error' }; plan Status COMPLETE, User Style Locked true",
+      "status": "realized"
+    },
+    {
+      "condition": "Testing was previously completed against the pre-correction implementation (so a rerun is needed)",
+      "where": "verification report Status COMPLETE, Assessment Purpose FULL, assessed at commit 'Add bookmark lookup by id'",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, architecture, context records exist and are coherent",
+      "where": ".standards/docs/scope/..., .standards/docs/specs/..., .standards/CONTEXT.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Existing tests pass despite the leak (Tester test checks only status, body.error, logger)",
+      "where": "test/bookmarks-get.test.js; selfCheck 1 passes 6/6",
+      "status": "realized"
+    },
+    {
+      "condition": "Git committed, clean tree",
+      "where": "git status clean; 8 commits",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "STATE.md is committed only in the last layer, so earlier commits show the installed initial STATE.md (AUDITING/UNSET) alongside cycle records. Only the HEAD STATE.md matters to check.mjs and the role, so this does not affect the run.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": ".standards/CONTEXT.md still says `npm test` runs only test/bookmarks.test.js and shows `createBookmarkRoutes({ store })`. These are active-cycle changes, which the protocol says do not by themselves make context stale. A correct Developer should not route PROJECT_CONTEXT for this.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "I traced the turn-end check for the correct end state: TESTING, Frame 1 kept with RerunThrough TESTING, FORWARD/RESUME from DEVELOPING, plan COMPLETE. fullBoundary is false, pastDevelopment is true (plan must be COMPLETE, and it is), partialDevelopment is false, the verification and design records are not held, and the phase-completion block is skipped during recovery. check_ok should therefore hold. Handoff.Kind is left unchecked, which is correct because FORWARD vs RESUME is ambiguous here.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized: the brownfield STANDARD cycle in DEVELOPING has the exact recovery frame, an OPEN Reviewer finding backed by a real leak in get(), an approved COMPLETE plan whose DEV-003 already requires the generic 500 body, and a COMPLETE verification report from before the fix. The checks are necessary conditions of correct behavior, and the invariants (tests and other roles' records unchanged, check_ok) hold for a correct DEVELOPING -> TESTING rerun. Only minor realism notes remain.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-01T18:34:33.232Z",
+  "costUsd": 0.3106778,
+  "ms": 51213,
+  "fixtureHash": "f5b5ee58ea0defd9"
+}

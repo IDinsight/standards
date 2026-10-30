@@ -1,0 +1,230 @@
+{
+  "base": "export-reviewing-impl",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "reviewer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The committed implementation satisfies AC-001 (filtered CSV export with RFC 4180 quoting, embedded quotes doubled) and AC-002 (no user gets 401, editor or viewer gets 403, and no export folder or file is created before the denial).",
+    "Tester's existing integration results (pnpm --filter export test:integration, 3 passed) identify the assessed commit 'Add integration test for denied exports' and observe both the admin export and the three denials; the unit suite passes 21 tests.",
+    "Source, tests, and the Developer and Tester records support their completion claims; no material defects or material assessment gaps exist, so a correct IMPLEMENTATION review records no material findings, marks the report COMPLETE, and hands off FORWARD to DOCUMENTING.",
+    "The working tree is clean and git diff is empty; the active change lives in the commits after the installer commit, from 'Record project context for CSV export' through 'Record CSV export verification'.",
+    "The same-second file-name overwrite is an accepted risk recorded in the technical design, not a defect."
+  ],
+  "history": null,
+  "vars": {},
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${REVIEW_IMPL}",
+          "why": "a correct run persists an implementation review report"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 2,
+      "complete": true,
+      "all": [
+        {
+          "provenance": {
+            "path": "${REVIEW_IMPL}",
+            "artifact": "REVIEW",
+            "cycle": "${ID}",
+            "kind": "IMPLEMENTATION"
+          }
+        },
+        {
+          "field": {
+            "path": "${REVIEW_IMPL}",
+            "name": "Cycle",
+            "equals": "${ID}"
+          }
+        },
+        {
+          "field": {
+            "path": "${REVIEW_IMPL}",
+            "name": "ReviewKind",
+            "equals": "IMPLEMENTATION"
+          }
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "test/**"
+          ],
+          "why": "no quota-filling tests are added by Reviewer"
+        },
+        {
+          "unchanged": [
+            "${SCOPE}",
+            "${ARCH}"
+          ],
+          "why": "no invented requirements or acceptance identifiers"
+        }
+      ]
+    },
+    {
+      "assertion": 4,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 5,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "DOCUMENTING"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FORWARD"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "REVIEWING_IMPLEMENTATION"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "false"
+        },
+        {
+          "field": {
+            "path": "${REVIEW_IMPL}",
+            "name": "Status",
+            "equals": "COMPLETE"
+          }
+        },
+        {
+          "reply_matches": "/documenter",
+          "why": "the active-client (Claude Code) Documenter invocation is presented"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "Reviewer suggests commits but does not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Reviewer must not change the assessed identity"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "packages/**",
+        "package.json",
+        "pnpm-lock.yaml",
+        ".gitignore",
+        "test/**",
+        "docs/**",
+        "README.md"
+      ],
+      "why": "Reviewer does not edit implementation, tests, or project documentation"
+    },
+    {
+      "unchanged": [
+        ".standards/CONTEXT.md",
+        ".standards/docs/scope/**",
+        ".standards/docs/specs/**",
+        ".standards/docs/development/**",
+        ".standards/docs/verification/**"
+      ],
+      "why": "Reviewer does not edit other roles' records"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test 2>&1 | grep -qE 'pass 21$'",
+      "expect": "pass",
+      "why": "the unit suite passes 21 tests"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration 2>&1 | grep -qE 'pass 3$'",
+      "expect": "pass",
+      "why": "the integration results that observe both behaviors still pass"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the REVIEWING_IMPLEMENTATION state is valid"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && git diff --quiet HEAD && test ! -e .standards/docs/reviews",
+      "expect": "pass",
+      "why": "all work is committed, the diff is empty, and no review report exists yet"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `REVIEWING_IMPLEMENTATION` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q 'ProjectMode`: `BROWNFIELD' .standards/MODE.md && grep -q '`Status`: `COMPLETE`' .standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md",
+      "expect": "pass",
+      "why": "stated workflow state, project mode, and Tester completion claim"
+    }
+  ],
+  "notes": "No overlay layers: the base export-reviewing-impl already establishes every fact the case states. BROWNFIELD, STANDARD, REVIEWING_IMPLEMENTATION, cycle export-20260924T090000Z-a7f3c1d2, FORWARD from TESTING, recovery and obligations inactive (STATE.md from base layer 48). Scope (AC-001 quoted CSV, AC-002 non-admin denied before any file), design, CONTEXT.md, COMPLETE plan, and COMPLETE FULL verification record with valid provenance. All work committed, clean tree. Tester's integration results cite the assessed commit and blob identities and observe both behaviors (3 integration tests, including anonymous/viewer/editor denials with no folder created). Implementation is correct with no material defects. Assertion 5 is complete:false because the trace ordering (persist before invocation) and the optional commit-suggestion ordering need the judge.",
+  "case": "reviewer-1",
+  "caseHash": "f0d199b50aece735",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-01T18:36:35.064Z",
+    "verdict": "pass",
+    "fixtureHash": "44965cf37a458255",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "50768762e2699edd",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:24:41.732Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-01T17:54:11.743Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-testing": "fd7044646ac2c395",
+    "export-reviewing-impl": "e5b0bce49a675583"
+  },
+  "migrations": [
+    {
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:24:41.732Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

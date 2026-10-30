@@ -1,0 +1,182 @@
+{
+  "base": "export-synchronizing",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-sync-record",
+      "action": "commit",
+      "message": "Start synchronization record for CSV export"
+    }
+  ],
+  "expectCheck": {
+    "ok": false,
+    "problemsMatch": [
+      "holds a SYNCHRONIZATION record for cycle .archive-records-20260903T141200Z-5c8e2d4f., not this cycle's SYNCHRONIZATION record"
+    ]
+  },
+  "prompt": {
+    "skill": "synchronizer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The file at .standards/docs/synchronization/export-20260924T090000Z-a7f3c1d2.md is another cycle's synchronization record: its provenance block names cycle archive-records-20260903T141200Z-5c8e2d4f, but its visible Cycle header field was edited to the active cycle export-20260924T090000Z-a7f3c1d2. Its body still describes that other cycle's archive work and claims COMPLETE.",
+    "The active cycle has no synchronization record of its own. The fixed path is a collision: the correct behavior is to leave the file unchanged (neither fixing the provenance block nor the visible Cycle field, nor moving, replacing, or adopting it), not to write a record at another path, to withhold sign-off readiness, and to report the collision to the user for resolution.",
+    "No other records of cycle archive-records-20260903T141200Z-5c8e2d4f exist in this repository; the paths the copied record cites do not exist.",
+    "Apart from the collision, the export cycle's scope, design, context, plan, verification, both reviews, documentation record, implementation, tests, and guide are consistent and current."
+  ],
+  "history": null,
+  "vars": {
+    "OTHER": "archive-records-20260903T141200Z-5c8e2d4f"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "unchanged": [
+            "${SYNC}"
+          ],
+          "why": "the colliding file must not be edited, moved, or deleted"
+        },
+        {
+          "provenance": {
+            "path": "${SYNC}",
+            "artifact": "SYNCHRONIZATION",
+            "cycle": "${OTHER}"
+          },
+          "why": "the provenance block still names the other cycle"
+        },
+        {
+          "field": {
+            "path": "${SYNC}",
+            "name": "Cycle",
+            "equals": "${ID}"
+          },
+          "why": "the visible Cycle field is left as found"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "exists": "${SYNC}",
+          "why": "the other cycle's artifact is preserved"
+        },
+        {
+          "unchanged": [
+            ".standards/docs/synchronization/**"
+          ],
+          "why": "no replacement record is written at the fixed path or beside it"
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "SYNCHRONIZING",
+          "why": "readiness is withheld: the cycle does not advance to AWAITING_USER_SIGNOFF"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no problem that was not there before the run"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "packages/**",
+        "docs/**",
+        "README.md",
+        "package.json"
+      ],
+      "why": "Synchronizer owns only its record and does not change the deliverable"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "fail",
+      "expectOutput": "holds a SYNCHRONIZATION record for cycle .archive-records-20260903T141200Z-5c8e2d4f., not this cycle's SYNCHRONIZATION record",
+      "why": "check reports the collision at the fixed synchronization path"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs --json | node -e 'let s=``;process.stdin.on(`data`,d=>s+=d).on(`end`,()=>{const r=JSON.parse(s);process.exit(r.problems.length===1&&r.problems[0].file===`.standards/docs/synchronization/export-20260924T090000Z-a7f3c1d2.md`?0:1)})'",
+      "expect": "pass",
+      "why": "the collision is the only problem check reports"
+    },
+    {
+      "cmd": "f=.standards/docs/synchronization/export-20260924T090000Z-a7f3c1d2.md && head -2 $f | grep -qx 'Artifact: SYNCHRONIZATION' && head -4 $f | grep -qx 'Cycle: archive-records-20260903T141200Z-5c8e2d4f' && grep -q '^`Cycle`: `export-20260924T090000Z-a7f3c1d2` `Status`: `COMPLETE`$' $f && git ls-files --error-unmatch $f",
+      "expect": "pass",
+      "why": "the committed file's provenance names another cycle while its visible Cycle names the active cycle"
+    },
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the project's tests still pass"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && grep -q 'WorkflowState`: `SYNCHRONIZING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '`BlockedOn`: `NONE`' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md && test $(ls .standards/docs/synchronization | wc -l) -eq 1 && ! git ls-files | grep -q archive-records",
+      "expect": "pass",
+      "why": "clean tree, SYNCHRONIZING with nothing blocked and recovery inactive, one file in the synchronization folder, and no other records of the other cycle"
+    },
+    {
+      "cmd": "git log -1 --format=%s | grep -qx 'Start synchronization record for CSV export'",
+      "expect": "pass",
+      "why": "the colliding file is committed on top of the base"
+    }
+  ],
+  "notes": "Built on export-synchronizing (cycle export-20260924T090000Z-a7f3c1d2 at SYNCHRONIZING, STANDARD, BROWNFIELD, FORWARD from REVIEWING_FINAL, every other record COMPLETE and consistent, recovery and obligations inactive, nothing blocked). One layer, 50-sync-record, commits a file at the cycle's fixed synchronization path: a COMPLETE synchronization record from another cycle (archive-records-20260903T141200Z-5c8e2d4f, an archive feature) whose provenance block is untouched but whose visible header Cycle was edited to the active cycle, as if someone copied it in as a starting point. check.mjs reports exactly one problem, the collision at that path, so expectCheck is ok false with that single regex. The catalog lists other-cycle-records; only this one copied record of the other cycle is present, because adding a whole prior cycle would contradict the base's history (the export cycle is the first cycle after install).",
+  "case": "synchronizer-27",
+  "caseHash": "6c4ce4582ceab885",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T14:37:10.363Z",
+    "verdict": "pass",
+    "fixtureHash": "f1d0159d7c18b797",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "25707fd8c59ff1b5",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:39:30.245Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T13:31:33.991Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-synchronizing": "33937a9926a74652"
+  },
+  "migrations": [
+    {
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:39:30.245Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

@@ -1,0 +1,99 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installer brownfield)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState REVIEWING_IMPLEMENTATION",
+      "where": ".standards/STATE.md header",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Current scope, architecture, context, development plan and Tester report exist with valid provenance",
+      "where": ".standards/docs/scope|specs|development|verification/<id>.md, .standards/CONTEXT.md; check.mjs reports no provenance problems",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation review is a downstream rerun under an outer frame Owner=SCOPING, ResumeAt=REVIEWING_FINAL, RerunThrough=REVIEWING_IMPLEMENTATION",
+      "where": ".standards/STATE.md Recovery Frame 1 (From REVIEWING_FINAL); handoff FORWARD from TESTING",
+      "status": "realized"
+    },
+    {
+      "condition": "Outstanding obligations inactive",
+      "where": ".standards/STATE.md Outstanding Obligations Active false",
+      "status": "realized"
+    },
+    {
+      "condition": "Full Developer and Tester completion holds at Reviewer entry",
+      "where": "plan Status COMPLETE with DEV-001..DEV-004 DONE; verification REVERIFY FULL COMPLETE covering AC-001..AC-003",
+      "status": "realized"
+    },
+    {
+      "condition": "A newly observable authorization defect exists that requires Developer correction",
+      "where": "src/routes/export.ts: recent.get(key) returns a cached admin CSV before requireAdmin(request.user); selfCheck reproduces 201 for viewer and anonymous after an admin export",
+      "status": "realized"
+    },
+    {
+      "condition": "Existing tests do not catch the defect (suites pass)",
+      "where": "test/integration/export-flow.test.ts denied test uses a fresh app; selfChecks show 22 and 5 passing",
+      "status": "realized"
+    },
+    {
+      "condition": "Design states authorization precedes the repeat lookup, so the code contradicts the contract",
+      "where": ".standards/docs/specs/<id>.md Decision and Data and Control Flow",
+      "status": "realized"
+    },
+    {
+      "condition": "Earlier-phase records (documentation, final review) exist from before the scope correction",
+      "where": ".standards/docs/documentation/<id>.md COMPLETE; reviews/<id>/final-deliverable.md BLOCKED with F-001",
+      "status": "realized"
+    },
+    {
+      "condition": "Git is committed and clean",
+      "where": "git status clean; selfCheck confirms",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "case-defect",
+      "assertion": -1,
+      "detail": "AC-003 was added during recovery, so PROTOCOL Acceptance Traceability rule 9 suggests the COMPLETE documentation record (which does not account for AC-003) is invalidated, yet the case fixes Frame 1 RerunThrough at REVIEWING_IMPLEMENTATION, skipping DOCUMENTING. A Reviewer may mention this; it is Scoper's routing decision and does not change what this run tests (push nested Developer frame, preserve outer frame).",
+      "recommendation": "run_as_is",
+      "fix": "None needed; the fixture builds the state the case states and the generator flagged it."
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 2,
+      "detail": "reply_matches 'active recovery' relies on the protocol's instruction to replace 'active workflow' with 'active recovery' in the invocation line. It is protocol-mandated for a recovery handoff, so a correct run should satisfy it, but a paraphrased invocation would fail it.",
+      "recommendation": "run_as_is",
+      "fix": "Acceptable as a necessary condition given Handoff Rules item 8."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The design's sentence 'Like every other step of the handler, that repeat lookup comes after authorization and filter validation' is pointed, but it is a legitimate contract statement the Reviewer must compare code against, not a leak of the answer.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes the case: a STANDARD brownfield rerun in REVIEWING_IMPLEMENTATION under an outer SCOPING frame, with a real, reproducible authorization bypass (cached repeat returned before requireAdmin) that the passing suites miss. I simulated the turn-end check for the expected end state (Frame 2 Developer, impl report reopened), and it stays clean. All checks and invariants are necessary for a correct run, and the only check.mjs problem is the Reviewer-owned stale COMPLETE report the role must reopen.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-01T18:36:59.368Z",
+  "costUsd": 0.4384808,
+  "ms": 70134,
+  "fixtureHash": "4cc96ac9567548c7"
+}

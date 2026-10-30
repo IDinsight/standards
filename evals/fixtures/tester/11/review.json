@@ -1,0 +1,104 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD, CycleMode STANDARD, WorkflowState TESTING",
+      "where": ".standards/MODE.md; .standards/STATE.md header",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id = export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, Architecture, Development reference current-cycle artifacts",
+      "where": "STATE.md Active Work paths; provenance blocks in scope/specs/development records",
+      "status": "realized"
+    },
+    {
+      "condition": "Valid Auditor context exists",
+      "where": ".standards/CONTEXT.md (committed 'Record project context for CSV export')",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery inactive, no obligations, BlockedOn NONE at start",
+      "where": "STATE.md Recovery/Outstanding Obligations Active false; BlockedOn NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Fresh chat (no prior conversation)",
+      "where": "history null",
+      "status": "realized"
+    },
+    {
+      "condition": "Five scenarios already allocated to src/export.ts",
+      "where": "verification report Scenario Budget row for src/export.ts: four csvCell tests plus the cross-charged admin end-to-end export",
+      "status": "realized"
+    },
+    {
+      "condition": "Required technical criteria for distinct null-field and absent-field serialization",
+      "where": "design Technical Acceptance Criteria, two AC-003 bullets; scope AC-003",
+      "status": "realized"
+    },
+    {
+      "condition": "No existing coverage proves the null/absent criteria",
+      "where": "test/export.test.ts and test/export-route.test.ts never pass null/undefined or call toCsv (selfCheck 4); report marks both AC-003 rows Uncovered",
+      "status": "realized"
+    },
+    {
+      "condition": "A proposed parameterized function contains both rows",
+      "where": "verification report Resume or Handoff: one parameterized test with rows 'null title' and 'absent owner'",
+      "status": "realized"
+    },
+    {
+      "condition": "No budget increase authorized",
+      "where": "Scenario Budget User additions NONE; BlockedOn NONE; no history",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation correct, so only evidence/budget blocks AC-003 (no confounding defect)",
+      "where": "src/export.ts csvCell returns '' for null/undefined; selfCheck 3 confirms",
+      "status": "realized"
+    },
+    {
+      "condition": "Within-budget work remains possible",
+      "where": "src/routes/export.ts has 4 allocations (e.g. export 400 on invalid status is uncovered)",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 1,
+      "detail": "Assertion 1's `unchanged` check also lists test/routes.test.ts, test/records.test.ts and test/authorize.test.ts. The assertion is about not deleting coverage. A correct run that adds a within-budget export-route scenario (e.g. invalid status 400) to test/routes.test.ts instead of test/export-route.test.ts would fail this check. That placement is unlikely, because export route tests already live in test/export-route.test.ts, but it is possible.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally narrow the unchanged glob in assertion 1 to test/export.test.ts, test/records.test.ts and test/authorize.test.ts. If you do, add `contains` checks for the existing test names in test/routes.test.ts instead of requiring the file to be unchanged."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 2,
+      "detail": "The `contains` checks for 'null' and 'absent|missing' in the verification report already pass on the built fixture, so they are vacuous preconditions. They do no harm, and the judge decides whether the report names the criteria and the increase of two.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "The spec uses base export-project rather than export-testing and replays the cycle layers with an added AC-003. The layering and history are coherent, check.mjs passes, and the COMMIT/BLOB placeholders resolve to earlier layers.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition: five allocations on src/export.ts, uncovered null and absent criteria, a correct implementation, and a neutrally worded two-row parameterized proposal with no authorized increase. Nothing leaks the expected answer of a two-scenario increase. Checks and invariants are necessary conditions for a correct run, apart from a slightly broad `unchanged` list in assertion 1 that a realistic correct run is very unlikely to trip.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-01T22:27:37.343Z",
+  "costUsd": 0.2914152,
+  "ms": 47424,
+  "fixtureHash": "1ee281736857dfa3"
+}

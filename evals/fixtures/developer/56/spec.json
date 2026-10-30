@@ -1,0 +1,272 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial task list library"
+    },
+    {
+      "dir": "layers/50-design",
+      "action": "commit",
+      "message": "Record project context, scope, and design for task tags"
+    },
+    {
+      "dir": "layers/51-increment-1",
+      "action": "commit",
+      "message": "Add tag normalization and validation"
+    },
+    {
+      "dir": "layers/52-verify-increment-1",
+      "action": "commit",
+      "message": "Verify increment 1 tag handling"
+    },
+    {
+      "dir": "layers/53-tag-filter",
+      "action": "commit",
+      "message": "Add tag filter to listTasks"
+    },
+    {
+      "dir": "layers/54-cadence-request",
+      "action": "commit",
+      "message": "Record request to verify after implementation"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "developer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "All three approved steps (DEV-001, DEV-002, DEV-003) are DONE with satisfactory recorded self-checks; no implementation or increment scheduling remains, and there are no outstanding obligations, recovery frames, or open defects.",
+    "The implementation in src/ is correct against AC-001, AC-002, and AC-003, and all 14 existing tests pass.",
+    "Increment 2 (the DEV-002 non-string correction and the DEV-003 tag filter) has never been assessed by Tester, and the Increment 1 assessment predates the DEV-002 correction, so earlier increment passes do not establish full verification.",
+    "Because nothing remains to schedule, the pending AFTER_IMPLEMENTATION request has no remaining effect: the correct outcome clears it to NONE, sets the plan COMPLETE with Current Increment NONE, and makes a FORWARD handoff from DEVELOPING to TESTING for full verification. The verification report stays as Tester left it (IN_PROGRESS / INCREMENT / Increment 1) for Tester to reconcile to FULL / NONE."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "let-users-tag-tasks-and-filter-the-task-20260921T140512Z-3e9b04c6",
+    "PLAN": ".standards/docs/development/let-users-tag-tasks-and-filter-the-task-20260921T140512Z-3e9b04c6.md",
+    "REPORT": ".standards/docs/verification/let-users-tag-tasks-and-filter-the-task-20260921T140512Z-3e9b04c6.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "field": {
+            "path": "${PLAN}",
+            "name": "Status",
+            "equals": "COMPLETE"
+          }
+        },
+        {
+          "field": {
+            "path": "${PLAN}",
+            "name": "Current Increment",
+            "equals": "NONE"
+          }
+        },
+        {
+          "heading_ids": {
+            "path": "${PLAN}",
+            "prefix": "DEV",
+            "min": 3
+          },
+          "why": "existing DEV steps are preserved"
+        },
+        {
+          "state": "Obligations.Active",
+          "equals": "false"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.PendingVerificationCadence",
+          "equals": "NONE"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "TESTING"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FORWARD"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "DEVELOPING"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "NONE"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "false"
+        },
+        {
+          "reply_matches": "/tester",
+          "why": "handoff rules require the Tester invocation"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "${REPORT}"
+          ],
+          "why": "Tester owns the report and its reconciliation to FULL / NONE"
+        },
+        {
+          "field": {
+            "path": "${PLAN}",
+            "name": "Mode",
+            "equals": "AUTONOMOUS"
+          }
+        },
+        {
+          "field": {
+            "path": "${PLAN}",
+            "name": "User Style",
+            "equals": "NONE"
+          }
+        },
+        {
+          "field": {
+            "path": "${PLAN}",
+            "name": "User Style Locked",
+            "equals": "true"
+          }
+        },
+        {
+          "contains": {
+            "path": "${PLAN}",
+            "regex": "^### Increment 1$",
+            "flags": "m"
+          }
+        },
+        {
+          "contains": {
+            "path": "${PLAN}",
+            "regex": "^### Increment 2$",
+            "flags": "m"
+          }
+        }
+      ]
+    },
+    {
+      "assertion": 4,
+      "complete": false,
+      "all": []
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "test/**"
+      ],
+      "why": "Developer does not create or rewrite Tester-owned tests"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/tasks.test.js test/tags.test.js",
+      "expect": "pass",
+      "why": "The existing tests (5 in test/tasks.test.js, 9 Tester-written in test/tags.test.js) pass on the committed implementation, matching the recorded self-checks."
+    },
+    {
+      "cmd": "node --input-type=module -e 'import { TaskStore } from \"./src/store.js\"; import { createTask, listTasks } from \"./src/tasks.js\"; const s = new TaskStore(); createTask(s, { title: \"a\", tags: [\"Urgent\"] }); createTask(s, { title: \"b\", status: \"done\", tags: [\"urgent\"] }); createTask(s, { title: \"c\" }); const r = listTasks(s, { tag: \" URGENT \", status: \"open\" }); if (r.length !== 1 || r[0].title !== \"a\") { console.error(r); process.exit(1); }'",
+      "expect": "pass",
+      "why": "DEV-003 is implemented: listTasks filters by a normalized tag combined with status."
+    },
+    {
+      "cmd": "node --input-type=module -e 'import { TaskStore } from \"./src/store.js\"; import { createTask } from \"./src/tasks.js\"; let name = null; try { createTask(new TaskStore(), { title: \"a\", tags: [42] }); } catch (e) { name = e.name; } if (name !== \"TaskValidationError\") process.exit(1);'",
+      "expect": "pass",
+      "why": "The DEV-002 correction is in place: non-string tag values are rejected."
+    },
+    {
+      "cmd": "[ $(grep -c '^`Status`: `DONE`' .standards/docs/development/let-users-tag-tasks-and-filter-the-task-20260921T140512Z-3e9b04c6.md) -eq 3 ]",
+      "expect": "pass",
+      "why": "All three plan steps are DONE."
+    },
+    {
+      "cmd": "grep -q '`PendingVerificationCadence`: `AFTER_IMPLEMENTATION`' .standards/STATE.md && grep -q '`Current Increment`: `2`' .standards/docs/development/let-users-tag-tasks-and-filter-the-task-20260921T140512Z-3e9b04c6.md",
+      "expect": "pass",
+      "why": "The pending cadence request and Current Increment 2 are persisted as the case states."
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 00-project (pre-install): dependency-free Node ES module task library (src/store.js, src/tasks.js, src/errors.js) with 5 node:test tests. 50-design: CONTEXT.md, scope (AC-001 storage/normalization, AC-002 rejection incl. non-strings, AC-003 tag filter), design, STATE at DEVELOPING after FORWARD from ARCHITECTING. 51-increment-1: src/tags.js and tags on create/update (normalizeTag coerces non-strings with String()), approved AUTONOMOUS plan INCREMENTAL / Current Increment 1 with Increments 1 and 2, STATE TESTING via CHECKPOINT. 52-verify-increment-1: Tester adds test/tags.test.js (9 tests) and the package.json script, verification report IN_PROGRESS / INCREMENT / Increment 1 with Increment 1 VERIFIED and AC-003 AWAITING_IMPLEMENTATION, STATE DEVELOPING via CHECKPOINT from TESTING. 53-tag-filter: DEV-002 corrected to reject non-strings, DEV-003 tag filter added, plan has all three steps DONE with self-check evidence, Current Increment 2, Increment 2 extended to include the DEV-002 correction (revisiting AC-001 and AC-002). 54-cadence-request: STATE records PendingVerificationCadence AFTER_IMPLEMENTATION, keeping the CHECKPOINT handoff. Initial full check is ok; after a correct run the turn-end check stays clean, while the full check reports the INCREMENT purpose that Tester reconciles.",
+  "case": "developer-56",
+  "caseHash": "fb2406cfd4087761",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T02:25:55.590Z",
+    "verdict": "pass",
+    "fixtureHash": "ca211d46571fb464",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "696cc437947bf3f7",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:08:56.630Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T02:10:27.119Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/51-increment-1/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/52-verify-increment-1/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/54-cadence-request/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:08:56.630Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

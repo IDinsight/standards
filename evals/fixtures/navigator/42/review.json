@@ -1,0 +1,61 @@
+{
+  "conditions": [
+    {
+      "condition": "Project is BROWNFIELD with a STANDARD cycle in REVIEWING_FINAL, no active recovery",
+      "where": ".standards/MODE.md (BROWNFIELD); .standards/STATE.md WorkflowState REVIEWING_FINAL, CycleMode STANDARD, Recovery.Active false, Handoff RESUME from TESTING",
+      "status": "realized"
+    },
+    {
+      "condition": "An existing Reviewer finding F-003 exists and is still open",
+      "where": ".standards/docs/reviews/<ID>/final-deliverable.md: `### F-003`, Status OPEN, P1, Owner Developer; report Status BLOCKED",
+      "status": "realized"
+    },
+    {
+      "condition": "Current code appears to correct F-003",
+      "where": "src/report.js projectTotals now skips only `entry.date > end`; test/report.test.js adds a closing-Sunday test; the selfChecks show 12/12 passing and the Sunday entry counted",
+      "status": "realized"
+    },
+    {
+      "condition": "No Reviewer re-review has happened since the correction",
+      "where": "F-003 Reassessment says 'not yet reassessed'; the final-deliverable report predates commits 0e8d22d/1106b87 and still cites the pre-fix blob d351eeb",
+      "status": "realized"
+    },
+    {
+      "condition": "Full upstream record set (context, scope, architecture, development, verification, implementation review, documentation, final review) present and coherent",
+      "where": ".standards/CONTEXT.md and .standards/docs/{scope,specs,development,verification,documentation,reviews}/…; check.mjs reports ok",
+      "status": "realized"
+    },
+    {
+      "condition": "Git is committed and clean",
+      "where": "git status: clean on main; history reads as real cycle work",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The recovery reran only through TESTING and resumed REVIEWING_FINAL, so the implementation review (COMPLETE, assessed at d05a015) predates the code fix. This is a defensible frame-owner choice and is recorded in Plan Notes. A thorough Navigator may mention it, and the mention can only strengthen assertion 1.",
+      "recommendation": "run_as_is",
+      "fix": "None needed; graderOnly already states this fact so the judge will not penalize mentioning it."
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 0,
+      "detail": "`reply_not_matches: ^ *Next role:` could in principle catch a Navigator that quotes the protocol's next-role block while explaining ownership. A correct Navigator emits no handoff and would rarely write that line-leading label, so the risk is small.",
+      "recommendation": "run_as_is",
+      "fix": "Optional: drop this check and rely on no_skill_call plus the judge."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes the case faithfully. It is in REVIEWING_FINAL with F-003 still OPEN and the final review BLOCKED and not reassessed, while the committed code and the new test show the closing-Sunday fix in place. check.mjs is clean, all selfChecks pass, there are no leaks, and the checks and Navigator invariants cannot fail a correct non-mutating explanation. Only minor notes remain: the implementation review was not rerun, and the 'Next role:' reply check carries a small risk.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T01:41:56.831Z",
+  "costUsd": 0.2643562,
+  "ms": 30780,
+  "fixtureHash": "d29d173b468a7d5d"
+}

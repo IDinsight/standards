@@ -1,0 +1,56 @@
+{
+  "conditions": [
+    {
+      "condition": "Request flow is route -> validate -> normalize -> save -> response",
+      "where": "src/server.js (reads JSON, calls route, writes result); src/router.js (route table -> createContact); src/contacts/handler.js lines 4-18 (validateContact, normalizeContact, store.save, return {status, body})",
+      "status": "realized"
+    },
+    {
+      "condition": "Validation rejects before save",
+      "where": "src/contacts/handler.js lines 5-8 return 400 before normalize/save; test 'rejects an invalid contact without saving it' asserts store.rows.size is 0",
+      "status": "realized"
+    },
+    {
+      "condition": "Save errors are mapped to 503",
+      "where": "src/contacts/handler.js lines 11-16 catch around store.save returning 503; src/store.js throws StoreFullError at limit; test 'returns 503 when the store rejects the write'",
+      "status": "realized"
+    },
+    {
+      "condition": "Small committed codebase with enough source evidence to trace a concrete input through success and failure paths",
+      "where": "two pre-install commits; git status clean; selfChecks pass",
+      "status": "realized"
+    },
+    {
+      "condition": "No workflow state is required for Navigator",
+      "where": ".standards/STATE.md left at the installed brownfield initial state; check.mjs ok",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "ungradeable-assertion",
+      "assertion": 1,
+      "detail": "Assertion 1 is conditional ('any sample input/output or diagram'). If the role shows no sample, the judge can only pass it vacuously. The expected output asks the role to trace a concrete input, so a sample is likely. The fixture cannot force one.",
+      "recommendation": "run_as_is",
+      "fix": "None; this is inherent to the assertion wording."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The commit subject 'Return 503 when the contact store rejects a write' describes the 503 mapping. This is ordinary history for a real feature commit and gives away no planted defect or verdict; the same fact is plain in handler.js.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The code realizes the stated flow exactly: src/contacts/handler.js validates (400 before save), normalizes, saves, maps any save error to 503, and returns the response, and selfChecks confirm the behavior. The checks (reply mentions handler.js and 503) are necessary for any correct evidence-backed explanation, and the Navigator invariants (unchanged **, HEAD, no mutating git) fit. The tests are in-memory, so running them would not break the unchanged invariant.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T01:34:36.333Z",
+  "costUsd": 0.670881,
+  "ms": 28862,
+  "fixtureHash": "d6a68adeb0062603"
+}

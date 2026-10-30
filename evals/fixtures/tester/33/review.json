@@ -1,0 +1,86 @@
+{
+  "conditions": [
+    {
+      "condition": "BROWNFIELD project, STANDARD cycle, WorkflowState TESTING",
+      "where": ".standards/MODE.md (installed BROWNFIELD); .standards/STATE.md WorkflowState TESTING, CycleMode STANDARD",
+      "status": "realized"
+    },
+    {
+      "condition": "Plan IN_PROGRESS with Verification Cadence INCREMENTAL and Current Increment 1",
+      "where": ".standards/docs/development/low-stock-alerts-…md header",
+      "status": "realized"
+    },
+    {
+      "condition": "Future DEV-003 PENDING (Increment 2, AC-003), unimplemented",
+      "where": "plan DEV-003 Status PENDING; packages/cli/src/main.js has no --low-stock",
+      "status": "realized"
+    },
+    {
+      "condition": "Tester found an implementation defect in Increment 1 and saved its INCREMENT / Increment 1 assignment for Frame 1, routing to Developer",
+      "where": "verification report Resume or Handoff ### Suspended Assignment 1 (Recovery Frame 1, exact Frame 1 Reason, INCREMENT/Increment 1); STATE Frame 1 TESTING→DEVELOPING IMPLEMENTATION; original lowStock.js used < (commit 6198545)",
+      "status": "realized"
+    },
+    {
+      "condition": "Developer repaired the implementation and discovered a genuine test defect",
+      "where": "packages/core/src/lowStock.js uses <=; low-stock.test.js 'uses the default threshold when none is set' expects ['B1'] though B2 (5 units, default 5) is low stock under AC-001/AC-002; selfChecks confirm the single failure",
+      "status": "realized"
+    },
+    {
+      "condition": "Developer saved a corrective assignment for Frame 2 before routing to Tester",
+      "where": "plan Plan Notes ### Suspended Assignment 1 (Recovery Frame 2, exact Frame 2 Reason, CORRECTION); STATE Frame 2 DEVELOPING→TESTING VERIFICATION, ResumeAt DEVELOPING, FAILURE handoff from DEVELOPING",
+      "status": "realized"
+    },
+    {
+      "condition": "Tester now owns the test correction (active frame owner TESTING, RerunThrough NONE)",
+      "where": ".standards/STATE.md Frame 2",
+      "status": "realized"
+    },
+    {
+      "condition": "A cadence switch to AFTER_IMPLEMENTATION is pending",
+      "where": ".standards/STATE.md PendingVerificationCadence AFTER_IMPLEMENTATION",
+      "status": "realized"
+    },
+    {
+      "condition": "Report has full AC inventory with AWAITING_IMPLEMENTATION for AC-003 and still shows INCREMENT/Increment 1 (role must set CORRECTION)",
+      "where": "verification report header and Acceptance Evidence; check.mjs reports exactly the expected CORRECTION problem",
+      "status": "realized"
+    },
+    {
+      "condition": "Context, scope, architecture records present and consistent",
+      "where": ".standards/CONTEXT.md, scope (AC-001..003), specs (coverage for all ACs, <= rule)",
+      "status": "realized"
+    },
+    {
+      "condition": "Established test commands run offline",
+      "where": "pnpm workspace with workspace:* link; selfChecks pnpm --filter @stockroom/core/cli test ran",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "Frame 2 Reason and DEV-001 Self-Check state plainly that B2 should be included and the test expectation is wrong. This is realistic Developer routing evidence and the case tests recovery routing, not defect discovery, so it does not leak the graded behavior.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 2,
+      "detail": "Traced the turn-end check after a correct RESUME (DEVELOPING, Frame 1 only, report CORRECTION): recoveryScope stays scoped via the Frame 1 TESTING suspended assignment, partialAssessment requires AC-001..003 in Acceptance Evidence (already present), plan need not be COMPLETE. check_ok should pass; the pre-run turn-end check is clean because the CORRECTION message is gated on !atTurnEnd.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized: nested Frames 1 and 2 with matching suspended assignments in the report and plan, a genuine test defect after the committed <= repair, DEV-003 pending, and a pending AFTER_IMPLEMENTATION cadence. check.mjs reports exactly the deliberate CORRECTION problem. The checks and invariants are necessary conditions that a correct RESUME-to-Developer run satisfies, and nothing leaks beyond realistic Developer routing evidence.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-01T22:36:16.029Z",
+  "costUsd": 0.2639712,
+  "ms": 44267,
+  "fixtureHash": "408eeeea165e40eb"
+}

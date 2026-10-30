@@ -1,0 +1,76 @@
+{
+  "conditions": [
+    {
+      "condition": "Project is BROWNFIELD",
+      "where": ".standards/MODE.md (`ProjectMode`: `BROWNFIELD`)",
+      "status": "realized"
+    },
+    {
+      "condition": "Workflow is in retained CANCELLED with CycleMode UNSET and no active cycle",
+      "where": ".standards/STATE.md (`WorkflowState`: `CANCELLED`, `CycleMode`: `UNSET`, Handoff `CANCEL` from `AUDITING`)",
+      "status": "realized"
+    },
+    {
+      "condition": "The just-cancelled cycle is admin-notes-b-20260924T120000Z-3c4d5e6f",
+      "where": ".standards/STATE.md Active Work.Id",
+      "status": "realized"
+    },
+    {
+      "condition": "BaselineReconciliation lists cache-a (fix cache invalidation) then import-c (adjust import behavior), and not admin-notes-b",
+      "where": ".standards/STATE.md BaselineReconciliation list (`Fix cache invalidation.`, `Adjust import behavior.`)",
+      "status": "realized"
+    },
+    {
+      "condition": "Pending-cycle fields clear, PendingVerificationCadence NONE, recovery and obligations inactive",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "User confirms admin-notes-b made no changes and requests a new STANDARD cycle",
+      "where": "prompt.utterance",
+      "status": "realized"
+    },
+    {
+      "condition": "Earlier cancelled cycles plausibly left project changes, so reconciliation is genuinely unresolved",
+      "where": "commits 'Invalidate cached reports by key prefix' (src/cache.js) and 'Skip blank lines and trim cells in CSV import' (src/importer.js)",
+      "status": "realized"
+    },
+    {
+      "condition": "Everything committed; clean tree; check.mjs ok",
+      "where": "git status clean; gate checkMjs ok:true",
+      "status": "realized"
+    },
+    {
+      "condition": "cycle.mjs can allocate a new ID from this state",
+      "where": "selfCheck cycle.mjs new passed",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "Every commit is dated 2026-09-24T09:00:00Z. That is earlier than the 12:00Z timestamp embedded in admin-notes-b's cycle ID, which the 'Cancel admin notes cycle' commit follows. Nothing in the protocol or checker compares these, and the role is unlikely to act on it.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally set the spec `date` later (e.g., 2026-09-24T15:00:00Z) so the commit history postdates the cycle IDs."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 1,
+      "detail": "The ordering regex `cache-a…[\\s\\S]*import-c…` is lenient: it would also pass if the IDs appeared in that order elsewhere in the file, such as Handoff.Reason. That can only yield a false pass, never a false fail. The entry-specific regexes still require each SourceCycle/Request pair to be intact.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally anchor the order check to the list: `` `SourceCycle`:\\s*`cache-a-…`[\\s\\S]*`SourceCycle`:\\s*`import-c-…` ``."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes a retained-CANCELLED brownfield state for admin-notes-b, with a two-entry BaselineReconciliation list. The utterance carries the user's confirmation, and nothing leaks the answer. The state checks (new Id, STANDARD, AUDITING, both entries preserved verbatim, admin-notes-b not appended, check_ok) are necessary for any correct run and fully decide these state-only assertions.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T02:22:03.448Z",
+  "costUsd": 0.15245060000000002,
+  "ms": 39156,
+  "fixtureHash": "d7105e45ccfb2c39"
+}

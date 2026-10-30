@@ -1,0 +1,54 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield template)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState ARCHITECTING",
+      "where": ".standards/STATE.md head fields",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery inactive and no outstanding obligations",
+      "where": ".standards/STATE.md Recovery/Outstanding Obligations Active false",
+      "status": "realized"
+    },
+    {
+      "condition": "Valid active-cycle project context exists",
+      "where": ".standards/CONTEXT.md, committed in 'Record project context for task due dates' with STATE FORWARD from AUDITING; it matches src/ and test/",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Scope points to a completed scope",
+      "where": "STATE.md Scope field -> .standards/docs/scope/<ID>.md with SCOPE provenance for the active cycle; Handoff FORWARD from SCOPING",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope's Done when conditions are observable but carry no AC-NNN identifiers",
+      "where": "scope record Work items 1 and 2: plain bullets; selfCheck grep -c returns 0",
+      "status": "realized"
+    },
+    {
+      "condition": "No technical design exists yet",
+      "where": "STATE.md Architecture NONE; no .standards/docs/specs/ file",
+      "status": "realized"
+    },
+    {
+      "condition": "Small brownfield codebase committed, clean tree",
+      "where": "src/*.js, test/tasks.test.js; git status clean; tests pass",
+      "status": "realized"
+    }
+  ],
+  "issues": [],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition: a brownfield STANDARD cycle at ARCHITECTING with valid context and a completed SCOPE record whose observable Done-when bullets have no AC-NNN identifiers. Nothing leaks, and the utterance is just 'Continue.'. check.mjs is ok. The state checks for the SCOPING failure, the recovery frame, and the `/scoper` invocation are necessary conditions for any correct run, and check_ok holds after the expected transition because acceptance and design checks are skipped during recovery in SCOPING.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T00:29:55.824Z",
+  "costUsd": 0.14773239999999999,
+  "ms": 28478,
+  "fixtureHash": "6e692869448e393e"
+}

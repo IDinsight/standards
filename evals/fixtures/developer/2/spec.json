@@ -1,0 +1,303 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add task list with SQLite store and HTML views"
+    },
+    {
+      "dir": "layers/60-design",
+      "action": "commit",
+      "message": "Record project context, scope, and design for task priority"
+    },
+    {
+      "dir": "layers/70-plan",
+      "action": "commit",
+      "message": "Propose development plan for task priority"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "developer",
+    "utterance": "Approved, proceed."
+  },
+  "graderOnly": [
+    "The architecture fully defines the required contracts; no upstream defect exists, so no failure routing is warranted.",
+    "The existing tests use substring checks and positional Task construction, so they keep passing once the designed field, badge, and select are added; tests/ is Tester-owned and needs no change.",
+    "No developer user style is selected and .standards/user-styles/ does not exist; the plan's User Style is NONE.",
+    "The Developer style files relevant to this change are styles/universal.md, styles/python.md, styles/html.md (app/views.py renders markup), and styles/sql.md (app/store.py's schema and queries change)."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "add-task-priority-20260923T141200Z-5c81e2a4",
+    "DEV": ".standards/docs/development/add-task-priority-20260923T141200Z-5c81e2a4.md",
+    "VER": ".standards/docs/verification/add-task-priority-20260923T141200Z-5c81e2a4.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.Development",
+          "equals": "${DEV}",
+          "why": "the approved plan remains the cycle's plan"
+        },
+        {
+          "provenance": {
+            "path": "${DEV}",
+            "artifact": "DEVELOPMENT",
+            "cycle": "${ID}"
+          }
+        },
+        {
+          "contains": {
+            "path": "${DEV}",
+            "regex": "^### DEV-001\\b",
+            "flags": "m"
+          },
+          "why": "approved step identities preserved"
+        },
+        {
+          "contains": {
+            "path": "${DEV}",
+            "regex": "^### DEV-002\\b",
+            "flags": "m"
+          }
+        },
+        {
+          "contains": {
+            "path": "${DEV}",
+            "regex": "^### DEV-003\\b",
+            "flags": "m"
+          }
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "field": {
+            "path": "${DEV}",
+            "name": "User Style Locked",
+            "equals": "true"
+          }
+        },
+        {
+          "field": {
+            "path": "${DEV}",
+            "name": "User Style",
+            "equals": "NONE"
+          }
+        },
+        {
+          "state": "ActiveWork.BlockedOn",
+          "equals": "NONE"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": true,
+      "all": [
+        {
+          "field": {
+            "path": "${DEV}",
+            "name": "Mode",
+            "equals": "AUTONOMOUS"
+          }
+        },
+        {
+          "contains": {
+            "path": "${DEV}",
+            "regex": "^### DEV-001\\b[^\\n]*\\n(?:[ \\t]*\\n)*`Status`:\\s*`DONE`",
+            "flags": "m"
+          },
+          "why": "DEV-001 done in this run"
+        },
+        {
+          "contains": {
+            "path": "${DEV}",
+            "regex": "^### DEV-002\\b[^\\n]*\\n(?:[ \\t]*\\n)*`Status`:\\s*`DONE`",
+            "flags": "m"
+          },
+          "why": "DEV-002 done in this run"
+        },
+        {
+          "contains": {
+            "path": "${DEV}",
+            "regex": "^### DEV-003\\b[^\\n]*\\n(?:[ \\t]*\\n)*`Status`:\\s*`DONE`",
+            "flags": "m"
+          },
+          "why": "DEV-003 done in this run"
+        },
+        {
+          "field": {
+            "path": "${DEV}",
+            "name": "Status",
+            "equals": "COMPLETE"
+          }
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "TESTING"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 4,
+      "complete": false,
+      "all": [
+        {
+          "absent": "${VER}",
+          "why": "Developer does not create the Tester's verification report"
+        },
+        {
+          "unchanged": [
+            "tests/**"
+          ],
+          "why": "Developer does not add or rewrite Tester-owned tests"
+        }
+      ]
+    },
+    {
+      "assertion": 5,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "TESTING"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FORWARD"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "DEVELOPING"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "NONE"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "false"
+        },
+        {
+          "state": "CycleMode",
+          "equals": "STANDARD"
+        },
+        {
+          "reply_matches": "/tester\\b",
+          "why": "Claude Code invocation of the Tester skill"
+        }
+      ]
+    },
+    {
+      "assertion": 6,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "TESTING"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        ".standards/docs/scope/**",
+        ".standards/docs/specs/**",
+        ".standards/CONTEXT.md"
+      ],
+      "why": "Developer does not change Scoper, Architect, or Auditor artifacts"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "python3 -m pytest -q",
+      "expect": "pass",
+      "why": "The existing suite of 15 tests passes before the change and is available as a Developer self-check."
+    },
+    {
+      "cmd": "grep -rc priority app",
+      "expect": "fail",
+      "expectOutput": "app/store\\.py:0",
+      "why": "Nothing in app/ handles priority yet; DEV-001 to DEV-003 are all PENDING."
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 50-project (pre-install): Python stdlib task-list app: app/models.py (Task dataclass), app/store.py (SQLite TaskStore, schema created on start), app/service.py (validation, ValueError/LookupError), app/views.py (HTML rendering with html.escape), app/web.py (handlers returning status/body), and 15 passing pytest tests in tests/ that use substring checks so the designed changes do not break them. 60-design: Auditor CONTEXT.md, scope with AC-001..AC-004, technical design that fully defines the priority contracts (column plus in-place ALTER TABLE, service PRIORITIES/default/ValueError, handler wiring, badge and select markup), STATE at DEVELOPING after FORWARD from ARCHITECTING with Development NONE. 70-plan: Developer plan PROPOSED, AUTONOMOUS, User Style NONE, User Style Locked false, AFTER_IMPLEMENTATION/NONE, DEV-001 persistence, DEV-002 service, DEV-003 UI, all PENDING with planned self-checks; STATE gains Active Work.Development and BlockedOn asking for Developer build plan approval. check.mjs passes on the built state.",
+  "case": "developer-2",
+  "caseHash": "0027ad9575baec2b",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T02:13:59.421Z",
+    "verdict": "issues",
+    "fixtureHash": "7de5c06ff2333f14",
+    "fixedBy": "owner decision",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "a3229e755e72f022",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:06:34.118Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T01:00:28.035Z"
+  },
+  "decision": {
+    "action": "fixed",
+    "note": "Owner-approved gate-3 recommendation (2026-10-03).",
+    "at": "2026-10-03T12:01:13.567Z",
+    "fixtureHash": "a3229e755e72f022"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/60-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/70-plan/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:06:34.118Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

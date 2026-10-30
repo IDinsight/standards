@@ -1,0 +1,61 @@
+{
+  "conditions": [
+    {
+      "condition": "A small project with retry behavior to explain",
+      "where": "src/retry.js (withRetry, isRetryable, RETRY_LIMIT, BASE_DELAY_MS) used by src/client.js getJson",
+      "status": "realized"
+    },
+    {
+      "condition": "HEAD has retry limit 2",
+      "where": "commit d6e4031 src/retry.js line 1 `export const RETRY_LIMIT = 2;` (selfCheck 1 passes)",
+      "status": "realized"
+    },
+    {
+      "condition": "The index stages limit 4 for the same file",
+      "where": "layer 50-staged, `git show :src/retry.js` line 1 `RETRY_LIMIT = 4` (selfCheck 2 passes)",
+      "status": "realized"
+    },
+    {
+      "condition": "The same working-tree file has limit 6",
+      "where": "layer 60-unstaged, working-tree src/retry.js line 1 `RETRY_LIMIT = 6`; git status `MM src/retry.js` (selfCheck 3 passes)",
+      "status": "realized"
+    },
+    {
+      "condition": "Only that one file differs across versions, so the three-way comparison is unambiguous",
+      "where": "selfCheck 4: cached and unstaged diffs name only src/retry.js; no untracked files",
+      "status": "realized"
+    },
+    {
+      "condition": "Navigator can run without an active cycle",
+      "where": ".standards/STATE.md is the pristine brownfield install state; check.mjs ok",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 1,
+      "detail": "The working-tree label regex includes `local|locally`. The user's own question uses \"locally\", so almost any reply satisfies it. It is still a valid necessary condition, and the judge decides the actual mapping of each value to HEAD, the index, and the working tree.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "`check_ok` is omitted from the invariants. The spec format exempts Navigator from it, and `unchanged: [\"**\"]` covers non-mutation. The tests write no files, so a Navigator run that inspects them or runs them cannot trip the unchanged invariant.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes the three-version state exactly: HEAD has limit 2, the index stages 4, and the working tree has 6, all on line 1 of src/retry.js, with no other dirty paths and no hints in names, commits, or tests. The checks are loose necessary conditions (the reply names 4 and 6 and labels the staged and local versions) that a correct run would satisfy, and the Navigator invariants fit. It is fit to run.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T01:38:07.325Z",
+  "costUsd": 0.0988042,
+  "ms": 29545,
+  "fixtureHash": "a6e34c824a81f1ce"
+}

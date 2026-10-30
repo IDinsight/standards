@@ -1,0 +1,201 @@
+{
+  "base": "export-documenting",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-guide",
+      "action": "commit",
+      "message": "Document CSV export in the usage guide"
+    },
+    {
+      "dir": "layers/52-doc-record",
+      "action": "commit",
+      "message": "Record usage guide progress for CSV export"
+    },
+    {
+      "dir": "layers/55-export-options",
+      "action": "commit",
+      "message": "Group export settings into a single createApp option"
+    },
+    {
+      "dir": "layers/57-seed",
+      "action": "commit",
+      "message": "Update @records/seed to 0.2.0",
+      "pnpmInstall": true
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "documenter",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "After the documentation record captured its input identities, commit 'Group export settings into a single createApp option' replaced createApp's exportDir and now options with a nested exports: { dir, now } option, changed writeExport(dir, records, now) to writeExport(records, { dir, now }), and changed registerExportRoutes' options to { dir, now }.",
+    "Because Node only strips types, the guide's createApp({ exportDir, now }) example still runs without error, but both options are silently ignored: files go to the default exports folder with the current time in the name. The record's check C1 (run with createApp({ exportDir, now })) no longer reproduces on the current code.",
+    "Commit 'Update @records/seed to 0.2.0' bumped packages/seed/package.json from 0.1.0 to 0.2.0 and renamed seed record 3 to 'Q3 \"priority\" accounts review'; the guide's owner=dana example output still shows the Q2 title.",
+    "docs/usage.md and README.md are byte-identical to the versions the record cites; the record's docs/usage.md and README.md blob identities still match, while its src/export.ts, src/routes/export.ts, src/app.ts, packages/seed/package.json, and packages/seed/index.js identities no longer match.",
+    "The HTTP behavior of POST /records/export (path, admin-only authorization, 401/403/400 responses, 201 headers, CSV format, default exports folder, file naming) is unchanged, so the guide's HTTP-level statements remain accurate; retained evidence for them needs justification against the current code.",
+    "The verification report and implementation review assessed the earlier implementation and seed; neither has been updated for the two later commits. Current tests pass (21 unit, 3 integration).",
+    "STATE.md was not changed by the two later commits: DOCUMENTING, FORWARD from REVIEWING_IMPLEMENTATION, recovery and obligations inactive, nothing blocked."
+  ],
+  "history": null,
+  "vars": {
+    "GUIDE_COMMIT": "${COMMIT:Document CSV export in the usage guide}"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${DOC}",
+          "why": "the incomplete documentation record is preserved, not replaced"
+        },
+        {
+          "provenance": {
+            "path": "${DOC}",
+            "artifact": "DOCUMENTATION",
+            "cycle": "${ID}"
+          },
+          "why": "the record keeps this cycle's provenance"
+        },
+        {
+          "changed": [
+            "${DOC}"
+          ],
+          "why": "reconciling changed inputs against an incomplete record requires persisting the result (new identities, invalidated evidence, or a discrepancy) in that record"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": []
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        ".standards/docs/verification/**",
+        ".standards/docs/reviews/**",
+        ".standards/docs/development/**",
+        ".standards/docs/scope/**",
+        ".standards/docs/specs/**",
+        ".standards/CONTEXT.md"
+      ],
+      "why": "Documenter does not edit other roles' records"
+    },
+    {
+      "unchanged": [
+        "package.json",
+        "pnpm-lock.yaml",
+        "packages/seed/package.json",
+        ".gitignore"
+      ],
+      "why": "Documenter does not change dependencies or configuration"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test 2>&1 | grep -qE 'pass 21$'",
+      "expect": "pass",
+      "why": "the unit suite still passes 21 tests after the later commits"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration 2>&1 | grep -qE 'pass 3$'",
+      "expect": "pass",
+      "why": "the integration suite, updated for the new option and seed title, passes 3 tests"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the DOCUMENTING state with an IN_PROGRESS documentation record is valid"
+    },
+    {
+      "cmd": "d=.standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md && grep -q '`Status`: `IN_PROGRESS`' $d && grep -q $(git rev-parse HEAD:docs/usage.md) $d && grep -q $(git rev-parse HEAD:README.md) $d && grep -q $(git rev-parse HEAD:src/records/filter.ts) $d && ! grep -q $(git rev-parse HEAD:src/app.ts) $d && ! grep -q $(git rev-parse HEAD:src/export.ts) $d && ! grep -q $(git rev-parse HEAD:src/routes/export.ts) $d && ! grep -q $(git rev-parse HEAD:packages/seed/package.json) $d && ! grep -q $(git rev-parse HEAD:packages/seed/index.js) $d && ! grep -rqE 'COMMIT:|BLOB:' $d",
+      "expect": "pass",
+      "why": "the record is IN_PROGRESS; its documentation identities still match while its implementation and dependency identities are stale"
+    },
+    {
+      "cmd": "grep -q 'createApp({' docs/usage.md && grep -q 'exportDir:' docs/usage.md && grep -q 'Q2 \"\"priority\"\"' docs/usage.md && ! grep -q exportDir src/app.ts && grep -q 'exports?: ExportSettings' src/app.ts && grep -q 'writeExport(records: readonly RecordItem\\[\\], target: ExportTarget)' src/export.ts && grep -q '\"version\": \"0.2.0\"' packages/seed/package.json && grep -q 'Q3 \"priority\" accounts review' packages/seed/index.js",
+      "expect": "pass",
+      "why": "the guide still documents the old createApp options and old seed title while the code and seed changed"
+    },
+    {
+      "cmd": "node --input-type=module -e \"import { existsSync, mkdtempSync } from 'node:fs'; import { tmpdir } from 'node:os'; import path from 'node:path'; import { createApp } from './src/app.ts'; const dir = path.join(mkdtempSync(path.join(tmpdir(), 'guide-')), 'out'); const app = createApp({ exportDir: dir, now: () => new Date('2026-09-24T09:00:00Z') }); const res = app.handle({ method: 'POST', path: '/records/export', query: { owner: 'dana' }, user: { id: 1, name: 'Ada', role: 'admin' } }); if (res.status !== 201 || existsSync(dir) || !existsSync('exports') || !res.body.includes('Q3 ') || res.headers['content-disposition'].includes('20260924T090000Z')) process.exit(1);\"",
+      "expect": "pass",
+      "why": "the guide's createApp example runs without error but its options are ignored now (file goes to the default folder with the current time), and the export shows the new seed title"
+    },
+    {
+      "cmd": "git diff --quiet HEAD~4 HEAD -- .standards/STATE.md .standards/docs/verification .standards/docs/reviews .standards/docs/development && git diff --quiet HEAD~2 HEAD -- docs README.md .standards/docs/documentation",
+      "expect": "pass",
+      "why": "the four case commits leave workflow state and other roles' records unchanged, and the two later commits change neither the guide, README, nor the documentation record"
+    },
+    {
+      "cmd": "git log -4 --format=%s | paste -s -d '|' - | grep -qx 'Update @records/seed to 0.2.0|Group export settings into a single createApp option|Record usage guide progress for CSV export|Document CSV export in the usage guide'",
+      "expect": "pass",
+      "why": "history shows the documentation work followed by the two interrupting commits"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q .",
+      "expect": "pass",
+      "why": "all changes are committed"
+    }
+  ],
+  "notes": "Built on export-documenting (cycle export-20260924T090000Z-a7f3c1d2 at DOCUMENTING, FORWARD from REVIEWING_IMPLEMENTATION, recovery and obligations inactive, nothing blocked). Layer 50-guide commits an export section in docs/usage.md (who may export, filters, response and file, CSV format, an owner=dana example showing seed records 1 and 3, errors, and a createApp({ exportDir, now }) folder example) that was accurate for the implementation at that time. Layer 52-doc-record commits an IN_PROGRESS AUTONOMOUS/ACTIVE_CHANGE documentation record citing that commit and BLOB identities of the scope, design, context, plan, verification, review, src files, package.json, @records/seed 0.1.0 (package.json and index.js), docs/usage.md, and README.md, with checks C1-C4 that passed (example run in-process, error cases, both test suites, inspection), no discrepancies, and README.md as the remaining item. Layer 55 (committed while Documenter was away) changes the export API signatures: createApp's exportDir/now become exports: { dir, now }, writeExport and registerExportRoutes options change; the integration test is updated. Layer 57 bumps @records/seed to 0.2.0 and renames seed record 3 (Q2 -> Q3), updating the integration test. HTTP behavior is unchanged. The guide text and README are unchanged after the record, so HEAD-relative documentation diffs and the docs blob look fresh while the example and C1 evidence are stale. STATE.md is untouched by the later commits.",
+  "case": "documenter-40",
+  "caseHash": "40ab33e383e586d5",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T16:34:41.229Z",
+    "verdict": "pass",
+    "fixtureHash": "7b5cefe72cc78e0b",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "8f52fb18d43692c2",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:14:52.437Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T15:16:50.404Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-documenting": "cad63ec878d1dad0"
+  },
+  "migrations": [
+    {
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:14:52.437Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

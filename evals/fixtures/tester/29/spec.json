@@ -1,0 +1,223 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add order store and JSON orders route"
+    },
+    {
+      "dir": "layers/10-planning",
+      "action": "commit",
+      "message": "Record scope, design, and project context for CSV export"
+    },
+    {
+      "dir": "layers/20-implementation",
+      "action": "commit",
+      "message": "Add CSV export for orders"
+    },
+    {
+      "dir": "layers/30-dev-complete",
+      "action": "commit",
+      "message": "Complete development plan for CSV export"
+    },
+    {
+      "dir": "layers/40-test-edits",
+      "action": "unstaged"
+    },
+    {
+      "dir": "layers/50-test-new",
+      "action": "untracked"
+    },
+    {
+      "dir": "layers/60-report",
+      "action": "untracked"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "tester",
+    "utterance": "Now run the implementation review here."
+  },
+  "graderOnly": [
+    "The committed implementation (src/export.js and handleExport in src/http.js) satisfies AC-001 through AC-004, and node --test test/*.test.js passes 10 of 10 tests in the built fixture.",
+    "The earlier turns of this conversation ran Tester: they wrote test/export.test.js, the two export-route scenarios in test/http.test.js, and the verification report, so this conversation contains test and evidence authoring history.",
+    "The verification report already records complete passing evidence for every current AC; it is IN_PROGRESS only because the user asked to see the results before any handoff, so the full Tester gate can pass now.",
+    "No implementation, scope, design, or context defect exists in this fixture.",
+    "In the first history turn the user invoked /tester and asked for /reviewer to run the implementation review afterwards."
+  ],
+  "history": {
+    "turns": [
+      {
+        "role": "user",
+        "text": "/tester Continue the active workflow from `.standards/STATE.md`. Read the persisted Active Work, relevant project context and owned artifacts, and recovery context before proceeding. When testing is done, also run /reviewer for the implementation review. Show me the test results before you hand anything off."
+      },
+      {
+        "role": "assistant",
+        "text": "Working as Tester. `.standards/STATE.md` is in `TESTING` with `CycleMode: STANDARD`, recovery inactive, and a FORWARD handoff from DEVELOPING; `check` reported no problems. This chat is separate from Developer's implementation conversation as far as I can see; I cannot verify session metadata, so I reconstructed the assessment from the persisted scope, design, context, development plan, and the repository.\n\nMode `VERIFY`, Assessment Purpose `FULL`, target `NONE`. Report: `.standards/docs/verification/let-staff-export-orders-as-csv-20260922T141000Z-5c81e2a4.md`.\n\nTests added (5 new scenarios, within the per-file budget):\n- `test/export.test.js` (new): header and one row per order; empty export keeps the header; quoting of commas, double quotes, and line breaks.\n- `test/http.test.js`: export route filtered by `status: paid`; unknown status rejected with 400 and no CSV rows.\n- Reused `test/orders.test.js` (list returns orders in id order) for the AC-001 ordering.\n\nRun: `node --test test/*.test.js` from the project root, source at the `Add CSV export for orders` commit with no uncommitted source changes: 10 tests, 10 passed, 0 failed, exit 0.\n\n- AC-001 header row and id order: verified\n- AC-002 RFC 4180 quoting: verified\n- AC-003 two-decimal totals: verified\n- AC-004 status filter and 400 on an unknown status: verified\n\nNo defects found in the implementation or in the upstream records. The evidence is saved in the report, which I have left `IN_PROGRESS` because you asked to see the results before anything is handed off.\n\nSuggested commit message: `test(export): cover CSV export formatting and status filter`"
+      }
+    ]
+  },
+  "vars": {
+    "ID": "let-staff-export-orders-as-csv-20260922T141000Z-5c81e2a4",
+    "VER": ".standards/docs/verification/let-staff-export-orders-as-csv-20260922T141000Z-5c81e2a4.md",
+    "REVIEW": ".standards/docs/reviews/let-staff-export-orders-as-csv-20260922T141000Z-5c81e2a4/implementation.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "absent": "${REVIEW}",
+          "why": "no formal implementation review is started in the conversation that authored the tests and evidence"
+        },
+        {
+          "reply_matches": "/reviewer",
+          "why": "the handoff provides the Reviewer invocation for a separate session"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "REVIEWING_IMPLEMENTATION",
+          "why": "Tester completes its gate and hands off rather than stopping in TESTING"
+        },
+        {
+          "field": {
+            "path": "${VER}",
+            "name": "Status",
+            "equals": "COMPLETE"
+          },
+          "why": "Tester completion evidence is persisted before the forward handoff"
+        },
+        {
+          "absent": "${REVIEW}",
+          "why": "the immediate-continuation exception does not run the review here"
+        },
+        {
+          "reply_matches": "/reviewer",
+          "why": "a Reviewer invocation is still emitted for a fresh session"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "state": "Handoff.Kind",
+          "equals": "FORWARD",
+          "why": "normal forward handoff from Tester"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "TESTING",
+          "why": "normal forward handoff from Tester"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "absent": "${REVIEW}",
+          "why": "no implementation review report is created by Tester"
+        },
+        {
+          "unchanged": [
+            ".standards/docs/reviews/**"
+          ],
+          "why": "no Reviewer-owned record is written"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "package.json",
+        ".standards/CONTEXT.md",
+        ".standards/docs/scope/**",
+        ".standards/docs/specs/**",
+        ".standards/docs/development/**"
+      ],
+      "why": "Tester does not edit implementation or other roles' records"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/*.test.js",
+      "expect": "pass",
+      "why": "All 10 tests (committed source, unstaged and untracked test changes) pass, as the history and the report state."
+    },
+    {
+      "cmd": "git status --porcelain | grep -q '^ M test/http.test.js$' && git status --porcelain | grep -q '^?? test/export.test.js$' && git status --porcelain | grep -q '^?? .standards/docs/verification/$'",
+      "expect": "pass",
+      "why": "The Tester-authored test edit is unstaged and the new test file and verification report are untracked, matching where the history left the project."
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 00-project (pre-install): order-desk, a dependency-free Node ESM module with an in-memory order store, cents formatting, a JSON orders route, and two node:test suites. 10-planning: CONTEXT.md, scope with AC-001..AC-004, design, STATE at DEVELOPING. 20-implementation: correct src/export.js and handleExport in src/http.js. 30-dev-complete: COMPLETE development plan whose self-checks cite the implementation commit; STATE at TESTING, STANDARD, FORWARD from DEVELOPING, recovery inactive. 40 (unstaged): two export-route scenarios added to test/http.test.js. 50 (untracked): new test/export.test.js. 60 (untracked): verification report (VERIFY, FULL, NONE) with passing evidence for every AC and technical criterion, Status IN_PROGRESS because in the history the user asked to see results before any handoff. History: the first user turn invoked /tester and asked for /reviewer afterwards; the assistant, as Tester, wrote the tests and the report in that conversation. The run is expected to finalize the report as COMPLETE, move to REVIEWING_IMPLEMENTATION with a FORWARD handoff, and give a fresh-chat /reviewer invocation naming IMPLEMENTATION with the advisory model recommendation, without reviewing here.",
+  "case": "tester-29",
+  "caseHash": "a03c42749b6d946c",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T15:43:57.095Z",
+    "verdict": "pass",
+    "fixtureHash": "1041399a0d163060",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "95b32cb5352ee10b",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:49:09.701Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T15:37:33.222Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/10-planning/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/30-dev-complete/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:49:09.701Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

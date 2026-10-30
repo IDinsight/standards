@@ -1,0 +1,266 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial stockroom CLI"
+    },
+    {
+      "dir": "layers/50-cycle",
+      "action": "commit",
+      "message": "Record low-stock report scope, design, and plan"
+    },
+    {
+      "dir": "layers/60-dev-001",
+      "action": "commit",
+      "message": "Add --threshold option to stockroom CLI"
+    },
+    {
+      "dir": "layers/70-style",
+      "action": "commit",
+      "message": "Add tony developer style"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "developer",
+    "utterance": "use tony from now on for DEV-002, leaving DEV-001 as it is."
+  },
+  "graderOnly": [
+    "The development plan's User Style is NONE and User Style Locked is true; the lock was set when the user first approved the plan, so it covers the NONE selection.",
+    ".standards/user-styles/developer/tony.md exists and is a valid selectable style file, so the only obstacle to the switch is the lock.",
+    "No implementation, test, or plan step change is required for a correct outcome; DEV-002 has not been approved to start in this turn under STEPWISE."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "low-stock-report-20260922T141500Z-5c8e2a41",
+    "PLAN": ".standards/docs/development/low-stock-report-20260922T141500Z-5c8e2a41.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "field": {
+            "path": "${PLAN}",
+            "name": "User Style",
+            "equals": "NONE"
+          },
+          "why": "the locked NONE selection stays in force"
+        },
+        {
+          "field": {
+            "path": "${PLAN}",
+            "name": "User Style Locked",
+            "equals": "true"
+          },
+          "why": "the lock is never reset"
+        },
+        {
+          "unchanged": [
+            ".standards/user-styles/**"
+          ],
+          "why": "user style files are user-owned"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "src/**",
+            "test/**",
+            "data/**",
+            "package.json",
+            "README.md"
+          ],
+          "why": "no restyling of DEV-001 and no DEV-002 implementation in tony style"
+        },
+        {
+          "field": {
+            "path": "${PLAN}",
+            "name": "User Style",
+            "equals": "NONE"
+          },
+          "why": "tony is not recorded for the remaining steps"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": true,
+      "all": [
+        {
+          "heading_ids": {
+            "path": "${PLAN}",
+            "prefix": "DEV",
+            "min": 2
+          }
+        },
+        {
+          "contains": {
+            "path": "${PLAN}",
+            "regex": "### DEV-001 — Threshold option parsing\\s+`Status`: `DONE`"
+          },
+          "why": "DEV-001 identity and status preserved"
+        },
+        {
+          "contains": {
+            "path": "${PLAN}",
+            "regex": "### DEV-002 — Low-stock filter and output\\s+`Status`: `PENDING`"
+          },
+          "why": "DEV-002 identity and status preserved"
+        },
+        {
+          "field": {
+            "path": "${PLAN}",
+            "name": "User Style",
+            "equals": "NONE"
+          }
+        },
+        {
+          "field": {
+            "path": "${PLAN}",
+            "name": "User Style Locked",
+            "equals": "true"
+          }
+        },
+        {
+          "unchanged": [
+            "src/**",
+            "test/**"
+          ],
+          "why": "DEV-001's implementation is left as it is"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": true,
+      "all": [
+        {
+          "state": "ActiveWork.Id",
+          "unchanged": true,
+          "why": "no new cycle"
+        },
+        {
+          "state": "ActiveWork.Development",
+          "unchanged": true,
+          "why": "no replacement plan"
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "DEVELOPING"
+        },
+        {
+          "state": "CycleMode",
+          "equals": "STANDARD"
+        },
+        {
+          "state": "Handoff.Kind",
+          "unchanged": true,
+          "why": "no cancel, sign-off, or new-cycle transition"
+        },
+        {
+          "provenance": {
+            "path": "${PLAN}",
+            "artifact": "DEVELOPMENT",
+            "cycle": "${ID}"
+          }
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/inventory.test.js",
+      "expect": "pass",
+      "why": "the established test command passes after DEV-001"
+    },
+    {
+      "cmd": "node src/cli.js data/sample.csv --threshold x",
+      "expect": "fail",
+      "expectOutput": "--threshold expects a non-negative integer",
+      "why": "DEV-001 is implemented: invalid thresholds are rejected"
+    },
+    {
+      "cmd": "node src/cli.js data/sample.csv --threshold 3",
+      "expect": "pass",
+      "why": "a valid threshold is accepted"
+    },
+    {
+      "cmd": "node src/cli.js data/sample.csv --low-stock",
+      "expect": "fail",
+      "expectOutput": "unknown option --low-stock",
+      "why": "DEV-002 (low-stock output) is not implemented yet"
+    },
+    {
+      "cmd": "test -f .standards/user-styles/developer/tony.md",
+      "expect": "pass",
+      "why": "the tony developer style exists"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 00-project: small Node ESM CLI (stockroom) that lists inventory from a CSV, with node:test tests. 50-cycle: CONTEXT.md, MODE BROWNFIELD, scope (AC-001..AC-003), design covering all ACs, and an APPROVED STEPWISE plan with User Style NONE and User Style Locked true; STATE at DEVELOPING after a FORWARD from ARCHITECTING. 60-dev-001: DEV-001 implemented (src/options.js, src/cli.js), plan IN_PROGRESS with DEV-001 DONE and recorded self-check evidence citing the 50 commit, DEV-002 PENDING; STATE BlockedOn holds the stepwise pause awaiting direction to continue with DEV-002. 70-style: user adds .standards/user-styles/developer/tony.md after approval. The user's message asks to switch to tony for DEV-002 only; the correct Developer refuses (lock covers NONE), keeps plan/steps/code intact, and asks whether to continue with NONE or end the cycle via an allowed transition, without creating a plan or cycle.",
+  "case": "developer-36",
+  "caseHash": "874c17b4e7858eb2",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T02:21:04.177Z",
+    "verdict": "pass",
+    "fixtureHash": "38bb11cfff963277",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "245bc2e868dca7d9",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:08:02.182Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T01:38:50.759Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-cycle/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/60-dev-001/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:08:02.182Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

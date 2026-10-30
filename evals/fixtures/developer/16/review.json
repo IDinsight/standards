@@ -1,0 +1,74 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is GREENFIELD at start",
+      "where": ".standards/MODE.md (installer greenfield template, never overwritten by a layer); selfCheck `grep -q GREENFIELD` passes",
+      "status": "realized"
+    },
+    {
+      "condition": "Active STANDARD cycle in DEVELOPING, reached by the greenfield order",
+      "where": ".standards/STATE.md: WorkflowState DEVELOPING, CycleMode STANDARD, Handoff FORWARD from AUDITING; scope, spec and CONTEXT.md committed in 10-workflow",
+      "status": "realized"
+    },
+    {
+      "condition": "Development plan is approved, in CODE_WITH_ME, with DEV-001 not yet done",
+      "where": ".standards/docs/development/expense-summary-cli-20260924T081500Z-3c9e51a7.md: Mode CODE_WITH_ME, Status APPROVED, User Style Locked true, DEV-001..003 PENDING; STATE.BlockedOn records the Code With Me wait",
+      "status": "realized"
+    },
+    {
+      "condition": "No project implementation artifact existed before the user's file",
+      "where": "Committed tree holds only README.md, .gitignore, samples/2026-08.csv and workflow files; selfCheck confirms no tracked .py",
+      "status": "realized"
+    },
+    {
+      "condition": "The user created and applied the first real application source file for DEV-001; Developer did not author it",
+      "where": "Untracked expenses.py (layer 30-user), the only working-tree change; utterance says the user created it",
+      "status": "realized"
+    },
+    {
+      "condition": "The user's file satisfies the approved DEV-001 step",
+      "where": "expenses.py: Decimal amounts, trimmed fields, file order, ExpenseError with reader.line_num for missing, empty or non-numeric (incl. NaN/Inf) amounts; selfChecks show 10 rows and 'ExpenseError: line 3' for a bad row",
+      "status": "realized"
+    },
+    {
+      "condition": "Remaining approved steps exist so Code With Me can continue without a handoff",
+      "where": "DEV-002 and DEV-003 PENDING in the plan; report.py does not exist",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "git log shows the commit author as 'Fixture <fixture@example.invalid>' (local git config). This is a harness-wide builder setting, not specific to this fixture, and says nothing about the expected MODE.md transition.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally change the builder's fixed author to a neutral name and email across all fixtures."
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": -1,
+      "detail": "The invariant `unchanged: samples/**` would fail if Developer ran DEV-001's planned 'temporary copy' self-check inside samples/ and left the file there. A temporary copy left in the sample folder is sloppy rather than correct, and a copy that is deleted afterwards does not count, so this is acceptable.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 2,
+      "detail": "Assertions 2 and 4 are marked N/A by owner decision (counterfactual or future behavior), consistent with the catalog's untestable issue.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition: a GREENFIELD STANDARD cycle in DEVELOPING with an approved CODE_WITH_ME plan, no prior implementation, and an untracked user-authored expenses.py that the selfChecks show satisfies DEV-001. The checks are necessary preconditions with complete:false, where order matters for the judge (ProjectMode BROWNFIELD, DEVELOPING, Mode CODE_WITH_ME, Status not PROPOSED, no report.py). The invariants fit a Developer run, and nothing leaks the answer.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T02:17:04.540Z",
+  "costUsd": 0.1716866,
+  "ms": 41437,
+  "fixtureHash": "4641687a30451b88"
+}

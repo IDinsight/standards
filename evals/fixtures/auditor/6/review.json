@@ -1,0 +1,104 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is BROWNFIELD",
+      "where": ".standards/MODE.md (installer, --mode brownfield)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState AUDITING",
+      "where": ".standards/STATE.md (layer 74)",
+      "status": "realized"
+    },
+    {
+      "condition": "Handoff.Kind PROMOTE from REVIEWING_IMPLEMENTATION, FailureType NONE",
+      "where": ".standards/STATE.md Handoff",
+      "status": "realized"
+    },
+    {
+      "condition": "PromotionReason is exactly 'a consequential compatibility decision requires the standard workflow'",
+      "where": ".standards/STATE.md Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and outstanding obligations inactive",
+      "where": ".standards/STATE.md Recovery/Outstanding Obligations Active: false",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id shareable-report-links-20260925T100000Z-7e8f9a0b",
+      "where": ".standards/STATE.md and record provenance",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope and Architecture are NONE",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Prior cycle was EXPEDITED and promoted after implementation review found a consequential compatibility decision",
+      "where": "git history (layers 70/72 STATE EXPEDITED), .standards/docs/reviews/<id>/implementation.md F-001 (token format break vs docs/api.md)",
+      "status": "realized"
+    },
+    {
+      "condition": "A generally usable .standards/CONTEXT.md already exists (and is not perfectly current, giving gap-fill real work)",
+      "where": ".standards/CONTEXT.md from earlier cancelled CSV cycle; omits GET /reports added in commit 'Add report listing for the signed-in owner'",
+      "status": "realized"
+    },
+    {
+      "condition": "Developer's tentative active-cycle changes are visible in version control",
+      "where": "commit 'Add shareable report links' after cycle-start commit 'Plan shareable report links' (src/tokens.js, src/api.js, tests, package.json); selfCheck 3 confirms",
+      "status": "realized"
+    },
+    {
+      "condition": "Tentative change actually breaks the documented pre-cycle token contract",
+      "where": "src/tokens.js now requires 4 segments; docs/api.md still documents 3; selfCheck 2 confirms pre-cycle token rejected",
+      "status": "realized"
+    },
+    {
+      "condition": "Pre-cycle baseline is distinguishable without material ambiguity (no blocking question needed)",
+      "where": "clean commit boundary; BaselineReconciliation NONE with NEW_CYCLE reason confirming cancelled cycle left no changes",
+      "status": "realized"
+    },
+    {
+      "condition": "Test suite passes at HEAD",
+      "where": "selfCheck npm test (20 pass)",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-wrong",
+      "assertion": 5,
+      "detail": "The contains checks require a '## Active-Cycle Non-Baseline Work' heading and the cycle id in CONTEXT.md. The assertion is conditional ('when material'), but here the four-segment token layout and share routes in src/ directly diverge from the documented baseline that Scoper/Architect must decide about, and auditor SKILL invariant 14 directs such material active-cycle implementation into that section with the current Id. A correct run should therefore produce it; the check is a reasonable necessary condition.",
+      "recommendation": "run_as_is",
+      "fix": "None needed; materiality is evident from F-001 and the code/docs divergence."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "Every commit carries the same timestamp (2026-09-25T16:00:00Z), including the earlier CSV cycle (id dated 20260918) and pre-install project commits. Slightly unrealistic but does not affect provenance reasoning, which relies on commit order and contents.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally stagger per-layer dates if the builder supports it."
+    },
+    {
+      "severity": "note",
+      "kind": "case-defect",
+      "assertion": 6,
+      "detail": "Assertion 6 (block on ambiguity) cannot be exercised in a fixture where assertion 9 (hand off to Scoper) must pass; it is correctly marked N/A.",
+      "recommendation": "run_as_is",
+      "fix": "Already N/A."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition: the promoted STANDARD AUDITING state with PROMOTE from REVIEWING_IMPLEMENTATION, the verbatim PromotionReason, a usable but slightly stale CONTEXT.md, and a single, cleanly separable tentative implementation commit that breaks the documented token contract. No hints leak, records are coherent, and check.mjs is ok. The checks and invariants are necessary conditions a correct gap-fill audit that hands off FORWARD to SCOPING would satisfy.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T21:07:12.146Z",
+  "costUsd": 0.28691679999999997,
+  "ms": 50829,
+  "fixtureHash": "044fc3d6df357555"
+}

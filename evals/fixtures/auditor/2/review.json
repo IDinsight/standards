@@ -1,0 +1,86 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is GREENFIELD",
+      "where": ".standards/MODE.md (installed with --mode greenfield, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode is STANDARD and WorkflowState is AUDITING",
+      "where": ".standards/STATE.md header",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope is complete",
+      "where": ".standards/docs/scope/build-the-job-runner-…-5e2a91c4.md defines AC-001..AC-005; STATE history shows Scoper's FORWARD (commit 'Define job runner scope')",
+      "status": "realized"
+    },
+    {
+      "condition": "Architecture is complete and accounts for every AC",
+      "where": ".standards/docs/specs/build-the-job-runner-…-5e2a91c4.md Acceptance Coverage AC-001..AC-005; STATE Handoff FORWARD from ARCHITECTING",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery inactive, no outstanding obligations, no blockers",
+      "where": ".standards/STATE.md Recovery.Active false, Obligations false, BlockedOn NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Repository holds only a minimal scaffold: a package manifest and empty source/test directories",
+      "where": "package.json (no deps, no scripts), src/.gitkeep, test/.gitkeep; selfChecks 1–2 confirm",
+      "status": "realized"
+    },
+    {
+      "condition": "Established project instructions exist as independent constraints",
+      "where": "AGENTS.md pre-install instructions (Node 22+, ESM, src/test layout, node:test, ask before deps, env config)",
+      "status": "realized"
+    },
+    {
+      "condition": "Architecture plans an HTTP API, PostgreSQL persistence, and a background worker",
+      "where": "spec Decision/Components: node:http routes, pg + migrations/, src/worker.js",
+      "status": "realized"
+    },
+    {
+      "condition": "None of the planned design is implemented",
+      "where": "no src files, no migrations/, no pg dependency, no scripts; selfCheck 3",
+      "status": "realized"
+    },
+    {
+      "condition": "No prior CONTEXT.md (scheduled initial greenfield audit)",
+      "where": ".standards/CONTEXT.md absent; selfCheck 3",
+      "status": "realized"
+    },
+    {
+      "condition": "Work is committed, clean tree",
+      "where": "git status clean on main",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 1,
+      "detail": "Assertion 1 requires CONTEXT.md to contain the literal `package.json`. A correct context could in principle call it 'the package manifest' without naming the file, but the template's Structure/Evidence sections ask for paths and the manifest is the scaffold's only real evidence, so a correct run almost always names it.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally drop the contains check and leave assertion 1 to the judge."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The scaffold also has .gitignore and AGENTS.md beyond 'only a package manifest and empty directories'. AGENTS.md is needed (the installer writes it anyway) to give 'established instructions' evidence, and .gitignore is harmless. Neither contradicts the case.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes a greenfield STANDARD cycle at AUDITING after complete scope and design (FORWARD from ARCHITECTING), with a bare scaffold and a design that plans an API, PostgreSQL, and a worker, none of which exists. check.mjs passes, there are no leaks, the state checks for the AUDITING->DEVELOPING handoff and the /developer invocation are necessary under the skill, and the invariants (including ProjectMode staying GREENFIELD) fit. Only minor notes remain.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T21:06:15.585Z",
+  "costUsd": 0.74588,
+  "ms": 38536,
+  "fixtureHash": "36e30f0e15d30228"
+}

@@ -1,0 +1,282 @@
+{
+  "base": "export-synchronizing",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-sync",
+      "action": "commit",
+      "message": "Record CSV export synchronization progress"
+    },
+    {
+      "dir": "layers/52-final-finding",
+      "action": "commit",
+      "message": "Record final review finding on export self-check claims"
+    },
+    {
+      "dir": "layers/54-plan-fix",
+      "action": "commit",
+      "message": "Correct DEV-002 self-check evidence in export plan"
+    },
+    {
+      "dir": "layers/56-reverify",
+      "action": "commit",
+      "message": "Record verification rerun and synchronization failure"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "synchronizer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "Recovery Frame 1 (older): From REVIEWING_FINAL, Owner DEVELOPING, FailureType IMPLEMENTATION, ResumeAt REVIEWING_FINAL, RerunThrough REVIEWING_IMPLEMENTATION. Developer has already corrected its defect (the DEV-002 self-check claim) and the rerun through TESTING and REVIEWING_IMPLEMENTATION is still in progress.",
+    "Recovery Frame 2 (active): From TESTING, Owner SYNCHRONIZING, FailureType SYNCHRONIZATION, ResumeAt TESTING, RerunThrough NONE.",
+    "The synchronization record's AC-001 entry for the 201 response and written file cites the DEV-002 self-check at the commit 'Add CSV export of filtered records', with the old wording that both integration tests compare the written file, and labels it current. The plan has since corrected that self-check (only the owner-filter test compares the file; a one-off script compared the unfiltered export), so the cited result is superseded. The correct reference is the plan's corrected DEV-002 self-check, with Tester's E2 as prior evidence awaiting the Tester rerun. Synchronizer can verify this by reading the current plan and test/integration/export-flow.test.ts.",
+    "The test 'an export without filters contains every record in id order' really does not read the written file's content.",
+    "Implementation, tests, and documentation are unchanged since the final review; there are no independent defects, and the record correction needs no additional reruns.",
+    "Tester's rerun (integration run and full gate), the implementation-review rerun, and the final-review reassessment of F-001 are all unfinished. A correct run keeps the synchronization record IN_PROGRESS or BLOCKED, pops only Frame 2, and records a RESUME to TESTING.",
+    "The git history does not show how REVIEWING_FINAL was re-entered after the first synchronization pass; this is a fixture compromise, and the role is not expected to investigate or repair it."
+  ],
+  "history": null,
+  "vars": {},
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "TESTING",
+          "why": "the corrective return goes back to the interrupted Tester state"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "RESUME"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "SYNCHRONIZING"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "1",
+          "why": "only the Synchronizer frame is popped"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "state": "Recovery.Active",
+          "equals": "true"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "1"
+        },
+        {
+          "state": "Recovery.Frame1.From",
+          "equals": "REVIEWING_FINAL"
+        },
+        {
+          "state": "Recovery.Frame1.Owner",
+          "equals": "DEVELOPING"
+        },
+        {
+          "state": "Recovery.Frame1.FailureType",
+          "equals": "IMPLEMENTATION"
+        },
+        {
+          "state": "Recovery.Frame1.ResumeAt",
+          "equals": "REVIEWING_FINAL"
+        },
+        {
+          "state": "Recovery.Frame1.RerunThrough",
+          "equals": "REVIEWING_IMPLEMENTATION"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${SYNC}"
+        },
+        {
+          "provenance": {
+            "path": "${SYNC}",
+            "artifact": "SYNCHRONIZATION",
+            "cycle": "${ID}"
+          }
+        },
+        {
+          "field": {
+            "path": "${SYNC}",
+            "name": "Status",
+            "not": "COMPLETE"
+          },
+          "why": "the full synchronization gate cannot pass while Tester and Reviewer work is unfinished"
+        },
+        {
+          "unchanged": [
+            "${VERIFICATION}",
+            "${REVIEW_IMPL}",
+            "${REVIEW_FINAL}",
+            "${DOC}",
+            "${DEV}",
+            "${SCOPE}",
+            "${ARCH}",
+            "${CONTEXT}"
+          ],
+          "why": "Synchronizer never edits other roles' records"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": true,
+      "all": [
+        {
+          "reply_matches": "open a fresh chat separate from Developer['’]s implementation conversation",
+          "flags": "i",
+          "why": "the protocol's verbatim Tester independent-session prefix"
+        },
+        {
+          "reply_order": [
+            "fresh chat separate from Developer",
+            "/tester(?![a-z])"
+          ]
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "packages/**",
+        "docs/**",
+        "README.md",
+        "package.json"
+      ],
+      "why": "Synchronizer does not change the deliverable"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the unit suite passes offline"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration 2>&1 | grep -qE 'pass 3$'",
+      "expect": "pass",
+      "why": "the integration script runs three passing tests"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the nested-recovery SYNCHRONIZING state is valid"
+    },
+    {
+      "cmd": "s=.standards/STATE.md && grep -q 'WorkflowState`: `SYNCHRONIZING` `CycleMode`: `STANDARD`' $s && grep -q '^`Kind`: `FAILURE` `From`: `TESTING` `FailureType`: `SYNCHRONIZATION`' $s && test $(grep -c '^### Frame ' $s) -eq 2 && grep -q '^`From`: `REVIEWING_FINAL` `Owner`: `DEVELOPING` `FailureType`: `IMPLEMENTATION`$' $s && grep -q '^`ResumeAt`: `REVIEWING_FINAL` `RerunThrough`: `REVIEWING_IMPLEMENTATION`$' $s && grep -q '^`From`: `TESTING` `Owner`: `SYNCHRONIZING` `FailureType`: `SYNCHRONIZATION`$' $s && grep -q '^`ResumeAt`: `TESTING` `RerunThrough`: `NONE`$' $s && grep -q '`BlockedOn`: `NONE`$' $s && grep -A2 '^## Outstanding Obligations' $s | grep -q 'Active`: `false' && test $(grep -cF 'Synchronization record labels the superseded DEV-002 self-check result as current AC-001 evidence.' $s) -eq 2",
+      "expect": "pass",
+      "why": "STATE holds the two stated frames, the FAILURE handoff from TESTING, nothing blocked, obligations inactive"
+    },
+    {
+      "cmd": "sed -n '/an export without filters/,/^});/p' test/integration/export-flow.test.ts | grep -q readdirSync && ! sed -n '/an export without filters/,/^});/p' test/integration/export-flow.test.ts | grep -q readFileSync",
+      "expect": "pass",
+      "why": "the unfiltered export test never reads the written file, so the original DEV-002 claim was overstated"
+    },
+    {
+      "cmd": "s=.standards/docs/synchronization/export-20260924T090000Z-a7f3c1d2.md && f=.standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md && p=.standards/docs/development/export-20260924T090000Z-a7f3c1d2.md && v=.standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md && head -3 $s | grep -qx 'Artifact: SYNCHRONIZATION' && grep -q '`Status`: `IN_PROGRESS`$' $s && ! grep -qE '^### D-' $s && grep -q '^`Status`: `BLOCKED` `User Style`: `NONE`$' $f && grep -q '^### F-001 ' $f && grep -q '`Status`: `OPEN`' $f && grep -q '`Status`: `COMPLETE`$' $p && test $(grep -c '^`Status`: `DONE`' $p) -eq 3 && grep -q '`Mode`: `REVERIFY` `Status`: `IN_PROGRESS`$' $v && grep -q '`Assessment Purpose`: `FULL` `Assessment Target`: `NONE`$' $v && grep -q '^### Suspended Assignment 1$' $v && grep -qF 'Synchronization record labels the superseded DEV-002 self-check result as current AC-001 evidence.' $v",
+      "expect": "pass",
+      "why": "sync record IN_PROGRESS with no discrepancy entries, final review BLOCKED with open F-001, plan COMPLETE, verification rerun IN_PROGRESS with its suspended assignment for Frame 2"
+    },
+    {
+      "cmd": "c=$(git log --format=%H -1 --fixed-strings --grep='Add CSV export of filtered records') && git diff --quiet $c HEAD -- src packages package.json .gitignore pnpm-lock.yaml && g=$(git log --format=%H -1 --fixed-strings --grep='Document CSV export in usage guide') && git diff --quiet $g HEAD -- test docs README.md AGENTS.md CLAUDE.md",
+      "expect": "pass",
+      "why": "no implementation, test, or documentation content changed during recovery"
+    },
+    {
+      "cmd": "s=.standards/docs/synchronization/export-20260924T090000Z-a7f3c1d2.md && v=.standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md && p=.standards/docs/development/export-20260924T090000Z-a7f3c1d2.md && grep -q $(git log --format=%H -1 --fixed-strings --grep='Record CSV export final review') $s && grep -q $(git log --format=%H -1 --fixed-strings --grep='Add CSV export of filtered records') $s && grep -q $(git rev-parse HEAD:$p) $v && grep -q $(git log --format=%H -1 --fixed-strings --grep='Record final review finding on export self-check claims') $p && ! grep -rqE 'COMMIT:|BLOB:' .standards/docs",
+      "expect": "pass",
+      "why": "records cite real revisions and identities; no placeholder remains"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && test ! -e exports",
+      "expect": "pass",
+      "why": "clean tree, no export files"
+    },
+    {
+      "cmd": "git log -4 --format=%s | paste -s -d '|' - | grep -qx 'Record verification rerun and synchronization failure|Correct DEV-002 self-check evidence in export plan|Record final review finding on export self-check claims|Record CSV export synchronization progress'",
+      "expect": "pass",
+      "why": "overlay commits in order"
+    }
+  ],
+  "notes": "Built on export-synchronizing (cycle export-20260924T090000Z-a7f3c1d2 at SYNCHRONIZING). 50-sync: first Synchronizer pass record, IN_PROGRESS, no D entries; its AC-001 entry for the 201 response and written file cites the DEV-002 self-check (implementation commit, old wording that both integration tests compare the written file) as current. STATE unchanged. 52-final-finding: final-deliverable review reopened to BLOCKED with F-001 (P2, OPEN, Developer, IMPLEMENTATION): the DEV-002 self-check overstates what the unfiltered integration test compares (true in the base test). STATE DEVELOPING, FAILURE from REVIEWING_FINAL, Frame 1 with RerunThrough NONE. 54-plan-fix: plan COMPLETE again with DEV-002's self-check corrected plus a new one-off check, Plan Notes explain the rerun through TESTING and REVIEWING_IMPLEMENTATION; no source change. STATE TESTING, FORWARD from DEVELOPING, Frame 1 RerunThrough REVIEWING_IMPLEMENTATION. 56-reverify: verification report reopened (REVERIFY, IN_PROGRESS, FULL/NONE), E3 unit rerun done, integration rerun pending, open item naming the synchronization record's superseded reference, Suspended Assignment 1 for Frame 2. Final STATE: SYNCHRONIZING, FAILURE from TESTING, Frames 1 and 2 exactly as the case states. Compromise: no legal transition shows REVIEWING_FINAL being re-entered after the first synchronization pass (that needs a third frame the case does not have); the two-frame stack is built as stated and check.mjs passes.",
+  "case": "synchronizer-34",
+  "caseHash": "3909dcd69854bc82",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T14:39:30.641Z",
+    "verdict": "pass",
+    "fixtureHash": "3789fa03ba38749b",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "df19c312951386aa",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:40:11.109Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T13:48:42.916Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-synchronizing": "33937a9926a74652"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/52-final-finding/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/54-plan-fix/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/56-reverify/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:40:11.109Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

@@ -1,0 +1,91 @@
+{
+  "conditions": [
+    {
+      "condition": "Brownfield project",
+      "where": ".standards/MODE.md (installer, --mode brownfield)",
+      "status": "realized"
+    },
+    {
+      "condition": "STANDARD cycle at DEVELOPING",
+      "where": ".standards/STATE.md: WorkflowState DEVELOPING, CycleMode STANDARD",
+      "status": "realized"
+    },
+    {
+      "condition": "No recovery, no outstanding obligations, no blocker",
+      "where": ".standards/STATE.md: Recovery.Active false, Obligations false, BlockedOn NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Completed scope, design and Auditor context for the active cycle",
+      "where": ".standards/docs/scope/…3c9e1f7a.md (AC-001, AC-002), .standards/docs/specs/…3c9e1f7a.md, .standards/CONTEXT.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Approved, style-locked AUTONOMOUS plan with Status IN_PROGRESS",
+      "where": "development plan header: Mode AUTONOMOUS, User Style NONE, User Style Locked true, Status IN_PROGRESS; Plan Notes record the approval",
+      "status": "realized"
+    },
+    {
+      "condition": "Verification Cadence INCREMENTAL, Current Increment 1",
+      "where": "development plan header",
+      "status": "realized"
+    },
+    {
+      "condition": "Increment 1 = DEV-001 search endpoint for AC-001; Increment 2 = DEV-002 search UI for AC-002",
+      "where": "plan ## Verification Increments and ### DEV-001/DEV-002",
+      "status": "realized"
+    },
+    {
+      "condition": "DEV-002 PENDING, depends on DEV-001",
+      "where": "plan ### DEV-002",
+      "status": "realized"
+    },
+    {
+      "condition": "DEV-001 dependency-ready but not implemented",
+      "where": "plan DEV-001 PENDING, Depends On NONE; src/routes.js has no search route (selfCheck shows /api/books/search returns 404)",
+      "status": "realized"
+    },
+    {
+      "condition": "Self-check can actually run offline and passes once implemented",
+      "where": "package.json test script; selfCheck node --test passes",
+      "status": "realized"
+    },
+    {
+      "condition": "Clean committed git state",
+      "where": "git status clean on main",
+      "status": "realized"
+    },
+    {
+      "condition": "PendingVerificationCadence NONE (no pending switch)",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "Plan Status is IN_PROGRESS while every step is still PENDING. The template defines IN_PROGRESS as 'at least one approved step has started'. The case text states IN_PROGRESS explicitly, and check.mjs accepts it.",
+      "recommendation": "run_as_is",
+      "fix": "None; this follows the case text."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 2,
+      "detail": "If the Developer runs plain check.mjs after writing the TESTING checkpoint, verification.mjs reports 'The assigned checkpoint requires Assessment Purpose INCREMENT…' against the nonexistent Tester report. This is a Tester-owned file, and the turn-end check (atTurnEnd) skips the problem, so check_ok still passes. It may make the Developer hesitate, but a correct run handles it by checking before the handoff as the protocol requires.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized: an approved, style-locked AUTONOMOUS INCREMENTAL plan with Current Increment 1, DEV-001 pending and unimplemented (search falls into the :id route), and DEV-002 pending. The records are coherent, and check.mjs and the selfChecks agree. The checks are necessary conditions a correct checkpoint run satisfies: DEV-001 DONE, plan IN_PROGRESS, CHECKPOINT naming only Increment 1, turn-end check_ok, a /tester invocation with independent-session wording, no Tester or Reviewer records, and test/** unchanged. No leaks were found and the invariants fit.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-01T18:39:07.873Z",
+  "costUsd": 0.20348660000000002,
+  "ms": 51308,
+  "fixtureHash": "2b6fae406bd45de1"
+}

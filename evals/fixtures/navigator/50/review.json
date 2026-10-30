@@ -1,0 +1,71 @@
+{
+  "conditions": [
+    {
+      "condition": "An ongoing GRILL_ME (quiz) conversation with Navigator exists in prior turns",
+      "where": "spec.history.turns: the user opens with '/navigator Quiz me on how the rate limiter in this repo works.', and the assistant asks Question 1 and Question 2",
+      "status": "realized"
+    },
+    {
+      "condition": "A question is pending and has not yet been answered",
+      "where": "history: Question 2 (requests possible after 4 idle seconds); the user's only reply is a request for a hint",
+      "status": "realized"
+    },
+    {
+      "condition": "A hint was already given for the pending question after the user asked for one",
+      "where": "history, final assistant turn: a hint pointing at refill() in src/limiter.js lines 11-16 without revealing the cap",
+      "status": "realized"
+    },
+    {
+      "condition": "The user now asks for the answer",
+      "where": "prompt.utterance 'Just tell me the answer.'",
+      "status": "realized"
+    },
+    {
+      "condition": "The answer can be derived from inspected repository evidence",
+      "where": "src/config.js (capacity 5, refillPerSecond 2) and src/limiter.js line 14 (Math.min cap); the second selfCheck shows the result is 5",
+      "status": "realized"
+    },
+    {
+      "condition": "Small committed code, clean tree",
+      "where": "two pre-install commits plus the install commit; git status clean on main",
+      "status": "realized"
+    },
+    {
+      "condition": "Line references in history match the files",
+      "where": "src/middleware.js lines 7-12 (bucket lookup) and 17-21 (Retry-After/429); src/limiter.js lines 11-16 (refill) with line 14 Math.min",
+      "status": "realized"
+    },
+    {
+      "condition": "Workflow state unspecified and no records needed",
+      "where": "default brownfield install STATE.md; check.mjs ok",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 1,
+      "detail": "Neither assertion has a deterministic check. This is deliberate and correct: an 'at most one ?' reply check could fail a correct reply that restates the question or quotes code. The judge decides both assertions.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The README says 'A client can send a burst of up to `capacity` requests', and src/limiter.js line 1 comments 'holds up to `capacity` tokens'. Both bear on the answer, but they are ordinary project documentation and only make the evidence-based answer easier. Nothing is leaked to the role beyond what the code itself shows.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The history sets up a realistic GRILL_ME session with a pending Question 2 and a hint already given, and the line numbers it cites match the files. The answer (5, because refill is capped at capacity) is proven by a selfCheck and appears only in graderOnly. The Navigator invariants (unchanged **, HEAD unchanged, no mutating git) fit, and both judge-only assertions can be observed in this fixture.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T15:40:44.182Z",
+  "costUsd": 0.6738,
+  "ms": 22655,
+  "fixtureHash": "20015d3199fc25e2"
+}

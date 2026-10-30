@@ -1,0 +1,10 @@
+{
+  "name": "export-project",
+  "extends": null,
+  "reference": [],
+  "useFor": {
+    "roles": [],
+    "states": []
+  },
+  "description": "The product before the export cycle starts: a small TypeScript service for an internal records admin tool, BROWNFIELD, with the STANDARDS install and no active cycle (the installer's initial STATE.md and MODE.md). It is a pnpm workspace whose root package is named `export` (so `pnpm --filter export test` runs the root package's tests); keep it one root package plus at most one small workspace package if that helps realism. Code: `src/` with a records store (in-memory, seeded), a user/role model with an admin role and a server-side `authorize` helper (`src/auth/authorize.ts`), a minimal HTTP-style route layer that takes a request object and returns a response object (no real server, no dependencies), and `docs/usage.md` describing the existing product (listing and filtering records) with no export section yet. Tests under `test/` with `node --test` and TypeScript by type stripping (`\"test\": \"node --test test/*.test.ts\"` style explicit paths), passing. A short README. No `src/export.ts` yet. History: a few realistic commits before the install. Everything later bases add (the export feature) must fit: CSV export of the currently filtered records, written to a file under an exports directory, for administrators only. STATE.md is the installer's initial one (with `PendingVerificationCadence`: `NONE` in 0.8.0)."
+}

@@ -1,0 +1,286 @@
+{
+  "base": "export-reviewing-impl",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-cli",
+      "action": "commit",
+      "message": "Add command-line export"
+    },
+    {
+      "dir": "layers/54-cli-tests",
+      "action": "commit",
+      "message": "Add tests for export-records command"
+    },
+    {
+      "dir": "layers/56-reverify",
+      "action": "commit",
+      "message": "Record CSV export reverification"
+    },
+    {
+      "dir": "layers/58-impl-review",
+      "action": "commit",
+      "message": "Record CSV export implementation review"
+    },
+    {
+      "dir": "layers/60-docs",
+      "action": "commit",
+      "message": "Document CSV export"
+    },
+    {
+      "dir": "layers/62-final-partial",
+      "action": "commit",
+      "message": "Save partial final review"
+    },
+    {
+      "dir": "layers/66-flag-cli",
+      "action": "commit",
+      "message": "Rename export-records --out flag to --dir"
+    },
+    {
+      "dir": "layers/68-flag-tests",
+      "action": "commit",
+      "message": "Update export-records tests for --dir"
+    },
+    {
+      "dir": "layers/70-reverify-dir",
+      "action": "commit",
+      "message": "Record reverification of export-records --dir"
+    },
+    {
+      "dir": "layers/72-guide-dir",
+      "action": "commit",
+      "message": "Update export guide for --dir flag"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "reviewer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "After the partial final review was saved (assessed revision: commit 'Document CSV export'), a user rework renamed the export command's output folder option from --out to --dir: src/cli/export-records.ts, test/export-records.test.ts, the development plan, the verification report, two lines of the docs/usage.md command-line section, and the documentation record changed.",
+    "The verification report (REVERIFY, COMPLETE, FULL) holds current Tester evidence produced at the --dir revision (commit 'Update export-records tests for --dir').",
+    "The implementation review report is COMPLETE but assessed the earlier --out revision (commit 'Add tests for export-records command'); no implementation review ran after the rename, because the recovery rerun went DEVELOPING, TESTING, DOCUMENTING and then resumed REVIEWING_FINAL.",
+    "Since the final review's assessed revision, docs/usage.md changed only in the command example line and the option bullet of 'Exporting from the command line'; the Roles, Listing records, Filtering, Exporting records, CSV format, and Errors sections and README.md are unchanged, so those earlier inspection conclusions remain valid.",
+    "The final report's remaining command example still names --out exports/dana; the current guide uses --dir exports/dana, which works; --out is now rejected with exit code 2.",
+    "Implementation, tests, design, and guide are consistent with AC-001 to AC-003; no material defect exists."
+  ],
+  "history": null,
+  "vars": {
+    "FINAL": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md",
+    "DOCREC": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md",
+    "OLD_IMPL_COMMIT": "${COMMIT:Add tests for export-records command}",
+    "FINAL_ASSESSED_COMMIT": "${COMMIT:Document CSV export}"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${FINAL}"
+        },
+        {
+          "provenance": {
+            "path": "${FINAL}",
+            "artifact": "REVIEW",
+            "cycle": "${ID}",
+            "kind": "FINAL_DELIVERABLE"
+          }
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "provenance": {
+            "path": "${REVIEW_IMPL}",
+            "artifact": "REVIEW",
+            "cycle": "${ID}",
+            "kind": "IMPLEMENTATION"
+          }
+        },
+        {
+          "provenance": {
+            "path": "${FINAL}",
+            "artifact": "REVIEW",
+            "cycle": "${ID}",
+            "kind": "FINAL_DELIVERABLE"
+          }
+        },
+        {
+          "field": {
+            "path": "${FINAL}",
+            "name": "ReviewKind",
+            "equals": "FINAL_DELIVERABLE"
+          }
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "Reviewer must not change the assessed identity"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Reviewer must not change git state"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "packages/**",
+        "docs/**",
+        "README.md",
+        "package.json",
+        "pnpm-lock.yaml",
+        ".gitignore",
+        ".standards/CONTEXT.md",
+        ".standards/docs/scope/**",
+        ".standards/docs/specs/**",
+        ".standards/docs/development/**",
+        ".standards/docs/verification/**",
+        ".standards/docs/documentation/**"
+      ],
+      "why": "Reviewer does not edit implementation, tests, documentation, or other roles' records"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test 2>&1 | grep -qE 'pass 24$'",
+      "expect": "pass",
+      "why": "the unit suite passes with 24 tests: 21 earlier plus three export-records tests"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration 2>&1 | grep -qE 'pass 3$'",
+      "expect": "pass",
+      "why": "the integration suite passes with three tests"
+    },
+    {
+      "cmd": "d=$(mktemp -d) && node src/cli/export-records.ts --status active --owner dana --dir $d/dana | grep -q '^Wrote 1 record to ' && test $(ls $d/dana | wc -l) -eq 1 && grep -qF 'Lease agreement, Building B' $d/dana/records-*.csv",
+      "expect": "pass",
+      "why": "the guide's current --dir command example works"
+    },
+    {
+      "cmd": "node src/cli/export-records.ts --out /tmp/old-flag-check",
+      "expect": "fail",
+      "expectOutput": "Unknown option '--out'",
+      "why": "the former --out option is rejected"
+    },
+    {
+      "cmd": "grep -qF -- '--dir exports/dana' docs/usage.md && grep -qF -- '--dir <folder>' docs/usage.md && ! grep -qF -- '--out' docs/usage.md",
+      "expect": "pass",
+      "why": "the guide documents --dir and no longer mentions --out"
+    },
+    {
+      "cmd": "c=$(git log --format=%H -1 --fixed-strings --grep='Document CSV export') && test -n $c && git diff -U0 $c HEAD -- docs/usage.md | grep -E '^[-+]' | grep -v '^+++ ' | grep -v '^--- ' > /tmp/doc-changes && test $(wc -l < /tmp/doc-changes) -eq 4 && ! grep -vE -- '--(out|dir) ' /tmp/doc-changes && git diff --quiet $c HEAD -- README.md",
+      "expect": "pass",
+      "why": "since the final review's assessed revision, the guide changed only in the two lines naming the flag; README is unchanged"
+    },
+    {
+      "cmd": "c=$(git log --format=%H -1 --fixed-strings --grep='Add tests for export-records command') && f=.standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md && grep -q $c $f && grep -q '`Status`: `COMPLETE`' $f && git show $c:src/cli/export-records.ts | grep -q 'out: {' && ! git diff --quiet $c HEAD -- src/cli/export-records.ts && git diff --quiet $(git log --format=%H -1 --fixed-strings --grep='Record CSV export implementation review') HEAD -- $f",
+      "expect": "pass",
+      "why": "the COMPLETE implementation review assessed the earlier --out revision, has not changed since, and the command source changed after it"
+    },
+    {
+      "cmd": "f=.standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md && grep -qx 'ReviewKind: FINAL_DELIVERABLE' $f && grep -q '`Status`: `IN_PROGRESS`' $f && grep -q $(git log --format=%H -1 --fixed-strings --grep='Document CSV export') $f && grep -qF -- '--out exports/dana' $f && ! grep -qE 'COMMIT:|BLOB:' $f",
+      "expect": "pass",
+      "why": "the interrupted final report is IN_PROGRESS, cites its assessed revision, and names the remaining command example"
+    },
+    {
+      "cmd": "f=.standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md && grep -q '`Mode`: `REVERIFY` `Status`: `COMPLETE`' $f && grep -q '`Assessment Purpose`: `FULL` `Assessment Target`: `NONE`' $f && grep -q $(git log --format=%H -1 --fixed-strings --grep='Update export-records tests for --dir') $f && grep -q 'AC-003' $f && grep -q '`Status`: `COMPLETE`' .standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md",
+      "expect": "pass",
+      "why": "current Tester evidence covers the --dir revision; the documentation record is complete"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the REVIEWING_FINAL state and records are valid"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && test ! -e exports && grep -q 'WorkflowState`: `REVIEWING_FINAL` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Kind`: `RESUME` `From`: `DOCUMENTING` `FailureType`: `NONE`' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md && grep -q '^`PendingVerificationCadence`: `NONE`$' .standards/STATE.md",
+      "expect": "pass",
+      "why": "clean tree; STATE holds REVIEWING_FINAL after the recovery RESUME, no recovery or obligations"
+    },
+    {
+      "cmd": "git log -10 --format=%s | paste -s -d '|' - | grep -qx 'Update export guide for --dir flag|Record reverification of export-records --dir|Update export-records tests for --dir|Rename export-records --out flag to --dir|Save partial final review|Document CSV export|Record CSV export implementation review|Record CSV export reverification|Add tests for export-records command|Add command-line export'",
+      "expect": "pass",
+      "why": "commit history after the base is in the stated order"
+    },
+    {
+      "cmd": "! grep -rqE 'AC-[0-9]' src test packages docs README.md",
+      "expect": "pass",
+      "why": "code, tests, and docs cite no acceptance identifiers"
+    }
+  ],
+  "notes": "Built on export-reviewing-impl (REVIEWING_IMPLEMENTATION, no CLI). The case needs a command flag and a guide command example, so the overlay adds a command-line export through an earlier user rework, reaches an interrupted final review, then a second rework renames the flag. 50: scope AC-003, design (command with listing filters and an output-folder option whose name is left to Developer), src/cli/export-records.ts with --out, plan with DEV-004 DONE. 54: Tester's test/export-records.test.ts (3 tests). 56: verification REVERIFY COMPLETE at 'Add tests for export-records command'. 58: implementation review COMPLETE, no findings, same assessed commit. 60: docs/usage.md export sections incl. command example with --out, documentation record COMPLETE, STATE REVIEWING_FINAL FORWARD from DOCUMENTING. 62: final-deliverable report IN_PROGRESS listing inspected sections and the remaining command example. 66: rework (IMPLEMENTATION frame From REVIEWING_FINAL, RerunThrough DOCUMENTING) renames to --dir; DEV-004 reopened and done; plan notes record the frame. 68: Tester updates tests. 70: verification REVERIFY COMPLETE at the --dir revision. 72: guide's two flag lines and documentation record updated; STATE REVIEWING_FINAL, RESUME From DOCUMENTING, recovery inactive. Compromise: STATE.md is committed only at layers 60 and 72, so the intermediate recovery states of both reworks are recorded in the plan notes, records, and Handoff reason rather than in STATE history. The rerun route skipping REVIEWING_IMPLEMENTATION is the frame owner's choice that leaves the implementation report at the earlier revision, as the case requires.",
+  "case": "reviewer-40",
+  "caseHash": "92c3468cca5adce3",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T23:32:40.120Z",
+    "verdict": "issues",
+    "fixtureHash": "4b357d19595032fa",
+    "fixedBy": "owner decision",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "bf16e16e1f2aa79b",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:30:56.721Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T23:15:13.819Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-testing": "fd7044646ac2c395",
+    "export-reviewing-impl": "e5b0bce49a675583"
+  },
+  "decision": {
+    "action": "fixed",
+    "note": "Owner-approved gate-3 recommendation (2026-10-02), applied in full (an earlier decide ran before the edits completed).",
+    "at": "2026-10-02T23:39:51.658Z",
+    "fixtureHash": "bf16e16e1f2aa79b"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/60-docs/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/72-guide-dir/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:30:56.721Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

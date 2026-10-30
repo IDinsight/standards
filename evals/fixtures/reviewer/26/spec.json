@@ -1,0 +1,263 @@
+{
+  "base": "export-project",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-export",
+      "action": "commit",
+      "message": "Add CSV export of filtered records"
+    },
+    {
+      "dir": "layers/52-review",
+      "action": "commit",
+      "message": "Record implementation review findings"
+    },
+    {
+      "dir": "layers/54-restrict",
+      "action": "commit",
+      "message": "Restrict CSV export to administrators"
+    },
+    {
+      "dir": "layers/56-promote",
+      "action": "commit",
+      "message": "Promote CSV export to a standard cycle"
+    },
+    {
+      "dir": "layers/58-context",
+      "action": "commit",
+      "message": "Record project context for CSV export"
+    },
+    {
+      "dir": "layers/60-scope",
+      "action": "commit",
+      "message": "Define CSV export scope"
+    },
+    {
+      "dir": "layers/62-design",
+      "action": "commit",
+      "message": "Design CSV export"
+    },
+    {
+      "dir": "layers/64-plan",
+      "action": "commit",
+      "message": "Reconcile CSV export plan with scope and design"
+    },
+    {
+      "dir": "layers/66-verification",
+      "action": "commit",
+      "message": "Record CSV export verification"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "reviewer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The finding named by the REVIEWING_IMPLEMENTATION outstanding obligation, F-001 in the implementation review report, is unsupported: csvCell in src/export.ts quotes any value containing a comma, double quote, CR, or LF, so a value with a lone carriage return is quoted. Correcting it means withdrawing F-001 with that evidence; no implementation change is needed.",
+    "F-002 (editors can export) is corrected for signed-in users: editor and viewer export requests get 403 before anything is written.",
+    "A separate material acceptance gap remains for AC-002: the handler's check `if (role && role !== 'admin')` lets a request with no signed-in user through, so an anonymous POST /records/export returns 201 and writes an export file instead of 401. No test sends an export request without a user; the verification report's AC-002 row relies on inspection I1 for that case, and Developer's DEV-003 self-check never exercised it. The defect is Developer-owned (IMPLEMENTATION), with a Tester evidence gap for AC-002.",
+    "At the start of the run there is exactly one outstanding obligation (REVIEWING_IMPLEMENTATION) and no recovery frame: the DEVELOPING obligation converted at promotion (F-002) was removed by Developer after verifying its correction."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "export-20260924T090000Z-a7f3c1d2",
+    "REVIEW": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md",
+    "DEV": ".standards/docs/development/export-20260924T090000Z-a7f3c1d2.md",
+    "VERIFICATION": ".standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "state": "Obligations.Active",
+          "equals": "false",
+          "why": "the only obligation, owned by REVIEWING_IMPLEMENTATION, is removed once its correction is verified"
+        },
+        {
+          "contains": {
+            "path": "${REVIEW}",
+            "regex": "### F-001[^#]*?`Status`:[^`]*`WITHDRAWN`"
+          },
+          "why": "Reviewer corrects the unsupported finding by withdrawing it"
+        },
+        {
+          "field": {
+            "path": "${REVIEW}",
+            "name": "Status",
+            "not": "COMPLETE"
+          },
+          "why": "the removal happens while the full review gate has not passed"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 2,
+      "complete": true,
+      "all": [
+        {
+          "field": {
+            "path": "${REVIEW}",
+            "name": "Status",
+            "not": "COMPLETE"
+          },
+          "why": "the AC-002 gap keeps the review incomplete"
+        },
+        {
+          "state": "WorkflowState",
+          "not": "DOCUMENTING",
+          "why": "no forward handoff after the correction"
+        },
+        {
+          "state": "WorkflowState",
+          "not": "AWAITING_USER_SIGNOFF",
+          "why": "the cycle is not completed"
+        },
+        {
+          "state": "WorkflowState",
+          "not": "SIGNED_OFF",
+          "why": "the cycle is not completed"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "Reviewer must not change the assessed identity"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Reviewer must not change git state"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "packages/**",
+        "package.json",
+        "pnpm-lock.yaml",
+        "docs/**",
+        "README.md",
+        ".standards/CONTEXT.md",
+        ".standards/docs/scope/**",
+        ".standards/docs/specs/**",
+        ".standards/docs/development/**",
+        ".standards/docs/verification/**"
+      ],
+      "why": "Reviewer does not edit implementation, tests, documentation, or other roles' records"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test 2>&1 | grep -qE 'pass 21$'",
+      "expect": "pass",
+      "why": "the unit suite passes with 21 tests"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration 2>&1 | grep -qE 'pass 3$'",
+      "expect": "pass",
+      "why": "the integration script passes with three tests"
+    },
+    {
+      "cmd": "node -e 'import(`./src/export.ts`).then(({ csvCell }) => { const cr = String.fromCharCode(13); const q = String.fromCharCode(34); if (csvCell(`a` + cr + `b`) !== q + `a` + cr + `b` + q) process.exit(1); console.log(`quoted`); }, (error) => { console.error(error); process.exit(3); })'",
+      "expect": "pass",
+      "why": "F-001 is unsupported: a lone carriage return is quoted"
+    },
+    {
+      "cmd": "node -e 'import(`./src/app.ts`).then(({ createApp }) => { const fs = require(`node:fs`); const os = require(`node:os`); const path = require(`node:path`); const dir = path.join(fs.mkdtempSync(path.join(os.tmpdir(), `anon-`)), `out`); const response = createApp({ exportDir: dir }).handle({ method: `POST`, path: `/records/export`, query: {}, user: null }); if (response.status !== 201 || fs.readdirSync(dir).length !== 1) process.exit(1); console.log(`anonymous export written`); }, (error) => { console.error(error); process.exit(3); })'",
+      "expect": "pass",
+      "why": "the remaining AC-002 gap: a request without a user gets 201 and writes a file"
+    },
+    {
+      "cmd": "node -e 'import(`./src/app.ts`).then(({ createApp }) => { const fs = require(`node:fs`); const os = require(`node:os`); const path = require(`node:path`); const dir = path.join(fs.mkdtempSync(path.join(os.tmpdir(), `deny-`)), `out`); const app = createApp({ exportDir: dir }); const send = (role) => app.handle({ method: `POST`, path: `/records/export`, query: {}, user: { id: 9, name: `Sam`, role } }).status; if (send(`viewer`) !== 403 || send(`editor`) !== 403 || fs.existsSync(dir)) process.exit(1); if (send(`admin`) !== 201) process.exit(2); console.log(`refused before write`); }, (error) => { console.error(error); process.exit(3); })'",
+      "expect": "pass",
+      "why": "F-002 is corrected: editor and viewer get 403 with no folder; admin export works"
+    },
+    {
+      "cmd": "! grep -q null test/integration/export-flow.test.ts && ! grep -q records/export test/export.test.ts test/routes.test.ts test/records.test.ts test/authorize.test.ts",
+      "expect": "pass",
+      "why": "no test sends an export request without a user"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs && ! git status --porcelain | grep -q . && test ! -e exports",
+      "expect": "pass",
+      "why": "the state is valid and the tree is clean"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `REVIEWING_IMPLEMENTATION` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Kind`: `FORWARD` `From`: `TESTING` `FailureType`: `NONE`' .standards/STATE.md && grep -q '^### Obligation 1$' .standards/STATE.md && ! grep -q 'Obligation 2' .standards/STATE.md && grep -q '^`Owner`: `REVIEWING_IMPLEMENTATION` `FailureType`: `REVIEW`$' .standards/STATE.md && ! grep -q '### Frame' .standards/STATE.md && ! grep -q '`PromotionReason`: `NONE`' .standards/STATE.md",
+      "expect": "pass",
+      "why": "promoted STANDARD cycle at REVIEWING_IMPLEMENTATION with one REVIEWING_IMPLEMENTATION obligation and no frames"
+    },
+    {
+      "cmd": "f=.standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md && grep -q '`Status`: `BLOCKED`' $f && test $(grep -c '`Status`: `OPEN`' $f) -eq 2 && v=.standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md && grep -q '`Assessment Purpose`: `FULL` `Assessment Target`: `NONE`' $v && ! grep -qE 'COMMIT:|BLOB:' $v $f",
+      "expect": "pass",
+      "why": "the expedited review report is BLOCKED with two open findings; the verification record is FULL"
+    },
+    {
+      "cmd": "git log -9 --format=%s | paste -s -d '|' - | grep -qx 'Record CSV export verification|Reconcile CSV export plan with scope and design|Design CSV export|Define CSV export scope|Record project context for CSV export|Promote CSV export to a standard cycle|Restrict CSV export to administrators|Record implementation review findings|Add CSV export of filtered records'",
+      "expect": "pass",
+      "why": "history follows the expedited path, promotion, and the standard order"
+    }
+  ],
+  "notes": "Built on export-project rather than export-reviewing-impl, because a promoted cycle needs expedited history (code before context and scope). 50: expedited cycle, plan with three DONE steps, export code and admin tests; the role check refuses only viewers. 52: expedited implementation review (BLOCKED) with F-001 (unsupported lone-CR claim) and F-002 (editors can export). 54: role check changed to if (role && role !== admin); STATE in EXPEDITED recovery with Frame 1 (DEVELOPING, F-002) and Frame 2 (REVIEWING_IMPLEMENTATION, F-001 unsupported). 56: user-authorized PROMOTE to STANDARD/AUDITING; frames converted to Obligation 1 (DEVELOPING) and Obligation 2 (REVIEWING_IMPLEMENTATION). 58/60/62: context (with Active-Cycle Non-Baseline Work), scope (AC-001, AC-002), design (401 for no user, 403 for editor/viewer); these commits do not touch STATE. 64: plan COMPLETE reconciled to ACs; Developer removed its F-002 obligation, leaving Obligation 1 = REVIEWING_IMPLEMENTATION; STATE TESTING. 66: Tester's editor/viewer refusal test, COMPLETE FULL verification, STATE REVIEWING_IMPLEMENTATION. Remaining gap: anonymous export gets 201 and writes a file.",
+  "case": "reviewer-26",
+  "caseHash": "5eb079adf0c01044",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T23:27:40.357Z",
+    "verdict": "pass",
+    "fixtureHash": "06eeec141b59bc18",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "cb94ef1caaaa82fa",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:29:19.372Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T22:37:47.830Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-export/.standards/STATE.md: NONE",
+        "layers/54-restrict/.standards/STATE.md: NONE",
+        "layers/56-promote/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/64-plan/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/66-verification/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:29:19.372Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

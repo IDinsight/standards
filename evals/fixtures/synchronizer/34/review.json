@@ -1,0 +1,91 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield template)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState SYNCHRONIZING",
+      "where": ".standards/STATE.md header",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id = export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md Active Work; every record's provenance block",
+      "status": "realized"
+    },
+    {
+      "condition": "Synchronization record has valid current-cycle provenance",
+      "where": ".standards/docs/synchronization/export-20260924T090000Z-a7f3c1d2.md (Artifact SYNCHRONIZATION, matching Cycle, Status IN_PROGRESS)",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery active; outstanding obligations inactive; nothing blocked",
+      "where": "STATE.md: Recovery Active true, Outstanding Obligations Active false, BlockedOn NONE, PendingCycleBlockedOn NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Older frame: Owner DEVELOPING, ResumeAt REVIEWING_FINAL, RerunThrough REVIEWING_IMPLEMENTATION",
+      "where": "STATE.md ### Frame 1 (From REVIEWING_FINAL, FailureType IMPLEMENTATION)",
+      "status": "realized"
+    },
+    {
+      "condition": "Newer frame: Owner SYNCHRONIZING, ResumeAt TESTING, RerunThrough NONE",
+      "where": "STATE.md ### Frame 2 (From TESTING, FailureType SYNCHRONIZATION); Handoff FAILURE from TESTING",
+      "status": "realized"
+    },
+    {
+      "condition": "Tester found the sync record labels a prior result as current and is waiting for the correction",
+      "where": "Sync record AC-001 '201 response...' entry cites the DEV-002 self-check at 9cbac2c with the old 'both integration tests compare' wording as current; verification report Open Findings item and Suspended Assignment 1 (Frame 2, FULL/NONE, matching reason)",
+      "status": "realized"
+    },
+    {
+      "condition": "The corrected evidence reference can be verified",
+      "where": "Development plan DEV-002 Self-Check, now corrected; test/integration/export-flow.test.ts (unfiltered test never reads the file, proven by selfCheck)",
+      "status": "realized"
+    },
+    {
+      "condition": "Tester execution and later review remain unfinished on the preserved route",
+      "where": "Verification report REVERIFY/IN_PROGRESS with integration rerun not yet run; final-deliverable review BLOCKED with F-001 OPEN; implementation review not yet rerun",
+      "status": "realized"
+    },
+    {
+      "condition": "No independent defects; no additional reruns needed",
+      "where": "src/test/docs unchanged since implementation and guide commits (selfCheck); unit and integration suites pass",
+      "status": "realized"
+    },
+    {
+      "condition": "Committed git state, clean tree",
+      "where": "git status clean; HEAD 'Record verification rerun and synchronization failure'",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "case-defect",
+      "assertion": -1,
+      "detail": "The case requires a synchronization record to exist alongside a two-frame stack whose older frame came from REVIEWING_FINAL with ResumeAt REVIEWING_FINAL. That stack cannot be reached through legal transitions without a third frame for re-entering REVIEWING_FINAL from SYNCHRONIZING. The catalog lists exactly two frames. The fixture builds the stated stack, so git history shows STATE going SYNCHRONIZING -> DEVELOPING at commit 3fdfea3, and the final review calls itself an unexplained 'reassessment'. A Synchronizer that inspects STATE history could treat this as a reconciliation gap, but it is not prominent. The protocol also tells roles to resume from persisted state.",
+      "recommendation": "run_as_is",
+      "fix": "Accept the documented compromise; graderOnly already tells the judge not to expect investigation of it."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": 2,
+      "detail": "Parts of the first-pass synchronization record are now stale and owned by the role under test. Its Assessed Inputs list the final review as COMPLETE at blob 441b83c and say recovery is inactive. A correct run is expected to refresh these on resumption. They are not independent defects in another role's artifact.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The built tree realizes every stated condition: two frames exactly as specified, the FAILURE handoff from TESTING, the Tester-side open finding and suspended assignment, a verifiable correction in the plan, and unfinished Tester and Reviewer work. check.mjs passes, and a simulated turn-end check after a correct pop-and-RESUME to TESTING stays clean. The checks are necessary conditions, and assertion 3 requires only the protocol's verbatim Tester prefix and a /tester invocation. The only concern is the case's inherently unreachable history, which is documented and acceptable.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T14:39:30.641Z",
+  "costUsd": 0.44560479999999997,
+  "ms": 88315,
+  "fixtureHash": "df19c312951386aa"
+}

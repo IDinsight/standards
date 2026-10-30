@@ -1,0 +1,97 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD, CycleMode STANDARD, WorkflowState REVIEWING_IMPLEMENTATION",
+      "where": ".standards/MODE.md; .standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Current scope, architecture, context, development plan and Tester report present with valid ownership",
+      "where": ".standards/docs/{scope,specs,development,verification}/export-20260924T090000Z-a7f3c1d2.md; .standards/CONTEXT.md; check.mjs ok:true",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and outstanding obligations inactive; nothing blocked; BaselineReconciliation NONE",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "A committed authorization rewrite exists",
+      "where": "commit 'Move role checks to a permission table' (src/auth/authorize.ts, test/authorize.test.ts)",
+      "status": "realized"
+    },
+    {
+      "condition": "A cancelled cycle exists that the rewrite could belong to",
+      "where": "commits 50-54; .standards/docs/development/role-permissions-20260921T140000Z-3e9b4f07.md DEV-001 IN_PROGRESS describes the same change; STATE history shows CANCELLED",
+      "status": "realized"
+    },
+    {
+      "condition": "History and persisted plan do not identify which cycle owns the rewrite",
+      "where": "commit message names no cycle; export plan DEV-003 lists requireAdmin in authorize.ts as affected area without claiming a change; export design/scope/verification silent; CONTEXT.md says cancelled cycle left no changes at audit time",
+      "status": "realized"
+    },
+    {
+      "condition": "The uncertainty materially changes the review boundary",
+      "where": "requireAdmin is AC-002's access check (src/routes/export.ts); the rewrite falls outside the HEAD diff and inside the export cycle's development window",
+      "status": "realized"
+    },
+    {
+      "condition": "No authoritative evidence resolves the question; context is stale about authorize.ts",
+      "where": ".standards/CONTEXT.md describes authorize.ts pre-rewrite and records src/ unchanged at audit",
+      "status": "realized"
+    },
+    {
+      "condition": "Apart from provenance, no material defect (so routing is driven by the gap alone)",
+      "where": "authorize.ts behaviorally equivalent; selfChecks: 23 unit and 3 integration pass",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "generator_notes_for_reviewer are stale. They say the case accepts only a user question and that assertion 1 checks 'persisted before asking'. The current case and the spec's checks instead require a PROJECT_CONTEXT route to Auditor (WorkflowState AUDITING, FAILURE from REVIEWING_IMPLEMENTATION, frame ResumeAt REVIEWING_IMPLEMENTATION). The checks match the current assertion, so nothing in the run is affected.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally refresh notes_for_reviewer to describe the Auditor route."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": 1,
+      "detail": "Two facts tilt the ambiguity slightly toward 'this cycle': CONTEXT.md records a clean tree with the cancelled cycle leaving no changes, and the rewrite commit falls inside the export cycle's DEVELOPING window. A Reviewer could argue it is unplanned export-cycle work and file an IMPLEMENTATION finding instead. Three facts keep the question genuinely open: the change exactly matches the cancelled cycle's IN_PROGRESS DEV-001 (same permission names and tests), no export record claims it, and the context is now stale for authorize.ts. The case itself asserts PROJECT_CONTEXT is the expected route.",
+      "recommendation": "run_as_is",
+      "fix": "None needed; the judge sees the reasoning."
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 2,
+      "detail": "Assertion 2 is complete:true. The 'cycle conclusion certified' half is decided only by WorkflowState != DOCUMENTING and review Status != COMPLETE, so a reply that verbally certifies the work would not be caught. The exists check on the review report is justified, because SKILL.md step 2 and 'Persist the report before the state transition' make it necessary.",
+      "recommendation": "run_as_is",
+      "fix": "Acceptable; flip to complete:false only if verbal certification should be judged."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "Every commit, including those for the cycle dated 20260921, shares the 2026-09-24T09:00:00Z timestamp and the 'Fixture' author. This is the harness default and does not reveal the answer.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is in the repository: an unattributed authorization rewrite committed inside the export cycle's window, a cancelled cycle whose plan describes the same change, and silent export records with context that no longer reflects the rewrite. The checks match the current assertion requiring a PROJECT_CONTEXT failure to Auditor resuming at REVIEWING_IMPLEMENTATION, a correct run can satisfy the turn-end check, and the invariants fit. Only minor notes remain: stale generator notes, slight tilt in the ambiguity, and a lenient complete:true on assertion 2.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T19:36:15.435Z",
+  "costUsd": 0.98534,
+  "ms": 74565,
+  "fixtureHash": "4b8a99b93d71bd70"
+}

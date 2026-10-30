@@ -65,7 +65,7 @@ your user styles, without changing anything. See
 
 Each role has eval cases in `skills/<role>/evals/evals.json`. See
 [`SKILL_EVAL_REPORT.md`](SKILL_EVAL_REPORT.md) for an earlier evaluation and its
-results.
+results, and [`evals/README.md`](evals/README.md) to run them yourself.
 
 ## Choose when a standard cycle finishes
 

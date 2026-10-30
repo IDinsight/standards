@@ -1,0 +1,259 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial project"
+    },
+    {
+      "dir": "layers/10-all-tags-filter",
+      "action": "commit",
+      "message": "Add notesWithAllTags filter"
+    },
+    {
+      "dir": "layers/20-node-22",
+      "action": "commit",
+      "message": "Move to Node 22 and rename test script to test:unit"
+    },
+    {
+      "dir": "layers/30-cycle",
+      "action": "commit",
+      "message": "Start cycle for built-in Set methods"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "auditor",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The committed .standards/CONTEXT.md says the runtime is Node.js 20 (.nvmrc 20, engines >=20) and that the test command is `npm test`; current package.json (engines.node >=22, only a `test:unit` script), .nvmrc (22), .github/workflows/ci.yml (`npm run test:unit`, Node version from .nvmrc), and README establish Node.js 22 and `npm run test:unit`. `npm test` now fails with a missing-script error.",
+    "The CONTEXT.md Evidence line citing `npm test` with 7 passing tests and the Testing line saying test files are listed in the `test` script are part of the same stale command claim; the unit suite now has 10 tests run by `npm run test:unit`.",
+    "Everything else in CONTEXT.md (library purpose, ES modules, no dependencies, src/index.js, src/tags.js, src/notes.js boundaries, conventions, test framework, existing helper behavior) is accurate for the current repository.",
+    "The active request (replace hand-written set helpers with built-in Set methods, which need Node 22, and keep the tests passing) depends on the runtime version and the test command.",
+    "The Node 22 move was an ordinary committed change made after the previous cycle was signed off; it is established baseline, not cycle residue (BaselineReconciliation is NONE).",
+    "The correct outcome is a gap-fill refresh of CONTEXT.md followed by a FORWARD handoff AUDITING -> SCOPING with a /scoper invocation."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "replace-the-hand-written-set-helpers-in-20260924T085200Z-5c81e0a7",
+    "PRIOR": "add-a-filter-for-notes-that-have-all-of-20260911T143000Z-2e9b4d16",
+    "CONTEXT": ".standards/CONTEXT.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "changed": [
+            ".standards/CONTEXT.md"
+          ],
+          "why": "the stale claims must be corrected in the context file"
+        },
+        {
+          "contains": {
+            "path": "${CONTEXT}",
+            "regex": "npm run test:unit"
+          },
+          "why": "the verified test command is the exact script name"
+        },
+        {
+          "contains": {
+            "path": "${CONTEXT}",
+            "regex": "\\b22\\b"
+          },
+          "why": "the verified runtime version appears in the refreshed context"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "contains": {
+            "path": "${CONTEXT}",
+            "regex": "npm run test:unit"
+          }
+        },
+        {
+          "contains": {
+            "path": "${CONTEXT}",
+            "regex": "tags\\.js"
+          },
+          "why": "the still-accurate, cycle-relevant module boundary is preserved"
+        },
+        {
+          "contains": {
+            "path": "${CONTEXT}",
+            "regex": "notes\\.js"
+          },
+          "why": "the still-accurate module boundary that uses the helpers is preserved"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 4,
+      "complete": false,
+      "all": [
+        {
+          "contains": {
+            "path": "${CONTEXT}",
+            "regex": "^(?!(?:[\\s\\S]*\\n)?# Project Context[\\s\\S]*\\n# Project Context)[\\s\\S]*?(?:^|\\n)# Project Context"
+          },
+          "why": "exactly one Project Context document, not an appended second copy"
+        }
+      ]
+    },
+    {
+      "assertion": 5,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "SCOPING"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FORWARD"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "AUDITING"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "NONE"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "false"
+        },
+        {
+          "state": "CycleMode",
+          "equals": "STANDARD"
+        },
+        {
+          "reply_matches": "/scoper\\b",
+          "why": "Claude Code next-role invocation"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "*.json",
+        ".nvmrc",
+        ".github/**",
+        "README.md"
+      ],
+      "why": "Auditor does not mutate project artifacts to learn about them (this also catches a package-lock.json created by npm install)"
+    },
+    {
+      "unchanged": [
+        ".standards/docs/**"
+      ],
+      "why": "Auditor creates or edits no cycle records; earlier cycle records are preserved"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "npm run test:unit",
+      "expect": "pass",
+      "why": "the current test command established by package.json works and the suite passes"
+    },
+    {
+      "cmd": "npm test",
+      "expect": "fail",
+      "expectOutput": "Missing script",
+      "why": "the command recorded in the stale context no longer exists"
+    },
+    {
+      "cmd": "node -e \"const p=require('./package.json'); if (p.engines.node !== '>=22' || p.scripts.test || !p.scripts['test:unit']) process.exit(1)\" && grep -qx 22 .nvmrc && grep -q 'npm run test:unit' .github/workflows/ci.yml",
+      "expect": "pass",
+      "why": "manifests and scripts establish Node 22 and test:unit"
+    },
+    {
+      "cmd": "grep -q 'Node.js 20' .standards/CONTEXT.md && grep -qF 'npm test' .standards/CONTEXT.md && ! grep -q 'test:unit' .standards/CONTEXT.md && ! grep -q '22' .standards/CONTEXT.md",
+      "expect": "pass",
+      "why": "the committed context still describes Node 20 and npm test"
+    },
+    {
+      "cmd": "node -e \"if (new Set([1]).union(new Set([2])).size !== 2) process.exit(1)\"",
+      "expect": "pass",
+      "why": "the built-in Set methods the cycle depends on exist on the project runtime"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 00-project (pre-install): dependency-free ES-module library `taglist` on Node 20 with `npm test`, .nvmrc 20, CI using .nvmrc and `npm test`. Installer runs. 10-all-tags-filter: a previous STANDARD cycle (${PRIOR}) squashed into one commit: its Auditor-written .standards/CONTEXT.md (Node.js 20, `npm test`, 7 tests), complete scope/spec/plan/verification/both reviews/documentation/synchronization records, the notesWithAllTags code and tests, README entry, and STATE.md SIGNED_OFF. 20-node-22: ordinary post-sign-off commit moving to Node 22 (engines >=22, .nvmrc 22) and renaming the only test script to `test:unit` (CI and README updated); nothing else the context describes changes. 30-cycle: STATE.md starts the new STANDARD cycle ${ID} at AUDITING with Handoff NEW_CYCLE from SIGNED_OFF, AuditTarget NONE, recovery inactive, BaselineReconciliation NONE. The request (replace hand-written set helpers with built-in Set methods, keep tests passing) depends on Node 22 and the test command. CONTEXT.md is generic about notes.js filters so it stays accurate after the prior cycle's addition; only runtime and test-command claims are stale.",
+  "case": "auditor-5",
+  "caseHash": "6a55c3353686e15c",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T21:06:36.704Z",
+    "verdict": "pass",
+    "fixtureHash": "6ccda531820d7605",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "983199b8aebe7e89",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:05:57.586Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T20:51:45.436Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/10-all-tags-filter/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/30-cycle/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:05:57.586Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

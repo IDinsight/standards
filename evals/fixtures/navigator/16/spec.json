@@ -1,0 +1,184 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial invoice summary CLI"
+    },
+    {
+      "dir": "layers/10-change",
+      "action": "commit",
+      "message": "Show summary totals with two decimal places"
+    },
+    {
+      "dir": "layers/20-workflow",
+      "action": "commit",
+      "message": "Record expedited development plan"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "navigator",
+    "utterance": "Explain the current work."
+  },
+  "graderOnly": [
+    "CycleMode is EXPEDITED and WorkflowState is REVIEWING_IMPLEMENTATION; Handoff is FORWARD from DEVELOPING with no recovery and no outstanding obligations.",
+    "Scope, Architecture, verification, documentation, and synchronization records are intentionally absent because the expedited topology omits those roles; their absence is not a failure.",
+    "No implementation review record exists yet; the implementation review is Reviewer's pending work, and nothing in the repository establishes that the change is ready for sign-off.",
+    "The only cycle record is the COMPLETE development plan with two DONE steps mapped to EXPEDITED_REQUEST; the implementation is commit 'Show summary totals with two decimal places', which changes src/summary.js and test/summary.test.js."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "summary-two-decimal-totals-20260924T083000Z-5c9e1a07",
+    "DEV": ".standards/docs/development/summary-two-decimal-totals-20260924T083000Z-5c9e1a07.md",
+    "REVIEW": ".standards/docs/reviews/summary-two-decimal-totals-20260924T083000Z-5c9e1a07/implementation.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "state": "CycleMode",
+          "equals": "EXPEDITED",
+          "why": "no promotion"
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "REVIEWING_IMPLEMENTATION"
+        },
+        {
+          "state": "ActiveWork.PromotionReason",
+          "equals": "NONE"
+        },
+        {
+          "state": "ActiveWork.Scope",
+          "equals": "NONE"
+        },
+        {
+          "state": "ActiveWork.Architecture",
+          "equals": "NONE"
+        },
+        {
+          "absent": ".standards/docs/scope/${ID}.md",
+          "why": "no synthesized scope"
+        },
+        {
+          "absent": ".standards/docs/specs/${ID}.md",
+          "why": "no synthesized design"
+        },
+        {
+          "absent": ".standards/docs/verification/${ID}.md",
+          "why": "no synthesized verification"
+        },
+        {
+          "absent": ".standards/docs/documentation/${ID}.md",
+          "why": "no synthesized documentation record"
+        },
+        {
+          "absent": ".standards/docs/synchronization/${ID}.md",
+          "why": "no synthesized synchronization record"
+        },
+        {
+          "no_skill_call": "auditor",
+          "why": "promotion would restart at Auditor"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "absent": "${REVIEW}",
+          "why": "Navigator does not write the implementation review"
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "REVIEWING_IMPLEMENTATION"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FORWARD"
+        },
+        {
+          "no_skill_call": "reviewer",
+          "why": "Navigator does not dispatch the review"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "unchanged": [
+        "**"
+      ],
+      "why": "Navigator persists nothing (generated caches are ignored)"
+    },
+    {
+      "head_unchanged": true,
+      "why": "Navigator never moves HEAD"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Navigator never mutates git state"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/summary.test.js test/parse.test.js",
+      "expect": "pass",
+      "why": "the plan's recorded self-check (5 passing tests) is true for the committed implementation"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs --json",
+      "expect": "pass",
+      "why": "the expedited state with only the development plan is valid"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 00-project (pre-install): small Node CLI (bin/ledger.js, src/parse.js, src/summary.js, tests) that prints per-customer subtotals and a raw float total. 10-change: the expedited implementation commit formatting all amounts with toFixed(2) and updating the summary tests (adds a 0.1+0.2 case). 20-workflow: STATE.md at REVIEWING_IMPLEMENTATION, CycleMode EXPEDITED, Scope/Architecture NONE, FORWARD from DEVELOPING, no recovery; and the COMPLETE development plan (AFTER_IMPLEMENTATION, Current Increment NONE, two DONE steps on EXPEDITED_REQUEST, self-check citing the implementation commit via ${COMMIT:...}). No scope, design, verification, documentation, synchronization, or review records exist, and no CONTEXT.md (no audit has run; expedited does not require one). The Navigator only needs to read and explain.",
+  "case": "navigator-16",
+  "caseHash": "b9931475998934ff",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T01:36:41.521Z",
+    "verdict": "pass",
+    "fixtureHash": "ee74effc593ed10e",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "3e05a9fa512c0a13",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:18:43.199Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T01:00:32.460Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/20-workflow/.standards/STATE.md: NONE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:18:43.199Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

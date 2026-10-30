@@ -1,0 +1,114 @@
+{
+  "conditions": [
+    {
+      "condition": "Fresh chat with no earlier turns",
+      "where": "spec history: null",
+      "status": "realized"
+    },
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md, installed in brownfield mode",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState TESTING, Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md header and Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, Architecture and Development reference current-cycle artifacts",
+      "where": "STATE.md Active Work paths; provenance blocks in .standards/docs/{scope,specs,development}/export-20260924T090000Z-a7f3c1d2.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Valid Auditor context exists",
+      "where": ".standards/CONTEXT.md (pre-cycle baseline at 52b1b38, test command, conventions)",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery inactive; last handoff FORWARD from DEVELOPING",
+      "where": "STATE.md Handoff and Recovery `Active`: `false`",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-001 requires filtered CSV export with RFC 4180 quoting",
+      "where": "scope AC-001",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-002 denies non-admin or unauthenticated export before any file is created",
+      "where": "scope AC-002",
+      "status": "realized"
+    },
+    {
+      "condition": "Design specifies quoting and server authorization before writes",
+      "where": "specs Interfaces and Contracts, Data and Control Flow, Technical Acceptance Criteria",
+      "status": "realized"
+    },
+    {
+      "condition": "Developer marks all steps DONE and the plan COMPLETE",
+      "where": "development plan header `Status`: `COMPLETE`; DEV-001..003 `DONE`",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation is committed and git diff is empty",
+      "where": "commit 0bebb8d 'Add CSV export of filtered records'; git status clean; selfCheck git diff --quiet passed",
+      "status": "realized"
+    },
+    {
+      "condition": "Existing tests cover quoting but not export authorization",
+      "where": "test/export.test.ts covers csvCell/toCsv; test/integration/export-flow.test.ts runs as admin only; authorize.test.ts tests the helpers but not the route; selfCheck grep passed",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation actually satisfies AC-001/AC-002 (no material defect)",
+      "where": "src/routes/export.ts: requireAdmin then parseFilter, list, writeExport, so a denied request never calls mkdirSync. src/export.ts quoting is correct. Admin integration tests pass.",
+      "status": "realized"
+    },
+    {
+      "condition": "`pnpm --filter export test` is established and runs offline",
+      "where": "package.json test script; README; CONTEXT.md Commands; selfCheck passed (21 tests)",
+      "status": "realized"
+    },
+    {
+      "condition": "No verification report exists yet (VERIFY applies)",
+      "where": "selfCheck `test ! -e .standards/docs/verification` passed",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The local git config and commit author are `Fixture <fixture@example.invalid>`, and every commit has the same timestamp. A role reading `git log` could notice this. These are harness builder defaults, not choices made by this spec.",
+      "recommendation": "run_as_is",
+      "fix": "Harness-level: consider a neutral author name for all fixtures."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The Developer plan lists test/export.test.ts and test/integration/export-flow.test.ts as its self-check harness, so the Developer authored the existing tests. The developer template says not to create Tester-owned tests in the plan. This is how 'existing tests cover quoting' is realized for new code. A Tester could remark on it, but it does not block a correct VERIFY.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 6,
+      "detail": "`reply_matches: fresh chat` relies on the protocol's prescribed prefix wording ('Open a fresh chat separate from...'). A paraphrase such as 'new session' would fail. The protocol states that exact prefix, so a correct run should use it.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally widen to `fresh (chat|session)|new chat`."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The export-testing base realizes every stated condition: brownfield STANDARD cycle in TESTING, COMPLETE plan, committed correct implementation with a clean tree, quoting-only test coverage with no export-authorization test, and an established offline pnpm command. check.mjs and all selfChecks pass. Checks are necessary conditions for a correct VERIFY-and-handoff run, invariants fit Tester's ownership, and nothing in the files leaks the answer.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-01T18:38:16.570Z",
+  "costUsd": 0.27770079999999997,
+  "ms": 57713,
+  "fixtureHash": "62f88647f784516a"
+}

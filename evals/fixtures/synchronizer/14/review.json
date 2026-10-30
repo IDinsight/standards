@@ -1,0 +1,84 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD, CycleMode STANDARD, WorkflowState SYNCHRONIZING, Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/MODE.md; .standards/STATE.md (layer 74)",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and outstanding obligations inactive; no blocked user question",
+      "where": ".standards/STATE.md: Recovery Active false, Obligations Active false, BlockedOn NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, architecture, context, development plan, verification, and both review reports exist with valid ownership and content identities",
+      "where": ".standards/docs/{scope,specs,development,verification,reviews/*}/export-20260924T090000Z-a7f3c1d2*.md, .standards/CONTEXT.md; check.mjs ok; blob/commit citations resolved",
+      "status": "realized"
+    },
+    {
+      "condition": "Documentation evidence is available",
+      "where": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md (COMPLETE, G1–G4); docs/usage.md",
+      "status": "realized"
+    },
+    {
+      "condition": "A retained verification result links a fixture that has been deleted",
+      "where": "verification report X1 links ../../../test/fixtures/export-filter-cases.json; deleted in commit 'Add integration test for denied exports'",
+      "status": "realized"
+    },
+    {
+      "condition": "The retained result references an execution environment that is no longer reproducible",
+      "where": "verification report X1: disposable sandbox container (Node 22.6.0, --experimental-strip-types), discarded",
+      "status": "realized"
+    },
+    {
+      "condition": "No content identity or preserved result establishes that X1 covered the current criterion",
+      "where": "X1 records no commit, blob, or log; historical fixture lacks any q case; no committed test covers status/q export filters; the report says the criterion for other filters rests on X1",
+      "status": "realized"
+    },
+    {
+      "condition": "No synchronization record exists yet",
+      "where": ".standards/docs/synchronization absent",
+      "status": "realized"
+    },
+    {
+      "condition": "Clean working tree with the deletion committed",
+      "where": "git status clean; selfCheck confirms",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The fixture deletion is committed under 'Add integration test for denied exports', and the verification report itself says the fixture was 'removed from the repository'. That is a candid Tester note, not a leak of the answer. It is slightly unusual but plausible.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 1,
+      "detail": "The network is open, so a run could try to rebuild Node 22.6.0 or rerun its own filter comparison. The ad hoc script was never committed and the sandbox was discarded, so the original result still cannot be reproduced. Whether the Synchronizer improperly substitutes its own verification is left to the judge, which fits complete:false.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "Both reviews cite X1. A correct run may also record a REVIEW discrepancy alongside the VERIFICATION gap. No check penalizes this, and check_ok holds whether the run stays in SYNCHRONIZING or routes FAILURE to TESTING with a frame: I traced checkVerificationWorkflow and checkAcceptance for the turn-end case.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition: X1 links a fixture deleted in history, cites a discarded sandbox, records no identities, and the historical fixture even lacks q cases. All other records are coherent, and check.mjs passes. The checks (sync record exists and is not COMPLETE; state is not AWAITING_USER_SIGNOFF) and the invariants are necessary conditions under every correct path, including routing a VERIFICATION failure to TESTING; the only notes are minor realism and judge-level concerns.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T14:32:43.939Z",
+  "costUsd": 0.4148648,
+  "ms": 60434,
+  "fixtureHash": "3f48e15e7a011da8"
+}

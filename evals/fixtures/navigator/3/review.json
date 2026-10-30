@@ -1,0 +1,56 @@
+{
+  "conditions": [
+    {
+      "condition": "The project has a timeout parameter whose meaning is documented",
+      "where": "README.md, Configuration section; docstring of fetch in src/fetchlite.py",
+      "status": "realized"
+    },
+    {
+      "condition": "The documented meaning is readable and plain",
+      "where": "README.md Configuration paragraph and the fetch docstring both state: seconds to wait for the server at each step (connect, then each read) before FetchTimeout; limits each wait, not the total time",
+      "status": "realized"
+    },
+    {
+      "condition": "The implemented meaning matches the documentation",
+      "where": "src/fetchlite.py passes timeout to urllib.request.urlopen, which applies it as a per-blocking-operation socket timeout. Both TimeoutError and a URLError wrapping a TimeoutError become FetchTimeout. The tests pass (selfCheck: 2 passed).",
+      "status": "realized"
+    },
+    {
+      "condition": "Small committed codebase with no dirty state",
+      "where": "Single pre-install commit plus the install commit; git status is clean",
+      "status": "realized"
+    },
+    {
+      "condition": "Workflow state left unspecified, with Navigator needing no records",
+      "where": "Default brownfield install STATE.md (no cycle); check.mjs ok",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": 0,
+      "detail": "The installed .claude/settings.json contains a stop-hook \"timeout\": 120. In principle a role could treat \"the timeout parameter\" as ambiguous and ask which one is meant, which would hurt assertion 0. fetch(url, timeout=10) is clearly the project's parameter and the hook value is framework configuration, so the risk is low. A clarifying question in that situation would arguably be the role's error, not a fixture flaw.",
+      "recommendation": "run_as_is",
+      "fix": "None needed. The judge should treat a clarification about the hook timeout as unforced."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 0,
+      "detail": "The generator downgraded assertion 0 to complete:false, although the catalog suggested deterministic grading. This is reasonable: \"about one sentence\" and \"no clarification question\" need judgment, and a trailing offer containing \"?\" should not fail by itself. The table and diagram-fence checks cannot fail a correct one-sentence answer.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes a small, consistent fetchlite project. README, docstring, and urllib-based code all define timeout as the per-step wait in seconds (default 10), and the tests pass offline. No hints leak, the invariants fit Navigator (unchanged **, HEAD unchanged, no mutating git), and the checks for assertion 0 are safe preconditions with the judge deciding the rest.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T01:34:31.672Z",
+  "costUsd": 0.654333,
+  "ms": 24193,
+  "fixtureHash": "25e9ba5c699fe0ac"
+}

@@ -1,0 +1,66 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is BROWNFIELD, so a pending EXPEDITED preference is legal",
+      "where": ".standards/MODE.md (installed BROWNFIELD template, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "Previous cycle is SIGNED_OFF",
+      "where": ".standards/STATE.md `WorkflowState`: `SIGNED_OFF`; Handoff Kind SIGNOFF from AWAITING_USER_SIGNOFF",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode is UNSET",
+      "where": ".standards/STATE.md `CycleMode`: `UNSET`",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work still describes the completed cycle for traceability",
+      "where": ".standards/STATE.md Active Work Id add-since-filter-to-invoice-list-20260921T141500Z-3c9e1a7b, Request, Development path; matching plan and review records under .standards/docs/",
+      "status": "realized"
+    },
+    {
+      "condition": "PendingCycleMode is STANDARD from the user's earlier preference",
+      "where": ".standards/STATE.md `PendingCycleMode`: `STANDARD`",
+      "status": "realized"
+    },
+    {
+      "condition": "No next-cycle request has been given (no pending blocked request)",
+      "where": ".standards/STATE.md `PendingCycleRequest`: `UNSET`, `PendingCycleBlockedOn`: `NONE`",
+      "status": "realized"
+    },
+    {
+      "condition": "Workflow state is valid and committed with a clean tree",
+      "where": "git status clean; check.mjs ok:true",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The commit 'Sign off since filter change' writes SIGNED_OFF and PendingCycleMode STANDARD in the same commit, although sign-off clears pending fields and the STANDARD preference was set afterwards. The role cannot see when the fields changed, and the final state is legal, so the run is unaffected.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally split layers/70-signoff into a sign-off commit with PendingCycleMode UNSET and a second commit such as 'Set next cycle mode preference' that sets STANDARD."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 3,
+      "detail": "The check `Handoff.Kind equals SIGNOFF` assumes a correct run leaves Handoff untouched. Choose the next cycle's mode is a coordination update with no handoff kind of its own, so Kind should stay SIGNOFF. A run that rewrites only Reason would still pass this check.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes a brownfield, SIGNED_OFF state with CycleMode UNSET, PendingCycleMode STANDARD, no pending request, and traceable terminal Active Work and records, and check.mjs reports ok. The checks are necessary conditions a correct pending-mode replacement satisfies, and the invariants are standard. Only minor realism notes remain.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T02:17:39.266Z",
+  "costUsd": 0.1391906,
+  "ms": 26046,
+  "fixtureHash": "8053d9ab377e426f"
+}

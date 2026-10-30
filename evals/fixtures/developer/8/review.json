@@ -1,0 +1,81 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is GREENFIELD",
+      "where": ".standards/MODE.md (`ProjectMode`: `GREENFIELD`, committed in 50-design; selfCheck grep passes)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD and WorkflowState DEVELOPING",
+      "where": ".standards/STATE.md header",
+      "status": "realized"
+    },
+    {
+      "condition": "Upstream greenfield records exist (scope, design, context) so Developer may proceed",
+      "where": ".standards/docs/scope/<ID>.md (AC-001..AC-005), .standards/docs/specs/<ID>.md (covers all ACs), .standards/CONTEXT.md; Handoff FORWARD from AUDITING",
+      "status": "realized"
+    },
+    {
+      "condition": "Development plan is approved",
+      "where": ".standards/docs/development/<ID>.md: `Status`: `APPROVED`, `User Style Locked`: `true`; STATE BlockedOn NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "No project implementation artifact exists yet",
+      "where": "git tree: only STANDARDS install and workflow records; tally/ absent (selfCheck passes)",
+      "status": "realized"
+    },
+    {
+      "condition": "DEV-001 creates the first application source file",
+      "where": "plan DEV-001 Affected Area: tally/__init__.py and tally/ledger.py; design Components",
+      "status": "realized"
+    },
+    {
+      "condition": "The write succeeds",
+      "where": "runner environment; selfCheck mkdir/touch tally/__init__.py passes; Python 3.11 stdlib available",
+      "status": "realized"
+    },
+    {
+      "condition": "More build steps remain after DEV-001, and the run should stay in DEVELOPING",
+      "where": "plan DEV-002, DEV-003 PENDING; Mode STEPWISE forces a pause after DEV-001",
+      "status": "realized"
+    },
+    {
+      "condition": "No recovery or outstanding obligations",
+      "where": "STATE.md Recovery Active false, Obligations Active false",
+      "status": "realized"
+    },
+    {
+      "condition": "Starting state valid per check.mjs",
+      "where": "gate checkMjs ok:true",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "ungradeable-assertion",
+      "assertion": 0,
+      "detail": "The plan was created and approved before the run, so the run only partially exercises 'creating or approving the plan does not trigger the mode change'. The fixture's committed GREENFIELD MODE.md alongside an APPROVED plan, and the run's APPROVED→IN_PROGRESS edit preceding or following the first tally/ write, still give the judge an observable ordering in the trace.",
+      "recommendation": "run_as_is",
+      "fix": "None needed; the judge grades the ordering of the MODE.md edit relative to the plan status edit and the first tally/ write."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 3,
+      "detail": "Assertion 3 is marked N/A ('decision 8'). The catalog suggested reducing it to an end-of-run MODE.md check, but that is already covered by assertion 1's ProjectMode check. The harness accepted the N/A.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition: a GREENFIELD STANDARD cycle in DEVELOPING, upstream records, an approved STEPWISE plan whose DEV-001 creates the first tally/ source, remaining steps, and no existing implementation. Nothing hints at the ProjectMode transition. The checks are necessary conditions a correct run satisfies, the invariants fit the Developer role, and the turn-end check should accept the post-DEV-001 state.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T02:15:12.666Z",
+  "costUsd": 0.1643906,
+  "ms": 43284,
+  "fixtureHash": "076d9f4ad896fc21"
+}

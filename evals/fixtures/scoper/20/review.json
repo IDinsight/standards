@@ -1,0 +1,99 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield template)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState SCOPING, Handoff FORWARD from AUDITING",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery inactive, no outstanding obligations",
+      "where": ".standards/STATE.md Recovery/Outstanding Obligations Active false",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id is search-filters-20260927T101500Z-9f8e7d6c",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Request adds date filters to search",
+      "where": ".standards/STATE.md Active Work.Request",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Scope not yet recorded for the new cycle",
+      "where": ".standards/STATE.md Scope NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "docs/product/search.md is the single canonical, unmarked scope document",
+      "where": "docs/product/search.md (no provenance block); .standards/CONTEXT.md Structure and Boundaries; earlier cycle's STATE Scope in commit b006367",
+      "status": "realized"
+    },
+    {
+      "condition": "The document lists AC-001 to AC-003 as current list items and AC-004 as retired, from an earlier signed-off cycle",
+      "where": "docs/product/search.md Work and Retired Acceptance Identifiers; layers 10-12 run keyword-search-20260915T140000Z-3c5a9e21 to SIGNED_OFF",
+      "status": "realized"
+    },
+    {
+      "condition": "Next free AC identifier in the document is AC-005",
+      "where": "selfCheck id.mjs next AC prints AC-005",
+      "status": "realized"
+    },
+    {
+      "condition": "Auditor-produced project context exists for brownfield scoping",
+      "where": ".standards/CONTEXT.md refreshed in commit 'Record project context for search filters'",
+      "status": "realized"
+    },
+    {
+      "condition": "Small existing code with no date filtering, records carry publishedOn",
+      "where": "src/search.js, src/catalog.js; tests pass",
+      "status": "realized"
+    },
+    {
+      "condition": "Clean committed git state",
+      "where": "git status clean on main",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The request leaves open whether a caller can apply date filters without a keyword query (existing AC-003 rejects empty queries) and how invalid or inverted date ranges behave. A Scoper could treat one of these as blocking, persist BlockedOn, and stop before restructuring docs/product/search.md. That would make all four assertions fail. CONTEXT.md's 'Invalid input is reported by throwing SearchError' and the explicit inclusive wording make proceeding with non-blocking assumptions the more likely path.",
+      "recommendation": "run_as_is",
+      "fix": "Acceptable. If runs show Scoper blocking on this, tighten Active Work.Request (for example, 'date filters narrow the keyword results').."
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 0,
+      "detail": "Check 2 rejects any list item above `## Previous Cycles` that begins with AC-001..AC-004, even when it is not a definition, such as '- `AC-001`–`AC-003` behavior is preserved' under Constraints. Check 1 matches the heading case-sensitively. Both edge cases are unlikely, because the protocol and template name the exact heading and a current list item that starts with an old ID would be odd.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "history",
+      "assertion": -1,
+      "detail": "All commits, including the earlier cycle's (id timestamp 2026-09-15), share the date 2026-09-27T10:30Z. This is cosmetic and does not affect behavior or checks.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is in the files. The unmarked canonical docs/product/search.md holds AC-001..AC-003 plus retired AC-004 from a real signed-off earlier cycle, `id.mjs next AC` yields AC-005, state is SCOPING/STANDARD/BROWNFIELD with Scope NONE, and check.mjs is clean. The checks are sound necessary conditions: `complete:true` is used only for file and state facts, and the turn-end checker accepts a correctly moved Previous Cycles section. The notes cover a small risk that Scoper blocks on an open filter question, and cosmetic commit dates.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T20:10:44.113Z",
+  "costUsd": 0.23136420000000002,
+  "ms": 52608,
+  "fixtureHash": "90fe81018c1db840"
+}

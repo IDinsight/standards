@@ -1,0 +1,74 @@
+{
+  "case": "navigator-3",
+  "caseHash": "03004599d01cead6",
+  "status": "draft",
+  "reviewedBy": null,
+  "notes": "Hand-written sample to exercise the builder. Navigator needs only project code; brownfield install with the default initial state.",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial project"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "navigator",
+    "utterance": "Explain in one sentence what the timeout parameter means."
+  },
+  "graderOnly": [
+    "The documented and implemented meaning of timeout is consistent: seconds to wait for the complete response before FetchTimeout."
+  ],
+  "history": null,
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "reply_not_matches": "^\\s*\\|.*\\|\\s*$",
+          "flags": "m",
+          "why": "no Markdown table"
+        },
+        {
+          "reply_not_matches": "```(mermaid|dot|plantuml)",
+          "why": "no diagram block"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [],
+      "why": "assertion added to the case after this sample was written; graded by the judge"
+    }
+  ],
+  "invariants": [
+    {
+      "unchanged": [
+        "**"
+      ],
+      "why": "Navigator persists nothing (generated caches are ignored)"
+    },
+    {
+      "head_unchanged": true,
+      "why": "Navigator never moves HEAD"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Navigator never mutates git state"
+    }
+  ]
+}

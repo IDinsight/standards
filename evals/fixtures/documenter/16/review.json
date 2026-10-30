@@ -1,0 +1,86 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD, CycleMode STANDARD, WorkflowState DOCUMENTING, Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/MODE.md; .standards/STATE.md (layer 48-review)",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, architecture, context, development, verification, and implementation review have matching provenance and current evidence",
+      "where": ".standards/docs/{scope,specs,development,verification,reviews/<id>/implementation}.md, .standards/CONTEXT.md; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-001 covers CSV export behavior; AC-002 requires an accurate usage guide",
+      "where": ".standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and obligations inactive, no blocked user question, editing unrestricted",
+      "where": ".standards/STATE.md (Active false, BlockedOn NONE); documentation record 'Editing boundary: unrestricted'",
+      "status": "realized"
+    },
+    {
+      "condition": "Explicit tony selection is active and persisted",
+      "where": "documentation record header `User Style`: `tony`, committed in 55-documentation",
+      "status": "realized"
+    },
+    {
+      "condition": "tony.md asks for NumPy docstrings with one simple happy-path example in Examples",
+      "where": ".standards/user-styles/documenter/tony.md",
+      "status": "realized"
+    },
+    {
+      "condition": "A method's parameters changed this cycle and its docstring needs a material update",
+      "where": "records/store.py export_csv now takes status, owner, columns and returns a count; docstring still says 'Write all records' with no parameters/returns",
+      "status": "realized"
+    },
+    {
+      "condition": "The old docstring has no example",
+      "where": "records/store.py export_csv docstring (no Examples, no >>>; selfCheck confirms)",
+      "status": "realized"
+    },
+    {
+      "condition": "Unrelated docstrings exist to be preserved",
+      "where": "records/store.py module/RecordStore/__init__/add/get/list; records/models.py; records/__init__.py",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation has no material defects; tests pass",
+      "where": "records/export.py, records/store.py; selfChecks 15 passed and behavior probe",
+      "status": "realized"
+    },
+    {
+      "condition": "Documentation record resumable with nothing assessed yet",
+      "where": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md IN_PROGRESS, no DOC entries",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "blocking",
+      "kind": "check-too-strict",
+      "assertion": 0,
+      "detail": "The assertion-0 regex requires the export_csv docstring to open with a bare `\"\"\"` (`\\s*\\x22{3}`). A correct run whose doctest Example shows written bytes or escapes (e.g. `b'...\\r\\n'`) would reasonably switch to a raw docstring `r\"\"\"`, and the check would then fail even though the docstring documents `columns`.",
+      "recommendation": "fix_file",
+      "fix": "In documenter-16/spec.json, checks[0].all[1].contains.regex, change `:\\\\n\\\\s*\\\\x22{3}` to `:\\\\n\\\\s*[rRuU]?\\\\x22{3}` so the check reads `def export_csv[(]self, path, status=None, owner=None, columns=DEFAULT_COLUMNS[)]:\\n\\s*[rRuU]?\\x22{3}(?:(?!\\x22{3})[\\s\\S])*columns`."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "Commit author is user.name 'Fixture' / fixture@example.invalid, which is visible in git log. This is harness-wide, not specific to this case.",
+      "recommendation": "run_as_is",
+      "fix": "Harness-level; no fixture change needed."
+    }
+  ],
+  "verdict": "issues",
+  "summary": "The fixture faithfully realizes the case. export_csv has new parameters and a return value but keeps its stale pre-cycle docstring with no example, csv_rows is undocumented, tony is persisted in the IN_PROGRESS record, the style file matches, and the records are coherent and check-clean. The unrelated-docstring checks match byte-for-byte. One assertion-0 regex would reject a correct run that uses a raw `r\"\"\"` docstring for a doctest with escapes; a one-line regex fix resolves it.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T16:25:25.124Z",
+  "costUsd": 0.3563206,
+  "ms": 79039,
+  "fixtureHash": "cc1de604fe4370da"
+}

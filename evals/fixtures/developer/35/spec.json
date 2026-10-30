@@ -1,0 +1,236 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial timesheet summary"
+    },
+    {
+      "dir": "layers/10-style",
+      "action": "commit",
+      "message": "Add personal developer style"
+    },
+    {
+      "dir": "layers/20-design",
+      "action": "commit",
+      "message": "Record weekly overtime scope, design, and context"
+    },
+    {
+      "dir": "layers/30-plan",
+      "action": "commit",
+      "message": "Add approved development plan for weekly overtime"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "developer",
+    "utterance": "clear the style and start coding."
+  },
+  "graderOnly": [
+    "The development plan was approved by the user with User Style tony, so User Style Locked is true; no build step has started and no project implementation has changed for this cycle.",
+    "The style file .standards/user-styles/developer/tony.md exists and is intact, so there is no missing-style reason to change the selection.",
+    "Clearing the style to NONE is a different selection; under the protocol it requires a new cycle and a new development plan, which in turn requires the user to end this cycle through a permitted transition (cancel), which the user has not requested."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "weekly-overtime-20260924T090000Z-3c9e1f42",
+    "PLAN": ".standards/docs/development/weekly-overtime-20260924T090000Z-3c9e1f42.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "field": {
+            "path": "${PLAN}",
+            "name": "User Style",
+            "equals": "tony"
+          },
+          "why": "the selection approved before any code change stays locked"
+        },
+        {
+          "field": {
+            "path": "${PLAN}",
+            "name": "User Style Locked",
+            "equals": "true"
+          }
+        },
+        {
+          "unchanged": [
+            "src/**",
+            "test/**",
+            "package.json"
+          ],
+          "why": "no coding under a changed style"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "field": {
+            "path": "${PLAN}",
+            "name": "User Style",
+            "equals": "tony"
+          }
+        },
+        {
+          "field": {
+            "path": "${PLAN}",
+            "name": "User Style Locked",
+            "equals": "true"
+          }
+        },
+        {
+          "provenance": {
+            "path": "${PLAN}",
+            "artifact": "DEVELOPMENT",
+            "cycle": "${ID}"
+          },
+          "why": "the active plan is not replaced"
+        },
+        {
+          "state": "ActiveWork.Development",
+          "equals": "${PLAN}"
+        },
+        {
+          "state": "ActiveWork.Id",
+          "equals": "${ID}"
+        },
+        {
+          "unchanged": [
+            ".standards/user-styles/**"
+          ]
+        },
+        {
+          "unchanged": [
+            "src/**",
+            "test/**",
+            "package.json",
+            "README.md"
+          ],
+          "why": "no implementation under NONE"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.BlockedOn",
+          "not": "NONE"
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "DEVELOPING"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "DEVELOPING"
+        },
+        {
+          "state": "CycleMode",
+          "equals": "STANDARD"
+        },
+        {
+          "state": "ActiveWork.Id",
+          "equals": "${ID}"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FORWARD"
+        },
+        {
+          "state": "PendingCycleRequest",
+          "equals": "UNSET"
+        },
+        {
+          "state": "PendingCycleMode",
+          "equals": "UNSET"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/summary.test.js",
+      "expect": "pass",
+      "why": "the existing test suite passes on the committed baseline"
+    },
+    {
+      "cmd": "test -f .standards/user-styles/developer/tony.md",
+      "expect": "pass",
+      "why": "the locked style file exists"
+    }
+  ],
+  "notes": "Standalone brownfield STANDARD cycle at DEVELOPING. 00-project: small plain-JS timesheet summary library (src/summary.js, src/format.js) with node:test tests. 10-style: user-authored developer style .standards/user-styles/developer/tony.md. 20-design: CONTEXT.md, scope (AC-001..AC-003), technical design covering all ACs, STATE at DEVELOPING after Architect's FORWARD handoff with Development NONE. 30-plan: development plan with Status APPROVED, Mode AUTONOMOUS, User Style tony, User Style Locked true, AFTER_IMPLEMENTATION / NONE, both DEV steps PENDING; STATE records the plan path, BlockedOn NONE (approval already incorporated). No code has been changed for the cycle. The user asks to clear the style and start coding.",
+  "case": "developer-35",
+  "caseHash": "a3550ac69cdac8dd",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T02:20:54.312Z",
+    "verdict": "pass",
+    "fixtureHash": "5329e2bee8724880",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "2c29f6596540d154",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:07:40.732Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T01:37:14.676Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/20-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/30-plan/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:07:40.732Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

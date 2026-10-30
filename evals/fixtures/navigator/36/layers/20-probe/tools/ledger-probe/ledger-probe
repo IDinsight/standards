@@ -1,0 +1,26 @@
+#!/bin/sh
+# ledger-probe 2.4.1 (platform tools)
+set -eu
+
+cmd=${1:-status}
+[ $# -gt 0 ] && shift
+data=data
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --data) data=$2; shift 2 ;;
+    *) shift ;;
+  esac
+done
+
+case "$cmd" in
+  status)
+    count=$(grep -c '"account"' "$data/ledger.json" || true)
+    stamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+    printf '{"checkedAt":"%s","entries":%s}\n' "$stamp" "$count" > "$data/probe-state.json"
+    echo "ledger-probe: $count entries in $data/ledger.json"
+    ;;
+  *)
+    echo "ledger-probe: unknown command $cmd" >&2
+    exit 2
+    ;;
+esac

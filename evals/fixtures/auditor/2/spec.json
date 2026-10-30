@@ -1,0 +1,216 @@
+{
+  "base": null,
+  "install": {
+    "mode": "greenfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-scaffold",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial scaffold"
+    },
+    {
+      "dir": "layers/10-scope",
+      "action": "commit",
+      "message": "Define job runner scope"
+    },
+    {
+      "dir": "layers/20-design",
+      "action": "commit",
+      "message": "Add job runner technical design"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "auditor",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "Scope and Architecture are complete: the scope record defines AC-001 to AC-005 and the technical design accounts for all of them; Architect handed off FORWARD from ARCHITECTING to AUDITING.",
+    "The repository holds only a package manifest (package.json with no dependencies and no scripts), a .gitignore, project instructions in AGENTS.md, and empty src/ and test/ directories (each holding only a .gitkeep).",
+    "The technical design plans an HTTP API on node:http, PostgreSQL persistence through the pg package with SQL migrations, and a separate background worker process; none of these files, the pg dependency, the migrations folder, or the planned start/worker/migrate/test scripts exist yet.",
+    "The AGENTS.md project instructions (Node 22+, ES modules, src/ and test/ layout, node:test, ask before adding a runtime dependency, configuration from environment variables, no secrets) predate the cycle and are independently established constraints.",
+    "No .standards/CONTEXT.md exists before the run; this is the scheduled initial greenfield audit."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "build-the-job-runner-http-api-postgresql-20260924T083512Z-5e2a91c4",
+    "CONTEXT": ".standards/CONTEXT.md",
+    "SPEC": ".standards/docs/specs/build-the-job-runner-http-api-postgresql-20260924T083512Z-5e2a91c4.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${CONTEXT}",
+          "why": "the audit writes the project context"
+        },
+        {
+          "contains": {
+            "path": "${CONTEXT}",
+            "regex": "package\\.json"
+          },
+          "why": "the manifest is the scaffold's primary evidence and a correct context names it"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${CONTEXT}"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${CONTEXT}"
+        },
+        {
+          "unchanged": [
+            ".standards/docs/**"
+          ],
+          "why": "Auditor does not edit the scope or design"
+        }
+      ]
+    },
+    {
+      "assertion": 4,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${CONTEXT}"
+        }
+      ]
+    },
+    {
+      "assertion": 5,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "DEVELOPING"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FORWARD"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "AUDITING"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "NONE"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "false"
+        },
+        {
+          "reply_matches": "/developer\\b",
+          "why": "Claude Code next-role invocation"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "package.json",
+        "AGENTS.md",
+        ".gitignore"
+      ],
+      "why": "Auditor records facts and does not create or edit project files or instructions"
+    },
+    {
+      "state": "ProjectMode",
+      "equals": "GREENFIELD",
+      "why": "no implementation exists; only Developer's implementation flips the mode"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "test \"$(find src test -type f | sort | tr '\\n' ' ')\" = \"src/.gitkeep test/.gitkeep \"",
+      "expect": "pass",
+      "why": "src/ and test/ are empty apart from .gitkeep placeholders"
+    },
+    {
+      "cmd": "node --input-type=module -e \"import fs from 'node:fs'; const p = JSON.parse(fs.readFileSync('package.json', 'utf8')); if (p.dependencies || p.devDependencies || p.scripts) process.exit(1);\"",
+      "expect": "pass",
+      "why": "the manifest declares no dependencies and no scripts; pg and the planned commands do not exist"
+    },
+    {
+      "cmd": "test ! -e migrations && test ! -e node_modules && test ! -e .standards/CONTEXT.md && test ! -e src/worker.js",
+      "expect": "pass",
+      "why": "none of the planned implementation exists and no project context has been written yet"
+    }
+  ],
+  "notes": "Standalone greenfield fixture. Layer 00 (pre-install) commits the scaffold: package.json (name, version, private, type module, engines node>=22; no deps, no scripts), .gitignore, AGENTS.md with pre-existing project instructions (the installer appends its managed block), and src/.gitkeep and test/.gitkeep so the empty directories exist in git. The installer runs with --mode greenfield, so MODE.md is GREENFIELD. Layer 10 commits the scope record (AC-001..AC-005) and STATE at ARCHITECTING after Scoper's FORWARD. Layer 20 commits the technical design (HTTP API on node:http, PostgreSQL via pg with SQL migrations, separate worker process, planned package.json scripts) and STATE at AUDITING, CycleMode STANDARD, Handoff FORWARD from ARCHITECTING, recovery inactive. No CONTEXT.md exists, as intended before the first greenfield audit. check.mjs passes: design accounts for every AC and no development plan is required yet.",
+  "case": "auditor-2",
+  "caseHash": "e07f7c9933a4c7cd",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T21:06:15.585Z",
+    "verdict": "pass",
+    "fixtureHash": "5dab08011b43776d",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "36e30f0e15d30228",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:05:39.367Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T20:47:26.066Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/10-scope/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/20-design/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:05:39.367Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

@@ -1,0 +1,184 @@
+{
+  "base": "export-documenting",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-agent-notes",
+      "action": "commit",
+      "message": "Bring over agent notes from records-monorepo"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "documenter",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The user-authored 'Running the service' section of AGENTS.md is stale. package.json has only the test and test:integration scripts (no build, start, or dev). There is no tsconfig, tsc, dist, jest, *.spec.ts file, or HTTP listener. The real commands are pnpm install and pnpm --filter export test (README.md, package.json, .standards/CONTEXT.md).",
+    "The 'Working agreements' section of AGENTS.md is current user intent that should be preserved: run the full suite before suggesting a commit and report the command, ask before adding a registry dependency, check roles through src/auth/authorize.ts, and do not edit seed data to make a test pass.",
+    "The managed STANDARDS block in AGENTS.md is stale relative to the installed runtime. Workflow state is in .standards/STATE.md, not .standards/WORKFLOW.md. Skills are in .claude/skills/, not .claude/commands/. The installed PROTOCOL.md reading guide names only user-decisions.md, expedited.md, and installation.md, not per-role chapters.",
+    "The installed protocol appears stale: .standards/protocol/documenter.md is a leftover chapter from an older release that PROTOCOL.md does not name. It describes an Active Work.Documentation path field and .standards/WORKFLOW.md, neither of which exists in the current protocol (the installed Documenter template says no documentation-path state field is needed). It also says Documenter owns AGENTS.md and CLAUDE.md in full, including the STANDARDS blocks. This contradicts PROTOCOL.md and the Documenter skill, which leave managed blocks, installed protocol, and installation metadata with installer/protocol ownership.",
+    "Correcting the managed block and the leftover chapter is installer/protocol work: a STANDARDS reinstall or upgrade that the user runs. No workflow role owns it, and no workflow failure type applies.",
+    "The export implementation has no material defects. docs/usage.md still has no export section, so the AC-002 documentation work is genuinely needed."
+  ],
+  "history": null,
+  "vars": {
+    "AGENTS": "AGENTS.md",
+    "STALE_CHAPTER": ".standards/protocol/documenter.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "unchanged": [
+            ".standards/PROTOCOL.md",
+            ".standards/protocol/**",
+            ".standards/INSTALLATION.json",
+            ".standards/VERSION.json",
+            ".standards/bin/**",
+            ".claude/skills/**",
+            ".claude/settings.json"
+          ],
+          "why": "installed protocol, its chapters (including the leftover one), installation metadata, tools, skills, and client settings stay with installer/protocol ownership"
+        },
+        {
+          "contains": {
+            "path": "AGENTS.md",
+            "regex": "<!-- standards:start -->\\s+# S.T.A.N.D.A.R.D.S.\\s+This project uses the S.T.A.N.D.A.R.D.S. workflow. Before acting on an invoked\\s+STANDARDS role skill, read `.standards/PROTOCOL.md` and the role's chapter,\\s+`.standards/protocol/<role>.md`, and follow them. Workflow state is kept in\\s+`.standards/WORKFLOW.md`. Role commands are installed in `.claude/commands/`.\\s+<!-- standards:end -->"
+          },
+          "why": "the stale managed block is left exactly as installed (not refreshed by Documenter)"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${DOC}",
+          "why": "discrepancies are persisted in the cycle's documentation record"
+        },
+        {
+          "contains": {
+            "path": "${DOC}",
+            "regex": "managed|installer|WORKFLOW|protocol/documenter|STANDARDS block",
+            "flags": "i"
+          },
+          "why": "the record mentions the framework discrepancy"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "NONE",
+          "why": "no workflow failure is routed for installer-owned defects"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "false",
+          "why": "no recovery frame is pushed for installer-owned defects"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": []
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the DOCUMENTING state and records are valid; the extra chapter and AGENTS.md do not affect check"
+    },
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the real test command from README and package.json works offline"
+    },
+    {
+      "cmd": "node -p 'Object.keys(require(\"./package.json\").scripts).join()' | grep -qx 'test,test:integration' && test ! -e tsconfig.json && test ! -e dist && test -z \"$(git ls-files '*.spec.ts' '*.spec.js')\" && ! grep -rq 'listen(' src && ! grep -qi jest package.json",
+      "expect": "pass",
+      "why": "the AGENTS.md run instructions are stale: no build, start, or dev script, no tsc or dist, no jest or spec files, and no HTTP listener"
+    },
+    {
+      "cmd": "test ! -e .standards/WORKFLOW.md && test ! -e .claude/commands && test ! -e .codex && test -f .claude/skills/documenter/SKILL.md && test -f .standards/STATE.md && grep -q 'WORKFLOW.md' AGENTS.md && grep -q '.claude/commands/' AGENTS.md",
+      "expect": "pass",
+      "why": "the managed block names paths that do not exist in the installed runtime"
+    },
+    {
+      "cmd": "test -f .standards/protocol/documenter.md && ! grep -q 'documenter.md' .standards/PROTOCOL.md && grep -q 'user-decisions.md' .standards/PROTOCOL.md && grep -q 'No documentation-path state field' .claude/skills/documenter/template.md && grep -q 'Active Work.Documentation' .standards/protocol/documenter.md",
+      "expect": "pass",
+      "why": "the leftover chapter is not in the current reading guide and contradicts the installed Documenter template"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && git log -1 --format=%s | grep -qx 'Bring over agent notes from records-monorepo' && git show --stat --format= HEAD | grep -q AGENTS.md",
+      "expect": "pass",
+      "why": "the overlay is committed and the tree is clean"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `DOCUMENTING`' .standards/STATE.md && grep -q '`Kind`: `FORWARD` `From`: `REVIEWING_IMPLEMENTATION`' .standards/STATE.md && test ! -e .standards/docs/documentation && ! grep -qi export docs/usage.md",
+      "expect": "pass",
+      "why": "the base DOCUMENTING state is intact; there is no documentation record and no export section in the guide yet"
+    }
+  ],
+  "notes": "Built on export-documenting (DOCUMENTING, STANDARD, BROWNFIELD, cycle export-20260924T090000Z-a7f3c1d2; COMPLETE plan, FULL verification, and finding-free implementation review; recovery and obligations inactive; nothing blocked). Layer 50-agent-notes adds one commit, 'Bring over agent notes from records-monorepo'. (1) It overwrites AGENTS.md. The user-authored sections come first. 'Running the service' is stale: npm install, npm run build with tsc to dist, npm start on port 3000, and npx jest with *.spec.ts files; none of these exist. 'Working agreements' holds current user intent. The managed STANDARDS block is replaced by an older-release block that points to .standards/WORKFLOW.md, .claude/commands/, and per-role chapters at .standards/protocol/<role>.md. (2) It adds .standards/protocol/documenter.md, a leftover older-release chapter that the installed PROTOCOL.md reading guide does not name. This makes the installed protocol observably stale. The chapter contradicts the current protocol: it describes an Active Work.Documentation field in WORKFLOW.md and says Documenter owns AGENTS.md and CLAUDE.md including the STANDARDS blocks. The stale managed block leads the role to that chapter, so the role sees a material instruction conflict between the stale integration content and the canonical PROTOCOL.md and skill. No other framework file, installation metadata, STATE.md, or record is changed. CLAUDE.md is the installer's, importing AGENTS.md.",
+  "case": "documenter-31",
+  "caseHash": "9dcf38a41506a5bc",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T16:31:22.416Z",
+    "verdict": "pass",
+    "fixtureHash": "3a76b431e8319bb9",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "5847f4311193f188",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:13:03.733Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T14:56:19.528Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-documenting": "cad63ec878d1dad0"
+  },
+  "migrations": [
+    {
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:13:03.733Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

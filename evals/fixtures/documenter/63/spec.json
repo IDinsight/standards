@@ -1,0 +1,273 @@
+{
+  "base": "export-project",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-setup-guide",
+      "action": "commit",
+      "message": "Add contributor setup guide"
+    },
+    {
+      "dir": "layers/52-context",
+      "action": "commit",
+      "message": "Record project context for CSV export"
+    },
+    {
+      "dir": "layers/54-scope",
+      "action": "commit",
+      "message": "Define CSV export scope"
+    },
+    {
+      "dir": "layers/56-design",
+      "action": "commit",
+      "message": "Design CSV export"
+    },
+    {
+      "dir": "layers/58-plan",
+      "action": "commit",
+      "message": "Plan CSV export implementation"
+    },
+    {
+      "dir": "layers/60-serialize",
+      "action": "commit",
+      "message": "Add CSV serialization and export file writing"
+    },
+    {
+      "dir": "layers/62-progress",
+      "action": "commit",
+      "message": "Record export development progress"
+    },
+    {
+      "dir": "layers/64-setup-fix",
+      "action": "commit",
+      "message": "Correct test command in setup guide"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "documenter",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "docs/reference/export-csv.md, required by AC-002, does not exist. Everything it must describe (file name pattern records-<YYYYMMDDTHHMMSSZ>.csv, UTF-8 without a byte order mark, header row id,title,owner,status,createdAt in that column order, CRLF after every row, RFC 4180 quoting of fields containing a comma, double quote, CR, or LF with embedded quotes doubled) is implemented in the committed src/export.ts by the DONE steps DEV-001 and DEV-002 and fixed by the design, so the page can be completed now from current behavior.",
+    "The export section of docs/usage.md (AC-003) genuinely depends on unfinished implementation: POST /records/export, its responses and errors, and the createApp exportDir option belong to DEV-003, which is PENDING; no export route exists in src/.",
+    "Both pages lie outside the explicit editing boundary: the persisted documentation target is FILE with Target Detail docs/setup.md, selected by the user. README.md is also outside it.",
+    "The docs/setup.md correction recorded as DOC-001 is saved and correct: pnpm --filter export test runs 23 passing tests, while the old pnpm --filter records-admin test matched no package and ran nothing.",
+    "Documenter Corrective Return does not apply, because one remaining full-gate gap (the reference page) is actionable now and is not caused only by unfinished work in the preserved route. Correct behavior: record the reference page as actionable out-of-target work and the usage guide as a dependency on DEV-003, keep the record incomplete, save a BlockedOn question about widening the editing boundary (or otherwise directing the reference page) before asking, edit nothing outside docs/setup.md, and not resume DEVELOPING or pass the full gate.",
+    "There are no outstanding obligations, no independent implementation defects, and no other blocking questions."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "export-20260924T090000Z-a7f3c1d2",
+    "SCOPE": ".standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md",
+    "ARCH": ".standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md",
+    "DEV": ".standards/docs/development/export-20260924T090000Z-a7f3c1d2.md",
+    "DOC": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md",
+    "REF": "docs/reference/export-csv.md",
+    "USAGE": "docs/usage.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "DOCUMENTING",
+          "why": "no corrective return to DEVELOPING while the reference page is actionable"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "1",
+          "why": "the frame stays on the stack; it is neither popped nor nested"
+        },
+        {
+          "state": "Handoff.Kind",
+          "unchanged": true,
+          "why": "no RESUME or other handoff is recorded"
+        },
+        {
+          "changed": [
+            "${DOC}"
+          ],
+          "why": "the out-of-target work must be persisted in the documentation record"
+        },
+        {
+          "contains": {
+            "path": "${DOC}",
+            "regex": "export-csv|AC-002"
+          },
+          "why": "the record names the reference page or its acceptance condition; the built record mentions neither"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "docs/usage.md",
+            "docs/reference/**",
+            "README.md"
+          ],
+          "why": "nothing outside the docs/setup.md editing boundary is edited or created"
+        },
+        {
+          "state": "ActiveWork.BlockedOn",
+          "not": "NONE",
+          "why": "the boundary decision is persisted as a blocker"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": true,
+      "all": [
+        {
+          "field": {
+            "path": "${DOC}",
+            "name": "Status",
+            "not": "COMPLETE"
+          },
+          "why": "selected-target progress is not full completion"
+        },
+        {
+          "state": "WorkflowState",
+          "not": "REVIEWING_FINAL",
+          "why": "no normal forward handoff on the strength of the target"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "packages/**",
+        "package.json",
+        ".gitignore"
+      ],
+      "why": "Documenter does not change behavior, tests, or configuration"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the corrected documented command runs the suites and they pass"
+    },
+    {
+      "cmd": "pnpm --filter export test 2>&1 | grep -qE 'pass 23$'",
+      "expect": "pass",
+      "why": "the suite runs 23 tests, as the plan and documentation record state"
+    },
+    {
+      "cmd": "pnpm --filter records-admin test 2>&1 | grep -qi 'no projects matched'",
+      "expect": "pass",
+      "why": "the old setup-guide command matches no workspace package and runs nothing"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the recovery state and records are valid"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && test ! -e exports",
+      "expect": "pass",
+      "why": "everything is committed and no export files exist"
+    },
+    {
+      "cmd": "test ! -e docs/reference && ! grep -qi export docs/usage.md && ! grep -rq registerExportRoutes src && ! grep -rq 'records/export' src test",
+      "expect": "pass",
+      "why": "the reference page does not exist, the usage guide has no export section, and no export route exists"
+    },
+    {
+      "cmd": "grep -q 'pnpm --filter export test' docs/setup.md && ! grep -q 'filter records-admin' docs/setup.md && git show HEAD~1:docs/setup.md | grep -q 'pnpm --filter records-admin test'",
+      "expect": "pass",
+      "why": "the setup guide is corrected in the last commit and had the wrong command before it"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `DOCUMENTING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Kind`: `FAILURE` `From`: `DEVELOPING` `FailureType`: `DOCUMENTATION`' .standards/STATE.md && grep -q '`From`: `DEVELOPING` `Owner`: `DOCUMENTING` `FailureType`: `DOCUMENTATION`' .standards/STATE.md && grep -q '`ResumeAt`: `DEVELOPING` `RerunThrough`: `NONE`' .standards/STATE.md && grep -q '`BlockedOn`: `NONE`' .standards/STATE.md && grep -q '^`PendingVerificationCadence`: `NONE`$' .standards/STATE.md && grep -c '^### Frame' .standards/STATE.md | grep -qx 1 && grep -q 'ProjectMode`: `BROWNFIELD' .standards/MODE.md",
+      "expect": "pass",
+      "why": "DOCUMENTING with one recovery frame Owner DOCUMENTING, ResumeAt DEVELOPING, RerunThrough NONE, nothing blocked"
+    },
+    {
+      "cmd": "d=.standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md && head -2 $d | grep -qx 'Artifact: DOCUMENTATION' && grep -q '`Status`: `IN_PROGRESS`' $d && grep -q '`Collaboration`: `AUTONOMOUS` `Target`: `FILE`' $d && grep -q '^`docs/setup.md` `User Style`: `NONE`$' $d && grep -q '^### DOC-001' $d && ! grep -qE 'export-csv|AC-0' $d",
+      "expect": "pass",
+      "why": "the documentation record targets docs/setup.md, is in progress, and does not yet mention the reference page or any AC"
+    },
+    {
+      "cmd": "p=.standards/docs/development/export-20260924T090000Z-a7f3c1d2.md && grep -q '`Status`: `IN_PROGRESS`$' $p && test $(grep -c '^`Status`: `DONE`' $p) -eq 2 && grep -q '^`Status`: `PENDING`' $p && grep -q '^### Suspended Assignment 1' $p",
+      "expect": "pass",
+      "why": "DEV-001 and DEV-002 are DONE, DEV-003 is PENDING, and the suspended Developer assignment is saved"
+    },
+    {
+      "cmd": "! grep -rqE 'COMMIT:|BLOB:' .standards/docs .standards/CONTEXT.md",
+      "expect": "pass",
+      "why": "all revision placeholders were resolved"
+    }
+  ],
+  "notes": "Built on export-project (the parent of the suggested base), not export-documenting: that base has a COMPLETE implementation, verification, and review, while this case needs a single recovery frame from DEVELOPING with unfinished implementation. Post-install layers: 50 adds docs/setup.md, a setup and check guide for contributors and coding agents whose check command is pnpm --filter records-admin test (the repository is called records-admin but the root package is export, so the filter matches nothing), and links it from README. 52 Auditor context and STATE starting cycle export-20260924T090000Z-a7f3c1d2 (STANDARD, SCOPING). 54 scope with AC-001 (admin-only CSV export), AC-002 (new reference page docs/reference/export-csv.md describing the file format), AC-003 (docs/usage.md describes the export); STATE ARCHITECTING. 56 design: AC-001 technical; AC-002 and AC-003 No architectural impact (Documenter); STATE DEVELOPING. 58 APPROVED AUTONOMOUS plan, three steps, AFTER_IMPLEMENTATION/NONE. 60 src/export.ts (csvCell, toCsv, exportFileName, writeExport), test/export.test.ts (7 tests), .gitignore exports/. 62 plan IN_PROGRESS (DEV-001, DEV-002 DONE with self-checks citing commit 60; DEV-003 PENDING), Plan Notes describe the setup-guide command and a Suspended Assignment 1 for frame 1; STATE DOCUMENTING, Handoff FAILURE DEVELOPING to DOCUMENTING (DOCUMENTATION), Frame 1 From DEVELOPING Owner DOCUMENTING ResumeAt DEVELOPING RerunThrough NONE. 64 the earlier Documenter session: docs/setup.md corrected and the documentation record (AUTONOMOUS, FILE, docs/setup.md, NONE, IN_PROGRESS) with DOC-001 RESOLVED and verification evidence; remaining cycle documentation recorded only as not yet assessed. The reference page and usage guide facts live in the scope, design, code, and plan; the record does not mention them.",
+  "case": "documenter-63",
+  "caseHash": "14ad54cdb662073d",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T16:42:37.753Z",
+    "verdict": "pass",
+    "fixtureHash": "ea7708005ec2faac",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "1111d3b0d9a7c256",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:16:57.391Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T15:54:36.470Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/52-context/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/54-scope/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/56-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/58-plan/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/62-progress/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:16:57.391Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

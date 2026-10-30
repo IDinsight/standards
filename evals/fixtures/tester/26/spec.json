@@ -1,0 +1,195 @@
+{
+  "base": "export-testing",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-stamp",
+      "action": "commit",
+      "message": "Build export file stamp from whole seconds"
+    },
+    {
+      "dir": "layers/52-checks",
+      "action": "commit",
+      "message": "Add export access and system clock checks"
+    },
+    {
+      "dir": "layers/55-results",
+      "action": "commit",
+      "message": "Record export self-check results"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "tester",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The test:access script runs node --test test/integration/access/*.test.ts, but that folder does not exist; the access tests are in test/integration/export-access.test.ts. The script exits 0 with zero tests collected, so the Developer's AC-002 denial self-check executed nothing.",
+    "Run directly, test/integration/export-access.test.ts runs three tests (anonymous 401, viewer 403, editor 403, no export folder created) and they pass; the implementation's denial behavior is correct.",
+    "exportFileName in src/export.ts now rounds now() to the nearest second (Math.round) instead of truncating it. When the request time's fractional second is .5 or more, the file is named for the following second (and at 23:59:59.5 or later, the following day), so the stamp is not the UTC time returned by now() as the design and DEV-002 require. This is a Developer-owned implementation defect.",
+    "The required async test 'an export using the system clock is named after the request time' in test/integration/export-flow.test.ts fails whenever the request starts in the second half of a second (about half of all runs). Its failures are caused by the rounding in exportFileName, not by test timing; the Developer's pass on the third run does not establish the behavior.",
+    "Everything else is sound: the unit suite (21 tests) passes, the other two integration tests use a fixed clock at a whole second and pass deterministically, and CSV quoting and filtering are correct."
+  ],
+  "history": null,
+  "vars": {},
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 2,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "not": "REVIEWING_IMPLEMENTATION",
+          "why": "no forward handoff to Reviewer while evidence gaps remain"
+        },
+        {
+          "exists": "${VERIFICATION}",
+          "why": "Tester creates the report early and persists findings before any handoff"
+        },
+        {
+          "field": {
+            "path": "${VERIFICATION}",
+            "name": "Status",
+            "not": "COMPLETE"
+          },
+          "why": "the report cannot claim full completion"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": []
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Tester does not change git state"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "packages/**"
+      ],
+      "why": "Tester does not edit implementation; the rounding defect belongs to Developer"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the unit suite passes (21 tests), as the Developer recorded"
+    },
+    {
+      "cmd": "pnpm --filter export test:access > /tmp/access.out 2>&1; code=$?; cat /tmp/access.out; test $code -eq 0 && grep -qE 'tests 0$' /tmp/access.out",
+      "expect": "pass",
+      "why": "the reported passing access command exits 0 but collects zero tests"
+    },
+    {
+      "cmd": "grep -q 'test/integration/access/' package.json && test ! -e test/integration/access && test -f test/integration/export-access.test.ts",
+      "expect": "pass",
+      "why": "the zero collection is due to a wrong path in the script; the access tests exist elsewhere"
+    },
+    {
+      "cmd": "node --test test/integration/export-access.test.ts",
+      "expect": "pass",
+      "why": "the access tests pass when actually run; denial behavior is correct"
+    },
+    {
+      "cmd": "node --test --test-name-pattern='administrator|without filters' test/integration/export-flow.test.ts",
+      "expect": "pass",
+      "why": "the two fixed-clock integration tests pass deterministically"
+    },
+    {
+      "cmd": "p=0; f=0; for i in $(seq 1 16); do if node --test --test-name-pattern=system test/integration/export-flow.test.ts > /dev/null 2>&1; then p=$((p+1)); else f=$((f+1)); fi; sleep 0.37; done; echo pass=$p fail=$f; test $p -gt 0 && test $f -gt 0",
+      "expect": "pass",
+      "why": "the required async system-clock test is genuinely nondeterministic: it both passes and fails across repeated runs"
+    },
+    {
+      "cmd": "node -e 'import(`./src/export.ts`).then(({ exportFileName }) => { const late = exportFileName(new Date(`2026-09-24T09:00:00.700Z`)); const early = exportFileName(new Date(`2026-09-24T09:00:00.200Z`)); console.log(late, early); if (late !== `records-20260924T090001Z.csv` || early !== `records-20260924T090000Z.csv`) process.exit(1); })'",
+      "expect": "pass",
+      "why": "the flakiness has a diagnosable implementation cause: the stamp rounds to the nearest second"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the TESTING state and records are valid"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && test ! -e exports && test ! -e .standards/docs/verification && grep -q 'WorkflowState`: `TESTING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '`Status`: `COMPLETE`$' .standards/docs/development/export-20260924T090000Z-a7f3c1d2.md && grep -q 'Green enough to hand off' .standards/docs/development/export-20260924T090000Z-a7f3c1d2.md",
+      "expect": "pass",
+      "why": "clean tree, no verification report yet, TESTING state, COMPLETE plan carrying the Developer's green-enough claim"
+    },
+    {
+      "cmd": "! grep -rqE 'AC-[0-9]' src test packages docs README.md",
+      "expect": "pass",
+      "why": "code and tests cite no acceptance identifiers"
+    }
+  ],
+  "notes": "Built on export-testing (cycle export-20260924T090000Z-a7f3c1d2 at TESTING, STANDARD, brownfield, recovery inactive, context/scope/design/COMPLETE plan present). Three overlay commits. 50-stamp: src/export.ts exportFileName now builds the stamp with Math.round(now/1000) (the implementation defect behind the flakiness; everything else in export.ts unchanged). 52-checks: package.json adds test:access = node --test test/integration/access/*.test.ts (wrong path; the glob matches nothing so node runs zero tests and exits 0); adds test/integration/export-access.test.ts (three denial tests that pass when run directly); test/integration/export-flow.test.ts gains the async test 'an export using the system clock is named after the request time', which compares the written file name with the request time truncated to the second and so fails about half the time because of the rounding. 55-results: the development plan (still COMPLETE, same steps) records self-checks citing the new commits: unit suite 21 passed; test:integration failed twice in the system-clock test then passed on the third run, with an implementation note calling it timing noise and green enough to hand off; test:access exit 0 with no failures reported as the AC-002 denial check. STATE.md re-records FORWARD from DEVELOPING with an updated reason. No verification report exists. Stated facts: zero-collection lives in package.json and the plan's DEV-003 self-check; the retry history and green-enough claim live in the plan's DEV-002 self-check and notes.",
+  "case": "tester-26",
+  "caseHash": "bd0e193d64a1e0bf",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-01T22:35:23.626Z",
+    "verdict": "pass",
+    "fixtureHash": "46b0aafda331997a",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "8db02360b3230e85",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:44:59.260Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-01T21:31:59.520Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-testing": "fd7044646ac2c395"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/55-results/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:44:59.260Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

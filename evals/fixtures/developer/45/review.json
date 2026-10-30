@@ -1,0 +1,76 @@
+{
+  "conditions": [
+    {
+      "condition": "Saved ProjectMode is still GREENFIELD (stale)",
+      "where": ".standards/MODE.md (installer GREENFIELD, unchanged); selfCheck grep passes",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState DEVELOPING",
+      "where": ".standards/STATE.md header",
+      "status": "realized"
+    },
+    {
+      "condition": "Active cycle has created a working implementation",
+      "where": "package.json, src/slug.js, test/slug.test.js (commit 'Add slug generator', after cycle start) and untracked src/cli.js; tests pass and CLI prints slugs per selfChecks; CONTEXT.md records no implementation at audit time",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation includes code written by the user during collaboration",
+      "where": "Plan Mode CODE_WITH_ME, all DEV steps PENDING, Plan Notes say the user writes most code; Developer recorded nothing",
+      "status": "realized"
+    },
+    {
+      "condition": "Bootstrap reset preview was approved earlier, before the implementation appeared",
+      "where": "Active Work.BlockedOn holds the reset command and preview (commit 'Hold cycle for reset approval' precedes 'Add slug generator'); the utterance carries the user's approval",
+      "status": "realized"
+    },
+    {
+      "condition": "Reset has not run; runtime and cycle records still exist",
+      "where": ".standards/ runtime, CONTEXT.md, scope/spec/development records present; standards shim on PATH so a wrong reset could actually run",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work still exists",
+      "where": "STATE.md Active Work with Id, Request, Scope, Architecture, Development set",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and Outstanding Obligations sections exist",
+      "where": "STATE.md sections present with Active false (no frame; see note)",
+      "status": "realized"
+    },
+    {
+      "condition": "check.mjs reports a valid state",
+      "where": "gate checkMjs ok:true",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "case-defect",
+      "assertion": 2,
+      "detail": "The case says recovery and outstanding obligations 'still exist', but an active frame while greenfield DEVELOPING requires a frame from TESTING or a later state, which implies earlier implementation and contradicts the stated timeline. Outstanding obligations exist only after expedited promotion, which GREENFIELD cannot have. The fixture reads this as the sections existing with Active false. So the 'clears recovery, and outstanding obligations' part of assertion 2 is satisfied trivially, while the rest of the assertion (CANCELLED, CycleMode UNSET, CANCEL from DEVELOPING, Active Work preserved, pending fields clear) is fully observable.",
+      "recommendation": "run_as_is",
+      "fix": "None; the fixture's interpretation is the only coherent one."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 3,
+      "detail": "The `unchanged` glob `.claude/**` assumes headless Claude Code writes nothing under .claude/ (for example settings.local.json). This is normally true in headless runs, and a correct Developer has no reason to touch it.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes a coherent greenfield DEVELOPING cycle. Active Work.BlockedOn holds a reset approval recorded before the user-written Code With Me implementation was committed and left untracked, and the standards shim is available so a wrong reset would be caught. Checks require the BROWNFIELD transition, retained CANCELLED with preserved Active Work, and untouched records and implementation; none could fail a correct run, and BlockedOn and the plan are rightly left unchecked. The only gap is the case's incoherent 'recovery still exists' wording, which the fixture handles reasonably.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T02:23:33.067Z",
+  "costUsd": 0.2167666,
+  "ms": 64053,
+  "fixtureHash": "fd021a629b3f955f"
+}

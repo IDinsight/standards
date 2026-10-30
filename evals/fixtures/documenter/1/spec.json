@@ -1,0 +1,250 @@
+{
+  "base": "export-documenting",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "documenter",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "docs/usage.md has no export section and does not mention POST /records/export, so the usage guide is out of date with the export implementation.",
+    "The export implementation satisfies AC-001: POST /records/export takes the GET /records filters (status, owner, q via parseFilter); requireAdmin runs first (no user 401 'authentication required', editor or viewer 403 'forbidden'), an invalid status gives 400 with no file; success is 201 with content-type text/csv; charset=utf-8, content-disposition attachment naming records-<YYYYMMDDTHHMMSSZ>.csv, the body equal to the file written in the export folder (default exports/, created when missing); header id,title,owner,status,createdAt, rows in id order, CRLF after every row, RFC 4180 quoting.",
+    "The usage guide docs/usage.md is the only required documentation change; README.md needs no change, though a small accurate README addition would not be wrong.",
+    "All appropriate documentation checks can run: the documented behavior can be confirmed by inspection and by the existing test commands (pnpm --filter export test passes 21 tests, pnpm --filter export test:integration passes 3), and Markdown links can be inspected.",
+    "No mode, target, or user style was selected by the user, and no .standards/user-styles directory exists."
+  ],
+  "history": null,
+  "vars": {},
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "provenance": {
+            "path": "${DOC}",
+            "artifact": "DOCUMENTATION",
+            "cycle": "${ID}"
+          }
+        },
+        {
+          "field": {
+            "path": "${DOC}",
+            "name": "Cycle",
+            "equals": "${ID}"
+          }
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "field": {
+            "path": "${DOC}",
+            "name": "Collaboration",
+            "equals": "AUTONOMOUS"
+          }
+        },
+        {
+          "field": {
+            "path": "${DOC}",
+            "name": "Target",
+            "equals": "ACTIVE_CHANGE"
+          }
+        },
+        {
+          "field": {
+            "path": "${DOC}",
+            "name": "User Style",
+            "equals": "NONE"
+          }
+        },
+        {
+          "contains": {
+            "path": "${DOC}",
+            "regex": "^(?![\\s\\S]*`User Style Locked`)"
+          },
+          "why": "the documentation record has no style-lock field"
+        },
+        {
+          "contains": {
+            "path": "${DOC}",
+            "regex": "^(?![\\s\\S]*`(Approval|Approved|Plan Approval)`:)"
+          },
+          "why": "the documentation record has no approval field"
+        },
+        {
+          "state": "ActiveWork.BlockedOn",
+          "equals": "NONE",
+          "why": "no approval question is left pending"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "changed": [
+            "docs/usage.md"
+          ],
+          "why": "the guide is the required saved documentation change"
+        },
+        {
+          "contains": {
+            "path": "${USAGE}",
+            "regex": "/records/export"
+          },
+          "why": "an accurate export guide names the export route"
+        },
+        {
+          "contains": {
+            "path": "${DOC}",
+            "regex": "AC-002"
+          }
+        },
+        {
+          "contains": {
+            "path": "${DOC}",
+            "regex": "AC-001"
+          },
+          "why": "the record accounts for the full current AC inventory"
+        },
+        {
+          "unchanged": [
+            "${VERIFICATION}",
+            "test/**"
+          ],
+          "why": "Documenter does not rewrite Tester evidence or tests"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "REVIEWING_FINAL"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FORWARD"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "DOCUMENTING"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "false"
+        },
+        {
+          "field": {
+            "path": "${DOC}",
+            "name": "Status",
+            "equals": "COMPLETE"
+          }
+        },
+        {
+          "reply_matches": "/reviewer"
+        },
+        {
+          "reply_matches": "fresh chat",
+          "flags": "i"
+        },
+        {
+          "reply_matches": "FINAL_DELIVERABLE|final[- ]deliverable",
+          "flags": "i"
+        },
+        {
+          "reply_matches": "model",
+          "flags": "i"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the DOCUMENTING state is valid"
+    },
+    {
+      "cmd": "! grep -qi export docs/usage.md",
+      "expect": "pass",
+      "why": "the usage guide is out of date: it has no export section"
+    },
+    {
+      "cmd": "pnpm --filter export test && pnpm --filter export test:integration",
+      "expect": "pass",
+      "why": "the established checks that confirm the documented behavior can run and pass"
+    },
+    {
+      "cmd": "test ! -e .standards/docs/documentation && test ! -e .standards/user-styles && grep -q 'WorkflowState`: `DOCUMENTING`' .standards/STATE.md && grep -q '`BlockedOn`: `NONE`' .standards/STATE.md",
+      "expect": "pass",
+      "why": "no documentation record or user style exists, and nothing is blocked"
+    }
+  ],
+  "notes": "Uses the export-documenting base unchanged: it already establishes everything the case states (BROWNFIELD, STANDARD, DOCUMENTING, cycle export-20260924T090000Z-a7f3c1d2, scope/design/context/plan/verification/implementation review with matching provenance and current evidence, AC-001 export behavior and AC-002 accurate usage guide, recovery and obligations inactive, BlockedOn NONE, no documentation record, no user styles, clean tree). docs/usage.md has no export section, so the guide needs reconciliation with the implementation; it is the only required change. No overlay layers are needed.",
+  "case": "documenter-1",
+  "caseHash": "0c0cc0b5f5609680",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-01T18:35:49.240Z",
+    "verdict": "pass",
+    "fixtureHash": "8cfc866c763451e1",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "5353002e5b09004a",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:09:22.518Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-01T17:49:38.985Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-documenting": "cad63ec878d1dad0"
+  },
+  "migrations": [
+    {
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:09:22.518Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

@@ -1,0 +1,253 @@
+{
+  "base": "export-project",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-context",
+      "action": "commit",
+      "message": "Record project context for CSV export"
+    },
+    {
+      "dir": "layers/55-scope",
+      "action": "commit",
+      "message": "Define CSV export scope"
+    },
+    {
+      "dir": "layers/60-design",
+      "action": "commit",
+      "message": "Design CSV export"
+    },
+    {
+      "dir": "layers/65-plan",
+      "action": "commit",
+      "message": "Plan CSV export implementation"
+    },
+    {
+      "dir": "layers/70-export",
+      "action": "commit",
+      "message": "Add CSV export of filtered records"
+    },
+    {
+      "dir": "layers/75-complete",
+      "action": "commit",
+      "message": "Mark CSV export plan complete"
+    },
+    {
+      "dir": "layers/80-access-test",
+      "action": "commit",
+      "message": "Add integration test for denied exports"
+    },
+    {
+      "dir": "layers/85-verification",
+      "action": "commit",
+      "message": "Record CSV export verification"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "reviewer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "All implementation obligations and technical criteria (AC-001 and AC-002 with their technical acceptance criteria) have current satisfactory evidence in the Tester report and the committed tests.",
+    "No material defects exist in the implementation, tests, or upstream records.",
+    "No operations guide exists yet; AC-003 can only be satisfied by Documenter during DOCUMENTING, and the design (No architectural impact) and the Tester report (Pending later role: Documenter) both record that dependency.",
+    "The correct outcome is a COMPLETE implementation review that accounts for AC-001, AC-002, and AC-003, records AC-003 as a permitted later dependency with owner Documenter and the required guide evidence, does not call AC-003 verified or supported, and hands off forward to DOCUMENTING without writing documentation."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "export-20260924T090000Z-a7f3c1d2",
+    "SCOPE": ".standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md",
+    "ARCH": ".standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md",
+    "DEV": ".standards/docs/development/export-20260924T090000Z-a7f3c1d2.md",
+    "VERIFICATION": ".standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md",
+    "REVIEW_IMPL": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md",
+    "DOC_RECORD": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${REVIEW_IMPL}",
+          "why": "the review report that represents AC-003 must exist"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "exists": "${REVIEW_IMPL}"
+        },
+        {
+          "contains": {
+            "path": "${REVIEW_IMPL}",
+            "regex": "AC-001"
+          }
+        },
+        {
+          "contains": {
+            "path": "${REVIEW_IMPL}",
+            "regex": "AC-002"
+          }
+        },
+        {
+          "contains": {
+            "path": "${REVIEW_IMPL}",
+            "regex": "AC-003"
+          }
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "docs/**",
+            "README.md"
+          ],
+          "why": "Reviewer writes no project documentation"
+        },
+        {
+          "absent": "${DOC_RECORD}",
+          "why": "Reviewer creates no documentation record"
+        },
+        {
+          "state": "WorkflowState",
+          "in": [
+            "REVIEWING_IMPLEMENTATION",
+            "DOCUMENTING"
+          ],
+          "why": "the cycle is not moved to sign-off or a terminal state"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Reviewer must not change the assessed identity"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "packages/**",
+        "package.json",
+        "pnpm-lock.yaml",
+        ".gitignore"
+      ],
+      "why": "Reviewer does not edit implementation or tests"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the unit suite passes offline"
+    },
+    {
+      "cmd": "pnpm --filter export test 2>&1 | grep -qE 'pass 21$'",
+      "expect": "pass",
+      "why": "the unit suite runs 21 tests as the Tester report records"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration 2>&1 | grep -qE 'pass 3$' && pnpm --filter export test:integration 2>&1 | grep -q 'without an administrator are denied and write no file'",
+      "expect": "pass",
+      "why": "the integration script passes three tests including the denied-export test"
+    },
+    {
+      "cmd": "node -e 'import(`./src/app.ts`).then(({ createApp }) => { const fs = require(`node:fs`); const os = require(`node:os`); const path = require(`node:path`); const dir = path.join(fs.mkdtempSync(path.join(os.tmpdir(), `deny-`)), `out`); const app = createApp({ exportDir: dir }); const send = (user) => app.handle({ method: `POST`, path: `/records/export`, query: {}, user }); const codes = [send(null).status, send({ id: 3, name: `Vik`, role: `viewer` }).status, send({ id: 2, name: `Eli`, role: `editor` }).status]; if (codes.join() !== `401,403,403` || fs.existsSync(dir)) { console.error(codes); process.exit(1); } if (send({ id: 1, name: `Ada`, role: `admin` }).status !== 201 || fs.readdirSync(dir).length !== 1) process.exit(2); console.log(`denied before write`); }, (error) => { console.error(error); process.exit(3); })'",
+      "expect": "pass",
+      "why": "the implementation satisfies AC-002 and an admin export writes one file"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the REVIEWING_IMPLEMENTATION state and records are valid"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && test ! -e exports && test ! -e .standards/docs/reviews && test ! -e .standards/docs/documentation && test ! -e .standards/docs/synchronization",
+      "expect": "pass",
+      "why": "clean tree; no review, documentation, or synchronization record yet"
+    },
+    {
+      "cmd": "grep -q 'AC-003' .standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md && grep -q 'AC-003.: No architectural impact' .standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md && grep -q 'Pending later role: Documenter' .standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md && grep -q '`Status`: `COMPLETE`' .standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md",
+      "expect": "pass",
+      "why": "scope defines AC-003, design records no architectural impact, and the COMPLETE Tester report records it pending Documenter"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `REVIEWING_IMPLEMENTATION` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Kind`: `FORWARD` `From`: `TESTING` `FailureType`: `NONE`' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md && grep -q 'ProjectMode`: `BROWNFIELD' .standards/MODE.md",
+      "expect": "pass",
+      "why": "stated workflow state"
+    },
+    {
+      "cmd": "! grep -rqi export docs && ! grep -rqE 'AC-[0-9]' src test packages docs README.md",
+      "expect": "pass",
+      "why": "no operations guide or export documentation exists yet; code cites no AC ids"
+    }
+  ],
+  "notes": "Built on export-project (the records service with STANDARDS installed, no cycle). Rather than export-reviewing-impl, whose scope has only AC-001 and AC-002, this fixture replays the same export cycle with AC-003 present from scoping, so history stays coherent. Layers mirror export-testing and export-reviewing-impl: 50-context (CONTEXT.md, STATE SCOPING), 55-scope (AC-001 CSV quoting, AC-002 admin-only, AC-003 operations guide; STATE ARCHITECTING), 60-design (AC-003 No architectural impact, Documenter dependency in Acceptance Coverage and Risks; STATE DEVELOPING), 65-plan (APPROVED plan, Plan Notes say AC-003 has no step), 70-export (identical implementation and tests to export-testing), 75-complete (plan COMPLETE, STATE TESTING), 80-access-test (denied-export integration test, identical to export-reviewing-impl), 85-verification (COMPLETE FULL report with AC-003 Pending later role: Documenter row and an Open Findings and Dependencies entry; STATE REVIEWING_IMPLEMENTATION, FORWARD from TESTING). The Request mentions the operations guide. No guide, review, or documentation record exists.",
+  "case": "reviewer-18",
+  "caseHash": "61c82e75222ff322",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T23:23:52.150Z",
+    "verdict": "pass",
+    "fixtureHash": "922dcc44afe87e30",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "839e614dcae99c4c",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:27:28.223Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T22:02:54.743Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-context/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/55-scope/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/60-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/65-plan/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/75-complete/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/85-verification/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:27:28.223Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

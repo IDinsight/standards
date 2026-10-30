@@ -1,0 +1,89 @@
+{
+  "conditions": [
+    {
+      "condition": "Fresh Tester session; ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md; no history",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState TESTING, Active Work.Id export-20260924T090000Z-a7f3c1d2, recovery inactive",
+      "where": ".standards/STATE.md (FORWARD from DEVELOPING, Recovery Active false)",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, Architecture, Development reference current-cycle artifacts",
+      "where": ".standards/docs/{scope,specs,development}/export-20260924T090000Z-a7f3c1d2.md with matching provenance; plan COMPLETE",
+      "status": "realized"
+    },
+    {
+      "condition": "Auditor context exists",
+      "where": ".standards/CONTEXT.md (written by the current cycle's Auditor, commit 'Record project context for CSV export')",
+      "status": "realized"
+    },
+    {
+      "condition": "Context claims SQLite",
+      "where": ".standards/CONTEXT.md Stack and Tooling, Conventions (SQLite deferred transactions), Testing Baseline (in-memory SQLite); stale README.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Manifests and integration environment use PostgreSQL-specific streaming",
+      "where": "pyproject.toml (psycopg), app/db.py, app/schema.sql (bigserial/timestamptz), app/streaming.py (named server-side cursor), compose.test.yaml and .github/workflows/test.yml (postgres:16)",
+      "status": "realized"
+    },
+    {
+      "condition": "The mismatch materially affects transaction tests",
+      "where": "AC-002 snapshot consistency in scope; design and app/export.py use REPEATABLE READ, READ ONLY; context describes SQLite deferred-transaction semantics",
+      "status": "realized"
+    },
+    {
+      "condition": "Context carries a prior-cycle non-baseline exclusion on which current verification relies",
+      "where": "CONTEXT.md Active-Cycle Non-Baseline Work entry for cancelled cycle stream-records-20260811T143000Z-5e2b9d04 (app/streaming.py); app/export.py streams through iter_records",
+      "status": "realized"
+    },
+    {
+      "condition": "No planted implementation defect; integration tests cannot run (no PostgreSQL/psycopg)",
+      "where": "app/export.py, app/cli.py read correct; selfChecks: 7 passed, 4 skipped; import psycopg fails",
+      "status": "realized"
+    },
+    {
+      "condition": "All work committed; no verification report yet",
+      "where": "git status clean; selfCheck confirms no .standards/docs/verification",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 3,
+      "detail": "Assertion 3's checks require the verification report to exist. A Tester could argue it routes at procedure step 1 before creating a report. However, the skill says to create the report early (step 2). It also says that when routing changes state, Tester saves the interrupted assignment in the report's Resume or Handoff section. TESTING→AUDITING is a state change, so a correct run creates the report. The check is defensible.",
+      "recommendation": "run_as_is",
+      "fix": "None needed; keep the check."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "Every commit is dated 2026-09-24T09:00:00Z, including the prior cycle whose ID encodes 2026-08-11. This is unlikely to affect behavior, but a careful Tester checking git history might notice the mismatch.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally set a per-layer date around 2026-08-11 for layers 50–56."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 2,
+      "detail": "Assertion 2 is a counterfactual and is marked N/A per the catalog issue. The gate accepted the N/A marking.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized in the files and git history. CONTEXT.md wrongly claims SQLite while the manifests, code, and CI/compose are PostgreSQL 16. It also carries a stale non-baseline entry for app/streaming.py from a cancelled prior cycle, and the active export depends on that file. Records are coherent, check.mjs passes, and the expected PROJECT_CONTEXT routing would pass the turn-end check; the checks and invariants are sound, with only minor notes.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-01T22:27:22.862Z",
+  "costUsd": 0.3202512,
+  "ms": 64312,
+  "fixtureHash": "753a9f0a1798eb08"
+}

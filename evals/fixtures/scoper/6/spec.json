@@ -1,0 +1,249 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial reports service"
+    },
+    {
+      "dir": "layers/60-cycle",
+      "action": "commit",
+      "message": "Add report export scope and design"
+    },
+    {
+      "dir": "layers/70-dev",
+      "action": "commit",
+      "message": "Add CSV serialization for report export"
+    },
+    {
+      "dir": "layers/80-rework",
+      "action": "commit",
+      "message": "Route filename requirement removal to scoping"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "scoper",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The user's removal of the filename requirement is persisted in Active Work.Request, in Handoff (USER_REWORK from DEVELOPING, FailureType SCOPING), and in the recovery frame Reason. The utterance itself says only Continue.",
+    "docs/scope/report-export.md is an unmarked project-owned scope document for this cycle holding AC-001 (export a report as CSV with a header row and one row per entry) and AC-002 (the exported filename includes the report date).",
+    "The completed design covers AC-002 only by pointing at the existing attachmentName helper, so no technical decision depends on AC-002. Its Acceptance Coverage and Technical Acceptance Criteria still list AC-002, so the design is stale once AC-002 is retired.",
+    "The recovery frame is From DEVELOPING, Owner SCOPING, FailureType SCOPING, ResumeAt DEVELOPING, RerunThrough NONE. A correct result keeps AC-001, moves AC-002 under Retired Acceptance Identifiers, adds no new AC, keeps the frame with RerunThrough ARCHITECTING and ResumeAt DEVELOPING, sets WorkflowState ARCHITECTING with Handoff FORWARD from SCOPING, and gives an Architect invocation."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "let-users-export-a-report-as-csv-with-20260924T081500Z-3f9a6c1e",
+    "SCOPE": "docs/scope/report-export.md",
+    "SPEC": ".standards/docs/specs/let-users-export-a-report-as-csv-with-20260924T081500Z-3f9a6c1e.md",
+    "PLAN": ".standards/docs/development/let-users-export-a-report-as-csv-with-20260924T081500Z-3f9a6c1e.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${SCOPE}"
+        },
+        {
+          "contains": {
+            "path": "${SCOPE}",
+            "regex": "^[ ]*[-*+][ ]+[*_`]*AC-001[*_`]*[ ]*(:|—|–|- ).*^##[ ]+Retired Acceptance Identifiers",
+            "flags": "msi"
+          },
+          "why": "AC-001 is still defined as a current list item above the retired section"
+        },
+        {
+          "check_ok": true,
+          "why": "check rejects AC-001 being both current and retired"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "contains": {
+            "path": "${SCOPE}",
+            "regex": "^##[ ]+Retired Acceptance Identifiers.*^[ ]*[-*+][ ]+[*_`]*AC-002[*_`]*[ ]*(:|—|–|- )",
+            "flags": "msi"
+          },
+          "why": "AC-002 is recorded as a list item under the retired heading"
+        },
+        {
+          "check_ok": true,
+          "why": "check reports AC-002 if it is deleted, left current as well, or written in a non-defining form"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": true,
+      "all": [
+        {
+          "contains": {
+            "path": "${SCOPE}",
+            "regex": "^(?!.*AC-0(0[3-9]|[1-9][0-9]))",
+            "flags": "s"
+          },
+          "why": "no new acceptance identifier appears in the scope"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "state": "Recovery.Top.RerunThrough",
+          "equals": "ARCHITECTING"
+        },
+        {
+          "unchanged": [
+            ".standards/docs/specs/**",
+            ".standards/docs/development/**",
+            "src/**",
+            "test/**"
+          ],
+          "why": "Scoper routes the stale design to Architect rather than editing it"
+        }
+      ]
+    },
+    {
+      "assertion": 4,
+      "complete": true,
+      "all": [
+        {
+          "state": "Recovery.Active",
+          "equals": "true"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "1"
+        },
+        {
+          "state": "Recovery.Top.From",
+          "equals": "DEVELOPING"
+        },
+        {
+          "state": "Recovery.Top.Owner",
+          "equals": "SCOPING"
+        },
+        {
+          "state": "Recovery.Top.FailureType",
+          "equals": "SCOPING"
+        },
+        {
+          "state": "Recovery.Top.ResumeAt",
+          "equals": "DEVELOPING"
+        },
+        {
+          "state": "Recovery.Top.RerunThrough",
+          "equals": "ARCHITECTING"
+        }
+      ]
+    },
+    {
+      "assertion": 5,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "ARCHITECTING"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FORWARD"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "SCOPING"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "NONE"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "1"
+        },
+        {
+          "reply_matches": "(^|[ `])/architect",
+          "flags": "m",
+          "why": "a Claude Code Architect invocation is shown"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/summary.test.js test/attachment.test.js",
+      "expect": "pass",
+      "why": "the established test suites (summary download and attachment naming) pass on the built fixture"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 50-project (pre-install): small Node reports service with a JSON summary download whose filename comes from src/http/attachment.js attachmentName (title slug plus report date), tests, and an early unmarked product note at docs/scope/report-export.md. 60-cycle: CONTEXT.md, the scope rewritten in place as this cycle's unmarked project scope with AC-001 (CSV export) and AC-002 (filename includes report date), an ARCHITECTURE record covering both (AC-002 covered only by reuse of the existing helper), STATE at DEVELOPING. 70-dev: src/export.js toCsv (DEV-001 DONE), development plan IN_PROGRESS with DEV-002 (download route, AC-001 and AC-002) PENDING, STATE records the plan path. 80-rework: user rework recorded: Request revised to drop the filename requirement and say no design decision changes, Handoff USER_REWORK from DEVELOPING with FailureType SCOPING, one recovery frame (From DEVELOPING, Owner SCOPING, ResumeAt DEVELOPING, RerunThrough NONE), and a Suspended Assignment in the plan's Plan Notes whose Recovery Reason matches the frame. The catalog said the persistence location of the change was unspecified; it lives in Request, Handoff.Reason, and the frame Reason.",
+  "case": "scoper-6",
+  "caseHash": "36f1b051d9152477",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T20:06:53.040Z",
+    "verdict": "pass",
+    "fixtureHash": "562e86a99a818766",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "85ece40e944bb566",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:33:54.497Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T19:44:23.996Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/60-cycle/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/70-dev/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/80-rework/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:33:54.497Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

@@ -1,0 +1,74 @@
+{
+  "conditions": [
+    {
+      "condition": "Brownfield project in a STANDARD cycle in AUDITING, no active recovery",
+      "where": ".standards/MODE.md (installed BROWNFIELD); .standards/STATE.md WorkflowState AUDITING, CycleMode STANDARD, Recovery.Active false",
+      "status": "realized"
+    },
+    {
+      "condition": "BaselineReconciliation lists cache-a-20260921T100000Z-0a1b2c3d (fix cache invalidation) and import-b-20260922T100000Z-4e5f6a7b (adjust imports) in the protocol list format",
+      "where": ".standards/STATE.md Active Work, Requests 'Fix cache invalidation.' and 'Adjust imports.'",
+      "status": "realized"
+    },
+    {
+      "condition": "Evidence confirms cache-a's changes were reverted",
+      "where": "commit 'Invalidate cached records on write' (adds the cache-a plan and changes src/store.js, test/store.test.js), then 'Revert \"Invalidate cached records on write\"'; store files match the initial commit (selfCheck)",
+      "status": "realized"
+    },
+    {
+      "condition": "import-b's remaining changes are present and repository evidence establishes their behavior",
+      "where": "commit 'Match CSV import headers by name' adds the import-b plan (DEV-001 DONE, DEV-002 PENDING) and changes src/import.js and test/import.test.js; the 7 import tests pass",
+      "status": "realized"
+    },
+    {
+      "condition": "User explicitly adopts import-b's remaining changes",
+      "where": "utterance 'I adopt the remaining import-b-20260922T100000Z-4e5f6a7b changes.'",
+      "status": "realized"
+    },
+    {
+      "condition": "No other audit blockers",
+      "where": "STATE.md BlockedOn NONE, no recovery or obligations, clean tree, check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "No current-cycle implementation exists, so nothing is current-cycle non-baseline work",
+      "where": "git log: the last commit only replaces STATE.md; Development NONE",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "blocking",
+      "kind": "check-too-strict",
+      "assertion": 3,
+      "detail": "The negative `contains` regex on .standards/CONTEXT.md fails whenever any heading 'Active-Cycle Non-Baseline Work' is followed, before the next H1/H2, by text mentioning import-b's ID, src/import, or test/import. A run that does not mislabel anything could still write that section as a note, for example '## Active-Cycle Non-Baseline Work\\n\\nNONE — the import-b changes in src/import.js were adopted into the baseline.' The check would fail that run with no judge involved, even though nothing is labeled current-cycle work. Whether a mention there is a mislabel needs judgment.",
+      "recommendation": "fix_file",
+      "fix": "In auditor-10/spec.json, checks entry for assertion 3: remove the `contains` check so that `all` is [] and `complete` stays false, leaving the decision to the judge. Alternatively, narrow the regex to a list item inside that section that starts with `Cycle: add-a-dry-run-mode-to-csv-import-20260924T083000Z-5e8f1a2c` and names import-b's ID or src/import or test/import."
+    },
+    {
+      "severity": "note",
+      "kind": "case-defect",
+      "assertion": -1,
+      "detail": "The stated history cannot be reached under the protocol. While cache-a's entry was unresolved, import-b would have had to be STANDARD and start in AUDITING. Yet its plan is expedited (Scope NONE, EXPEDITED_REQUEST) and reached DONE implementation without cache-a being reconciled. The generator records this in its notes. The Auditor is not required to re-validate past cycles, and the case states there are no other blockers.",
+      "recommendation": "run_as_is",
+      "fix": "None needed; this is inherent in the case."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "All commits carry 2026-09-24T09:00:00Z, while the cycle IDs encode 2026-09-21 and 2026-09-22. The catalog also lists a 'context' record, but no prior CONTEXT.md exists, so the run is a whole-repo audit. The prompt does not require a prior context, so this choice is reasonable.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally set per-layer dates to match the cycle timestamps."
+    }
+  ],
+  "verdict": "issues",
+  "summary": "Every stated condition is realized: both reconciliation entries carry their exact IDs and requests, cache-a's change and its full revert are visible in history, import-b's committed changes and tests establish its behavior, and the user's adoption comes only from the utterance. The checks for assertions 1 and 2 and the invariants are sound. The assertion-3 negative regex can fail a run that mentions import-b in an Active-Cycle Non-Baseline Work section without mislabeling it, so it should be dropped in favor of the judge.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T21:08:48.784Z",
+  "costUsd": 0.25616479999999997,
+  "ms": 70930,
+  "fixtureHash": "03faea01bafab539"
+}

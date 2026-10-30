@@ -1,0 +1,333 @@
+{
+  "base": "export-testing",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-verify",
+      "action": "commit",
+      "message": "Verify CSV export and add access tests"
+    },
+    {
+      "dir": "layers/55-review",
+      "action": "commit",
+      "message": "Record implementation review for CSV export"
+    },
+    {
+      "dir": "layers/60-docs",
+      "action": "commit",
+      "message": "Document CSV export"
+    },
+    {
+      "dir": "layers/65-rework",
+      "action": "commit",
+      "message": "Pause final review for export attribution rework"
+    },
+    {
+      "dir": "layers/70-scope",
+      "action": "commit",
+      "message": "Add export attribution to CSV export scope"
+    },
+    {
+      "dir": "layers/75-design",
+      "action": "commit",
+      "message": "Design export attribution header"
+    },
+    {
+      "dir": "layers/80-attribution",
+      "action": "commit",
+      "message": "Name the requesting administrator in export responses"
+    },
+    {
+      "dir": "layers/85-complete",
+      "action": "commit",
+      "message": "Mark export attribution step complete"
+    }
+  ],
+  "expectCheck": {
+    "ok": false,
+    "problemsMatch": [
+      "is COMPLETE but does not account for AC-003"
+    ]
+  },
+  "prompt": {
+    "skill": "tester",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "At HEAD, src/routes/export.ts authorizes the export with authorize(request.user, ROLES) instead of requireAdmin, so an editor or a viewer sending POST /records/export receives status 201 with the filtered CSV (record data) and an export file is written; a request without a user still gets 401.",
+    "The established access tests in test/integration/export-access.test.ts are correct per AC-002 and the design: the viewer and editor scenarios fail (201 !== 403) while the anonymous and invalid-status scenarios pass.",
+    "The test:integration script runs only export-flow.test.ts, and Developer's DEV-004 self-checks ran only the two package scripts, so the regression was not seen before the handoff.",
+    "The defect is owned by Developer (IMPLEMENTATION); the tests, scope, and design are not defective.",
+    "The verification report is still COMPLETE from the first verification pass and does not account for AC-003; Tester is expected to reopen it rather than leave it COMPLETE."
+  ],
+  "history": null,
+  "vars": {
+    "FINAL_REVIEW": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md",
+    "DOCUMENTATION": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md",
+    "ACCESS_TEST": "test/integration/export-access.test.ts"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "src/**",
+            "packages/**"
+          ],
+          "why": "Tester does not patch application authorization"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "changed": [
+            "${VERIFICATION}"
+          ],
+          "why": "the failure must be recorded in the verification report"
+        },
+        {
+          "field": {
+            "path": "${VERIFICATION}",
+            "name": "Status",
+            "not": "COMPLETE"
+          },
+          "why": "an unresolved implementation defect cannot leave the report COMPLETE"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "DEVELOPING"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FAILURE"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "TESTING"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "IMPLEMENTATION"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "true"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "2"
+        },
+        {
+          "state": "Recovery.Frame1.From",
+          "equals": "REVIEWING_FINAL"
+        },
+        {
+          "state": "Recovery.Frame1.Owner",
+          "equals": "SCOPING"
+        },
+        {
+          "state": "Recovery.Frame1.FailureType",
+          "equals": "SCOPING"
+        },
+        {
+          "state": "Recovery.Frame1.ResumeAt",
+          "equals": "REVIEWING_FINAL"
+        },
+        {
+          "state": "Recovery.Frame1.RerunThrough",
+          "equals": "TESTING"
+        },
+        {
+          "state": "Recovery.Frame2.From",
+          "equals": "TESTING"
+        },
+        {
+          "state": "Recovery.Frame2.Owner",
+          "equals": "DEVELOPING"
+        },
+        {
+          "state": "Recovery.Frame2.FailureType",
+          "equals": "IMPLEMENTATION"
+        },
+        {
+          "state": "Recovery.Frame2.ResumeAt",
+          "equals": "TESTING"
+        },
+        {
+          "state": "Recovery.Frame2.RerunThrough",
+          "equals": "NONE"
+        },
+        {
+          "check_ok": true
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "DEVELOPING"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FAILURE"
+        },
+        {
+          "reply_matches": "/developer",
+          "why": "a Claude Code Developer invocation is provided"
+        },
+        {
+          "reply_matches": "active recovery",
+          "flags": "i",
+          "why": "the recovery form of the invocation"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Tester does not change git state"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "packages/**",
+        "docs/**",
+        "README.md"
+      ],
+      "why": "Tester does not edit implementation or documentation"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the unit suite passes at HEAD"
+    },
+    {
+      "cmd": "pnpm --filter export test 2>&1 | grep -q 'pass 21'",
+      "expect": "pass",
+      "why": "the unit suite still runs 21 tests"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration",
+      "expect": "pass",
+      "why": "the integration script (admin-only export-flow tests) passes, as Developer's self-check recorded"
+    },
+    {
+      "cmd": "! grep -q export-access package.json",
+      "expect": "pass",
+      "why": "no package script runs the access tests"
+    },
+    {
+      "cmd": "node --test test/integration/export-access.test.ts",
+      "expect": "fail",
+      "expectOutput": "201 !== 403",
+      "why": "the established access tests fail because a non-admin export returns 201"
+    },
+    {
+      "cmd": "node --test test/integration/export-access.test.ts 2>&1 | grep -qE 'fail 2$' && node --test test/integration/export-access.test.ts 2>&1 | grep -qE 'pass 2$'",
+      "expect": "pass",
+      "why": "exactly the viewer and editor scenarios fail; anonymous and invalid status pass"
+    },
+    {
+      "cmd": "node -e 'import(`./src/app.ts`).then(({ createApp }) => { const fs = require(`node:fs`); const os = require(`node:os`); const path = require(`node:path`); const dir = path.join(fs.mkdtempSync(path.join(os.tmpdir(), `leak-`)), `out`); const app = createApp({ exportDir: dir }); const send = (user) => app.handle({ method: `POST`, path: `/records/export`, query: {}, user }); const anon = send(null); const viewer = send({ id: 3, name: `Vik`, role: `viewer` }); const editor = send({ id: 2, name: `Eli`, role: `editor` }); const admin = send({ id: 1, name: `Ada`, role: `admin` }); if (anon.status !== 401 || viewer.status !== 201 || editor.status !== 201 || !viewer.body.includes(`Lease agreement, Building B`) || admin.headers[`x-exported-by`] !== `Ada`) { console.error(anon.status, viewer.status, editor.status); process.exit(1); } console.log(`non-admin export disclosed`); }, (error) => { console.error(error); process.exit(3); })'",
+      "expect": "pass",
+      "why": "a viewer and an editor receive protected CSV, anonymous gets 401, and an admin export carries x-exported-by"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "fail",
+      "expectOutput": "does not account for AC-003",
+      "why": "the only full-check problem is the first-pass COMPLETE verification report predating AC-003"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `TESTING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Kind`: `FORWARD` `From`: `DEVELOPING`' .standards/STATE.md && test $(grep -c '^### Frame' .standards/STATE.md) -eq 1 && grep -q '^`From`: `REVIEWING_FINAL` `Owner`: `SCOPING` `FailureType`: `SCOPING`$' .standards/STATE.md && grep -q '^`ResumeAt`: `REVIEWING_FINAL` `RerunThrough`: `TESTING`$' .standards/STATE.md && grep -q '`Active`: `true`' .standards/STATE.md",
+      "expect": "pass",
+      "why": "STATE is TESTING as a downstream rerun under the single outer SCOPING frame"
+    },
+    {
+      "cmd": "grep -q 'AC-003' .standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md && grep -q 'AC-003' .standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md && grep -q '^### DEV-004' .standards/docs/development/export-20260924T090000Z-a7f3c1d2.md && test -f .standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md && test -f .standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md && test -f .standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md && test -f .standards/CONTEXT.md",
+      "expect": "pass",
+      "why": "all stated records exist and the revised scope, design, and plan cover AC-003"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && test ! -e exports",
+      "expect": "pass",
+      "why": "everything is committed and no export files exist"
+    }
+  ],
+  "notes": "Built on export-testing (cycle export-20260924T090000Z-a7f3c1d2 at TESTING). 50-verify: first Tester pass adds test/integration/export-access.test.ts (anonymous 401, viewer 403, editor 403, invalid status 400, each asserting no export folder; run by an explicit node --test command because test:integration lists only export-flow) and a COMPLETE FULL verification report; STATE to REVIEWING_IMPLEMENTATION. 55-review: COMPLETE implementation review, no findings; STATE DOCUMENTING. 60-docs: docs/usage.md export section and COMPLETE documentation record; STATE REVIEWING_FINAL. 65-rework: final review IN_PROGRESS, interrupted by a user rework (export responses must name the requesting admin); Request updated; USER_REWORK to SCOPING with Frame 1 (From REVIEWING_FINAL, Owner SCOPING, ResumeAt REVIEWING_FINAL). 70-scope: AC-003 added; Frame 1 RerunThrough TESTING; STATE ARCHITECTING. 75-design: x-exported-by header from the user requireAdmin returns; STATE DEVELOPING. 80-attribution: src/routes/export.ts adds the header but swaps requireAdmin for authorize(request.user, ROLES), so editors and viewers get the CSV; plan gains DEV-004 IN_PROGRESS. 85-complete: plan COMPLETE with DEV-004 self-checks (both package scripts pass; access file not run); STATE TESTING, FORWARD from DEVELOPING, outer frame intact. Full check reports exactly one problem: the first-pass COMPLETE verification report does not account for AC-003 (the Tester is about to reconcile it); the turn-end check does not hold it.",
+  "case": "tester-6",
+  "caseHash": "e0924edd19f1c0cb",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-01T18:38:54.590Z",
+    "verdict": "pass",
+    "fixtureHash": "9936b619f97f259f",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "191612279ec24918",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:41:34.893Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-01T18:25:03.533Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-testing": "fd7044646ac2c395"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-verify/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/55-review/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/60-docs/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/65-rework/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/70-scope/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/75-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/85-complete/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:41:34.893Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

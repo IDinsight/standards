@@ -1,0 +1,73 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is BROWNFIELD",
+      "where": ".standards/MODE.md (installer brownfield template, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode is STANDARD with an initialized first cycle",
+      "where": ".standards/STATE.md: CycleMode STANDARD, Id add-csv-export-of-expenses-to-the-20260924T090000Z-3e9a6b10 (slug matches cycle.mjs slugFor of the Request), Handoff INITIAL per Start a cycle",
+      "status": "realized"
+    },
+    {
+      "condition": "WorkflowState is AUDITING",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery inactive, no outstanding obligations",
+      "where": ".standards/STATE.md Recovery.Active false, Obligations.Active false",
+      "status": "realized"
+    },
+    {
+      "condition": ".standards/CONTEXT.md does not exist",
+      "where": "built tree; selfCheck `test ! -e .standards/CONTEXT.md` passes",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Request is to add CSV export to an existing product",
+      "where": ".standards/STATE.md Request `Add CSV export of expenses to the expense tracker.`",
+      "status": "realized"
+    },
+    {
+      "condition": "An existing, medium-sized product with no CSV/export code exists",
+      "where": "src/** expense API (routes, auth, store, format, validate, reports); selfCheck grep for csv finds nothing",
+      "status": "realized"
+    },
+    {
+      "condition": "Established commands exist in project configuration and docs",
+      "where": "package.json scripts start/test, README.md, AGENTS.md; npm test passes (14 tests)",
+      "status": "realized"
+    },
+    {
+      "condition": "Project instructions exist for the Auditor to treat as constraints",
+      "where": "AGENTS.md pre-existing section above the STANDARDS managed block",
+      "status": "realized"
+    },
+    {
+      "condition": "Git state is clean and committed",
+      "where": "git status clean on main; pre-install history plus install and cycle commits",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "ungradeable-assertion",
+      "assertion": 0,
+      "detail": "Catalog marks assertion 0 as deterministic_complete via trace (reads modes/whole-repo.md only), but the check vocabulary has no file-read predicate, so the spec leaves it to the judge with an empty check list. The judge sees all tool calls, so it remains gradeable.",
+      "recommendation": "run_as_is",
+      "fix": "None needed; judge grades mode selection from the trace."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition: a valid first-cycle BROWNFIELD/STANDARD AUDITING state with no CONTEXT.md, a realistic dependency-free expense API with no export code, established npm commands, and pre-existing AGENTS.md instructions. Nothing leaks. The checks are necessary conditions for a correct run: forward handoff to SCOPING, a /scoper reply, unchanged project files, and no design record. The invariants are standard and the turn-end check accepts the post-handoff SCOPING state.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-01T18:33:28.901Z",
+  "costUsd": 0.767116,
+  "ms": 36963,
+  "fixtureHash": "49a2208720f8c14f"
+}

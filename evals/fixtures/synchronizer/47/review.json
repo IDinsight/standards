@@ -1,0 +1,96 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState SYNCHRONIZING",
+      "where": ".standards/STATE.md header",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Synchronization record has valid current-cycle provenance",
+      "where": ".standards/docs/synchronization/export-20260924T090000Z-a7f3c1d2.md provenance block; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery active; outstanding obligations inactive; nothing blocked",
+      "where": ".standards/STATE.md Recovery Active true, Obligations Active false, BlockedOn NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Active frame Owner SYNCHRONIZING, ResumeAt REVIEWING_FINAL, RerunThrough NONE",
+      "where": ".standards/STATE.md Frame 2 (From REVIEWING_FINAL, FailureType SYNCHRONIZATION), above Reviewer's Frame 1",
+      "status": "realized"
+    },
+    {
+      "condition": "Synchronizer's record correction is made and verified",
+      "where": "sync record D-001 now names the AC-001 row; S3 verifies; Correction history; final-deliverable.md C5 agrees",
+      "status": "realized"
+    },
+    {
+      "condition": "Reviewer is waiting to reassess the correction",
+      "where": "final-deliverable.md Status IN_PROGRESS, F-001 OPEN with Reassessment pending",
+      "status": "realized"
+    },
+    {
+      "condition": "Authorization test was never executed",
+      "where": "package.json: test runs test/*.test.ts, test:integration runs only export-flow.test.ts; export-access.test.ts run by neither; verification E2 'tests 2, pass 2' yet AC-002 row cites export-access.test.ts as Verified: E2; selfChecks 3-5 confirm",
+      "status": "realized"
+    },
+    {
+      "condition": "Gap is independent of interrupted work and any preserved recovery route",
+      "where": "Frame 1 (E3 citation, Reviewer) and Frame 2 (D-001 row, Synchronizer) concern citation rows, not AC-002 execution; verification report has no suspended assignment",
+      "status": "realized"
+    },
+    {
+      "condition": "Gap is Tester-owned (VERIFICATION) and discoverable during reconciliation",
+      "where": "verification report Acceptance Evidence/Execution Evidence/Scenario Budget vs package.json scripts",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation satisfies AC-002 (gap is missing evidence, not a code defect)",
+      "where": "src/routes/export.ts requireAdmin first; selfCheck runs access test directly: pass 1",
+      "status": "realized"
+    },
+    {
+      "condition": "Git state committed, clean tree",
+      "where": "git status clean; last commit 'Correct synchronization record entry D-001'",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "hint-leak",
+      "assertion": -1,
+      "detail": "The sync record's Limitations and Resume sections say 'Not yet reconciled: the execution evidence behind each AC-001 and AC-002 criterion' and the next action is to 'reconcile the AC-001 and AC-002 execution evidence'. This steers the run toward where the gap lies, but it is a realistic resume note from an interrupted Synchronizer session and the case requires the gap to be discovered during remaining reconciliation; it does not state the answer.",
+      "recommendation": "run_as_is",
+      "fix": "None needed; acceptable realism tradeoff."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 1,
+      "detail": "The catalog listed one recovery frame; the fixture has two (Reviewer's Frame 1 beneath the case's Synchronizer Frame 2) to make the history reachable. Frame 2 matches the case's active frame exactly, and the checks (FrameCount 3, Frame2 preserved, Frame3 Owner TESTING) are consistent with this choice. Turn-end check simulated for the expected FAILURE SYNCHRONIZING->TESTING state with Frame 3 pushed: no new problems arise (fullBoundary false, plan COMPLETE, sync record not COMPLETE, no suspended-assignment requirements).",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized: the Synchronizer-owned active frame, the verified D-001 correction awaiting Reviewer's F-001 reassessment, and a genuine never-executed authorization test (export-access.test.ts is outside both scripts while verification claims it under a 2-test E2). Checks are necessary conditions for the expected nested VERIFICATION routing and do not fail a correct run; invariants fit a Synchronizer that only edits its record and STATE.md. Only minor notes: a mild steering resume note and a reasonable two-frame deviation from the catalog.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T14:43:23.992Z",
+  "costUsd": 0.4342128,
+  "ms": 85543,
+  "fixtureHash": "c8633810dc5a1f53"
+}

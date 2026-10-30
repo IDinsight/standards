@@ -1,0 +1,278 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial project"
+    },
+    {
+      "dir": "layers/50-scope-design",
+      "action": "commit",
+      "message": "Record directory search scope and design"
+    },
+    {
+      "dir": "layers/60-increment-1",
+      "action": "commit",
+      "message": "Implement directory name search"
+    },
+    {
+      "dir": "layers/70-verify-increment-1",
+      "action": "commit",
+      "message": "Verify name search increment"
+    },
+    {
+      "dir": "layers/80-increment-2",
+      "action": "commit",
+      "message": "Add email search with shared normalization"
+    }
+  ],
+  "expectCheck": {
+    "ok": false,
+    "problemsMatch": [
+      "assigned checkpoint requires Assessment Purpose INCREMENT and target Increment 2"
+    ]
+  },
+  "prompt": {
+    "skill": "tester",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "DEV-001's code in src/search.js was rewritten while adding DEV-002 (commit Add email search with shared normalization): name matching now goes through src/normalize.js and every name match carries matchedOn name, so the Increment 1 evidence recorded against the earlier src/search.js blob is stale.",
+    "The architecture (Interfaces and Contracts, Technical Acceptance Criteria for AC-001 and AC-002, Build Plan step 2) requires every result, including name matches, to have exactly id, name, email, and matchedOn, so the AC-001 test 'finds people by any part of their name, ignoring case' in test/search.test.js, which deep-equals the old three-key shape, is obsolete rather than catching a regression.",
+    "That obsolete test is the only failing test: node --test test/search.test.js reports 1 pass and 1 fail, and test/directory.test.js passes.",
+    "src/search.js and src/normalize.js at the last commit implement the design correctly for AC-001 and AC-002; there is no implementation defect for the grouped Increment 2 outcome.",
+    "The prior report allocates 2 of 8 scenarios to src/search.js (the obsolete name-match scenario and the no-match scenario): the user approved a targeted increase to 8 for src/search.js only. src/normalize.js is a new source file with no allocations yet and the default limit of five."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "directory-search-20260923T141500Z-5b8e2a19",
+    "DEV": ".standards/docs/development/directory-search-20260923T141500Z-5b8e2a19.md",
+    "VER": ".standards/docs/verification/directory-search-20260923T141500Z-5b8e2a19.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "field": {
+            "path": "${VER}",
+            "name": "Assessment Purpose",
+            "equals": "INCREMENT"
+          }
+        },
+        {
+          "field": {
+            "path": "${VER}",
+            "name": "Assessment Target",
+            "equals": "Increment 2"
+          }
+        },
+        {
+          "contains": {
+            "path": "${VER}",
+            "regex": "AC-003.*AWAITING_IMPLEMENTATION"
+          },
+          "why": "AC-003 stays in the inventory as awaiting implementation"
+        },
+        {
+          "contains": {
+            "path": "${VER}",
+            "regex": "^[|] *1 *[|]",
+            "flags": "m"
+          },
+          "why": "Increment 1 history row retained"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "changed": [
+            "test/search.test.js"
+          ],
+          "why": "the obsolete AC-001 test must be updated or removed"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "contains": {
+            "path": "${VER}",
+            "regex": "## Scenario Budget"
+          }
+        }
+      ]
+    },
+    {
+      "assertion": 4,
+      "complete": false,
+      "all": [
+        {
+          "contains": {
+            "path": "${VER}",
+            "regex": "^[|] *2 *[|].*[|] *VERIFIED *[|] *$",
+            "flags": "m"
+          },
+          "why": "Increment 2 assessment row recorded as VERIFIED"
+        },
+        {
+          "contains": {
+            "path": "${VER}",
+            "regex": "## Execution Evidence"
+          }
+        }
+      ]
+    },
+    {
+      "assertion": 5,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "DEVELOPING"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "CHECKPOINT"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "TESTING"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "NONE"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "false"
+        },
+        {
+          "field": {
+            "path": "${DEV}",
+            "name": "Current Increment",
+            "equals": "2"
+          }
+        },
+        {
+          "unchanged": [
+            "${DEV}"
+          ]
+        },
+        {
+          "field": {
+            "path": "${VER}",
+            "name": "Status",
+            "equals": "IN_PROGRESS"
+          }
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Tester does not change git state"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "data/**",
+        ".standards/docs/development/**",
+        ".standards/docs/scope/**",
+        ".standards/docs/specs/**",
+        ".standards/CONTEXT.md"
+      ],
+      "why": "Tester does not edit implementation, the plan, scope, design, or context"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/directory.test.js",
+      "expect": "pass",
+      "why": "the pre-existing directory tests pass"
+    },
+    {
+      "cmd": "node --test test/search.test.js",
+      "expect": "fail",
+      "expectOutput": "matchedOn",
+      "why": "the AC-001 test still asserts the Increment 1 result shape without matchedOn and fails against the current source"
+    },
+    {
+      "cmd": "node --test test/search.test.js",
+      "expect": "fail",
+      "expectOutput": "fail 1",
+      "why": "only that one search test fails; the no-match test still passes"
+    },
+    {
+      "cmd": "node --input-type=module -e 'const assert = (await import(`node:assert/strict`)).default; const { searchUsers } = await import(`./src/search.js`); const u = [{ id: 1, name: `Grace Hopper`, email: `grace.hopper@example.org` }, { id: 2, name: `Ada Lovelace`, email: `ada@example.org` }, { id: 5, name: `Bob Stone`, email: `ada.stone@example.org` }]; assert.deepEqual(searchUsers(u, `AD`), [{ id: 2, name: `Ada Lovelace`, email: `ada@example.org`, matchedOn: `name` }, { id: 5, name: `Bob Stone`, email: `ada.stone@example.org`, matchedOn: `email` }]); assert.deepEqual(searchUsers(u, ` HOPPER@ `).map((r) => r.id + r.matchedOn), [`1email`]); assert.deepEqual(searchUsers(u, `ada  love`).map((r) => r.id), [2]); assert.deepEqual(searchUsers(u, `   `), []);'",
+      "expect": "pass",
+      "why": "the current implementation satisfies the design contract for name and email search (shape, ordering, normalization, blank query)"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 00-project: staff-directory Node library (src/directory.js, data/users.json, test/directory.test.js). 50-scope-design: Auditor context, scope (AC-001 name search, AC-002 email search with matched field, AC-003 paging), design whose Interfaces, Technical Acceptance Criteria, and Build Plan step 2 require matchedOn on every result and shared normalization; STATE at DEVELOPING with a pending INCREMENTAL cadence request. 60-increment-1: approved INCREMENTAL plan (Increments 1: DEV-001/AC-001; 2: DEV-001, DEV-002/AC-001, AC-002; 3: DEV-003/AC-003), src/search.js v1 returning {id,name,email}; CHECKPOINT Increment 1. 70-verify-increment-1: test/search.test.js (2 scenarios charged to src/search.js), package.json test script, verification report IN_PROGRESS / INCREMENT / Increment 1 with Increment 1 VERIFIED, prior blob/commit identities, AC-002 and AC-003 AWAITING_IMPLEMENTATION; CHECKPOINT back to DEVELOPING. 80-increment-2: src/search.js rewritten (DEV-001 reopened and DONE again), new src/normalize.js, plan Current Increment 2 with DEV-001/DEV-002 DONE and self-checks, DEV-003 PENDING; STATE TESTING, CHECKPOINT from DEVELOPING, Reason Increment 2 ready. The full check fails only because the report still targets Increment 1 (deliberate, per catalog); the turn-end check accepts it.",
+  "case": "tester-31",
+  "caseHash": "4690e80382ebd54d",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T20:50:38.143Z",
+    "verdict": "pass",
+    "fixtureHash": "dd718e4bfebfc9d3",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "364a24832a72832e",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:46:37.310Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-01T18:32:18.230Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-scope-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/60-increment-1/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/70-verify-increment-1/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/80-increment-2/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:46:37.310Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

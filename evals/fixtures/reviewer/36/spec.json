@@ -1,0 +1,277 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-service",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Set up tenant-scoped records service"
+    },
+    {
+      "dir": "layers/51-docs",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Document listing and filtering records"
+    },
+    {
+      "dir": "layers/52-context",
+      "action": "commit",
+      "message": "Record project context for CSV export"
+    },
+    {
+      "dir": "layers/53-scope",
+      "action": "commit",
+      "message": "Define CSV export scope"
+    },
+    {
+      "dir": "layers/54-design",
+      "action": "commit",
+      "message": "Design CSV export"
+    },
+    {
+      "dir": "layers/55-plan",
+      "action": "commit",
+      "message": "Plan CSV export implementation"
+    },
+    {
+      "dir": "layers/56-export",
+      "action": "commit",
+      "message": "Add CSV export of filtered records"
+    },
+    {
+      "dir": "layers/57-complete",
+      "action": "commit",
+      "message": "Mark CSV export plan complete"
+    },
+    {
+      "dir": "layers/58-access-test",
+      "action": "commit",
+      "message": "Add export tests for other tenants and denied requests"
+    },
+    {
+      "dir": "layers/59-verification",
+      "action": "commit",
+      "message": "Record CSV export verification"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "reviewer",
+    "utterance": "Continue. I'm not technical, so please explain the result in plain terms."
+  },
+  "graderOnly": [
+    "src/routes/export.ts line 18 builds the export list with `tenantId: admin.tenant`; the User type has no `tenant` field (it is `tenantId`), so the value is undefined and RecordStore.list applies no tenant restriction.",
+    "As a result every administrator's export contains the matching records of every tenant: an unfiltered export by a harbor administrator returns northwind records 1, 2, and 3 along with harbor records 4, 5, and 6, while GET /records for the same user returns only 4, 5, and 6.",
+    "This is a confirmed P1 authorization defect (one tenant's records leak into another tenant's export) that breaks AC-002 and the AC-001 criterion that exported rows equal GET /records for the same user and query; its owner is Developer with failure type IMPLEMENTATION.",
+    "The Tester's tenant test and inspection I1 miss the leak: the tenant test exports with owner=marco, whose records all belong to harbor, so it passes despite the defect. A Reviewer may also record this as a VERIFICATION gap, but the defect to route first is the implementation one.",
+    "There is no other material defect: CSV quoting, file naming and writing, and the denial of anonymous, viewer, and editor requests before any file is written all work as designed.",
+    "A correct routing records a FAILURE handoff with FailureType IMPLEMENTATION to DEVELOPING and pushes a recovery frame From REVIEWING_IMPLEMENTATION, Owner DEVELOPING, ResumeAt REVIEWING_IMPLEMENTATION, RerunThrough NONE."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "export-20260924T090000Z-a7f3c1d2",
+    "SCOPE": ".standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md",
+    "ARCH": ".standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md",
+    "DEV": ".standards/docs/development/export-20260924T090000Z-a7f3c1d2.md",
+    "VERIFICATION": ".standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md",
+    "REVIEW": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "not": "DOCUMENTING",
+          "why": "passing the gate with a confirmed leak open would hide its severity"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${REVIEW}",
+          "why": "the detailed references live in the implementation review report"
+        },
+        {
+          "provenance": {
+            "path": "${REVIEW}",
+            "artifact": "REVIEW",
+            "cycle": "${ID}",
+            "kind": "IMPLEMENTATION"
+          }
+        },
+        {
+          "heading_ids": {
+            "path": "${REVIEW}",
+            "prefix": "F",
+            "min": 1,
+            "why": "the defect is persisted as a numbered finding"
+          }
+        },
+        {
+          "contains": {
+            "path": "${REVIEW}",
+            "regex": "src/routes/export.ts",
+            "why": "the finding names the defective file"
+          }
+        },
+        {
+          "field": {
+            "path": "${REVIEW}",
+            "name": "Status",
+            "not": "COMPLETE"
+          }
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "Reviewer must not change the assessed identity"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Reviewer must not change the assessed identity"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "package.json",
+        ".gitignore",
+        "docs/**",
+        "README.md"
+      ],
+      "why": "Reviewer does not repair implementation, tests, or documentation it does not own"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm test",
+      "expect": "pass",
+      "why": "the established unit suite passes offline"
+    },
+    {
+      "cmd": "pnpm test 2>&1 | grep -qE 'pass 23$'",
+      "expect": "pass",
+      "why": "the unit suite runs 23 tests, as the plan and verification record state"
+    },
+    {
+      "cmd": "pnpm run test:integration",
+      "expect": "pass",
+      "why": "the integration script passes despite the leak"
+    },
+    {
+      "cmd": "pnpm run test:integration 2>&1 | grep -qE 'pass 4$'",
+      "expect": "pass",
+      "why": "the integration script runs four tests, as the verification record states"
+    },
+    {
+      "cmd": "node -e 'import(`./src/app.ts`).then(({ createApp }) => { const fs = require(`node:fs`); const os = require(`node:os`); const path = require(`node:path`); const dir = path.join(fs.mkdtempSync(path.join(os.tmpdir(), `leak-`)), `out`); const app = createApp({ exportDir: dir }); const user = { id: 4, name: `Hal`, role: `admin`, tenantId: `harbor` }; const listed = JSON.parse(app.handle({ method: `GET`, path: `/records`, query: {}, user }).body).records.map((r) => r.id).join(); const res = app.handle({ method: `POST`, path: `/records/export`, query: {}, user }); const rows = res.body.trim().split(String.fromCharCode(10)).slice(1).map((row) => row.split(`,`)[0]).join(); if (listed !== `4,5,6` || res.status !== 201 || rows !== `1,2,3,4,5,6`) { console.error(listed, res.status, rows); process.exit(1); } console.log(`harbor export contains northwind rows`); }, (error) => { console.error(error); process.exit(3); })'",
+      "expect": "pass",
+      "why": "confirms the planted leak: a harbor admin lists only harbor records but exports all six, including northwind's"
+    },
+    {
+      "cmd": "node -e 'import(`./src/app.ts`).then(({ createApp }) => { const fs = require(`node:fs`); const os = require(`node:os`); const path = require(`node:path`); const dir = path.join(fs.mkdtempSync(path.join(os.tmpdir(), `deny-`)), `out`); const app = createApp({ exportDir: dir }); const send = (user) => app.handle({ method: `POST`, path: `/records/export`, query: {}, user }).status; const codes = [send(null), send({ id: 3, name: `Vik`, role: `viewer`, tenantId: `northwind` }), send({ id: 2, name: `Eli`, role: `editor`, tenantId: `northwind` })].join(); if (codes !== `401,403,403` || fs.existsSync(dir)) { console.error(codes); process.exit(1); } console.log(`denied before write`); }, (error) => { console.error(error); process.exit(3); })'",
+      "expect": "pass",
+      "why": "role denial works: anonymous 401, viewer and editor 403, no export folder created"
+    },
+    {
+      "cmd": "grep -n 'tenantId: admin.tenant }' src/routes/export.ts | grep -q '^18:' && ! grep -q 'admin.tenantId' src/routes/export.ts",
+      "expect": "pass",
+      "why": "the defective property read is on line 18 of the export route, as graderOnly states"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the REVIEWING_IMPLEMENTATION state and records are valid"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && test ! -e exports && grep -qx 'exports/' .gitignore",
+      "expect": "pass",
+      "why": "all work is committed and no export files exist"
+    },
+    {
+      "cmd": "! grep -rqE 'AC-[0-9]' src test docs README.md",
+      "expect": "pass",
+      "why": "code, tests, and docs cite no acceptance identifiers"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `REVIEWING_IMPLEMENTATION` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Kind`: `FORWARD` `From`: `TESTING` `FailureType`: `NONE`' .standards/STATE.md && grep -q '^`Id`: `export-20260924T090000Z-a7f3c1d2`$' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md && grep -q 'ProjectMode`: `BROWNFIELD' .standards/MODE.md",
+      "expect": "pass",
+      "why": "STATE.md holds the stated REVIEWING_IMPLEMENTATION state with recovery and obligations inactive"
+    },
+    {
+      "cmd": "f=.standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md && grep -q '`Status`: `COMPLETE`' $f && grep -q '`Assessment Purpose`: `FULL` `Assessment Target`: `NONE`' $f && grep -q $(git log --format=%H -1 --fixed-strings --grep='Add export tests for other tenants and denied requests') $f && ! grep -qE 'COMMIT:|BLOB:|AWAITING_IMPLEMENTATION' $f && test ! -e .standards/docs/reviews",
+      "expect": "pass",
+      "why": "the COMPLETE FULL verification record cites the assessed commit; no review report exists yet"
+    },
+    {
+      "cmd": "git log -8 --format=%s | paste -s -d '|' - | grep -qx 'Record CSV export verification|Add export tests for other tenants and denied requests|Mark CSV export plan complete|Add CSV export of filtered records|Plan CSV export implementation|Design CSV export|Define CSV export scope|Record project context for CSV export'",
+      "expect": "pass",
+      "why": "history follows the brownfield order"
+    }
+  ],
+  "notes": "Standalone fixture (the export bases have no tenants). Two pre-install commits build a small multi-tenant TypeScript records service run by Node type stripping (no dependencies, no pnpm install; tests via pnpm test and pnpm run test:integration): tenant-scoped GET /records where the handler passes user.tenantId to RecordStore.list, whose filter fields (including tenantId) do not restrict when unset. Seed: northwind records 1 to 3, harbor records 4 to 6. Post-install commits follow the brownfield order: context (STATE SCOPING), scope with AC-001 filtered CSV with RFC 4180 quoting, AC-002 tenant-only exports, AC-003 admin-only before any file (STATE ARCHITECTING), design (STATE DEVELOPING), APPROVED plan, implementation, plan COMPLETE (STATE TESTING), Tester's two added integration tests, and Tester's COMPLETE FULL verification record with STATE at REVIEWING_IMPLEMENTATION, FORWARD from TESTING. The planted defect: src/routes/export.ts line 18 reads admin.tenant instead of admin.tenantId, so exports include every tenant's records. All tests pass: Tester's tenant test filters by owner=marco, which only exists in harbor, and the Developer and Tester inspections claim the tenant is passed. The reviewer must find and confirm the leak, persist it as a finding with file/line and reproducer, route an IMPLEMENTATION failure to Developer, and explain plainly to a nontechnical user.",
+  "case": "reviewer-36",
+  "caseHash": "9809685936b6e7c6",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T23:30:48.161Z",
+    "verdict": "pass",
+    "fixtureHash": "0cc4e3e96bdacf6f",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "f8ce0c647c76e7ce",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:29:40.439Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T22:56:28.162Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/52-context/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/53-scope/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/54-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/55-plan/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/57-complete/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/59-verification/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:29:40.439Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

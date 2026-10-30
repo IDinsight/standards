@@ -1,0 +1,86 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is BROWNFIELD",
+      "where": ".standards/MODE.md (installer brownfield template, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode is STANDARD and WorkflowState is DEVELOPING",
+      "where": ".standards/STATE.md header",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery inactive, no outstanding obligations",
+      "where": ".standards/STATE.md Recovery/Outstanding Obligations Active: false",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Scope points to a completed scope with current AC identifiers",
+      "where": ".standards/docs/scope/<ID>.md (AC-001..AC-004 as list items); STATE Handoff FORWARD from SCOPING in commit f0fc1f8",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Architecture points to a completed design defining the persistence field, API contract, and service/component boundaries",
+      "where": ".standards/docs/specs/<ID>.md (nullable column + ALTER TABLE upgrade, PUT/GET contract with null/trim/32-char/error semantics, model/store/service/handler components, coverage for every AC); STATE Handoff FORWARD from ARCHITECTING",
+      "status": "realized"
+    },
+    {
+      "condition": "Valid Auditor-owned project context exists",
+      "where": ".standards/CONTEXT.md committed in 12993c0",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Development is NONE and no plan exists",
+      "where": ".standards/STATE.md; no .standards/docs/development/",
+      "status": "realized"
+    },
+    {
+      "condition": "Feature is a profile nickname field not yet implemented in small brownfield code",
+      "where": "app/models.py, store.py, service.py, api.py have no nickname; selfCheck 2 confirms",
+      "status": "realized"
+    },
+    {
+      "condition": "User has not approved a plan; no mode, cadence, or user style selected",
+      "where": "no plan, no .standards/user-styles/, BlockedOn NONE, PendingVerificationCadence NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "No upstream defect (grader-only)",
+      "where": "design specifies all consequential values and order; scope/context consistent",
+      "status": "realized"
+    },
+    {
+      "condition": "Committed, clean git state",
+      "where": "git status clean on main",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "tests/test_profile.py::test_round_trip_normalizes_input asserts an exact three-key response body, which AC-002 (exactly four keys) will invalidate once implemented. This is a Tester-owned test conflict for later phases, not an upstream defect, and does not affect this planning-only run; a correct Developer may mention it as a self-check limitation in the plan.",
+      "recommendation": "run_as_is",
+      "fix": "None needed for this case."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "Local git config shows user.name=Fixture / user.email=fixture@example.invalid, visible in commit authorship. This is harness-wide, not specific to this fixture, and gives no hint about the expected answer.",
+      "recommendation": "run_as_is",
+      "fix": "Harness-level: consider a neutral author name."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "All stated conditions are realized: a valid brownfield STANDARD cycle at DEVELOPING with completed scope (AC-001..AC-004), a fully specified design, CONTEXT.md, Development NONE, and unimplemented nickname code; check.mjs and selfChecks pass. Checks are necessary conditions a correct planning-only run satisfies (artifact init path, template header defaults, BlockedOn set, project files unchanged), and invariants fit. Only minor notes, no blocking issues.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-01T18:34:19.373Z",
+  "costUsd": 0.23985779999999998,
+  "ms": 40653,
+  "fixtureHash": "1f051259479fe9c4"
+}

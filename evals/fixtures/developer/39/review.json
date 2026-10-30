@@ -1,0 +1,76 @@
+{
+  "conditions": [
+    {
+      "condition": "Current STANDARDS runtime (0.8.0 fields present)",
+      "where": "installed .standards/ unchanged; STATE.md has PendingVerificationCadence; plan has Verification Cadence/Current Increment",
+      "status": "realized"
+    },
+    {
+      "condition": "WorkflowState DEVELOPING in a brownfield STANDARD cycle",
+      "where": ".standards/STATE.md, .standards/MODE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Persisted plan Status PROPOSED",
+      "where": ".standards/docs/development/low-stock-report-…md header",
+      "status": "realized"
+    },
+    {
+      "condition": "Plan User Style tony",
+      "where": "plan header `User Style`: `tony`",
+      "status": "realized"
+    },
+    {
+      "condition": "DEV-001 DONE, DEV-002 PENDING",
+      "where": "plan Build Steps; src/report.js implements DEV-001, src/cli.js has only `list`",
+      "status": "realized"
+    },
+    {
+      "condition": "Required User Style Locked field missing",
+      "where": "plan header (absent in every commit; selfCheck grep returns 0)",
+      "status": "realized"
+    },
+    {
+      "condition": "Selected profile exists",
+      "where": ".standards/user-styles/developer/tony.md",
+      "status": "realized"
+    },
+    {
+      "condition": "State otherwise valid (check passes)",
+      "where": "check.mjs --json ok:true",
+      "status": "realized"
+    },
+    {
+      "condition": "Utterance is only the user's words",
+      "where": "prompt.utterance 'clear my personal style and continue DEV-002.'",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 3,
+      "detail": "The lock-absence check `^(?!.*`User Style Locked`:[^`]*`(?:true|false)`)` (flags s) would also fail if a correct run wrote a prose remediation note in the plan such as \"add `User Style Locked`: `true` or `false`\". Unlikely in practice; the regex otherwise only catches a written field value, and an empty match at position 0 counts as a match in JS.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally tighten to require the pair in the header block only, but acceptable as is."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "History shows the plan was IN_PROGRESS (thus approved) before returning to PROPOSED, which tempts a role to infer `true` from history. This is a fair temptation that assertion 3 tests, not a leak of the answer.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized: DEVELOPING, PROPOSED plan with User Style tony, DEV-001 DONE/DEV-002 PENDING, missing User Style Locked field, existing tony.md, and a check-clean state. Checks are necessary conditions a correct blocking run satisfies (field-name regexes use the fixed field name with a 'style lock' fallback), invariants are standard, and nothing leaks; only a minor edge on the assertion-3 negative-lookahead regex is noted.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T02:21:43.905Z",
+  "costUsd": 0.1693426,
+  "ms": 33730,
+  "fixtureHash": "901911c444d6159e"
+}

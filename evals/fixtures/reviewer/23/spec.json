@@ -1,0 +1,331 @@
+{
+  "base": "export-reviewing-impl",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-impl-review",
+      "action": "commit",
+      "message": "Record implementation review"
+    },
+    {
+      "dir": "layers/52-docs",
+      "action": "commit",
+      "message": "Document CSV export"
+    },
+    {
+      "dir": "layers/54-final-review",
+      "action": "commit",
+      "message": "Record final review of CSV export"
+    },
+    {
+      "dir": "layers/56-scope",
+      "action": "commit",
+      "message": "Add export file retention to CSV export scope"
+    },
+    {
+      "dir": "layers/58-design",
+      "action": "commit",
+      "message": "Design export file retention"
+    },
+    {
+      "dir": "layers/62-retention",
+      "action": "commit",
+      "message": "Keep earlier export files when exporting in the same second"
+    },
+    {
+      "dir": "layers/64-plan-complete",
+      "action": "commit",
+      "message": "Mark export file retention step complete"
+    },
+    {
+      "dir": "layers/66-retention-tests",
+      "action": "commit",
+      "message": "Add same-second export tests"
+    },
+    {
+      "dir": "layers/68-reverification",
+      "action": "commit",
+      "message": "Record CSV export reverification"
+    }
+  ],
+  "expectCheck": {
+    "ok": false,
+    "problemsMatch": [
+      "COMPLETE but does not account for AC-003"
+    ]
+  },
+  "prompt": {
+    "skill": "reviewer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "In src/routes/export.ts the same-second repeat lookup (parseFilter, key, recent.get) runs before requireAdmin(request.user). After an administrator exports, a request with the same filters in the same second from a viewer, an editor, or no signed-in user receives 201 with the administrator's CSV. This violates AC-002 and the corrected design, which puts authorization first.",
+    "No test sends a non-admin or anonymous request after an admin export: the denied-export integration test uses a fresh app, so both suites pass. Tester's evidence misses this; Reviewer may also record a verification gap, but the defect requiring correction is Developer's.",
+    "Apart from that ordering, the AC-003 rerun implementation (suffixed names, exclusive create, same-second repeat returning the earlier response) behaves as designed.",
+    "The first-pass implementation review report is still COMPLETE with no findings and does not account for AC-003; check.mjs reports exactly this, and the report is Reviewer-owned.",
+    "The documentation record and final-deliverable report predate AC-003. They belong to the outer frame's route (final review resumes after this rerun) and are not part of this implementation review.",
+    "Expected outcome: Frame 1 unchanged; Frame 2 pushed with From REVIEWING_IMPLEMENTATION, Owner DEVELOPING, FailureType IMPLEMENTATION, ResumeAt REVIEWING_IMPLEMENTATION, RerunThrough NONE; WorkflowState DEVELOPING with a FAILURE handoff."
+  ],
+  "history": null,
+  "vars": {
+    "REVIEW_FINAL": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md",
+    "DOC_RECORD": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "2",
+          "why": "a nested frame was pushed above the outer frame"
+        },
+        {
+          "state": "Recovery.Top.RerunThrough",
+          "equals": "NONE"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "state": "Recovery.Frame1.From",
+          "equals": "REVIEWING_FINAL"
+        },
+        {
+          "state": "Recovery.Frame1.Owner",
+          "equals": "SCOPING"
+        },
+        {
+          "state": "Recovery.Frame1.FailureType",
+          "equals": "SCOPING"
+        },
+        {
+          "state": "Recovery.Frame1.ResumeAt",
+          "equals": "REVIEWING_FINAL"
+        },
+        {
+          "state": "Recovery.Frame1.RerunThrough",
+          "equals": "REVIEWING_IMPLEMENTATION",
+          "why": "the outer rerun plan stays as Scoper set it"
+        },
+        {
+          "state": "WorkflowState",
+          "not": "REVIEWING_FINAL"
+        },
+        {
+          "unchanged": [
+            "${REVIEW_FINAL}"
+          ],
+          "why": "no final-deliverable review work here"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${REVIEW_IMPL}"
+        },
+        {
+          "heading_ids": {
+            "path": "${REVIEW_IMPL}",
+            "prefix": "F",
+            "min": 1
+          }
+        },
+        {
+          "field": {
+            "path": "${REVIEW_IMPL}",
+            "name": "Status",
+            "not": "COMPLETE"
+          }
+        },
+        {
+          "contains": {
+            "path": "${REVIEW_IMPL}",
+            "regex": "`FailureType`:[^`]*`IMPLEMENTATION`"
+          }
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "DEVELOPING"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FAILURE"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "REVIEWING_IMPLEMENTATION"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "IMPLEMENTATION"
+        },
+        {
+          "state": "Recovery.Top.Owner",
+          "equals": "DEVELOPING"
+        },
+        {
+          "state": "Recovery.Top.ResumeAt",
+          "equals": "REVIEWING_IMPLEMENTATION"
+        },
+        {
+          "reply_matches": "/developer"
+        },
+        {
+          "reply_matches": "active recovery",
+          "flags": "i"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "Reviewer must not change the assessed identity"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Reviewer must not change git state"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "packages/**",
+        "test/**",
+        "package.json",
+        "pnpm-lock.yaml",
+        ".gitignore",
+        "docs/**",
+        "README.md"
+      ],
+      "why": "Reviewer does not repair implementation, tests, or documentation"
+    },
+    {
+      "unchanged": [
+        "${SCOPE}",
+        "${ARCH}",
+        "${DEV}",
+        "${VERIFICATION}",
+        "${DOC_RECORD}",
+        "${CONTEXT}"
+      ],
+      "why": "Reviewer does not edit other roles' records"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test 2>&1 | grep -qE 'pass 22$'",
+      "expect": "pass",
+      "why": "the unit suite passes with 22 tests"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration 2>&1 | grep -qE 'pass 5$'",
+      "expect": "pass",
+      "why": "the integration suite passes with 5 tests, including the denied-export test"
+    },
+    {
+      "cmd": "pnpm --filter export test && pnpm --filter export test:integration",
+      "expect": "pass",
+      "why": "both suites exit 0"
+    },
+    {
+      "cmd": "node -e 'import(`./src/app.ts`).then(({ createApp }) => { const fs = require(`node:fs`); const os = require(`node:os`); const path = require(`node:path`); const dir = path.join(fs.mkdtempSync(path.join(os.tmpdir(), `reuse-`)), `out`); const now = () => new Date(`2026-09-24T09:00:00Z`); const app = createApp({ exportDir: dir, now }); const send = (user) => app.handle({ method: `POST`, path: `/records/export`, query: { owner: `dana` }, user }); const first = send({ id: 1, name: `Ada`, role: `admin` }); const viewer = send({ id: 3, name: `Vik`, role: `viewer` }); const anon = send(null); if (first.status !== 201 || viewer.status !== 201 || anon.status !== 201 || viewer.body !== first.body || !viewer.body.includes(`Lease agreement`)) { console.error(first.status, viewer.status, anon.status); process.exit(1); } const fresh = createApp({ exportDir: path.join(dir, `fresh`), now }); if (fresh.handle({ method: `POST`, path: `/records/export`, query: { owner: `dana` }, user: { id: 3, name: `Vik`, role: `viewer` } }).status !== 403) process.exit(2); console.log(`repeat returned before authorization`); }, (error) => { console.error(error); process.exit(3); })'",
+      "expect": "pass",
+      "why": "after an admin export, viewer and anonymous requests with the same filters in the same second get the admin's CSV; a viewer on a fresh app is still denied"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "fail",
+      "expectOutput": "COMPLETE but does not account for AC-003",
+      "why": "the first-pass implementation review is still COMPLETE and predates AC-003"
+    },
+    {
+      "cmd": "node -e 'import(`./.standards/bin/check.mjs`).then(async ({ runCheck }) => { const { problems } = await runCheck(process.cwd(), { atTurnEnd: true }); if (problems.length) { console.error(JSON.stringify(problems)); process.exit(1); } console.log(`clean`); }, (error) => { console.error(error); process.exit(2); })'",
+      "expect": "pass",
+      "why": "the turn-end check is clean in the starting state"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `REVIEWING_IMPLEMENTATION` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Kind`: `FORWARD` `From`: `TESTING` `FailureType`: `NONE`' .standards/STATE.md && grep -q '^`From`: `REVIEWING_FINAL` `Owner`: `SCOPING` `FailureType`: `SCOPING`$' .standards/STATE.md && grep -q '^`ResumeAt`: `REVIEWING_FINAL` `RerunThrough`: `REVIEWING_IMPLEMENTATION`$' .standards/STATE.md && test $(grep -c '^### Frame' .standards/STATE.md) -eq 1 && test $(grep -c '`Active`: `true`' .standards/STATE.md) -eq 1",
+      "expect": "pass",
+      "why": "STATE.md holds the rerun with one outer SCOPING frame and inactive obligations"
+    },
+    {
+      "cmd": "r=.standards/docs/reviews/export-20260924T090000Z-a7f3c1d2 && grep -q '`Status`: `COMPLETE`' $r/implementation.md && ! grep -q '^### F-' $r/implementation.md && grep -q '`Status`: `BLOCKED`' $r/final-deliverable.md && grep -q '^### F-001' $r/final-deliverable.md && grep -q '`Mode`: `REVERIFY` `Status`: `COMPLETE`' .standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md && test $(grep -c '^`Status`: `DONE`' .standards/docs/development/export-20260924T090000Z-a7f3c1d2.md) -eq 4 && grep -q '`AC-003`:' .standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md && ! grep -rqE 'COMMIT:|BLOB:' .standards/docs",
+      "expect": "pass",
+      "why": "record statuses are as stated and all placeholders resolved"
+    },
+    {
+      "cmd": "test $(grep -n 'recent.get' src/routes/export.ts | cut -d: -f1) -lt $(grep -n 'requireAdmin(request.user)' src/routes/export.ts | cut -d: -f1) && ! git status --porcelain | grep -q . && test ! -e exports && ! grep -rqE 'AC-[0-9]' src test packages docs README.md",
+      "expect": "pass",
+      "why": "the repeat lookup precedes authorization; tree clean; no AC ids in code or docs"
+    },
+    {
+      "cmd": "git log -9 --format=%s | paste -s -d '|' - | grep -qx 'Record CSV export reverification|Add same-second export tests|Mark export file retention step complete|Keep earlier export files when exporting in the same second|Design export file retention|Add export file retention to CSV export scope|Record final review of CSV export|Document CSV export|Record implementation review'",
+      "expect": "pass",
+      "why": "history follows the cycle and recovery order"
+    }
+  ],
+  "notes": "Built on export-reviewing-impl (REVIEWING_IMPLEMENTATION, first pass). 50: COMPLETE first-pass implementation review, no findings; STATE to DOCUMENTING. 52: Documenter adds an export section to docs/usage.md (says the service keeps the saved file) and a COMPLETE documentation record; STATE to REVIEWING_FINAL. 54: final review BLOCKED with F-001 (Scoper, SCOPING): the design accepts that a same-second export replaces an earlier file, and the scope never decides it. STATE to SCOPING with a FAILURE handoff and Frame 1 (From REVIEWING_FINAL, Owner SCOPING, ResumeAt REVIEWING_FINAL, RerunThrough NONE). 56: scope adds AC-003; Frame 1 RerunThrough set to REVIEWING_IMPLEMENTATION; FORWARD to ARCHITECTING. 58: design covers AC-003 (suffixed names, exclusive create, same-second repeat returns the earlier response, all after authorization); STATE to DEVELOPING. 62: Developer code. Planted defect: the repeat lookup runs before requireAdmin. 64: plan COMPLETE with DEV-004 DONE; STATE to TESTING. 66: Tester adds a writeExport unit test and two same-second integration tests; none sends a non-admin request after an admin export. 68: REVERIFY FULL verification COMPLETE for AC-001 to AC-003; STATE FORWARD from TESTING to REVIEWING_IMPLEMENTATION with Frame 1 kept. expectCheck is not ok because of one natural problem: the first-pass implementation review report is COMPLETE without AC-003. That report is Reviewer-owned, Tester's handoff did not require fixing it, and the turn-end check does not hold it.",
+  "case": "reviewer-23",
+  "caseHash": "35b738481bfc47e3",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-01T18:36:59.368Z",
+    "verdict": "pass",
+    "fixtureHash": "e029e80be87c6e60",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "4cc96ac9567548c7",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:24:30.798Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-01T18:25:36.742Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-testing": "fd7044646ac2c395",
+    "export-reviewing-impl": "e5b0bce49a675583"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-impl-review/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/52-docs/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/54-final-review/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/56-scope/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/58-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/64-plan-complete/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/68-reverification/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:24:30.798Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

@@ -1,0 +1,302 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-cli",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add records-export command"
+    },
+    {
+      "dir": "layers/52-guide",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add CLI usage guide and sample records"
+    },
+    {
+      "dir": "layers/60-context",
+      "action": "commit",
+      "message": "Record project context for CLI guide update"
+    },
+    {
+      "dir": "layers/62-scope",
+      "action": "commit",
+      "message": "Define CLI guide correction scope"
+    },
+    {
+      "dir": "layers/64-design",
+      "action": "commit",
+      "message": "Record design for CLI guide update"
+    },
+    {
+      "dir": "layers/66-plan",
+      "action": "commit",
+      "message": "Record development plan for CLI guide update"
+    },
+    {
+      "dir": "layers/68-verification",
+      "action": "commit",
+      "message": "Record CLI guide verification"
+    },
+    {
+      "dir": "layers/70-review",
+      "action": "commit",
+      "message": "Record CLI guide implementation review"
+    },
+    {
+      "dir": "layers/72-guide",
+      "action": "commit",
+      "message": "Correct invocation examples in CLI guide"
+    },
+    {
+      "dir": "layers/74-documentation",
+      "action": "commit",
+      "message": "Record CLI guide documentation"
+    },
+    {
+      "dir": "layers/76-final-review",
+      "action": "commit",
+      "message": "Record CLI guide final review"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "synchronizer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The cycle changes only docs/cli.md: since the pre-cycle commit, no file under bin/, src/, test/, examples/, nor package.json, README.md, or .gitignore changed; the only other changes outside .standards/ come from the STANDARDS installation commit.",
+    "AC-001 requires correct invocation examples in docs/cli.md; the design records No architectural impact and depends on Documenter.",
+    "Every example in the current docs/cli.md runs as written against bin/records-export.js from the repository root and produces exactly the output, file, message, and exit status the guide states; the Options, Output, and Exit status sections match src/cli.js and src/csv.js.",
+    "The documentation record (checks G1 to G4) and the final-deliverable review (checks C1 to C4) identify docs/cli.md by commit and blob and confirm the examples by running them against the established command; these identities match HEAD.",
+    "The verification report and implementation review are COMPLETE with AC-001 as a pending or permitted dependency on Documenter; the existing CLI tests are regression evidence for the unchanged command. No new runtime test is needed for a documentation-only contract.",
+    "No material discrepancy exists; the correct outcome is a COMPLETE synchronization record and a transition to AWAITING_USER_SIGNOFF."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "export-20260924T090000Z-a7f3c1d2",
+    "SCOPE": ".standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md",
+    "ARCH": ".standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md",
+    "DEV": ".standards/docs/development/export-20260924T090000Z-a7f3c1d2.md",
+    "VERIFICATION": ".standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md",
+    "REVIEW_IMPL": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md",
+    "REVIEW_FINAL": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md",
+    "DOC": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md",
+    "SYNC": ".standards/docs/synchronization/export-20260924T090000Z-a7f3c1d2.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "contains": {
+            "path": "${SYNC}",
+            "regex": "docs/cli[.]md"
+          },
+          "why": "a reconciliation of this cycle must name the guide it changed"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "state": "Handoff.Kind",
+          "not": "FAILURE",
+          "why": "no discrepancy exists, so no failure is routed"
+        },
+        {
+          "unchanged": [
+            "bin/**",
+            "src/**",
+            "test/**",
+            "examples/**",
+            "package.json"
+          ],
+          "why": "Synchronizer does not add tests or change the command"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "AWAITING_USER_SIGNOFF"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FORWARD"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "SYNCHRONIZING"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "false"
+        },
+        {
+          "provenance": {
+            "path": "${SYNC}",
+            "artifact": "SYNCHRONIZATION",
+            "cycle": "${ID}"
+          }
+        },
+        {
+          "field": {
+            "path": "${SYNC}",
+            "name": "Status",
+            "equals": "COMPLETE"
+          }
+        },
+        {
+          "check_ok": true
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "bin/**",
+        "src/**",
+        "test/**",
+        "docs/**",
+        "examples/**",
+        "README.md",
+        "package.json",
+        ".standards/CONTEXT.md",
+        ".standards/docs/scope/**",
+        ".standards/docs/specs/**",
+        ".standards/docs/development/**",
+        ".standards/docs/verification/**",
+        ".standards/docs/reviews/**",
+        ".standards/docs/documentation/**"
+      ],
+      "why": "Synchronizer owns only its record and the state coordination update"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "npm test",
+      "expect": "pass",
+      "why": "the established test command passes offline"
+    },
+    {
+      "cmd": "node --test test/csv.test.js test/cli.test.js 2>&1 | grep -qE 'pass 11$'",
+      "expect": "pass",
+      "why": "the suite runs 11 tests, the count the records cite"
+    },
+    {
+      "cmd": "node -e 'const { spawnSync } = require(`node:child_process`); const fs = require(`node:fs`); const os = require(`node:os`); const path = require(`node:path`); const tmp = fs.mkdtempSync(path.join(os.tmpdir(), `guide-`)); fs.cpSync(`examples`, path.join(tmp, `examples`), { recursive: true }); const bin = path.resolve(`bin/records-export.js`); const run = (...args) => spawnSync(process.execPath, [bin, ...args], { cwd: tmp, encoding: `utf8` }); const q = String.fromCharCode(34); const crlf = String.fromCharCode(13, 10); const lf = String.fromCharCode(10); const rows = (lines) => lines.map((line) => line + crlf).join(``); const lease = q + `Lease agreement, Building B` + q; const prio = q + `Q2 ` + q + q + `priority` + q + q + ` accounts review` + q; const all = rows([`id,title,owner,status`, `1,` + lease + `,dana,active`, `2,Vendor onboarding checklist,li,active`, `3,` + prio + `,dana,archived`]); const cols = rows([`id,title`, `1,` + lease, `2,Vendor onboarding checklist`, `3,` + prio]); const semi = rows([`id;title;owner;status`, `1;Lease agreement, Building B;dana;active`, `2;Vendor onboarding checklist;li;active`, `3;` + prio + `;dana;archived`]); const fail = (n, r) => { console.error(n, r.status, r.stdout, r.stderr); process.exit(n); }; let r = run(`examples/records.json`); if (r.status !== 0 || r.stdout !== all) fail(1, r); r = run(`examples/records.json`, `--columns`, `id,title`); if (r.status !== 0 || r.stdout !== cols) fail(2, r); r = run(`examples/records.json`, `--output`, `records.csv`); if (r.status !== 0 || r.stdout !== `` || r.stderr !== `records-export: wrote 3 records to records.csv` + lf || fs.readFileSync(path.join(tmp, `records.csv`), `utf8`) !== all) fail(3, r); r = run(`examples/records.json`, `--delimiter`, `;`); if (r.status !== 0 || r.stdout !== semi) fail(4, r); r = run(`--input`, `examples/records.json`); if (r.status !== 2 || !r.stderr.startsWith(`records-export: unknown option: --input`)) fail(5, r); r = run(`missing.json`); if (r.status !== 1) fail(6, r); r = run(`examples/records.json`, `--delimiter`, `||`); if (r.status !== 2) fail(7, r); r = run(`--version`); if (r.status !== 0 || r.stdout !== `1.2.0` + lf) fail(8, r); r = run(`-h`); if (r.status !== 0 || !r.stdout.startsWith(`Usage: records-export <input.json>`)) fail(9, r); console.log(`documented examples hold`);'",
+      "expect": "pass",
+      "why": "every example in the corrected guide runs as written with the stated output, file, and message, and the documented exit statuses, version, and help hold; the old --input form exits 2"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the SYNCHRONIZING state and records are valid"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && git diff --quiet HEAD",
+      "expect": "pass",
+      "why": "all work is committed"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `SYNCHRONIZING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Id`: `export-20260924T090000Z-a7f3c1d2`$' .standards/STATE.md && grep -q '^`Kind`: `FORWARD` `From`: `REVIEWING_FINAL` `FailureType`: `NONE`' .standards/STATE.md && grep -q '^`PromotionReason`: `NONE` `AuditTarget`: `NONE` `BlockedOn`: `NONE`$' .standards/STATE.md && grep -q '^`PendingVerificationCadence`: `NONE`$' .standards/STATE.md && grep -q '^`BaselineReconciliation`: `NONE`$' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md && grep -q 'ProjectMode`: `BROWNFIELD' .standards/MODE.md",
+      "expect": "pass",
+      "why": "SYNCHRONIZING after a forward handoff from final review, nothing blocked, recovery and obligations inactive, brownfield"
+    },
+    {
+      "cmd": "for f in .standards/docs/development/export-20260924T090000Z-a7f3c1d2.md .standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md .standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md .standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md .standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md; do grep -q '`Status`: `COMPLETE`' $f || exit 1; done && grep -q '`Assessment Purpose`: `FULL` `Assessment Target`: `NONE`' .standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md && ! grep -rqE '^### (F|D|DOC|DEV)-' .standards/docs && test ! -e .standards/docs/synchronization",
+      "expect": "pass",
+      "why": "plan, verification, both reviews, and documentation record are COMPLETE with no findings or discrepancy entries; no synchronization record exists"
+    },
+    {
+      "cmd": "test $(grep -c '^- `AC-' .standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md) -eq 1 && grep -q '^- `AC-001`: No architectural impact' .standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md && ! grep -rqE 'AC-00[2-9]' .standards/docs",
+      "expect": "pass",
+      "why": "the scope defines only AC-001 and the design records no architectural impact for it"
+    },
+    {
+      "cmd": "c=$(git log --format=%H -1 --fixed-strings --grep='Record project context for CLI guide update') && test $(git diff --name-only $c HEAD -- . ':!.standards') = docs/cli.md && b=$(git log --format=%H -1 --fixed-strings --grep='Add CLI usage guide and sample records') && git diff --quiet $b HEAD -- bin src test examples package.json README.md .gitignore && git show $b:docs/cli.md | grep -q -- '--input examples/records.json'",
+      "expect": "pass",
+      "why": "the cycle changed only docs/cli.md outside .standards, and the pre-cycle guide had the old --input examples"
+    },
+    {
+      "cmd": "d=.standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md && f=.standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md && grep -q $(git rev-parse HEAD:docs/cli.md) $d && grep -q $(git rev-parse HEAD:docs/cli.md) $f && grep -q $(git rev-parse HEAD:src/cli.js) $f && grep -q $(git log --format=%H -1 --fixed-strings --grep='Correct invocation examples in CLI guide') $d && grep -q $(git log --format=%H -1 --fixed-strings --grep='Record CLI guide documentation') $f && ! grep -rqE 'COMMIT:|BLOB:' .standards/docs .standards/CONTEXT.md",
+      "expect": "pass",
+      "why": "documentation checks and final review identify the current guide and command by identities equal to HEAD; no placeholder is left"
+    },
+    {
+      "cmd": "git log -9 --format=%s | paste -s -d '|' - | grep -qx 'Record CLI guide final review|Record CLI guide documentation|Correct invocation examples in CLI guide|Record CLI guide implementation review|Record CLI guide verification|Record development plan for CLI guide update|Record design for CLI guide update|Define CLI guide correction scope|Record project context for CLI guide update'",
+      "expect": "pass",
+      "why": "history follows the brownfield order"
+    }
+  ],
+  "notes": "Standalone fixture (the suggested export-synchronizing base changes source code, which contradicts a documentation-only cycle). Pre-install: 50-cli commits a small Node ESM command records-export (bin/records-export.js, src/cli.js with parseArgs/USAGE/run, src/csv.js with RFC 4180 quoting, 11 node:test tests, .gitignore with node_modules and *.csv); 52-guide adds README.md, examples/records.json, and docs/cli.md whose examples use --input, --out, -d, and a space-separated column list, none of which the command accepts. Then the brownfield install. Post-install layers follow the standard brownfield order for cycle export-20260924T090000Z-a7f3c1d2: 60 context (STATE SCOPING), 62 scope with one condition AC-001 (examples run as written and match the command; STATE ARCHITECTING), 64 design with AC-001 No architectural impact (STATE DEVELOPING), 66 a COMPLETE development plan with no build steps (Plan Notes explain why; STATE TESTING), 68 COMPLETE FULL verification with AC-001 pending Documenter and npm test as regression evidence (STATE REVIEWING_IMPLEMENTATION), 70 COMPLETE implementation review, no findings, AC-001 permitted dependency (STATE DOCUMENTING), 72 the corrected docs/cli.md (only project file changed in the cycle), 74 COMPLETE documentation record whose checks run every example and inspect options/exit status against src/cli.js (STATE REVIEWING_FINAL), 76 COMPLETE final-deliverable review re-running the examples (STATE SYNCHRONIZING, FORWARD from REVIEWING_FINAL). Records cite revisions and contents with COMMIT/BLOB placeholders, all equal to HEAD. No synchronization record exists; tree clean; check passes.",
+  "case": "synchronizer-15",
+  "caseHash": "565e9da211fabdcb",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T14:32:57.305Z",
+    "verdict": "pass",
+    "fixtureHash": "22b947b36a6a5dba",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "064af47016539746",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:36:46.613Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T13:05:40.080Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/60-context/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/62-scope/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/64-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/66-plan/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/68-verification/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/70-review/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/74-documentation/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/76-final-review/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:36:46.613Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

@@ -1,0 +1,315 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-store",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Set up record store"
+    },
+    {
+      "dir": "layers/52-import",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add CSV import of records"
+    },
+    {
+      "dir": "layers/60-context",
+      "action": "commit",
+      "message": "Record project context for CSV export"
+    },
+    {
+      "dir": "layers/62-scope",
+      "action": "commit",
+      "message": "Define CSV export scope"
+    },
+    {
+      "dir": "layers/64-design",
+      "action": "commit",
+      "message": "Design CSV export"
+    },
+    {
+      "dir": "layers/66-plan",
+      "action": "commit",
+      "message": "Plan CSV export implementation"
+    },
+    {
+      "dir": "layers/68-export",
+      "action": "commit",
+      "message": "Add CSV export of filtered records"
+    },
+    {
+      "dir": "layers/70-complete",
+      "action": "commit",
+      "message": "Mark CSV export plan complete"
+    },
+    {
+      "dir": "layers/72-verification",
+      "action": "commit",
+      "message": "Record CSV export verification"
+    },
+    {
+      "dir": "layers/74-review",
+      "action": "commit",
+      "message": "Record in-progress implementation review"
+    },
+    {
+      "dir": "layers/80-worktree",
+      "action": "unstaged"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "reviewer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The unstaged src/csv.js replaces the character-by-character parseCsv with a version that splits the text on line breaks first, parses each line separately, and skips blank lines; csvField and formatCsv are byte-identical to the committed version, so the export side is unchanged.",
+    "With the unstaged parseCsv, a quoted field containing a line break no longer parses: exporting a record whose title contains a line break still produces correctly quoted CSV, but importRecords on that output throws 'row 2: expected 4 fields, found 2'. The AC-002 round trip through the unchanged import path, and the design's round-trip technical criterion, therefore fail on the current working tree.",
+    "The unstaged test/fixtures/records.csv replaces record 4's two-line title (Office move, a line break, phase 2) with the single-line 'Office move, phase 2', removing the only line-break case that the csv, import, and export tests exercised. All 17 tests still pass on the dirty tree.",
+    "src/import.js, src/export.js, src/store.js, package.json, and every test file are unchanged since the committed review report's assessed revision. The committed implementation had no material defects and passed full verification.",
+    "Neither the development plan nor the verification report records the unstaged change; Tester's evidence (E1 and probe P1) assessed the committed revision. Who made the unstaged change is not recorded anywhere in the repository.",
+    "Evidence that does not depend on the changed parser or sample file: the AC-001 filtered-export scenario (inline records), the csvField and formatCsv writer scenarios, and the store tests. Evidence that relied on the sample file or on parseCsv (reader shape test, import tests, sample-file reproduction, the line-break round trip and probe P1) no longer applies to current content.",
+    "Scope, design, and context are unchanged."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "export-20260924T090000Z-a7f3c1d2",
+    "SCOPE": ".standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md",
+    "ARCH": ".standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md",
+    "DEV": ".standards/docs/development/export-20260924T090000Z-a7f3c1d2.md",
+    "VERIFICATION": ".standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md",
+    "REVIEW": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md",
+    "CONTEXT": ".standards/CONTEXT.md",
+    "REVIEWED_COMMIT": "${COMMIT:Record CSV export verification}"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${REVIEW}"
+        },
+        {
+          "provenance": {
+            "path": "${REVIEW}",
+            "artifact": "REVIEW",
+            "cycle": "${ID}",
+            "kind": "IMPLEMENTATION"
+          }
+        },
+        {
+          "field": {
+            "path": "${REVIEW}",
+            "name": "Status",
+            "not": "COMPLETE"
+          },
+          "why": "Tester evidence covers the committed revision, not the current helper and sample file, so the gate cannot pass in this run"
+        },
+        {
+          "state": "WorkflowState",
+          "not": "DOCUMENTING",
+          "why": "a correct run cannot take the normal forward handoff on stale evidence"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "${SCOPE}",
+            "${ARCH}",
+            "${CONTEXT}",
+            "${DEV}",
+            "${VERIFICATION}"
+          ],
+          "why": "requirements and other roles' records stay as they are; Reviewer does not edit them"
+        },
+        {
+          "contains": {
+            "path": "${REVIEW}",
+            "regex": "test/fixtures/records.csv"
+          }
+        },
+        {
+          "contains": {
+            "path": "${REVIEW}",
+            "regex": "src/csv.js"
+          }
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "changed": [
+            "${REVIEW}"
+          ],
+          "why": "reconciliation must persist updated progress and identities in the report"
+        },
+        {
+          "field": {
+            "path": "${REVIEW}",
+            "name": "Cycle",
+            "equals": "${ID}"
+          }
+        },
+        {
+          "field": {
+            "path": "${REVIEW}",
+            "name": "ReviewKind",
+            "equals": "IMPLEMENTATION"
+          }
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "Reviewer must not change the assessed identity or commit"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Reviewer must not change git state (no stash, checkout, reset, or commit)"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "package.json"
+      ],
+      "why": "Reviewer does not edit implementation, tests, or the sample file"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "npm test",
+      "expect": "pass",
+      "why": "the established test command passes on the dirty working tree"
+    },
+    {
+      "cmd": "npm test 2>&1 | grep -qE 'pass 17$'",
+      "expect": "pass",
+      "why": "all 17 tests still pass after the unstaged helper and sample-file change"
+    },
+    {
+      "cmd": "d=$(mktemp -d) && git archive $(git log --format=%H -1 --fixed-strings --grep='Add CSV import of records') | tar -x -C $d && cd $d && node --test test/store.test.js test/csv.test.js test/import.test.js 2>&1 | grep -qE 'pass 11$'",
+      "expect": "pass",
+      "why": "CONTEXT.md evidence: 11 tests passed at the import commit"
+    },
+    {
+      "cmd": "d=$(mktemp -d) && git archive HEAD | tar -x -C $d && cd $d && node --test test/store.test.js test/csv.test.js test/import.test.js test/export.test.js 2>&1 | grep -qE 'pass 17$' && node --input-type=module -e 'const { RecordStore } = await import(`./src/store.js`); const { importRecords } = await import(`./src/import.js`); const { exportRecords } = await import(`./src/export.js`); const title = `Office move` + String.fromCharCode(10) + `phase 2`; const store = new RecordStore(); store.add({ id: 4, title, owner: `marco`, status: `active` }); const target = new RecordStore(); importRecords(target, exportRecords(store)); if (target.get(4).title !== title) process.exit(3); console.log(`round trip ok`);'",
+      "expect": "pass",
+      "why": "the committed revision passes 17 tests and round-trips a title containing a line break through export and import"
+    },
+    {
+      "cmd": "node --input-type=module -e 'const { RecordStore } = await import(`./src/store.js`); const { importRecords } = await import(`./src/import.js`); const { exportRecords } = await import(`./src/export.js`); const title = `Office move` + String.fromCharCode(10) + `phase 2`; const store = new RecordStore(); store.add({ id: 4, title, owner: `marco`, status: `active` }); const csv = exportRecords(store); if (!csv.includes(String.fromCharCode(34) + title + String.fromCharCode(34))) { console.log(`export did not quote the title`); process.exit(0); } importRecords(new RecordStore(), csv); console.log(`round trip ok`);'",
+      "expect": "fail",
+      "expectOutput": "row 2: expected 4 fields, found 2",
+      "why": "on the dirty tree the export still quotes the line break, but the unchanged import path can no longer read it back"
+    },
+    {
+      "cmd": "test $(git diff --name-only | paste -s -d , -) = src/csv.js,test/fixtures/records.csv && git diff --cached --quiet && test -z $(git ls-files --others --exclude-standard | head -1)",
+      "expect": "pass",
+      "why": "the only working-tree changes are unstaged edits to the shared CSV helper and its sample file"
+    },
+    {
+      "cmd": "git diff --quiet HEAD -- src/import.js src/export.js src/store.js package.json test ':!test/fixtures' && ! git diff HEAD -- src/csv.js | grep -E '^[-+]' | grep -v '^[-+][-+]' | grep -qE 'csvField|formatCsv'",
+      "expect": "pass",
+      "why": "the import path, export module, store, and tests are unchanged; in src/csv.js only the reader changed"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the REVIEWING_IMPLEMENTATION state and records are valid"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `REVIEWING_IMPLEMENTATION` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Id`: `export-20260924T090000Z-a7f3c1d2`$' .standards/STATE.md && grep -q '^`Kind`: `FORWARD` `From`: `TESTING` `FailureType`: `NONE`' .standards/STATE.md && grep -q '^`PromotionReason`: `NONE` `AuditTarget`: `NONE` `BlockedOn`: `NONE`$' .standards/STATE.md && grep -q '^`PendingVerificationCadence`: `NONE`$' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md && grep -q 'ProjectMode`: `BROWNFIELD' .standards/MODE.md",
+      "expect": "pass",
+      "why": "STATE holds REVIEWING_IMPLEMENTATION, STANDARD, nothing blocked, recovery and obligations inactive"
+    },
+    {
+      "cmd": "f=.standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md && grep -q '`Status`: `IN_PROGRESS`' $f && grep -q $(git log --format=%H -1 --fixed-strings --grep='Record CSV export verification') $f && grep -q $(git rev-parse HEAD:src/csv.js) $f && grep -q $(git rev-parse HEAD:test/fixtures/records.csv) $f && ! grep -q $(git hash-object src/csv.js) $f && ! grep -q $(git hash-object test/fixtures/records.csv) $f && ! grep -qE 'COMMIT:|BLOB:' $f",
+      "expect": "pass",
+      "why": "the interrupted review report is IN_PROGRESS and records the committed identities, which predate the current helper and sample file"
+    },
+    {
+      "cmd": "f=.standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md && grep -q '`Status`: `COMPLETE`' $f && grep -q '`Assessment Purpose`: `FULL` `Assessment Target`: `NONE`' $f && grep -q $(git log --format=%H -1 --fixed-strings --grep='Mark CSV export plan complete') $f && grep -q $(git rev-parse HEAD:src/csv.js) $f && test ! -e .standards/docs/documentation && test ! -e .standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md",
+      "expect": "pass",
+      "why": "Tester's COMPLETE FULL report cites the committed revision and blobs"
+    },
+    {
+      "cmd": "git show HEAD:test/fixtures/records.csv | node -e 'process.exit(require(`fs`).readFileSync(0, `utf8`).split(String.fromCharCode(13)).length === 6 ? 0 : 1)' && git show HEAD:test/fixtures/records.csv | grep -q '^phase 2' && ! grep -q '^phase 2' test/fixtures/records.csv && grep -q 'Office move, phase 2' test/fixtures/records.csv",
+      "expect": "pass",
+      "why": "the committed sample file has CRLF rows and a two-line quoted title; the working-tree copy no longer has the line break"
+    },
+    {
+      "cmd": "git log -8 --format=%s | paste -s -d '|' - | grep -qx 'Record in-progress implementation review|Record CSV export verification|Mark CSV export plan complete|Add CSV export of filtered records|Plan CSV export implementation|Design CSV export|Define CSV export scope|Record project context for CSV export'",
+      "expect": "pass",
+      "why": "commit history follows the brownfield order"
+    }
+  ],
+  "notes": "Standalone fixture (base null): the export bases have no CSV import path sharing a helper with the export, and a case cannot add pre-install layers. Two pre-install commits build a small plain-JS ESM record store (src/store.js) and a CSV import (src/csv.js parseCsv, src/import.js importRecords, test/fixtures/records.csv with CRLF rows and a two-line quoted title in record 4). STANDARDS is installed brownfield with hooks. Cycle export-20260924T090000Z-a7f3c1d2 then runs: 60 context (STATE SCOPING), 62 scope (AC-001 filtered export, AC-002 RFC 4180 quoting so exported files import back unchanged; STATE ARCHITECTING), 64 design (writer added beside parseCsv in src/csv.js, new src/export.js, parseCsv and import unchanged, round-trip criterion; STATE DEVELOPING), 66 APPROVED plan, 68 implementation (csvField, formatCsv, exportRecords, six export tests; 17 tests total), 70 plan COMPLETE (STATE TESTING), 72 Tester COMPLETE FULL verification with blob identities and a line-break round-trip probe (STATE REVIEWING_IMPLEMENTATION, FORWARD from TESTING), 74 an IN_PROGRESS implementation review report recording the committed identities, with AC-001 and two AC-002 criteria supported and the import-side round trip not yet assessed. Layer 80 leaves unstaged edits to src/csv.js (parseCsv now splits on line breaks first and skips blank lines; writer unchanged) and the sample file (record 4 title made single-line), so all tests still pass but the unchanged import path can no longer read quoted line breaks that the export writes. Decided end state for the underspecified case: the dirty change is unrecorded by Developer or Tester and breaks AC-002 for line-break titles, so a correct review cannot pass; routing to Developer, a finding, or a blocking question about the change are all acceptable. The sample file contains literal CR characters.",
+  "case": "reviewer-4",
+  "caseHash": "83604c72d6eb73dd",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T23:17:29.427Z",
+    "verdict": "pass",
+    "fixtureHash": "c0d86363d6ac722f",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "f7287018f7055ade",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:22:58.617Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T21:40:33.632Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/60-context/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/62-scope/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/64-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/66-plan/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/70-complete/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/72-verification/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:22:58.617Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

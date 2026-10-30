@@ -1,0 +1,92 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState TESTING, Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md head and Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, Architecture and Development reference current-cycle artifacts",
+      "where": "STATE.md Active Work paths; provenance blocks in .standards/docs/scope, specs, development (Cycle matches)",
+      "status": "realized"
+    },
+    {
+      "condition": "Valid Auditor context exists",
+      "where": ".standards/CONTEXT.md (pre-cycle baseline; planned export work does not make it stale)",
+      "status": "realized"
+    },
+    {
+      "condition": "Tester is a downstream rerun under an outer frame Owner=SCOPING, ResumeAt=REVIEWING_FINAL, RerunThrough=TESTING",
+      "where": "STATE.md Recovery Frame 1 (From REVIEWING_FINAL, FailureType SCOPING); Handoff FORWARD from DEVELOPING; layers 65-85 history",
+      "status": "realized"
+    },
+    {
+      "condition": "A valid established integration request returns protected CSV to a non-admin",
+      "where": "src/routes/export.ts uses authorize(request.user, ROLES); test/integration/export-access.test.ts viewer/editor scenarios fail with 201 !== 403 (selfChecks 5-7)",
+      "status": "realized"
+    },
+    {
+      "condition": "Behavior contradicts AC-002 and the server-side authorization contract",
+      "where": "scope AC-002; design Interfaces and Contracts (requireAdmin, 403 for editor/viewer)",
+      "status": "realized"
+    },
+    {
+      "condition": "The access test is established and runnable, so the reproducer can be preserved",
+      "where": "test/integration/export-access.test.ts committed by first Tester pass; command recorded in verification report Execution Evidence 3",
+      "status": "realized"
+    },
+    {
+      "condition": "All work committed, clean tree",
+      "where": "git status clean; selfCheck 11",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "record-format",
+      "assertion": -1,
+      "detail": "expectCheck is ok:false with one problem: the first-pass verification report is COMPLETE but does not account for AC-003. During recovery the full check holds the current state's own COMPLETE record. This is a Tester-owned record that the role must reopen on entry, and the turn-end check does not hold it (atTurnEnd && phase === workflowState), so check_ok starts clean. This is an acceptable consequence of a scope rework that adds an AC.",
+      "recommendation": "run_as_is",
+      "fix": "None; the trade-off is consistent with the spec format's allowance for records the role is about to update."
+    },
+    {
+      "severity": "note",
+      "kind": "case-defect",
+      "assertion": -1,
+      "detail": "Adding AC-003 under protocol rule 9 would invalidate the COMPLETE implementation review and the documentation record. Strictly, Scoper's RerunThrough TESTING should therefore extend further, but the case states RerunThrough=TESTING. This does not affect the Tester's nested IMPLEMENTATION routing, because only the active frame owner plans reruns.",
+      "recommendation": "run_as_is",
+      "fix": "None needed for this case."
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 2,
+      "detail": "Assertion 2 is complete:true and checks Frame1 From/Owner/FailureType/ResumeAt/RerunThrough but not Frame1.Reason. A run that rewrote the outer frame's reason would still pass the 'outer frame remains intact' clause.",
+      "recommendation": "fix_file",
+      "fix": "In tester-6/spec.json checks[assertion 2].all, add {\"state\": \"Recovery.Frame1.Reason\", \"equals\": \"User asked that each export response name the requesting administrator.\"}."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 3,
+      "detail": "reply_matches 'active recovery' relies on the protocol's mandated recovery wording of the invocation. A correct run is expected to use it, because Handoff Rules require replacing 'active workflow' with 'active recovery'.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes the case faithfully. The run starts in TESTING as a downstream rerun under an intact SCOPING frame, and DEV-004 regressed the export to authorize(ROLES), so the established export-access tests fail for viewer/editor with 201 !== 403. No hints leak, and the checks and invariants are consistent with every correct routing (the nested FAILURE to DEVELOPING keeps the turn-end check clean whether the report ends IN_PROGRESS or BLOCKED). The remaining items are notes: the deliberate full-check problem on the Tester-owned COMPLETE report, the case's RerunThrough choice, and an optional Frame1.Reason check.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-01T18:38:54.590Z",
+  "costUsd": 0.4042912,
+  "ms": 77555,
+  "fixtureHash": "191612279ec24918"
+}

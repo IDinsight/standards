@@ -1,0 +1,307 @@
+{
+  "base": "export-project",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-context",
+      "action": "commit",
+      "message": "Record project context for CSV export"
+    },
+    {
+      "dir": "layers/52-scope",
+      "action": "commit",
+      "message": "Define CSV export scope"
+    },
+    {
+      "dir": "layers/54-design",
+      "action": "commit",
+      "message": "Design CSV export"
+    },
+    {
+      "dir": "layers/56-plan",
+      "action": "commit",
+      "message": "Plan CSV export implementation"
+    },
+    {
+      "dir": "layers/58-export",
+      "action": "commit",
+      "message": "Add CSV export of filtered records"
+    },
+    {
+      "dir": "layers/60-complete",
+      "action": "commit",
+      "message": "Mark CSV export plan complete"
+    },
+    {
+      "dir": "layers/62-access-test",
+      "action": "commit",
+      "message": "Add integration test for denied exports"
+    },
+    {
+      "dir": "layers/64-verification",
+      "action": "commit",
+      "message": "Record CSV export verification"
+    },
+    {
+      "dir": "layers/66-review",
+      "action": "commit",
+      "message": "Record CSV export implementation review"
+    },
+    {
+      "dir": "layers/68-guide",
+      "action": "commit",
+      "message": "Document CSV export in usage guide"
+    },
+    {
+      "dir": "layers/70-documentation",
+      "action": "commit",
+      "message": "Record CSV export documentation"
+    },
+    {
+      "dir": "layers/72-final-review",
+      "action": "commit",
+      "message": "Record CSV export final review"
+    },
+    {
+      "dir": "layers/80-migration",
+      "action": "untracked"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "synchronizer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "migrations/0001-created-at-millis.ts is untracked and has no git history at all; nothing in the repository establishes when or by whom it was written, or whether it is the migration the request refers to.",
+    "Active Work.Request in STATE.md says the export ships together with the pending records migration; the development plan summarizes the request without it and its Plan Notes say the untracked migration predates the cycle and is not part of it. The scope, design, and project context do not mention any migration.",
+    "The verification report, both review reports, and the documentation record each excluded the untracked migration because of the plan's note and did not assess it.",
+    "Whether the existing evidence applies depends on the migration's status: if it belongs to the cycle, nothing verified, reviewed, or documented it, and its up() rewrites every createdAt (2026-03-02T10:15:00Z becomes 2026-03-02T10:15:00.000Z), so the guide's CSV example and the integration test's expected file would no longer describe exported data; if it does not belong, the evidence applies as recorded.",
+    "Apart from this boundary question, the records are complete, their cited commits and blob identities match the tree, and the implementation, tests, and guide have no defects.",
+    "The expected outcome is a persisted boundary gap in the synchronization record, a SCOPING failure routed to Scoper with a recovery frame resuming at SYNCHRONIZING, no sign-off readiness, and the migration left untouched."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "export-20260924T090000Z-a7f3c1d2",
+    "SYNC": ".standards/docs/synchronization/export-20260924T090000Z-a7f3c1d2.md",
+    "DEV": ".standards/docs/development/export-20260924T090000Z-a7f3c1d2.md",
+    "MIGRATION": "migrations/0001-created-at-millis.ts",
+    "HEAD_COMMIT": "${COMMIT:Record CSV export final review}"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${MIGRATION}",
+          "why": "the migration is neither deleted nor moved"
+        },
+        {
+          "unchanged": [
+            "migrations/**"
+          ],
+          "why": "Synchronizer neither adopts nor discards the migration by editing it"
+        },
+        {
+          "exists": "${SYNC}",
+          "why": "the gap must be persisted in the synchronization record"
+        },
+        {
+          "contains": {
+            "path": "${SYNC}",
+            "regex": "0001-created-at-millis"
+          },
+          "why": "the record names the migration whose boundary status is unresolved"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "SCOPING",
+          "why": "the request includes the migration but the completed scope never decides it"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FAILURE",
+          "why": "routed as a failure handoff"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "SYNCHRONIZING",
+          "why": "the interrupted state"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "SCOPING",
+          "why": "SCOPING is the owning failure type"
+        },
+        {
+          "state": "Recovery.Top.Owner",
+          "equals": "SCOPING",
+          "why": "the recovery frame names the owner"
+        },
+        {
+          "state": "Recovery.Top.ResumeAt",
+          "equals": "SYNCHRONIZING",
+          "why": "work resumes where it was interrupted"
+        },
+        {
+          "field": {
+            "path": "${SYNC}",
+            "name": "Status",
+            "not": "COMPLETE"
+          },
+          "why": "the Synchronizer gate is not claimed"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Synchronizer must not change git state or the assessed identities"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "packages/**",
+        "docs/**",
+        "README.md",
+        "package.json",
+        "migrations/**",
+        ".standards/CONTEXT.md",
+        ".standards/docs/scope/**",
+        ".standards/docs/specs/**",
+        ".standards/docs/development/**",
+        ".standards/docs/verification/**",
+        ".standards/docs/reviews/**",
+        ".standards/docs/documentation/**"
+      ],
+      "why": "Synchronizer owns only its synchronization record; it does not edit implementation, tests, documentation, or other roles' records"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the unit suite passes offline"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration",
+      "expect": "pass",
+      "why": "the integration suite passes offline"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the SYNCHRONIZING state and records are valid"
+    },
+    {
+      "cmd": "git status --porcelain | grep -qx '?? migrations/' && test $(git status --porcelain | wc -l) -eq 1 && git diff --quiet HEAD",
+      "expect": "pass",
+      "why": "the only working-tree change is the untracked migrations folder"
+    },
+    {
+      "cmd": "test $(git log --all --format=%H -- migrations | wc -l) -eq 0 && ! git ls-files --error-unmatch migrations/0001-created-at-millis.ts",
+      "expect": "pass",
+      "why": "git history has no trace of the migration, so history cannot establish its origin"
+    },
+    {
+      "cmd": "! grep -rq created-at-millis src test packages docs README.md package.json",
+      "expect": "pass",
+      "why": "nothing in the project imports or mentions the migration"
+    },
+    {
+      "cmd": "node -e 'import(`./migrations/0001-created-at-millis.ts`).then((m) => { const out = m.up([{ id: 1, title: `Lease agreement, Building B`, owner: `dana`, status: `active`, createdAt: `2026-03-02T10:15:00Z` }]); if (out[0].createdAt !== `2026-03-02T10:15:00.000Z`) process.exit(1); }, () => process.exit(2))' && grep -q 'dana,active,2026-03-02T10:15:00Z$' docs/usage.md",
+      "expect": "pass",
+      "why": "applying the migration would change exported createdAt values away from what the guide example shows, so evidence applicability depends on it"
+    },
+    {
+      "cmd": "grep -q 'together with the pending records migration' .standards/STATE.md && grep -q 'WorkflowState`: `SYNCHRONIZING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`PromotionReason`: `NONE` `AuditTarget`: `NONE` `BlockedOn`: `NONE`$' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md && grep -q 'ProjectMode`: `BROWNFIELD' .standards/MODE.md",
+      "expect": "pass",
+      "why": "STATE is SYNCHRONIZING, nothing blocked, recovery and obligations inactive, and the request includes the migration"
+    },
+    {
+      "cmd": "p=.standards/docs/development/export-20260924T090000Z-a7f3c1d2.md && grep -q 'migrations/0001-created-at-millis.ts' $p && grep -q 'predates this cycle' $p && ! grep -q 'pending records migration' $p",
+      "expect": "pass",
+      "why": "the plan excludes the migration and its request summary omits it"
+    },
+    {
+      "cmd": "! grep -rqi migration .standards/docs/scope .standards/docs/specs .standards/CONTEXT.md",
+      "expect": "pass",
+      "why": "scope, design, and context are silent about the migration"
+    },
+    {
+      "cmd": "test ! -e .standards/docs/synchronization && ! grep -rqE 'COMMIT:|BLOB:' .standards/docs .standards/CONTEXT.md && grep -q $(git rev-parse HEAD:docs/usage.md) .standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md && grep -q $(git rev-parse HEAD:src/export.ts) .standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md",
+      "expect": "pass",
+      "why": "no synchronization record yet, placeholders resolved, and cited identities match HEAD"
+    }
+  ],
+  "notes": "Built on export-project (the parent of the suggested export-synchronizing), because the case needs the plan and the assessment records to have known about the untracked migration from the start; overlaying export-synchronizing would either change the plan's blob after every record cited it or leave records claiming nothing was untracked, which would date the migration after final review. Layers 50 to 72 reproduce export-synchronizing's layers 20 to 42 with the same commit subjects and the same code, tests, guide, scope, design, and context, with these changes: every STATE.md has the request `Let administrators export the filtered records list as CSV, together with the pending records migration; non-admins must not be able to export. Document the export in the usage guide.`; the plan's Implementation Contract summarizes the request without the migration and its Plan Notes say migrations/0001-created-at-millis.ts is uncommitted, predates this cycle, and is not part of it; Developer, Tester, both Reviewers, and Documenter records describe the working tree as having no tracked changes with that one untracked path, excluded per the plan and not assessed. Layer 80 leaves migrations/0001-created-at-millis.ts untracked: a migration whose up() rewrites createdAt to millisecond ISO strings, imported by nothing. Final state: SYNCHRONIZING, FORWARD from REVIEWING_FINAL, nothing blocked, no synchronization record.",
+  "case": "synchronizer-9",
+  "caseHash": "3cf066536034520a",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T19:39:25.491Z",
+    "verdict": "pass",
+    "fixtureHash": "961700d64a3340ce",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "775ba2ca57ef7cf6",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:33:52.703Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T12:55:32.698Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-context/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/52-scope/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/54-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/56-plan/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/60-complete/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/64-verification/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/66-review/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/70-documentation/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/72-final-review/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:33:52.703Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

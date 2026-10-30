@@ -1,0 +1,86 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState AUDITING, recovery and obligations inactive",
+      "where": ".standards/STATE.md (layer 80-cycle)",
+      "status": "realized"
+    },
+    {
+      "condition": "An initialized active cycle exists (new cycle after a signed-off one)",
+      "where": ".standards/STATE.md Id prorate-charges-...-8d41b0e2, Handoff NEW_CYCLE from SIGNED_OFF; prior cycle records under .standards/docs/",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.AuditTarget is services/billing",
+      "where": ".standards/STATE.md AuditTarget `services/billing`",
+      "status": "realized"
+    },
+    {
+      "condition": "A usable-looking project-level CONTEXT.md exists, so SUBTREE is the natural initial mode",
+      "where": ".standards/CONTEXT.md: complete template sections, names services/billing and its files",
+      "status": "realized"
+    },
+    {
+      "condition": "Context's language-version claim is stale",
+      "where": "CONTEXT.md says Node.js 18 / engines >=18; .nvmrc is 22 and package.json engines >=22",
+      "status": "realized"
+    },
+    {
+      "condition": "Context's build-system claim is stale",
+      "where": "CONTEXT.md describes npm workspaces, scripts/build.mjs, main dist/index.js; repo has pnpm-workspace.yaml, workspace:* deps, exports ./src/index.js, scripts/build.mjs deleted (selfCheck: pnpm run build fails)",
+      "status": "realized"
+    },
+    {
+      "condition": "Context's test-command claim is stale",
+      "where": "CONTEXT.md: npm run build + npm test --workspaces; package.json test is pnpm -r test (selfChecks: npm test --workspaces fails, pnpm test passes)",
+      "status": "realized"
+    },
+    {
+      "condition": "Context's workspace-boundary claims are stale",
+      "where": "CONTEXT.md names packages/shared / @tally/shared; repo has packages/money / @tally/money imported by billing and ledger",
+      "status": "realized"
+    },
+    {
+      "condition": "Staleness is discoverable from primary evidence during a billing-targeted inspection",
+      "where": "services/billing/package.json (workspace:*, exports src, @tally/money), invoice.js imports @tally/money; git log commit 151a2c0",
+      "status": "realized"
+    },
+    {
+      "condition": "No scope/architecture/development artifacts exist for the active cycle",
+      "where": "STATE.md Scope/Architecture/Development NONE; no records for the new ID",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 4,
+      "detail": "The `(^|[^0-9.])22([^0-9]|$)` contains check requires the rewritten CONTEXT.md to state the Node version. A correct run could in principle drop the version line instead of restating it, but the template asks for versions when material and the .nvmrc/engines evidence makes stating 22 the overwhelmingly likely correction.",
+      "recommendation": "run_as_is",
+      "fix": "Acceptable as is; optionally loosen to also accept `.nvmrc` being referenced, but not required."
+    },
+    {
+      "severity": "note",
+      "kind": "case-defect",
+      "assertion": 1,
+      "detail": "The skill offers subtree -> gapfill when the project baseline 'remains usable'. A run could arguably judge four wrong project-wide claims repairable via gapfill. The fixture makes the staleness broad (stack, tooling, build, commands, structure, evidence all wrong), which matches the case's 'no longer trustworthy' premise; the remaining call is the judge's.",
+      "recommendation": "run_as_is",
+      "fix": "None needed; the judge grades the escalation choice."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized: a complete-looking CONTEXT.md written for a prior signed-off cycle, persisted AuditTarget services/billing, and a later pnpm/Node 22/money migration that makes its language, build, test-command, and workspace claims wrong, discoverable from billing's own files and git history. Checks are necessary conditions for a correct run (AuditTarget NONE, rewritten context naming pnpm/22/money, no project or upstream-artifact changes), invariants are standard, and check.mjs plus all selfChecks pass. Only minor notes remain.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T21:06:30.906Z",
+  "costUsd": 0.83804,
+  "ms": 53849,
+  "fixtureHash": "7b6cec35b6bdb7b7"
+}

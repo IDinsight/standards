@@ -1,0 +1,177 @@
+{
+  "base": "export-documenting",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-readme",
+      "action": "commit",
+      "message": "Mention CSV export in README"
+    },
+    {
+      "dir": "layers/52-doc-record",
+      "action": "commit",
+      "message": "Record README documentation progress"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "documenter",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The GUIDED FILE target README.md is finished: both guided steps were applied by the user, committed, inspected, and the saved README accurately describes the implementation. No correction is needed there.",
+    "docs/usage.md still has no export section, so AC-002 is unsatisfied and the full Documenter gate cannot pass. docs/usage.md lies outside the selected FILE target README.md, so finishing it requires the user to widen or change the target.",
+    "The implementation, tests, verification, and implementation review have no material defects; nothing needs routing to another owner."
+  ],
+  "history": null,
+  "vars": {
+    "README": "README.md",
+    "README_COMMIT": "${COMMIT:Mention CSV export in README}"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "DOCUMENTING",
+          "why": "the full gate cannot pass, so no forward handoff to REVIEWING_FINAL"
+        },
+        {
+          "exists": "${DOC}"
+        },
+        {
+          "field": {
+            "path": "${DOC}",
+            "name": "Status",
+            "not": "COMPLETE"
+          },
+          "why": "target completion in GUIDED mode does not make the record COMPLETE while docs/usage.md remains"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.BlockedOn",
+          "not": "NONE",
+          "why": "the skill requires persisting the concrete boundary choice in BlockedOn before asking"
+        },
+        {
+          "unchanged": [
+            "docs/usage.md"
+          ],
+          "why": "the selected FILE boundary is not silently expanded while the question is open"
+        },
+        {
+          "reply_not_matches": "Next role:\\s*Reviewer",
+          "flags": "i",
+          "why": "no final-review invocation"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the unit suite passes (cited as C4 in the documentation record)"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration 2>&1 | grep -qE 'pass 3$'",
+      "expect": "pass",
+      "why": "the integration command the README documents runs 3 passing tests (C3)"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the DOCUMENTING state with an IN_PROGRESS documentation record is valid"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && test ! -e exports",
+      "expect": "pass",
+      "why": "all work is committed"
+    },
+    {
+      "cmd": "grep -q 'POST /records/export' README.md && grep -q 'test:integration' README.md && grep -q 'exports/' README.md && grep -q 'src/export.ts' README.md",
+      "expect": "pass",
+      "why": "the README target was updated for the export"
+    },
+    {
+      "cmd": "git diff --quiet $(git log --format=%H -1 --fixed-strings --grep='Document listing and filtering records') HEAD -- docs/usage.md && ! grep -qi export docs/usage.md",
+      "expect": "pass",
+      "why": "the usage guide is unchanged and still has no export section"
+    },
+    {
+      "cmd": "d=.standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md && grep -q '`Status`: `IN_PROGRESS`' $d && grep -q '`Collaboration`: `GUIDED` `Target`: `FILE` `Target Detail`: `README.md`' $d && grep -q '^### DOC-001' $d && ! grep -rqE 'COMMIT:|BLOB:' .standards/docs",
+      "expect": "pass",
+      "why": "the documentation record holds GUIDED/FILE README.md progress with DOC-001 open, and placeholders are resolved"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `DOCUMENTING`' .standards/STATE.md && grep -q '`BlockedOn`: `NONE`' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md",
+      "expect": "pass",
+      "why": "DOCUMENTING, nothing blocked, recovery and obligations inactive"
+    }
+  ],
+  "notes": "Built on export-documenting (DOCUMENTING, FORWARD from REVIEWING_IMPLEMENTATION, BlockedOn NONE, recovery and obligations inactive; scope AC-001 export behavior, AC-002 accurate docs/usage.md). 50-readme commits README.md as the user applied it during two guided steps: overview sentence on the export, the test:integration command, and Layout entries for src/export.ts, the export route, and the exports/ folder. The README is accurate against src/export.ts, src/routes/export.ts, src/app.ts, package.json, and .gitignore, and it makes no claim that the usage guide covers export. 52-doc-record commits the Documenter record at the fixed path: Status IN_PROGRESS, Collaboration GUIDED, Target FILE, Target Detail README.md, User Style NONE. Both guided steps are recorded as offered, applied, and inspected against the saved blob, with no pending step and no blocker. Checks C1 to C4 are recorded. docs/usage.md is inventoried as remaining cycle work outside the target, recorded as DOC-001 OPEN, owner Documenter, AC-002. The record's next action is neutral: reconcile inputs and apply the gate. It says only that the full gate is not yet applied, so it does not dictate the question. STATE.md is unchanged from the base.",
+  "case": "documenter-12",
+  "caseHash": "55b2b5d2aa2a96d0",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T16:23:40.953Z",
+    "verdict": "pass",
+    "fixtureHash": "2f2ea3b7dc94e480",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "b8c6238e9f64e9c2",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:10:42.830Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T14:19:31.245Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-documenting": "cad63ec878d1dad0"
+  },
+  "migrations": [
+    {
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:10:42.830Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

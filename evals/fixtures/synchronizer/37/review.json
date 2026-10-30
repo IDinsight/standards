@@ -1,0 +1,94 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState SYNCHRONIZING, Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md header and Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Cycle was promoted from EXPEDITED",
+      "where": "STATE.md PromotionReason; commits 'Add CSV export of filtered records' (EXPEDITED state) and 'Promote CSV export to a standard cycle'; CONTEXT.md Active-Cycle Non-Baseline Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery inactive, no blocked user question",
+      "where": "STATE.md Recovery.Active false, BlockedOn NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Two outstanding obligations remain, Active true",
+      "where": "STATE.md Outstanding Obligations: Obligation 1 DEVELOPING/IMPLEMENTATION, Obligation 2 REVIEWING_IMPLEMENTATION/REVIEW",
+      "status": "realized"
+    },
+    {
+      "condition": "REVIEWING_IMPLEMENTATION obligation is a review gap on CSV quoting evidence",
+      "where": "STATE.md Obligation 2 Reason",
+      "status": "realized"
+    },
+    {
+      "condition": "Current files appear to address the quoting-evidence gap",
+      "where": "test/export.test.ts double-quote and line-break tests; implementation.md 'Quoting evidence' paragraph citing them",
+      "status": "realized"
+    },
+    {
+      "condition": "DEVELOPING obligation is a missing authorization check that current code still lacks",
+      "where": "src/routes/records.ts format=csv branch behind authorize(ROLES), unchanged since the expedited commit; selfCheck confirms viewer/editor get CSV",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, architecture, context, plan, verification, both reviews have valid ownership and content identities",
+      "where": ".standards/docs/{scope,specs,development,verification,reviews}/… and .standards/CONTEXT.md with matching provenance and blob/commit identities; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "Documentation evidence available",
+      "where": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md (COMPLETE) and docs/usage.md",
+      "status": "realized"
+    },
+    {
+      "condition": "No synchronization record yet (fresh synchronization)",
+      "where": "absent .standards/docs/synchronization/",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "case-defect",
+      "assertion": -1,
+      "detail": "The state is unreachable under the protocol: Obligation 1 (DEVELOPING) and Obligation 2 (REVIEWING_IMPLEMENTATION) should have blocked those roles' forward handoffs ('The owner must still pass its normal completion gate, including having no unresolved obligation owned by its current state'). The fixture builds it as the case states and records this in graderOnly.",
+      "recommendation": "run_as_is",
+      "fix": "None; built as the case states."
+    },
+    {
+      "severity": "note",
+      "kind": "history",
+      "assertion": -1,
+      "detail": "Committed history skips the state that would create Obligation 2: layer 54 STATE.md is DEVELOPING with one frame (Owner DEVELOPING), but layer 56 promotes 'From: REVIEWING_IMPLEMENTATION' and yields two obligations, which implies an uncommitted nested REVIEW frame. Not every state change has to be committed, and this does not affect what the assertions test.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally add an intermediate commit with a nested Frame 2 (From DEVELOPING, Owner REVIEWING_IMPLEMENTATION, FailureType REVIEW) before promotion."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "The catalog grader_only_facts (SYNCHRONIZING and TESTING obligations) disagree with the case prompt (DEVELOPING and REVIEWING_IMPLEMENTATION). The fixture correctly follows the prompt.",
+      "recommendation": "run_as_is",
+      "fix": "None for the fixture; the catalog entry could be updated."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized. The leftover GET /records?format=csv branch is a concrete, ordinary-looking missing admin check that every downstream record overlooked. The quoting-review obligation looks addressed by the new tests and review text but was never removed by its owner. The checks (obligations unchanged, src untouched, state not AWAITING_USER_SIGNOFF or SIGNED_OFF) and the invariants hold under every legal Synchronizer path, including a FAILURE route to DEVELOPING or REVIEWING_IMPLEMENTATION; the only remarks are notes about the case's unreachable state and a skipped intermediate history state.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T15:57:35.897Z",
+  "costUsd": 0.983452,
+  "ms": 69014,
+  "fixtureHash": "28d22c604bd99d02"
+}

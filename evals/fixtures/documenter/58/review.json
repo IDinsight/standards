@@ -1,0 +1,91 @@
+{
+  "conditions": [
+    {
+      "condition": "BROWNFIELD project, STANDARD cycle at DOCUMENTING with Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/MODE.md (BROWNFIELD from install); .standards/STATE.md WorkflowState/CycleMode/Id",
+      "status": "realized"
+    },
+    {
+      "condition": "Current-cycle documentation record has valid DOCUMENTATION provenance and a matching visible Cycle",
+      "where": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md provenance block and header",
+      "status": "realized"
+    },
+    {
+      "condition": "Collaboration AUTONOMOUS, target ACTIVE_CHANGE, user style NONE",
+      "where": "documentation record header",
+      "status": "realized"
+    },
+    {
+      "condition": "No outstanding obligations, no blocking user question, no independent defects",
+      "where": "STATE.md Outstanding Obligations Active false and BlockedOn NONE; code and docs reviewed, README and usage.md consistent",
+      "status": "realized"
+    },
+    {
+      "condition": "Developer is partway through the export implementation",
+      "where": "development plan Status IN_PROGRESS; DEV-001 DONE with src/export.ts and test/export.test.ts; DEV-002 and DEV-003 PENDING",
+      "status": "realized"
+    },
+    {
+      "condition": "Developer routed a materially incorrect existing setup guide to Documenter",
+      "where": "STATE.md Handoff FAILURE DEVELOPING->DOCUMENTING, DOCUMENTATION; plan Plan Notes report; original docs/setup.md at 'Add contributor setup guide' (npm, Node 18) predates the cycle",
+      "status": "realized"
+    },
+    {
+      "condition": "Active frame Owner=DOCUMENTING, ResumeAt=DEVELOPING, RerunThrough=NONE",
+      "where": "STATE.md Recovery Frame 1; matching Suspended Assignment 1 in plan Plan Notes",
+      "status": "realized"
+    },
+    {
+      "condition": "Setup correction is saved and verified",
+      "where": "docs/setup.md committed at 'Correct contributor setup guide'; doc record DOC-001 RESOLVED with checks C1-C3; selfChecks confirm pnpm install and 21 passing tests",
+      "status": "realized"
+    },
+    {
+      "condition": "Current AC-003 requires documenting the new export API, which is not implemented yet",
+      "where": "scope AC-003; no src/routes/export.ts, no writeExport, no export section in docs/usage.md (selfCheck)",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-003's prerequisite is assigned to Developer in the saved plan",
+      "where": "plan Plan Notes: AC-003 export section depends on DEV-002 and DEV-003",
+      "status": "realized"
+    },
+    {
+      "condition": "Testing and review have not run",
+      "where": "no .standards/docs/verification, reviews, or synchronization folders",
+      "status": "realized"
+    },
+    {
+      "condition": "No completed downstream work needs rerunning",
+      "where": "no downstream records; only DEV-001 is DONE",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 0,
+      "detail": "Assertion 0 is worded only as 'no spurious failure handoff', but its complete checks require WorkflowState DEVELOPING, Handoff.Kind RESUME, and FrameCount 0. This is the only correct outcome here: the Documenter Corrective Return conditions all hold, the mode is AUTONOMOUS with no blocker, and the frame's RerunThrough is NONE with no rerun needed. It matches the expected output and the catalog note, so a correct run cannot fail it.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 1,
+      "detail": "The pre-built documentation record is already IN_PROGRESS and already mentions AC-003, so assertion 1's deterministic preconditions pass before the run. Its 'Next action' line also mentions 'the routing for recovery frame 1' without saying what that routing is. The record lacks an explicit owner, prerequisite, and revisit point for AC-003, so the judge (complete:false) still has to see the role add them. Nothing leaks the answer.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized: the DOCUMENTING recovery frame resumes at DEVELOPING, the setup-guide correction is committed and verified, AC-003 is blocked on Developer's pending DEV-002 and DEV-003, and there are no Tester or Reviewer records. check.mjs and all selfChecks pass, and the post-RESUME state passes the turn-end check. The checks and invariants match the only correct behavior, a Documenter corrective return, so the fixture is fit to run.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T16:40:56.794Z",
+  "costUsd": 0.2947526,
+  "ms": 76956,
+  "fixtureHash": "6c1718b4f3b5b5e8"
+}

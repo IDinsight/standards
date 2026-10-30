@@ -1,0 +1,83 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is BROWNFIELD",
+      "where": ".standards/MODE.md (brownfield install)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState REVIEWING_IMPLEMENTATION, Handoff FORWARD from TESTING",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id is export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md Active Work.Id; provenance of every record",
+      "status": "realized"
+    },
+    {
+      "condition": "Current scope, architecture, context, development plan and Tester report exist with valid ownership",
+      "where": ".standards/docs/scope|specs|development|verification/<id>.md, .standards/CONTEXT.md; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and outstanding obligations inactive",
+      "where": ".standards/STATE.md Recovery/Outstanding Obligations Active false",
+      "status": "realized"
+    },
+    {
+      "condition": "All implementation obligations (AC-001, AC-002) and technical criteria have current satisfactory evidence",
+      "where": "src/export.ts, src/routes/export.ts (requireAdmin first), test/export.test.ts, test/integration/export-flow.test.ts; verification report E1/E2/I1; selfChecks 21 and 3 tests pass, denied requests write no folder",
+      "status": "realized"
+    },
+    {
+      "condition": "No material defects in implementation, tests, or records",
+      "where": "Code read: RFC 4180 quoting correct, auth precedes parseFilter and write, filters reuse parseFilter/store.list, counts in records match actual runs",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-003 separately requires an operations guide during DOCUMENTING",
+      "where": "scope work item 3 AC-003; no guide in docs/ or README.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Design records AC-003 as a later (documentation) dependency with no architectural impact",
+      "where": "specs Acceptance Coverage `AC-003`: No architectural impact; Risks and Follow-up",
+      "status": "realized"
+    },
+    {
+      "condition": "Tester report explicitly records AC-003 as pending later role Documenter",
+      "where": "verification report Acceptance Evidence AC-003 row and Open Findings and Dependencies",
+      "status": "realized"
+    },
+    {
+      "condition": "Reviewer runs in an independent chat",
+      "where": "fresh headless session, history null",
+      "status": "realized"
+    },
+    {
+      "condition": "No implementation review report exists yet; clean committed tree",
+      "where": "git status clean; selfCheck confirms .standards/docs/reviews absent",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-wrong",
+      "assertion": 1,
+      "detail": "Assertion 1 is marked complete:true with only `contains` checks for AC-001/AC-002/AC-003 in the review report. A report that names AC-003 only in an inventory line (e.g. 'current acceptance set AC-001 to AC-003') without any disposition would pass, so the checks are necessary but not fully sufficient for 'accounts for every current ID'. This can only produce a lenient pass, never a false fail, and the catalog endorsed it.",
+      "recommendation": "fix_file",
+      "fix": "In reviewer-18/spec.json checks entry for assertion 1, change \"complete\": true to \"complete\": false so the judge confirms each ID, including AC-003, has a disposition (permitted dependency with owner Documenter)."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition: a coherent STANDARD brownfield cycle in REVIEWING_IMPLEMENTATION with complete, consistent records, a defect-free implementation whose tests pass, and AC-003 recorded as a Documenter dependency in both design and Tester report. Checks and invariants cannot fail a correct run; the only note is that assertion 1's complete:true is slightly lenient and could be left to the judge.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T23:23:52.150Z",
+  "costUsd": 0.3238168,
+  "ms": 101320,
+  "fixtureHash": "839e614dcae99c4c"
+}

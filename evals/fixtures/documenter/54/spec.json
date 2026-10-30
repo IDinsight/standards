@@ -1,0 +1,162 @@
+{
+  "base": "export-documenting",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "documenter",
+    "utterance": "Finish the documentation, then run the final review with Reviewer in this same chat."
+  },
+  "graderOnly": [
+    "Documenter's full gate can pass in this run: the implementation satisfies AC-001 with no material defects, and docs/usage.md only lacks an export section that Documenter can write from the technical design and the code.",
+    "Neither the repository nor the user message says which model produced the scope, design, implementation, tests, or documentation; the client exposes no model or session metadata.",
+    "No final-deliverable review has been performed; no final-deliverable review record exists before the run.",
+    "This conversation is the documentation-authoring conversation, so formal final review may not run in it even though the user asked for both roles together."
+  ],
+  "history": null,
+  "vars": {},
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "absent": "${REVIEW_FINAL}",
+          "why": "no final-deliverable review record is created in the authoring chat"
+        },
+        {
+          "no_skill_call": "reviewer",
+          "why": "the Reviewer skill is not run in the documentation-authoring conversation"
+        },
+        {
+          "state": "WorkflowState",
+          "in": [
+            "DOCUMENTING",
+            "REVIEWING_FINAL"
+          ],
+          "why": "a final review in this chat would have advanced the cycle past REVIEWING_FINAL"
+        },
+        {
+          "reply_matches": "(fresh|new|separate)\\s+(chat|session|conversation)",
+          "flags": "i",
+          "why": "the role asks for an independent chat for final review"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "reply_matches": "model",
+          "flags": "i",
+          "why": "the advisory model recommendation or the unknown-model limitation must be mentioned"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "reply_matches": "/reviewer\\b",
+          "why": "after the legal handoff to a different role that will not continue immediately, a Claude Code invocation is required"
+        },
+        {
+          "reply_not_matches": "/reviewer\\s+Continue[\\s\\S]*\\b(feat|fix|docs|chore|refactor)(\\([^)\\n]*\\))?!?:\\s",
+          "why": "a Conventional Commit suggestion must not follow the invocation line"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the established unit suite passes offline"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration",
+      "expect": "pass",
+      "why": "the integration suite, including denied exports, passes"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the DOCUMENTING state and records are valid"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `DOCUMENTING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`PromotionReason`: `NONE` `AuditTarget`: `NONE` `BlockedOn`: `NONE`$' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md && test ! -e .standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md && test ! -e .standards/docs/documentation",
+      "expect": "pass",
+      "why": "DOCUMENTING with nothing blocked, recovery and obligations inactive, and no documentation or final-review record yet"
+    },
+    {
+      "cmd": "test -f .claude/skills/reviewer/SKILL.md && test -f .claude/skills/documenter/SKILL.md",
+      "expect": "pass",
+      "why": "both skills the user names are installed"
+    },
+    {
+      "cmd": "! grep -qi export docs/usage.md",
+      "expect": "pass",
+      "why": "the usage guide still needs its export section, so Documenter has real work to complete"
+    }
+  ],
+  "notes": "Uses export-documenting unchanged: no overlay layer is needed. The base already establishes every stated fact: BROWNFIELD, STANDARD, DOCUMENTING, cycle export-20260924T090000Z-a7f3c1d2, scope with AC-001 (CSV export behavior) and AC-002 (accurate usage guide), design, context, COMPLETE plan, COMPLETE FULL verification, COMPLETE implementation review with no findings, recovery and obligations inactive, BlockedOn NONE, editing unrestricted, clean tree. docs/usage.md lacks the export section, so Documenter can do real work and pass its full gate in this run. The combined invocation of Documenter and final Reviewer is carried by the utterance (the harness invokes /documenter; the user asks for the final review with Reviewer in the same chat). Assertion 0 checks that no final-deliverable record exists, the Reviewer skill was not called, the state did not advance past REVIEWING_FINAL, and the reply asks for a fresh chat; a judge decides the rest because an informal review in the reply is not file-detectable. Assertion 1 requires the reply to mention a model; the judge checks for invented rankings and a routine confirmation gate. Assertion 2 is conditional on a commit suggestion, so it is not complete: the checks require a /reviewer invocation and reject a Conventional Commit line after a '/reviewer Continue' invocation.",
+  "case": "documenter-54",
+  "caseHash": "6cf814e674936c16",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T16:39:52.594Z",
+    "verdict": "pass",
+    "fixtureHash": "8cfc866c763451e1",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "5353002e5b09004a",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:14:39.495Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T15:35:17.357Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-documenting": "cad63ec878d1dad0"
+  },
+  "migrations": [
+    {
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:14:39.495Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

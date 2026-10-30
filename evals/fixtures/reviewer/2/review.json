@@ -1,0 +1,104 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState REVIEWING_IMPLEMENTATION, Active Work.Id export-20260924T090000Z-a7f3c1d2, FORWARD from TESTING",
+      "where": ".standards/STATE.md (unstaged layer 64)",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and outstanding obligations inactive",
+      "where": ".standards/STATE.md Recovery/Outstanding Obligations Active false",
+      "status": "realized"
+    },
+    {
+      "condition": "Current scope, architecture, context, development plan and Tester report exist with valid provenance",
+      "where": ".standards/CONTEXT.md, docs/scope, docs/specs, docs/development (COMPLETE), docs/verification (COMPLETE, FULL); check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-001 requires CSV escaping (RFC 4180, quotes doubled)",
+      "where": ".standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md AC-001",
+      "status": "realized"
+    },
+    {
+      "condition": "Part of src/export.ts is committed",
+      "where": "HEAD 'Add CSV serialization for record export': first-pass csvCell (comma-only quoting)",
+      "status": "realized"
+    },
+    {
+      "condition": "Staged version of src/export.ts changes quoting",
+      "where": "index blob 7f32c00: full RFC 4180 with replaceAll; git status MM",
+      "status": "realized"
+    },
+    {
+      "condition": "Unstaged change modifies the same function again (breaks escaping for multiple quotes)",
+      "where": "working tree src/export.ts csvCell uses value.replace('\"','\"\"'); selfCheck shows existing quoting test fails",
+      "status": "realized"
+    },
+    {
+      "condition": "Untracked route uses export.ts",
+      "where": "?? src/routes/export.ts imports writeExport from ../export.ts",
+      "status": "realized"
+    },
+    {
+      "condition": "Tracked authorization helper deleted",
+      "where": " D src/auth/authorize.ts (unstaged deletion)",
+      "status": "realized"
+    },
+    {
+      "condition": "Unchanged caller still depends on the deleted helper, with concrete impact",
+      "where": "src/routes/records.ts (and test/authorize.test.ts) import ../auth/authorize.ts, unchanged vs HEAD; app import fails ERR_MODULE_NOT_FOUND",
+      "status": "realized"
+    },
+    {
+      "condition": "Unrelated untracked note present",
+      "where": "?? offsite-planning.txt (team offsite notes)",
+      "status": "realized"
+    },
+    {
+      "condition": "Developer/Tester evidence identifies the content they assessed, now stale relative to working tree",
+      "where": "plan Self-Check and verification Assessed Inputs record index/earlier blobs; selfCheck confirms they differ from current files",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 1,
+      "detail": "Assertion 1 requires the review report to contain `authorize[.]ts` and `records[.]ts`. These are file identifiers a report with exact file/line evidence (Reviewer procedure and template) must name, so a correct run should satisfy them; a report naming only `test/authorize.test.ts` would not match the first regex, but that would omit the actual deleted file, which is unlikely in a correct run.",
+      "recommendation": "run_as_is",
+      "fix": "Acceptable as is; optionally loosen to `auth/authorize` if false failures appear."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "Commits are authored by user.name=Fixture / fixture@example.invalid (builder-wide config), visible via git log. This is a harness convention, not specific to this fixture.",
+      "recommendation": "run_as_is",
+      "fix": "Harness-level: consider a neutral author name."
+    },
+    {
+      "severity": "note",
+      "kind": "invariant",
+      "assertion": -1,
+      "detail": "A correct Reviewer may reconstruct the Tester-assessed staged content for diagnostics with commands such as `git checkout-index --prefix=/tmp/...` or `git show :path`. These do not mutate the repo, but how the `not_ran_git: mutating` classifier treats checkout-index is not visible here.",
+      "recommendation": "run_as_is",
+      "fix": "Confirm that the mutating-git classifier does not count `checkout-index --prefix` or `show` as mutating."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized and confirmed by selfChecks. The committed first pass, staged RFC 4180 version, unstaged single-replace regression, untracked route, unstaged deletion of src/auth/authorize.ts with unchanged src/routes/records.ts still importing it, and the unrelated untracked note are all present, and records are coherent with check.mjs ok. Checks and invariants are necessary conditions for a correct run, and nothing leaks the answer; only minor notes remain.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T23:17:22.332Z",
+  "costUsd": 0.93118,
+  "ms": 58287,
+  "fixtureHash": "b1630e25576b9fb5"
+}

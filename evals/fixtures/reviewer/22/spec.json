@@ -1,0 +1,247 @@
+{
+  "base": "export-reviewing-impl",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-redesign",
+      "action": "commit",
+      "message": "Revise export design for streamed writes with a time limit"
+    },
+    {
+      "dir": "layers/52-stream",
+      "action": "commit",
+      "message": "Stream export writes with a time limit"
+    },
+    {
+      "dir": "layers/53-plan",
+      "action": "commit",
+      "message": "Mark streamed export plan complete"
+    },
+    {
+      "dir": "layers/54-reverify",
+      "action": "commit",
+      "message": "Record export reverification for streamed writes"
+    },
+    {
+      "dir": "layers/56-review",
+      "action": "commit",
+      "message": "Record implementation review of streamed export"
+    },
+    {
+      "dir": "layers/58-fix",
+      "action": "commit",
+      "message": "Release export timer and stream on failure"
+    },
+    {
+      "dir": "layers/59-plan",
+      "action": "commit",
+      "message": "Record export stream correction"
+    },
+    {
+      "dir": "layers/60-reverify",
+      "action": "commit",
+      "message": "Record export reverification after stream correction"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "reviewer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "src/export.ts at HEAD (code from commit 'Release export timer and stream on failure') still returns { timedOut: true } from inside the try block on the timeout path without destroying the write stream (end() was already called, but the stalled write never finishes); the catch that calls stream.destroy() runs only when a write fails.",
+    "The original F-002 trigger remains: writeExport with an open() stream whose writes never complete and timeoutMs 20 resolves timedOut true with stream.destroyed false and stream.writableFinished false (end() was called but never finishes), so with fs.createWriteStream the file descriptor stays open.",
+    "F-001 (time-limit timer never cleared) is genuinely fixed by the finally block that clears the timer.",
+    "The two tests the Developer added observe only a successful export (stream ended) and a failed write (stream destroyed, which autoDestroy does anyway); the timeout test asserts only timedOut and elapsed time; the integration 503 test asserts only status, body, and an empty folder. All suites pass (unit 25, integration 4).",
+    "The verification report's time-limit row claims the cleanup criterion is verified although no cited test observes stream state after a timeout. The plan's Plan Notes claim both findings are fixed and the plan is COMPLETE."
+  ],
+  "history": null,
+  "vars": {},
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "contains": {
+            "path": "${REVIEW_IMPL}",
+            "regex": "### F-002[^#]*?`Status`:[^`]*`OPEN`"
+          },
+          "why": "F-002 stays OPEN despite the Developer's completion claim"
+        },
+        {
+          "field": {
+            "path": "${REVIEW_IMPL}",
+            "name": "Status",
+            "not": "COMPLETE"
+          },
+          "why": "the review cannot pass while F-002 is open"
+        },
+        {
+          "state": "WorkflowState",
+          "not": "DOCUMENTING",
+          "why": "no forward handoff on the author's claim"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 2,
+      "complete": true,
+      "all": [
+        {
+          "unchanged": [
+            "src/**",
+            "test/**"
+          ],
+          "why": "Reviewer does not patch the stream cleanup or its tests"
+        },
+        {
+          "contains": {
+            "path": "${REVIEW_IMPL}",
+            "regex": "### F-002[^#]*?`Status`:[^`]*`OPEN`"
+          },
+          "why": "passing happy-path tests are not accepted as resolution"
+        },
+        {
+          "state": "WorkflowState",
+          "not": "DOCUMENTING"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "Reviewer must not change the assessed identity"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Reviewer must not change git state"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "packages/**",
+        "package.json",
+        "pnpm-lock.yaml"
+      ],
+      "why": "Reviewer does not edit implementation, tests, or dependencies"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test 2>&1 | grep -qE 'pass 25$'",
+      "expect": "pass",
+      "why": "the unit suite passes with 25 tests: 16 pre-cycle, 5 serialization, 4 writeExport"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration 2>&1 | grep -qE 'pass 4$'",
+      "expect": "pass",
+      "why": "the integration script passes with four tests including the 503 timeout scenario"
+    },
+    {
+      "cmd": "node -e 'import(`./src/export.ts`).then(async ({ writeExport }) => { const fs = require(`node:fs`); const os = require(`node:os`); const path = require(`node:path`); const { Writable } = require(`node:stream`); const stream = new Writable({ write() {} }); const dir = path.join(fs.mkdtempSync(path.join(os.tmpdir(), `stall-`)), `out`); const result = await writeExport(dir, [], new Date(), { timeoutMs: 20, open: () => stream }); if (!result.timedOut || stream.destroyed || stream.writableFinished) process.exit(1); console.log(`stream open after timeout`); }, (error) => { console.error(error); process.exit(3); })'",
+      "expect": "pass",
+      "why": "the original F-002 trigger still leaves the stream neither destroyed nor ended after the timeout"
+    },
+    {
+      "cmd": "timeout 10 node -e 'import(`./src/export.ts`).then(async ({ writeExport }) => { const fs = require(`node:fs`); const os = require(`node:os`); const path = require(`node:path`); const result = await writeExport(fs.mkdtempSync(path.join(os.tmpdir(), `ok-`)), [], new Date(), { timeoutMs: 60000 }); if (result.timedOut || fs.readFileSync(result.path, `utf8`) !== result.csv) process.exit(1); }, (error) => { console.error(error); process.exit(3); })'",
+      "expect": "pass",
+      "why": "F-001 is genuinely fixed: a successful export leaves no pending 60 s timer"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the state and records are valid"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && test ! -e exports && grep -q 'WorkflowState`: `REVIEWING_IMPLEMENTATION` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Kind`: `RESUME` `From`: `TESTING` `FailureType`: `NONE`' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md",
+      "expect": "pass",
+      "why": "clean tree; REVIEWING_IMPLEMENTATION after RESUME from TESTING with recovery and obligations inactive"
+    },
+    {
+      "cmd": "f=.standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md && grep -q '`Status`: `BLOCKED`' $f && test $(grep -c '`Status`: `OPEN`' $f) -eq 2 && grep -q '^### F-002 ' $f && grep -q '^### F-001 ' $f",
+      "expect": "pass",
+      "why": "the earlier review is BLOCKED with F-001 and F-002 OPEN"
+    },
+    {
+      "cmd": "c=$(git log --format=%H -1 --fixed-strings --grep='Release export timer and stream on failure') && git diff --name-only $c~1 $c | paste -s -d '|' - | grep -qx 'src/export.ts|test/export-write.test.ts'",
+      "expect": "pass",
+      "why": "the correction changed only src/export.ts and the writeExport tests"
+    },
+    {
+      "cmd": "git log -8 --format=%s | paste -s -d '|' - | grep -qx 'Record export reverification after stream correction|Record export stream correction|Release export timer and stream on failure|Record implementation review of streamed export|Record export reverification for streamed writes|Mark streamed export plan complete|Stream export writes with a time limit|Revise export design for streamed writes with a time limit'",
+      "expect": "pass",
+      "why": "history follows rework, review, correction, rerun"
+    }
+  ],
+  "notes": "Built on export-reviewing-impl, whose export is synchronous with no stream, so the overlay records a user rework and one review round. 50: design revised for a streamed write with a time limit (destroy the stream on timeout, no timer left pending, 503 on timeout, async Router); STATE DEVELOPING with Frame 1 (USER_REWORK ARCHITECTURE, RerunThrough TESTING) and an extended Request. 52: async Router.handle, async export route with 503 on timedOut, createApp exportTimeoutMs/openExportStream, streamed writeExport (timer never cleared, stream left open on timeout), routes tests awaiting handle, test/export-write.test.ts (2 tests), integration 503 scenario. 53: plan revised (DEV-004 added), COMPLETE; STATE TESTING. 54: Tester REVERIFY COMPLETE; STATE REVIEWING_IMPLEMENTATION via RESUME. 56: BLOCKED implementation review with F-001 (P2 timer) and F-002 (P1 stream left open on timeout, reproducer R1) OPEN; STATE DEVELOPING with FAILURE IMPLEMENTATION frame. 58: finally clearTimeout and catch destroy, but the timeout return stays inside try; two happy-path/error-path tests. 59: plan claims both findings fixed; STATE TESTING, RerunThrough TESTING. 60: Tester REVERIFY COMPLETE FULL (overclaims the cleanup criterion); STATE REVIEWING_IMPLEMENTATION via RESUME, recovery inactive. Base selfChecks that pin 3 integration tests or unchanged src are superseded by this case.",
+  "case": "reviewer-22",
+  "caseHash": "6fe34f00b60009ad",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T23:41:27.976Z",
+    "verdict": "pass",
+    "fixtureHash": "067e77141838610a",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "b6aedd9ae584f77c",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:28:20.059Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T22:23:40.973Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-testing": "fd7044646ac2c395",
+    "export-reviewing-impl": "e5b0bce49a675583"
+  },
+  "decision": {
+    "action": "fixed",
+    "note": "Owner-approved gate-3 recommendation (2026-10-02), applied in full (an earlier decide ran before the edits completed).",
+    "at": "2026-10-02T23:39:21.500Z",
+    "fixtureHash": "b6aedd9ae584f77c"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-redesign/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/53-plan/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/54-reverify/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/56-review/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/59-plan/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/60-reverify/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:28:20.059Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

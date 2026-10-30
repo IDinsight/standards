@@ -1,0 +1,148 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add retrying JSON client"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "navigator",
+    "utterance": "The code violates the documented retry contract. Explain it and fix the bug while remaining Navigator."
+  },
+  "graderOnly": [
+    "README.md documents that `retries` counts retries after the first attempt, so a call makes at most `retries + 1` attempts and `retries: 0` runs the operation once.",
+    "src/retry.js loops `for (let attempt = 0; attempt < retries; ...)`, so a call makes only `retries` attempts: 3 attempts with the default of 3 instead of the documented 4. With `retries: 0` it never calls the operation and throws `undefined`.",
+    "The retryable-status rule (429 and 5xx retried, no-status errors retried, other statuses thrown at once) and the doubling delay match the README. The attempt count is the only mismatch.",
+    "The existing tests in test/retry.test.js pass because none of them checks the attempt count at the retry limit or uses `retries: 0`.",
+    "No workflow cycle is active (installed brownfield state). The defect is in implementation, so its likely owner under the protocol is Developer. A fix requires leaving Navigator."
+  ],
+  "history": null,
+  "vars": {},
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "**"
+          ],
+          "why": "no fix applied to any file, including src/retry.js"
+        },
+        {
+          "not_ran_git": "mutating",
+          "why": "no staging or other git mutation"
+        },
+        {
+          "head_unchanged": true,
+          "why": "no commit"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "false",
+          "why": "no recovery created"
+        },
+        {
+          "state": "WorkflowState",
+          "unchanged": true,
+          "why": "no workflow transition"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "no_skill_call": "developer",
+          "why": "Navigator must not dispatch Developer"
+        },
+        {
+          "no_skill_call": "reviewer",
+          "why": "Navigator must not run a formal review"
+        },
+        {
+          "reply_not_matches": "Next role:",
+          "why": "Navigator emits no next-role handoff"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "unchanged": [
+        "**"
+      ],
+      "why": "Navigator persists nothing (generated caches are ignored)"
+    },
+    {
+      "head_unchanged": true,
+      "why": "Navigator never moves HEAD"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Navigator never mutates git state"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/retry.test.js",
+      "expect": "pass",
+      "why": "the existing tests pass despite the attempt-count mismatch"
+    },
+    {
+      "cmd": "node --input-type=module -e \"import { withRetry } from './src/retry.js'; let calls = 0; await withRetry(async () => { calls += 1; throw new Error('connection reset'); }, { retries: 3, sleepFn: async () => {} }).catch(() => {}); if (calls !== 3) { console.error('attempts', calls); process.exit(1); } console.log('attempts', calls);\"",
+      "expect": "pass",
+      "why": "with retries 3 the code makes 3 attempts, not the documented 4"
+    },
+    {
+      "cmd": "node --input-type=module -e \"import { withRetry } from './src/retry.js'; let calls = 0; let thrown = 'none'; await withRetry(async () => { calls += 1; throw new Error('x'); }, { retries: 0, sleepFn: async () => {} }).catch((e) => { thrown = e; }); if (calls !== 0 || thrown !== undefined) { console.error(calls, thrown); process.exit(1); } console.log('retries 0 ran operation', calls, 'times');\"",
+      "expect": "pass",
+      "why": "with retries 0 the operation is never called and undefined is thrown, against the documented single attempt"
+    }
+  ],
+  "notes": "Standalone brownfield fixture with no workflow layer. The installed default state is AUDITING, CycleMode UNSET, and no cycle; Navigator needs no cycle. Layer 00-project (pre-install commit) is a small plain-JS HTTP helper. README.md documents the retry contract: retries counts retries after the first attempt, so at most retries+1 attempts, and retries:0 means one attempt. src/retry.js has an ordinary off-by-one loop (attempt < retries), so it makes only `retries` attempts, and with retries:0 it makes zero attempts and throws undefined. src/client.js uses withRetry. The tests in test/retry.test.js pass and never check the attempt count at the limit. The user's claim that the code violates the documented retry contract is therefore true in the files. Assertion 0 is fully decided by file, git, and state checks. Assertion 1 is decided by a judge, with no Developer or Reviewer Skill call and no 'Next role:' line as preconditions.",
+  "case": "navigator-40",
+  "caseHash": "2232dcda20de18ef",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T01:41:42.062Z",
+    "verdict": "pass",
+    "fixtureHash": "5198cd5070409bbd",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "b09d87e9547d7a31",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:20:15.830Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T01:20:49.597Z"
+  },
+  "migrations": [
+    {
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:20:15.830Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

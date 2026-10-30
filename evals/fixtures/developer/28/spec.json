@@ -1,0 +1,203 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial stockroom inventory tool"
+    },
+    {
+      "dir": "layers/10-styles",
+      "action": "commit",
+      "message": "Add personal developer styles"
+    },
+    {
+      "dir": "layers/20-cycle",
+      "action": "commit",
+      "message": "Record project context, scope, and design for low-stock report"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "developer",
+    "utterance": "use the tony development style. Create the development plan."
+  },
+  "graderOnly": [
+    "The planned implementation touches only Python files (stockroom/ package); no TypeScript, React, Next.js, HTML, CSS, or SQL is created or modified, so only styles/universal.md and styles/python.md are applicable technology/universal style files.",
+    ".standards/user-styles/developer/priya.md is a second developer user style that the user did not select; it must not be loaded or applied.",
+    "No development plan exists before the run; Active Work.Development is NONE and the user has not approved any plan."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "low-stock-report-20260924T090000Z-3c8e1f5a",
+    "DEV": ".standards/docs/development/low-stock-report-20260924T090000Z-3c8e1f5a.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "state": "ActiveWork.Development",
+          "equals": "${DEV}",
+          "why": "the plan path is persisted in STATE.md"
+        },
+        {
+          "provenance": {
+            "path": "${DEV}",
+            "artifact": "DEVELOPMENT",
+            "cycle": "${ID}"
+          }
+        },
+        {
+          "field": {
+            "path": "${DEV}",
+            "name": "User Style",
+            "equals": "tony"
+          },
+          "why": "the selection persists as the identifier, not a path"
+        },
+        {
+          "field": {
+            "path": "${DEV}",
+            "name": "User Style Locked",
+            "equals": "false"
+          },
+          "why": "not locked before first approval"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 4,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            ".standards/user-styles/**"
+          ],
+          "why": "user styles are user-owned and are never edited by Developer"
+        }
+      ]
+    },
+    {
+      "assertion": 5,
+      "complete": true,
+      "all": [
+        {
+          "field": {
+            "path": "${DEV}",
+            "name": "Status",
+            "equals": "PROPOSED"
+          }
+        },
+        {
+          "state": "ActiveWork.BlockedOn",
+          "not": "NONE",
+          "why": "plan approval request is persisted as the blocker"
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "DEVELOPING"
+        },
+        {
+          "unchanged": [
+            "stockroom/**",
+            "tests/**",
+            "README.md"
+          ],
+          "why": "no implementation before approval"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "python3 -m pytest -q",
+      "expect": "pass",
+      "why": "the existing stockroom tests pass on the committed baseline"
+    },
+    {
+      "cmd": "test -f .standards/user-styles/developer/tony.md && test -f .standards/user-styles/developer/priya.md",
+      "expect": "pass",
+      "why": "the selected tony style exists, alongside a second unselected developer style"
+    },
+    {
+      "cmd": "test -f .claude/skills/developer/styles/universal.md && test -f .claude/skills/developer/styles/python.md",
+      "expect": "pass",
+      "why": "the installed Developer skill ships the universal and Python style files the run should load"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 00-project (pre-install): a small stdlib Python CLI 'stockroom' (Item dataclass, JSON-backed Inventory, argparse CLI with list/adjust) plus pytest tests; all docs use python3 because the runner has no 'python' command. 10-styles: two developer user styles, tony.md (selected by the user) and priya.md (unselected, with conflicting preferences so the judge can tell which was applied). 20-cycle: STATE.md at DEVELOPING / STANDARD with Active Work.Development NONE and a FORWARD handoff from ARCHITECTING, Auditor CONTEXT.md, a scope with AC-001..AC-004, and a technical design covering all four ACs with Python-only changes (models.py, inventory.py, new reports.py, __main__.py). Assertions 1-4 are about which style files were read and in what order; they are left to the judge from the tool trace. Assertions 0 and 5 are decided by plan header fields, STATE.md, and untouched implementation.",
+  "case": "developer-28",
+  "caseHash": "8c4e6f21fa442a4a",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T02:19:30.659Z",
+    "verdict": "pass",
+    "fixtureHash": "3fb9108d2f9192b4",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "87b0cf3ba476c591",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:07:50.991Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T01:30:18.528Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/20-cycle/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:07:50.991Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

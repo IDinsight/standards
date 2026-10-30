@@ -1,0 +1,86 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is BROWNFIELD",
+      "where": "install mode brownfield; .standards/MODE.md (installed brownfield template)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState ARCHITECTING, recovery inactive, no outstanding obligations",
+      "where": ".standards/STATE.md (layer 61-scope)",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id is improve-search-20260923T141500Z-9c2e4b71",
+      "where": ".standards/STATE.md Active Work.Id",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Scope points to the completed current-cycle scope",
+      "where": ".standards/docs/scope/improve-search-20260923T141500Z-9c2e4b71.md (SCOPE provenance for the active cycle, AC-001..AC-004 as list items); Handoff FORWARD from SCOPING",
+      "status": "realized"
+    },
+    {
+      "condition": "Valid active-cycle project context exists",
+      "where": ".standards/CONTEXT.md, committed after install with Handoff FORWARD from AUDITING; matches the code in src/",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Architecture is NONE",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "docs/specs/user-search.md exists and begins with a STANDARDS provenance block Artifact: ARCHITECTURE, Cycle: user-search-v1-old",
+      "where": "docs/specs/user-search.md (layer 51-design); selfCheck grep confirms",
+      "status": "realized"
+    },
+    {
+      "condition": "The current scope requires a new design (old design does not cover it)",
+      "where": "old design specifies case-sensitive startsWith on name only; scope AC-001..AC-004 require substring name/email, trim/400, ordering, limit 20 plus total",
+      "status": "realized"
+    },
+    {
+      "condition": "No appropriate unmarked project-owned canonical architecture document exists",
+      "where": "repository tree: only README.md and docs/specs/user-search.md (marked) outside .standards",
+      "status": "realized"
+    },
+    {
+      "condition": "No current-cycle design exists before the run",
+      "where": "selfCheck test ! -e on the target path",
+      "status": "realized"
+    },
+    {
+      "condition": "check.mjs reports no problems at start",
+      "where": "gate checkMjs ok:true",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 0,
+      "detail": "Recognition of docs/specs/user-search.md depends on the Architect exploring docs/ on its own: CONTEXT.md's Structure section lists only src/ and data/, and nothing else points at docs/specs. The skill's search for an existing project design document and its brownfield 'relevant existing design' input make discovery likely, and leaving it unmentioned avoids a hint, so a run that never opens the file failing assertion 0 is a legitimate outcome.",
+      "recommendation": "run_as_is",
+      "fix": "None needed; the judge decides recognition from the trace and reply."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "A STANDARDS-provenance design is committed before STANDARDS is installed (layer 51-design is pre-install). This implies an earlier installation whose record was moved out of .standards/ before an uninstall. That is plausible and is the situation the case states. Nothing in commit messages or records hints at it.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized: brownfield STANDARD ARCHITECTING state with a complete scope and valid context, a prior-cycle ARCHITECTURE record at docs/specs/user-search.md, and no unmarked design document. The checks are sound necessary conditions; assertion 1 is fully decided by the old file staying unchanged and Architecture not pointing to it, and the exact-path and provenance checks match what artifact init produces. The invariants fit an Architect run, and the turn-end check after a FORWARD to DEVELOPING only requires the new design to cover AC-001..AC-004.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T00:31:01.981Z",
+  "costUsd": 0.1768084,
+  "ms": 47651,
+  "fixtureHash": "0e8b0f1ab47ffd1f"
+}

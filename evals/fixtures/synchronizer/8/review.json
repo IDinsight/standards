@@ -1,0 +1,94 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState SYNCHRONIZING, Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, architecture, context, plan, verification and both review reports exist with valid ownership and content identities",
+      "where": ".standards/docs/{scope,specs,development,verification,reviews}/…, .standards/CONTEXT.md; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "Documentation evidence available",
+      "where": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md (COMPLETE, G1–G4)",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and outstanding obligations inactive, no blocked user question, no synchronization record yet",
+      "where": ".standards/STATE.md; selfCheck `test ! -e .standards/docs/synchronization`",
+      "status": "realized"
+    },
+    {
+      "condition": "Export helper has a committed version, different staged content, and a further unstaged edit",
+      "where": "src/export.ts (git status `MM`; selfCheck compares HEAD, index and worktree blobs)",
+      "status": "realized"
+    },
+    {
+      "condition": "An untracked CLI calls the export helper",
+      "where": "scripts/export-records.ts (untracked; calls writeExport with a prefix)",
+      "status": "realized"
+    },
+    {
+      "condition": "A tracked authorization helper was deleted",
+      "where": "src/auth/authorize.ts (unstaged deletion, ` D` in git status)",
+      "status": "realized"
+    },
+    {
+      "condition": "An unchanged caller references the deleted helper, breaking the deliverable",
+      "where": "src/routes/records.ts and src/routes/export.ts (unchanged, import ../auth/authorize.ts); selfChecks show ERR_MODULE_NOT_FOUND in both test commands",
+      "status": "realized"
+    },
+    {
+      "condition": "An unrelated untracked personal note exists",
+      "where": "scratch-notes.md (untracked)",
+      "status": "realized"
+    },
+    {
+      "condition": "Existing records cite only HEAD content, so they cannot cover the dirty tree",
+      "where": "final-deliverable.md cites the clean tree at 25479bf; selfCheck greps confirm no staged or worktree blob is cited",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "case-defect",
+      "assertion": 3,
+      "detail": "The case does not say whether the unplanned prefix change and the CLI are cycle work. A careful run could also record stale-evidence discrepancies for Tester and Reviewer, or a scope or boundary question. The checks require only one Developer/IMPLEMENTATION D entry and a FAILURE to DEVELOPING. That matches the assertion's wording ('routed to Developer') and does not penalize extra entries. A run that only blocks on a user question would fail, which is what the case intends.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The local git config sets user.name=Fixture and user.email=fixture@example.invalid, so commit authors hint that this is a test repository. This appears to come from the harness and applies to every fixture. It does not touch the planted defect or the answer.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "The case says 'an unchanged caller'. The fixture has two unchanged route callers plus test/authorize.test.ts importing the deleted helper. This is consistent with the case and strengthens the defect.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized. The export helper differs across HEAD, the index and the working tree. authorize.ts is deleted while unchanged routes still import it, and the selfChecks show ERR_MODULE_NOT_FOUND. The untracked CLI and the personal note are present. Records cite only the clean HEAD content and check.mjs passes. Assertion 3's state and record checks match a legal FAILURE route to DEVELOPING with a Developer-owned D entry and are not too strict; the other assertions are left to the judge with safe preconditions.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T14:30:42.491Z",
+  "costUsd": 0.3165288,
+  "ms": 64946,
+  "fixtureHash": "780916291b6462af"
+}

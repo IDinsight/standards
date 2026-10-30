@@ -1,0 +1,104 @@
+{
+  "conditions": [
+    {
+      "condition": "BROWNFIELD project, STANDARD cycle, WorkflowState TESTING",
+      "where": ".standards/MODE.md (BROWNFIELD); .standards/STATE.md (WorkflowState TESTING, CycleMode STANDARD)",
+      "status": "realized"
+    },
+    {
+      "condition": "Developer's final FORWARD handoff into TESTING, no recovery, no obligations",
+      "where": ".standards/STATE.md Handoff Kind FORWARD From DEVELOPING; Recovery and Outstanding Obligations Active false",
+      "status": "realized"
+    },
+    {
+      "condition": "Incremental plan COMPLETE, Current Increment NONE, every approved step DONE",
+      "where": ".standards/docs/development/<id>.md header (Status COMPLETE, Verification Cadence INCREMENTAL, Current Increment NONE); DEV-001..DEV-004 all DONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Verification report IN_PROGRESS / INCREMENT / Increment 2",
+      "where": ".standards/docs/verification/<id>.md header",
+      "status": "realized"
+    },
+    {
+      "condition": "Report holds historical VERIFIED and SUPERSEDED increment rows",
+      "where": "verification report ## Increment Assessments: Increment 1 SUPERSEDED, Increment 1 re-run VERIFIED, Increment 2 VERIFIED",
+      "status": "realized"
+    },
+    {
+      "condition": "Report holds an AWAITING_IMPLEMENTATION acceptance row",
+      "where": "verification report ## Acceptance Evidence, AC-004 row",
+      "status": "realized"
+    },
+    {
+      "condition": "Scenario allocations near the limit",
+      "where": "verification report ## Scenario Budget: parse.js 4 of 5, summary.js 4 of 5, cli.js 0 of 5",
+      "status": "realized"
+    },
+    {
+      "condition": "Later source and fixture changes affected earlier AC evidence",
+      "where": "Fixture change in commit 'Verify increment 2' superseded the Increment 1 evidence; commit 'Add JSON summary output' changed src/summary.js (sorting), src/cli.js, and added src/format.js after the Increment 2 assessment, so the AC-002/AC-003 evidence recorded on blob a585778 is stale (selfCheck git diff HEAD~2 confirms)",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-004 implemented but untested; AWAITING_IMPLEMENTATION must now be resolved",
+      "where": "src/cli.js, src/format.js; no test references them (selfCheck)",
+      "status": "realized"
+    },
+    {
+      "condition": "No implementation defect; existing tests pass",
+      "where": "Code read: parse/summary/format/cli match design; selfChecks: 12/12 pass, JSON ordering correct, usage error exits 2",
+      "status": "realized"
+    },
+    {
+      "condition": "User requests AFTER_IMPLEMENTATION but no implementation or increment scheduling remains",
+      "where": "utterance 'Switch to AFTER_IMPLEMENTATION verification.'; PendingVerificationCadence NONE; plan COMPLETE",
+      "status": "realized"
+    },
+    {
+      "condition": "Starting state deliberately fails full check with exactly the FULL-purpose problem; turn-end check accepts it",
+      "where": "gate checkMjs: single problem 'Full verification requires Assessment Purpose FULL and target NONE.'; verification.mjs skips that check atTurnEnd",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, architecture, and context records present and consistent",
+      "where": ".standards/docs/scope/<id>.md (AC-001..AC-004), .standards/docs/specs/<id>.md (coverage for all ACs), .standards/CONTEXT.md",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "history",
+      "assertion": -1,
+      "detail": "The intermediate CHECKPOINT STATE.md and plan versions are never committed: STATE.md jumps from DEVELOPING (layer 50, FORWARD from ARCHITECTING) straight to TESTING with FORWARD from DEVELOPING (layer 56), and the plan appears only in its final form. The records and Plan Notes still describe the checkpoints consistently, so the run tests the same thing.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "ungradeable-assertion",
+      "assertion": 4,
+      "detail": "PendingVerificationCadence starts NONE. The request exists only in the utterance, which is the correct reading of the case. As a result, the deterministic 'equals NONE' check passes whether or not the role ever records the request. The meaningful parts are still checked: no Developer return (WorkflowState not DEVELOPING) and the plan left unchanged.",
+      "recommendation": "run_as_is",
+      "fix": "None needed; the judge can see from the trace whether the role explained that the switch has no remaining effect."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 3,
+      "detail": "The graderOnly budget sentence ('fits only if ordering coverage charges src/summary.js at most once more') is prescriptive. Assertion 3 is conditional. A run that charges cross-file CLI scenarios to summary.js more than once and then correctly blocks on a targeted increase is also correct, so the judge should not treat either outcome as wrong in itself.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally reword the graderOnly fact to say that either fitting the budget with recorded charging or blocking with a targeted increase request in BlockedOn is acceptable."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized: the COMPLETE incremental plan, the stale INCREMENT/Increment 2 report with SUPERSEDED, VERIFIED and AWAITING_IMPLEMENTATION rows, near-limit allocations, post-assessment source changes, and a defect-free implementation confirmed by the selfChecks. expectCheck matches the single intended FULL-purpose problem. The checks and invariants are necessary conditions that a correct run (either blocked in TESTING or forwarded to Reviewer) satisfies. Only minor notes remain: the omitted intermediate history, the near-vacuous pending-cadence check, and a prescriptive budget grader fact.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-01T22:37:47.299Z",
+  "costUsd": 0.3267872,
+  "ms": 83271,
+  "fixtureHash": "42300f103c643eb7"
+}

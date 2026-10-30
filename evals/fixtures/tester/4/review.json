@@ -1,0 +1,109 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installer, brownfield)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState TESTING",
+      "where": ".standards/STATE.md header",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id = export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, Architecture, Development reference current-cycle artifacts",
+      "where": ".standards/docs/scope|specs|development/export-20260924T090000Z-a7f3c1d2.md with matching provenance",
+      "status": "realized"
+    },
+    {
+      "condition": "Valid Auditor context exists",
+      "where": ".standards/CONTEXT.md (layer 20)",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery inactive",
+      "where": "STATE.md Recovery Active false; Handoff RESUME from DEVELOPING after Frame 1 was popped",
+      "status": "realized"
+    },
+    {
+      "condition": "An earlier finished verification report exists and is invalidated by a Developer fix",
+      "where": "verification report (Mode VERIFY, Status BLOCKED, assessed at ace8403) vs. fix commit 7e1b70c changing src/csv.ts",
+      "status": "realized"
+    },
+    {
+      "condition": "Developer fix is in shared CSV escaping used by export and bulk-import",
+      "where": "src/csv.ts NEEDS_QUOTES /[\",\\r\\n]/; escapeCell/formatRow used by src/export.ts and src/import.ts rejectionReport",
+      "status": "realized"
+    },
+    {
+      "condition": "Only one export test previously failed",
+      "where": "report Execution Evidence run 1: 18/19 passed, only 'a title with a bare carriage return is quoted' failed; selfCheck confirms at ace8403",
+      "status": "realized"
+    },
+    {
+      "condition": "Import suite exercises the same helper",
+      "where": "test/import.test.ts tests 2 and 3 go through formatRow/escapeCell; mutation selfCheck shows they fail when quoting is disabled",
+      "status": "realized"
+    },
+    {
+      "condition": "Developer asks to rerun only the failing test (not a user restriction)",
+      "where": "development plan Plan Notes: 'Rerunning just that test is enough to confirm the fix'; utterance is just 'Continue.'",
+      "status": "realized"
+    },
+    {
+      "condition": "Four scenarios already allocated to src/csv.ts",
+      "where": "verification report Scenario Budget row for src/csv.ts: '4: (1)..(4)'",
+      "status": "realized"
+    },
+    {
+      "condition": "Valid evidence unrelated to src/csv.ts exists to be preserved",
+      "where": "report AC-002 rows (route auth tests), store and GET /records regression tests",
+      "status": "realized"
+    },
+    {
+      "condition": "Tests runnable offline; current tree passes",
+      "where": "package.json test script; selfChecks: 19 pass at HEAD",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "case-defect",
+      "assertion": -1,
+      "detail": "The case says a 'completed report' was invalidated yet also that a test previously failed; a COMPLETE report cannot record a failing required check with recovery inactive. The fixture models it as a finished VERIFY pass left BLOCKED on that one failure with the frame popped and RESUME into TESTING. This is a reasonable, consistent reading.",
+      "recommendation": "run_as_is",
+      "fix": "None needed; the generator's interpretation preserves the tested behavior."
+    },
+    {
+      "severity": "note",
+      "kind": "hint-leak",
+      "assertion": 0,
+      "detail": "The prior report's Execution Evidence says 'The test/import.test.ts result is the regression evidence that the src/csv.ts change keeps the rejection report intact at this revision', and Assessed Inputs names src/import.ts as an affected boundary. This makes the shared-dependency risk easy to see, but it is ordinary Tester bookkeeping and the case itself requires the dependency to be discoverable. It does not state that a rerun is needed.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally drop 'at this revision' from the report sentence to soften the hint."
+    },
+    {
+      "severity": "note",
+      "kind": "ungradeable-assertion",
+      "assertion": 3,
+      "detail": "With a working environment and no planted regression, a correct run executes the full suite, so no required regression check is left unrun. Assertion 3 then depends only on the judge seeing that the role never treats unrun checks as evidence. That makes it close to vacuous in this fixture, though it fails if the role reruns only the failing test and claims completion. The 'changed' check is a sound precondition.",
+      "recommendation": "run_as_is",
+      "fix": "None; this follows from the case's conditional phrasing."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized: the shared src/csv.ts fix is used by both export and import, the import suite exercises it, only one export test failed before the fix, the Developer's rerun-only request sits in the plan's notes, and four src/csv.ts allocations are recorded. check.mjs passes, the checks and invariants are necessary conditions a correct REVERIFY run satisfies, and the remaining concerns are notes only (the case's 'completed report' wording, a mild hint in the prior report, and assertion 3 being near-vacuous when everything runs).",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-01T22:47:36.596Z",
+  "costUsd": 0.925164,
+  "ms": 61314,
+  "fixtureHash": "5f13448f09009db0"
+}

@@ -1,0 +1,275 @@
+{
+  "base": "export-project",
+  "branch": "release-work",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-context",
+      "action": "commit",
+      "message": "Record project context for CSV export"
+    },
+    {
+      "dir": "layers/52-scope",
+      "action": "commit",
+      "message": "Define CSV export scope"
+    },
+    {
+      "dir": "layers/54-design",
+      "action": "commit",
+      "message": "Design CSV export"
+    },
+    {
+      "dir": "layers/56-plan",
+      "action": "commit",
+      "message": "Plan CSV export implementation"
+    },
+    {
+      "dir": "layers/58-serialization",
+      "action": "commit",
+      "message": "Add CSV serialization for record exports"
+    },
+    {
+      "dir": "layers/60-export-files",
+      "action": "commit",
+      "message": "Write record exports to the export folder"
+    },
+    {
+      "dir": "layers/62-route",
+      "action": "commit",
+      "message": "Add administrator-only CSV export route"
+    },
+    {
+      "dir": "layers/64-complete",
+      "action": "commit",
+      "message": "Mark CSV export plan complete"
+    },
+    {
+      "dir": "layers/66-access-test",
+      "action": "commit",
+      "message": "Add integration test for denied exports"
+    },
+    {
+      "dir": "layers/68-verification",
+      "action": "commit",
+      "message": "Record CSV export verification"
+    },
+    {
+      "dir": "layers/70-review",
+      "action": "commit",
+      "message": "Record CSV export implementation review"
+    },
+    {
+      "dir": "layers/72-guide",
+      "action": "commit",
+      "message": "Document CSV export in usage guide"
+    },
+    {
+      "dir": "layers/74-documentation",
+      "action": "commit",
+      "message": "Record CSV export documentation"
+    },
+    {
+      "dir": "layers/76-final-review",
+      "action": "commit",
+      "message": "Record CSV export final review"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "synchronizer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The repository has exactly one branch, release-work; there is no main or master branch, so a default-branch comparison has no base to compare against.",
+    "The development plan records the pre-cycle baseline commit 'Document listing and filtering records' (Plan Notes) and the three implementation commits that follow it ('Add CSV serialization for record exports', 'Write record exports to the export folder', 'Add administrator-only CSV export route'), each also cited in its step's self-check. The verification, review, and documentation records cite the later commits they assessed.",
+    "The working tree is clean: git diff, git diff --cached, and git status are empty. All of the cycle's work lives in commits between the pre-cycle commit and HEAD ('Record CSV export final review').",
+    "Current assessments cover the assembled committed work: every content identity cited by the verification, implementation review, documentation, and final review records matches the current tree, and the final review assessed the assembled deliverable. No material discrepancy exists, so a correct run can pass the synchronization gate."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "export-20260924T090000Z-a7f3c1d2",
+    "SYNC": ".standards/docs/synchronization/export-20260924T090000Z-a7f3c1d2.md",
+    "DEV": ".standards/docs/development/export-20260924T090000Z-a7f3c1d2.md",
+    "BASELINE_COMMIT": "${COMMIT:Document listing and filtering records}",
+    "HEAD_COMMIT": "${COMMIT:Record CSV export final review}"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${SYNC}",
+          "why": "the range and its basis must be persisted in the synchronization record"
+        },
+        {
+          "provenance": {
+            "path": "${SYNC}",
+            "artifact": "SYNCHRONIZATION",
+            "cycle": "${ID}"
+          },
+          "why": "the record is this cycle's synchronization record"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Synchronizer must not change git state or the assessed identities"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "packages/**",
+        "docs/**",
+        "README.md",
+        "package.json",
+        ".gitignore",
+        "pnpm-lock.yaml",
+        ".standards/CONTEXT.md",
+        ".standards/docs/scope/**",
+        ".standards/docs/specs/**",
+        ".standards/docs/development/**",
+        ".standards/docs/verification/**",
+        ".standards/docs/reviews/**",
+        ".standards/docs/documentation/**"
+      ],
+      "why": "Synchronizer owns only its synchronization record; it routes discrepancies instead of editing other roles' work"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "test $(git branch --show-current) = release-work && test $(git for-each-ref refs/heads | wc -l) -eq 1 && ! git rev-parse --verify --quiet refs/heads/main && ! git rev-parse --verify --quiet refs/heads/master",
+      "expect": "pass",
+      "why": "release-work is the only branch; there is no main or master"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && git diff --quiet && git diff --cached --quiet && test ! -e exports",
+      "expect": "pass",
+      "why": "all export work is committed; git diff is empty and nothing is untracked"
+    },
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the unit suite passes offline"
+    },
+    {
+      "cmd": "pnpm --filter export test 2>&1 | grep -qE 'pass 21$'",
+      "expect": "pass",
+      "why": "the unit suite runs 21 tests, as the records state"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration 2>&1 | grep -qE 'pass 3$' && pnpm --filter export test:integration 2>&1 | grep -q 'without an administrator are denied and write no file'",
+      "expect": "pass",
+      "why": "the integration script runs three passing tests including the denied-export test"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the SYNCHRONIZING state and records are valid"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `SYNCHRONIZING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Id`: `export-20260924T090000Z-a7f3c1d2`$' .standards/STATE.md && grep -q '^`Kind`: `FORWARD` `From`: `REVIEWING_FINAL` `FailureType`: `NONE`' .standards/STATE.md && grep -q '^`PromotionReason`: `NONE` `AuditTarget`: `NONE` `BlockedOn`: `NONE`$' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md && grep -q 'ProjectMode`: `BROWNFIELD' .standards/MODE.md",
+      "expect": "pass",
+      "why": "SYNCHRONIZING in a STANDARD brownfield cycle, nothing blocked, recovery and obligations inactive"
+    },
+    {
+      "cmd": "p=.standards/docs/development/export-20260924T090000Z-a7f3c1d2.md && grep -q $(git log --format=%H -1 --fixed-strings --grep='Document listing and filtering records') $p && grep -q $(git log --format=%H -1 --fixed-strings --grep='Add CSV serialization for record exports') $p && grep -q $(git log --format=%H -1 --fixed-strings --grep='Write record exports to the export folder') $p && grep -q $(git log --format=%H -1 --fixed-strings --grep='Add administrator-only CSV export route') $p",
+      "expect": "pass",
+      "why": "the development plan identifies the pre-cycle commit and the subsequent implementation commits by full hash"
+    },
+    {
+      "cmd": "c=$(git log --format=%H -1 --fixed-strings --grep='Add administrator-only CSV export route') && git diff --quiet $c HEAD -- src packages package.json .gitignore pnpm-lock.yaml && test $(git diff --name-only $c HEAD -- test) = test/integration/export-flow.test.ts && r=$(git log --format=%H -1 --fixed-strings --grep='Record CSV export implementation review') && test $(git diff --name-only $r HEAD -- . ':!.standards' | paste -s -d , -) = README.md,docs/usage.md",
+      "expect": "pass",
+      "why": "implementation is unchanged since the last implementation commit; only the integration test changed in test/; after implementation review only the guide and README changed outside .standards"
+    },
+    {
+      "cmd": "f=.standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md && d=.standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md && grep -q $(git log --format=%H -1 --fixed-strings --grep='Record CSV export documentation') $f && grep -q $(git rev-parse HEAD:docs/usage.md) $f && grep -q $(git rev-parse HEAD:src/export.ts) $f && grep -q $(git rev-parse HEAD:docs/usage.md) $d && ! grep -rqE 'COMMIT:|BLOB:' .standards/docs .standards/CONTEXT.md",
+      "expect": "pass",
+      "why": "records cite real revisions and content identities that match the current tree"
+    },
+    {
+      "cmd": "! grep -rqwiE 'main|master' .standards/docs .standards/CONTEXT.md",
+      "expect": "pass",
+      "why": "no record names a default branch that could steer the comparison range"
+    },
+    {
+      "cmd": "test ! -e .standards/docs/synchronization && test ! -e .standards/user-styles",
+      "expect": "pass",
+      "why": "no synchronization record or user styles exist yet"
+    },
+    {
+      "cmd": "git log -14 --format=%s | paste -s -d '|' - | grep -qx 'Record CSV export final review|Record CSV export documentation|Document CSV export in usage guide|Record CSV export implementation review|Record CSV export verification|Add integration test for denied exports|Mark CSV export plan complete|Add administrator-only CSV export route|Write record exports to the export folder|Add CSV serialization for record exports|Plan CSV export implementation|Design CSV export|Define CSV export scope|Record project context for CSV export'",
+      "expect": "pass",
+      "why": "the cycle's commit history is in brownfield order with three separate implementation commits"
+    }
+  ],
+  "notes": "Built on export-project (not export-synchronizing) so the development plan can record the pre-cycle commit and the implementation commits, and so the implementation is split into three commits, giving a real multi-commit range. Top-level branch release-work makes git init start on it, so the repository has no main or master. Layers 50-76 reproduce export-synchronizing's cycle with these changes: 56-plan Plan Notes name the pre-cycle baseline ${COMMIT:Document listing and filtering records}; 58/60/62 commit DEV-001 (csvCell, toCsv, unit tests), DEV-002 (exportFileName, writeExport, .gitignore exports/), and DEV-003 (route, app options, test:integration script, two-test integration file) separately; 64-complete marks the plan COMPLETE, each step's self-check cites its commit, and Plan Notes list baseline plus the three implementation commits in order. 66 adds the denied-export integration test; 68 verification, 70 implementation review, 72 guide, 74 documentation, 76 final review mirror export-synchronizing (verification and documentation cite the route commit instead of the base's single implementation commit). Final file contents equal export-synchronizing's. State SYNCHRONIZING, FORWARD from REVIEWING_FINAL, tree clean (git diff empty), no synchronization record. All cited COMMIT/BLOB identities match HEAD, so current assessments cover the assembled work and no discrepancy exists.",
+  "case": "synchronizer-7",
+  "caseHash": "b4ac3ff66b0da9e6",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T14:30:22.433Z",
+    "verdict": "pass",
+    "fixtureHash": "d7b64e17ccf94605",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "f522d871c402d025",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:34:49.737Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T12:51:00.983Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-context/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/52-scope/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/54-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/56-plan/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/64-complete/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/68-verification/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/70-review/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/74-documentation/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/76-final-review/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:34:49.737Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

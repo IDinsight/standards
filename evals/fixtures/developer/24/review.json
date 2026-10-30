@@ -1,0 +1,89 @@
+{
+  "conditions": [
+    {
+      "condition": "Project is BROWNFIELD",
+      "where": ".standards/MODE.md (installer brownfield template, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "WorkflowState CANCELLED, CycleMode UNSET (retained brownfield cancellation)",
+      "where": ".standards/STATE.md head; Handoff Kind CANCEL From DEVELOPING",
+      "status": "realized"
+    },
+    {
+      "condition": "Terminal Active Work still identifies cancelled cycle auth-v1-old-20260920T090000Z-9e8d7c6b and its request",
+      "where": ".standards/STATE.md Active Work Id/Request",
+      "status": "realized"
+    },
+    {
+      "condition": "Cancelled cycle may have left project changes requiring reconciliation",
+      "where": "src/tokens.js committed in 'Add signed session token helper for auth v1'; plan DEV-001 DONE",
+      "status": "realized"
+    },
+    {
+      "condition": "No prior reconciliation entries (the cancelled cycle's entry is added only at Start a cycle)",
+      "where": ".standards/STATE.md `BaselineReconciliation`: `NONE`",
+      "status": "realized"
+    },
+    {
+      "condition": "PendingCycleMode EXPEDITED",
+      "where": ".standards/STATE.md head",
+      "status": "realized"
+    },
+    {
+      "condition": "PendingCycleRequest holds a new bounded implementation request",
+      "where": ".standards/STATE.md PendingCycleRequest (SESSION_TTL_MINUTES request)",
+      "status": "realized"
+    },
+    {
+      "condition": "PendingCycleBlockedOn says EXPEDITED cannot start while cancelled-cycle residue needs reconciliation",
+      "where": ".standards/STATE.md PendingCycleBlockedOn",
+      "status": "realized"
+    },
+    {
+      "condition": "cycle.mjs can allocate an ID from this terminal state",
+      "where": "selfCheck 3 passed",
+      "status": "realized"
+    },
+    {
+      "condition": "State is valid and the work tree is clean",
+      "where": "check.mjs ok:true; git status clean",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 4,
+      "detail": "The contains regex requires `SourceCycle` to come before `Request` in the list entry. The protocol's Baseline Reconciliation Format and the STATE.md comment both show that order, so a correct run will almost certainly match. A run that reversed the field order would still be valid to the parser and would fail this check.",
+      "recommendation": "run_as_is",
+      "fix": "Optional: allow either order, e.g. a lookahead for both fields within one list entry."
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 0,
+      "detail": "The check requires the new Active Work `Request` to contain SESSION_TTL_MINUTES. The protocol says to use the persisted request, so a verbatim or near-verbatim copy is expected. A heavy summary that dropped the variable name is unlikely but would fail the check.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The ID slug 'auth-v1-old' does not match what cycle.mjs would derive from the cancelled cycle's request text. The case mandates this exact ID, so the mismatch is acceptable.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition: a retained BROWNFIELD CANCELLED state, plausible residue in src/tokens.js, a pending EXPEDITED preference with a paired request and blocker, and BaselineReconciliation NONE so the role must add the entry itself. Checks and invariants are necessary conditions for a correct NEW_CYCLE start into AUDITING, and complete:true is used only on state-decided assertions. The only issues are minor pattern-strictness notes.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T02:19:02.229Z",
+  "costUsd": 0.1667026,
+  "ms": 50581,
+  "fixtureHash": "f3301da4e2187a8f"
+}

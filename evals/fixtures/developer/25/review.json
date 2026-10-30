@@ -1,0 +1,81 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is BROWNFIELD",
+      "where": ".standards/MODE.md (installer brownfield template)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState DEVELOPING, recovery inactive, no outstanding obligations",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id is improve-search-20260923T141500Z-9c2e4b71",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Scope and Architecture point to completed current-cycle artifacts",
+      "where": ".standards/docs/scope/improve-search-20260923T141500Z-9c2e4b71.md (AC-001..AC-003) and .standards/docs/specs/improve-search-20260923T141500Z-9c2e4b71.md (full Acceptance Coverage); Handoff FORWARD from ARCHITECTING",
+      "status": "realized"
+    },
+    {
+      "condition": "Valid project context exists and matches the repository",
+      "where": ".standards/CONTEXT.md, consistent with src/search.js, src/cli.js, tests",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Development is NONE",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Old shared docs/development/plan.md exists (unmarked, project-owned)",
+      "where": "docs/development/plan.md (pre-install commit)",
+      "status": "realized"
+    },
+    {
+      "condition": "Prior-cycle .standards/docs/development/user-search-v1-old.md with provenance Artifact: DEVELOPMENT, Cycle: user-search-v1-old",
+      "where": ".standards/docs/development/user-search-v1-old.md",
+      "status": "realized"
+    },
+    {
+      "condition": "User has not approved any plan for the active cycle",
+      "where": "no history; no plan file for the active cycle",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope/design have no material defect forcing a failure route instead of planning",
+      "where": "scope and spec are consistent and specific; check.mjs ok",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The earlier cycle left only its development plan: no scope/spec/verification/review records, and STATE.md history jumps from the installer's INITIAL state straight to the new cycle at DEVELOPING. The prior plan also cites scope/spec paths that do not exist. The case only describes the prior plan, and check.mjs is ok, so this does not change what is tested.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 2,
+      "detail": "Whether `artifact.mjs init DEVELOPMENT` was actually used is visible only in the trace. complete:false with the exists and provenance preconditions is correct.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is in the files. The active cycle is DEVELOPING/STANDARD with completed scope, design, and context, Development is NONE, and both the unmarked shared docs/development/plan.md and the prior-cycle DEVELOPMENT record exist, with no hint at the answer. The checks are necessary conditions mandated by the Developer skill's Approval Gate and plan-path rules (PROPOSED status, non-NONE BlockedOn, path recorded, implementation unchanged), and the invariants are the standard set.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T02:18:52.872Z",
+  "costUsd": 0.1598186,
+  "ms": 37939,
+  "fixtureHash": "25998bfef213c3e1"
+}

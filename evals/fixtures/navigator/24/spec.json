@@ -1,0 +1,178 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add order handlers and in-memory store"
+    },
+    {
+      "dir": "layers/10-jobs",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add open-order reconciliation job"
+    },
+    {
+      "dir": "layers/50-replacement",
+      "action": "untracked"
+    },
+    {
+      "action": "delete",
+      "paths": [
+        "src/handlers/orders.js"
+      ],
+      "stage": false
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "navigator",
+    "utterance": "Explain the refactor."
+  },
+  "graderOnly": [
+    "src/handlers/orders.js is tracked in HEAD but deleted in the working tree (unstaged deletion, not git rm).",
+    "src/routes/orders/handler.js is an untracked file that replaces it; it exports the same createOrder, getOrder, and listOrders with the same behavior, with validation pulled into a local validate() helper and a small json() response helper.",
+    "src/server.js, src/jobs/reconcile.js, and test/orders.test.js are unchanged from HEAD and still import the old path (handlers/orders.js), so importing them now fails with ERR_MODULE_NOT_FOUND and the test suite fails.",
+    "No STANDARDS cycle is active; the workflow is at the installed brownfield initial state. Fixing the imports would be implementation work, which the protocol assigns to Developer."
+  ],
+  "history": null,
+  "vars": {},
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "reply_matches": "routes/orders/handler",
+          "why": "an explanation of the refactor must identify the untracked replacement"
+        },
+        {
+          "reply_matches": "handlers/orders",
+          "why": "the explanation must identify the deleted old handler path the callers still use"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "src/**",
+            "test/**"
+          ],
+          "why": "Navigator does not fix the imports"
+        },
+        {
+          "reply_matches": "developer",
+          "flags": "i",
+          "why": "the reply names Developer as the likely owner"
+        },
+        {
+          "no_skill_call": "developer",
+          "why": "Navigator does not dispatch Developer"
+        },
+        {
+          "no_skill_call": "reviewer",
+          "why": "Navigator does not run a formal review"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "unchanged": [
+        "**"
+      ],
+      "why": "Navigator persists nothing (generated caches are ignored)"
+    },
+    {
+      "head_unchanged": true,
+      "why": "Navigator never moves HEAD"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Navigator never mutates git state"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "git cat-file -e HEAD:src/handlers/orders.js",
+      "expect": "pass",
+      "why": "the old handler is tracked in HEAD"
+    },
+    {
+      "cmd": "git status --porcelain --untracked-files=all | grep -q '^ D src/handlers/orders.js$' && git status --porcelain --untracked-files=all | grep -q '^?? src/routes/orders/handler.js$'",
+      "expect": "pass",
+      "why": "the old handler is deleted in the working tree (unstaged) and the replacement is untracked"
+    },
+    {
+      "cmd": "git diff --quiet HEAD -- src/server.js src/jobs/reconcile.js src/store.js test/",
+      "expect": "pass",
+      "why": "the callers and tests are unchanged from HEAD"
+    },
+    {
+      "cmd": "grep -q \"from './handlers/orders.js'\" src/server.js && grep -q \"from '../handlers/orders.js'\" src/jobs/reconcile.js && grep -q \"from '../src/handlers/orders.js'\" test/orders.test.js",
+      "expect": "pass",
+      "why": "the unchanged callers still import the old path"
+    },
+    {
+      "cmd": "node --input-type=module -e \"const m = await import('./src/routes/orders/handler.js'); for (const n of ['createOrder','getOrder','listOrders']) if (typeof m[n] !== 'function') process.exit(1)\"",
+      "expect": "pass",
+      "why": "the untracked replacement loads and exports the same handlers"
+    },
+    {
+      "cmd": "node --input-type=module -e \"await import('./src/server.js')\"",
+      "expect": "fail",
+      "expectOutput": "ERR_MODULE_NOT_FOUND|Cannot find module",
+      "why": "the router cannot load because its import target was deleted"
+    },
+    {
+      "cmd": "node --test test/orders.test.js test/server.test.js",
+      "expect": "fail",
+      "expectOutput": "ERR_MODULE_NOT_FOUND|Cannot find module",
+      "why": "the existing tests fail because callers import the deleted path"
+    }
+  ],
+  "notes": "Standalone brownfield fixture with no active cycle (installed initial STATE.md/MODE.md left as written by the installer). 00-project (pre-install commit): small Node ES-module order service: src/store.js (in-memory Map), src/handlers/orders.js (createOrder/getOrder/listOrders), src/server.js (route() importing ./handlers/orders.js), tests, README. 10-jobs (pre-install commit): src/jobs/reconcile.js importing ../handlers/orders.js plus its test in test/server.test.js. 50-replacement (untracked): src/routes/orders/handler.js, same exports and behavior, reorganized with validate()/json() helpers. Final layer: unstaged deletion of src/handlers/orders.js. Callers (server.js, reconcile.js, test/orders.test.js) and README still reference the old path, so module loading and the test suite fail with ERR_MODULE_NOT_FOUND. Nothing in the repo names the breakage.",
+  "case": "navigator-24",
+  "caseHash": "84647d2d2f223dac",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T01:38:02.067Z",
+    "verdict": "pass",
+    "fixtureHash": "ffc3d586ece091cf",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "c21bb40b6f422ecf",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:18:55.398Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T01:07:17.300Z"
+  },
+  "migrations": [
+    {
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:18:55.398Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

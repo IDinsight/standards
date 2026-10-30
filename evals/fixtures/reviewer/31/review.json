@@ -1,0 +1,76 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState REVIEWING_IMPLEMENTATION, Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Current scope, architecture, context, development plan and Tester report exist with valid ownership",
+      "where": ".standards/docs/scope|specs|development|verification/export-20260924T090000Z-a7f3c1d2.md, .standards/CONTEXT.md; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and outstanding obligations inactive",
+      "where": ".standards/STATE.md Recovery.Active false, Outstanding Obligations.Active false",
+      "status": "realized"
+    },
+    {
+      "condition": "Fresh independent Reviewer session; no review report yet",
+      "where": "headless run; selfCheck confirms .standards/docs/reviews absent",
+      "status": "realized"
+    },
+    {
+      "condition": "User prohibits command execution",
+      "where": "prompt.utterance 'Review this without running any commands.'",
+      "status": "realized"
+    },
+    {
+      "condition": "Tester evidence covers runtime criteria for exactly the assessed content and environment",
+      "where": "verification record (COMPLETE, FULL) cites commit 82dc688 and blobs; only the record and STATE.md changed afterwards (selfCheck 3); clean tree",
+      "status": "realized"
+    },
+    {
+      "condition": "Remaining review concerns an inspection-based API declaration that source sufficiently evidences",
+      "where": "design Components/Interfaces (createApp exportDir default `exports`, now default, registerExportRoutes signature, POST route, ignored body); stated directly in src/app.ts, src/routes/export.ts, .gitignore; not exercised by tests (selfCheck 5)",
+      "status": "realized"
+    },
+    {
+      "condition": "No material defects",
+      "where": "src/export.ts, src/routes/export.ts, src/app.ts, router, tests; requireAdmin first, RFC 4180 quoting correct, 405 for wrong method",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "case-defect",
+      "assertion": -1,
+      "detail": "The utterance forbids all commands, while assertion 0 permits the STANDARDS runtime tools and read-only file viewing. A strict role may refuse to run check.mjs or artifact.mjs, or may stop instead of persisting the report. Without git, the Reviewer also cannot recompute the blob or commit identities the Tester record cites. It must accept that the evidence applies to the current content from reading files and .git refs, and may disclose this as a limitation. The case's premise ('independently examined ... exactly the assessed content') covers this, and the fixture cannot remove the ambiguity.",
+      "recommendation": "run_as_is",
+      "fix": "Judge should accept a run that discloses an unverified content identity as a non-material limitation, and should not penalize use of the runtime tools that assertion 0 explicitly permits."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 2,
+      "detail": "Assertion 2 has no deterministic preconditions, although a correct run under assertion 0's reading would mark the report COMPLETE and hand off to DOCUMENTING. Leaving the decision to the judge is conservative and cannot fail a correct run.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The base export-reviewing-impl already realizes every stated condition. Current Tester FULL evidence matches the clean tree exactly, and the design declares createApp/route API details that only source inspection establishes and no test exercises. No defects are planted. Checks are necessary conditions (no read-only git subcommands; review report exists with IMPLEMENTATION provenance) and invariants fit a Reviewer; the remaining concern is the case's inherent ambiguity about runtime tools and identity verification without git.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T20:10:45.891Z",
+  "costUsd": 0.2397352,
+  "ms": 56279,
+  "fixtureHash": "50768762e2699edd"
+}

@@ -1,0 +1,124 @@
+{
+  "case": "reviewer-2",
+  "caseHash": "0bda3f4020cc69c6",
+  "status": "draft",
+  "reviewedBy": null,
+  "notes": "Hand-written sample. The unstaged toCsv drops quote doubling and newline quoting (a material AC-001 defect); the untracked route and the unchanged admin caller both import the deleted authorize helper.",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial project"
+    },
+    {
+      "dir": "layers/10-cycle",
+      "action": "commit",
+      "message": "Start CSV export"
+    },
+    {
+      "dir": "layers/20-staged",
+      "action": "stage"
+    },
+    {
+      "dir": "layers/30-unstaged",
+      "action": "unstaged"
+    },
+    {
+      "dir": "layers/40-untracked",
+      "action": "untracked"
+    },
+    {
+      "action": "delete",
+      "paths": [
+        "src/auth/authorize.ts"
+      ],
+      "stage": false
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "reviewer",
+    "utterance": "Continue the active workflow from .standards/STATE.md. Review the implementation."
+  },
+  "graderOnly": [
+    "The unstaged cell() no longer doubles embedded quotes or quotes newlines, so AC-001 fails on the assembled working tree.",
+    "src/routes/exportRoute.ts (untracked) and src/admin/users.ts (unchanged) import the deleted src/auth/authorize.ts.",
+    "NOTES-scratch.md is unrelated to the cycle."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "export-20260924T090000Z-a7f3c1d2",
+    "REVIEW": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "NOTES-scratch.md"
+          ]
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "not": "DOCUMENTING"
+        },
+        {
+          "exists": "${REVIEW}"
+        },
+        {
+          "field": {
+            "path": "${REVIEW}",
+            "name": "Status",
+            "not": "COMPLETE"
+          }
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "unchanged": [
+        "src/**",
+        "test/**"
+      ],
+      "why": "Reviewer does not repair implementation it does not own"
+    },
+    {
+      "head_unchanged": true,
+      "why": "Reviewer must not change the assessed identity"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Reviewer must not change the assessed identity"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    }
+  ]
+}

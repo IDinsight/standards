@@ -1,0 +1,91 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState REVIEWING_FINAL, Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md header and Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Current scope, architecture, and context available with valid ownership",
+      "where": ".standards/docs/scope/<id>.md (AC-001..003), .standards/docs/specs/<id>.md (AC-003 no architectural impact), .standards/CONTEXT.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Development plan COMPLETE with valid provenance",
+      "where": ".standards/docs/development/<id>.md (Status COMPLETE, DEV-001..003 DONE)",
+      "status": "realized"
+    },
+    {
+      "condition": "Tester report COMPLETE with the guide AC pending Documenter",
+      "where": ".standards/docs/verification/<id>.md (FULL, COMPLETE; AC-003 later-role dependency on Documenter)",
+      "status": "realized"
+    },
+    {
+      "condition": "Passing implementation review recording AC-003 as a permitted Documenter dependency",
+      "where": ".standards/docs/reviews/<id>/implementation.md (COMPLETE, no material findings)",
+      "status": "realized"
+    },
+    {
+      "condition": "Documentation completed after the passing implementation review",
+      "where": "commits 'Document CSV export in the usage guide' and 'Record CSV export documentation' follow 'Record CSV export implementation review'; documentation record COMPLETE; Handoff FORWARD from DOCUMENTING",
+      "status": "realized"
+    },
+    {
+      "condition": "Guide accurately describes current flags (filters) and permissions",
+      "where": "docs/usage.md Roles, Exporting records, CSV format, checked against src/routes/export.ts, src/export.ts, src/records/filter.ts, src/app.ts",
+      "status": "realized"
+    },
+    {
+      "condition": "Every current AC and technical criterion has sufficient current evidence; no findings or gaps",
+      "where": "verification E1-E3/I1, implementation review R1-R4, documentation record; implementation and tests unchanged since assessed commit (selfCheck)",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and outstanding obligations inactive; nothing blocked",
+      "where": ".standards/STATE.md Recovery/Obligations Active false, BlockedOn NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "No final-deliverable review or synchronization record exists yet",
+      "where": "absent paths (selfCheck)",
+      "status": "realized"
+    },
+    {
+      "condition": "All work committed, clean tree",
+      "where": "git status clean",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "The fixture uses base export-project rather than the export-reviewing-impl base, replaying the cycle so AC-003 exists from scoping onward. The harness accepted it (baseHashes recorded), and the replay is coherent: code and tests match, check.mjs is ok, and the history order is realistic.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": ".standards/CONTEXT.md still describes the pre-cycle baseline (\"no export feature\"). Under PROTOCOL 'Project context lifecycle', planned active-cycle implementation does not make context stale, so a correct Reviewer should not route PROJECT_CONTEXT. The judge should be aware a run might comment on it.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition holds in the built tree: REVIEWING_FINAL after a FORWARD from DOCUMENTING, COMPLETE upstream records with AC-003 previously pending Documenter, and an accurate guide verified against the code. Nothing leaks, check.mjs is clean, and the checks (provenance and fields, AC-003 mention, implementation report unchanged, no sync record, COMPLETE, SYNCHRONIZING via FORWARD, /synchronizer invocation) are all necessary for a correct run. The invariants fit a Reviewer that must not touch code, tests, or docs.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T23:17:08.764Z",
+  "costUsd": 0.967676,
+  "ms": 44710,
+  "fixtureHash": "1b051c449ad466d8"
+}

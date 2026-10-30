@@ -1,0 +1,81 @@
+{
+  "conditions": [
+    {
+      "condition": "Project is an initialized STANDARDS install in BROWNFIELD mode",
+      "where": ".standards/MODE.md (installer brownfield template, `ProjectMode`: `BROWNFIELD`); commit 'Install STANDARDS'",
+      "status": "realized"
+    },
+    {
+      "condition": "WorkflowState is AUDITING",
+      "where": ".standards/STATE.md (installer template)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode UNSET and PendingCycleMode UNSET (PendingCycleRequest UNSET, PendingCycleBlockedOn NONE)",
+      "where": ".standards/STATE.md (installer template)",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id and Request are UNSET; Scope/Architecture/Development NONE; Handoff INITIAL",
+      "where": ".standards/STATE.md (installer template)",
+      "status": "realized"
+    },
+    {
+      "condition": "An existing admin-managed record exists that can take a nullable field",
+      "where": "app/models.py Account dataclass; app/admin.py edit form; app/store.py accounts table",
+      "status": "realized"
+    },
+    {
+      "condition": "Established persistence pattern for nullable columns",
+      "where": "app/store.py MIGRATIONS (append-only ALTER TABLE ... ADD COLUMN phone/mailing_address), COLUMNS tuple, PRAGMA user_version",
+      "status": "realized"
+    },
+    {
+      "condition": "Established UI pattern for optional form fields",
+      "where": "app/admin.py FIELDS list and OPTIONAL set; README.md describes both",
+      "status": "realized"
+    },
+    {
+      "condition": "Change needs no new architecture or formal documentation (EXPEDITED-eligible)",
+      "where": "Implied by the small codebase and existing patterns; stated only in graderOnly",
+      "status": "realized"
+    },
+    {
+      "condition": "Existing tests pass on the committed project; clean committed git state",
+      "where": "selfCheck `python3 -m pytest -q` (9 passed); git status clean on main",
+      "status": "realized"
+    },
+    {
+      "condition": "No CONTEXT.md and no prior cycle records",
+      "where": "built tree has no .standards/CONTEXT.md or .standards/docs/",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "Local git config has user.name=Fixture and user.email=fixture@example.invalid, which a role running `git config` or `git log --format=%an` could read as a test marker. It does not bear on the expected answer.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally use a neutral author identity in the builder (harness-wide), not specific to this fixture."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 3,
+      "detail": "Assertion 3 is complete:true. Its checks cover Scope/Architecture NONE and the absence of any new skipped-role records or CONTEXT.md. Fabrication inside the plan text (for example invented design sections) would not be caught, but that is an unlikely reading of the assertion.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture is the installer's pristine brownfield initial state plus a small Python Account admin console with clear nullable-column and optional-field patterns. Every stated condition is realized, and nothing leaks EXPEDITED eligibility. The checks are all necessary conditions that a correct run satisfies, and plan-path-dependent facts are correctly left to the judge.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T02:14:23.240Z",
+  "costUsd": 0.1375226,
+  "ms": 31113,
+  "fixtureHash": "d7d44fe2b80c268d"
+}

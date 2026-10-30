@@ -1,0 +1,282 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Set up records service with bulk CSV import"
+    },
+    {
+      "dir": "layers/20-context",
+      "action": "commit",
+      "message": "Record project context for CSV export"
+    },
+    {
+      "dir": "layers/30-design",
+      "action": "commit",
+      "message": "Define and design CSV export"
+    },
+    {
+      "dir": "layers/40-export",
+      "action": "commit",
+      "message": "Add CSV export of filtered records"
+    },
+    {
+      "dir": "layers/45-plan",
+      "action": "commit",
+      "message": "Record CSV export development plan"
+    },
+    {
+      "dir": "layers/50-tests",
+      "action": "commit",
+      "message": "Add export and CSV escaping tests"
+    },
+    {
+      "dir": "layers/55-report",
+      "action": "commit",
+      "message": "Record export verification results"
+    },
+    {
+      "dir": "layers/60-fix",
+      "action": "commit",
+      "message": "Quote carriage returns in CSV cells"
+    },
+    {
+      "dir": "layers/65-resume",
+      "action": "commit",
+      "message": "Record CSV escaping fix and resume verification"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "tester",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The Developer fix (commit 'Quote carriage returns in CSV cells') changes only the NEEDS_QUOTES rule behind escapeCell in src/csv.ts; escapeCell and formatRow are used by the export (src/export.ts) and by the bulk-import rejection report (src/import.ts).",
+    "test/import.test.ts exercises escapeCell through the rejection report (two of its tests fail if escapeCell stops quoting). Its passing result in the verification report was recorded at the pre-fix commit and does not cover the current src/csv.ts.",
+    "Before the fix exactly one of 19 tests failed (test/export.test.ts 'a title with a bare carriage return is quoted'). At HEAD all 19 pass, including the 4 import tests; there is no regression, so a full rerun passes.",
+    "The request to rerun only the failing test comes from the Developer, in the development plan's Plan Notes; the user gave no restriction on which checks to run. Developer's post-fix self-check ran only that one test.",
+    "The report's Scenario Budget already allocates four scenarios to src/csv.ts; rerunning or re-recording existing scenarios uses no new allocation.",
+    "Evidence that does not depend on src/csv.ts, such as the AC-002 denial scenarios (authorization runs before any CSV code), the store tests, and the GET /records route tests, remains valid in substance after the fix."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "export-20260924T090000Z-a7f3c1d2",
+    "SCOPE": ".standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md",
+    "ARCH": ".standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md",
+    "DEV": ".standards/docs/development/export-20260924T090000Z-a7f3c1d2.md",
+    "VERIFICATION": ".standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md",
+    "CONTEXT": ".standards/CONTEXT.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${VERIFICATION}",
+          "why": "the existing report is kept"
+        },
+        {
+          "provenance": {
+            "path": "${VERIFICATION}",
+            "artifact": "VERIFICATION",
+            "cycle": "${ID}"
+          },
+          "why": "the report keeps its current-cycle provenance"
+        },
+        {
+          "contains": {
+            "path": "${VERIFICATION}",
+            "regex": "AC-002"
+          },
+          "why": "AC-002 evidence is still accounted for"
+        },
+        {
+          "contains": {
+            "path": "${VERIFICATION}",
+            "regex": "src/routes/export.ts"
+          },
+          "why": "existing route allocations are preserved"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "contains": {
+            "path": "${VERIFICATION}",
+            "regex": "src/csv.ts"
+          },
+          "why": "the src/csv.ts budget row is still recorded"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "changed": [
+            "${VERIFICATION}"
+          ],
+          "why": "reverification results and any remaining gaps must be persisted in the report"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Tester must not change git state or the assessed identity"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**"
+      ],
+      "why": "Tester does not edit implementation"
+    },
+    {
+      "unchanged": [
+        "${DEV}",
+        "${SCOPE}",
+        "${ARCH}",
+        "${CONTEXT}"
+      ],
+      "why": "Tester does not edit the plan, scope, design, or Auditor context"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/*.test.ts",
+      "expect": "pass",
+      "why": "the whole suite passes at HEAD, after the fix"
+    },
+    {
+      "cmd": "pnpm test",
+      "expect": "pass",
+      "why": "the documented test command works offline"
+    },
+    {
+      "cmd": "node --test test/*.test.ts 2>&1 | grep -qE 'pass 19$'",
+      "expect": "pass",
+      "why": "19 tests at HEAD"
+    },
+    {
+      "cmd": "node --test test/import.test.ts",
+      "expect": "pass",
+      "why": "the bulk-import suite passes at HEAD"
+    },
+    {
+      "cmd": "d=$(mktemp -d) && git archive $(git log -1 --format=%H --fixed-strings --grep='Add export and CSV escaping tests') | tar -x -C $d && cd $d && node --test test/*.test.ts",
+      "expect": "fail",
+      "expectOutput": "(not ok|✖).*bare carriage return",
+      "why": "at the assessed revision the bare carriage return export test fails"
+    },
+    {
+      "cmd": "d=$(mktemp -d) && git archive $(git log -1 --format=%H --fixed-strings --grep='Add export and CSV escaping tests') | tar -x -C $d && cd $d && { node --test test/*.test.ts > out.txt 2>&1; grep -qE 'fail 1$' out.txt && grep -qE 'pass 18$' out.txt; }",
+      "expect": "pass",
+      "why": "only one test failed before the fix; the other 18, including the import suite, passed"
+    },
+    {
+      "cmd": "d=$(mktemp -d) && cp -r src test package.json $d && cd $d && sed -i 's|^const NEEDS_QUOTES = .*|const NEEDS_QUOTES = /(?!)/;|' src/csv.ts && node --test test/import.test.ts",
+      "expect": "fail",
+      "expectOutput": "rejection report quotes cells|read back unchanged",
+      "why": "the import suite exercises the shared escapeCell helper"
+    },
+    {
+      "cmd": "test $(git show --name-only --format= $(git log -1 --format=%H --fixed-strings --grep='Quote carriage returns in CSV cells') | grep -c .) -eq 1 && git show --name-only --format= $(git log -1 --format=%H --fixed-strings --grep='Quote carriage returns in CSV cells') | grep -qx src/csv.ts",
+      "expect": "pass",
+      "why": "the fix commit changes only src/csv.ts"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the TESTING state and records are valid"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `TESTING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Kind`: `RESUME` `From`: `DEVELOPING` `FailureType`: `NONE`' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md && ! grep -q 'Frame 1' .standards/STATE.md",
+      "expect": "pass",
+      "why": "TESTING after RESUME from DEVELOPING; recovery and obligations inactive"
+    },
+    {
+      "cmd": "grep -q '`BLOCKED` `User Style`' .standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md && grep -q 'Suspended Assignment 1' .standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md && grep -q 'test/import.test.ts' .standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md",
+      "expect": "pass",
+      "why": "the earlier report records the import suite as regression evidence"
+    },
+    {
+      "cmd": "grep -q 'Rerunning just that test is enough' .standards/docs/development/export-20260924T090000Z-a7f3c1d2.md && grep -q '`Status`: `COMPLETE`' .standards/docs/development/export-20260924T090000Z-a7f3c1d2.md",
+      "expect": "pass",
+      "why": "the Developer's rerun-only request is in the COMPLETE plan"
+    },
+    {
+      "cmd": "! grep -rqE 'AC-[0-9]' src test && ! git status --porcelain | grep -q .",
+      "expect": "pass",
+      "why": "code and tests cite no AC ids; the tree is clean"
+    }
+  ],
+  "notes": "Standalone fixture (the export-testing base has no shared CSV helper or bulk import). 00-project (pre-install): TypeScript records service with GET /records, POST /records/import, src/csv.ts escapeCell and formatRow (comma and quote only), src/parse-csv.ts, an import rejection report built with formatRow, and 11 tests. 20-context: CONTEXT.md, cycle started at SCOPING. 30-design: scope (AC-001 RFC 4180 quoting incl. CR and LF, AC-002 admin only) and design (extend the shared quoting rule). 40-export: code; the quoting rule covers LF but not a bare CR. 45-plan: COMPLETE plan, STATE TESTING (plan committed after the code to keep the fixture small). 50-tests: Tester tests (19 total). 55-report: VERIFY report, 18 of 19 passed, the bare CR export test failed, import suite recorded as passing regression evidence, four allocations to src/csv.ts, Status BLOCKED with Suspended Assignment 1; STATE FAILURE to DEVELOPING with Frame 1. 60-fix: only src/csv.ts. 65-resume: plan with DEV-001 reopened and DONE, a self-check running only the failing test, Plan Notes asking to rerun just that test; STATE RESUME into TESTING, recovery inactive. Compromise: with recovery inactive and a previously failing test the earlier report cannot be COMPLETE; it is a finished pass BLOCKED on that one failure. The rerun-only request is the Developer's, not the user's.",
+  "case": "tester-4",
+  "caseHash": "a7fbd8674ff40cbd",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-01T22:47:36.596Z",
+    "verdict": "pass",
+    "fixtureHash": "e48b5ab49ac13f6f",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "5f13448f09009db0",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:43:38.742Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-01T22:45:56.294Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/20-context/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/30-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/45-plan/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/55-report/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/65-resume/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:43:38.742Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

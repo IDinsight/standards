@@ -1,0 +1,66 @@
+{
+  "conditions": [
+    {
+      "condition": "Navigator is invoked with the utterance 'Explain the worker.'",
+      "where": "spec.prompt (skill navigator, utterance verbatim from catalog)",
+      "status": "realized"
+    },
+    {
+      "condition": "STANDARDS is installed and .standards/STATE.md exists",
+      "where": ".standards/STATE.md (pristine brownfield initial state from the installer, commit 'Install STANDARDS')",
+      "status": "realized"
+    },
+    {
+      "condition": ".standards/MODE.md is absent",
+      "where": "git rm in delete layer, committed in 'Document worker configuration'; selfChecks confirm absent and untracked",
+      "status": "realized"
+    },
+    {
+      "condition": ".standards/INSTALLATION.json is absent",
+      "where": "same commit; selfChecks confirm",
+      "status": "realized"
+    },
+    {
+      "condition": "check.mjs reports the missing metadata (deliberately invalid runtime)",
+      "where": "gate check.mjs output: exactly two 'is missing, so the runtime is incomplete.' problems for MODE.md and INSTALLATION.json",
+      "status": "realized"
+    },
+    {
+      "condition": "Worker source is readable and explainable",
+      "where": "src/worker.js, src/queue.js, src/handlers/sendEmail.js, src/index.js; tests pass (selfCheck)",
+      "status": "realized"
+    },
+    {
+      "condition": "Clean committed tree (no dirty state confounding the explanation)",
+      "where": "git status '## main' with no changes",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 1,
+      "detail": "reply_matches 'retr|attempt|backoff' assumes every correct explanation mentions retries. Retry/backoff is the worker's central logic and src/worker.js lines 1-3 and its maxAttempts field make a match near-certain, but a terse explanation phrased as 'pushed back with an exponential delay' or 're-queued' would not match.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally widen to 'retr|attempt|backoff|exponential|re-?queue|dead' in spec.json checks[1]."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The two metadata files are deleted in a commit titled 'Document worker configuration' alongside a README edit. This reads as an accidental deletion. It is plausible and does not hint at the expected behavior.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition. STATE.md is the pristine installed state, the absence of MODE.md and INSTALLATION.json is committed with check.mjs reporting exactly those two problems, and a small readable worker has passing tests. The checks and invariants (absent files, unchanged **, HEAD unchanged, no mutating git) cannot fail a correct non-mutating Navigator run. Assertion 0 is reasonably left to the judge for non-git installer or CLI attempts.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T01:36:32.494Z",
+  "costUsd": 0.1137522,
+  "ms": 23348,
+  "fixtureHash": "6901e1d953d90d45"
+}

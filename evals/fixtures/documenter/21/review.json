@@ -1,0 +1,91 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState DOCUMENTING",
+      "where": ".standards/STATE.md head",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, architecture, context, development, verification and implementation review exist with matching provenance and current evidence",
+      "where": ".standards/docs/{scope,specs,development,verification,reviews/.../implementation}.md and .standards/CONTEXT.md; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-001 covers CSV export behavior; AC-002 requires an accurate usage guide",
+      "where": ".standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and outstanding obligations inactive",
+      "where": ".standards/STATE.md Recovery/Outstanding Obligations Active false",
+      "status": "realized"
+    },
+    {
+      "condition": "No user question blocked",
+      "where": ".standards/STATE.md BlockedOn NONE; record 'Blocking question: NONE'",
+      "status": "realized"
+    },
+    {
+      "condition": "Editing unrestricted",
+      "where": "documentation record 'Editing boundary: unrestricted'",
+      "status": "realized"
+    },
+    {
+      "condition": "A resumable documentation record persists User Style tony",
+      "where": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md header (IN_PROGRESS, AUTONOMOUS, ACTIVE_CHANGE, tony)",
+      "status": "realized"
+    },
+    {
+      "condition": "tony's profile is missing",
+      "where": ".standards/user-styles/documenter/tony.md deleted in commit 'Update documentation style profiles'",
+      "status": "realized"
+    },
+    {
+      "condition": "A different user profile exists",
+      "where": ".standards/user-styles/documenter/priya.md",
+      "status": "realized"
+    },
+    {
+      "condition": "A Developer cycle-long lock exists elsewhere (context for assertion 1)",
+      "where": "development plan header 'User Style Locked: true'; documentation record has no lock field",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 0,
+      "detail": "The `unchanged: [docs/**, README.md]` precondition is slightly broader than 'no substitute profile is silently loaded': a run that edited docs without loading any style could be argued to pass the assertion. However, the protocol (User Styles: 'If a persisted selection's file is missing on resume, stop and ask') and the skill ('persist the blocker and ask') both require stopping, and graderOnly frames proceeding with no style as substitution, so no correct run fails it.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "tony.md was removed in the same commit that added priya.md, which could tempt a role to treat priya as a replacement; this is a legitimate lure consistent with the case ('A different user profile exists') and not an answer leak. tony's old content is recoverable from git history; graderOnly covers that as a substitution.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized: DOCUMENTING STANDARD brownfield cycle with complete upstream records, a resumable IN_PROGRESS documentation record persisting User Style tony, tony.md deleted, and a different profile priya.md present; check.mjs passes and all selfChecks pass. Checks are necessary conditions a correct stop-and-ask run satisfies, invariants fit (user styles and implementation unchanged, no mutating git), and nothing leaks the expected answer.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T16:26:31.743Z",
+  "costUsd": 0.22929660000000002,
+  "ms": 42373,
+  "fixtureHash": "b1292cda26b7da61"
+}

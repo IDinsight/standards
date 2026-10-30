@@ -1,0 +1,13 @@
+# Fixture layers are whole synthetic projects, so they hold files the root
+# .gitignore drops (data/ folders, .env files, logs, editor folders). Track
+# every file here: a fixture builds only from exactly the files that were
+# reviewed. Files a layer's own .gitignore hides (scoper-14's node_modules/)
+# need `git add -f`; `pnpm evals check` lists any that git would leave out.
+!*
+!*/
+# Except what stays local: each spec dir's generation log, the decision logs,
+# and the .DS_Store files Finder writes.
+/*/*/gen/
+/decisions.jsonl
+/regenerate-notes.json
+.DS_Store

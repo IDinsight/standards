@@ -1,0 +1,206 @@
+{
+  "base": "export-documenting",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-operator-docs",
+      "action": "commit",
+      "message": "Import operator pages from the team wiki"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "documenter",
+    "utterance": "Update the documentation in the docs/operators folder."
+  },
+  "graderOnly": [
+    "Within docs/operators, only runbook.md and migration.md need updates for this cycle. runbook.md says the service writes nothing to disk and the host needs no writable directory. That is no longer true: POST /records/export writes CSV files to exports/ under the working directory (or createApp's exportDir), creates the folder when missing, never removes files, and a second export in the same second replaces the first. migration.md has no entry for the change that adds the administrator-only POST /records/export route and the new writable export folder.",
+    "docs/operators/the-quiet-pager.md is an old on-call essay imported from the wiki. It is unrelated to the export and needs no change.",
+    "docs/usage.md lies outside the selected folder and still has no export section, which AC-002 requires. The full Documenter gate cannot pass until it is addressed. A correct run records it as required cycle documentation outside the target, and may ask whether to extend the target, rather than claiming full documentation completion.",
+    "The implementation has no material defects; the verification and implementation review records are current."
+  ],
+  "history": null,
+  "vars": {
+    "OPS": "docs/operators",
+    "RUNBOOK": "docs/operators/runbook.md",
+    "MIGRATION": "docs/operators/migration.md",
+    "ESSAY": "docs/operators/the-quiet-pager.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "provenance": {
+            "path": "${DOC}",
+            "artifact": "DOCUMENTATION",
+            "cycle": "${ID}"
+          }
+        },
+        {
+          "field": {
+            "path": "${DOC}",
+            "name": "Collaboration",
+            "equals": "AUTONOMOUS"
+          },
+          "why": "folder selection leaves collaboration at its default"
+        },
+        {
+          "field": {
+            "path": "${DOC}",
+            "name": "Target",
+            "equals": "FOLDER"
+          }
+        },
+        {
+          "contains": {
+            "path": "${DOC}",
+            "regex": "`Target Detail`:\\s*`docs/operators/?`"
+          }
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "${ESSAY}"
+          ],
+          "why": "the unrelated essay is preserved"
+        },
+        {
+          "exists": "${DOC}"
+        },
+        {
+          "contains": {
+            "path": "${DOC}",
+            "regex": "quiet-pager|quiet pager",
+            "flags": "i"
+          },
+          "why": "the excluded essay is named in the record"
+        },
+        {
+          "contains": {
+            "path": "${DOC}",
+            "regex": "runbook",
+            "flags": "i"
+          }
+        },
+        {
+          "contains": {
+            "path": "${DOC}",
+            "regex": "migration",
+            "flags": "i"
+          }
+        },
+        {
+          "contains": {
+            "path": "${DOC}",
+            "regex": "docs/usage\\.md|usage guide",
+            "flags": "i"
+          },
+          "why": "AC-002's guide is part of the cycle inventory"
+        },
+        {
+          "contains": {
+            "path": "${DOC}",
+            "regex": "AC-002"
+          }
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the established unit suite still passes"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the DOCUMENTING state is valid after the wiki import commit"
+    },
+    {
+      "cmd": "test -f docs/operators/runbook.md && test -f docs/operators/migration.md && test -f docs/operators/the-quiet-pager.md && test $(ls docs/operators | wc -l) -eq 3",
+      "expect": "pass",
+      "why": "the folder holds exactly the runbook, the migration page, and the essay"
+    },
+    {
+      "cmd": "grep -q 'writes nothing to disk' docs/operators/runbook.md && ! grep -rqi export docs/operators && ! grep -qi export docs/usage.md",
+      "expect": "pass",
+      "why": "the runbook still claims no disk writes, and no operator page or the usage guide describes the export"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && test ! -e .standards/docs/documentation && test \"$(git log -1 --format=%s)\" = 'Import operator pages from the team wiki'",
+      "expect": "pass",
+      "why": "clean tree, no documentation record yet, wiki import is the latest commit"
+    },
+    {
+      "cmd": "c=$(git log --format=%H -1 --fixed-strings --grep='Record CSV export implementation review') && test \"$(git diff --name-only $c HEAD)\" = \"$(printf 'docs/operators/migration.md\\ndocs/operators/runbook.md\\ndocs/operators/the-quiet-pager.md')\"",
+      "expect": "pass",
+      "why": "the overlay only adds the three operator pages"
+    }
+  ],
+  "notes": "Built on export-documenting (cycle export-20260924T090000Z-a7f3c1d2 at DOCUMENTING, STANDARD, BROWNFIELD, FORWARD from REVIEWING_IMPLEMENTATION; scope, design, context, COMPLETE plan, COMPLETE FULL verification, and COMPLETE implementation review; no blockers, recovery, or obligations). One overlay commit, 'Import operator pages from the team wiki', adds docs/operators/ with three pages carried over from the wiki: runbook.md (written before the export; says the service writes nothing to disk and needs no writable directory, so it needs updating), migration.md (per-release operator changes up to 0.3.0, with no entry for the export change, so it needs updating), and the-quiet-pager.md (a 2024 on-call essay, unrelated). The wiki import explains why an old unrelated essay sits in the folder. The import touches no implementation or test files, so the verification and review evidence stays current. The base's AC-002 names docs/usage.md, which is outside the selected folder and still lacks an export section. This makes the 'required cycle inventory' in assertion 1 concrete: Documenter must record that guide as remaining cycle work beyond the target. No check constrains whether Documenter edits docs/usage.md, asks for direction, or which state it leaves.",
+  "case": "documenter-3",
+  "caseHash": "edfbeb04e214d1e8",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T16:21:02.227Z",
+    "verdict": "pass",
+    "fixtureHash": "3d04c77b5baca43c",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "f04830fda0c5345c",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:09:15.348Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T14:06:10.007Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-documenting": "cad63ec878d1dad0"
+  },
+  "migrations": [
+    {
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:09:15.348Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

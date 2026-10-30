@@ -1,0 +1,84 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState SYNCHRONIZING, Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md (layer 74), Handoff FORWARD from REVIEWING_FINAL",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, architecture, context, plan, verification and both review reports have valid ownership and content identities",
+      "where": ".standards/docs/** and .standards/CONTEXT.md with matching provenance and resolved blob/commit identities; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "Documentation evidence available",
+      "where": ".standards/docs/documentation/<id>.md, Status COMPLETE",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and outstanding obligations inactive; no blocked user question",
+      "where": "STATE.md Recovery/Obligations Active false, BlockedOn NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Guide moved unchanged from docs/export.md to docs/usage/export.md",
+      "where": "commit 'Move export guide under docs/usage' (R100 rename plus link updates in README.md and docs/usage.md); selfCheck confirms identical blob",
+      "status": "realized"
+    },
+    {
+      "condition": "Documenter has current evidence for the move",
+      "where": "documentation record G4 (R100 move check), G5 (navigation links), current blobs of docs/usage/export.md, docs/usage.md, README.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Final review links only the deleted old path and does not assess navigation changes",
+      "where": "final-deliverable.md names docs/export.md only (with the unchanged blob), lists it among changed files, never mentions docs/usage.md, docs/usage/export.md, or README.md",
+      "status": "realized"
+    },
+    {
+      "condition": "No other discrepancy (implementation, tests, verification, implementation review sound)",
+      "where": "src/test unchanged since the implementation commit; tests pass; records mutually consistent",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "final-deliverable.md says its assessed revision is bbfd0f6 (after the move) yet lists docs/export.md as a changed file in baseline..bbfd0f6, where that path no longer exists, and omits README.md/docs/usage.md. A real `git diff` would not produce that list. It is consistent with the case's stale-review premise and still routes to Reviewer (REVIEW, FINAL_DELIVERABLE), so it does not change what is tested.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "The fixture builds on export-project instead of the suggested export-synchronizing, because that base's documentation lives in docs/usage.md. The build succeeded with baseHashes recorded, and layers 50-66 faithfully reproduce the cycle history. This choice is reasonable.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "check-wrong",
+      "assertion": -1,
+      "detail": "I traced check_ok for the expected FAILURE route to REVIEWING_FINAL (frame From SYNCHRONIZING, Owner REVIEWING_FINAL, REVIEW). With recovery active and Kind FAILURE, fullBoundary is false and only a COMPLETE synchronization record would be held. The design and fixed-record checks are skipped, so no new problem appears. Staying in SYNCHRONIZING with a blocker also passes.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized. The guide's R100 move, Documenter's current move and navigation evidence, and the final review that cites only the deleted path with the unchanged blob are all present, and check.mjs and every selfCheck pass. The checks (WorkflowState in SYNCHRONIZING/REVIEWING_FINAL, sync record not COMPLETE, record names docs/usage/export.md, guide, review, and documentation record unchanged) are necessary conditions for any correct run, and the invariants fit a Synchronizer. Only minor realism notes remain.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T14:32:30.443Z",
+  "costUsd": 0.4228248,
+  "ms": 57933,
+  "fixtureHash": "7cf8ddbcc959e803"
+}

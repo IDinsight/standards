@@ -1,0 +1,202 @@
+#!/usr/bin/env node
+'use strict';
+// S.T.A.N.D.A.R.D.S. command-line installer.
+//
+//   standards <install|upgrade|reset|uninstall> [--project <path>]
+//     [--mode greenfield|brownfield] [--dry-run] [--yes]
+
+const fs = require('node:fs');
+const path = require('node:path');
+
+const VERSION = '0.15.0';
+const PACKAGE = '@idinsight/standards';
+const MARKER = '<!-- standards:framework-owned -->';
+const COMMANDS = ['install', 'upgrade', 'reset', 'uninstall'];
+
+const USAGE = `standards ${VERSION}
+
+Usage: standards <command> [options]
+
+Commands:
+  install      Install STANDARDS into a project
+  upgrade      Upgrade an installed project to this version
+  reset        Return an installed project's workflow to a fresh installation
+  uninstall    Remove STANDARDS from a project
+
+Options:
+  --project <path>     Project directory (default: current directory)
+  --mode <mode>        greenfield or brownfield (install, reset)
+  --client <name>      claude, codex, or both (install)
+  --hooks, --no-hooks  Add or skip the stop hook (install)
+  --dry-run            Report planned changes without writing files
+  --yes                Skip the confirmation prompt
+  --version            Print the CLI version
+  --help               Show this help
+`;
+
+function fail(message) {
+  process.stderr.write(`standards: ${message}\n`);
+  process.exit(1);
+}
+
+function say(lines) {
+  process.stdout.write(`${[].concat(lines).join('\n')}\n`);
+}
+
+function parseArgs(argv) {
+  const options = { command: null, project: null, mode: null, dryRun: false, yes: false, help: false, version: false };
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
+    const [name, inline] = arg.split(/=(.*)/s, 2);
+    const value = () => {
+      const next = inline ?? argv[(index += 1)];
+      if (next === undefined || next === '') fail(`${name} needs a value.`);
+      return next;
+    };
+    switch (name) {
+      case '--project': options.project = value(); break;
+      case '--mode': options.mode = value().toLowerCase(); break;
+      case '--client': value(); break;
+      case '--hooks': case '--no-hooks': break;
+      case '--dry-run': options.dryRun = true; break;
+      case '--yes': case '-y': options.yes = true; break;
+      case '--help': case '-h': options.help = true; break;
+      case '--version': case '-v': case '-V': options.version = true; break;
+      default:
+        if (!arg.startsWith('-') && options.command === null) options.command = arg;
+        else fail(`unknown argument ${arg}. Run standards --help.`);
+    }
+  }
+  return options;
+}
+
+function stateTemplate(mode) {
+  const start = mode === 'GREENFIELD' ? 'SCOPING' : 'AUDITING';
+  return [
+    '# S.T.A.N.D.A.R.D.S. Workflow State',
+    '',
+    '`WorkflowState`: `' + start + '` `CycleMode`: `UNSET` `PendingCycleMode`: `UNSET`',
+    '`PendingCycleRequest`: `UNSET` `PendingCycleBlockedOn`: `NONE`',
+    '',
+    '## Active Work',
+    '',
+    '`Id`: `UNSET` `Request`: `UNSET` `Scope`: `NONE` `Architecture`: `NONE`',
+    '`Development`: `NONE` `PromotionReason`: `NONE` `AuditTarget`: `NONE`',
+    '`BlockedOn`: `NONE` `PendingVerificationCadence`: `NONE`',
+    '',
+    '`BaselineReconciliation`: `NONE`',
+    '',
+    '## Handoff',
+    '',
+    '`Kind`: `INITIAL` `From`: `NONE` `FailureType`: `NONE` `Reason`:',
+    '`Initial ' + mode.toLowerCase() + ' workflow state; cycle mode not yet selected.`',
+    '',
+    '## Recovery',
+    '',
+    '`Active`: `false`',
+    '',
+    '## Outstanding Obligations',
+    '',
+    '`Active`: `false`',
+    '',
+  ].join('\n');
+}
+
+function modeTemplate(mode) {
+  return ['# S.T.A.N.D.A.R.D.S. Project Mode', '', '`ProjectMode`: `' + mode + '`', ''].join('\n');
+}
+
+function detectMode(root) {
+  const ignored = new Set(['.git', '.standards', '.claude', '.codex', '.agents', 'AGENTS.md', 'CLAUDE.md', '.gitignore']);
+  const project = fs.readdirSync(root).filter((name) => !ignored.has(name) && !/^(README|LICENSE)/i.test(name));
+  return project.length ? 'brownfield' : 'greenfield';
+}
+
+function countRecords(dir) {
+  if (!fs.existsSync(dir)) return 0;
+  let count = 0;
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) count += countRecords(full);
+    else if (entry.isFile() && entry.name.endsWith('.md')) count += 1;
+  }
+  return count;
+}
+
+function main() {
+  const options = parseArgs(process.argv.slice(2));
+  if (options.version || options.command === 'version') return say(VERSION);
+  if (options.help || options.command === null || options.command === 'help') return process.stdout.write(USAGE);
+  const { command } = options;
+  if (!COMMANDS.includes(command)) fail(`unknown command ${command}. Run standards --help.`);
+  if (options.mode !== null && !['greenfield', 'brownfield'].includes(options.mode)) {
+    fail('--mode must be greenfield or brownfield.');
+  }
+
+  const root = path.resolve(options.project ?? process.cwd());
+  if (!fs.existsSync(root) || !fs.statSync(root).isDirectory()) fail(`${command}: ${root} is not a directory.`);
+  const read = (relative) => {
+    try {
+      return fs.readFileSync(path.join(root, relative), 'utf8');
+    } catch (error) {
+      if (error.code === 'ENOENT') return null;
+      throw error;
+    }
+  };
+  const protocol = read('.standards/PROTOCOL.md');
+  if (!protocol || !protocol.includes(MARKER)) fail(`${command}: no STANDARDS installation found at ${root}.`);
+
+  const versionFile = path.join(root, '.standards', 'VERSION.json');
+  const versionText = read('.standards/VERSION.json');
+  if (versionText === null) {
+    fail(`${command}: ${versionFile} is missing, so the installed version cannot be checked. Nothing was changed.`);
+  }
+  let recorded;
+  try {
+    recorded = JSON.parse(versionText);
+  } catch (error) {
+    fail(`${command}: ${versionFile} is invalid (${error.message}). The installed version cannot be checked, so ${command} refuses to run. Nothing was changed.`);
+  }
+  const installed = recorded && typeof recorded.version === 'string' ? recorded.version : null;
+  if (!installed) {
+    fail(`${command}: ${versionFile} is invalid (no version recorded). The installed version cannot be checked, so ${command} refuses to run. Nothing was changed.`);
+  }
+  if (installed !== VERSION) {
+    fail(`${command}: ${root} has STANDARDS ${installed}, but this CLI is ${VERSION}. Run the matching release instead: npx ${PACKAGE}@${installed} ${command}`);
+  }
+
+  if (command === 'install' || command === 'upgrade') {
+    return say(`STANDARDS ${VERSION} is already installed at ${root}; nothing to change.`);
+  }
+  if (command === 'uninstall') {
+    say([`Target: ${root}`, 'Planned changes:',
+      '  delete .standards/ (workflow state, project context, cycle records, user styles)',
+      '  remove STANDARDS skills, hooks, and managed blocks']);
+    if (options.dryRun) return say('Dry run: nothing was changed.');
+    if (!options.yes) fail('uninstall: confirmation required; run again with --yes.');
+    fs.rmSync(path.join(root, '.standards'), { recursive: true, force: true });
+    return say('Uninstalled STANDARDS.');
+  }
+
+  const mode = (options.mode ?? detectMode(root)).toUpperCase();
+  const docs = path.join(root, '.standards', 'docs');
+  const records = countRecords(docs);
+  const plural = records === 1 ? '' : 's';
+  const context = read('.standards/CONTEXT.md') !== null;
+  const plan = [`Target: ${root}`, `Mode: ${mode}${options.mode ? '' : ' (chosen from project contents)'}`, 'Planned changes:'];
+  if (context) plan.push('  delete .standards/CONTEXT.md');
+  if (fs.existsSync(docs)) plan.push(`  delete .standards/docs/ (${records} cycle record${plural})`);
+  plan.push('  write .standards/STATE.md (fresh workflow state)', `  write .standards/MODE.md (${mode})`);
+  plan.push('Kept: PROTOCOL.md, protocol/, bin/, VERSION.json, INSTALLATION.json, user-styles/, skills, hooks, client settings, managed blocks');
+  if (records) plan.push(`Warning: ${records} cycle record${plural} under .standards/docs/ will be deleted.`);
+  say(plan);
+  if (options.dryRun) return say('Dry run: nothing was changed.');
+  if (!options.yes) fail('reset: confirmation required; run again with --yes.');
+  if (context) fs.rmSync(path.join(root, '.standards', 'CONTEXT.md'));
+  fs.rmSync(docs, { recursive: true, force: true });
+  fs.writeFileSync(path.join(root, '.standards', 'STATE.md'), stateTemplate(mode));
+  fs.writeFileSync(path.join(root, '.standards', 'MODE.md'), modeTemplate(mode));
+  return say('Reset complete.');
+}
+
+main();

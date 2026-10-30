@@ -1,0 +1,99 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState SYNCHRONIZING, Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md head and Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, architecture, context, development plan, verification, and both review reports exist with valid provenance and content identities",
+      "where": ".standards/docs/{scope,specs,development,verification,reviews/<id>/implementation.md,reviews/<id>/final-deliverable.md}, .standards/CONTEXT.md; blob/commit citations in each record",
+      "status": "realized"
+    },
+    {
+      "condition": "Documentation evidence is available",
+      "where": ".standards/docs/documentation/<id>.md (COMPLETE, checks G1–G4)",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and outstanding obligations inactive; no blocked user question",
+      "where": "STATE.md Recovery Active false, Obligations Active false, BlockedOn NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope adds AC-004 for audit events",
+      "where": "scope record Work item 2, `AC-004` list item (admin-only rejection plus audit event for every request)",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope retires AC-002",
+      "where": "scope record `## Retired Acceptance Identifiers` → `- `AC-002`: Retired; replaced by AC-004…`",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-001 and AC-003 retained unchanged",
+      "where": "scope record AC-001 and AC-003 list items; text matches the old inventory the records cite",
+      "status": "realized"
+    },
+    {
+      "condition": "Completed downstream reports cover only the earlier inventory",
+      "where": "design, plan, verification, both reviews, documentation record mention AC-001–AC-003 only and cite the pre-revision scope blob 46da294…; selfCheck confirms no AC-004",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation files unchanged",
+      "where": "git: only STATE.md and the scope changed after 'Record CSV export final review'; src/ has no audit code (selfChecks)",
+      "status": "realized"
+    },
+    {
+      "condition": "Committed, clean tree",
+      "where": "git status clean",
+      "status": "realized"
+    },
+    {
+      "condition": "check.mjs reports exactly the stale-coverage problems (deliberately invalid)",
+      "where": "gate results: design lacks AC-004 plus four COMPLETE records lack AC-004; matches expectCheck",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "case-defect",
+      "assertion": -1,
+      "detail": "The case states that the scope changed while the cycle is in SYNCHRONIZING with recovery inactive and the handoff still FORWARD from REVIEWING_FINAL. Under the protocol, a scope change mid-cycle would arrive as USER_REWORK to SCOPING with a recovery frame. The fixture builds the stated state faithfully: a commit revises the scope and Active Work.Request and leaves Handoff untouched. A run could reasonably remark on the irregular change. Every legal response (routing a FAILURE to ARCHITECTING, or blocking in SYNCHRONIZING with the discrepancies recorded) keeps check_ok satisfied; I simulated both against check.mjs.",
+      "recommendation": "run_as_is",
+      "fix": "None; the judge should accept a run that also flags the out-of-protocol scope revision, provided it reconciles and routes."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "AC-004 bundles the retired AC-002's admin-only rejection with audit events, so the existing code partly satisfies AC-004. This is a reasonable reading of 'adds AC-004 for audit events / retires AC-002' that avoids silently dropping access control. AC-004 still has no design coverage and no verification, review, or documentation evidence, so the assertions are unaffected.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 0,
+      "detail": "`exists`, `contains AC-004`, and `field Status not COMPLETE` on ${SYNC} assume the role creates its record before routing. The skill requires this: step 2 says to create or resume the record early, step 5 says to persist every unresolved discrepancy before routing one, and the gate says the record must account for every current AC. These are acceptable necessary conditions. A run that stops before creating the record would not meet the expected output anyway.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture faithfully realizes the stated state. The scope adds AC-004, retires AC-002, and keeps AC-001 and AC-003; every completed downstream record covers only the old inventory; code is unchanged; and check.mjs reports exactly the five expected AC-004 coverage problems. The checks are necessary conditions under the skill, and check_ok holds whether the run routes FAILURE ARCHITECTURE or blocks in SYNCHRONIZING. The only issues are notes about the case's out-of-protocol scope change and the reading of AC-004.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T14:31:43.512Z",
+  "costUsd": 0.3135208,
+  "ms": 64166,
+  "fixtureHash": "e357065c268fc582"
+}

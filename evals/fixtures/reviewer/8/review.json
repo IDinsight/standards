@@ -1,0 +1,99 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState REVIEWING_IMPLEMENTATION",
+      "where": ".standards/STATE.md header",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id = export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Current scope, architecture, context, development plan and Tester report exist with valid ownership/provenance",
+      "where": ".standards/docs/scope|specs|development|verification/export-20260924T090000Z-a7f3c1d2.md, .standards/CONTEXT.md; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "Verification is a COMPLETE FULL report and the plan is COMPLETE (Full Verification Boundary holds)",
+      "where": "verification record header (COMPLETE, FULL, NONE); plan header (COMPLETE, all steps DONE)",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and outstanding obligations inactive; BlockedOn NONE",
+      "where": ".standards/STATE.md Recovery/Outstanding Obligations Active false",
+      "status": "realized"
+    },
+    {
+      "condition": "Handoff entered Reviewer by a normal FORWARD from TESTING",
+      "where": ".standards/STATE.md Handoff",
+      "status": "realized"
+    },
+    {
+      "condition": "No implementation review report exists yet",
+      "where": "no .standards/docs/reviews/ (selfCheck 4)",
+      "status": "realized"
+    },
+    {
+      "condition": "Client exposes neither session nor author-model metadata",
+      "where": "headless Claude Code run; no record names an author model",
+      "status": "realized"
+    },
+    {
+      "condition": "No artifact authoring in the visible conversation",
+      "where": "history null; fresh session with one user message",
+      "status": "realized"
+    },
+    {
+      "condition": "Inputs sufficient for assessment; implementation and tests sound (no material defects)",
+      "where": "src/export.ts, src/routes/export.ts (requireAdmin first, parseFilter before write), tests pass 21 + 3 (selfChecks 1-2)",
+      "status": "realized"
+    },
+    {
+      "condition": "Committed, clean working tree",
+      "where": "git status clean; selfCheck 4",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The verification record's Assessed Inputs says 'The client exposes no session metadata, so session freshness is stated, not machine-certified.' This is a realistic Tester statement the template asks for, but it models the limitation wording the Reviewer is graded on and may slightly prime the run.",
+      "recommendation": "run_as_is",
+      "fix": "Acceptable: the Tester template requires a session-freshness limitation; it does not tell the Reviewer its own answer."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "The spec has an empty layers list and relies entirely on base export-reviewing-impl. Gates built and passed with it, and the base already holds every stated condition.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "ungradeable-assertion",
+      "assertion": 2,
+      "detail": "Reviewer hands off to Documenter, so no Reviewer-entry invocation with the model recommendation is required. A correct run may simply not mention the recommendation, and assertion 2 would then be judged on the absence of any model gate. It is observable but may be weakly exercised.",
+      "recommendation": "run_as_is",
+      "fix": "Leave to the judge (complete: false is already set)."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The base fixture realizes every stated condition: a brownfield STANDARD cycle at REVIEWING_IMPLEMENTATION with coherent, check-clean records, a COMPLETE FULL verification report, and sound implementation and tests. Assertion 0's preconditions (BlockedOn NONE, review report exists) hold for any correct run, and the invariants fit a Reviewer that creates its report and hands off to Documenter. Only minor notes: mild priming from the Tester's session-limitation line, and assertion 2 may be weakly exercised.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T23:18:23.821Z",
+  "costUsd": 0.2018968,
+  "ms": 54402,
+  "fixtureHash": "50768762e2699edd"
+}

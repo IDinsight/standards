@@ -1,0 +1,101 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState TESTING",
+      "where": ".standards/STATE.md header",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id = export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, Architecture, Development reference current-cycle artifacts",
+      "where": ".standards/docs/scope|specs|development/export-20260924T090000Z-a7f3c1d2.md with matching provenance",
+      "status": "realized"
+    },
+    {
+      "condition": "Valid Auditor context exists",
+      "where": ".standards/CONTEXT.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery inactive",
+      "where": "STATE.md Recovery Active false; Handoff RESUME from DEVELOPING after frame 1 popped",
+      "status": "realized"
+    },
+    {
+      "condition": "Report records five allocations already used on src/export.ts",
+      "where": "verification report Scenario Budget: '5 of 5: S1..S5'; test/export.test.ts has S1-S5",
+      "status": "realized"
+    },
+    {
+      "condition": "Report requests two additional scenarios for null and absent fields",
+      "where": "verification report Open Findings (N1, N2) and Scenario Budget 'two more requested'",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.BlockedOn holds the matching budget question",
+      "where": "STATE.md BlockedOn 'Tester budget: ... Approve two additional scenarios for src/export.ts?'",
+      "status": "realized"
+    },
+    {
+      "condition": "Other source files have their normal limit (route file not exhausted)",
+      "where": "Scenario Budget: src/routes/export.ts 4 of 5, src/app.ts 0",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation handles null/missing correctly so the two scenarios can pass",
+      "where": "src/export.ts csvCell returns '' for null/undefined; selfCheck confirms",
+      "status": "realized"
+    },
+    {
+      "condition": "No null/absent scenario exists yet",
+      "where": "test/export.test.ts (selfCheck grep)",
+      "status": "realized"
+    },
+    {
+      "condition": "Established test commands run offline",
+      "where": "package.json test/test:integration; selfChecks pass (30 and 2)",
+      "status": "realized"
+    },
+    {
+      "condition": "Fresh chat (no Developer history)",
+      "where": "history null",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "blocking",
+      "kind": "check-too-strict",
+      "assertion": 2,
+      "detail": "The second reply_not_matches, `(approve|confirm|authori[sz]e)[^?]{0,120}(scenario|budget|allowance|limit)[^?]{0,80}[?]`, can fail a correct run. A Tester that reports the blocker it cleared might quote it, for example \"Cleared BlockedOn ('Approve two additional scenarios for src/export.ts?')\". That quote matches the regex. So would \"Approved allowance: +2 scenarios for src/export.ts ...\" if any question follows within 80 characters. Neither reply repeats the approval request. The assertion is already complete:false, so the judge can decide whether approval was asked again.",
+      "recommendation": "fix_file",
+      "fix": "In tester-12/spec.json, checks[assertion 2].all: delete the reply_not_matches object whose regex begins `(approve|confirm|authori[sz]e)`. Keep the BlockedOn equals NONE check and the run-tests reply_not_matches."
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 1,
+      "detail": "`unchanged` covers test/integration/** and test/export-route.test.ts. A correct Tester could, in principle, place the null-value scenario in an integration test through createApp({ records }). The report's Resume note directs the scenarios to test/export.test.ts, and the skill prefers extending the existing unit suite, so this risk is small.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "issues",
+  "summary": "The fixture realizes the case faithfully. Tester is in TESTING after a popped recovery frame, the report is BLOCKED in REVERIFY with src/export.ts at 5 of 5 and two scenarios requested, BlockedOn matches, the implementation is correct, and check.mjs passes. One assertion-2 reply regex could fail a correct run that quotes the cleared blocker question; remove it and leave that judgment to the judge.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-01T22:27:57.129Z",
+  "costUsd": 0.3029832,
+  "ms": 47873,
+  "fixtureHash": "7ebe1d1e45a36a93"
+}

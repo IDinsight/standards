@@ -1,0 +1,53 @@
+{
+  "conditions": [
+    {
+      "condition": "Cycle is STANDARD and WorkflowState is REVIEWING_FINAL with no recovery or obligations",
+      "where": ".standards/STATE.md (WorkflowState REVIEWING_FINAL, CycleMode STANDARD, Handoff FORWARD from DOCUMENTING, Recovery/Obligations inactive)",
+      "status": "realized"
+    },
+    {
+      "condition": "Final review is incomplete",
+      "where": ".standards/docs/reviews/<ID>/final-deliverable.md Status IN_PROGRESS, with the remaining checks and gate decision listed",
+      "status": "realized"
+    },
+    {
+      "condition": "Upstream records exist and are coherent (scope, architecture, context, development, verification, implementation review, documentation)",
+      "where": ".standards/CONTEXT.md, docs/scope, docs/specs, docs/development (COMPLETE), docs/verification (COMPLETE FULL/NONE), reviews/<ID>/implementation.md (COMPLETE), docs/documentation (COMPLETE); check.mjs ok:true",
+      "status": "realized"
+    },
+    {
+      "condition": "No synchronization record exists yet",
+      "where": "no .standards/docs/synchronization/ path in the built tree",
+      "status": "realized"
+    },
+    {
+      "condition": "User asks only to synchronize, with no control-plane request",
+      "where": "prompt.utterance \"Synchronize.\"",
+      "status": "realized"
+    },
+    {
+      "condition": "Everything is committed",
+      "where": "git status clean on main",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "case-defect",
+      "assertion": 1,
+      "detail": "The catalog flags it as unclear whether a copy/paste Reviewer line in the reply counts as an \"automatic Reviewer invocation\". Handoff Rules 7 emits none because no transition occurs, but a correct reply might still say \"run /reviewer\". The fixture sets complete:false and leaves this to the judge, which is the right handling.",
+      "recommendation": "run_as_is",
+      "fix": "Judge should treat only an actual Skill call or Reviewer work performed inline as invocation, not a suggestion to the user."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes a STANDARD brownfield cycle at REVIEWING_FINAL with an IN_PROGRESS final-deliverable review, coherent completed upstream records, no synchronization record, and a clean check.mjs. The checks are sound necessary conditions: no record created, STATE and docs unchanged, no Reviewer skill call. The invariants fit a Synchronizer that must not act outside its state, and nothing leaks the expected answer.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-01T18:37:09.892Z",
+  "costUsd": 0.2130048,
+  "ms": 31377,
+  "fixtureHash": "d2a293e182f3f758"
+}

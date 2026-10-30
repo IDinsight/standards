@@ -1,0 +1,185 @@
+{
+  "base": "export-synchronizing",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-synchronization",
+      "action": "commit",
+      "message": "Record CSV export synchronization"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "synchronizer",
+    "utterance": "Finish."
+  },
+  "graderOnly": [
+    "The committed synchronization record is COMPLETE and sufficient: it accounts for AC-001, AC-002, and AC-003, cites the commit 'Record CSV export final review' as its assessed revision, and every blob identity it cites equals the current HEAD content.",
+    "Nothing in the deliverable or in any other cycle record changed after the synchronization record was written; the only later commit adds the record itself.",
+    "The earlier Synchronizer run was interrupted after committing its record but before persisting the SYNCHRONIZING -> AWAITING_USER_SIGNOFF transition, so STATE.md still shows SYNCHRONIZING with the FORWARD handoff from REVIEWING_FINAL.",
+    "No material discrepancy exists; the correct outcome is to re-verify applicability and persist only the transition to AWAITING_USER_SIGNOFF, presenting the user's sign-off actions."
+  ],
+  "history": null,
+  "vars": {
+    "SYNC_COMMIT": "${COMMIT:Record CSV export synchronization}"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "provenance": {
+            "path": "${SYNC}",
+            "artifact": "SYNCHRONIZATION",
+            "cycle": "${ID}"
+          },
+          "why": "the existing record keeps its identity; whether any edit was gratuitous is for the judge"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "contains": {
+            "path": "${SYNC}",
+            "regex": "^(?![\\s\\S]*\\n#{3}\\s+D-[0-9])"
+          },
+          "why": "no D-NNN discrepancy entries appear in the synchronization record"
+        },
+        {
+          "unchanged": [
+            ".standards/CONTEXT.md",
+            ".standards/docs/scope/**",
+            ".standards/docs/specs/**",
+            ".standards/docs/development/**",
+            ".standards/docs/verification/**",
+            ".standards/docs/reviews/**",
+            ".standards/docs/documentation/**"
+          ],
+          "why": "no findings or discrepancies are manufactured in other roles' records"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": []
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "packages/**",
+        "docs/**",
+        "README.md",
+        "package.json",
+        ".gitignore",
+        "pnpm-lock.yaml"
+      ],
+      "why": "Synchronizer owns no project files and does not repair other roles' work"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the unit suite still passes"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration",
+      "expect": "pass",
+      "why": "the integration suite still passes"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "SYNCHRONIZING with a COMPLETE synchronization record is a valid state"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && test ! -e exports",
+      "expect": "pass",
+      "why": "everything is committed; nothing is dirty"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `SYNCHRONIZING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Kind`: `FORWARD` `From`: `REVIEWING_FINAL` `FailureType`: `NONE`' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md && grep -q '^`PromotionReason`: `NONE` `AuditTarget`: `NONE` `BlockedOn`: `NONE`$' .standards/STATE.md",
+      "expect": "pass",
+      "why": "the transition out of SYNCHRONIZING was never persisted; nothing blocked, recovery and obligations inactive"
+    },
+    {
+      "cmd": "s=.standards/docs/synchronization/export-20260924T090000Z-a7f3c1d2.md && head -3 $s | grep -qx 'Artifact: SYNCHRONIZATION' && grep -q '`Status`: `COMPLETE`$' $s && grep -q '^`User Style`: `NONE`$' $s && ! grep -qE '^### D-' $s && grep -q AC-001 $s && grep -q AC-002 $s && grep -q AC-003 $s && ! grep -qE 'COMMIT:|BLOB:' $s",
+      "expect": "pass",
+      "why": "the existing record is COMPLETE, has no discrepancy entries, and covers every current AC"
+    },
+    {
+      "cmd": "s=.standards/docs/synchronization/export-20260924T090000Z-a7f3c1d2.md && grep -q $(git log --format=%H -1 --fixed-strings --grep='Record CSV export final review') $s && for f in docs/usage.md README.md src/export.ts src/routes/export.ts src/app.ts package.json test/export.test.ts test/integration/export-flow.test.ts .standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md .standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md .standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md; do grep -q $(git rev-parse HEAD:$f) $s || exit 1; done",
+      "expect": "pass",
+      "why": "the record's assessed identities equal the current content, so all inputs are identical"
+    },
+    {
+      "cmd": "git diff --name-only HEAD~1 HEAD | grep -qx '.standards/docs/synchronization/export-20260924T090000Z-a7f3c1d2.md' && test $(git diff --name-only HEAD~1 HEAD | wc -l) -eq 1 && git log -1 --format=%s | grep -qx 'Record CSV export synchronization'",
+      "expect": "pass",
+      "why": "the last commit only adds the synchronization record"
+    }
+  ],
+  "notes": "Built on export-synchronizing (cycle export-20260924T090000Z-a7f3c1d2 at SYNCHRONIZING, FORWARD from REVIEWING_FINAL, all upstream records COMPLETE, clean tree). One layer, 50-synchronization, commits a COMPLETE synchronization record (Synchronizer template, User Style NONE) that cites the commit 'Record CSV export final review' as assessed revision and BLOB identities of every contract record, supporting record, implementation, test, dependency, and documentation file; accounts for AC-001 to AC-003 by reference to existing evidence; Discrepancies NONE; conclusion: full gate passed, handoff forward to AWAITING_USER_SIGNOFF. STATE.md is left as in the base (SYNCHRONIZING), which is the interrupted transition: the record says the handoff happened, the state says it did not. No file changes after the record, so every assessed input is identical. check.mjs passes because a COMPLETE synchronization record in SYNCHRONIZING covers every current AC.",
+  "case": "synchronizer-2",
+  "caseHash": "07fe80f68909135a",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T14:29:11.540Z",
+    "verdict": "pass",
+    "fixtureHash": "df30968c0c528845",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "2c35fad22991dd50",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:35:00.900Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T12:44:01.574Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-synchronizing": "33937a9926a74652"
+  },
+  "migrations": [
+    {
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:35:00.900Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

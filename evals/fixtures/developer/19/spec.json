@@ -1,0 +1,258 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial client directory API"
+    },
+    {
+      "dir": "layers/50-expedited-export",
+      "action": "commit",
+      "message": "Add client CSV export endpoint"
+    },
+    {
+      "dir": "layers/55-review",
+      "action": "commit",
+      "message": "Record implementation review of client export"
+    },
+    {
+      "dir": "layers/60-promotion",
+      "action": "commit",
+      "message": "Promote client export cycle to standard"
+    },
+    {
+      "dir": "layers/65-standard-records",
+      "action": "commit",
+      "message": "Record context, scope, and design for client export"
+    },
+    {
+      "dir": "layers/70-plan-reconciled",
+      "action": "commit",
+      "message": "Reconcile client export plan after promotion"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "developer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "Outstanding Obligation 1 (Owner DEVELOPING, FailureType IMPLEMENTATION, Reason 'authorization is missing on the new endpoint') corresponds to DEV-003: exportClients in src/routes/clients.js never calls requireAdmin, so signed-out and member requests to GET /clients/export currently get status 200 with every active client's email and phone.",
+    "Adding requireAdmin(actor) to exportClients (or an equivalent admin check before the store is read) makes signed-out and member requests return 403 through the existing ForbiddenError mapping in src/router.js, while admin output is unchanged; a targeted node call of handle() is enough for the Developer self-check to verify this.",
+    "The existing suite (npm test, 5 tests in test/clients.test.js) does not exercise the export route and passes before and after the fix.",
+    "DEV-001 and DEV-002 are correctly DONE; the user already approved the reconciled plan including DEV-003; no other blocker, open question, or material deviation remains."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "export-the-client-list-as-csv-20260922T141000Z-5c8e2a91",
+    "PLAN": ".standards/docs/development/export-the-client-list-as-csv-20260922T141000Z-5c8e2a91.md",
+    "REVIEW": ".standards/docs/reviews/export-the-client-list-as-csv-20260922T141000Z-5c8e2a91/implementation.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "state": "Obligations.Active",
+          "equals": "false",
+          "why": "the corrected obligation was removed"
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "TESTING",
+          "why": "removal did not wait on the full gate; the run did not deadlock"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "state": "Obligations.Active",
+          "equals": "false"
+        },
+        {
+          "changed": [
+            "src/**"
+          ],
+          "why": "the authorization correction was implemented"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 3,
+      "complete": true,
+      "all": [
+        {
+          "field": {
+            "path": "${PLAN}",
+            "name": "Status",
+            "equals": "COMPLETE"
+          }
+        },
+        {
+          "field": {
+            "path": "${PLAN}",
+            "name": "Current Increment",
+            "equals": "NONE"
+          }
+        },
+        {
+          "check_ok": true,
+          "why": "check reports a COMPLETE plan whose step is not DONE"
+        }
+      ]
+    },
+    {
+      "assertion": 4,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "TESTING"
+        },
+        {
+          "state": "CycleMode",
+          "equals": "STANDARD"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FORWARD"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "DEVELOPING"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "NONE"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "false"
+        },
+        {
+          "state": "Obligations.Active",
+          "equals": "false"
+        }
+      ]
+    },
+    {
+      "assertion": 5,
+      "complete": false,
+      "all": [
+        {
+          "reply_matches": "/tester",
+          "why": "Claude Code invocation of the next role"
+        },
+        {
+          "changed": [
+            "${PLAN}"
+          ],
+          "why": "implementation claims and self-check evidence are persisted in the plan"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "test/**"
+      ],
+      "why": "Developer does not create or rewrite Tester-owned tests"
+    },
+    {
+      "unchanged": [
+        ".standards/CONTEXT.md",
+        ".standards/docs/scope/**",
+        ".standards/docs/specs/**",
+        ".standards/docs/reviews/**"
+      ],
+      "why": "Developer does not change Auditor, Scoper, Architect, or Reviewer artifacts"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "npm test",
+      "expect": "pass",
+      "why": "the established test command passes on the built fixture"
+    },
+    {
+      "cmd": "node --input-type=module -e \"import { handle } from './src/router.js'; import { ClientStore } from './src/store.js'; const res = handle({ method: 'GET', path: '/clients/export', actor: null }, { store: new ClientStore([{ id: 1, name: 'Ada', email: 'ada@example.org', phone: '555-0100' }]) }); console.log('status', res.status); process.exit(res.status === 200 ? 0 : 1);\"",
+      "expect": "pass",
+      "why": "the recorded obligation is real: a signed-out request to GET /clients/export currently gets 200"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the starting workflow state is valid"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 00-project (pre-install): small Node ESM client directory API (src/auth.js requireSignedIn/requireAdmin + ForbiddenError, src/store.js, src/routes/clients.js, src/router.js mapping ForbiddenError to 403) with 5 node:test tests. 50-expedited-export: the expedited cycle's code (src/csv.js, exportClients without an auth check, GET /clients/export route), plan v1 (COMPLETE, EXPEDITED_REQUEST), STATE at REVIEWING_IMPLEMENTATION. 55-review: implementation review BLOCKED with F-001 (no authorization), STATE FAILURE to DEVELOPING with Frame 1 Reason 'authorization is missing on the new endpoint'. 60-promotion: STATE PROMOTE to AUDITING, frame converted to Obligation 1 (DEVELOPING, IMPLEMENTATION, same Reason). 65-standard-records: CONTEXT.md (with Active-Cycle Non-Baseline Work), scope AC-001..AC-003, design (AC-003 = requireAdmin on export), final STATE: DEVELOPING, STANDARD, FORWARD from ARCHITECTING, recovery inactive, Obligations active with the one entry. 70-plan-reconciled: plan v2 IN_PROGRESS, approved (User Style Locked true), DEV-001/DEV-002 DONE, DEV-003 PENDING covering the obligation, Plan Notes recording reconciliation and user approval. Expected run: implement the admin check, self-check, remove the obligation, mark plan COMPLETE, FORWARD to TESTING with the independent Tester prefix.",
+  "case": "developer-19",
+  "caseHash": "56deb2b7ddad8abe",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T02:18:00.063Z",
+    "verdict": "pass",
+    "fixtureHash": "961ecce8ce714ab7",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "98cd7a8df05fdb94",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:06:59.606Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T01:24:00.677Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-expedited-export/.standards/STATE.md: NONE",
+        "layers/55-review/.standards/STATE.md: NONE",
+        "layers/60-promotion/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/65-standard-records/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:06:59.606Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

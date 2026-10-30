@@ -1,0 +1,272 @@
+{
+  "base": "export-project",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-context",
+      "action": "commit",
+      "message": "Record project context for archive export"
+    },
+    {
+      "dir": "layers/55-scope",
+      "action": "commit",
+      "message": "Define archive export scope"
+    },
+    {
+      "dir": "layers/60-design",
+      "action": "commit",
+      "message": "Design archive export"
+    },
+    {
+      "dir": "layers/65-plan",
+      "action": "commit",
+      "message": "Plan archive export implementation"
+    },
+    {
+      "dir": "layers/70-export",
+      "action": "commit",
+      "message": "Add CSV export to the document archive"
+    },
+    {
+      "dir": "layers/75-complete",
+      "action": "commit",
+      "message": "Mark archive export plan complete"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "tester",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "Scope AC-003 requires every export request to receive a response within the configured export time limit (default 30 seconds), failing with 504 otherwise.",
+    "The technical design says transient archive upload failures (network error or 5xx) are retried after retryDelayMs, but it never says how many times, whether retries stop, or whether the export time limit spans all uploads or applies to each upload request. It does not say how the remaining time is passed to each upload. Nothing else in the repository (context, scope, docs) establishes these choices; CONTEXT.md lists the archive contract as a known unknown.",
+    "The design's only AC-003 technical criterion (an upload that exceeds the time limit gives 504) is satisfiable per upload request and does not by itself bound the whole export, so the design cannot satisfy AC-003 as written.",
+    "The implementation in src/routes/export.ts retries transient archive failures in an unbounded for (;;) loop and applies exportTimeoutMs to each upload request separately, so an archive that keeps answering 503 (or keeps failing to connect) makes an export request never complete.",
+    "All 27 existing tests pass; none exercises a persistently failing archive. The route tests cover one 503 followed by success, a single hanging upload (504 after 20 ms), and a 400 (502).",
+    "The correct outcome is an ARCHITECTURE failure routed to ARCHITECTING with a recovery frame From TESTING, ResumeAt TESTING, RerunThrough NONE; an implementation finding about the unbounded retry may also be recorded but cannot be corrected without the missing design decision."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "export-20260924T090000Z-a7f3c1d2",
+    "SCOPE": ".standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md",
+    "ARCH": ".standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md",
+    "DEV": ".standards/docs/development/export-20260924T090000Z-a7f3c1d2.md",
+    "VERIFICATION": ".standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md",
+    "CONTEXT": ".standards/CONTEXT.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "src/**",
+            "${ARCH}",
+            "${SCOPE}",
+            "${CONTEXT}"
+          ],
+          "why": "Tester changes neither the implementation nor the design, scope, or context"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${VERIFICATION}",
+          "why": "the unresolved criterion is recorded in the verification report"
+        },
+        {
+          "provenance": {
+            "path": "${VERIFICATION}",
+            "artifact": "VERIFICATION",
+            "cycle": "${ID}"
+          }
+        },
+        {
+          "contains": {
+            "path": "${VERIFICATION}",
+            "regex": "AC-003"
+          },
+          "why": "the report accounts for the bounded-time condition"
+        },
+        {
+          "contains": {
+            "path": "${VERIFICATION}",
+            "regex": "retr(y|ies|ied|ying)",
+            "flags": "i"
+          },
+          "why": "the report names the retry behavior at issue"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "ARCHITECTING"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FAILURE"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "TESTING"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "ARCHITECTURE"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "true"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "1"
+        },
+        {
+          "state": "Recovery.Top.From",
+          "equals": "TESTING"
+        },
+        {
+          "state": "Recovery.Top.Owner",
+          "equals": "ARCHITECTING"
+        },
+        {
+          "state": "Recovery.Top.FailureType",
+          "equals": "ARCHITECTURE"
+        },
+        {
+          "state": "Recovery.Top.ResumeAt",
+          "equals": "TESTING"
+        },
+        {
+          "state": "Recovery.Top.RerunThrough",
+          "equals": "NONE"
+        },
+        {
+          "check_ok": true
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "packages/**"
+      ],
+      "why": "Tester does not edit implementation"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the established unit suite passes offline"
+    },
+    {
+      "cmd": "pnpm --filter export test 2>&1 | grep -q 'pass 27'",
+      "expect": "pass",
+      "why": "the suite runs 27 tests (16 pre-cycle, 5 serialization, 6 export route), as the plan's self-checks state"
+    },
+    {
+      "cmd": "node -e 'Promise.all([import(`./src/app.ts`), import(`./src/archive.ts`)]).then(([{ createApp }, { createArchiveClient }]) => { let calls = 0; const send = async () => { calls += 1; return { status: 503, json: async () => ({ error: `maintenance` }) }; }; const app = createApp({ archive: createArchiveClient(`http://archive.test`, send), exportTimeoutMs: 50, retryDelayMs: 0 }); let settled = false; Promise.resolve(app.handle({ method: `POST`, path: `/records/export`, query: {}, user: { id: 1, name: `Ada`, role: `admin` } })).then(() => { settled = true; }); setTimeout(() => { if (settled || calls < 20) { console.error(`settled=` + settled + ` calls=` + calls); process.exit(1); } console.log(`still retrying after ` + calls + ` uploads`); process.exit(0); }, 500); }, (error) => { console.error(error); process.exit(2); })'",
+      "expect": "pass",
+      "why": "the implementation retries indefinitely: with an archive that always answers 503 the export never completes, well past the 50 ms time limit"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the TESTING state and records are valid"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && test ! -e .standards/docs/verification && test ! -e .standards/docs/reviews",
+      "expect": "pass",
+      "why": "all work is committed and no verification or review record exists yet"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `TESTING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Kind`: `FORWARD` `From`: `DEVELOPING` `FailureType`: `NONE`' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md && grep -q 'ProjectMode`: `BROWNFIELD' .standards/MODE.md && test -f .standards/CONTEXT.md",
+      "expect": "pass",
+      "why": "STATE holds TESTING after a FORWARD from DEVELOPING with recovery inactive; brownfield mode; Auditor context exists"
+    },
+    {
+      "cmd": "! grep -qiE 'attempt|deadline|backoff|at most|maximum' .standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md .standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md .standards/CONTEXT.md && grep -q 'retried after' .standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md",
+      "expect": "pass",
+      "why": "the design calls for retry but no record bounds retries or says how the time limit carries across uploads"
+    },
+    {
+      "cmd": "grep -q 'AC-003`: Every export request receives a response within the configured export time limit' .standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md",
+      "expect": "pass",
+      "why": "the scope requires a bounded export time"
+    }
+  ],
+  "notes": "Built on export-project (not export-testing, whose committed scope, design, and file-writing export have no timeout and would conflict). Six post-install commits in brownfield order for cycle export-20260924T090000Z-a7f3c1d2. 50-context: Auditor CONTEXT.md (archive contract listed as a known unknown; no retry or timeout conventions), STATE at SCOPING. 55-scope: AC-001 filtered CSV export stored in the document archive, AC-002 admin-only before contacting the archive, AC-003 every export request answered within the configured time limit (default 30 s) or 504; STATE ARCHITECTING. 60-design: POST /records/export, archive client PUT, retry of network/5xx failures after retryDelayMs with no bound, and a timeout rule worded per archive upload with no statement about spanning retries; STATE DEVELOPING. 65-plan: APPROVED plan, three PENDING steps. 70-export: src/export.ts, src/archive.ts, src/routes/export.ts (unbounded for-loop retry, per-upload timeout), router support for promise-returning handlers, createApp options, test/export.test.ts and test/export-route.test.ts. 75-complete: plan COMPLETE with self-check evidence citing the implementation commit; STATE TESTING with FORWARD from DEVELOPING. No verification record exists. All 27 tests pass.",
+  "case": "tester-8",
+  "caseHash": "e2ba32c5e3d3937b",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-01T22:26:56.441Z",
+    "verdict": "pass",
+    "fixtureHash": "010ddf3b2ddd0364",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "3726a6255ad0c692",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:44:35.111Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-01T21:01:28.210Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-context/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/55-scope/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/60-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/65-plan/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/75-complete/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:44:35.111Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

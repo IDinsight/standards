@@ -1,0 +1,48 @@
+{
+  "conditions": [
+    {
+      "condition": "No baseline or comparison range is recorded (no active cycle, no cycle records, no persisted intent naming a range)",
+      "where": ".standards/STATE.md is the pristine installed brownfield state (Active Work.Id UNSET); no .standards/docs/ records",
+      "status": "realized"
+    },
+    {
+      "condition": "Repository history has several plausible, unrelated ranges that 'this change' could mean",
+      "where": "git log: three most recent commits touch unrelated areas (src/webhooks/deliver.js retry; src/reports/summary.js formatting; src/config.js + src/app.js env config), with the 'Install STANDARDS' commit and two pre-install commits before them",
+      "status": "realized"
+    },
+    {
+      "condition": "No dirty content or feature branch implies the change",
+      "where": "git status clean on main; single branch 'main' (selfChecks 2 and 4)",
+      "status": "realized"
+    },
+    {
+      "condition": "Current code is readable and explainable independent of the baseline question",
+      "where": "src/webhooks/deliver.js, src/reports/summary.js, src/config.js, src/app.js; tests pass (selfCheck npm test, 8 passes)",
+      "status": "realized"
+    },
+    {
+      "condition": "Git history is committed only (catalog git: committed)",
+      "where": "six commits, clean working tree",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "Every commit has the same timestamp (2026-09-24 09:00:00) and the author is 'Fixture <fixture@example.invalid>' (from git config local). A role reading `git log` sees an author named 'Fixture', a mild sign the repo is synthetic. This is the harness's fixed builder identity, applies to every fixture, and does not hint at the expected answer. Identical dates if anything make the ranges more ambiguous.",
+      "recommendation": "run_as_is",
+      "fix": "None needed for this case; a harness-level author name like a plausible developer would improve realism globally."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition. There is a fresh brownfield install with no recorded baseline, a clean single-branch history whose three latest commits are unrelated changes, and fully readable current code with passing tests. Nothing leaks the answer, both judge-only assertions are observable, and the Navigator invariants (unchanged **, HEAD unchanged, no mutating git) are correct and cannot fail a correct run.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T01:38:28.065Z",
+  "costUsd": 0.1000002,
+  "ms": 20743,
+  "fixtureHash": "a62450ed71b76336"
+}

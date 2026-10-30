@@ -1,0 +1,193 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add basic message sender"
+    },
+    {
+      "dir": "layers/60-planning",
+      "action": "commit",
+      "message": "Record context, scope, and design for message validation and retry"
+    },
+    {
+      "dir": "layers/70-implementation",
+      "action": "commit",
+      "message": "Implement message validation and send retry"
+    },
+    {
+      "dir": "layers/80-verification",
+      "action": "commit",
+      "message": "Add validation and retry tests; return attempt limit to development"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "navigator",
+    "utterance": "Stop the quiz now."
+  },
+  "graderOnly": [
+    "The conversation so far is a GRILL_ME quiz: two questions, both about input validation (src/validate.js and the validation step in src/send.js), and the user answered both correctly.",
+    "No question about retry behavior was asked or answered; the last assistant turn only offered to move on to retry. Retry understanding was not assessed.",
+    "The workflow is STANDARD at DEVELOPING with one active recovery frame (From TESTING, Owner DEVELOPING, FailureType IMPLEMENTATION, ResumeAt TESTING, RerunThrough NONE).",
+    "Useful next reading for the untested retry topic includes the retry loop in src/send.js (lines 29-37), test/retry.test.js, and the verification report's open finding."
+  ],
+  "history": {
+    "turns": [
+      {
+        "role": "user",
+        "text": "/navigator Grill me on the message validation and retry work in this cycle. Start with validation."
+      },
+      {
+        "role": "assistant",
+        "text": "Quick context first: `.standards/STATE.md` has this cycle in `DEVELOPING` with one open recovery frame (Tester reported that `sendMessage` makes four transport calls when three attempts are allowed), so I'll quiz you on the code as it currently stands in `src/validate.js` and `src/send.js`, not on the pending fix. Question 1: someone calls `sendMessage(transport, { to: 'ada', subject: '   ', body: 42 })`. Is the transport called, and what does the caller get back?"
+      },
+      {
+        "role": "user",
+        "text": "The transport isn't called. validateMessage finds three problems: the address has no @ and domain, the subject is only spaces so it counts as missing, and body isn't a string. sendMessage throws an InvalidMessageError carrying all three."
+      },
+      {
+        "role": "assistant",
+        "text": "Correct on every point. `src/send.js` lines 26-27 run `validateMessage` and throw `InvalidMessageError` before the transport call on line 31, and `validateMessage` (`src/validate.js` lines 9-21) collects every problem instead of stopping at the first one, so `error.errors` is `['to must be an email address', 'subject is required', 'body must be a string']`. Question 2: a message has a valid address and body and a subject of 121 letters with no spaces. Which error or errors come back, and would a 120-letter subject pass?"
+      },
+      {
+        "role": "user",
+        "text": "Only one error, 'subject must be at most 120 characters'. The blank check passes because it isn't blank, so it falls through to the length check. Exactly 120 is fine since the check is greater than 120."
+      },
+      {
+        "role": "assistant",
+        "text": "Right again. Line 13 of `src/validate.js` handles a missing or blank subject, and only otherwise does line 15 compare `message.subject.length > MAX_SUBJECT_LENGTH` (120, defined on line 3), so 121 letters gives exactly that one error and 120 passes. That covers input validation: you've shown that validation runs before any send, reports every problem at once, and where the subject limit sits. Next I'd move to what `sendMessage` does when the transport answers with a failure status. Shall I continue with that?"
+      }
+    ]
+  },
+  "vars": {
+    "ID": "validate-outgoing-messages-and-retry-20260922T141500Z-3c9e51ab"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "DEVELOPING",
+          "why": "the cycle was not cancelled or moved"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "true",
+          "why": "the recovery frame is still in place"
+        },
+        {
+          "state": "Handoff.Kind",
+          "unchanged": true,
+          "why": "no CANCEL or other handoff was recorded"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "unchanged": [
+            "**"
+          ],
+          "why": "no saved score, summary, or other file change"
+        },
+        {
+          "state": "WorkflowState",
+          "unchanged": true
+        },
+        {
+          "state": "Handoff.Kind",
+          "unchanged": true
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "unchanged": true
+        },
+        {
+          "state": "Recovery.Top.Reason",
+          "unchanged": true
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "Navigator never moves HEAD"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Navigator never mutates git state"
+    },
+    {
+      "unchanged": [
+        "**"
+      ],
+      "why": "Navigator persists nothing (generated caches are ignored)"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/send.test.js test/validate.test.js",
+      "expect": "pass",
+      "why": "the original send test and the Tester's validation tests pass, matching the verification report"
+    },
+    {
+      "cmd": "node --test test/retry.test.js",
+      "expect": "fail",
+      "expectOutput": "# fail 1",
+      "why": "exactly one retry test fails (four transport calls instead of three), matching the recovery frame and the verification report"
+    }
+  ],
+  "notes": "Standalone brownfield fixture for a Navigator GRILL_ME stop. 50-project (pre-install): notify library with a single-shot sendMessage and one test. 60-planning: CONTEXT.md, scope with AC-001 to AC-004, technical design, STATE at DEVELOPING after a FORWARD from ARCHITECTING. 70-implementation: new src/validate.js, reworked src/send.js with validation and a retry loop (the loop runs attempt 0..maxAttempts inclusive, so four calls), COMPLETE development plan, STATE at TESTING. 80-verification: Tester's test/validate.test.js and test/retry.test.js, a BLOCKED FULL verification report with a suspended assignment for frame 1, and STATE at DEVELOPING with a FAILURE handoff and one IMPLEMENTATION recovery frame (From TESTING, Owner DEVELOPING, ResumeAt TESTING, RerunThrough NONE). The history carries the quiz: two validation questions answered correctly, the retry topic only offered, never asked. Navigator changes nothing, so assertion 1 is decided by unchanged ** plus unchanged state fields; assertion 0 needs a judge to confirm no further quiz question and a brief strengths/untested/reading wrap-up.",
+  "case": "navigator-59",
+  "caseHash": "2733faf87a29ca5f",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T15:41:54.745Z",
+    "verdict": "pass",
+    "fixtureHash": "99bb08110275a6a1",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "75bed3c6898a8324",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:23:25.141Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T15:29:08.225Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/60-planning/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/70-implementation/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/80-verification/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:23:25.141Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

@@ -1,0 +1,187 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial order service"
+    },
+    {
+      "dir": "layers/01-startup",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Move startup into src/main.js so routes can be tested"
+    },
+    {
+      "dir": "layers/50-plan",
+      "action": "commit",
+      "message": "Record project context, scope, and design for orders CSV export"
+    },
+    {
+      "dir": "layers/51-implement",
+      "action": "commit",
+      "message": "Add orders CSV export"
+    },
+    {
+      "dir": "layers/52-verify",
+      "action": "commit",
+      "message": "Add export tests and verification report"
+    },
+    {
+      "dir": "layers/53-review",
+      "action": "commit",
+      "message": "Record implementation review"
+    },
+    {
+      "dir": "layers/54-docs",
+      "action": "commit",
+      "message": "Document CSV export endpoint"
+    },
+    {
+      "dir": "layers/55-final-review",
+      "action": "commit",
+      "message": "Record final deliverable review"
+    },
+    {
+      "dir": "layers/56-sync",
+      "action": "commit",
+      "message": "Record synchronization"
+    },
+    {
+      "dir": "layers/57-totals",
+      "action": "commit",
+      "message": "Write order totals with two decimals in CSV export"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "navigator",
+    "utterance": "The Auditor context names an old entry point, and the Synchronizer record claims current evidence despite outdated file identities. Explain both."
+  },
+  "graderOnly": [
+    "Since the pre-cycle commit 'Move startup into src/main.js so routes can be tested', package.json runs 'node src/main.js' for npm start; src/main.js creates the store and calls listen; src/server.js only exports route() and createServer() and never listens.",
+    ".standards/CONTEXT.md names src/server.js as the entry point that listens on PORT and says npm start runs 'node src/server.js'; it never mentions src/main.js. Its own Evidence line cites the commit where main.js already existed. This is a material context error owned by Auditor (PROJECT_CONTEXT); it predates the cycle's implementation and is not explained by planned active-cycle changes.",
+    "The synchronization record is COMPLETE and says every cited identity matches the deliverable offered for sign-off. It cites deliverable revision = the 'Record final deliverable review' commit and src/export.js at the blob from before the last commit 'Write order totals with two decimals in CSV export', which was made after synchronization.",
+    "The current src/export.js blob differs from the one cited in the synchronization record (and in the verification report and both reviews); HEAD differs from the cited revision. The other cited blobs (src/server.js, src/orders.js, src/store.js, test/export.test.js, package.json, README.md) still match the current files.",
+    "The post-sync change makes totals render with two decimals (57 becomes 57.00, 182.4 becomes 182.40); the existing tests still pass because they do not assert those totals. The synchronization conclusion therefore no longer applies to the current deliverable; re-establishing it is Synchronizer-owned reconciliation, and the changed file's verification and review evidence would need reassessment by their owners. WorkflowState is still AWAITING_USER_SIGNOFF.",
+    "The two discrepancies are independent: the entry-point move predates the cycle; the export change came after synchronization."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "export-orders-as-csv-so-warehouse-staff-20260924T083012Z-3c9e71a4",
+    "SYNC": ".standards/docs/synchronization/export-orders-as-csv-so-warehouse-staff-20260924T083012Z-3c9e71a4.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            ".standards/CONTEXT.md",
+            ".standards/docs/synchronization/**"
+          ],
+          "why": "Navigator must not refresh context or edit the synchronization record"
+        },
+        {
+          "state": "WorkflowState",
+          "unchanged": true,
+          "why": "no sign-off or workflow transition"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": []
+    }
+  ],
+  "invariants": [
+    {
+      "unchanged": [
+        "**"
+      ],
+      "why": "Navigator persists nothing (generated caches are ignored)"
+    },
+    {
+      "head_unchanged": true,
+      "why": "Navigator never moves HEAD"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Navigator never mutates git state"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/orders.test.js test/server.test.js test/export.test.js",
+      "expect": "pass",
+      "why": "the project's tests pass on the current tree, including after the post-sync totals change"
+    },
+    {
+      "cmd": "grep -q 'node src/main.js' package.json && grep -q 'node src/server.js' .standards/CONTEXT.md && ! grep -q main.js .standards/CONTEXT.md && ! grep -q 'listen(' src/server.js",
+      "expect": "pass",
+      "why": "npm start runs src/main.js, CONTEXT.md names src/server.js and never mentions main.js, and server.js does not listen"
+    },
+    {
+      "cmd": "! grep -q $(git hash-object src/export.js) .standards/docs/synchronization/export-orders-as-csv-so-warehouse-staff-20260924T083012Z-3c9e71a4.md && grep -q $(git rev-parse HEAD~1:src/export.js) .standards/docs/synchronization/export-orders-as-csv-so-warehouse-staff-20260924T083012Z-3c9e71a4.md && grep -q $(git hash-object src/server.js) .standards/docs/synchronization/export-orders-as-csv-so-warehouse-staff-20260924T083012Z-3c9e71a4.md && grep -q $(git hash-object README.md) .standards/docs/synchronization/export-orders-as-csv-so-warehouse-staff-20260924T083012Z-3c9e71a4.md",
+      "expect": "pass",
+      "why": "the sync record cites the pre-change src/export.js blob, not the current one, while its other cited blobs still match"
+    },
+    {
+      "cmd": "! grep -q $(git rev-parse HEAD) .standards/docs/synchronization/export-orders-as-csv-so-warehouse-staff-20260924T083012Z-3c9e71a4.md && grep -q $(git rev-parse HEAD~2) .standards/docs/synchronization/export-orders-as-csv-so-warehouse-staff-20260924T083012Z-3c9e71a4.md && git log -1 --format=%s | grep -q 'two decimals'",
+      "expect": "pass",
+      "why": "the sync record's assessed revision is the final-review commit, and the latest commit (after sync) changed export totals"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. Pre-install: 00-project (order service whose src/server.js listened at import), 01-startup (startup moved to src/main.js, server.js now only exports route/createServer, package.json start = node src/main.js, route tests added). Post-install, one commit per role in a STANDARD cycle: 50 CONTEXT.md (wrongly names src/server.js as entry point and npm start as node src/server.js) plus scope (AC-001..003) and design; 51 src/export.js and route + plan COMPLETE; 52 tests + verification COMPLETE; 53 implementation review COMPLETE; 54 README + documentation record COMPLETE; 55 final review COMPLETE; 56 synchronization record COMPLETE citing ${COMMIT}/${BLOB} identities, STATE AWAITING_USER_SIGNOFF; 57 a later commit changes src/export.js (totals toFixed(2)) without touching .standards, so the sync record's src/export.js blob and assessed revision are outdated while it still claims current evidence. Each STATE.md in 50-56 matches its role's forward handoff. check.mjs passes.",
+  "case": "navigator-44",
+  "caseHash": "ff42431f328ceec4",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T01:42:33.639Z",
+    "verdict": "pass",
+    "fixtureHash": "ab5c90613aaefd1b",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "e635c7669aec0bdb",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:20:28.994Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T01:31:18.958Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-plan/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/51-implement/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/52-verify/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/53-review/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/54-docs/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/55-final-review/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/56-sync/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:20:28.994Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

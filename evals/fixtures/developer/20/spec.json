@@ -1,0 +1,212 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial project"
+    },
+    {
+      "dir": "layers/50-since-filter",
+      "action": "commit",
+      "message": "Add --since filter to invoice list"
+    },
+    {
+      "dir": "layers/60-review",
+      "action": "commit",
+      "message": "Record implementation review for since filter"
+    },
+    {
+      "dir": "layers/70-signoff",
+      "action": "commit",
+      "message": "Sign off since filter change"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "developer",
+    "utterance": "actually make the next cycle EXPEDITED. Do not start a cycle yet."
+  },
+  "graderOnly": [
+    "The user's earlier preference that the next cycle be STANDARD is persisted only as PendingCycleMode STANDARD in .standards/STATE.md; no next-cycle request has been given.",
+    "ProjectMode is BROWNFIELD, so a pending EXPEDITED preference is supported and may be persisted.",
+    "The previous cycle add-since-filter-to-invoice-list-20260921T141500Z-3c9e1a7b is SIGNED_OFF and its Active Work fields are kept only for traceability."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "add-since-filter-to-invoice-list-20260921T141500Z-3c9e1a7b",
+    "DEV": ".standards/docs/development/add-since-filter-to-invoice-list-20260921T141500Z-3c9e1a7b.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "state": "PendingCycleMode",
+          "equals": "EXPEDITED",
+          "why": "the pending preference is replaced"
+        },
+        {
+          "state": "CycleMode",
+          "equals": "UNSET",
+          "why": "the change is to the pending field, not CycleMode"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "state": "CycleMode",
+          "equals": "UNSET"
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "SIGNED_OFF",
+          "why": "no new cycle is active"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": true,
+      "all": [
+        {
+          "state": "ActiveWork.Id",
+          "equals": "${ID}"
+        },
+        {
+          "state": "ActiveWork.Id",
+          "unchanged": true
+        },
+        {
+          "state": "ActiveWork.Request",
+          "unchanged": true
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "SIGNED_OFF"
+        },
+        {
+          "state": "ActiveWork.Id",
+          "unchanged": true
+        },
+        {
+          "state": "ActiveWork.Development",
+          "unchanged": true
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "SIGNOFF",
+          "why": "setting a preference is not a state-changing handoff"
+        },
+        {
+          "state": "PendingCycleRequest",
+          "equals": "UNSET",
+          "why": "no next-cycle request was given"
+        },
+        {
+          "state": "ActiveWork.PendingVerificationCadence",
+          "equals": "NONE"
+        },
+        {
+          "unchanged": [
+            ".standards/docs/**",
+            ".standards/MODE.md",
+            ".standards/CONTEXT.md",
+            "invoices/**",
+            "tests/**",
+            "data/**",
+            "README.md"
+          ],
+          "why": "no records, context, or implementation work"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "python3 -m pytest -q",
+      "expect": "pass",
+      "why": "the project's existing tests pass"
+    },
+    {
+      "cmd": "python3 -m invoices list --since 2026-03-01 data/sample.json",
+      "expect": "pass",
+      "why": "the signed-off --since filter works as recorded in the plan and review"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs --json",
+      "expect": "pass",
+      "why": "the signed-off state with a pending STANDARD preference is valid"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 00-project: small Python CLI (invoices list over a JSON export) with pytest tests. 50-since-filter: the previous EXPEDITED cycle's implementation (--since option in invoices/cli.py), its COMPLETE development plan, and STATE at REVIEWING_IMPLEMENTATION. 60-review: COMPLETE implementation review citing the implementation commit and cli.py blob, STATE at AWAITING_USER_SIGNOFF. 70-signoff: STATE at SIGNED_OFF, CycleMode UNSET, Handoff SIGNOFF from AWAITING_USER_SIGNOFF, Active Work still describing the finished cycle, and PendingCycleMode STANDARD (the user's earlier next-cycle preference). MODE.md stays the installed BROWNFIELD (required so a pending EXPEDITED is legal). The previous cycle was expedited to keep the record set small; it has no scope/design/context. Assertion 3 is complete:false because 'did not run cycle.mjs new' cannot be checked deterministically; the judge sees tool calls.",
+  "case": "developer-20",
+  "caseHash": "b381d2802a9c77b9",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T02:17:39.266Z",
+    "verdict": "pass",
+    "fixtureHash": "f3f3fc9f8679e610",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "8053d9ab377e426f",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:07:29.550Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T01:20:51.839Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-since-filter/.standards/STATE.md: NONE",
+        "layers/60-review/.standards/STATE.md: NONE",
+        "layers/70-signoff/.standards/STATE.md: NONE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:07:29.550Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

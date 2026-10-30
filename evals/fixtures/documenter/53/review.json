@@ -1,0 +1,71 @@
+{
+  "conditions": [
+    {
+      "condition": "Project is BROWNFIELD",
+      "where": ".standards/MODE.md (installer brownfield template, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "WorkflowState is the initial AUDITING",
+      "where": ".standards/STATE.md (installer template, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode is UNSET",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work Id and Request are UNSET, so no initialized active request exists",
+      "where": ".standards/STATE.md; Handoff.Kind INITIAL",
+      "status": "realized"
+    },
+    {
+      "condition": "No cycle records exist",
+      "where": ".standards/docs absent (selfCheck 3 confirms)",
+      "status": "realized"
+    },
+    {
+      "condition": "Small committed project code with a clean tree",
+      "where": "src/export.js, bin/logpack.js, test/export.test.js, README.md; git status clean on main",
+      "status": "realized"
+    },
+    {
+      "condition": "Existing files offer something a role could wrongly infer as a documentation assignment",
+      "where": "Commit 'Add --since filter to export' adds --since, which README.md does not document",
+      "status": "realized"
+    },
+    {
+      "condition": "Utterance carries no new request that could legitimately start a cycle",
+      "where": "prompt.utterance 'Continue.'",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 0,
+      "detail": "The catalog tags assertion 0 as deterministic_complete, but the spec uses complete:false with a judge. This is reasonable because the reply could still claim an inferred cycle or documentation assignment (such as the --since gap) without writing any file. Every check (state fields unchanged, .standards/docs absent, unchanged ['**']) holds for any correct run, since Documenter must persist nothing here.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "SelfCheck 2 (grep for --since in README.md, expected to fail with '^$') only documents the lure. It passed the gate, and a missing README would print non-empty grep output and so would not match.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture is the untouched installer brownfield state (AUDITING, CycleMode/Id/Request UNSET, INITIAL handoff) with no records. It has a small committed project and a neutral, unassigned README gap as a lure, and nothing leaks. The checks and the standard invariants cannot fail a correct do-nothing Documenter run, and the assertion is observable through the state, file, and reply judgment.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T16:38:10.682Z",
+  "costUsd": 0.0909726,
+  "ms": 14819,
+  "fixtureHash": "037f1adbc76ddb45"
+}

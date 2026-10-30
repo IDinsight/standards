@@ -1,0 +1,81 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState REVIEWING_IMPLEMENTATION, Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md header and Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Cycle was promoted from EXPEDITED",
+      "where": "STATE.md PromotionReason; commits 'Add CSV export…' through 'Promote CSV export to a standard cycle'; CONTEXT.md Active-Cycle Non-Baseline Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Current scope, architecture, context, development plan and Tester report exist with valid provenance",
+      "where": ".standards/docs/scope|specs|development|verification/<id>.md, .standards/CONTEXT.md; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery inactive",
+      "where": "STATE.md Recovery Active false, no frames",
+      "status": "realized"
+    },
+    {
+      "condition": "An Outstanding Obligation owned by REVIEWING_IMPLEMENTATION requires correcting an unsupported finding",
+      "where": "STATE.md Obligation 1 (Owner REVIEWING_IMPLEMENTATION, FailureType REVIEW, F-001 reason); review report F-001 still OPEN",
+      "status": "realized"
+    },
+    {
+      "condition": "The finding is actually unsupported and correctable by Reviewer alone",
+      "where": "src/export.ts csvCell uses /[\",\\r\\n]/, so a lone CR is quoted; selfCheck 3",
+      "status": "realized"
+    },
+    {
+      "condition": "Another material acceptance gap remains after the correction",
+      "where": "src/routes/export.ts `if (role && role !== 'admin')` lets user:null through (201, file written) against AC-002 and the design's 401; no test covers it; verification I1 and DEV-003 claims are unsupported (selfChecks 4, 6)",
+      "status": "realized"
+    },
+    {
+      "condition": "Existing review report from the expedited phase to resume",
+      "where": ".standards/docs/reviews/<id>/implementation.md, BLOCKED with F-001 and F-002 OPEN",
+      "status": "realized"
+    },
+    {
+      "condition": "Committed, clean git state",
+      "where": "git status clean; HEAD 'Record CSV export verification'",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "case-defect",
+      "assertion": 1,
+      "detail": "Assertion 1 (other owners' obligations and existing frames preserved) has nothing to observe: the fixture has only the Reviewer-owned obligation and no frames. That follows the prompt's 'recovery and outstanding obligations are inactive unless specified'. With a COMPLETE Tester report and a post-promotion forward entry, another owner's obligation cannot legally remain (a DEVELOPING obligation must be removed before Developer's forward handoff). An active frame alongside this obligation would also conflict with the stated state. The judge will grade it vacuously. The checks are empty with complete:false, so nothing fails a correct run.",
+      "recommendation": "run_as_is",
+      "fix": "Accept a vacuous judgment for assertion 1, or revise the case to state a reachable configuration that includes another owner's obligation or a preserved frame."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The commits 'Record project context…', 'Define CSV export scope', and 'Design CSV export' do not update STATE.md. STATE therefore jumps from AUDITING (promotion commit) straight to TESTING ('Reconcile CSV export plan…'), and a Reviewer reading git history could notice the missing Auditor, Scoper, and Architect handoffs. The final state is valid and this does not affect what is tested.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally have commits 58/60/62 advance STATE.md through SCOPING, ARCHITECTING, and DEVELOPING with FORWARD handoffs."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes the promoted STANDARD cycle at REVIEWING_IMPLEMENTATION with a single Reviewer-owned obligation for an F-001 that is demonstrably unsupported (a lone CR is quoted). It also plants a real remaining AC-002 gap (anonymous export returns 201) that the Tester and Developer records wrongly claim is covered. The checks for assertions 0 and 2 are necessary conditions a correct run satisfies, and the invariants and turn-end check tolerate a failure routing to DEVELOPING. Assertion 1 is vacuous because of the case's own conditions; it is left to the judge.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T23:27:40.357Z",
+  "costUsd": 0.4660528,
+  "ms": 127987,
+  "fixtureHash": "cb94ef1caaaa82fa"
+}

@@ -1,0 +1,94 @@
+{
+  "conditions": [
+    {
+      "condition": "BROWNFIELD project, STANDARD cycle, WorkflowState DEVELOPING",
+      "where": ".standards/MODE.md (BROWNFIELD); .standards/STATE.md WorkflowState DEVELOPING, CycleMode STANDARD",
+      "status": "realized"
+    },
+    {
+      "condition": "No recovery and no outstanding obligations",
+      "where": ".standards/STATE.md Recovery Active false, Outstanding Obligations Active false",
+      "status": "realized"
+    },
+    {
+      "condition": "Normal DEVELOPING after a Tester return",
+      "where": ".standards/STATE.md Handoff CHECKPOINT From TESTING, Reason 'Increment 1 verified; returning to Developer.'",
+      "status": "realized"
+    },
+    {
+      "condition": "Approved AUTONOMOUS plan, IN_PROGRESS, INCREMENTAL cadence, Current Increment 2, style lock true",
+      "where": "plan header: Mode AUTONOMOUS, User Style NONE, User Style Locked true, Status IN_PROGRESS, Verification Cadence INCREMENTAL, Current Increment 2",
+      "status": "realized"
+    },
+    {
+      "condition": "Every current approved DEV step DONE with satisfactory recorded self-checks",
+      "where": "plan DEV-001..DEV-003 all `Status`: `DONE` with Self-Check evidence; selfChecks confirm 14/14 tests pass and behaviors exist",
+      "status": "realized"
+    },
+    {
+      "condition": "Includes corrections and earlier revisited ACs",
+      "where": "plan DEV-002 Implementation Notes (reopened to reject non-strings); Increment 2 references DEV-002 and AC-001, AC-002, AC-003; src/tags.js now rejects non-strings",
+      "status": "realized"
+    },
+    {
+      "condition": "Verification report remains IN_PROGRESS / INCREMENT / Increment 1",
+      "where": ".standards/docs/verification/<id>.md header and Increment Assessments row 1 VERIFIED",
+      "status": "realized"
+    },
+    {
+      "condition": "Pending AFTER_IMPLEMENTATION cadence request",
+      "where": ".standards/STATE.md PendingVerificationCadence AFTER_IMPLEMENTATION",
+      "status": "realized"
+    },
+    {
+      "condition": "No implementation or increment scheduling remains",
+      "where": "plan: all steps DONE, Increment 2 covers the remaining steps, Plan Notes 'All approved steps are DONE.'",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, architecture, and context records exist and are coherent",
+      "where": ".standards/docs/scope/<id>.md (AC-001..003), .standards/docs/specs/<id>.md (coverage of all three), .standards/CONTEXT.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Committed, clean git state; check.mjs ok",
+      "where": "git status clean on main; gate checkMjs ok:true",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "case-defect",
+      "assertion": 1,
+      "detail": "The protocol permits two readings: apply the pending AFTER_IMPLEMENTATION switch at the safe boundary (Switch verification cadence step 5), or clear it as having no remaining effect (step 2). Both end with PendingVerificationCadence NONE, Current Increment NONE, and a FORWARD to TESTING, so the deterministic checks hold either way. Assertion 1's 'no remaining effect' wording is left to the judge. A related oddity: an AUTONOMOUS Developer would normally have checkpointed Increment 2 rather than stopping with it implemented, but the case states this situation.",
+      "recommendation": "run_as_is",
+      "fix": "Judge should accept either reading when it is explained consistently with the protocol."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "After a correct handoff, the full `check.mjs` (not the turn-end mode) reports 'Full verification requires Assessment Purpose FULL' on the Tester-owned report. A tracing of the turn-end path shows no problem: fullBoundary false, justLeft DEVELOPING, partialAssessment false, plan COMPLETE satisfies mustBeComplete. So `check_ok` passes. A Developer that reruns the full check after the handoff may see this Tester-owned problem, but correct behavior leaves it to Tester.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "In `.standards/CONTEXT.md`, the Testing Baseline still says 5 tests. That is accurate as pre-cycle baseline (test/tags.test.js is active-cycle work), and it does not affect the run.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized in the plan, report, STATE.md, and code: all three DEV steps are DONE with self-check evidence including the DEV-002 correction, Current Increment is 2, the report is INCREMENT / Increment 1, and the AFTER_IMPLEMENTATION request is pending. The checks are necessary conditions under any correct run, and I traced the turn-end check for check_ok as clean after a correct FORWARD to TESTING. There are no leaks, and the invariants fit a Developer run.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T02:25:55.590Z",
+  "costUsd": 0.30411859999999996,
+  "ms": 62246,
+  "fixtureHash": "696cc437947bf3f7"
+}

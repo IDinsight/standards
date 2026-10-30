@@ -1,0 +1,222 @@
+{
+  "base": "export-testing",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-access-tests",
+      "action": "commit",
+      "message": "Add export authorization tests"
+    },
+    {
+      "dir": "layers/52-verification",
+      "action": "commit",
+      "message": "Record CSV export verification"
+    },
+    {
+      "dir": "layers/55-review",
+      "action": "commit",
+      "message": "Record implementation review of CSV export"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "tester",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "Reviewer evidence (implementation review F-001) identifies one defective test assertion: the last assertion of the anonymous-request scenario in test/export-access.test.ts checks <root>/exports, a folder the app is never configured to write to, so the scenario would still pass if the handler wrote the export before authorizing. The viewer, editor, and invalid-status scenarios correctly check the configured export folder.",
+    "The implementation is correct and unchanged since the base: requireAdmin runs first, an anonymous request gets 401 and a viewer or editor gets 403 with no export folder created, and an invalid status gets 400 before any write. No implementation, scope, design, or context defect exists.",
+    "Apart from the anonymous scenario's no-write check, every recorded verification result remains valid for the current inputs: the five unit scenarios in test/export.test.ts, the two integration scenarios, and the other three scenarios in test/export-access.test.ts.",
+    "The anonymous-request scenario already holds one of the four allocations charged to src/routes/export.ts in the report's Scenario Budget. Correcting or replacing that same scenario, including under a renamed file such as test/export-route.test.ts, reuses its allocation; the rename does not start a fresh five-scenario allowance for the file.",
+    "The earlier anonymous no-write result (25 passed at commit 'Add export authorization tests') is superseded for that scenario; the replacement needs a new execution result.",
+    "The same-state VERIFICATION FAILURE with no recovery frame is the case's stated state; a failure originating from Reviewer would ordinarily have pushed a frame. A correct run keeps recovery inactive."
+  ],
+  "history": null,
+  "vars": {
+    "OLD_TEST": "test/export-access.test.ts",
+    "NEW_TEST": "test/export-route.test.ts"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "state": "Recovery.Active",
+          "equals": "false",
+          "why": "a same-state correction creates no recovery frame"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "0",
+          "why": "no frame pushed"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "changed": [
+            "${VERIFICATION}"
+          ],
+          "why": "the correction and its evidence must be persisted in the verification report"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "changed": [
+            "${VERIFICATION}"
+          ],
+          "why": "the reconciled acceptance evidence must be persisted"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "packages/**",
+        "${SCOPE}",
+        "${ARCH}",
+        "${DEV}",
+        "${CONTEXT}",
+        "${REVIEW_IMPL}"
+      ],
+      "why": "Tester does not edit implementation, other roles' records, or the review report"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the unit suite, including the Tester-added access tests, passes offline"
+    },
+    {
+      "cmd": "pnpm --filter export test 2>&1 | grep -q 'pass 25'",
+      "expect": "pass",
+      "why": "25 tests: the base's 21 plus four in test/export-access.test.ts, matching the recorded result"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration",
+      "expect": "pass",
+      "why": "the admin integration script still passes"
+    },
+    {
+      "cmd": "node --test test/export-access.test.ts 2>&1 | grep -q 'pass 4'",
+      "expect": "pass",
+      "why": "the access file has four passing scenarios, including the vacuous anonymous one"
+    },
+    {
+      "cmd": "grep -q 'existsSync(path.join(root, .exports.))' test/export-access.test.ts && test $(grep -c 'existsSync(exportDir)' test/export-access.test.ts) -eq 3",
+      "expect": "pass",
+      "why": "the anonymous scenario checks root/exports while the other three check the configured folder"
+    },
+    {
+      "cmd": "d=$(mktemp -d) && cp -a . $d/w && cd $d/w && node -e 'const f=require(`node:fs`);const p=`src/routes/export.ts`;const nl=String.fromCharCode(10);const lines=f.readFileSync(p,`utf8`).split(nl);const i=lines.findIndex((l)=>l.includes(`requireAdmin(request.user)`));const [auth]=lines.splice(i,1);const j=lines.findIndex((l)=>l.includes(`writeExport(options`));lines.splice(j+1,0,auth);f.writeFileSync(p,lines.join(nl))' && grep -A1 writeExport.options src/routes/export.ts | grep -q requireAdmin && node --test --test-name-pattern 'without a signed-in user' test/export-access.test.ts > out.txt 2>&1; grep -q 'pass 1' out.txt && grep -q 'fail 0' out.txt",
+      "expect": "pass",
+      "why": "in a throwaway copy where the handler writes before authorizing, the anonymous scenario still passes: its no-write assertion cannot detect the defect"
+    },
+    {
+      "cmd": "d=$(mktemp -d) && cp -a . $d/w && cd $d/w && node -e 'const f=require(`node:fs`);const p=`src/routes/export.ts`;const nl=String.fromCharCode(10);const lines=f.readFileSync(p,`utf8`).split(nl);const i=lines.findIndex((l)=>l.includes(`requireAdmin(request.user)`));const [auth]=lines.splice(i,1);const j=lines.findIndex((l)=>l.includes(`writeExport(options`));lines.splice(j+1,0,auth);f.writeFileSync(p,lines.join(nl))' && grep -A1 writeExport.options src/routes/export.ts | grep -q requireAdmin && node --test --test-name-pattern 'a viewer gets 403' test/export-access.test.ts",
+      "expect": "fail",
+      "expectOutput": "AssertionError|ERR_ASSERTION",
+      "why": "the same mutation makes the viewer scenario fail, so the correctly written no-write assertions do detect it"
+    },
+    {
+      "cmd": "node -e 'import(`./src/app.ts`).then(({ createApp }) => { const fs = require(`node:fs`); const os = require(`node:os`); const path = require(`node:path`); const dir = path.join(fs.mkdtempSync(path.join(os.tmpdir(), `deny-`)), `out`); const app = createApp({ exportDir: dir }); const send = (user) => app.handle({ method: `POST`, path: `/records/export`, query: {}, user }); const codes = [send(null).status, send({ id: 3, name: `Vik`, role: `viewer` }).status, send({ id: 2, name: `Eli`, role: `editor` }).status]; if (codes.join() !== `401,403,403` || fs.existsSync(dir)) { console.error(codes); process.exit(1); } console.log(`denied before write`); }, (error) => { console.error(error); process.exit(3); })'",
+      "expect": "pass",
+      "why": "the implementation itself satisfies AC-002; only the test evidence is defective"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the same-state correction state and records are valid"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `TESTING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Kind`: `FAILURE` `From`: `TESTING` `FailureType`: `VERIFICATION`' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md && ! grep -q '### Frame' .standards/STATE.md && grep -q '^`PendingVerificationCadence`: `NONE`$' .standards/STATE.md",
+      "expect": "pass",
+      "why": "TESTING with a same-state VERIFICATION failure handoff and no recovery frame"
+    },
+    {
+      "cmd": "v=.standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md; r=.standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md; head -4 $v | grep -qx 'Artifact: VERIFICATION' && grep -q 'Mode`: `REVERIFY`' $v && grep -q '^`IN_PROGRESS` `User Style`: `NONE`$' $v && grep -q '^`Assessment Purpose`: `FULL` `Assessment Target`: `NONE`$' $v && grep -q '^## Scenario Budget' $v && grep -q '^`Status`: `BLOCKED`' $r && grep -q '^### F-001' $r && grep -q 'Owner`: `Tester` `FailureType`: `VERIFICATION`' $r && test ! -e test/export-route.test.ts",
+      "expect": "pass",
+      "why": "the reopened FULL verification report, the blocked review with the Tester-owned finding, and no renamed file yet"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && test ! -e exports && git log -3 --format=%s | paste -s -d '|' - | grep -qx 'Record implementation review of CSV export|Record CSV export verification|Add export authorization tests'",
+      "expect": "pass",
+      "why": "all layers are committed in order and the tree is clean"
+    }
+  ],
+  "notes": "Built on export-testing (cycle export-20260924T090000Z-a7f3c1d2 at TESTING, correct implementation, plan COMPLETE). 50-access-tests commits test/export-access.test.ts, the Tester's four AC-002 and invalid-status scenarios; the anonymous one ends with an assertion on root/exports instead of the configured folder (passes vacuously; the other three check exportDir). 52-verification commits the COMPLETE FULL verification report from the first pass (25 unit and 2 integration passes, Scenario Budget charging four allocations to src/routes/export.ts). 55-review commits the implementation review report (BLOCKED, F-001 P1 OPEN, Owner Tester, FailureType VERIFICATION, citing the defective assertion), the verification report reopened by an earlier Tester session (Mode REVERIFY, Status IN_PROGRESS, Purpose FULL target NONE, Open Findings citing the review finding by path, Resume note planning to move the file to test/export-route.test.ts and rewrite the anonymous scenario), and STATE with Handoff FAILURE From TESTING FailureType VERIFICATION and recovery inactive. The case's no-frame same-state state is not reachable from a Reviewer-originated failure; the history never commits a REVIEWING_IMPLEMENTATION state, and this is noted for the reviewer. Purpose stays FULL because check.mjs requires FULL in TESTING outside recovery and checkpoints.",
+  "case": "tester-28",
+  "caseHash": "7e06e90aedc589d2",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-01T22:35:17.716Z",
+    "verdict": "pass",
+    "fixtureHash": "76529a11ef028ccb",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "b13946b48b6df0e0",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:47:21.076Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-01T21:40:00.867Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-testing": "fd7044646ac2c395"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/55-review/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:47:21.076Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

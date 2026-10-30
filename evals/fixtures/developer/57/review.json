@@ -1,0 +1,76 @@
+{
+  "conditions": [
+    {
+      "condition": "Brownfield project",
+      "where": ".standards/MODE.md (installed BROWNFIELD template, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "EXPEDITED cycle at DEVELOPING",
+      "where": ".standards/STATE.md: WorkflowState DEVELOPING, CycleMode EXPEDITED, generated cycle Id, Scope/Architecture NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Unfinished work remains",
+      "where": "Plan Status IN_PROGRESS with DEV-002 reopened to PENDING (layer 40-reopen); src/render.js still emits formatted strings",
+      "status": "realized"
+    },
+    {
+      "condition": "Approved STEPWISE plan with AFTER_IMPLEMENTATION / NONE",
+      "where": "plan header: Mode STEPWISE, User Style NONE, User Style Locked true, Verification Cadence AFTER_IMPLEMENTATION, Current Increment NONE; earlier commit shows APPROVED",
+      "status": "realized"
+    },
+    {
+      "condition": "Steps mapped to EXPEDITED_REQUEST, no AC identifiers anywhere",
+      "where": "plan DEV-001..003 Acceptance EXPEDITED_REQUEST; no AC-NNN text in any record",
+      "status": "realized"
+    },
+    {
+      "condition": "Unsatisfied Developer-owned corrective obligation from expedited recovery",
+      "where": "STATE.md Recovery Frame 1 (From REVIEWING_IMPLEMENTATION, Owner DEVELOPING, IMPLEMENTATION, RerunThrough NONE); review F-001 OPEN; renderJson still uses formatCents (selfCheck 2 confirms)",
+      "status": "realized"
+    },
+    {
+      "condition": "No pending cadence request before the run",
+      "where": "STATE.md PendingVerificationCadence NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "User explicitly requests INCREMENTAL verification",
+      "where": "utterance: 'Use incremental verification for this cycle.'",
+      "status": "realized"
+    },
+    {
+      "condition": "Clean committed git state, valid check",
+      "where": "git status clean on main; check.mjs ok:true",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "After the STEPWISE Developer reopened DEV-002 in the prior session, BlockedOn stayed NONE rather than recording a continue-direction blocker; this is a defensible reading (stepwise sets the blocker after a completed step) and does not affect the promotion path being tested.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "ungradeable-assertion",
+      "assertion": 4,
+      "detail": "Assertion 4 concerns later scheduling at a future safe Developer boundary; marked N/A per owner decision. Assertion 1's checks (plan cadence still AFTER_IMPLEMENTATION / NONE, no verification record) capture the observable part.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes an EXPEDITED brownfield cycle at DEVELOPING with an approved STEPWISE AFTER_IMPLEMENTATION plan, DEV-002 reopened, and the corrective obligation as an active RerunThrough-NONE recovery frame backed by genuinely unfixed renderJson code; check.mjs passes and nothing leaks. The checks match the protocol's promotion rules (STANDARD/AUDITING/PROMOTE, frame converted to one DEVELOPING/IMPLEMENTATION obligation, pending INCREMENTAL preserved, plan fields untouched, /auditor invocation), and I traced check.mjs on the expected post-run state to confirm check_ok holds.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T02:26:19.846Z",
+  "costUsd": 0.2330586,
+  "ms": 45558,
+  "fixtureHash": "514803bf8a3463ad"
+}

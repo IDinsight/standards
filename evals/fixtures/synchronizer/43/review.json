@@ -1,0 +1,89 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (brownfield install, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState SYNCHRONIZING, Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, architecture, context, development plan, verification, and both review reports present with valid ownership and current content identities",
+      "where": ".standards/docs/{scope,specs,development,verification,reviews}/…, .standards/CONTEXT.md; check.mjs ok; identity selfCheck passes",
+      "status": "realized"
+    },
+    {
+      "condition": "Documentation evidence available",
+      "where": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md (COMPLETE, DOC-001 RESOLVED, G1–G5)",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and outstanding obligations inactive",
+      "where": ".standards/STATE.md Recovery/Outstanding Obligations Active false",
+      "status": "realized"
+    },
+    {
+      "condition": "An earlier Synchronizer pass resolved documentation discrepancy D-002 with evidence: Documenter's correction and the final Reviewer's independent check against the same AC",
+      "where": "sync record D-002 RESOLVED citing 66a5cb4 (G5) and final review C6 against AC-003; final-deliverable.md F-001 RESOLVED with C6; docs/usage.md empty-export paragraph",
+      "status": "realized"
+    },
+    {
+      "condition": "D-003 left blocked on a user question persisted in Active Work.BlockedOn",
+      "where": "STATE.md BlockedOn 'D-003: Is scripts/export-all.ts …'; sync record D-003 OPEN and Limitations repeat the question; record Status BLOCKED",
+      "status": "realized"
+    },
+    {
+      "condition": "Nothing has changed since the earlier pass",
+      "where": "sync record and STATE written in the last commit 2ff8656; clean tree; every cited blob/commit matches HEAD (selfCheck)",
+      "status": "realized"
+    },
+    {
+      "condition": "User has not answered; utterance only asks to reconcile again",
+      "where": "prompt.utterance 'Reconcile again.'",
+      "status": "realized"
+    },
+    {
+      "condition": "A Reviewer finding status exists for assertion 2 to protect",
+      "where": "final-deliverable.md F-001 Status RESOLVED",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "case-defect",
+      "assertion": -1,
+      "detail": "The catalog said the case contradicts the skill: once the gate passes, the state becomes AWAITING_USER_SIGNOFF. It also said assertion 1 needs a second run. The fixture resolves both. The open D-003 user question keeps the gate failing, so SYNCHRONIZING is legitimate, and the first pass's output is built in as the starting state. It follows the case prompt, where D-002 is RESOLVED, over the catalog's grader-only fact that D-002 is OPEN. That choice is consistent with the case.",
+      "recommendation": "run_as_is",
+      "fix": "None; the fixture's interpretation is the reachable reading of the case."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "D-003's subject, scripts/export-all.ts, was chosen by the generator. Its comment ('nightly copy to the shared reports drive') reads naturally and does not hint at an answer. A run that reopens D-003 and routes it differently would deviate from the case's expected output, so the D-003 OPEN, BlockedOn-unchanged, and SYNCHRONIZING checks are appropriate.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The git author is 'Fixture <fixture@example.invalid>' and every commit has an identical timestamp. Both are visible in git log. This comes from the harness builder, not the spec, and is the same across fixtures.",
+      "recommendation": "run_as_is",
+      "fix": "Harness-level; not addressable in this spec."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every condition the case states is realized. The SYNCHRONIZING state carries a BLOCKED second-pass synchronization record: D-001 WITHDRAWN, D-002 RESOLVED with Documenter G5 and Reviewer C6 evidence, and D-003 OPEN with its question persisted in BlockedOn. All cited identities match a clean HEAD, and check.mjs plus all selfChecks pass. The checks are necessary conditions a correct re-run satisfies: IDs kept, no duplicate headings, status not COMPLETE, state and blocker unchanged, and review reports unchanged. The invariants fit a Synchronizer that owns only its record.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T15:58:19.452Z",
+  "costUsd": 0.3574392,
+  "ms": 57225,
+  "fixtureHash": "2a5bd6fe82d8483f"
+}

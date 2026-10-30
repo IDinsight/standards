@@ -1,0 +1,73 @@
+{
+  "conditions": [
+    {
+      "condition": "STANDARD cycle, BROWNFIELD project, WorkflowState TESTING",
+      "where": ".standards/STATE.md (CycleMode STANDARD, WorkflowState TESTING); .standards/MODE.md BROWNFIELD",
+      "status": "realized"
+    },
+    {
+      "condition": "Current handoff is a CHECKPOINT from Developer naming Increment 1, with no recovery",
+      "where": ".standards/STATE.md Handoff Kind CHECKPOINT, From DEVELOPING, Reason names Increment 1; Recovery.Active false",
+      "status": "realized"
+    },
+    {
+      "condition": "Plan is IN_PROGRESS with effective INCREMENTAL cadence and Current Increment 1",
+      "where": ".standards/docs/development/<ID>.md header",
+      "status": "realized"
+    },
+    {
+      "condition": "Future DEV-002 is PENDING; Increment 1 is DEV-001 DONE with self-check evidence",
+      "where": "development plan DEV-001 DONE with Self-Check, DEV-002 PENDING, Increments 1 and 2 defined",
+      "status": "realized"
+    },
+    {
+      "condition": "Report is IN_PROGRESS / INCREMENT / Increment 1, with the assessment not yet finished",
+      "where": ".standards/docs/verification/<ID>.md header; empty Increment Assessments; Execution Evidence not yet run",
+      "status": "realized"
+    },
+    {
+      "condition": "An earlier AFTER_IMPLEMENTATION switch request is recorded in PendingVerificationCadence and not applied",
+      "where": "STATE.md Active Work PendingVerificationCadence AFTER_IMPLEMENTATION; plan still INCREMENTAL; report Resume note",
+      "status": "realized"
+    },
+    {
+      "condition": "The user now explicitly requests INCREMENTAL",
+      "where": "prompt.utterance 'Actually, keep incremental verification.'",
+      "status": "realized"
+    },
+    {
+      "condition": "Increment 1 implementation is testable and behaves per contract, so required testing can complete and pass",
+      "where": "src/discounts.js, src/invoice.js; selfChecks 2–3 confirm percentage, rejection, inclusive expiry, unchanged totals",
+      "status": "realized"
+    },
+    {
+      "condition": "Established test commands run offline",
+      "where": "package.json test script; selfCheck 1 passes 7 tests",
+      "status": "realized"
+    },
+    {
+      "condition": "Starting state passes check.mjs",
+      "where": "gate_results checkMjs ok true",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "hint-leak",
+      "assertion": 2,
+      "detail": "The report's Resume or Handoff note says the earlier AFTER_IMPLEMENTATION request is 'for Developer to apply at its next safe boundary; the assigned Increment 1 assessment continues unchanged.' It records a prior Tester's correct handling of the earlier request, which is realistic. It nudges toward finishing the increment but says nothing about how to treat the new matching request.",
+      "recommendation": "run_as_is",
+      "fix": "Acceptable as realistic prior-session record text."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized: TESTING under a Developer CHECKPOINT for Increment 1, an INCREMENTAL plan with DEV-002 pending, an IN_PROGRESS INCREMENT report, and a pending AFTER_IMPLEMENTATION cadence request. The implementation has no defect and check.mjs passes at the start. A correct run (clear pending to NONE, test, record VERIFIED, CHECKPOINT back to DEVELOPING with a /developer invocation) satisfies every check and the turn-end checker, and the invariants are standard and fit the case.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-01T22:36:24.029Z",
+  "costUsd": 0.2259592,
+  "ms": 60411,
+  "fixtureHash": "8759aeb00ef27730"
+}

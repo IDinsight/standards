@@ -1,0 +1,78 @@
+{
+  "conditions": [
+    {
+      "condition": "Project is BROWNFIELD",
+      "where": ".standards/MODE.md (installer brownfield template, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "WorkflowState CANCELLED, CycleMode UNSET, PendingCycleMode/PendingCycleRequest UNSET, PendingCycleBlockedOn NONE",
+      "where": ".standards/STATE.md (layer 20-cancel-cycle)",
+      "status": "realized"
+    },
+    {
+      "condition": "Retained Active Work.Id abandoned-note-20260921T091500Z-c3d4e5f6 and Request 'Abandoned note'",
+      "where": ".standards/STATE.md Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Last commit's STATE.md already ended that cycle in CANCELLED",
+      "where": "HEAD commit 'Cancel abandoned note cycle'; selfCheck git show HEAD:.standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Cancelled cycle produced no Scope, Architecture, Development, CONTEXT, or other records",
+      "where": "STATE.md Scope/Architecture/Development NONE; no .standards/docs or CONTEXT.md (selfCheck)",
+      "status": "realized"
+    },
+    {
+      "condition": "User confirms the cancelled cycle left no project changes",
+      "where": "utterance: 'The cancelled cycle left no project changes.'",
+      "status": "realized"
+    },
+    {
+      "condition": "New bounded request: nullable abandonedNote field on existing admin record via established update/render patterns, no new architecture or formal documentation",
+      "where": "utterance; src/adminRecords.js (EDITABLE_FIELDS, optionalText, suspendedReason null init) and src/render.js (LABELS, em-dash placeholder)",
+      "status": "realized"
+    },
+    {
+      "condition": "User explicitly authorizes a fresh generated ID and forbids reuse",
+      "where": "utterance",
+      "status": "realized"
+    },
+    {
+      "condition": "cycle.mjs new succeeds from the retained CANCELLED state; check.mjs passes",
+      "where": "gate results: check ok, selfCheck cycle.mjs new exit 0",
+      "status": "realized"
+    },
+    {
+      "condition": "No pending mode preference, so Developer may infer EXPEDITED for the bounded brownfield request",
+      "where": "STATE.md PendingCycleMode UNSET",
+      "status": "realized"
+    },
+    {
+      "condition": "Existing tests pass on committed code",
+      "where": "test/*.test.js; selfCheck pass 7/7",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "All commits are dated 2026-09-24 while the cancelled cycle ID timestamp is 2026-09-21; the start commit postdates the ID's time by three days. Harmless and not observable as a hint.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes a valid retained brownfield CANCELLED state with the exact cancelled ID committed at HEAD, no cycle records or CONTEXT.md, and a small admin-records module whose suspendedReason field gives a clear nullable-field pattern; check.mjs and cycle.mjs new both succeed. Checks are necessary conditions for a correct EXPEDITED start (new generated ID, NEW_CYCLE from CANCELLED, BaselineReconciliation NONE, plan created with BlockedOn persisted, implementation untouched), and complete:true is used only for the purely state-decided assertions 1 and 2. No leaks, standard invariants present.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T02:23:51.445Z",
+  "costUsd": 0.1570786,
+  "ms": 33417,
+  "fixtureHash": "1622b08002acec92"
+}

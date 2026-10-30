@@ -1,0 +1,76 @@
+{
+  "conditions": [
+    {
+      "condition": "Project mode is GREENFIELD",
+      "where": ".standards/MODE.md (installer greenfield template, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "WorkflowState is SCOPING",
+      "where": ".standards/STATE.md (installer template)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode is UNSET, with pending-cycle fields clear",
+      "where": ".standards/STATE.md (installer template)",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work Id and Request are UNSET; Handoff is INITIAL; no recovery",
+      "where": ".standards/STATE.md (installer template)",
+      "status": "realized"
+    },
+    {
+      "condition": "No cycle records and no project context exist",
+      "where": "no .standards/docs or .standards/CONTEXT.md (confirmed by selfCheck)",
+      "status": "realized"
+    },
+    {
+      "condition": "A README is available",
+      "where": "README.md",
+      "status": "realized"
+    },
+    {
+      "condition": "A scaffold exists that is not a completed implementation",
+      "where": "src/cli.js dispatches add/list/done to src/store.js, whose three functions throw 'not implemented yet'; test/cli.test.js covers only usage, help, and unknown-command",
+      "status": "realized"
+    },
+    {
+      "condition": "Everything is committed and the tree is clean",
+      "where": "git log (2 commits), git status clean",
+      "status": "realized"
+    },
+    {
+      "condition": "check.mjs passes on the fresh install",
+      "where": "gate checkMjs ok:true",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The local git config uses user.name=Fixture and email fixture@example.invalid, which the role could see in the git log or config. This comes from the harness and is common to every fixture; it reveals nothing about this case's answer.",
+      "recommendation": "run_as_is",
+      "fix": "None needed for this case."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 0,
+      "detail": "`cycle.mjs new` prints an ID without writing any file, so the state checks alone cannot detect ID generation. complete:false correctly leaves that part to the judge, which reads the trace. All the listed state and unchanged checks hold for every correct Navigator run, since running check.mjs, `node --test`, or the CLI writes nothing.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture is a clean greenfield install in the stated pre-cycle state (SCOPING, all fields UNSET) over a small, realistic shelf CLI. Its present-tense README and stubbed store.js make assertion 1 observable without hinting at the answer. The checks and invariants (unchanged everything, HEAD unchanged, no mutating git) cannot fail a correct Navigator run, and the selfChecks confirm the stated behavior.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T01:35:35.998Z",
+  "costUsd": 0.08618819999999999,
+  "ms": 15183,
+  "fixtureHash": "02605772dab85d01"
+}

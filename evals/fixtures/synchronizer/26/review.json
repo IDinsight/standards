@@ -1,0 +1,71 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is BROWNFIELD",
+      "where": ".standards/MODE.md (brownfield install, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState SYNCHRONIZING",
+      "where": ".standards/STATE.md header",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id is export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md Active Work.Id",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, architecture, context, development plan, verification, and both review reports exist with valid ownership and content identities",
+      "where": ".standards/docs/{scope,specs,development,verification}/export-20260924T090000Z-a7f3c1d2.md, .standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/{implementation,final-deliverable}.md, .standards/CONTEXT.md; check.mjs reports no problem in them",
+      "status": "realized"
+    },
+    {
+      "condition": "Documentation evidence is available",
+      "where": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md (COMPLETE, checks G1–G4, AC-003 evidence)",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and outstanding obligations inactive; no blocked user question",
+      "where": ".standards/STATE.md Recovery.Active false, Outstanding Obligations.Active false, BlockedOn NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "The fixed synchronization record path already holds an unmarked user note",
+      "where": "untracked .standards/docs/synchronization/export-20260924T090000Z-a7f3c1d2.md (layer 50-note, no provenance block); check.mjs and artifact init both report the collision",
+      "status": "realized"
+    },
+    {
+      "condition": "No other discrepancies in the cycle besides the collision",
+      "where": "check.mjs reports exactly one problem; records' cited commits and blobs match git log",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-wrong",
+      "assertion": 0,
+      "detail": "Assertion 0's complete check also requires all of `.standards/docs/**` unchanged. A run that leaves the note alone but writes a record at another path under .standards/docs would fail assertion 0 even though it added no provenance to the note; that behavior really violates assertion 1. No correct run changes .standards/docs, so no correct run is mis-graded. Only the attribution of the failure is off.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally drop the `.standards/docs/**` glob from assertion 0 and keep only `unchanged: [${SYNC}]`; assertion 1 already covers it."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "A personal checklist saved at the exact cycle-ID synchronization path is somewhat contrived. The case requires it, though, and the note's content is plausible user prose that refers to real project facts (POST export, exports/ retention, seed title). It does not hint at the collision.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition: a clean SYNCHRONIZING STANDARD cycle with complete, consistent upstream records, and an untracked unmarked user note at the fixed synchronization path. check.mjs and artifact init both report it as a collision, exactly as expectCheck lists. The checks are necessary conditions for a correct run: the note and the records stay unchanged, and STATE.md is left free for a BlockedOn update. The invariants fit, and nothing leaks.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T14:36:37.894Z",
+  "costUsd": 0.24307679999999998,
+  "ms": 35992,
+  "fixtureHash": "030f66070a053f60"
+}

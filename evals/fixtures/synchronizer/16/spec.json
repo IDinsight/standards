@@ -1,0 +1,319 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-scaffold",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Set up records service with seeded in-memory store"
+    },
+    {
+      "dir": "layers/05-auth",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add user roles and authorize helper"
+    },
+    {
+      "dir": "layers/10-routes",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add route layer and GET /records with filters"
+    },
+    {
+      "dir": "layers/15-export",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add admin CSV export of filtered records"
+    },
+    {
+      "dir": "layers/20-docs",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Document records service usage"
+    },
+    {
+      "dir": "layers/50-context",
+      "action": "commit",
+      "message": "Record project context for export authorization tests"
+    },
+    {
+      "dir": "layers/52-scope",
+      "action": "commit",
+      "message": "Define export authorization test scope"
+    },
+    {
+      "dir": "layers/54-design",
+      "action": "commit",
+      "message": "Design export authorization regression tests"
+    },
+    {
+      "dir": "layers/56-plan",
+      "action": "commit",
+      "message": "Plan export authorization test cycle"
+    },
+    {
+      "dir": "layers/58-tests",
+      "action": "commit",
+      "message": "Add export authorization regression tests"
+    },
+    {
+      "dir": "layers/60-verification",
+      "action": "commit",
+      "message": "Record export authorization test verification"
+    },
+    {
+      "dir": "layers/62-review",
+      "action": "commit",
+      "message": "Record implementation review of authorization tests"
+    },
+    {
+      "dir": "layers/64-documentation",
+      "action": "commit",
+      "message": "Record documentation check for authorization tests"
+    },
+    {
+      "dir": "layers/66-final-review",
+      "action": "commit",
+      "message": "Record final review of authorization tests"
+    },
+    {
+      "dir": "layers/70-edit",
+      "action": "unstaged"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "synchronizer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The cycle changes only test/integration/export-access.test.js; no source, package.json, documentation, or existing test file changed in the cycle.",
+    "The verification report, the implementation review, and the final-deliverable review all assessed the committed version of test/integration/export-access.test.js, which ends every refused-request case with assert.equal(existsSync(exportDir), false).",
+    "The unstaged working-tree edit to test/integration/export-access.test.js removes both existsSync(exportDir) assertions and the existsSync import; the status and error-body assertions remain and the whole suite still passes (25 tests).",
+    "With the edited suite, a regression that creates the export folder before the role check passes; the committed suite fails it. So the AC-002 evidence in the verification report and both reviews no longer applies to the current content.",
+    "The export implementation itself is correct and unchanged since the pre-cycle baseline; the defect is in the test, which Tester owns (VERIFICATION). Restoring or replacing the assertion and producing new formal results is Tester's work; review applicability (at least the final-deliverable review) then needs Reviewer reassessment."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "export-20260924T090000Z-a7f3c1d2",
+    "SYNC": ".standards/docs/synchronization/export-20260924T090000Z-a7f3c1d2.md",
+    "VERIFICATION": ".standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md",
+    "REVIEW_IMPL": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md",
+    "REVIEW_FINAL": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md",
+    "DOC": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md",
+    "TEST": "test/integration/export-access.test.js",
+    "TESTED_COMMIT": "${COMMIT:Add export authorization regression tests}",
+    "FINAL_REVIEWED_COMMIT": "${COMMIT:Record documentation check for authorization tests}"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${SYNC}",
+          "why": "the skill requires creating the record early and persisting discrepancies before routing"
+        },
+        {
+          "field": {
+            "path": "${SYNC}",
+            "name": "Status",
+            "not": "COMPLETE"
+          },
+          "why": "the dirty test edit invalidates the evidence, so the gate cannot pass"
+        },
+        {
+          "state": "WorkflowState",
+          "not": "AWAITING_USER_SIGNOFF",
+          "why": "sign-off readiness would treat unchanged source as proof of unchanged evidence"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "test/**"
+          ],
+          "why": "Synchronizer must not restore or rewrite the test assertions"
+        },
+        {
+          "unchanged": [
+            ".standards/docs/verification/**"
+          ],
+          "why": "formal results stay Tester-owned"
+        },
+        {
+          "contains": {
+            "path": "${SYNC}",
+            "regex": "`FailureType`:\\s*`VERIFICATION`"
+          },
+          "why": "the test discrepancy is recorded with Tester's canonical failure type"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            ".standards/docs/reviews/**"
+          ],
+          "why": "Synchronizer does not change review conclusions"
+        },
+        {
+          "heading_ids": {
+            "path": "${SYNC}",
+            "prefix": "D",
+            "min": 1
+          },
+          "why": "discrepancies are persisted as D-NNN entries"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Synchronizer must not change git state or the assessed working tree"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "package.json",
+        "docs/**",
+        "README.md",
+        ".standards/CONTEXT.md",
+        ".standards/docs/scope/**",
+        ".standards/docs/specs/**",
+        ".standards/docs/development/**",
+        ".standards/docs/documentation/**"
+      ],
+      "why": "Synchronizer owns only its record and protocol coordination updates"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "npm test",
+      "expect": "pass",
+      "why": "the project's test command passes on the dirty working tree"
+    },
+    {
+      "cmd": "npm test 2>&1 | grep -qE 'pass 25$'",
+      "expect": "pass",
+      "why": "the suite has 25 tests (21 pre-cycle plus 4 in the new access suite), as the records state"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the SYNCHRONIZING state and records are valid"
+    },
+    {
+      "cmd": "test \"$(git status --porcelain)\" = ' M test/integration/export-access.test.js'",
+      "expect": "pass",
+      "why": "the only uncommitted change is the unstaged edit to the regression suite"
+    },
+    {
+      "cmd": "test $(git show HEAD:test/integration/export-access.test.js | grep -c 'assert.equal(existsSync(exportDir), false);') -eq 2 && ! grep -q existsSync test/integration/export-access.test.js",
+      "expect": "pass",
+      "why": "the committed suite asserts folder absence; the working-tree edit removes those assertions"
+    },
+    {
+      "cmd": "c=$(git log --format=%H -1 --fixed-strings --grep='Record project context for export authorization tests') && test \"$(git diff --name-only $c HEAD -- . ':!.standards')\" = test/integration/export-access.test.js && test -z \"$(git diff --name-only $c~1 $c -- . ':!.standards')\"",
+      "expect": "pass",
+      "why": "the cycle changes only the regression test outside workflow records"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `SYNCHRONIZING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Id`: `export-20260924T090000Z-a7f3c1d2`$' .standards/STATE.md && grep -q '^`Kind`: `FORWARD` `From`: `REVIEWING_FINAL` `FailureType`: `NONE`' .standards/STATE.md && grep -q '`BlockedOn`: `NONE`' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md && grep -q 'ProjectMode`: `BROWNFIELD' .standards/MODE.md",
+      "expect": "pass",
+      "why": "state as the case describes: SYNCHRONIZING, STANDARD, nothing blocked, recovery and obligations inactive"
+    },
+    {
+      "cmd": "for f in .standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md .standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md .standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md .standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md .standards/docs/development/export-20260924T090000Z-a7f3c1d2.md; do grep -q '`Status`: `COMPLETE`' $f || exit 1; done; test ! -e .standards/docs/synchronization && test ! -e exports && ! grep -rqE 'COMMIT:|BLOB:' .standards/docs .standards/CONTEXT.md",
+      "expect": "pass",
+      "why": "all upstream records are COMPLETE, no synchronization record exists yet, and no placeholders remain"
+    },
+    {
+      "cmd": "f=.standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md && grep -q $(git rev-parse HEAD:test/integration/export-access.test.js) $f && ! grep -q $(git hash-object test/integration/export-access.test.js) $f && grep -q $(git rev-parse HEAD:test/integration/export-access.test.js) .standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md",
+      "expect": "pass",
+      "why": "verification and final review cite the committed test content, which differs from the working tree"
+    },
+    {
+      "cmd": "(node -e 'const fs=require(`node:fs`);const p=`src/routes/export.js`;const s=fs.readFileSync(p,`utf8`);fs.writeFileSync(p,`import { mkdirSync } from \"node:fs\";\\n`+s.replace(`requireAdmin(request.user);`,`mkdirSync(options.exportDir, { recursive: true });\\n    requireAdmin(request.user);`))' && node --test test/integration/export-access.test.js); r=$?; git checkout -- src/routes/export.js; exit $r",
+      "expect": "pass",
+      "why": "with the edited suite, a handler that creates the export folder before the role check still passes"
+    },
+    {
+      "cmd": "f=test/integration/zz-committed-access.test.js; git show HEAD:test/integration/export-access.test.js > $f; (node -e 'const fs=require(`node:fs`);const p=`src/routes/export.js`;const s=fs.readFileSync(p,`utf8`);fs.writeFileSync(p,`import { mkdirSync } from \"node:fs\";\\n`+s.replace(`requireAdmin(request.user);`,`mkdirSync(options.exportDir, { recursive: true });\\n    requireAdmin(request.user);`))' && node --test $f); r=$?; rm -f $f; git checkout -- src/routes/export.js; exit $r",
+      "expect": "fail",
+      "expectOutput": "true !== false|strictly equal",
+      "why": "the committed suite catches the same regression at the folder-absence assertion"
+    },
+    {
+      "cmd": "f=test/integration/zz-committed-access.test.js; git show HEAD:test/integration/export-access.test.js > $f; out=$(node --test $f 2>&1); r=$?; rm -f $f; echo \"$out\"; test $r -eq 0 && echo \"$out\" | grep -qE 'pass 4$'",
+      "expect": "pass",
+      "why": "the committed regression suite (4 tests) passes against the unchanged implementation"
+    }
+  ],
+  "notes": "Standalone fixture (the suggested export-synchronizing base runs a cycle that changes source, while this case needs a cycle that changes only tests, under the case's cycle id). Pre-install layers 00-20 build a small plain-JavaScript records service with the CSV export already in place (POST /records/export, requireAdmin first, writeExport is the only code that creates the export folder), unit tests, an integration suite covering only admin exports, README, and docs/usage.md (which already says refused exports create no file). Layers 50-66 are cycle export-20260924T090000Z-a7f3c1d2 in brownfield order: CONTEXT, scope (AC-001 refused status/body pinned by tests, AC-002 tests fail if a refused request writes, AC-003 runs in npm test with no source change), design (test-only), plan COMPLETE with one inspection-only step DEV-001 and Plan Notes assigning the suite to Tester, the Tester's commit adding test/integration/export-access.test.js (the only project file the cycle changes), COMPLETE FULL verification (E1 25 passed, E2/E3 fault checks), COMPLETE implementation review, COMPLETE no-change documentation record, COMPLETE final-deliverable review citing the committed test blob; STATE SYNCHRONIZING with FORWARD from REVIEWING_FINAL, recovery/obligations inactive, BlockedOn NONE. Layer 70 leaves an unstaged tidy-up of the access suite that drops both existsSync(exportDir) assertions; the suite still passes. Records cite revisions and blobs via placeholders resolved at build.",
+  "case": "synchronizer-16",
+  "caseHash": "78adebfe6c7897a0",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T14:33:22.675Z",
+    "verdict": "pass",
+    "fixtureHash": "8062656dfd1409b2",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "3ea73ff0c7f3b42f",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:32:41.482Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T13:13:12.839Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-context/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/52-scope/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/54-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/56-plan/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/60-verification/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/62-review/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/64-documentation/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/66-final-review/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:32:41.482Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

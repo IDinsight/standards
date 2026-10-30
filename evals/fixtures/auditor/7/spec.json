@@ -1,0 +1,240 @@
+{
+  "base": null,
+  "date": "2026-09-25T11:30:00Z",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add invoice store and request handlers"
+    },
+    {
+      "dir": "layers/51-share-links-expedited",
+      "action": "commit",
+      "message": "Add shareable invoice links"
+    },
+    {
+      "dir": "layers/52-share-links-context",
+      "action": "commit",
+      "message": "Record project context for share links"
+    },
+    {
+      "dir": "layers/53-share-links-scope-design",
+      "action": "commit",
+      "message": "Scope and design share link expiry and revocation"
+    },
+    {
+      "dir": "layers/54-share-links-implementation",
+      "action": "commit",
+      "message": "Implement share link expiry and revocation"
+    },
+    {
+      "dir": "layers/55-share-links-verification",
+      "action": "commit",
+      "message": "Verify and review share links"
+    },
+    {
+      "dir": "layers/56-share-links-docs-sync",
+      "action": "commit",
+      "message": "Document share links and synchronize cycle records"
+    },
+    {
+      "dir": "layers/57-share-links-signoff",
+      "action": "commit",
+      "message": "Sign off share links cycle"
+    },
+    {
+      "dir": "layers/58-invoice-search-cycle",
+      "action": "commit",
+      "message": "Start invoice search cycle"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "auditor",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The prior cycle share-invoice-links-20260915T130000Z-6a1d9e42 started EXPEDITED, was promoted to STANDARD (its Auditor wrote the CONTEXT.md entry at that point), completed every standard phase, and was signed off in commit 'Sign off share links cycle' (HEAD~1); its synchronization record, both review reports, the verification report, and the documentation record are COMPLETE.",
+    "The CONTEXT.md entry label previous-share-links is not the current Active Work.Id add-invoice-search-20260925T110000Z-1f2e3d4c (and is not the prior cycle's full Id either), so the entry is stale cycle-scoped context.",
+    "src/share-links.ts is committed, imported by src/app.ts, exercised by the share routes in src/handlers.ts, covered by test/share-links.test.ts (all 14 tests pass), and documented in README.md. Its baseline status is establishable from repository and version-control evidence: it is established project baseline, so a correct audit folds it into the ordinary baseline and removes the stale entry. No blocking question is needed in this fixture.",
+    "The current cycle has produced no implementation, so a correct refreshed CONTEXT.md has no Active-Cycle Non-Baseline Work entries (the section should be omitted or hold only entries for the current cycle).",
+    "Apart from the stale entry, CONTEXT.md predates the share routes in src/handlers.ts, the ShareLinks wiring in src/app.ts, test/share-links.test.ts, and the README share-links section; a coherent refresh accounts for those.",
+    "A correct successful audit hands off FORWARD from AUDITING to SCOPING (brownfield initial audit of a STANDARD cycle) with BaselineReconciliation NONE and BlockedOn NONE."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "add-invoice-search-20260925T110000Z-1f2e3d4c",
+    "PREV": "share-invoice-links-20260915T130000Z-6a1d9e42",
+    "CONTEXT": ".standards/CONTEXT.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "exists": "${CONTEXT}",
+          "why": "the context artifact must remain"
+        },
+        {
+          "contains": {
+            "path": "${CONTEXT}",
+            "regex": "^(?![\\s\\S]*(?:^|\\n)##\\s*Active-Cycle Non-Baseline Work[^\\n]*(?:(?!\\n##\\s)[\\s\\S])*share-links)",
+            "flags": "i"
+          },
+          "why": "no Active-Cycle Non-Baseline Work section mentions share-links: neither the old previous-share-links entry nor a relabeled current-cycle entry for src/share-links.ts"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "changed": [
+            "${CONTEXT}"
+          ],
+          "why": "the stale baseline must be refreshed from current evidence"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 4,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${CONTEXT}"
+        },
+        {
+          "changed": [
+            "${CONTEXT}"
+          ]
+        },
+        {
+          "contains": {
+            "path": "${CONTEXT}",
+            "regex": "^(?![\\s\\S]*(?:^|\\n)##\\s*Active-Cycle Non-Baseline Work[^\\n]*(?:(?!\\n##\\s)[\\s\\S])*share-links)",
+            "flags": "i"
+          },
+          "why": "the prior-cycle entry is gone from the non-baseline section"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "package.json",
+        "README.md"
+      ],
+      "why": "Auditor does not mutate project artifacts to learn about them"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --experimental-strip-types --test test/invoices.test.ts test/handlers.test.ts test/share-links.test.ts",
+      "expect": "pass",
+      "why": "the established test suite, including the share-links tests, passes"
+    },
+    {
+      "cmd": "grep -qF share-links.ts src/app.ts",
+      "expect": "pass",
+      "why": "src/share-links.ts is wired into the application context"
+    },
+    {
+      "cmd": "git ls-files --error-unmatch src/share-links.ts",
+      "expect": "pass",
+      "why": "the file still exists and is committed"
+    },
+    {
+      "cmd": "git show HEAD~1:.standards/STATE.md | grep -q SIGNED_OFF",
+      "expect": "pass",
+      "why": "the prior share-links cycle was signed off before the current cycle started"
+    },
+    {
+      "cmd": "grep -qF 'Cycle: previous-share-links; src/share-links.ts' .standards/CONTEXT.md",
+      "expect": "pass",
+      "why": "the existing context still holds the prior-cycle non-baseline entry"
+    },
+    {
+      "cmd": "grep -qF add-invoice-search-20260925T110000Z-1f2e3d4c .standards/STATE.md",
+      "expect": "pass",
+      "why": "the active cycle id is as stated"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 50-project (pre-install): small TypeScript invoicing service (src/invoices.ts, src/handlers.ts, src/app.ts, two node:test suites, README). 51-57 replay a complete prior cycle share-invoice-links-20260915T130000Z-6a1d9e42: 51 expedited DEV-001 adds src/share-links.ts and promotes to STANDARD; 52 that cycle's Auditor writes .standards/CONTEXT.md with the entry 'Cycle: previous-share-links; src/share-links.ts' under Active-Cycle Non-Baseline Work (label taken verbatim from the case); 53 scope (AC-001..AC-004) and design; 54 expiry/revocation, share routes, app wiring, plan COMPLETE; 55 Tester adds test/share-links.test.ts and COMPLETE verification plus COMPLETE implementation review; 56 README section, documentation record, final review, synchronization record, AWAITING_USER_SIGNOFF; 57 SIGNED_OFF. 58 starts the current STANDARD cycle add-invoice-search-20260925T110000Z-1f2e3d4c at AUDITING with NEW_CYCLE from SIGNED_OFF, PromotionReason NONE, BaselineReconciliation NONE, recovery inactive, no records. CONTEXT.md is the layer-52 version: usable project-level baseline but stale (no share routes, stale non-baseline entry). The evidence deliberately makes the file's status determinable (established baseline), so the expected branch is fold-in and remove, not block. Spec date is set to 2026-09-25T11:30:00Z so commits follow the cycle id timestamp. Code avoids template literals so no dollar-brace sequences appear in layer files besides COMMIT substitutions.",
+  "case": "auditor-7",
+  "caseHash": "9d17661d5f8059f1",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T21:07:32.646Z",
+    "verdict": "pass",
+    "fixtureHash": "6453da825418522a",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "94e0e61d44e0589b",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:06:07.934Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T21:00:05.645Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/51-share-links-expedited/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/52-share-links-context/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/53-share-links-scope-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/54-share-links-implementation/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/55-share-links-verification/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/56-share-links-docs-sync/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/57-share-links-signoff/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/58-invoice-search-cycle/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:06:07.934Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

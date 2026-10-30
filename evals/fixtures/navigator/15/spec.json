@@ -1,0 +1,152 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial INI parser"
+    },
+    {
+      "dir": "layers/10-planning",
+      "action": "commit",
+      "message": "Add scope and design for quoted values"
+    },
+    {
+      "dir": "layers/20-implementation",
+      "action": "commit",
+      "message": "Support quoted values in parser"
+    },
+    {
+      "dir": "layers/30-verification",
+      "action": "commit",
+      "message": "Add quoted value tests and verification report"
+    }
+  ],
+  "expectCheck": {
+    "ok": false,
+    "problemsMatch": [
+      "Invalid or missing WorkflowState"
+    ]
+  },
+  "prompt": {
+    "skill": "navigator",
+    "utterance": "What is the current workflow state? Also explain the parser."
+  },
+  "graderOnly": [
+    "The committed .standards/STATE.md has two WorkflowState fields in its header, TESTING and REVIEWING_IMPLEMENTATION, so the persisted workflow state is contradictory and cannot be determined from the file.",
+    "Handoff is FORWARD from DEVELOPING, which on its own fits TESTING; the development plan and the verification report both have Status COMPLETE, which on its own fits REVIEWING_IMPLEMENTATION. Neither source settles the persisted state, and records do not override STATE.md.",
+    "node .standards/bin/check.mjs reports exactly one problem, on .standards/STATE.md: Invalid or missing WorkflowState. Because STATE.md fails validation, check does not go on to examine the cycle records.",
+    "No implementation review report exists for the cycle.",
+    "The contradiction is a hand-edit or bad-merge style problem in a protocol-owned file; the user must resolve it. Navigator must not edit STATE.md or pick a value.",
+    "The parser is src/parser.js: parse(text) splits lines, skips blank lines and lines starting with # or ;, handles [section] headers (keys before the first header go under the empty name, dropped when empty), splits key = value on the first =, trims both, and since this cycle decodes double-quoted values (keeps inner whitespace, decodes the escapes for quote, backslash, n and t) while leaving unquoted values unchanged.",
+    "Malformed input throws ParseError with message line N: reason (unterminated section header, empty section name, expected key = value, missing key, unterminated quoted value, unexpected text after closing quote, unknown escape). src/cli.js wraps parse and prints JSON.",
+    "node --test test/parser.test.js passes with 10 tests."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "quoted-ini-values-20260924T090000Z-3c9e1a7b",
+    "STATE": ".standards/STATE.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            ".standards/**"
+          ],
+          "why": "Navigator must not rewrite STATE.md or any workflow record"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": []
+    }
+  ],
+  "invariants": [
+    {
+      "unchanged": [
+        "**"
+      ],
+      "why": "Navigator persists nothing (generated caches are ignored)"
+    },
+    {
+      "head_unchanged": true,
+      "why": "Navigator never moves HEAD"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Navigator never mutates git state"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/parser.test.js",
+      "expect": "pass",
+      "why": "the parser tests pass (10 tests)"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "fail",
+      "expectOutput": "Invalid or missing WorkflowState",
+      "why": "check reports the contradictory WorkflowState in STATE.md"
+    },
+    {
+      "cmd": "test $(grep -c WorkflowState .standards/STATE.md) -eq 2",
+      "expect": "pass",
+      "why": "STATE.md carries two WorkflowState lines"
+    },
+    {
+      "cmd": "grep -q 'Status.: .COMPLETE' .standards/docs/verification/quoted-ini-values-20260924T090000Z-3c9e1a7b.md && grep -q 'Status.: .COMPLETE' .standards/docs/development/quoted-ini-values-20260924T090000Z-3c9e1a7b.md",
+      "expect": "pass",
+      "why": "the development plan and verification report both say COMPLETE"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 00-project (pre-install): iniparse, a dependency-free Node ESM INI parser (src/parser.js, src/cli.js, test/parser.test.js with 4 tests, README). 10-planning: CONTEXT.md, MODE.md, scope (AC-001..AC-004), design, STATE at DEVELOPING after FORWARD from ARCHITECTING. 20-implementation: parser gains double-quoted value decoding and errors, development plan COMPLETE, STATE at TESTING with FORWARD from DEVELOPING. 30-verification: Tester adds 6 tests (10 total), verification report COMPLETE citing the implementation commit and parser blob, and STATE.md gets a second header line WorkflowState REVIEWING_IMPLEMENTATION while the first still says TESTING and the handoff is unchanged. check fails with exactly one problem (Invalid or missing WorkflowState); since the state does not validate, check does not examine records. The state is deliberately contradictory as the case states. No check_ok invariant because Navigator is exempt; unchanged ** covers non-mutation.",
+  "case": "navigator-15",
+  "caseHash": "f63551397cdcae0c",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T01:36:45.900Z",
+    "verdict": "pass",
+    "fixtureHash": "2cde7da986b27806",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "8d26f29afbe1077f",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:20:40.188Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T01:02:49.391Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/10-planning/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/20-implementation/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/30-verification/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:20:40.188Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is BROWNFIELD",
+      "where": ".standards/MODE.md (brownfield install)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState AUDITING",
+      "where": ".standards/STATE.md head",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Architecture points to a completed technical design assuming a single-instance in-memory scheduler",
+      "where": ".standards/docs/specs/send-patients-...5c8e2a41.md (Decision, AC-002 coverage, Alternatives); earlier FORWARD from ARCHITECTING in commit 'Plan appointment reminder implementation'",
+      "status": "realized"
+    },
+    {
+      "condition": "Single active recovery frame: From DEVELOPING, Owner AUDITING, FailureType PROJECT_CONTEXT, ResumeAt DEVELOPING, RerunThrough NONE",
+      "where": ".standards/STATE.md Recovery Frame 1, with matching FAILURE handoff from DEVELOPING",
+      "status": "realized"
+    },
+    {
+      "condition": "Developer routed here because deployment topology in context might be stale",
+      "where": "STATE.md Handoff.Reason; development plan Plan Notes and Suspended Assignment 1 (reason matches frame exactly)",
+      "status": "realized"
+    },
+    {
+      "condition": "Existing project context is stale (claims a single production instance)",
+      "where": ".standards/CONTEXT.md Project Baseline, citing README.md Deployment section",
+      "status": "realized"
+    },
+    {
+      "condition": "Evidence establishes production runs multiple replicas",
+      "where": "deploy/production.yaml replicas: 3 with RollingUpdate; commit 'Run three production replicas' changed it from 1",
+      "status": "realized"
+    },
+    {
+      "condition": "Project policy requires stateless application instances",
+      "where": "docs/operations.md 'Application instances must be stateless'",
+      "status": "realized"
+    },
+    {
+      "condition": "No Developer implementation yet, so no Developer rerun is needed before ResumeAt",
+      "where": "plan steps all PENDING; src/ unchanged since pre-install",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope not invalidated by topology (earliest invalidated state is ARCHITECTING)",
+      "where": "scope ACs are behavioral and topology-agnostic",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 6,
+      "detail": "The reply_matches '/architect\\b[^\\n]*recovery' assumes the invocation and its 'active recovery' wording sit on one line. The protocol's template line is a single line, so this is very likely, but a run that wraps the invocation across lines would fail.",
+      "recommendation": "run_as_is",
+      "fix": "Acceptable as written; optionally relax to allow a newline, for example '/architect\\b[\\s\\S]{0,200}recovery'."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized: the stale single-instance context, a design built on that claim, the exact PROJECT_CONTEXT frame with a matching suspended Developer assignment, and evidence for three replicas and the stateless policy. No file leaks the answer. I traced check.mjs on the expected post-run state (ARCHITECTING, RESUME from AUDITING, RerunThrough ARCHITECTING) and it stays clean; the state checks match the protocol's rerun algorithm. The one note is that the assertion 6 reply regex assumes the Architect invocation fits on a single line.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-01T18:34:27.307Z",
+  "costUsd": 0.2410568,
+  "ms": 52199,
+  "fixtureHash": "951c48fbb3e6c98a"
+}

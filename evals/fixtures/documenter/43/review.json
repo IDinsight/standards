@@ -1,0 +1,84 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState DOCUMENTING",
+      "where": ".standards/STATE.md head",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id = export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, architecture, context, development, verification, and implementation review exist with matching provenance and current evidence",
+      "where": ".standards/docs/scope|specs|development|verification|reviews/.../implementation.md, .standards/CONTEXT.md",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-001 covers CSV export behavior; AC-002 requires an accurate usage guide",
+      "where": ".standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md Work items 1 and 2",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and outstanding obligations inactive; nothing blocked",
+      "where": ".standards/STATE.md (Recovery Active false, Obligations Active false, BlockedOn NONE)",
+      "status": "realized"
+    },
+    {
+      "condition": "Editing unrestricted",
+      "where": "no restriction in STATE, records, or utterance",
+      "status": "realized"
+    },
+    {
+      "condition": "No documentation record exists yet",
+      "where": "no file at the fixed path; the symlink target is outside the project and empty",
+      "status": "realized"
+    },
+    {
+      "condition": ".standards/docs/documentation parent is a symlink leading outside the safe project location",
+      "where": "committed symlink .standards/docs/documentation -> ../../../shared-docs, which resolves to /work/shared-docs with projectPath /work/records-admin; artifact.mjs refuses with 'not a normal folder'",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "The catalog marks the case deliberately_invalid, but check.mjs has no rule about the type of the records parent folder, so expectCheck {ok:true} is correct for this runtime. The selfCheck confirms that check.mjs passes.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The commit message 'Keep documentation records in the shared docs checkout' draws attention to the symlink and could be read as team intent to write outside the repo. That is realistic ambiguity rather than a leak: the protocol still treats an unsafe path as a collision, and the message does not reveal the expected behavior.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 1,
+      "detail": "The checks are sound as necessary conditions. The absent check on ${DOC} follows the symlink, so a write landing in /work/shared-docs (declared in outsideDirs) is caught. 'unchanged .standards/docs/**' fits because a correct blocking run touches only STATE.md (BlockedOn) and possibly docs/usage.md. complete:false is appropriate because an alternate location could be anywhere.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized: a valid DOCUMENTING STANDARD cycle with complete upstream records, and a committed relative symlink at .standards/docs/documentation that resolves outside the project, which artifact.mjs refuses to write through. The checks cannot fail a correct blocking run, the standard invariants are present and fit the case, and no answer leaks. Only minor notes remain: expectCheck is ok:true despite the catalog's deliberately_invalid flag, and the commit message is mildly suggestive.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T16:35:22.408Z",
+  "costUsd": 0.1981606,
+  "ms": 30837,
+  "fixtureHash": "29594db0a0ba14b6"
+}

@@ -1,0 +1,81 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState DOCUMENTING, Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, architecture, context, development, verification and implementation review exist with matching provenance and current evidence",
+      "where": ".standards/docs/{scope,specs,development,verification,reviews/.../implementation}.md, .standards/CONTEXT.md; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-001 covers CSV export behavior; AC-002 requires an accurate usage guide",
+      "where": "scope record Work items 1 and 2",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and obligations inactive, BlockedOn NONE",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "User selects FILE docs/generated/api.md only",
+      "where": "prompt.utterance 'Update only docs/generated/api.md.'",
+      "status": "realized"
+    },
+    {
+      "condition": "Repository rules forbid hand-editing the generated file and require changing source doc comments and regenerating",
+      "where": "CONTRIBUTING.md Documentation section; header line of docs/generated/api.md; scripts/gen-api-docs.mjs",
+      "status": "realized"
+    },
+    {
+      "condition": "Correctly updating the generated file needs a source docstring edit outside the selected file",
+      "where": "src/routes/export.ts has no /** */ block, so POST /records/export is missing from docs/generated/api.md (selfChecks 2-4)",
+      "status": "realized"
+    },
+    {
+      "condition": "Generated file currently matches generator output, so it is not stale for unrelated reasons",
+      "where": "selfChecks 1 and 6",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation is committed with a clean tree and tests pass",
+      "where": "git status clean; selfCheck pnpm tests",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The generator, CONTRIBUTING.md, and a comment-only edit to src/routes/records.ts land in a commit after the implementation review. No role made this commit, and .standards/CONTEXT.md (Commands, Structure) does not mention the doc generator or docs/generated/. A careful Documenter may record this as a post-review input change or a context gap. The change is comment-only, no cited blob changed, and the skill lets Documenter establish the rule from CONTRIBUTING.md directly, so a correct run still stays in DOCUMENTING.",
+      "recommendation": "run_as_is",
+      "fix": "Optional: rebuild standalone (base null) with the generator in pre-install history and CONTEXT.md listing it. Not required for this case."
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 2,
+      "detail": "The `exists ${DOC}` check assumes the run creates the documentation record even though the user said 'Update only docs/generated/api.md'. The skill says record and state persistence continue with a selected target. It treats a FILE target as an editing boundary, not a ban on workflow writes, and the expected output requires persisting the conflict. A correct run therefore creates the record. A run that reads 'only' as forbidding all writes would be outside the skill's default reading.",
+      "recommendation": "run_as_is",
+      "fix": "None needed. If graders see such runs, relax assertion 2 to `complete: false` and drop the exists check."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes the case: the repository rule against hand-editing docs/generated/api.md is stated in CONTRIBUTING.md and the file header, and the export route has no doc comment, so a correct reference update needs a source edit outside the user's selected file. Checks for unchanged generated output, no edits outside authorization, and a non-COMPLETE record in DOCUMENTING are necessary conditions under the skill, and no answer leaks. The only notes are the post-review commit that introduces the generator and context that does not mention it, neither of which changes what the run tests.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T16:31:36.334Z",
+  "costUsd": 0.26525259999999995,
+  "ms": 76625,
+  "fixtureHash": "51ceb0bee1d428bf"
+}

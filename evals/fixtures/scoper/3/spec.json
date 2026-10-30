@@ -1,0 +1,259 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-service",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add password reset endpoint"
+    },
+    {
+      "dir": "layers/10-queue",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Send reset emails from an in-process job queue"
+    },
+    {
+      "dir": "layers/50-cycle",
+      "action": "commit",
+      "message": "Start token cleanup cycle"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "scoper",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "No .standards/CONTEXT.md exists and no Auditor has run for this cycle; the cycle was recorded directly in SCOPING with an INITIAL handoff.",
+    "Active Work.Request asks for a background job in the accounts service that deletes expired password-reset tokens every night.",
+    "The service's runtime (a Node HTTP server), its queueing mechanism (an in-process JobQueue drained by a setInterval in src/server.js), its deployment shape (a Procfile web process), and its npm commands have not been audited for this cycle.",
+    "The expected outcome is a FAILURE handoff from SCOPING to AUDITING with FailureType PROJECT_CONTEXT, one recovery frame (From SCOPING, Owner AUDITING, ResumeAt SCOPING, RerunThrough NONE), no scope file, Active Work.Scope still NONE, and an Auditor invocation in the reply."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "add-a-background-job-to-the-accounts-20260924T090000Z-3e9c41b7",
+    "SCOPE": ".standards/docs/scope/add-a-background-job-to-the-accounts-20260924T090000Z-3e9c41b7.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "state": "Handoff.Kind",
+          "equals": "FAILURE",
+          "why": "missing context is routed as a failure, not worked around"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "PROJECT_CONTEXT"
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "AUDITING"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "absent": ".standards/CONTEXT.md",
+          "why": "Scoper must not write Auditor-owned context"
+        },
+        {
+          "unchanged": [
+            "src/**",
+            "test/**",
+            "README.md",
+            "package.json",
+            "Procfile"
+          ],
+          "why": "no project files are touched"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": true,
+      "all": [
+        {
+          "state": "ActiveWork.Scope",
+          "equals": "NONE"
+        },
+        {
+          "absent": "${SCOPE}"
+        },
+        {
+          "unchanged": [
+            ".standards/docs/**"
+          ],
+          "why": "no scope or other record is created"
+        },
+        {
+          "unchanged": [
+            "src/**",
+            "test/**",
+            "README.md",
+            "package.json",
+            "Procfile"
+          ],
+          "why": "no scope written as a project document"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": true,
+      "all": [
+        {
+          "state": "Handoff.Kind",
+          "equals": "FAILURE"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "SCOPING"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "PROJECT_CONTEXT"
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "AUDITING"
+        },
+        {
+          "check_ok": true
+        }
+      ]
+    },
+    {
+      "assertion": 4,
+      "complete": true,
+      "all": [
+        {
+          "state": "Recovery.Active",
+          "equals": "true"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "1"
+        },
+        {
+          "state": "Recovery.Frame1.From",
+          "equals": "SCOPING"
+        },
+        {
+          "state": "Recovery.Frame1.Owner",
+          "equals": "AUDITING"
+        },
+        {
+          "state": "Recovery.Frame1.FailureType",
+          "equals": "PROJECT_CONTEXT"
+        },
+        {
+          "state": "Recovery.Frame1.ResumeAt",
+          "equals": "SCOPING"
+        },
+        {
+          "state": "Recovery.Frame1.RerunThrough",
+          "equals": "NONE"
+        },
+        {
+          "check_ok": true
+        }
+      ]
+    },
+    {
+      "assertion": 5,
+      "complete": false,
+      "all": [
+        {
+          "reply_matches": "/auditor",
+          "why": "Claude Code invocation of the Auditor skill"
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "AUDITING",
+          "why": "the transition is persisted"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/tokens.test.js test/queue.test.js",
+      "expect": "pass",
+      "why": "the existing service tests pass"
+    },
+    {
+      "cmd": "test ! -e .standards/CONTEXT.md",
+      "expect": "pass",
+      "why": "no Auditor project context exists"
+    },
+    {
+      "cmd": "test ! -e .standards/docs",
+      "expect": "pass",
+      "why": "no cycle records exist yet"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. Pre-install layers 00-service and 10-queue build a small Node accounts service: a password-reset HTTP endpoint (src/server.js, src/tokens.js, src/store.js, src/mailer.js), then an in-process JobQueue (src/queue.js) drained by a setInterval in server.js with a send-reset-email job (src/jobs/sendResetEmail.js), a Procfile web process, and node:test tests. Expired tokens are never purged, which motivates the request. Layer 50-cycle overwrites STATE.md: WorkflowState SCOPING, CycleMode STANDARD, an active cycle id in generated form, the request in Active Work.Request, Scope/Architecture/Development NONE, recovery and obligations inactive. No CONTEXT.md and no records. Compromise: a brownfield STANDARD cycle normally starts in AUDITING; the case states SCOPING without an audit, so the handoff is left as INITIAL (From NONE) with a neutral reason, which check.mjs accepts; this state is not reachable through the documented transitions, as the case requires.",
+  "case": "scoper-3",
+  "caseHash": "b1d00c831b997135",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T20:06:05.194Z",
+    "verdict": "pass",
+    "fixtureHash": "e49389f6e7e2c0af",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "7563ddf54f9863d6",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:33:33.604Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T19:40:25.149Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-cycle/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:33:33.604Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

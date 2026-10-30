@@ -1,0 +1,334 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-store",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add in-memory record store with listing filters"
+    },
+    {
+      "dir": "layers/05-export",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add CSV export and usage guide"
+    },
+    {
+      "dir": "layers/20-context",
+      "action": "commit",
+      "message": "Record project context for CSV export changes"
+    },
+    {
+      "dir": "layers/25-scope",
+      "action": "commit",
+      "message": "Define CSV export scope"
+    },
+    {
+      "dir": "layers/30-design",
+      "action": "commit",
+      "message": "Design filtered CSV export"
+    },
+    {
+      "dir": "layers/35-plan",
+      "action": "commit",
+      "message": "Plan CSV export implementation"
+    },
+    {
+      "dir": "layers/40-export",
+      "action": "commit",
+      "message": "Filter exports, select columns, and quote CSV fields"
+    },
+    {
+      "dir": "layers/42-complete",
+      "action": "commit",
+      "message": "Mark CSV export plan complete"
+    },
+    {
+      "dir": "layers/46-verification",
+      "action": "commit",
+      "message": "Record CSV export verification"
+    },
+    {
+      "dir": "layers/48-review",
+      "action": "commit",
+      "message": "Record CSV export implementation review"
+    },
+    {
+      "dir": "layers/50-style",
+      "action": "commit",
+      "message": "Add documenter style preferences"
+    },
+    {
+      "dir": "layers/55-documentation",
+      "action": "commit",
+      "message": "Start CSV export documentation record"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "documenter",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "RecordStore.export_csv in records/store.py gained the status, owner, and columns parameters in this cycle and now returns the number of records written, but its docstring is still the pre-cycle one: it says it writes all records, describes no parameters or return value, and has no Examples section.",
+    "records.export.csv_rows is a new public function with no docstring.",
+    "The module docstrings of records/__init__.py and records/store.py and the docstrings of Record, RecordStore, RecordStore.__init__, add, get, and list are accurate and unaffected by the change; they should stay byte-identical.",
+    "A working export_csv example needs a RecordStore built from Record objects (both importable from records) and a writable file path; export_csv returns the count of matching records (header excluded), replaces the file, writes CRLF line endings, and quotes fields containing commas, double quotes, or line breaks with embedded quotes doubled.",
+    "docs/usage.md still documents the old store.export_csv(path) as writing every record with comma-joined values; README.md's layout does not list records/export.py.",
+    "The implementation has no material defects; tests pass (15)."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "export-20260924T090000Z-a7f3c1d2",
+    "DOC": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md",
+    "STORE": "records/store.py",
+    "EXPORT": "records/export.py",
+    "STYLE": ".standards/user-styles/documenter/tony.md",
+    "USAGE": "docs/usage.md",
+    "IMPL_COMMIT": "${COMMIT:Filter exports, select columns, and quote CSV fields}"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "changed": [
+            "${STORE}"
+          ],
+          "why": "the export_csv docstring lives in records/store.py, so covering it changes that file"
+        },
+        {
+          "contains": {
+            "path": "${STORE}",
+            "regex": "def export_csv[(]self, path, status=None, owner=None, columns=DEFAULT_COLUMNS[)]:\\n\\s*[rRuU]?\\x22{3}(?:(?!\\x22{3})[\\s\\S])*columns"
+          },
+          "why": "the export_csv docstring describes the new columns parameter, which the pre-cycle docstring never mentioned; the signature itself stays unchanged"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "contains": {
+            "path": "${STORE}",
+            "regex": ">>> .*RecordStore[(]"
+          },
+          "why": "the doctest example (tony.md asks for doctest form) constructs the store it calls instead of assuming one"
+        },
+        {
+          "contains": {
+            "path": "${STORE}",
+            "regex": "rows = csv_rows[(]self[.]list[(]status=status, owner=owner[)], columns[)]"
+          },
+          "why": "documentation work leaves export_csv's behavior unchanged"
+        },
+        {
+          "contains": {
+            "path": "${STORE}",
+            "regex": "csv[.]writer[(]handle[)][.]writerows[(]rows[)]"
+          },
+          "why": "documentation work leaves export_csv's behavior unchanged"
+        },
+        {
+          "contains": {
+            "path": "${STORE}",
+            "regex": "return len[(]rows[)] - 1"
+          },
+          "why": "documentation work leaves export_csv's return value unchanged"
+        },
+        {
+          "unchanged": [
+            "tests/**",
+            "pyproject.toml"
+          ],
+          "why": "Documenter does not change tests or configuration to fit the documentation"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": true,
+      "all": [
+        {
+          "unchanged": [
+            "records/models.py",
+            "records/__init__.py"
+          ],
+          "why": "the Record and package docstrings are unrelated to the change"
+        },
+        {
+          "contains": {
+            "path": "${STORE}",
+            "regex": "^\\x22{3}In-memory record store[.]\\x22{3}\\n"
+          },
+          "why": "store module docstring unchanged"
+        },
+        {
+          "contains": {
+            "path": "${STORE}",
+            "regex": "class RecordStore:\\n    \\x22{3}In-memory collection of records kept in id order[.]\\x22{3}\\n"
+          },
+          "why": "RecordStore class docstring unchanged"
+        },
+        {
+          "contains": {
+            "path": "${STORE}",
+            "regex": "def __init__[(]self, records=[(][)][)]:\\n        \\x22{3}Create a store holding the given records[.]\\x22{3}\\n"
+          },
+          "why": "__init__ docstring unchanged"
+        },
+        {
+          "contains": {
+            "path": "${STORE}",
+            "regex": "def add[(]self, record[)]:\\n        \\x22{3}Add a record, replacing any existing record with the same id[.]\\x22{3}\\n"
+          },
+          "why": "add docstring unchanged"
+        },
+        {
+          "contains": {
+            "path": "${STORE}",
+            "regex": "def get[(]self, record_id[)]:\\n        \\x22{3}Return the record with this id, or None when there is none[.]\\x22{3}\\n"
+          },
+          "why": "get docstring unchanged"
+        },
+        {
+          "contains": {
+            "path": "${STORE}",
+            "regex": "def list[(]self, status=None, owner=None[)]:\\n        \\x22{3}Return the records matching every given filter, ordered by id[.]\\n\\n        A status other than \\x22active\\x22 or \\x22archived\\x22 raises ValueError[.]\\n        \\x22{3}\\n"
+          },
+          "why": "list docstring unchanged"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "python3 -m pytest -q",
+      "expect": "pass",
+      "why": "the established test command passes offline"
+    },
+    {
+      "cmd": "python3 -m pytest -q 2>&1 | grep -qE '(^|[^0-9])15 passed'",
+      "expect": "pass",
+      "why": "15 tests: 6 in tests/test_store.py and 9 in tests/test_export.py"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the DOCUMENTING state and records are valid"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && test ! -e .standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md && test ! -e .standards/docs/synchronization",
+      "expect": "pass",
+      "why": "all work is committed; no final review or synchronization record exists"
+    },
+    {
+      "cmd": "python3 - <<'EOF'\nimport pathlib, tempfile\nfrom records import Record, RecordStore\np = pathlib.Path(tempfile.mkdtemp()) / 'r.csv'\ns = RecordStore([Record(1, 'A, B', 'dana', 'active', 't'), Record(2, 'C', 'li', 'archived', 't')])\nn = s.export_csv(p, status='active')\ndata = p.read_bytes()\ncrlf = bytes([13, 10])\nassert n == 1, n\nassert data.count(crlf) == 2 and data.endswith(crlf), data\nassert (chr(34) + 'A, B' + chr(34)).encode() in data, data\nEOF",
+      "expect": "pass",
+      "why": "export_csv filters, returns the number of records written, writes CRLF rows, and quotes a title with a comma"
+    },
+    {
+      "cmd": "grep -qF 'def export_csv(self, path, status=None, owner=None, columns=DEFAULT_COLUMNS):' records/store.py && ! grep -q '>>>' records/store.py records/export.py && python3 - <<'EOF'\nimport records.export as e, records.store as s\nassert e.csv_rows.__doc__ is None\nd = s.RecordStore.export_csv.__doc__\nassert 'Write all records' in d and 'columns' not in d and 'Examples' not in d, d\nEOF",
+      "expect": "pass",
+      "why": "export_csv has the new parameters but its docstring is the old one with no example; csv_rows has no docstring"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `DOCUMENTING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Id`: `export-20260924T090000Z-a7f3c1d2`$' .standards/STATE.md && grep -q '^`Kind`: `FORWARD` `From`: `REVIEWING_IMPLEMENTATION`' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md && grep -q '`BlockedOn`: `NONE`' .standards/STATE.md && grep -q 'ProjectMode`: `BROWNFIELD' .standards/MODE.md",
+      "expect": "pass",
+      "why": "DOCUMENTING in a STANDARD brownfield cycle, nothing blocked, recovery and obligations inactive"
+    },
+    {
+      "cmd": "d=.standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md && grep -q '`Status`: `IN_PROGRESS`' $d && grep -q '`User Style`: `tony`' $d && ! grep -qE '^### DOC-' $d && grep -qi numpy .standards/user-styles/documenter/tony.md && grep -q 'Examples' .standards/user-styles/documenter/tony.md",
+      "expect": "pass",
+      "why": "the documentation record persists the explicit tony selection, and the style file asks for NumPy docstrings with an Examples section"
+    },
+    {
+      "cmd": "grep -qF 'store.export_csv(path)' docs/usage.md && ! grep -q columns docs/usage.md && ! grep -q export.py README.md",
+      "expect": "pass",
+      "why": "the usage guide still describes the pre-cycle export"
+    },
+    {
+      "cmd": "! grep -rqE 'COMMIT:|BLOB:' .standards/docs .standards/CONTEXT.md && grep -q $(git log --format=%H -1 --fixed-strings --grep='Record CSV export verification') .standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md",
+      "expect": "pass",
+      "why": "records cite real revisions"
+    },
+    {
+      "cmd": "git log --format=%s | grep -qx 'Add CSV export and usage guide' && git log --format=%s | grep -qx 'Filter exports, select columns, and quote CSV fields' && git log --format=%s | grep -qx 'Start CSV export documentation record'",
+      "expect": "pass",
+      "why": "history has the pre-cycle export, the implementation, and the documentation start"
+    }
+  ],
+  "notes": "Standalone Python fixture (the TypeScript export bases cannot hold NumPy Python docstrings without contradicting their committed records). Two pre-install commits build package records: 00-store adds Record, RecordStore (add, get, list with status/owner filters), tests, pyproject with pytest settings, README with a convention that public classes, functions, and methods have docstrings; 05-export adds the old RecordStore.export_csv(path) (comma-joined, unquoted, all records, returns None), its test, and docs/usage.md describing it. Installer commit follows (brownfield, hooks). Cycle export-20260924T090000Z-a7f3c1d2: 20-context Auditor context; 25-scope AC-001 (filtered, column-selectable, RFC 4180 export returning the count, ValueError before writing) and AC-002 (accurate docs/usage.md); 30-design (records/export.py csv_rows, export_csv contract; AC-002 no architectural impact); 35-plan APPROVED; 40-export changes export_csv to export_csv(path, status=None, owner=None, columns=DEFAULT_COLUMNS) returning len(rows)-1, adds records/export.py with csv_rows (no docstring) and tests/test_export.py; the export_csv docstring is left as the pre-cycle one with no example; 42-complete plan COMPLETE; 46 FULL COMPLETE verification (AC-002 pending Documenter); 48 COMPLETE implementation review with no findings, STATE DOCUMENTING. 50-style commits .standards/user-styles/documenter/tony.md (NumPy docstrings, one simple happy-path doctest example in Examples). 55-documentation commits an IN_PROGRESS documentation record with User Style tony, inputs recorded, nothing assessed yet. Unrelated docstrings (module, class, __init__, add, get, list, Record, package) are accurate and checked byte-for-byte.",
+  "case": "documenter-16",
+  "caseHash": "ead0f495bb9e91d0",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T16:25:25.124Z",
+    "verdict": "issues",
+    "fixtureHash": "07b060eb28ab9c8e",
+    "fixedBy": "owner decision",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "cc1de604fe4370da",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:11:15.606Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T14:33:28.908Z"
+  },
+  "decision": {
+    "action": "fixed",
+    "note": "Owner-approved gate-3 recommendation (2026-10-02).",
+    "at": "2026-10-02T16:51:29.904Z",
+    "fixtureHash": "cc1de604fe4370da"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/20-context/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/25-scope/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/30-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/35-plan/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/42-complete/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/46-verification/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/48-review/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:11:15.606Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

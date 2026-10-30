@@ -1,0 +1,96 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState TESTING, Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, Architecture, Development reference current-cycle artifacts",
+      "where": "STATE.md Active Work paths; provenance blocks in .standards/docs/{scope,specs,development}/export-20260924T090000Z-a7f3c1d2.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Valid Auditor context exists",
+      "where": ".standards/CONTEXT.md (commit 'Record project context for delimiter option')",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery inactive, no obligations, handoff FORWARD from DEVELOPING",
+      "where": ".standards/STATE.md Handoff/Recovery/Outstanding Obligations",
+      "status": "realized"
+    },
+    {
+      "condition": "src/export.ts has twelve pre-cycle scenarios",
+      "where": "test/export.test.ts (12 test() calls, committed before Install STANDARDS, untouched since)",
+      "status": "realized"
+    },
+    {
+      "condition": "Four pre-cycle scenarios cover the current contract",
+      "where": "Verification report Acceptance Evidence AC-002 row and Scenario Budget 'Reused coverage' listing four named scenarios",
+      "status": "realized"
+    },
+    {
+      "condition": "Initial verification added two active-cycle scenarios (allocations 2 of 5)",
+      "where": "test/export-delimiter.test.ts (2 tests); verification report Scenario Budget '2 of 5'",
+      "status": "realized"
+    },
+    {
+      "condition": "One active-cycle scenario needs a fixture correction for the same outcome",
+      "where": "test/fixtures/semicolon.ts semicolonCsv header uses commas; design requires COLUMNS joined with delimiter; selfCheck patching only that line gives pass 14",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation is correct (defect is test-owned only)",
+      "where": "src/export.ts toCsv joins header with delimiter; NEEDS_QUOTES per delimiter matches design",
+      "status": "realized"
+    },
+    {
+      "condition": "Verification report is an in-progress initial VERIFY pass (FULL/NONE) to be continued",
+      "where": ".standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md header and Resume or Handoff",
+      "status": "realized"
+    },
+    {
+      "condition": "Development plan COMPLETE with all steps DONE",
+      "where": ".standards/docs/development/export-20260924T090000Z-a7f3c1d2.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Test command runs offline",
+      "where": "package.json test script node --test test/*.test.ts; selfChecks confirm 13 pass / 1 fail",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "Catalog marked assertions 0 and 1 deterministic_complete, but the spec uses complete:false with judge involvement (running the full suite and keeping allocations at two are only visible in the trace/free-text report). This is the safer choice and the checks used (all twelve test names present; verification report changed) are necessary conditions a correct run satisfies.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "All commits share the same timestamp (builder default), and the cycle ID timestamp equals it. Harmless; the role has no reason to rely on commit times.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition: twelve pre-cycle scenarios for src/export.ts, four recorded as reused, two active-cycle allocations, and a single test-fixture defect (comma-joined expected header) whose correction makes all 14 tests pass while the implementation is correct. Nothing in files, names, or commits leaks the defect; records are coherent and check.mjs passes. Checks and invariants are necessary conditions a correct run (fix fixture, rerun, keep 2 allocations, possibly complete and hand off to Reviewer) would satisfy, including at the turn-end check.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-01T22:32:57.947Z",
+  "costUsd": 0.2394872,
+  "ms": 135385,
+  "fixtureHash": "26ca3cc669130a56"
+}

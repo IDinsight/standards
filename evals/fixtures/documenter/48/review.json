@@ -1,0 +1,94 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (brownfield install)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState DOCUMENTING, Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, architecture, context, development, verification and implementation review exist with matching provenance and current evidence",
+      "where": ".standards/docs/{scope,specs,development,verification,reviews}/…, .standards/CONTEXT.md; cited blobs unchanged since layer 50/55 touch only STATE.md, docs/usage.md and the documentation record",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-001 covers CSV export behavior; AC-002 requires an accurate usage guide",
+      "where": ".standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery inactive; no blocked user question",
+      "where": "STATE.md Recovery Active false, BlockedOn NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Editing is unrestricted",
+      "where": "Documentation record 'Editing boundary: unrestricted'; no user restriction in utterance",
+      "status": "realized"
+    },
+    {
+      "condition": "Cycle was promoted from EXPEDITED",
+      "where": "STATE.md Active Work.PromotionReason set (git history shows no PROMOTE; see note)",
+      "status": "realized"
+    },
+    {
+      "condition": "Exactly one Developer-owned outstanding obligation (FailureType IMPLEMENTATION, missing filter validation), unresolved",
+      "where": "STATE.md Outstanding Obligations Active true, Obligation 1 Owner DEVELOPING; src/records/store.ts list() really does not reject unknown status (selfCheck)",
+      "status": "realized"
+    },
+    {
+      "condition": "Obligation does not affect documented HTTP behavior, so the guide can be completed accurately",
+      "where": "src/records/filter.ts parseFilter rejects unknown status for both routes (selfCheck POST /records/export → 400)",
+      "status": "realized"
+    },
+    {
+      "condition": "Required usage guide is incomplete and can be finished now",
+      "where": "docs/usage.md partial 'Exporting records as CSV' section lacking 201/headers/CSV format/file location/errors/Roles; implementation and design present to document",
+      "status": "realized"
+    },
+    {
+      "condition": "Existing Documenter record from earlier session",
+      "where": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md IN_PROGRESS AUTONOMOUS/ACTIVE_CHANGE",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "case-defect",
+      "assertion": -1,
+      "detail": "The prompt says 'Recovery and obligations are inactive' and then states one active Developer obligation; the fixture reasonably takes the specific override. Also, a DEVELOPING-owned obligation surviving past DEVELOPING means Developer, Tester and Reviewer all passed gates despite it (expedited.md: owner must have no unresolved obligation before forward handoff). The state is formally inconsistent, as the catalog flagged, but the expected behavior (Documenter's own gate is unaffected) still follows from the protocol.",
+      "recommendation": "run_as_is",
+      "fix": "None; built as the case states."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The shared base has no expedited history: every earlier STATE.md commit is STANDARD, there is no PROMOTE handoff, CONTEXT.md has no Active-Cycle Non-Baseline Work, and PromotionReason plus Obligation 1 first appear in the commit 'Start usage guide section for CSV export'. A role that reads `git log -p .standards/STATE.md` could see this as a hand edit. The protocol directs roles to resume from persisted state rather than infer from history, and check.mjs passes, so a correct run still proceeds.",
+      "recommendation": "run_as_is",
+      "fix": "Acceptable compromise of building on export-documenting; a standalone fixture with an expedited→promote history would remove it."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "The catalog's grader_only_facts mention a verified Documenter obligation, which conflicts with the case prompt's Developer-owned obligation. The generator correctly followed the prompt and wrote consistent graderOnly facts.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is in the files. The Developer obligation is real but limited to the store, so documented HTTP behavior stays accurate, and the partial guide can be finished from the design and code. Checks are necessary conditions for a correct run: the guide changes, the record reaches COMPLETE, the obligation is left unchanged, the run hands off FORWARD to REVIEWING_FINAL, and the reply contains the /reviewer invocation. The remaining issues are notes about the case's inherent inconsistency and the base's missing expedited history.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T15:57:52.785Z",
+  "costUsd": 0.919605,
+  "ms": 85913,
+  "fixtureHash": "d8f512987e97d2b3"
+}

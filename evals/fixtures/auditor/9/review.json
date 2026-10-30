@@ -1,0 +1,84 @@
+{
+  "conditions": [
+    {
+      "condition": "Project is BROWNFIELD and the active cycle is STANDARD in AUDITING, with no recovery",
+      "where": ".standards/MODE.md (BROWNFIELD); .standards/STATE.md (WorkflowState AUDITING, CycleMode STANDARD, Recovery.Active false)",
+      "status": "realized"
+    },
+    {
+      "condition": "BaselineReconciliation lists cache-a-20260921T100000Z-0a1b2c3d (fix cache invalidation) then import-b-20260922T100000Z-4e5f6a7b (adjust imports)",
+      "where": ".standards/STATE.md BaselineReconciliation list: `Fix cache invalidation.` / `Adjust imports.` in that order",
+      "status": "realized"
+    },
+    {
+      "condition": "Evidence establishes that the cache-a changes were reverted",
+      "where": "commit 7c986d2 'Revert \"Invalidate cached entries by key prefix\"' restores src/cache.js and src/catalog.js to their content in 3718990 (verified by selfCheck); cache-a plan and design describe the reverted change",
+      "status": "realized"
+    },
+    {
+      "condition": "The user establishes that cache-a was reverted",
+      "where": "prompt.utterance: 'The cache-a-20260921T100000Z-0a1b2c3d changes were reverted.'",
+      "status": "realized"
+    },
+    {
+      "condition": "Material import-b changes remain in the repository",
+      "where": "commit c0b0ce9 (delimiterFor in src/importer.js plus a semicolon test) and an unstaged src/importer.js header-lowercasing edit; both touch parseProducts, which the active request depends on",
+      "status": "realized"
+    },
+    {
+      "condition": "Whether the import-b changes were adopted is unresolved",
+      "where": "no record, commit message, or user text states adoption; the unstaged edit in particular cannot be read as adopted",
+      "status": "realized"
+    },
+    {
+      "condition": "A prior project context exists that the refresh must reconcile",
+      "where": ".standards/CONTEXT.md from the cache-a cycle, still describing the comma-only importer with exact lowercase headers",
+      "status": "realized"
+    },
+    {
+      "condition": "Other cycles' records are present",
+      "where": ".standards/docs/{scope,specs,development}/cache-a-20260921T100000Z-0a1b2c3d.md",
+      "status": "realized"
+    },
+    {
+      "condition": "The workflow state is valid",
+      "where": "check.mjs --json reports ok:true",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "Every commit has the builder date 2026-09-24, while the cycle IDs embed 20260921 and 20260922. The import-b residue is also modeled as commits made while import-b sat in AUDITING, because the protocol would not let import-b reach DEVELOPING with cache-a unresolved. Both are disclosed compromises, and neither changes what the run tests.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 3,
+      "detail": "A run could argue that the committed delimiter change on main counts as adopted. The unstaged lowercase-header edit still leaves import-b residue whose status is unresolved, so a correct run must block either way. The judge decides whether CONTEXT.md presents import-b changes as baseline or as current-cycle non-baseline work.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "case-defect",
+      "assertion": 2,
+      "detail": "Assertions 1 and 2 overlap (the catalog notes this). The checks are consistent: assertion 1 requires that the import-b list item remains, and assertion 2 requires both entries unchanged and in order. Both are necessary under 'Preserve entry order and existing entries'.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition: two BaselineReconciliation entries in order, cache-a reverted byte-for-byte by a revert commit and confirmed in the utterance, and material committed plus unstaged import-b residue in parseProducts with no record of adoption. Nothing leaks the answer. The state checks for keeping the list and setting BlockedOn, and the invariants (HEAD, git, check_ok, unchanged src/test/docs), are all necessary for a correct Auditor run. Only minor realism notes remain.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T21:08:04.435Z",
+  "costUsd": 0.23474879999999998,
+  "ms": 45627,
+  "fixtureHash": "0faf1dbb438140c0"
+}

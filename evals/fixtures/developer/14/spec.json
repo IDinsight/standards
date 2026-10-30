@@ -1,0 +1,302 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial orders CLI with summary command"
+    },
+    {
+      "dir": "layers/50-expedited-plan",
+      "action": "commit",
+      "message": "Plan customer totals report"
+    },
+    {
+      "dir": "layers/51-totals-command",
+      "action": "commit",
+      "message": "Add customer totals report command"
+    },
+    {
+      "dir": "layers/52-promotion",
+      "action": "commit",
+      "message": "Promote customer totals cycle to standard"
+    },
+    {
+      "dir": "layers/53-context",
+      "action": "commit",
+      "message": "Record project context"
+    },
+    {
+      "dir": "layers/54-scope",
+      "action": "commit",
+      "message": "Record customer totals scope"
+    },
+    {
+      "dir": "layers/55-design",
+      "action": "commit",
+      "message": "Record customer totals design"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "developer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The standard scope (AC-001, AC-002) and the technical design describe exactly the behavior the expedited implementation already has: src/totals.js and the totals command in bin/orders.js satisfy them without any code change, so reconciling the development plan is bookkeeping only (Implementation Contract paths and AC mappings).",
+    "DEV-001 (aggregation and ordering in src/totals.js) maps naturally to AC-001 and AC-002; DEV-002 (CLI output) maps to AC-001 and, because it prints in the returned order, also supports AC-002. Any mapping that uses only AC-001 and AC-002 and covers both is acceptable.",
+    "No existing test exercises the totals command; formal verification belongs to Tester after Developer hands off. Handing off to TESTING after reconciliation, or stopping after reconciliation with the plan valid, are both acceptable outcomes."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "customer-totals-report-20260922T141500Z-3e8b1f5a",
+    "DEV": ".standards/docs/development/customer-totals-report-20260922T141500Z-3e8b1f5a.md",
+    "SCOPE": ".standards/docs/scope/customer-totals-report-20260922T141500Z-3e8b1f5a.md",
+    "SPEC": ".standards/docs/specs/customer-totals-report-20260922T141500Z-3e8b1f5a.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "changed": [
+            "${DEV}"
+          ],
+          "why": "the preserved expedited plan is reconciled, not resumed untouched"
+        },
+        {
+          "contains": {
+            "path": "${DEV}",
+            "regex": "^(?![\\s\\S]*`Acceptance`:[^\\n]*EXPEDITED_REQUEST)"
+          },
+          "why": "no step keeps the expedited acceptance mapping"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "contains": {
+            "path": "${DEV}",
+            "regex": "Scope[`*:\\s]*\\.standards/docs/scope/${ID}\\.md"
+          },
+          "why": "contract names the current scope path"
+        },
+        {
+          "contains": {
+            "path": "${DEV}",
+            "regex": "Architecture[`*:\\s]*\\.standards/docs/specs/${ID}\\.md"
+          },
+          "why": "contract names the current design path"
+        },
+        {
+          "contains": {
+            "path": "${DEV}",
+            "regex": "^(?![\\s\\S]*\\n\\s*- `Scope`:\\s*`NONE`)"
+          },
+          "why": "Implementation Contract no longer lists Scope as NONE"
+        },
+        {
+          "contains": {
+            "path": "${DEV}",
+            "regex": "^(?![\\s\\S]*\\n\\s*- `Architecture`:\\s*`NONE`)"
+          },
+          "why": "Implementation Contract no longer lists Architecture as NONE"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": true,
+      "all": [
+        {
+          "contains": {
+            "path": "${DEV}",
+            "regex": "^(?![\\s\\S]*`Acceptance`:[^\\n]*EXPEDITED_REQUEST)"
+          },
+          "why": "EXPEDITED_REQUEST mappings are gone"
+        },
+        {
+          "contains": {
+            "path": "${DEV}",
+            "regex": "`Acceptance`:[^\\n]*AC-001"
+          },
+          "why": "some step maps to AC-001"
+        },
+        {
+          "contains": {
+            "path": "${DEV}",
+            "regex": "`Acceptance`:[^\\n]*AC-002"
+          },
+          "why": "some step maps to AC-002"
+        },
+        {
+          "contains": {
+            "path": "${DEV}",
+            "regex": "^(?![\\s\\S]*AC-(?!00[12](?![0-9]))[0-9]{3})"
+          },
+          "why": "no acceptance identifier other than the scope's AC-001 and AC-002"
+        },
+        {
+          "check_ok": true,
+          "why": "check reports AC IDs not defined in the scope"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": true,
+      "all": [
+        {
+          "heading_ids": {
+            "path": "${DEV}",
+            "prefix": "DEV",
+            "min": 2
+          }
+        },
+        {
+          "contains": {
+            "path": "${DEV}",
+            "regex": "### DEV-001[^\\n]*\\n\\s*`Status`:\\s*`DONE`"
+          },
+          "why": "DEV-001 keeps its identity and DONE status"
+        },
+        {
+          "contains": {
+            "path": "${DEV}",
+            "regex": "### DEV-002[^\\n]*\\n\\s*`Status`:\\s*`DONE`"
+          },
+          "why": "DEV-002 keeps its identity and DONE status"
+        },
+        {
+          "unchanged": [
+            "src/**",
+            "bin/**"
+          ],
+          "why": "the completed outcomes remain valid, so the implementation is not redone"
+        }
+      ]
+    },
+    {
+      "assertion": 4,
+      "complete": false,
+      "all": [
+        {
+          "field": {
+            "path": "${DEV}",
+            "name": "Status",
+            "not": "PROPOSED"
+          },
+          "why": "bookkeeping-only reconciliation does not return the plan to PROPOSED"
+        },
+        {
+          "state": "ActiveWork.BlockedOn",
+          "equals": "NONE",
+          "why": "no plan-approval blocker is recorded"
+        }
+      ]
+    },
+    {
+      "assertion": 5,
+      "na": true,
+      "na_reason": "decision 8: counterfactual, future, or optional behavior"
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "test/**",
+        "README.md",
+        ".standards/CONTEXT.md",
+        "${SCOPE}",
+        "${SPEC}"
+      ],
+      "why": "Developer does not edit Tester-owned tests, Documenter-owned docs, Auditor context, scope, or design"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/orders.test.js test/cli.test.js",
+      "expect": "pass",
+      "why": "the existing test suite (6 tests) passes on the committed implementation, as the plan's self-check evidence and CONTEXT.md state"
+    },
+    {
+      "cmd": "node bin/orders.js totals test/data/orders.csv | tr '\\n' '|' | grep -qx 'Cobalt Inc: 210.00|Acme Ltd: 150.75|Birch & Co: 150.75|'",
+      "expect": "pass",
+      "why": "the expedited totals command already behaves as AC-001/AC-002 and the design require, and as the plan's DEV-002 self-check records"
+    },
+    {
+      "cmd": "node bin/orders.js summary test/data/orders.csv | tr '\\n' '|' | grep -qx 'Orders: 5|Total: 511.50|'",
+      "expect": "pass",
+      "why": "summary output is unchanged, as recorded in the plan"
+    },
+    {
+      "cmd": "! grep -rq totals test/",
+      "expect": "pass",
+      "why": "no existing test covers the totals command (CONTEXT.md and the plan say so)"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 00-project (pre-install): small Node ES-module CLI `orders` with a summary command, node:test suites (6 tests), sample CSV. 50-expedited-plan: first cycle started EXPEDITED at DEVELOPING; approved AUTONOMOUS plan with DEV-001/DEV-002 mapped to EXPEDITED_REQUEST, Scope/Architecture NONE in its Implementation Contract. 51-totals-command: src/totals.js and the totals subcommand; plan COMPLETE with DONE steps and self-check evidence citing the layer-50 commit. 52-promotion: user-authorized PROMOTE from DEVELOPING to STANDARD/AUDITING with PromotionReason (Tester-owned verification and documentation). 53-context: CONTEXT.md with Active-Cycle Non-Baseline Work for the totals code; state SCOPING. 54-scope: scope record defining AC-001 (one line per customer with summed total, two decimals) and AC-002 (ordering, ties by name); state ARCHITECTING. 55-design: design record covering both ACs with a contract identical to the existing implementation; final STATE.md is DEVELOPING/STANDARD, recovery and obligations inactive, Scope/Architecture/Development set, Handoff FORWARD from ARCHITECTING. check.mjs is ok: the plan uses no AC IDs yet, COMPLETE plan with all steps DONE, design accounts for AC-001/AC-002. Assertion 5 is N/A (counterfactual).",
+  "case": "developer-14",
+  "caseHash": "bdd79d3ace27d192",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T02:16:27.637Z",
+    "verdict": "pass",
+    "fixtureHash": "467c2a0743978175",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "90846cc32d52cf30",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:07:13.627Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T01:16:25.510Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-expedited-plan/.standards/STATE.md: NONE",
+        "layers/52-promotion/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/53-context/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/54-scope/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/55-design/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:07:13.627Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

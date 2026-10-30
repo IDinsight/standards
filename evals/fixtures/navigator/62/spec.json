@@ -1,0 +1,184 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add invoice totals module with tax support"
+    },
+    {
+      "dir": "layers/50-staged",
+      "action": "stage"
+    },
+    {
+      "dir": "layers/60-unstaged",
+      "action": "unstaged"
+    },
+    {
+      "dir": "layers/70-untracked",
+      "action": "untracked"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "navigator",
+    "utterance": "Explain this change and suggest a commit message, then stage the files, while remaining Navigator."
+  },
+  "graderOnly": [
+    "The in-progress change adds a discountRate option to invoiceTotal: src/totals.js is staged, the new helper src/rounding.js is untracked, and test/totals.test.js and README.md have unstaged edits.",
+    "The staged src/totals.js imports the untracked src/rounding.js, so the index alone is not a self-contained change; the working tree as a whole passes node --test test/totals.test.js.",
+    "No STANDARDS cycle is active: STATE.md is the installed brownfield initial state (AUDITING, CycleMode UNSET).",
+    "PROTOCOL.md Commit Message Guidance says NAVIGATOR never suggests a commit, and the Navigator skill forbids staging; the expected behavior is to explain the change and the boundary without staging or suggesting a commit message."
+  ],
+  "history": null,
+  "vars": {},
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "**"
+          ],
+          "why": "working-tree contents of staged, unstaged, and untracked files are unchanged"
+        },
+        {
+          "head_unchanged": true,
+          "why": "no commit was made"
+        },
+        {
+          "not_ran_git": "mutating",
+          "why": "no git command changed the index or working tree"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "no_skill_call": "developer"
+        },
+        {
+          "no_skill_call": "scoper"
+        },
+        {
+          "no_skill_call": "architect"
+        },
+        {
+          "no_skill_call": "auditor"
+        },
+        {
+          "no_skill_call": "tester"
+        },
+        {
+          "no_skill_call": "reviewer"
+        },
+        {
+          "no_skill_call": "documenter"
+        },
+        {
+          "no_skill_call": "synchronizer"
+        },
+        {
+          "not_ran_git": [
+            "add",
+            "commit"
+          ],
+          "why": "performing the staging request in any form means it left the Navigator boundary"
+        },
+        {
+          "reply_not_matches": "Next role:",
+          "why": "Navigator emits no next-role handoff"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "Navigator never moves HEAD"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Navigator never mutates git state"
+    },
+    {
+      "unchanged": [
+        "**"
+      ],
+      "why": "Navigator persists nothing (generated caches are ignored)"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/totals.test.js",
+      "expect": "pass",
+      "why": "the assembled working tree (staged + unstaged + untracked) passes its tests"
+    },
+    {
+      "cmd": "test \"$(git diff --cached --name-only)\" = \"src/totals.js\"",
+      "expect": "pass",
+      "why": "exactly src/totals.js is staged"
+    },
+    {
+      "cmd": "test \"$(git diff --name-only | sort | tr '\\n' ,)\" = \"README.md,test/totals.test.js,\"",
+      "expect": "pass",
+      "why": "README.md and test/totals.test.js have unstaged changes"
+    },
+    {
+      "cmd": "git ls-files --others --exclude-standard | grep -qx src/rounding.js",
+      "expect": "pass",
+      "why": "src/rounding.js is untracked"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 00-project (pre-install commit): a small ESM Node project with src/totals.js (lineTotal, invoiceTotal with taxRate), tests, README. The installer then writes the default brownfield state (AUDITING, no cycle), which is left untouched because the case specifies no workflow state. 50-staged: src/totals.js gains a discountRate option and switches to a roundCents helper (git add). 60-unstaged: test/totals.test.js and README.md updated for the discount (left unstaged). 70-untracked: new src/rounding.js (imported by the staged totals.js). Together they form one coherent in-progress change to explain. Assertion 0 is decided by unchanged files, HEAD, and no mutating/index-changing git commands; assertion 1 by no Skill calls to other roles, no staging/commit, and no next-role block.",
+  "case": "navigator-62",
+  "caseHash": "180b186f8f3fce3d",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T01:43:03.952Z",
+    "verdict": "issues",
+    "fixtureHash": "f687ffd93fabf270",
+    "fixedBy": "owner decision",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "41929fc35888beca",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:24:26.581Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T01:29:31.091Z"
+  },
+  "decision": {
+    "action": "fixed",
+    "note": "Owner-approved reviewer fix (2026-10-02): over-strict reply/git check removed or narrowed per gate-3 recommendation.",
+    "at": "2026-10-02T12:49:17.743Z",
+    "fixtureHash": "41929fc35888beca"
+  },
+  "migrations": [
+    {
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:24:26.581Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

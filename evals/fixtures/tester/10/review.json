@@ -1,0 +1,104 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield template)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState TESTING, Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md header and Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, Architecture and Development point to current-cycle artifacts",
+      "where": "STATE.md Active Work; .standards/docs/{scope,specs,development}/export-20260924T090000Z-a7f3c1d2.md with matching provenance",
+      "status": "realized"
+    },
+    {
+      "condition": "Valid Auditor context exists",
+      "where": ".standards/CONTEXT.md (base layer)",
+      "status": "realized"
+    },
+    {
+      "condition": "One recovery frame: Owner SCOPING, ResumeAt REVIEWING_FINAL, RerunThrough REVIEWING_IMPLEMENTATION; Tester is a downstream rerun",
+      "where": "STATE.md Recovery Frame 1 (From REVIEWING_FINAL); Handoff FORWARD from DEVELOPING",
+      "status": "realized"
+    },
+    {
+      "condition": "Prior COMPLETE verification report covers AC-001 and AC-002",
+      "where": ".standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md (Mode VERIFY, Status COMPLETE, FULL/NONE)",
+      "status": "realized"
+    },
+    {
+      "condition": "Scoper retired AC-002 and added AC-004 for an operations guide",
+      "where": "scope file: AC-001 and AC-004 current; AC-002 (and AC-003) under Retired Acceptance Identifiers",
+      "status": "realized"
+    },
+    {
+      "condition": "Architect reconciled coverage with no architectural impact for AC-004",
+      "where": "specs file Acceptance Coverage: AC-004 No architectural impact, Documenter owns the guide",
+      "status": "realized"
+    },
+    {
+      "condition": "Code and tests unchanged since the COMPLETE report",
+      "where": "git history: only workflow records, docs/usage.md and README.md changed after 'Record verification of CSV export'; selfCheck git diff passes",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-001 evidence still valid (suites pass)",
+      "where": "selfChecks: pnpm --filter export test (24 pass), test:integration (2 pass)",
+      "status": "realized"
+    },
+    {
+      "condition": "No operations guide exists, so AC-004 depends on Documenter",
+      "where": "docs/usage.md and README.md lack folder/retention/same-second content; selfCheck grep",
+      "status": "realized"
+    },
+    {
+      "condition": "Downstream records needed for a REVIEWING_FINAL resume exist (implementation review, documentation, paused final review)",
+      "where": ".standards/docs/reviews/.../implementation.md COMPLETE, documentation record COMPLETE, final-deliverable.md IN_PROGRESS",
+      "status": "realized"
+    },
+    {
+      "condition": "All work committed",
+      "where": "git status clean",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "case-defect",
+      "assertion": -1,
+      "detail": "Scoper's route (RerunThrough REVIEWING_IMPLEMENTATION, ResumeAt REVIEWING_FINAL) does not rerun DOCUMENTING even though Acceptance Traceability rule 9 invalidates the COMPLETE documentation record, which lacks AC-004. Final review would have to route a DOCUMENTATION failure later. Only the active frame owner plans reruns, so Tester recording AC-004 as pending Documenter is still correct. The catalog's issue about RerunThrough=TESTING does not apply to this fixture, because implementation review is in the rerun route.",
+      "recommendation": "run_as_is",
+      "fix": "None needed for this run; the judge should not penalize Tester for noting the documentation rerun gap."
+    },
+    {
+      "severity": "note",
+      "kind": "record-format",
+      "assertion": -1,
+      "detail": "expectCheck is ok:false with exactly the stale COMPLETE verification report missing AC-004. The catalog says deliberately_invalid:false, but this is the natural consequence of the case's stated state (the full check holds the current state's COMPLETE record during recovery). The turn-end check passes before the run. I traced it for the expected end state (REVIEWING_IMPLEMENTATION, FORWARD, frame kept, fullBoundary true): it holds only the design (covers AC-001/AC-004) and the verification report, so check_ok is satisfiable.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The design's 'Documenter owns the guide' and the plan note 'src/, test/, and package.json are unchanged since 656a156' strongly suggest the expected dispositions. They are, however, statements the owning roles would really write, and the case states these facts.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition (SCOPING frame with RerunThrough REVIEWING_IMPLEMENTATION/ResumeAt REVIEWING_FINAL, stale COMPLETE report covering AC-001/AC-002, retired AC-002, new AC-004 with no architectural impact, unchanged code) is realized and verified by selfChecks. Checks and invariants fit a correct REVERIFY run that forwards to REVIEWING_IMPLEMENTATION while keeping the frame. Only notes remain: a case-level gap where documentation is not rerun, and the expected one-problem full check.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T15:58:51.535Z",
+  "costUsd": 0.41945520000000003,
+  "ms": 58757,
+  "fixtureHash": "d2441add67c80ea5"
+}

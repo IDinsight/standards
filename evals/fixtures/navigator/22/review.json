@@ -1,0 +1,81 @@
+{
+  "conditions": [
+    {
+      "condition": "Active cycle exists with persisted intent identifying the change's baseline",
+      "where": ".standards/STATE.md (STANDARD, DEVELOPING, cycle show-invoice-amounts-…-5c8e21a4); plan Plan Notes cite 6860cf4 'Add invoice summary report'; .standards/CONTEXT.md 'Audited at 6860cf4…'",
+      "status": "realized"
+    },
+    {
+      "condition": "Git history identifies the baseline (pre-cycle project commit followed only by install/record commits)",
+      "where": "git log: 6860cf4 Add invoice summary report → 129ee64 Install STANDARDS (framework only) → 1c9c14c plan records → 9bf8487 feat(totals)",
+      "status": "realized"
+    },
+    {
+      "condition": "Development record exists and describes the change",
+      "where": ".standards/docs/development/<ID>.md (IN_PROGRESS; DEV-001 DONE, DEV-002/003 IN_PROGRESS)",
+      "status": "realized"
+    },
+    {
+      "condition": "Committed part of the change",
+      "where": "HEAD 9bf8487 modifies src/totals.js (toMinor, invoiceTotalsMinor)",
+      "status": "realized"
+    },
+    {
+      "condition": "Staged config change",
+      "where": "config/settings.json staged (M in index), identical in working tree",
+      "status": "realized"
+    },
+    {
+      "condition": "Unstaged caller changes",
+      "where": "src/report.js and src/cli.js modified in working tree only",
+      "status": "realized"
+    },
+    {
+      "condition": "Untracked helper that is part of the change",
+      "where": "src/format/money.js (untracked; imported by unstaged callers)",
+      "status": "realized"
+    },
+    {
+      "condition": "Untracked unrelated notes",
+      "where": "notes/2026-09-23-standup.md (untracked, unrelated content)",
+      "status": "realized"
+    },
+    {
+      "condition": "Unchanged but affected dependencies exist to inspect",
+      "where": "src/config.js (loadSettings passes currency through), lineAmount in src/totals.js, data/invoices.json, test/report.test.js",
+      "status": "realized"
+    },
+    {
+      "condition": "Workflow state is valid",
+      "where": "check.mjs --json ok:true",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 0,
+      "detail": "Catalog marked assertion 0 deterministic_complete, but the check vocabulary has no file-read predicate, so the spec correctly uses complete:false with a reply_matches precondition on money.js|formatMoney|format/money. Any correct explanation of the active change will name the untracked helper, so the precondition is safe.",
+      "recommendation": "run_as_is",
+      "fix": "None needed; judge decides reads of the helper and unchanged dependencies from the trace."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "Handoff remains FORWARD from ARCHITECTING while Developer work is partly done; this is the correct persisted value since no later transition occurred. Records are consistent with the code state (DEV-002/003 IN_PROGRESS, self-checks not yet run).",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized: the baseline is identifiable from both history and the plan/CONTEXT, and the change spans a committed totals.js edit, staged settings.json, unstaged report.js/cli.js, and an untracked money.js helper, plus unrelated untracked notes. Nothing leaks, records are coherent and check.mjs passes, and the checks and Navigator invariants (unchanged **, HEAD unchanged, no mutating git) cannot fail a correct run. Both assertions are observable in this fixture.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-01T18:35:33.592Z",
+  "costUsd": 0.17205420000000002,
+  "ms": 33247,
+  "fixtureHash": "bc433590c7e8aa8e"
+}

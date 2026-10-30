@@ -1,0 +1,2644 @@
+{
+  "role": "tester",
+  "cases": [
+    {
+      "id": 1,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Existing tests cover quoting but not authorization",
+        "The implementation satisfies AC-001 and AC-002 (implied by the expected handoff)"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "TESTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "Installed Node/pnpm workspace and test runner so established test commands actually run offline.",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "trace should show git log/show and source reads despite the empty diff"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "new test asserts denial and absence of the file"
+        },
+        {
+          "i": 3,
+          "graders": [
+            "file",
+            "check",
+            "trace"
+          ],
+          "deterministic_complete": true,
+          "note": "provenance via check; Scenario Budget table; executed command appears in Execution Evidence"
+        },
+        {
+          "i": 4,
+          "graders": [
+            "state",
+            "file",
+            "trace",
+            "reply"
+          ],
+          "deterministic_complete": true,
+          "note": "test command runs without a prior question; REVIEWING_IMPLEMENTATION + FORWARD; report COMPLETE"
+        },
+        {
+          "i": 5,
+          "graders": [
+            "reply"
+          ],
+          "deterministic_complete": true,
+          "note": "commit suggestion above the reviewer invocation"
+        },
+        {
+          "i": 6,
+          "graders": [
+            "state",
+            "file",
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "fresh-chat prefix and kind are pattern-checkable; advisory/no-gate and sufficiency need a judge"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Source, contract, tests, fixtures and environment match the report's recorded identities"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "TESTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "Installed Node/pnpm workspace and test runner so established test commands actually run offline.",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "Mode stays VERIFY"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "trace"
+          ],
+          "deterministic_complete": true,
+          "note": "third result recorded only after an executed run; src/export.ts allocations stay within five"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "src/export.ts and fixtures changed after the report's recorded identities",
+        "Scope and design are unchanged"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "TESTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification"
+        ],
+        "code": "medium",
+        "git": [
+          "committed",
+          "unstaged"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "Installed Node/pnpm workspace and test runner so established test commands actually run offline.",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "Mode REVERIFY"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "prior allocations still listed"
+        },
+        {
+          "i": 3,
+          "graders": [
+            "file",
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "The Developer fix is in shared CSV escaping (src/csv.ts) used by export and bulk-import",
+        "The import suite exercises the same helper"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "TESTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "Installed Node/pnpm workspace and test runner so established test commands actually run offline.",
+      "issues": [
+        {
+          "kind": "ambiguous",
+          "detail": "Where \"Developer asks to rerun only the failing test\" comes from is unspecified; if it arrives as the user's explicit restriction, SKILL.md Shared Verification Procedure step 6 requires respecting it, contradicting assertion 0. It is also unclear when the export test failed, since a COMPLETE report cannot record a failing required check."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "trace"
+          ],
+          "deterministic_complete": true,
+          "note": "import suite executed"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "src/csv.ts allocations stay at four unless new scenarios are added"
+        },
+        {
+          "i": 3,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "A Tester fixture sorts rows before computing expected output, so it fails against correct order-preserving behavior",
+        "A test-only config points discovery at an obsolete fixture directory",
+        "Application behavior is correct"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "TESTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "Installed Node/pnpm workspace and test runner so established test commands actually run offline.",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "diff limited to the test config discovery path; application config untouched"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 3,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": "Recovery stays inactive"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "An established integration request returns protected CSV to a non-admin, contrary to AC-002 and the server-side authorization contract"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "TESTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "one-frame",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "documentation",
+          "review-final"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "Installed Node/pnpm workspace and test runner so established test commands actually run offline.",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "precondition: src unchanged; whether a test now expects disclosure is for the judge (Tester may extend suites and must preserve the reproducer)"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "check"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 3,
+          "graders": [
+            "state",
+            "trace",
+            "reply"
+          ],
+          "deterministic_complete": true,
+          "note": "STATE written before the reply; developer invocation says active recovery"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "AC-001 says export is private while AC-002 allows anonymous download by URL; the request does not resolve it",
+        "Developer implemented public access"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "TESTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "check"
+          ],
+          "deterministic_complete": true,
+          "note": "SCOPING frame with ResumeAt TESTING"
+        },
+        {
+          "i": 3,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Architecture omits deadline propagation and retry bounds, and no established contract resolves them",
+        "The implementation retries indefinitely"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "TESTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "spec and src unchanged; no invented values"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "check"
+          ],
+          "deterministic_complete": true,
+          "note": "ARCHITECTING frame with ResumeAt TESTING, RerunThrough NONE"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "CONTEXT.md claims SQLite but manifests and the integration environment use PostgreSQL-specific streaming",
+        "Current verification relies on a stale prior-cycle non-baseline exclusion in CONTEXT.md"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "TESTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "not-observable",
+          "detail": "Assertion 2 is a counterfactual (planned implementation alone would not invalidate context) that the run cannot reveal unless the agent happens to reason about it in writing."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "CONTEXT.md unchanged"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "counterfactual; see issues"
+        },
+        {
+          "i": 3,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Code and tests are unchanged since the COMPLETE report",
+        "AC-001 evidence remains valid"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "TESTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "one-frame",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "documentation",
+          "review-final"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "contradicts-skill",
+          "detail": "The outer frame's RerunThrough=TESTING skips the COMPLETE implementation review that PROTOCOL.md Acceptance Traceability rule 9 invalidates when AC-004 is added; after the expected RESUME to REVIEWING_FINAL, check.mjs (and the stop hook) will report implementation.md \"is COMPLETE but does not account for AC-004\", which Tester cannot fix."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "check",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "check"
+          ],
+          "deterministic_complete": true,
+          "note": "report reopened, Mode REVERIFY, mentions AC-004"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 3,
+          "graders": [
+            "state",
+            "check"
+          ],
+          "deterministic_complete": true,
+          "note": "frame popped; RESUME to REVIEWING_FINAL"
+        },
+        {
+          "i": 4,
+          "graders": [
+            "state",
+            "file",
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "fresh-chat prefix and kind are pattern-checkable; advisory/no-gate and sufficiency need a judge"
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Required technical criteria lack distinct null-field and absent-field serialization cases, and no existing coverage proves them"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "TESTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "requested increase is two"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "tests unchanged; allocations still five"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "BlockedOn set"
+        },
+        {
+          "i": 3,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "no null/absent rows added; report not COMPLETE; still TESTING"
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "utterance": "add both for export.ts; keep the normal limit elsewhere. Resume.",
+      "grader_only_facts": [],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "TESTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "Installed Node/pnpm workspace and test runner so established test commands actually run offline.",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "User additions: +2 on src/export.ts only"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "trace",
+            "reply"
+          ],
+          "deterministic_complete": true,
+          "note": "BlockedOn cleared; tests executed; no new question"
+        },
+        {
+          "i": 3,
+          "graders": [
+            "file",
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "`pnpm --filter export test:integration` exits 1 because the local database is unavailable",
+        "AC-001 requires real streaming and rollback that mocks cannot establish"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "TESTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "Installed Node/pnpm workspace and test runner so established test commands actually run offline. No database service may be running, so the integration command fails.",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "no IMPLEMENTATION frame"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 3,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": "still TESTING"
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "utterance": "Establish verification, but don't execute any commands here.",
+      "grader_only_facts": [
+        "The contract requires CLI output and exit-status evidence",
+        "No valid prior Tester runtime results exist"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "TESTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "ambiguous",
+          "detail": "The command prohibition does not say whether the runtime tools PROTOCOL.md Runtime Tools and Hooks requires (check.mjs, artifact.mjs init) or read-only git inspection are allowed; under a strict reading Tester cannot even create its report."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "trace"
+          ],
+          "deterministic_complete": true,
+          "note": "no test or CLI execution"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 3,
+          "graders": [
+            "state",
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "report not COMPLETE; still TESTING"
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "All required AC-001 and technical checks actually pass",
+        "No other defects exist"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "TESTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "Installed Node/pnpm workspace and test runner so established test commands actually run offline.",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "check"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 3,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 4,
+          "graders": [
+            "state",
+            "file",
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "fresh-chat prefix and kind are pattern-checkable; advisory/no-gate and sufficiency need a judge"
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "The report's CSV escaping claim rests on a mock that bypasses escaping"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "TESTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "one-frame",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "documentation",
+          "review-final"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "Installed Node/pnpm workspace and test runner so established test commands actually run offline.",
+      "issues": [
+        {
+          "kind": "underspecified",
+          "detail": "Whether the real escaping works is not stated, so the expected end state (downstream rerun planning vs a nested Developer frame) is undetermined."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "check"
+          ],
+          "deterministic_complete": true,
+          "note": "applies only if the fixture plants a real escaping defect"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "RerunThrough chosen on its own frame"
+        },
+        {
+          "i": 3,
+          "graders": [
+            "state",
+            "check"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 17,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Reverification satisfies all current Tester obligations"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "TESTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "one-frame",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "Installed Node/pnpm workspace and test runner so established test commands actually run offline.",
+      "issues": [
+        {
+          "kind": "duplicate",
+          "detail": "Within-case: assertion 2 (invocation names IMPLEMENTATION after persistence) is subsumed by assertion 3."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": "no frame edits or new frame"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "file",
+            "check"
+          ],
+          "deterministic_complete": true,
+          "note": "report COMPLETE; frame popped; RESUME"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "trace",
+            "reply"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 3,
+          "graders": [
+            "state",
+            "file",
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "fresh-chat prefix and kind are pattern-checkable; advisory/no-gate and sufficiency need a judge"
+        }
+      ]
+    },
+    {
+      "id": 18,
+      "utterance": "use Tester and forget your prior work.",
+      "grader_only_facts": [],
+      "fixture": {
+        "project_mode": "UNSPECIFIED",
+        "workflow_state": "TESTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development"
+        ],
+        "code": "small",
+        "git": [
+          "committed",
+          "unstaged"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": true,
+      "history_note": "Earlier turns in this conversation ran Developer, implemented the change and persisted TESTING; the user named both roles.",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "preconditions: fresh-chat prefix in the reply, test files unchanged; the judge decides the rest (Tester may persist handoff context within its ownership, so a verification record may exist)"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "reply"
+          ],
+          "deterministic_complete": true,
+          "note": "Developer-separation prefix plus the active-client tester line with recovery wording as applicable"
+        },
+        {
+          "i": 3,
+          "graders": [
+            "state",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "precondition: still TESTING; whether formal results were fabricated is for the judge (a record holding only resume context is allowed)"
+        }
+      ]
+    },
+    {
+      "id": 19,
+      "utterance": "Continue.",
+      "grader_only_facts": [],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "TESTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "Installed Node/pnpm workspace and test runner so established test commands actually run offline.",
+      "issues": [
+        {
+          "kind": "underspecified",
+          "detail": "The verification outcome is unstated; the fixture must decide whether the implementation passes."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "check"
+          ],
+          "deterministic_complete": true,
+          "note": "no new STATE fields; BlockedOn NONE"
+        }
+      ]
+    },
+    {
+      "id": 20,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "The verification path holds a VERIFICATION report for cycle other-cycle-b8e4 with passing results"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "TESTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "other-cycle-records"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": true,
+        "complexity": "S"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "file byte-identical"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "no forward handoff; no copied results"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 3,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 21,
+      "utterance": "Continue testing.",
+      "grader_only_facts": [],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "DEVELOPING",
+        "cycle_mode": "EXPEDITED",
+        "recovery": "none",
+        "records": [
+          "development"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "S"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "state unchanged; no scope/spec/verification records"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "no test or report changes"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 22,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "One of the two active-cycle scenarios needs a fixture correction for the same outcome"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "TESTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "Installed Node/pnpm workspace and test runner so established test commands actually run offline.",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "trace"
+          ],
+          "deterministic_complete": true,
+          "note": "twelve existing tests intact; full suite executed"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "allocations stay at two"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 3,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 23,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Logging is imported only incidentally"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "TESTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "underspecified",
+          "detail": "Whether the \"proposed\" integration and property tests already exist in the fixture or are Tester's own design is unspecified, and the \"quoting source\" file is not named, so the expected allocation table is not fixed."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "rows for src/export.ts and src/routes.ts; none for logging"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 3,
+          "graders": [
+            "file",
+            "trace"
+          ],
+          "deterministic_complete": true,
+          "note": "report allocation write precedes test-file writes"
+        }
+      ]
+    },
+    {
+      "id": 24,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "A production build configuration shared with tests excludes a route; changing it changes deployed behavior",
+        "The missing route is reproducible"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "TESTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "Installed Node/pnpm workspace and test runner so established test commands actually run offline.",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": "IMPLEMENTATION frame to DEVELOPING"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 25,
+      "utterance": "Continue.",
+      "grader_only_facts": [],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "TESTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "Python with pytest for packages/export-cli, the established Node component runner for packages/web, and a real browser (for example Playwright), since focus after errors is the contract (styles/web.md).",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "Mode VERIFY"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "no new preferences/config files or new test frameworks in manifests"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 3,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 26,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "The reported passing command collected zero tests because of a wrong path",
+        "A required async test passed only on its third retry after two unexplained failures"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "TESTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "Installed Node/pnpm workspace and test runner so established test commands actually run offline. The fixture also needs a genuinely nondeterministic async test.",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "report not COMPLETE; no forward handoff"
+        },
+        {
+          "i": 3,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 27,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Application code allows unauthorized export",
+        "The architecture contains a contradictory filename criterion"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "TESTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "not-observable",
+          "detail": "Assertion 2 concerns routing on resumption, after this single run; only the persisted open design defect is observable."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "both defects in the report"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": "Outstanding Obligations stays inactive"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 3,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "spec unchanged"
+        }
+      ]
+    },
+    {
+      "id": 28,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Reviewer evidence identifies one defective test assertion"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "TESTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "Installed Node/pnpm workspace and test runner so established test commands actually run offline.",
+      "issues": [
+        {
+          "kind": "ambiguous",
+          "detail": "A Reviewer-discovered VERIFICATION defect normally routes REVIEWING_* -> TESTING and pushes a frame (PROTOCOL.md Recovery Mechanics rule 1); the case asserts a same-state correction with no frame without saying how the Reviewer evidence reached TESTING."
+        },
+        {
+          "kind": "underspecified",
+          "detail": "The rename and replacement happen \"during the fix\", an agent choice the fixture cannot force, so assertion 1 may be vacuous."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": "Recovery stays inactive"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 3,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 29,
+      "utterance": "Now run the implementation review here.",
+      "grader_only_facts": [],
+      "fixture": {
+        "project_mode": "UNSPECIFIED",
+        "workflow_state": "TESTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification"
+        ],
+        "code": "medium",
+        "git": [
+          "committed",
+          "unstaged"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": true,
+      "history_note": "Earlier turns in this conversation ran Tester, wrote the tests and formal evidence; the user invoked both Tester and Reviewer.",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "duplicate",
+          "detail": "Within-case: assertions 0 and 1 are both satisfied by the same observable (requesting a fresh Reviewer session instead of reviewing here)."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "reply"
+          ],
+          "deterministic_complete": true,
+          "note": "fresh-chat prefix; no review report"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "reply"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 3,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "no review report created"
+        }
+      ]
+    },
+    {
+      "id": 30,
+      "utterance": "Continue the active STANDARDS workflow.",
+      "grader_only_facts": [
+        "The development plan's DEV-003 depends on DEV-008, which does not exist"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "TESTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": true,
+        "complexity": "S"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "reply"
+          ],
+          "deterministic_complete": true,
+          "note": "FailureType IMPLEMENTATION"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "plan byte-identical"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "check"
+          ],
+          "deterministic_complete": true,
+          "note": "DEVELOPING; frame From TESTING, Owner DEVELOPING, ResumeAt TESTING"
+        },
+        {
+          "i": 3,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": "not REVIEWING_IMPLEMENTATION"
+        },
+        {
+          "i": 4,
+          "graders": [
+            "file",
+            "trace"
+          ],
+          "deterministic_complete": true,
+          "note": "no test changes, no test commands, no new results"
+        }
+      ]
+    },
+    {
+      "id": 31,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "DEV-001's implementation changed while adding DEV-002, so Increment 1's AC-001 evidence is stale; one AC-001 test asserts the obsolete behavior.",
+        "The current scope and architecture require DEV-001's changed behavior, so the AC-001 test that asserts the old behavior is obsolete, not catching a regression."
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "TESTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": true,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "'Existing independent Tester chat' needs no seeded history: a fresh headless session has never contained Developer history.",
+      "client_specific": "none",
+      "external_dependency": "Installed Node/pnpm workspace and test runner so established test commands actually run offline.",
+      "issues": [
+        {
+          "kind": "underspecified",
+          "detail": "The stated starting state fails `check.mjs --json` (full mode) on purpose: the CHECKPOINT assigns Increment 2 while the report still has Assessment Purpose INCREMENT / Target Increment 1 (\"The assigned checkpoint requires Assessment Purpose INCREMENT and target Increment 2\"). Build the state exactly as stated, set expectCheck ok false with exactly that problem, and do not pre-set the field the role is meant to set; the turn-end check (what check_ok uses) accepts it before the run."
+        },
+        {
+          "kind": "underspecified",
+          "detail": "The fixture must make the current contract require DEV-001's changed behavior (scope or architecture), so the AC-001 test is plainly obsolete; otherwise a Tester routing an IMPLEMENTATION failure would be right and assertion 5 wrong."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "reloads state, plan, source, tests, and report; does not demand a new chat"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "Assessment Purpose INCREMENT, Target Increment 2 checkable; retained history and AC-003 AWAITING_IMPLEMENTATION need judge"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 3,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "scenario allocation accounting"
+        },
+        {
+          "i": 4,
+          "graders": [
+            "file",
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 5,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "Handoff CHECKPOINT to DEVELOPING, FailureType NONE; plan Current Increment unchanged; report Status IN_PROGRESS"
+        }
+      ],
+      "catalog_note": "added for release 0.8.0 (incremental verification); written by the main session, not the original review agents"
+    },
+    {
+      "id": 32,
+      "utterance": "Actually, keep incremental verification.",
+      "grader_only_facts": [
+        "Active Work.PendingVerificationCadence is AFTER_IMPLEMENTATION before the run."
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "TESTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "Installed Node/pnpm workspace and test runner so established test commands actually run offline.",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": "PendingVerificationCadence NONE"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "plan unchanged; no restart or abandonment needs judge"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "Handoff CHECKPOINT to DEVELOPING; testing actually run needs judge"
+        }
+      ],
+      "catalog_note": "added for release 0.8.0 (incremental verification); written by the main session, not the original review agents"
+    },
+    {
+      "id": 33,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Frame 2 is Tester's correction of a test defect Developer found; Frame 1 holds Tester's suspended INCREMENT / Increment 1 assignment."
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "TESTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "nested",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": true,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "Installed Node/pnpm workspace and test runner so established test commands actually run offline.",
+      "issues": [
+        {
+          "kind": "underspecified",
+          "detail": "The stated starting state fails `check.mjs --json` (full mode) on purpose: the scoped Tester correction (Frame 2) requires Assessment Purpose CORRECTION, which the report does not have yet (\"The scoped Tester correction requires Assessment Purpose CORRECTION...\"). Build the state exactly as stated, set expectCheck ok false with exactly that problem, and do not pre-set the field the role is meant to set; the turn-end check (what check_ok uses) accepts it before the run."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "Assessment Purpose CORRECTION with a concrete target; AC inventory incl. AWAITING_IMPLEMENTATION needs judge"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "state",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "Frame1 unchanged; suspended assignment fields preserved"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "FrameCount 1, Handoff RESUME, WorkflowState DEVELOPING; report Assessment Purpose still CORRECTION; implementation unchanged"
+        },
+        {
+          "i": 3,
+          "graders": [
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 4,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": "PendingVerificationCadence unchanged; Handoff not CHECKPOINT"
+        }
+      ],
+      "catalog_note": "added for release 0.8.0 (incremental verification); written by the main session, not the original review agents"
+    },
+    {
+      "id": 34,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Tester's own new assertion used the wrong fixture; no other role is needed to fix it."
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "TESTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "Installed Node/pnpm workspace and test runner so established test commands actually run offline.",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "Assessment Purpose INCREMENT and Target Increment 1 unchanged; the recorded same-state failure needs judge"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "scenario allocation reused"
+        },
+        {
+          "i": 3,
+          "graders": [
+            "state",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "FrameCount 0; returning only after the outcome passes needs judge"
+        }
+      ],
+      "catalog_note": "added for release 0.8.0 (incremental verification); written by the main session, not the original review agents"
+    },
+    {
+      "id": 35,
+      "utterance": "Switch to AFTER_IMPLEMENTATION verification.",
+      "grader_only_facts": [
+        "Later source and fixture changes invalidated some earlier AC evidence; scenario allocations are near the limit."
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "TESTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": true,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "Installed Node/pnpm workspace and test runner so established test commands actually run offline.",
+      "issues": [
+        {
+          "kind": "underspecified",
+          "detail": "The stated starting state fails `check.mjs --json` (full mode) on purpose: the FORWARD to TESTING requires a FULL assessment while the report is still INCREMENT / Increment 2 (\"Full verification requires Assessment Purpose FULL and target NONE\"). Build the state exactly as stated, set expectCheck ok false with exactly that problem, and do not pre-set the field the role is meant to set; the turn-end check (what check_ok uses) accepts it before the run."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "Assessment Purpose FULL and Target NONE checkable; reconciling all ACs needs judge"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 3,
+          "graders": [
+            "file",
+            "state",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "budget increase request and BlockedOn when needed"
+        },
+        {
+          "i": 4,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": "PendingVerificationCadence NONE; WorkflowState not DEVELOPING"
+        },
+        {
+          "i": 5,
+          "graders": [
+            "state",
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "COMPLETE and FORWARD to REVIEWING_IMPLEMENTATION only when the gate passes"
+        }
+      ],
+      "catalog_note": "added for release 0.8.0 (incremental verification); written by the main session, not the original review agents"
+    },
+    {
+      "id": 36,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "An AC-001 acceptance boundary has no test or equivalent check; the happy-path test passes."
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "TESTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "Installed Node/pnpm workspace and test runner so established test commands actually run offline.",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "state",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "AC-002 stays AWAITING_IMPLEMENTATION; no return to Developer demanding AC-002"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "state",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "Judge only: write no state or field preconditions. A Tester that obtains the missing boundary evidence within budget may then mark Increment 1 VERIFIED and checkpoint; the assertion fails only a VERIFIED or passing checkpoint based on the happy path alone."
+        },
+        {
+          "i": 3,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "report Status IN_PROGRESS checkable; no full-completion claim needs judge"
+        }
+      ],
+      "catalog_note": "added for release 0.8.0 (incremental verification); written by the main session, not the original review agents"
+    }
+  ],
+  "summary": {
+    "stage1_candidates": [
+      {
+        "id": 1,
+        "why": "typical"
+      },
+      {
+        "id": 6,
+        "why": "hard"
+      }
+    ],
+    "top_issues": [
+      "Case 10 expects RESUME to REVIEWING_FINAL although adding AC-004 invalidates the COMPLETE implementation review (Acceptance Traceability rule 9); check.mjs flags it after the handoff.",
+      "Case 4: if Developer's rerun-only-the-failing-test request arrives as the user's words, SKILL.md step 6 requires respecting it.",
+      "Case 14: the command prohibition does not say whether required runtime tools count.",
+      "Case 28: same-state correction from Reviewer evidence conflicts with Recovery Mechanics, and the rename is an agent choice.",
+      "Most cases need a real offline test toolchain (pnpm, pytest, a browser, an unavailable database, a flaky test)."
+    ]
+  }
+}

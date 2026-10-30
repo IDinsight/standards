@@ -1,0 +1,228 @@
+{
+  "base": "export-documenting",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-doc-tools",
+      "action": "commit",
+      "message": "Add docs link check and preview helpers"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "documenter",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The only documentation work the cycle needs is an accurate export description in docs/usage.md. The filters an export accepts (status, owner, q) are the unchanged GET /records filters parsed by the unchanged parseFilter. Who may export, the 201 response, the file written, and the 400/401/403 errors are fixed by src/routes/export.ts, src/export.ts, src/app.ts, src/records/filter.ts and src/auth/authorize.ts.",
+    "Source inspection of those files plus the local link and anchor check `node docs/tools/check-links.mjs` fully establish whether the guide is accurate.",
+    "The remote preview `node docs/tools/preview.mjs` cannot reach docs-preview.records-admin.internal in this environment. It only renders the existing Markdown with the docs portal theme and is not needed to establish the guide's accuracy, so its unavailability is a non-blocking limitation.",
+    "The implementation has no material defects. Scope, design, context, plan, verification, and implementation review are current, and nothing besides the missing export section blocks documentation."
+  ],
+  "history": null,
+  "vars": {},
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "REVIEWING_FINAL",
+          "why": "a correct run passes the gate on sufficient evidence instead of stopping for further checks"
+        },
+        {
+          "state": "ActiveWork.BlockedOn",
+          "equals": "NONE",
+          "why": "no user question is needed"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "REVIEWING_FINAL"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FORWARD"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "DOCUMENTING"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "NONE"
+        },
+        {
+          "state": "ActiveWork.BlockedOn",
+          "equals": "NONE"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "false"
+        },
+        {
+          "provenance": {
+            "path": "${DOC}",
+            "artifact": "DOCUMENTATION",
+            "cycle": "${ID}"
+          }
+        },
+        {
+          "field": {
+            "path": "${DOC}",
+            "name": "Status",
+            "equals": "COMPLETE"
+          }
+        },
+        {
+          "contains": {
+            "path": "${DOC}",
+            "regex": "preview",
+            "flags": "i"
+          },
+          "why": "the record names the preview limitation it judged non-blocking"
+        },
+        {
+          "contains": {
+            "path": "docs/usage.md",
+            "regex": "/records/export"
+          },
+          "why": "the gate passed with the required guide content saved"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "test/**",
+        "packages/**",
+        "package.json",
+        "pnpm-lock.yaml",
+        "docs/tools/**",
+        ".standards/CONTEXT.md",
+        ".standards/docs/scope/**",
+        ".standards/docs/specs/**",
+        ".standards/docs/development/**",
+        ".standards/docs/verification/**",
+        ".standards/docs/reviews/**"
+      ],
+      "why": "Documenter does not change tests, tooling, dependencies, or other roles' records"
+    }
+  ],
+  "runtime": {
+    "blockHosts": [
+      "docs-preview.records-admin.internal"
+    ]
+  },
+  "selfChecks": [
+    {
+      "cmd": "node docs/tools/check-links.mjs",
+      "expect": "pass",
+      "why": "the local link and anchor check runs offline and passes on the current docs"
+    },
+    {
+      "cmd": "node docs/tools/preview.mjs",
+      "expect": "fail",
+      "expectOutput": "Could not reach the preview service",
+      "why": "the remote docs preview is unavailable in the run environment"
+    },
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the unit suite still passes"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration",
+      "expect": "pass",
+      "why": "the integration suite still passes"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the DOCUMENTING state is valid"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && ! grep -qi export docs/usage.md && test ! -e .standards/docs/documentation",
+      "expect": "pass",
+      "why": "clean tree, the guide has no export section yet, and no documentation record exists"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `DOCUMENTING` `CycleMode`: `STANDARD`' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md && grep -q '`BlockedOn`: `NONE`' .standards/STATE.md",
+      "expect": "pass",
+      "why": "DOCUMENTING, recovery and obligations inactive, nothing blocked"
+    },
+    {
+      "cmd": "c=$(git log --format=%H -1 --fixed-strings --grep='Record CSV export implementation review') && test -n \"$c\" && git diff --quiet $c HEAD -- src test packages package.json pnpm-lock.yaml docs/usage.md .standards",
+      "expect": "pass",
+      "why": "the tooling commit changes no implementation, test, guide content, or workflow record"
+    },
+    {
+      "cmd": "grep -q 'node docs/tools/check-links.mjs' README.md && grep -q 'node docs/tools/preview.mjs' README.md",
+      "expect": "pass",
+      "why": "README documents both documentation helpers"
+    }
+  ],
+  "notes": "Built on export-documenting (DOCUMENTING, STANDARD, BROWNFIELD, cycle export-20260924T090000Z-a7f3c1d2, complete scope/design/context/plan/verification/implementation review, recovery and obligations inactive, BlockedOn NONE). One added commit, 50-doc-tools, made by a maintainer: docs/tools/check-links.mjs (offline check of relative links and heading anchors in README.md and docs/), docs/tools/preview.mjs (uploads README.md and docs/ to the remote docs preview service docs-preview.records-admin.internal, which renders them with the portal theme), and a README Documentation section describing both. The preview host is in runtime.blockHosts, so the preview always fails with 'Could not reach the preview service'. No implementation, test, package.json, guide, or .standards file changes, so the review and verification identities remain valid. Compromise: the case's 'unchanged flags' maps to the export's query filters (status, owner, q), which are the unchanged GET /records filters. The guide still needs a new export section that describes them and the export behavior (AC-002). Everything it needs is established by source inspection plus the local link check; the remote preview is not.",
+  "case": "documenter-37",
+  "caseHash": "37ea1405f6e79a67",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T16:33:42.948Z",
+    "verdict": "pass",
+    "fixtureHash": "bf6cc11658530161",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "482208588cd6a787",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:14:08.667Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T15:07:46.729Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-documenting": "cad63ec878d1dad0"
+  },
+  "migrations": [
+    {
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:14:08.667Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

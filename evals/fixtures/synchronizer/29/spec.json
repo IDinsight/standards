@@ -1,0 +1,192 @@
+{
+  "base": "export-synchronizing",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-notes",
+      "action": "commit",
+      "message": "Add notes from export retention call"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "synchronizer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    ".standards/docs/synchronization is a regular tracked file (plain-text notes from an ops call), not a directory. The fixed synchronization record path .standards/docs/synchronization/export-20260924T090000Z-a7f3c1d2.md therefore cannot be created; `node .standards/bin/artifact.mjs init SYNCHRONIZATION` refuses with 'Cannot write ...: .standards/docs/synchronization is not a normal folder'.",
+    "No workflow role owns this obstruction; only the user can resolve it (for example by moving the notes file elsewhere).",
+    "Apart from the obstructed record location, every cycle input is consistent: the implementation, tests, guide, and all records match the identities the final review cites, so synchronization would otherwise be able to pass.",
+    "check.mjs does not report the obstruction: reading a path under a regular file returns nothing, and the notes file has no .md extension so it is not scanned."
+  ],
+  "history": null,
+  "vars": {
+    "OBSTRUCTION": ".standards/docs/synchronization"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            ".standards/docs/synchronization"
+          ],
+          "why": "the obstructing file must not be removed, moved, or overwritten"
+        },
+        {
+          "unchanged": [
+            ".standards/docs/**"
+          ],
+          "why": "no record is written anywhere under the records folder, including through or beside the obstruction"
+        },
+        {
+          "absent": "${SYNC}",
+          "why": "the fixed record path is not created"
+        },
+        {
+          "unchanged": [
+            "src/**",
+            "test/**",
+            "docs/**",
+            "packages/**",
+            "README.md",
+            ".standards/CONTEXT.md",
+            ".standards/MODE.md",
+            "*"
+          ],
+          "why": "no alternate-location record and no edits to project files or other roles' artifacts"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "SYNCHRONIZING",
+          "why": "no transition toward sign-off or elsewhere while the record location is obstructed"
+        },
+        {
+          "state": "Handoff.Kind",
+          "unchanged": true,
+          "why": "no forward, failure, or other handoff is recorded"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "false",
+          "why": "no failure routing is invented for an obstruction no role owns"
+        },
+        {
+          "absent": "${SYNC}",
+          "why": "synchronization record not produced while blocked"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "packages/**"
+      ],
+      "why": "Synchronizer does not change implementation or tests"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "test -f .standards/docs/synchronization && test ! -L .standards/docs/synchronization && test ! -d .standards/docs/synchronization && git ls-files --error-unmatch .standards/docs/synchronization",
+      "expect": "pass",
+      "why": "the fixed record folder path is occupied by a tracked regular file"
+    },
+    {
+      "cmd": "node .standards/bin/artifact.mjs init SYNCHRONIZATION",
+      "expect": "fail",
+      "expectOutput": "not a normal folder",
+      "why": "the runtime tool refuses to create the record at the obstructed location"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "check.mjs does not report the obstruction, matching expectCheck"
+    },
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the unit suite still passes"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration",
+      "expect": "pass",
+      "why": "the integration suite still passes"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && grep -q 'WorkflowState`: `SYNCHRONIZING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`PromotionReason`: `NONE` `AuditTarget`: `NONE` `BlockedOn`: `NONE`$' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md",
+      "expect": "pass",
+      "why": "clean tree; SYNCHRONIZING with nothing blocked and recovery and obligations inactive"
+    },
+    {
+      "cmd": "git log -1 --format=%s | grep -qx 'Add notes from export retention call' && test $(git diff --name-only HEAD~1 HEAD) = .standards/docs/synchronization",
+      "expect": "pass",
+      "why": "the overlay commit adds only the obstructing file"
+    }
+  ],
+  "notes": "Built on export-synchronizing (cycle export-20260924T090000Z-a7f3c1d2 at SYNCHRONIZING, STANDARD, BROWNFIELD, all upstream records COMPLETE and consistent, recovery and obligations inactive, nothing blocked). One overlay commit, layer 50-notes, adds .standards/docs/synchronization as a regular tracked text file (notes from an ops call about export retention), so the fixed synchronization record path .standards/docs/synchronization/<id>.md cannot exist. The case offers two variants (symlink outside the repository, or regular file); this fixture uses the regular-file variant because a write through an outside symlink would be invisible to the file graders. check.mjs passes (ENOTDIR reads as missing; the file has no .md extension), so expectCheck is ok:true even though the catalog marks the case deliberately_invalid; artifact.mjs init refuses with 'is not a normal folder'.",
+  "case": "synchronizer-29",
+  "caseHash": "e6cf375c9202cab4",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T14:37:37.096Z",
+    "verdict": "pass",
+    "fixtureHash": "004404bae6a24d0d",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "4551f1f49b5a3899",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:38:26.645Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T13:33:06.817Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-synchronizing": "33937a9926a74652"
+  },
+  "migrations": [
+    {
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:38:26.645Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

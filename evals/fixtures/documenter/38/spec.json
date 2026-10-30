@@ -1,0 +1,195 @@
+{
+  "base": "export-documenting",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-guide",
+      "action": "commit",
+      "message": "Document CSV export in usage guide"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "documenter",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "docs/usage.md and README.md already describe the CSV export accurately as implemented: admin-only POST /records/export, the status/owner/q filters with GET /records validation, the 201 response headers and body, the CSV format and RFC 4180 quoting, the export file name, folder, and same-second overwrite, and the 401/403/400 errors with no file written. The guide's example CSV for owner=dana is byte-for-byte the actual output (apart from CRLF line endings, which the guide states).",
+    "No documentation change is needed and no material documentation discrepancy exists for this cycle.",
+    "The commit 'Document CSV export in usage guide' was made after the implementation review and changed only docs/usage.md and README.md; implementation and tests are unchanged since the reviewed revision.",
+    ".standards/CONTEXT.md describing no export feature is the Auditor's pre-cycle baseline; planned implementation does not make it a documentation defect."
+  ],
+  "history": null,
+  "vars": {
+    "GUIDE_COMMIT": "${COMMIT:Document CSV export in usage guide}"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "docs/**",
+            "README.md",
+            "CHANGELOG*",
+            "**/CHANGELOG*",
+            "src/**",
+            "packages/**",
+            "AGENTS.md",
+            "CLAUDE.md"
+          ],
+          "why": "the guides are already accurate, so a correct run makes no edit to project documentation, comments, or release notes"
+        },
+        {
+          "exists": "${DOC}",
+          "why": "the no-change outcome is persisted in the documentation record"
+        },
+        {
+          "contains": {
+            "path": "${DOC}",
+            "regex": "^(?![\\s\\S]*\\n### DOC-\\d)"
+          },
+          "why": "no DOC-NNN discrepancy entry is manufactured"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "false",
+          "why": "no invented defect is routed to another owner"
+        },
+        {
+          "state": "ActiveWork.BlockedOn",
+          "equals": "NONE",
+          "why": "no invented blocking question"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "provenance": {
+            "path": "${DOC}",
+            "artifact": "DOCUMENTATION",
+            "cycle": "${ID}"
+          }
+        },
+        {
+          "contains": {
+            "path": "${DOC}",
+            "regex": "docs/usage.md"
+          },
+          "why": "the record names the assessed guide"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "packages/**",
+        "package.json",
+        "pnpm-lock.yaml"
+      ],
+      "why": "Documenter does not change behavior or tests"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "unit suite passes"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration",
+      "expect": "pass",
+      "why": "integration suite passes"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "DOCUMENTING state is valid"
+    },
+    {
+      "cmd": "node --input-type=module -e 'import {createApp} from \"./src/app.ts\"; import {readFileSync, mkdtempSync} from \"node:fs\"; import {tmpdir} from \"node:os\"; import {join} from \"node:path\"; const app = createApp({exportDir: mkdtempSync(join(tmpdir(), \"guide-\")), now: () => new Date(\"2026-09-24T09:00:00Z\")}); const r = app.handle({method: \"POST\", path: \"/records/export\", query: {owner: \"dana\"}, user: {id: 1, name: \"Ada\", role: \"admin\"}}); const csv = r.body.split(String.fromCharCode(13)).join(\"\"); const guide = readFileSync(\"docs/usage.md\", \"utf8\"); if (r.status !== 201 || !guide.includes(csv)) process.exit(1);'",
+      "expect": "pass",
+      "why": "the guide's CSV example is exactly what the implementation produces for owner=dana"
+    },
+    {
+      "cmd": "grep -q 'POST /records/export' docs/usage.md && grep -q 'text/csv; charset=utf-8' docs/usage.md && grep -q 'authentication required' docs/usage.md && grep -q 'records-<YYYYMMDDTHHMMSSZ>.csv' docs/usage.md && grep -q 'Only `admin` can export' docs/usage.md && grep -q 'src/export.ts' README.md && grep -q 'test:integration' README.md && ! grep -rqE 'AC-[0-9]' docs README.md",
+      "expect": "pass",
+      "why": "guide and README describe the export and cite no acceptance IDs"
+    },
+    {
+      "cmd": "git log -1 --format=%s | grep -qx 'Document CSV export in usage guide' && git diff --name-only HEAD~1 HEAD | paste -s -d, - | grep -qx 'README.md,docs/usage.md' && ! git status --porcelain | grep -q . && test ! -e .standards/docs/documentation && grep -q 'WorkflowState`: `DOCUMENTING`' .standards/STATE.md",
+      "expect": "pass",
+      "why": "the last commit changed only the two docs, tree is clean, no documentation record exists, state is DOCUMENTING"
+    }
+  ],
+  "notes": "Built on export-documenting (DOCUMENTING, FORWARD from REVIEWING_IMPLEMENTATION, COMPLETE plan, FULL verification, finding-free implementation review, recovery and obligations inactive, nothing blocked). One overlay layer, 50-guide, commits an updated docs/usage.md (new 'Exporting records as CSV' section: admin-only, filters, 201 headers, CSV format and quoting, example CSV for owner=dana, export file naming/folder/overwrite, 401/403/400 errors with no file written; Roles section adds that only admin can export) and README.md (export link, test:integration command, src/export.ts and exports/ in Layout). Everything in both is accurate to the implementation; a selfCheck runs the real export and confirms the guide's CSV example. No STATE change; check passes. The Documenter must assess and persist a no-change outcome.",
+  "case": "documenter-38",
+  "caseHash": "36f0c8b1778403a5",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T16:54:41.010Z",
+    "verdict": "issues",
+    "fixtureHash": "34eafd43e940dde3",
+    "fixedBy": "owner decision",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "f5930840b6d440ca",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:13:00.993Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T15:07:15.727Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-documenting": "cad63ec878d1dad0"
+  },
+  "decision": {
+    "action": "fixed",
+    "note": "Owner-approved (2026-10-02): assertion 0 to the judge (complete:false), BlockedOn NONE precondition added.",
+    "at": "2026-10-02T16:57:00.791Z",
+    "fixtureHash": "f5930840b6d440ca"
+  },
+  "migrations": [
+    {
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:13:00.993Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

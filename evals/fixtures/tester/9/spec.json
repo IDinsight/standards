@@ -1,0 +1,268 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-sqlite",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Set up records service with SQLite storage"
+    },
+    {
+      "dir": "layers/05-postgres",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Move record storage to PostgreSQL"
+    },
+    {
+      "dir": "layers/50-stream-plan",
+      "action": "commit",
+      "message": "Plan streamed record listing"
+    },
+    {
+      "dir": "layers/52-stream-impl",
+      "action": "commit",
+      "message": "Stream record listing through a server-side cursor"
+    },
+    {
+      "dir": "layers/54-stream-context",
+      "action": "commit",
+      "message": "Record project context for streamed listing"
+    },
+    {
+      "dir": "layers/56-stream-cancel",
+      "action": "commit",
+      "message": "Cancel streamed listing cycle"
+    },
+    {
+      "dir": "layers/60-context",
+      "action": "commit",
+      "message": "Record project context for CSV export"
+    },
+    {
+      "dir": "layers/62-scope",
+      "action": "commit",
+      "message": "Define CSV export scope"
+    },
+    {
+      "dir": "layers/64-design",
+      "action": "commit",
+      "message": "Design CSV export"
+    },
+    {
+      "dir": "layers/66-plan",
+      "action": "commit",
+      "message": "Plan CSV export implementation"
+    },
+    {
+      "dir": "layers/68-export",
+      "action": "commit",
+      "message": "Add CSV export streamed from one snapshot"
+    },
+    {
+      "dir": "layers/70-complete",
+      "action": "commit",
+      "message": "Mark CSV export plan complete"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "tester",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "CONTEXT.md says storage is SQLite with an in-memory test database and describes SQLite deferred-transaction semantics, but pyproject.toml depends on psycopg, app/db.py connects with psycopg, app/schema.sql uses bigserial and timestamptz, list_query uses ILIKE, app/streaming.py uses a named server-side cursor, app/export.py sets REPEATABLE READ, and compose.test.yaml and .github/workflows/test.yml run the integration tests against PostgreSQL 16. The SQLite description comes from a README that was never updated after the move to PostgreSQL.",
+    "The SQLite claim matters for the AC-002 snapshot test: whether and how transaction isolation can be tested depends on the real database, which the context misstates.",
+    "CONTEXT.md keeps an Active-Cycle Non-Baseline Work entry for the cancelled prior cycle stream-records-20260811T143000Z-5e2b9d04 (app/streaming.py and tests/integration/test_streaming_db.py), copied unchanged even though the active cycle is different and its Auditor cleared the baseline reconciliation. The active export streams through iter_records in app/streaming.py, so the baseline status of that file determines the active-change boundary and regression surface; it is stale and unresolved.",
+    "No application defect is planted. The unit tests pass (7) and the four integration tests skip because no PostgreSQL service and no psycopg driver are available in this environment; that is an environment limitation, not an implementation failure.",
+    "The expected outcome is a PROJECT_CONTEXT failure routed to AUDITING (recovery frame From TESTING, Owner AUDITING, ResumeAt TESTING) with Tester's FULL assignment saved in the verification report, without Tester editing CONTEXT.md."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "export-20260924T090000Z-a7f3c1d2",
+    "PRIOR_ID": "stream-records-20260811T143000Z-5e2b9d04",
+    "CONTEXT": ".standards/CONTEXT.md",
+    "DEV": ".standards/docs/development/export-20260924T090000Z-a7f3c1d2.md",
+    "VERIFICATION": ".standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            ".standards/CONTEXT.md"
+          ],
+          "why": "Tester does not rewrite Auditor-owned context"
+        },
+        {
+          "no_skill_call": "auditor",
+          "why": "Tester routes to Auditor instead of running the audit itself"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 2,
+      "na": true,
+      "na_reason": "decision 8: counterfactual, future, or optional behavior"
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${VERIFICATION}",
+          "why": "Tester creates the report early and saves its interrupted assignment there before routing"
+        },
+        {
+          "provenance": {
+            "path": "${VERIFICATION}",
+            "artifact": "VERIFICATION",
+            "cycle": "${ID}"
+          }
+        },
+        {
+          "field": {
+            "path": "${VERIFICATION}",
+            "name": "Status",
+            "not": "COMPLETE"
+          },
+          "why": "verification cannot complete on an untrusted baseline"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Tester must not change git state"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "app/**",
+        "README.md",
+        ".standards/docs/development/**",
+        ".standards/docs/scope/**",
+        ".standards/docs/specs/**"
+      ],
+      "why": "Tester does not edit implementation, documentation, or other roles' records"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "python3 -m pytest -q -rs",
+      "expect": "pass",
+      "why": "the suite passes offline: unit tests pass, integration tests skip without a database"
+    },
+    {
+      "cmd": "python3 -m pytest -q -rs 2>&1 | grep -q '7 passed, 4 skipped'",
+      "expect": "pass",
+      "why": "seven unit tests pass and the four PostgreSQL integration tests are skipped"
+    },
+    {
+      "cmd": "python3 -m pytest -q -rs tests/integration 2>&1 | grep -q 'TEST_DATABASE_URL is not set'",
+      "expect": "pass",
+      "why": "the integration tests skip because the PostgreSQL test database is not configured"
+    },
+    {
+      "cmd": "python3 -c 'import psycopg'",
+      "expect": "fail",
+      "expectOutput": "No module named .psycopg.",
+      "why": "the PostgreSQL driver the manifest requires is not installed in the runner"
+    },
+    {
+      "cmd": "python3 -m app.cli export --status deleted",
+      "expect": "fail",
+      "expectOutput": "unknown status: deleted",
+      "why": "the export command rejects an invalid filter before connecting, as the plan's DEV-003 self-check records"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the TESTING state and records are valid"
+    },
+    {
+      "cmd": "grep -q 'Storage is SQLite' .standards/CONTEXT.md && grep -q 'psycopg' pyproject.toml && grep -q 'image: postgres:16' compose.test.yaml && grep -q 'postgres:16' .github/workflows/test.yml && grep -q 'cursor(name=' app/streaming.py && grep -q 'REPEATABLE READ' app/export.py && grep -q 'ILIKE' app/repository.py && grep -q 'SQLite' README.md",
+      "expect": "pass",
+      "why": "context claims SQLite while manifests, code, and the integration environment are PostgreSQL-specific; the README is stale"
+    },
+    {
+      "cmd": "grep -q 'Cycle: stream-records-20260811T143000Z-5e2b9d04; app/streaming.py' .standards/CONTEXT.md && grep -q 'iter_records' app/export.py && git log --format=%s | grep -qx 'Stream record listing through a server-side cursor' && git log --format=%s | grep -qx 'Cancel streamed listing cycle'",
+      "expect": "pass",
+      "why": "context carries the cancelled prior cycle's non-baseline entry for app/streaming.py, which the active export relies on"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `TESTING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '`Kind`: `FORWARD` `From`: `DEVELOPING`' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md && test ! -e .standards/docs/verification && grep -q 'ProjectMode`: `BROWNFIELD' .standards/MODE.md",
+      "expect": "pass",
+      "why": "TESTING with FORWARD from DEVELOPING, no recovery, no verification report yet"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q .",
+      "expect": "pass",
+      "why": "all work is committed"
+    }
+  ],
+  "notes": "Standalone Python fixture (export-testing is an in-memory TypeScript service with no database, so it cannot carry a SQLite-versus-PostgreSQL context error). 00-sqlite (pre-install): first version with sqlite3 storage, README describing SQLite and in-memory tests. 05-postgres (pre-install): storage moved to PostgreSQL via psycopg (lazy import), schema.sql with bigserial/timestamptz, list_query with ILIKE, compose.test.yaml (postgres:16), CI workflow running integration tests against postgres, tests/integration with a TEST_DATABASE_URL fixture that skips when unset; README left stale. Installer commit. 50-56: prior cycle stream-records-20260811T143000Z-5e2b9d04 started EXPEDITED, added app/streaming.py (named server-side cursor) and its integration test, was promoted (Auditor wrote CONTEXT.md with an Active-Cycle Non-Baseline Work entry for it and the SQLite claim), then cancelled at SCOPING; its development plan remains. 60-context: current cycle export-20260924T090000Z-a7f3c1d2; Auditor refreshed CONTEXT.md, still claiming SQLite and carrying the prior-cycle entry unchanged, and cleared baseline reconciliation; STATE SCOPING. 62 scope (AC-001 CSV export, AC-002 single-snapshot consistency), 64 design (export_csv in one REPEATABLE READ, READ ONLY transaction streaming iter_records into write_csv; CLI), 66 approved plan, 68 implementation plus a unit test and one integration test, 70 plan COMPLETE and STATE TESTING FORWARD from DEVELOPING. No verification or later record exists. Implementation is believed correct; integration tests cannot run here (no PostgreSQL, no psycopg).",
+  "case": "tester-9",
+  "caseHash": "136324909d6fde6e",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-01T22:27:22.862Z",
+    "verdict": "pass",
+    "fixtureHash": "0d78c35beb53e482",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "753a9f0a1798eb08",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:46:04.090Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-01T21:06:26.877Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-stream-plan/.standards/STATE.md: NONE",
+        "layers/54-stream-context/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/56-stream-cancel/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/60-context/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/62-scope/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/64-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/66-plan/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/70-complete/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:46:04.090Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

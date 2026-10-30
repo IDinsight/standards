@@ -1,0 +1,154 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add webhook notifier with config loading and retries"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "navigator",
+    "utterance": "Skip that question and focus on config loading at a simpler level."
+  },
+  "graderOnly": [
+    "The pending question in the conversation (Question 2) is about retry behavior in notifier/sender.py, not about config loading.",
+    "load_config in notifier/config.py starts from DEFAULTS, then applies a JSON file (from the path argument or the NOTIFIER_CONFIG environment variable), then NOTIFIER_<KEY> environment variables, and finally coerces types into a frozen Config dataclass; environment values win over file values, which win over defaults.",
+    "A JSON config file containing a key not in DEFAULTS makes load_config raise ValueError naming the unknown keys.",
+    "The installed workflow state is the fresh brownfield state (AUDITING, no active cycle); nothing about the redirect is a workflow change."
+  ],
+  "history": {
+    "turns": [
+      {
+        "role": "user",
+        "text": "/navigator Grill me on how this notifier project works. I'm new to it."
+      },
+      {
+        "role": "assistant",
+        "text": "I read the README, `notifier/cli.py`, `notifier/config.py`, and `notifier/sender.py`. Let's start with the big picture.\n\nQuestion 1: When someone runs `python3 -m notifier.cli \"Deploy finished\"`, what are the main steps between that command and the message reaching the webhook?"
+      },
+      {
+        "role": "user",
+        "text": "It loads the config, builds a payload with the message, and posts it to the webhook URL. If that fails it retries."
+      },
+      {
+        "role": "assistant",
+        "text": "Mostly right. `main` in `notifier/cli.py` calls `load_config`, wraps the message as `{\"text\": ...}`, and hands it to `send_with_retry` in `notifier/sender.py`, which posts it. One refinement: it does not retry every failure. Only some HTTP statuses are retried, and only up to a limit.\n\nQuestion 2: With the default settings, suppose the webhook answers `503` on every attempt. How many times does `send_with_retry` call `post`, how long does it wait between attempts, and what happens at the end?"
+      }
+    ]
+  },
+  "vars": {},
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "**"
+          ],
+          "why": "a persisted preference or quiz progress would be a changed or added file"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "unchanged": true
+        },
+        {
+          "state": "Handoff.Kind",
+          "unchanged": true
+        },
+        {
+          "unchanged": [
+            ".standards/**"
+          ],
+          "why": "redirecting a quiz records no workflow change"
+        },
+        {
+          "no_skill_call": "auditor",
+          "why": "Navigator does not dispatch the role that owns the current state"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "unchanged": [
+        "**"
+      ],
+      "why": "Navigator persists nothing (generated caches are ignored)"
+    },
+    {
+      "head_unchanged": true,
+      "why": "Navigator never moves HEAD"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Navigator never mutates git state"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "python3 -m pytest -q",
+      "expect": "pass",
+      "why": "the project's config and sender tests pass"
+    },
+    {
+      "cmd": "python3 -c \"from notifier.config import load_config; c = load_config(environ={'NOTIFIER_TIMEOUT': '9'}); assert c.timeout == 9.0 and c.max_attempts == 3 and c.backoff == 0.5, c; print('ok')\"",
+      "expect": "pass",
+      "why": "environment variables override defaults, as the history and graderOnly describe"
+    },
+    {
+      "cmd": "python3 -c \"from notifier.config import Config; from notifier.sender import send_with_retry, DeliveryError; calls=[]; sleeps=[]\ntry:\n    send_with_retry(Config('http://x', 1.0, 3, 0.5), {'text': 'a'}, post=lambda u, p, t: calls.append(u) or 503, sleep=sleeps.append)\nexcept DeliveryError:\n    pass\nassert len(calls) == 3 and sleeps == [0.5, 1.0], (calls, sleeps); print('ok')\"",
+      "expect": "pass",
+      "why": "the pending retry question in history has a definite answer in the code (3 posts, sleeps 0.5 and 1.0, then DeliveryError)"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. layers/00-project (pre-install commit) is a small Python stdlib project: notifier/config.py (load_config: defaults < JSON file < NOTIFIER_* env vars, unknown keys rejected), notifier/sender.py (send_with_retry with exponential backoff on 429/502/503/504), notifier/cli.py, pytest tests for both, README describing configuration (commands use python3, which the runner image provides). The installer leaves the fresh brownfield state (AUDITING, no cycle); the case does not specify workflow state, so none is added. History holds a GRILL_ME conversation: a big-picture question answered, then a pending Question 2 about retry behavior; the run's utterance asks to skip it and focus on config loading at a simpler level.",
+  "case": "navigator-53",
+  "caseHash": "08be4b24be14be1a",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T15:41:16.400Z",
+    "verdict": "pass",
+    "fixtureHash": "b6a7fb4ef74cc465",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "f40fbc0b73f6999c",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:22:00.494Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T15:21:16.102Z"
+  },
+  "migrations": [
+    {
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:22:00.494Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

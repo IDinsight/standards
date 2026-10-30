@@ -1,0 +1,213 @@
+{
+  "base": "export-synchronizing",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-sync-progress",
+      "action": "commit",
+      "message": "Record CSV export synchronization progress"
+    },
+    {
+      "dir": "layers/60-worktree",
+      "action": "unstaged"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "synchronizer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The committed IN_PROGRESS synchronization record cites the blobs of src/records/filter.ts (the helper) and packages/seed/index.js (the seed data the tests and guide examples rely on) as they were at the commit 'Record CSV export final review' (version A). Both files now have unstaged modifications (version B) that no record cites.",
+    "src/records/filter.ts B lowercases the status query value before validating it, so GET /records and POST /records/export now accept a status in any letter case: status=ACTIVE returns 200 instead of 400.",
+    "src/routes/records.ts (GET /records) is unchanged but imports parseFilter from src/records/filter.ts, so its behavior changed with the helper. src/routes/export.ts imports the same helper.",
+    "packages/seed/index.js B renames record 4 from 'Insurance renewal 2026' to 'Insurance renewal, fleet 2026'. That title now needs CSV quoting in an unfiltered export. Records 1 and 3 (owner dana) are unchanged.",
+    "docs/usage.md still says that a status other than active or archived returns 400, and its listing example still shows record 4 as 'Insurance renewal 2026'. Neither statement matches the working tree any more. The guide's owner=dana CSV example still matches.",
+    "No verification, review, or documentation record assessed the B content. Every test still passes on it (21 unit tests, 3 integration tests), so passing tests do not show that the changes were assessed.",
+    "B leaves the following unchanged: src/export.ts, src/routes/export.ts, src/app.ts, src/auth/authorize.ts, all test files, README.md, and every cycle record. Two pieces of evidence still apply. The CSV-format evidence still applies because the serialization tests in test/export.test.ts use their own inline records. The AC-002 denial evidence still applies because requireAdmin runs before the query is parsed or any record is read.",
+    "Nothing in the repository records who made the unstaged edits or whether they belong to this cycle."
+  ],
+  "history": null,
+  "vars": {
+    "FILTER": "src/records/filter.ts",
+    "SEED": "packages/seed/index.js"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "provenance": {
+            "path": "${SYNC}",
+            "artifact": "SYNCHRONIZATION",
+            "cycle": "${ID}"
+          },
+          "why": "the interrupted record is resumed, not replaced or relabeled"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "changed": [
+            "${SYNC}"
+          ],
+          "why": "invalidated conclusions and the changed inputs must be persisted in the record"
+        },
+        {
+          "field": {
+            "path": "${SYNC}",
+            "name": "Status",
+            "not": "COMPLETE"
+          },
+          "why": "the final review and other assessments no longer cover the working tree, so the gate cannot pass"
+        },
+        {
+          "state": "WorkflowState",
+          "not": "AWAITING_USER_SIGNOFF",
+          "why": "unassessed changes to the deliverable block sign-off readiness"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${SYNC}"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Synchronizer must not change git state, including stashing or restoring the unstaged edits"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "packages/**",
+        "test/**",
+        "docs/**",
+        "README.md",
+        "package.json",
+        ".gitignore",
+        "pnpm-lock.yaml"
+      ],
+      "why": "Synchronizer owns none of these; the unstaged edits must be left as they are"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the unit suite passes on the modified working tree"
+    },
+    {
+      "cmd": "pnpm --filter export test 2>&1 | grep -qE 'pass 21$'",
+      "expect": "pass",
+      "why": "21 unit tests still pass with the B helper and seed"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration 2>&1 | grep -qE 'pass 3$'",
+      "expect": "pass",
+      "why": "the three integration tests still pass with the B helper and seed"
+    },
+    {
+      "cmd": "test $(git status --porcelain | wc -l) -eq 2 && git status --porcelain | grep -qx ' M src/records/filter.ts' && git status --porcelain | grep -qx ' M packages/seed/index.js'",
+      "expect": "pass",
+      "why": "the only working-tree changes are the unstaged edits to the helper and the seed data"
+    },
+    {
+      "cmd": "s=.standards/docs/synchronization/export-20260924T090000Z-a7f3c1d2.md && for f in src/records/filter.ts packages/seed/index.js; do grep -q $(git rev-parse HEAD:$f) $s && ! grep -q $(git hash-object $f) $s || exit 1; done && grep -q '`Status`: `IN_PROGRESS`' $s && grep -q $(git log --format=%H -1 --fixed-strings --grep='Record CSV export final review') $s && ! grep -qE 'COMMIT:|BLOB:' $s",
+      "expect": "pass",
+      "why": "the IN_PROGRESS record cites version A of both files and not the current version B, and it cites the assessed commit"
+    },
+    {
+      "cmd": "git diff --quiet HEAD -- src/routes/records.ts src/routes/export.ts && grep -qF 'records/filter.ts' src/routes/records.ts && grep -qF 'records/filter.ts' src/routes/export.ts",
+      "expect": "pass",
+      "why": "the unchanged GET /records handler and the export handler both import the changed helper"
+    },
+    {
+      "cmd": "node -e 'import(`./src/app.ts`).then(({ createApp }) => { const viewer = { id: 3, name: `Vik`, role: `viewer` }; const r = createApp().handle({ method: `GET`, path: `/records`, query: { status: `ACTIVE` }, user: viewer }); const ids = JSON.parse(r.body).records.map((x) => x.id).join(); if (r.status !== 200 || ids !== `1,2,4,6`) { console.error(r); process.exit(1); } console.log(`mixed-case status accepted`); }, (e) => { console.error(e); process.exit(2); })'",
+      "expect": "pass",
+      "why": "with the B helper, the unchanged GET /records accepts a mixed-case status that the documented contract rejects with 400"
+    },
+    {
+      "cmd": "grep -qF 'Any other value returns `400`' docs/usage.md && grep -qF 'Insurance renewal 2026' docs/usage.md && grep -qF 'Insurance renewal, fleet 2026' packages/seed/index.js && ! grep -qF 'Insurance renewal, fleet 2026' docs/usage.md",
+      "expect": "pass",
+      "why": "the guide still describes version A's status validation and record 4 title"
+    },
+    {
+      "cmd": "git diff --quiet HEAD -- src/export.ts src/routes src/app.ts src/auth test docs README.md package.json .gitignore pnpm-lock.yaml .standards",
+      "expect": "pass",
+      "why": "everything else, including all records and tests, is unchanged since HEAD"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the SYNCHRONIZING state with an IN_PROGRESS synchronization record is valid"
+    },
+    {
+      "cmd": "git log -1 --format=%s | grep -qx 'Record CSV export synchronization progress' && git log -2 --format=%s | tail -1 | grep -qx 'Record CSV export final review'",
+      "expect": "pass",
+      "why": "the synchronization progress commit follows the final review commit"
+    }
+  ],
+  "notes": "Built on export-synchronizing, which provides cycle export-20260924T090000Z-a7f3c1d2 at SYNCHRONIZING with a FORWARD handoff from REVIEWING_FINAL. That base has valid COMPLETE plan, verification, and both reviews, a COMPLETE documentation record, context, scope, and design, and no recovery, obligations, or blockers. Layer 50-sync-progress commits an interrupted synchronization record, Status IN_PROGRESS. It cites COMMIT 'Record CSV export final review' with a clean tree and the BLOB identities of every input. Those include helper A, src/records/filter.ts (parseFilter, shared by GET /records and POST /records/export), and seed data A, packages/seed/index.js (the records the integration tests and guide examples rely on). The record has already reconciled two items with reasons: AC-001 CSV format (serialization tests, own inline data) and AC-002 denial (requireAdmin first). It marks the AC-001 rows item, the AC-001 response item, AC-003, and final-review applicability as not yet reconciled. It has no discrepancies yet. STATE.md is unchanged from the base. Layer 60-worktree leaves two unstaged edits. In version B, parseFilter lowercases status before validation. In version B, seed record 4 is retitled with a comma. All tests still pass. The unchanged import caller is src/routes/records.ts (GET /records). Its behavior changes with the helper, and docs/usage.md no longer matches it. No record covers B, which resolves the catalog's underspecified issue: the role should treat the current assessments as not applicable to B.",
+  "case": "synchronizer-31",
+  "caseHash": "57403a54d0a64d55",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T14:38:45.523Z",
+    "verdict": "pass",
+    "fixtureHash": "323e0d1116fdd600",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "b800f1e5f7b4b6dc",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:40:05.033Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T13:38:13.571Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-synchronizing": "33937a9926a74652"
+  },
+  "migrations": [
+    {
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:40:05.033Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

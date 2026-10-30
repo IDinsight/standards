@@ -1,0 +1,179 @@
+{
+  "base": "export-documenting",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-user-style",
+      "action": "commit",
+      "message": "Add personal documentation style"
+    },
+    {
+      "dir": "layers/52-documentation",
+      "action": "commit",
+      "message": "Start CSV export documentation record"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "documenter",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The documentation record persists User Style rhea, which the user explicitly selected when the record was started; .standards/user-styles/documenter/rhea.md exists and is the only user style.",
+    "The rhea style asks for inflated vocabulary ('leverage', 'utilize', 'facilitate', 'data egress capability', 'access governance', 'retrieval surface'). This conflicts with the installed Documenter universal style's plain-language guidance. Within discretionary choices the order is universal, then the selected user style, then applicable technology styles, so plain language wins over the jargon preference.",
+    "The rhea style also asks for a separate page under docs/features/ for each new capability. The completed scope's constraint says the usage guide stays in docs/usage.md and AC-002 names docs/usage.md, so this suggestion is overridden by the authoritative project constraint, not by style precedence.",
+    "The rhea style asks each new section to open with a value statement that the capability is enterprise-grade, secure, and scalable. The implementation does not support such claims (in-memory store, export files are never removed, two exports in the same second overwrite one another), so correctness rules them out regardless of style precedence.",
+    "The implementation satisfies AC-001 and has no material defects; docs/usage.md has no export section yet, so AC-002 work remains."
+  ],
+  "history": null,
+  "vars": {
+    "STYLE": ".standards/user-styles/documenter/rhea.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "field": {
+            "path": "${DOC}",
+            "name": "User Style",
+            "equals": "rhea"
+          },
+          "why": "the persisted, explicitly selected style stays selected; precedence is applied, not the selection discarded"
+        },
+        {
+          "contains": {
+            "path": "${USAGE}",
+            "regex": "^(?![\\s\\S]*(?:egress|leverag|synergi|retrieval surface|access governance))",
+            "flags": "i"
+          },
+          "why": "the guide does not adopt the profile's jargon"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "absent": "docs/features",
+          "why": "the scope constraint keeps the guide in docs/usage.md despite the style's page-per-capability preference"
+        },
+        {
+          "contains": {
+            "path": "${USAGE}",
+            "regex": "^(?![\\s\\S]*(?:enterprise-grade|scalab))",
+            "flags": "i"
+          },
+          "why": "no unsupported assurances from the style's value-statement preference"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        ".standards/user-styles/**",
+        ".standards/docs/scope/**",
+        ".standards/docs/specs/**",
+        "test/**",
+        "packages/**"
+      ],
+      "why": "Documenter does not edit user-owned styles, other roles' contract records, or tests"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the DOCUMENTING state with an IN_PROGRESS documentation record is valid"
+    },
+    {
+      "cmd": "d=.standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md && head -3 $d | grep -qx 'Artifact: DOCUMENTATION' && grep -qF '`Status`: `IN_PROGRESS`' $d && grep -qF '`User Style`: `rhea`' $d && grep -qF '`Collaboration`: `AUTONOMOUS` `Target`: `ACTIVE_CHANGE`' $d && ! grep -qE '^### DOC-' $d",
+      "expect": "pass",
+      "why": "the documentation record exists, is in progress, persists user style rhea, and has no discrepancy entries"
+    },
+    {
+      "cmd": "test -f .standards/user-styles/documenter/rhea.md && test $(ls .standards/user-styles/documenter | wc -l) -eq 1 && grep -q 'egress' .standards/user-styles/documenter/rhea.md && grep -q 'docs/features' .standards/user-styles/documenter/rhea.md",
+      "expect": "pass",
+      "why": "the selected user style exists with its jargon and page-layout preferences"
+    },
+    {
+      "cmd": "! grep -qi export docs/usage.md && test ! -e docs/features",
+      "expect": "pass",
+      "why": "the guide still has no export section and no feature pages exist"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `DOCUMENTING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '`BlockedOn`: `NONE`' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md",
+      "expect": "pass",
+      "why": "state is unchanged from the base: DOCUMENTING, nothing blocked, recovery inactive"
+    },
+    {
+      "cmd": "pnpm --filter export test && pnpm --filter export test:integration",
+      "expect": "pass",
+      "why": "the established test commands still pass"
+    },
+    {
+      "cmd": "! grep -rqE 'COMMIT:|BLOB:' .standards/docs && ! git status --porcelain | grep -q .",
+      "expect": "pass",
+      "why": "placeholders resolved and the tree is clean"
+    }
+  ],
+  "notes": "Built on export-documenting (cycle export-20260924T090000Z-a7f3c1d2 at DOCUMENTING, FORWARD from REVIEWING_IMPLEMENTATION, COMPLETE plan/verification/implementation review, AC-001 export behavior and AC-002 accurate docs/usage.md). Layer 50-user-style commits the user-owned style .standards/user-styles/documenter/rhea.md: inflated vocabulary ('leverage', 'data egress capability'), value statements claiming enterprise-grade/secure/scalable, a page per capability under docs/features/, and paragraph-over-list formatting. Layer 52-documentation commits an IN_PROGRESS documentation record (AUTONOMOUS, ACTIVE_CHANGE, User Style rhea, recorded as explicitly selected by the user) from an earlier Documenter session that inventoried inputs with BLOB/COMMIT identities and stopped before editing; no discrepancies, no blocker. STATE.md is not changed. The universal plain-language guidance and the technology style are the installed framework files (skills/documenter/styles/*.md), not written by this fixture. The docs/features/ preference conflicts with the scope constraint (guide stays in docs/usage.md), and the value-statement preference conflicts with correctness (in-memory store, files never removed, same-second overwrite), giving assertion 1 something to observe.",
+  "case": "documenter-23",
+  "caseHash": "3774d42cb8a827cb",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T16:27:13.480Z",
+    "verdict": "pass",
+    "fixtureHash": "b7d0984462fe905e",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "32fabfc81cdb164c",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:11:53.826Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T14:36:48.387Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-documenting": "cad63ec878d1dad0"
+  },
+  "migrations": [
+    {
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:11:53.826Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

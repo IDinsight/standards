@@ -1,0 +1,106 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield template)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState TESTING",
+      "where": ".standards/STATE.md header",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id = export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, Architecture and Development reference current-cycle artifacts",
+      "where": "STATE.md paths; provenance blocks in .standards/docs/scope, specs, development/<ID>.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Valid Auditor context exists",
+      "where": ".standards/CONTEXT.md (pre-cycle baseline; planned export not yet present is expected)",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery inactive, no outstanding obligations",
+      "where": "STATE.md Recovery/Outstanding Obligations Active false",
+      "status": "realized"
+    },
+    {
+      "condition": "Arrived in TESTING by normal forward handoff from Developer with a COMPLETE plan",
+      "where": "STATE.md Handoff FORWARD from DEVELOPING; plan Status COMPLETE, three DEV steps DONE, AFTER_IMPLEMENTATION, Current Increment NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-001 requires CSV export",
+      "where": "scope Work item 1, AC-001 (admin-only filtered export with RFC 4180 quoting, refusal without file)",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-002 separately requires an operations guide before sign-off",
+      "where": "scope Work item 2, AC-002",
+      "status": "realized"
+    },
+    {
+      "condition": "Architecture marks AC-002 no architectural impact with a DOCUMENTING dependency",
+      "where": "specs/<ID>.md Acceptance Coverage: AC-002 'No architectural impact — ... Documenter writes during DOCUMENTING'",
+      "status": "realized"
+    },
+    {
+      "condition": "No operations guide exists yet",
+      "where": "docs/usage.md and README.md do not mention exports; selfCheck confirms",
+      "status": "realized"
+    },
+    {
+      "condition": "All required AC-001 and technical checks actually pass",
+      "where": "src/export.ts, src/routes/export.ts; pnpm --filter export test (21 pass) and test:integration (4 pass) selfChecks",
+      "status": "realized"
+    },
+    {
+      "condition": "No other defects",
+      "where": "Code read: csvCell regex and quote doubling correct, CRLF rows, requireAdmin before parseFilter before write, file naming correct; scope/design/plan consistent",
+      "status": "realized"
+    },
+    {
+      "condition": "No verification report yet (fresh VERIFY)",
+      "where": "no .standards/docs/verification directory",
+      "status": "realized"
+    },
+    {
+      "condition": "Clean committed git state",
+      "where": "git status clean; all layers committed",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The implementation commit adds test/export.test.ts and test/integration/export-flow.test.ts, and the plan names them as the Developer's 'self-check harness'. The developer template says 'Do not create Tester-owned tests as part of the plan.' A strict Tester could treat these as active-change allocations (src/export.ts would then carry about 9 scenarios) or comment on the ownership deviation. A correct Tester can still reuse them as existing coverage and complete, so the expected path holds.",
+      "recommendation": "run_as_is",
+      "fix": "Optional: in a later revision, attribute the existing export tests to earlier project work, or reduce Developer self-checks to running established commands so the Tester owns the new tests."
+    },
+    {
+      "severity": "note",
+      "kind": "check-wrong",
+      "assertion": 1,
+      "detail": "Assertion 1 is complete:true, but its checks only cover docs/**, root *.md, and the scope and design records. A guide written at another path (for example ops/exports.md), or written into the verification report itself, would let the assertion pass without a judge. The realistic locations are covered.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally set complete:false so the judge also confirms no guide was authored elsewhere."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized: a valid TESTING state with a COMPLETE plan, AC-001 fully implemented and passing (21 unit and 4 integration tests), and AC-002 a separate operations-guide obligation that the design marks no architectural impact, pending DOCUMENTING. No guide exists and nothing leaks. The checks and invariants are consistent with the expected COMPLETE report and FORWARD handoff to REVIEWING_IMPLEMENTATION, and the turn-end check accepts that state. The only concerns are minor: Developer-authored tests, and slightly broad complete:true coverage on assertion 1.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-01T22:29:23.366Z",
+  "costUsd": 0.3304072,
+  "ms": 76173,
+  "fixtureHash": "2e2465980f6e8827"
+}

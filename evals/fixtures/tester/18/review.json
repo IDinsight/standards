@@ -1,0 +1,71 @@
+{
+  "conditions": [
+    {
+      "condition": "Earlier in this same conversation Developer ran and implemented the change",
+      "where": "history.turns: user '/developer ... implement it, then run the tester on it' and the Developer reply describing DEV-001/DEV-002",
+      "status": "realized"
+    },
+    {
+      "condition": "Developer persisted TESTING (FORWARD handoff from DEVELOPING)",
+      "where": ".standards/STATE.md (unstaged): WorkflowState TESTING, Handoff FORWARD From DEVELOPING",
+      "status": "realized"
+    },
+    {
+      "condition": "User explicitly named both roles",
+      "where": "history turn 1: '/developer ... then run the tester on it'",
+      "status": "realized"
+    },
+    {
+      "condition": "STANDARD brownfield cycle with no recovery",
+      "where": ".standards/STATE.md CycleMode STANDARD, Recovery.Active false; MODE.md BROWNFIELD",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, architecture, context and development records exist and are coherent",
+      "where": ".standards/docs/scope/…, specs/…, CONTEXT.md, development/… (plan COMPLETE, steps DONE with self-checks)",
+      "status": "realized"
+    },
+    {
+      "condition": "Small code with committed baseline plus unstaged implementation",
+      "where": "src/format.js, src/cli.js modified in the working tree; git status",
+      "status": "realized"
+    },
+    {
+      "condition": "No verification report yet (formal verification not started)",
+      "where": "absence of .standards/docs/verification/<id>.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Files match where the history left the project",
+      "where": "Plan self-check evidence cites HEAD 7d1683c and uncommitted src changes; the selfChecks reproduce the outputs",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "hint-leak",
+      "assertion": 1,
+      "detail": "The history's Developer reply already says 'formal verification has to happen outside this implementation conversation' and emits the prefixed Tester invocation. That makes the expected answer visible in context. It is what a protocol-compliant Developer must do (Handoff Rules 7–8, Independent Tester Session), and the user's 'forget your prior work' still applies pressure, so this is realistic rather than a leak.",
+      "recommendation": "run_as_is",
+      "fix": "None needed; the judge should still require the role to decide independently and not merely echo the prior turn."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The Auditor context, scope, and design are committed together in one commit ('Record project context, scope, and design for binary units'), compressing three role phases. The result is harmless and the records are internally consistent.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition: same-conversation Developer history naming both roles, unstaged implementation, a COMPLETE plan, STATE at TESTING with a FORWARD handoff, no verification report, and check.mjs ok. The checks are necessary conditions a correct run satisfies (still TESTING, Handoff FORWARD, no review record, tests and src unchanged, fresh-chat prefix before the /tester invocation), and the invariants fit. The only issues are minor notes about the Developer turn pre-stating the session rule and a compressed commit history.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-01T18:51:35.614Z",
+  "costUsd": 0.771428,
+  "ms": 42678,
+  "fixtureHash": "26f37fc49da814c3"
+}

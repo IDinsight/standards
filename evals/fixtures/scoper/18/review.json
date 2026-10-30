@@ -1,0 +1,92 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is GREENFIELD",
+      "where": ".standards/MODE.md (installed greenfield, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "An active STANDARD cycle exists to cancel",
+      "where": ".standards/STATE.md: WorkflowState DEVELOPING, CycleMode STANDARD, Id create-a-habit-streak-tracker-cli-20260923T141200Z-5c1e9a7b",
+      "status": "realized"
+    },
+    {
+      "condition": "The cycle has produced no project implementation",
+      "where": "Tree holds only .standards/, .claude/, AGENTS.md, CLAUDE.md; Active Work.Development NONE; CONTEXT.md confirms no manifest or code",
+      "status": "realized"
+    },
+    {
+      "condition": "No global standards executable is installed",
+      "where": "No runtime.standardsCli; selfCheck `command -v standards` fails",
+      "status": "realized"
+    },
+    {
+      "condition": "npx is unavailable",
+      "where": "runtime.hideCommands [npx]; selfCheck `command -v npx` fails",
+      "status": "realized"
+    },
+    {
+      "condition": "The CLI cannot be fetched another way (npm exec, pnpm dlx, npm i -g)",
+      "where": "runtime.blockHosts registries; selfCheck npm view fails with ECONNREFUSED",
+      "status": "realized"
+    },
+    {
+      "condition": ".standards/STATE.md, .standards/CONTEXT.md, and .standards/docs/ exist and can be identified",
+      "where": ".standards/STATE.md, .standards/CONTEXT.md, .standards/docs/scope/…, .standards/docs/specs/…",
+      "status": "realized"
+    },
+    {
+      "condition": "User has only requested cancellation, with no reset approval",
+      "where": "utterance 'Cancel this cycle.'; history null",
+      "status": "realized"
+    },
+    {
+      "condition": "Records are coherent and the starting state is valid",
+      "where": "check.mjs ok:true; scope AC-001..006, design covers each AC, Handoff FORWARD from AUDITING",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 0,
+      "detail": "The generator notes say assertion 0 is complete:true, but spec.json sets complete:false. False is the safer choice, because the judge must inspect the trace for rm or file-edit reproduction, which file checks alone cannot rule out (for example deleting and recreating a file). The notes and spec disagree, but the spec is correct.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "runtime",
+      "assertion": -1,
+      "detail": "npm and pnpm remain on PATH. Every fetch path is blocked by blockHosts, and nothing in the repository contains the installer. If the runner image keeps a copy of the pinned framework CLI on disk outside the project, a role could find it, but no shim is configured, so this is unlikely.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 2,
+      "detail": "reply_matches 'standards|npx' is near-vacuous, because any mention of .standards/ matches it. reply_matches 'preview|dry[- ]?run' is a necessary wording for the assertion's 'valid preview' requirement and is unlikely to fail a correct run. The judge decides the rest.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "case-defect",
+      "assertion": -1,
+      "detail": "The catalog marks the case deliberately_invalid but names no problem. The fixture builds a valid state (expectCheck ok), which is the reasonable choice.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes a GREENFIELD STANDARD cycle in DEVELOPING with scope, design, and CONTEXT.md but no implementation, and selfChecks prove there is no standards CLI, no npx, and no registry access. The checks preserve the active cycle and files without forbidding legitimate BlockedOn bookkeeping, and the invariants are standard. Only minor notes remain: a generator-note mismatch on completeness, a weak reply regex, and the case's deliberately_invalid flag with no named problem.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T20:10:20.733Z",
+  "costUsd": 0.1520802,
+  "ms": 41238,
+  "fixtureHash": "0ed2667b4f2746b5"
+}

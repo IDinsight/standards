@@ -1,0 +1,274 @@
+{
+  "base": "export-documenting",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-usage",
+      "action": "commit",
+      "message": "Document CSV export in the usage guide"
+    },
+    {
+      "dir": "layers/52-doc-record",
+      "action": "commit",
+      "message": "Record CSV export documentation evidence"
+    },
+    {
+      "dir": "layers/55-rework",
+      "action": "commit",
+      "message": "Record request for export migration instructions"
+    },
+    {
+      "dir": "layers/60-scope",
+      "action": "commit",
+      "message": "Revise export scope for migration instructions"
+    },
+    {
+      "dir": "layers/65-design",
+      "action": "commit",
+      "message": "Update export design coverage for revised scope"
+    },
+    {
+      "dir": "layers/70-plan",
+      "action": "commit",
+      "message": "Reconcile development plan with revised scope"
+    },
+    {
+      "dir": "layers/75-verification",
+      "action": "commit",
+      "message": "Record CSV export reverification"
+    },
+    {
+      "dir": "layers/80-review",
+      "action": "commit",
+      "message": "Record CSV export implementation re-review"
+    }
+  ],
+  "expectCheck": {
+    "ok": false,
+    "problemsMatch": [
+      "COMPLETE but does not account for AC-009"
+    ]
+  },
+  "prompt": {
+    "skill": "documenter",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "Source behavior is unchanged: src/, packages/, package.json, .gitignore, and pnpm-lock.yaml are identical to commit 'Add CSV export of filtered records', and the tests are unchanged since 'Add integration test for denied exports'. No implementation change is needed for AC-009.",
+    "The export section already in docs/usage.md accurately describes the implemented export (who may export, filters, 201 response and headers, CSV format, file location, errors), but the guide contains no migration instructions, so the migration part of AC-009 is undocumented.",
+    "The COMPLETE documentation record predates the scope revision: it cites the pre-revision scope blob, accounts for AC-001 and the now-retired AC-002, and does not mention AC-009. Its conclusion is no longer supported for current inputs.",
+    "AC-002 is retired in the scope's Retired Acceptance Identifiers section and AC-009 materially replaced it (accurate export description plus migration instructions). The design, development plan, verification report (REVERIFY, COMPLETE), and implementation review were rerun after the revision and already account for AC-009 as a Documenter dependency.",
+    "The admin-tool front end is not in this repository; the scope's assumption limits the migration instructions to the service side of the switch (the replacing request, the admin role it requires, and how export columns and values correspond to GET /records fields). No user question is needed to write them.",
+    "Before the run, the full check reports exactly one problem: the documentation record is COMPLETE but does not account for AC-009."
+  ],
+  "history": null,
+  "vars": {},
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "${SCOPE}"
+          ],
+          "why": "the Scoper-owned scope, with retired AC-002 and current AC-001/AC-009, is not edited or renumbered by Documenter"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "changed": [
+            "${USAGE}"
+          ],
+          "why": "AC-009 requires migration instructions in docs/usage.md, which has none"
+        },
+        {
+          "contains": {
+            "path": "${DOC}",
+            "regex": "AC-009"
+          },
+          "why": "the documentation record accounts for the current AC-009"
+        },
+        {
+          "check_ok": true,
+          "why": "the turn-end check finds no new problem"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "contains": {
+            "path": "${DOC}",
+            "regex": "^(?!.*AC-(?!00[129](?![0-9]))[0-9]{3})",
+            "flags": "s"
+          },
+          "why": "the record cites no acceptance identifier other than the scope's AC-001, AC-002, AC-009"
+        },
+        {
+          "contains": {
+            "path": "${USAGE}",
+            "regex": "^(?!.*AC-(?!00[129](?![0-9]))[0-9]{3})",
+            "flags": "s"
+          },
+          "why": "no invented acceptance identifiers in the guide"
+        },
+        {
+          "unchanged": [
+            ".standards/docs/scope/**",
+            ".standards/docs/specs/**",
+            ".standards/docs/development/**",
+            ".standards/docs/verification/**",
+            ".standards/docs/reviews/**/implementation.md"
+          ],
+          "why": "Documenter does not rewrite other owners' records"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "test/**",
+        "package.json",
+        "pnpm-lock.yaml",
+        ".gitignore",
+        "packages/**"
+      ],
+      "why": "Documenter does not change tests, tooling, or dependencies"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "unit suite passes"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration",
+      "expect": "pass",
+      "why": "integration suite passes"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "fail",
+      "expectOutput": "documentation/export-20260924T090000Z-a7f3c1d2.md: is COMPLETE but does not account for AC-009",
+      "why": "the stale COMPLETE documentation record misses current AC-009"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs | grep -q 'found 1 problem:'",
+      "expect": "pass",
+      "why": "that is the only problem"
+    },
+    {
+      "cmd": "c=$(git log --format=%H -1 --fixed-strings --grep='Add CSV export of filtered records') && test ${#c} -eq 40 && git diff --quiet $c HEAD -- src packages package.json .gitignore pnpm-lock.yaml && t=$(git log --format=%H -1 --fixed-strings --grep='Add integration test for denied exports') && test ${#t} -eq 40 && git diff --quiet $t HEAD -- test",
+      "expect": "pass",
+      "why": "source behavior and tests are unchanged"
+    },
+    {
+      "cmd": "grep -q 'POST /records/export' docs/usage.md && ! grep -qi migrat docs/usage.md && ! grep -qE 'AC-[0-9]' docs/usage.md README.md",
+      "expect": "pass",
+      "why": "the guide documents the export but has no migration instructions and no AC ids"
+    },
+    {
+      "cmd": "s=.standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md && grep -q '^- `AC-001`:' $s && grep -q '^- `AC-009`:' $s && grep -A2 '^## Retired Acceptance Identifiers' $s | grep -q '^- `AC-002`:' && ! grep -qE 'AC-00[3-8]' $s",
+      "expect": "pass",
+      "why": "AC-001 and AC-009 current, AC-002 retired"
+    },
+    {
+      "cmd": "d=.standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md && grep -q '`Status`: `COMPLETE`' $d && grep -q AC-002 $d && ! grep -q AC-009 $d && grep -q '`Collaboration`: `AUTONOMOUS` `Target`: `ACTIVE_CHANGE`' $d",
+      "expect": "pass",
+      "why": "the documentation record is COMPLETE for the pre-revision inventory"
+    },
+    {
+      "cmd": "v=.standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md && r=.standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md && a=.standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md && grep -q AC-009 $v && grep -q AC-009 $r && grep -q AC-009 $a && ! grep -q AC-002 $a && grep -q '`Mode`: `REVERIFY` `Status`: `COMPLETE`' $v && grep -q '^`Status`: `COMPLETE` `User Style`: `NONE`$' $r",
+      "expect": "pass",
+      "why": "upstream records were rerun and account for AC-009"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `DOCUMENTING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Kind`: `RESUME` `From`: `REVIEWING_IMPLEMENTATION` `FailureType`: `NONE`' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md && ! grep -q '### Frame' .standards/STATE.md && grep -q '`BlockedOn`: `NONE`' .standards/STATE.md",
+      "expect": "pass",
+      "why": "DOCUMENTING after the recovery resume, no recovery, no blocker"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && ! grep -rqE 'COMMIT:|BLOB:' .standards/docs",
+      "expect": "pass",
+      "why": "clean tree and resolved placeholders"
+    }
+  ],
+  "notes": "Built on export-documenting (DOCUMENTING, no doc record). 50-usage: Documenter's first pass adds an accurate export section to docs/usage.md (no migration text). 52-doc-record: COMPLETE AUTONOMOUS/ACTIVE_CHANGE documentation record accounting for AC-001 and AC-002, citing the pre-revision scope blob and the guide blob; STATE left at DOCUMENTING. 55-rework: user rework from DOCUMENTING to SCOPING (FailureType SCOPING), frame 1 ResumeAt DOCUMENTING, Request extended with migration instructions. 60-scope: AC-002 retired and replaced by AC-009 (guide accuracy plus migration instructions); frame RerunThrough REVIEWING_IMPLEMENTATION; state ARCHITECTING. 65-design: AC-009 no architectural impact, AC-002 references removed; DEVELOPING. 70-plan: Plan Notes reconcile the revision, no step reopened; TESTING. 75-verification: REVERIFY COMPLETE FULL report with AC-001 verified and AC-009 pending Documenter, AC-002 noted as superseded; REVIEWING_IMPLEMENTATION. 80-review: re-review COMPLETE with AC-009 permitted dependency; frame popped, RESUME to DOCUMENTING. Full check fails only on the stale COMPLETE documentation record (missing AC-009), as the case intends.",
+  "case": "documenter-41",
+  "caseHash": "d100a8ea35f36629",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T16:35:35.249Z",
+    "verdict": "pass",
+    "fixtureHash": "631dc8d94a63480a",
+    "fixedBy": "owner decision",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "198b121635aa1735",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:14:42.077Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T15:18:45.378Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-documenting": "cad63ec878d1dad0"
+  },
+  "decision": {
+    "action": "fixed",
+    "note": "Owner-approved (2026-10-02): removed the /migrat/ wording check on assertion 1, which failed a correct run that wrote 'Moving from GET /records to the export'; the judge decides.",
+    "at": "2026-10-02T17:32:32.734Z",
+    "fixtureHash": "198b121635aa1735"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/55-rework/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/60-scope/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/65-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/70-plan/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/75-verification/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/80-review/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:14:42.077Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

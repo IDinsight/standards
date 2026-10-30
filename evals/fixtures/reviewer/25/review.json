@@ -1,0 +1,86 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState REVIEWING_IMPLEMENTATION",
+      "where": ".standards/STATE.md header",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Current scope, architecture, context, development plan, and Tester report exist with valid ownership",
+      "where": ".standards/docs/scope|specs|development|verification/<id>.md, .standards/CONTEXT.md; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "Single active REVIEW frame owned by REVIEWING_IMPLEMENTATION, ResumeAt SYNCHRONIZING, RerunThrough NONE",
+      "where": ".standards/STATE.md Recovery Frame 1; Handoff FAILURE From SYNCHRONIZING FailureType REVIEW",
+      "status": "realized"
+    },
+    {
+      "condition": "Outstanding obligations inactive",
+      "where": ".standards/STATE.md Outstanding Obligations Active false",
+      "status": "realized"
+    },
+    {
+      "condition": "An implementation review finding is erroneous and independent inspection can withdraw it",
+      "where": "implementation.md F-001 (R3 sent GET to /records/exports → 404); src/http/router.ts returns 405 for GET /records/export (selfChecks confirm 405 vs 404)",
+      "status": "realized"
+    },
+    {
+      "condition": "Documentation was completed and relied on the finding",
+      "where": "docs/usage.md Errors 404 row and 'A GET request to /records/export returns 404' sentence; documentation record COMPLETE citing F-001/R3 and DOC-001",
+      "status": "realized"
+    },
+    {
+      "condition": "Final review was completed and relied on the finding",
+      "where": "reviews/<id>/final-deliverable.md COMPLETE, row 'Accurate on that evidence' citing implementation.md#F-001, 404 not rerun",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation, tests, plan, and verification are not invalidated (no Developer/Tester rerun needed)",
+      "where": "src/ and tests unchanged since implementation/verification commits; tests pass (selfChecks)",
+      "status": "realized"
+    },
+    {
+      "condition": "Committed, clean working tree",
+      "where": "git status clean; selfCheck",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": 1,
+      "detail": "The implementation review report includes a contract row for the docs/usage.md Errors table, and the erroneous Documenter correction (DOC-001) now leaves a wrong 404 row there. A reviewer could argue that withdrawing F-001 exposes a present documentation defect and push a nested DOCUMENTATION frame instead of planning a rerun. The case explicitly expects a rerun on the existing frame (no duplicate frame for the same invalidation), and the protocol treats Documenter work as downstream of REVIEWING_IMPLEMENTATION, so the checks match the case.",
+      "recommendation": "run_as_is",
+      "fix": "None; the judge and the deterministic frame checks agree with the case's expected routing."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "The synchronization record D-001 states the 405 result and the /records/exports typo outright, so withdrawing the finding is easy. This is intentional because the case tests routing. The record does not say which downstream states must rerun, so the answer does not leak.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes the stated recovery state: one REVIEW frame owned by REVIEWING_IMPLEMENTATION with ResumeAt SYNCHRONIZING, plus a demonstrably erroneous F-001 on which committed documentation and the final review visibly relied. The implementation and tests are untouched and passing. The checks require RerunThrough REVIEWING_FINAL, a transition to DOCUMENTING, a single preserved frame, and unchanged docs, which matches the protocol's rerun algorithm, and check_ok holds for a correct FORWARD or RESUME transition to DOCUMENTING.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T23:26:46.742Z",
+  "costUsd": 0.4196728,
+  "ms": 88879,
+  "fixtureHash": "9309eaf6caa3b9b7"
+}

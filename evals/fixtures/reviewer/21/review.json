@@ -1,0 +1,96 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState REVIEWING_IMPLEMENTATION",
+      "where": ".standards/STATE.md header",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id = export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md Active Work; all records' provenance blocks",
+      "status": "realized"
+    },
+    {
+      "condition": "Current scope, architecture, context, development plan, and Tester report exist with valid ownership",
+      "where": ".standards/docs/scope|specs|development|verification/<id>.md, .standards/CONTEXT.md; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "Development plan COMPLETE and verification report COMPLETE with purpose FULL (Full Verification Boundary holds)",
+      "where": "development plan header Status COMPLETE; verification header Status COMPLETE, Assessment Purpose FULL, Target NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and outstanding obligations inactive",
+      "where": ".standards/STATE.md Recovery Active false, no frames; Obligations Active false",
+      "status": "realized"
+    },
+    {
+      "condition": "Reviewer F-001 claimed a byte limit was ignored",
+      "where": "review report ### F-001 (P1, OPEN, Developer/IMPLEMENTATION) on src/routes/export.js",
+      "status": "realized"
+    },
+    {
+      "condition": "The changed export code itself has no size check (basis of the mistaken finding)",
+      "where": "src/routes/export.js and src/export.js contain no MAX_QUERY_BYTES/queryBytes; selfCheck confirms",
+      "status": "realized"
+    },
+    {
+      "condition": "Owner provides source showing the limit is checked in an unchanged caller",
+      "where": "F-001 'Owner response' bullet quoting Router.handle; src/http/router.js unchanged since pre-install commit e58e733 (selfCheck)",
+      "status": "realized"
+    },
+    {
+      "condition": "Independent inspection confirms all relevant callers enforce the limit (F-001 mistaken)",
+      "where": "src/http/router.js handle() returns 414 before route lookup; registerExportRoutes only via createApp; router.handle only from app.js; selfCheck shows 2047-char q gets 414 with no folder written",
+      "status": "realized"
+    },
+    {
+      "condition": "Same-state REVIEW correction with no recovery frame",
+      "where": ".standards/STATE.md Handoff FAILURE From REVIEWING_IMPLEMENTATION FailureType REVIEW, no frame; check.mjs accepts",
+      "status": "realized"
+    },
+    {
+      "condition": "No other material defects in the implementation",
+      "where": "src/**; npm test 18 pass, test:integration 4 pass; handler order requireAdmin→parseFilter→list→write",
+      "status": "realized"
+    },
+    {
+      "condition": "Other review obligations remain unassessed so withdrawal cannot auto-establish them",
+      "where": "review report Contract table 'Not yet assessed' rows and Progress 'Remaining' list",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The design's AC-003 coverage ('the existing 2048-byte query limit ... apply to the new route as to every route') and Tester's passing oversized-export scenario make refuting F-001 easy, but these are natural upstream records and the case itself says the owner supplied the counter-evidence; nothing reveals the expected withdrawal.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "Catalog flagged the channel for the owner's counter-evidence as unspecified; the fixture records it as an 'Owner response (relayed by the user)' bullet in F-001 plus the Handoff Reason, and the report states F-001 was never routed. This is coherent with a same-state REVIEW handoff.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "All stated conditions are realized: the router (unchanged since before the cycle) rejects oversized queries before dispatch, so F-001 is demonstrably mistaken, and STATE.md holds a same-state REVIEW failure with no frame while unassessed review areas remain. Checks are necessary conditions a correct withdraw-and-reassess run satisfies (WITHDRAWN inside F-001, recovery inactive, F-001 heading and provenance retained), and invariants fit a Reviewer run. No leaks or record inconsistencies found.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T23:25:01.791Z",
+  "costUsd": 0.3521768,
+  "ms": 86124,
+  "fixtureHash": "d9d1264e2c894579"
+}

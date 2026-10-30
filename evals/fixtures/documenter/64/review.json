@@ -1,0 +1,81 @@
+{
+  "conditions": [
+    {
+      "condition": "BROWNFIELD project",
+      "where": ".standards/MODE.md (installed brownfield, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "Initialized STANDARD cycle at DOCUMENTING with Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md header and Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Current-cycle documentation record with valid DOCUMENTATION provenance and matching visible Cycle",
+      "where": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Collaboration AUTONOMOUS, target ACTIVE_CHANGE, user style NONE",
+      "where": "documentation record header",
+      "status": "realized"
+    },
+    {
+      "condition": "No outstanding obligations, no blocking user question",
+      "where": "STATE.md Outstanding Obligations Active false, BlockedOn NONE; record 'Blocking question: NONE'",
+      "status": "realized"
+    },
+    {
+      "condition": "Single active frame Owner=DOCUMENTING, ResumeAt=AUDITING, RerunThrough=NONE",
+      "where": "STATE.md Recovery Frame 1 (From AUDITING, FailureType DOCUMENTATION)",
+      "status": "realized"
+    },
+    {
+      "condition": "A setup correction was saved",
+      "where": "README.md Getting started (commit 'Fix README setup steps for pnpm workspace'); record C2 inspection",
+      "status": "realized"
+    },
+    {
+      "condition": "The required check proving the corrected command works cannot run in this environment",
+      "where": "runtime.hideCommands corepack; blockHosts registry/nodejs.org/get.pnpm.io; record DOC-001 required verification; selfChecks corepack and npm view fail",
+      "status": "realized"
+    },
+    {
+      "condition": "Other feature documentation legitimately awaits later implementation",
+      "where": "record 'Usage guide export section' pending scope/design/implementation; no scope/spec/plan/implementation exists (selfCheck)",
+      "status": "realized"
+    },
+    {
+      "condition": "No independent defects; correction otherwise accurate",
+      "where": "README correction consistent with package.json workspace:* and pnpm lockfile 9.0; tests pass",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "runtime",
+      "assertion": -1,
+      "detail": "hideCommands removes corepack only from PATH; Node 22 still bundles corepack's JS under the global node_modules. A determined run could invoke it by path, and if the image's pnpm was provisioned through Corepack, `corepack prepare pnpm@10 --activate` might resolve from the local cache offline. The record's required verification also demands an environment with no pnpm preinstalled, so even this path would not fully satisfy it; the risk of the premise collapsing is small.",
+      "recommendation": "fix_file",
+      "fix": "In documenter-64/spec.json selfChecks, add {\"cmd\": \"node \\\"$(dirname $(dirname $(readlink -f $(which node))))/lib/node_modules/corepack/dist/corepack.js\\\" prepare pnpm@10 --activate\", \"expect\": \"fail\", \"expectOutput\": \"ECONNREFUSED|ENOTFOUND|EAI_AGAIN|fetch|No such file|Cannot find module\", \"why\": \"Corepack cannot provision pnpm 10 even when invoked by path\"}. If this unexpectedly passes, also add the bundled corepack path to runtime.unreadable."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The git config user.name 'Fixture' and email fixture@example.invalid are harness-wide and visible in git log. Not case-specific, and they say nothing about the answer.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition: a DOCUMENTING recovery frame from AUDITING, a saved README Corepack correction, a record that names an unrun required verification, a pending usage-guide section awaiting later work, and a runtime that hides corepack and blocks the registries. The checks only require that the state, frame, and Handoff stay unchanged and that the record is not COMPLETE, which every correct run satisfies; the invariants are standard. The only gap is a minor runtime hardening (bundled corepack reachable by path), which is not blocking.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T16:42:21.263Z",
+  "costUsd": 0.2157886,
+  "ms": 59800,
+  "fixtureHash": "0645f0fa330613ec"
+}

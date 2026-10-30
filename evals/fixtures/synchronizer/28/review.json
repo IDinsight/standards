@@ -1,0 +1,89 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (`ProjectMode`: `BROWNFIELD`)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState SYNCHRONIZING",
+      "where": ".standards/STATE.md header",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, architecture, context, development plan, verification and both review reports have valid ownership and content identities",
+      "where": ".standards/docs/{scope,specs,development,verification,reviews}/… and .standards/CONTEXT.md from the export-synchronizing base, all COMPLETE with matching provenance",
+      "status": "realized"
+    },
+    {
+      "condition": "Documentation evidence is available",
+      "where": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md (COMPLETE, checks G1–G4)",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and outstanding obligations inactive; no blocked user question",
+      "where": ".standards/STATE.md (`Active`: `false` twice, `BlockedOn`: `NONE`)",
+      "status": "realized"
+    },
+    {
+      "condition": "Required synchronization path holds current-cycle provenance but Artifact: REVIEW",
+      "where": ".standards/docs/synchronization/export-20260924T090000Z-a7f3c1d2.md (Artifact: REVIEW, ReviewKind: FINAL_DELIVERABLE, Cycle: current id)",
+      "status": "realized"
+    },
+    {
+      "condition": "A moved synchronization record owned by a prior cycle sits in another directory",
+      "where": ".standards/docs/archive/synchronization/export-json-20260903T101500Z-4c8e2a91.md (Artifact: SYNCHRONIZATION, prior cycle id)",
+      "status": "realized"
+    },
+    {
+      "condition": "Similar names/content that could tempt adoption",
+      "where": "copy at sync path is identical to the final review; prior record name starts with `export-` and has sync-record content",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation and tests otherwise consistent, committed, clean tree",
+      "where": "src/, test/, git status clean; selfCheck `pnpm --filter export test` passes",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": 1,
+      "detail": "The prior-cycle record was added directly under .standards/docs/archive/synchronization/ in commit \"Keep JSON export synchronization record for reference\"; history shows no actual move from a fixed path. 'Moved' is conveyed only by location plus provenance naming a different cycle, which is what the protocol treats as decisive anyway.",
+      "recommendation": "run_as_is",
+      "fix": "Acceptable; provenance and non-fixed location are what the role must reason about."
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 1,
+      "detail": "Assertion 1 is complete:true on file preservation and provenance only; a run that leaves the file untouched but misstates its ownership in the reply would still pass. The catalog marked it deterministic_complete, and file-level preservation is the observable core, so this is a leniency, not a false-failure risk.",
+      "recommendation": "run_as_is",
+      "fix": "None needed; optionally make complete:false so the judge also checks the reply attributes the record to the prior cycle."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "Commit subject \"Start CSV export synchronization record\" describes the misplaced review copy as a synchronization record. This is a plausible user mistake and a natural lure, not a hint at the answer.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes both planted conditions exactly: a current-cycle REVIEW FINAL_DELIVERABLE copy at the fixed synchronization path, and a prior-cycle SYNCHRONIZATION record in an archive directory. All other records are consistent, and check.mjs reports exactly the two expected collision problems. The checks rely only on preservation and the state not reaching sign-off, and invariants are standard, so a correct run cannot fail them; only minor realism and leniency notes remain.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T14:37:25.676Z",
+  "costUsd": 0.2899168,
+  "ms": 47785,
+  "fixtureHash": "0bacef702623e73d"
+}

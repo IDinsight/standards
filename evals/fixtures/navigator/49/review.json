@@ -1,0 +1,69 @@
+{
+  "conditions": [
+    {
+      "condition": "Navigator is invoked and continues an earlier GRILL_ME conversation",
+      "where": "spec history: user turn '/navigator Grill me on the retry helper in src/retry.js...' and the assistant turn asking Question 1",
+      "status": "realized"
+    },
+    {
+      "condition": "Exactly one quiz question is pending and unanswered",
+      "where": "history assistant turn: a single bolded 'Question 1' about total sleep time with default options and repeated 503s",
+      "status": "realized"
+    },
+    {
+      "condition": "The pending question has a definite answer the code supports, so a hint can be judged",
+      "where": "src/retry.js withRetry/backoffDelay; selfCheck 2 prints 100+200",
+      "status": "realized"
+    },
+    {
+      "condition": "Small committed project code exists to quiz on",
+      "where": "commit 'Add retry helper with exponential backoff': src/retry.js, test/retry.test.js, README.md, package.json",
+      "status": "realized"
+    },
+    {
+      "condition": "Workflow state is unspecified; any valid state works and nothing is blocked",
+      "where": ".standards/STATE.md is the installed brownfield default (AUDITING, CycleMode UNSET, BlockedOn NONE); check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "Clean git tree with only committed changes",
+      "where": "git status '## main', no dirty files",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-wrong",
+      "assertion": 0,
+      "detail": "reply_not_matches '\\b300\\s*(ms|milliseconds)\\b' is a reasonable necessary condition: stating the 300 ms total gives the answer away, and a correct hint has no reason to write that string. The catalog's '?' limit is rightly left to the judge, because a hint can include a guiding rhetorical question.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The user asked to 'Start with the basics', and the history's question is a small computation rather than a big-picture question. It is still a plausible first question and does not affect what is tested.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    },
+    {
+      "severity": "note",
+      "kind": "ungradeable-assertion",
+      "assertion": 1,
+      "detail": "No cycle is active, so persisting a blocker is unlikely. The assertion is still observable: the state checks are deterministic, and the judge can see any reply that frames the gap as a blocker or failed acceptance.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes a pending single GRILL_ME question through realistic history over a small committed retry helper, and the answer is proven by a selfCheck. Checks and invariants are necessary conditions a correct Navigator run satisfies: no '300 ms' in the reply, .standards unchanged, HEAD unchanged, and no mutating git command. No leaks or record problems were found.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T15:40:48.518Z",
+  "costUsd": 0.662092,
+  "ms": 30586,
+  "fixtureHash": "e9c8d2ba8f603843"
+}

@@ -1,0 +1,101 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is BROWNFIELD",
+      "where": ".standards/MODE.md (brownfield install, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState ARCHITECTING",
+      "where": ".standards/STATE.md head",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery inactive, no outstanding obligations",
+      "where": ".standards/STATE.md Recovery/Outstanding Obligations Active false",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Scope points to the completed scope",
+      "where": "STATE.md Scope -> .standards/docs/scope/replace-session-cookie-authentication-20260923T141022Z-5b8e2f17.md; Handoff FORWARD from SCOPING",
+      "status": "realized"
+    },
+    {
+      "condition": "Valid active-cycle project context exists",
+      "where": ".standards/CONTEXT.md (audited for this cycle id, committed before scoping; Handoff history AUDITING -> SCOPING -> ARCHITECTING)",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-001 replaces the session-cookie contract with short-lived access tokens across API, web app, worker",
+      "where": "scope Work item 1, AC-001 (15-minute max lifetime)",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-002 existing sessions keep working during staged rollout",
+      "where": "scope Work item 2, AC-002",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-003 clients may update at different times",
+      "where": "scope Work item 2, AC-003; Constraints on separate release schedules",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-004 rollback possible until migration completes",
+      "where": "scope Work item 3, AC-004 with completion defined in Intent",
+      "status": "realized"
+    },
+    {
+      "condition": "An existing session-cookie authentication contract exists in code",
+      "where": "api/src/auth.js, api/src/sessions.js, shared/signing.js, shared/cookies.js, web/src/api-client.js, worker/src/api-session.js",
+      "status": "realized"
+    },
+    {
+      "condition": "The auth contract is shared across several project boundaries",
+      "where": "API issues/validates; web client uses credentials:'include' + X-CSRF-Token; worker stores cookie and re-signs in on 401",
+      "status": "realized"
+    },
+    {
+      "condition": "No existing design document; Architecture NONE",
+      "where": "STATE.md Architecture NONE; no design docs in tree; CONTEXT.md notes none",
+      "status": "realized"
+    },
+    {
+      "condition": "Established behavior to preserve is recorded in context",
+      "where": "CONTEXT.md Relevant Existing Behavior / Conventions (roles, rate limit, audit events, error shape, built-ins only)",
+      "status": "realized"
+    },
+    {
+      "condition": "check.mjs ok",
+      "where": "gate results: ok true, no problems",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 0,
+      "detail": "The catalog proposed a trace grader for mode selection; the spec leaves assertion 0 to the judge with no deterministic check. The judge sees tool calls (which mode file was read) and the reply, so this is gradeable and avoids a check that could fail a correct run that doesn't name the mode.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 5,
+      "detail": "Assertion 5's `check_ok` duplicates the standard invariant. It is harmless: after a correct handoff to DEVELOPING the design is held to full AC coverage, which a correct design satisfies, and Development NONE is not flagged in DEVELOPING. The fixed-path Architecture check is safe because no project-owned design document exists, and the skill mandates `artifact init` for a new design.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized: brownfield STANDARD cycle in ARCHITECTING with no recovery, a coherent completed scope with AC-001..AC-004, a matching active-cycle CONTEXT.md, and a real session-cookie contract spanning API, web, and worker. Nothing leaks the expected mode or answer. The checks (fixed design path, provenance, per-section AC regexes, check_ok) and invariants are necessary conditions that a correct run satisfies, and selfChecks and check.mjs pass.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-01T18:33:38.728Z",
+  "costUsd": 0.86101,
+  "ms": 46790,
+  "fixtureHash": "73b8dafeb2a6f4d0"
+}

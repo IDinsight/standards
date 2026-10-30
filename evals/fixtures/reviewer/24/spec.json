@@ -1,0 +1,276 @@
+{
+  "base": "export-reviewing-impl",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-impl-review",
+      "action": "commit",
+      "message": "Record CSV export implementation review"
+    },
+    {
+      "dir": "layers/52-usage-docs",
+      "action": "commit",
+      "message": "Document exporting records as CSV"
+    },
+    {
+      "dir": "layers/54-doc-record",
+      "action": "commit",
+      "message": "Record CSV export documentation"
+    },
+    {
+      "dir": "layers/56-final-review",
+      "action": "commit",
+      "message": "Record final review of CSV export"
+    },
+    {
+      "dir": "layers/58-filter-test",
+      "action": "commit",
+      "message": "Cover export filters and invalid status in integration test"
+    },
+    {
+      "dir": "layers/60-reverify",
+      "action": "commit",
+      "message": "Record CSV export reverification"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "reviewer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "All current implementation-review obligations pass with no material findings or material assessment gaps: the implementation files are byte-identical to the commit 'Add CSV export of filtered records' and satisfy AC-001 and AC-002, the development plan is COMPLETE, and the REVERIFY verification report is COMPLETE with Assessment Purpose FULL and current evidence (21 unit tests and 4 integration tests pass).",
+    "The Tester correction (the integration scenario 'exports apply the listing filters and an unknown status writes no file') addresses the evidence gap recorded as F-001 in the final-deliverable review; docs/usage.md accurately describes the export.",
+    "The expected outcome is: the Reviewer re-establishes the implementation review against the changed inputs, marks the implementation report COMPLETE, and, because REVIEWING_IMPLEMENTATION is the active frame's RerunThrough, pops Frame 1 and transitions to REVIEWING_FINAL with Handoff.Kind RESUME (From REVIEWING_IMPLEMENTATION, FailureType NONE) instead of a FORWARD to DOCUMENTING. Continuing into final review in the same run is optional.",
+    "The first-pass implementation review accepted inspection-only evidence for the export's status and q filters; revising that reasoning in its own report is the Reviewer's own correction, not a routed failure."
+  ],
+  "history": null,
+  "vars": {
+    "REVIEW_FINAL": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md",
+    "DOCUMENTATION": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md",
+    "CORRECTION_COMMIT": "${COMMIT:Cover export filters and invalid status in integration test}"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "field": {
+            "path": "${REVIEW_IMPL}",
+            "name": "Status",
+            "equals": "COMPLETE"
+          },
+          "why": "the implementation gate must pass, and be recorded, before the frame is popped"
+        },
+        {
+          "changed": [
+            "${REVIEW_IMPL}"
+          ],
+          "why": "the rerun reconciles the changed verification report and test in the implementation report"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "false",
+          "why": "the only frame is popped at the rerun boundary"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "0"
+        },
+        {
+          "state": "WorkflowState",
+          "in": [
+            "REVIEWING_FINAL",
+            "SYNCHRONIZING"
+          ],
+          "why": "resume at REVIEWING_FINAL (optionally continuing the final review), never forward to DOCUMENTING"
+        },
+        {
+          "check_ok": true
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "0",
+          "why": "no new or rewritten frame remains"
+        },
+        {
+          "state": "WorkflowState",
+          "in": [
+            "REVIEWING_FINAL",
+            "SYNCHRONIZING"
+          ],
+          "why": "the frame's original ResumeAt is honored"
+        },
+        {
+          "unchanged": [
+            "${VERIFICATION}",
+            "${DEV}",
+            "${SCOPE}",
+            "${ARCH}",
+            "${CONTEXT}",
+            "${DOCUMENTATION}"
+          ],
+          "why": "Reviewer does not edit the Tester-owned report or other roles' records"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "reply_not_matches": "/reviewer +Continue the active",
+          "flags": "i",
+          "why": "no redundant next-role invocation for the same role"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "na": true,
+      "na_reason": "decision 8: counterfactual, future, or optional behavior"
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "Reviewer suggests commits but does not make them"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Reviewer must not change the assessed identity"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "packages/**",
+        "test/**",
+        "package.json",
+        "pnpm-lock.yaml",
+        ".gitignore",
+        "docs/**",
+        "README.md"
+      ],
+      "why": "Reviewer does not edit implementation, tests, or documentation"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the unit suite passes offline"
+    },
+    {
+      "cmd": "pnpm --filter export test 2>&1 | grep -qE 'pass 21$'",
+      "expect": "pass",
+      "why": "the unit suite runs 21 tests, as the verification report states"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration",
+      "expect": "pass",
+      "why": "the integration script passes, including the new filter scenario"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration 2>&1 | grep -qE 'pass 4$' && pnpm --filter export test:integration 2>&1 | grep -q 'exports apply the listing filters and an unknown status writes no file'",
+      "expect": "pass",
+      "why": "test:integration runs four tests, one being Tester's correction scenario"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the recovery rerun state and records are valid"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `REVIEWING_IMPLEMENTATION` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Kind`: `FORWARD` `From`: `TESTING` `FailureType`: `NONE`' .standards/STATE.md && grep -q '^`Active`: `true`$' .standards/STATE.md && grep -q '^`From`: `REVIEWING_FINAL` `Owner`: `TESTING` `FailureType`: `VERIFICATION`$' .standards/STATE.md && grep -q '^`ResumeAt`: `REVIEWING_FINAL` `RerunThrough`: `REVIEWING_IMPLEMENTATION`$' .standards/STATE.md && test $(grep -c '^### Frame' .standards/STATE.md) -eq 1 && grep -q '^`PendingVerificationCadence`: `NONE`$' .standards/STATE.md",
+      "expect": "pass",
+      "why": "STATE.md holds the stated rerun frame: Owner TESTING, ResumeAt REVIEWING_FINAL, RerunThrough REVIEWING_IMPLEMENTATION"
+    },
+    {
+      "cmd": "r=.standards/docs/reviews/export-20260924T090000Z-a7f3c1d2 && grep -q '^`Status`: `COMPLETE` `User Style`: `NONE`$' $r/implementation.md && ! grep -q '^### F-' $r/implementation.md && grep -q '^`Status`: `BLOCKED` `User Style`: `NONE`$' $r/final-deliverable.md && grep -q '^### F-001 ' $r/final-deliverable.md && grep -q '`Status`: `OPEN` `Owner`: `Tester` `FailureType`: `VERIFICATION`' $r/final-deliverable.md && grep -q '`Mode`: `REVERIFY` `Status`: `COMPLETE`' .standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md && grep -q '`Assessment Purpose`: `FULL` `Assessment Target`: `NONE`' .standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md && grep -q '`Status`: `COMPLETE`' .standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md",
+      "expect": "pass",
+      "why": "record statuses are as stated: earlier implementation review COMPLETE, final review BLOCKED on F-001, REVERIFY report COMPLETE and FULL, documentation COMPLETE"
+    },
+    {
+      "cmd": "c=$(git log --format=%H -1 --fixed-strings --grep='Add CSV export of filtered records') && test -n $c && git diff --quiet $c HEAD -- src packages package.json .gitignore pnpm-lock.yaml && test $(git diff --name-only $c HEAD -- test) = test/integration/export-flow.test.ts && ! git status --porcelain | grep -q . && test ! -e exports",
+      "expect": "pass",
+      "why": "implementation is unchanged since the implementation commit, only the integration test changed, and the tree is clean"
+    },
+    {
+      "cmd": "! grep -rqE 'COMMIT:|BLOB:' .standards/docs && grep -q $(git log --format=%H -1 --fixed-strings --grep='Cover export filters and invalid status in integration test') .standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md && grep -q $(git log --format=%H -1 --fixed-strings --grep='Record CSV export verification') .standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md",
+      "expect": "pass",
+      "why": "revision placeholders resolved; the reverification cites the correction commit and the earlier implementation review cites its older assessed revision"
+    },
+    {
+      "cmd": "! grep -rqE 'AC-[0-9]' src test packages docs README.md",
+      "expect": "pass",
+      "why": "code, tests, and docs cite no acceptance identifiers"
+    },
+    {
+      "cmd": "git log -6 --format=%s | paste -s -d '|' - | grep -qx 'Record CSV export reverification|Cover export filters and invalid status in integration test|Record final review of CSV export|Record CSV export documentation|Document exporting records as CSV|Record CSV export implementation review'",
+      "expect": "pass",
+      "why": "history reads in workflow order"
+    }
+  ],
+  "notes": "Built on export-reviewing-impl (REVIEWING_IMPLEMENTATION, clean implementation, COMPLETE VERIFY report). Six commits. 50-impl-review: first-pass implementation review COMPLETE with no material findings (assessed revision = 'Record CSV export verification'); STATE to DOCUMENTING. 52-usage-docs: docs/usage.md export section and README layout. 54-doc-record: COMPLETE documentation record accounting for AC-001/AC-002; STATE to REVIEWING_FINAL. 56-final-review: final-deliverable review BLOCKED with F-001 (P2, OPEN, Owner Tester, VERIFICATION): export status/q filters and the unknown-status 400/no-file contract were marked verified on inspection alone; STATE TESTING, FAILURE from REVIEWING_FINAL, Frame 1 (From REVIEWING_FINAL, Owner TESTING, ResumeAt REVIEWING_FINAL, RerunThrough NONE). 58-filter-test: Tester adds a fourth integration test comparing exports with GET /records for status, q, and status+owner queries and asserting 400 with no folder for status=deleted. 60-reverify: verification report rewritten as REVERIFY, COMPLETE, FULL/NONE citing the correction commit and blobs; STATE REVIEWING_IMPLEMENTATION with FORWARD from TESTING and Frame 1 RerunThrough REVIEWING_IMPLEMENTATION (Tester's rerun plan; documentation judged unaffected). The final check passes: fullBoundary holds (FORWARD), the frame's From is REVIEWING_FINAL so no suspended assignment applies, verification COMPLETE/FULL. Superseded parent selfChecks: export-reviewing-impl's 'pass 3$' integration count and export-project's 'docs/usage.md contains no export' are no longer true by design. checks allow WorkflowState REVIEWING_FINAL or SYNCHRONIZING because continuing into final review is legitimate.",
+  "case": "reviewer-24",
+  "caseHash": "84c8115dba9960db",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T23:25:17.874Z",
+    "verdict": "pass",
+    "fixtureHash": "6a08d425d1dbaad0",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "db2c36c98fad4ee3",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:27:25.101Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T22:19:30.340Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-testing": "fd7044646ac2c395",
+    "export-reviewing-impl": "e5b0bce49a675583"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-impl-review/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/54-doc-record/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/56-final-review/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/60-reverify/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:27:25.101Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

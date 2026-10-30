@@ -1,0 +1,229 @@
+{
+  "base": "export-testing",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-logging",
+      "action": "commit",
+      "message": "Log completed CSV exports"
+    },
+    {
+      "dir": "layers/55-plan",
+      "action": "commit",
+      "message": "Note export logging in development plan"
+    },
+    {
+      "dir": "layers/60-verification",
+      "action": "commit",
+      "message": "Start CSV export verification"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "tester",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The proposed integration function described in the verification report imports src/logging.ts only to silence log output; it asserts nothing about logging, so src/logging.ts should get no allocation even though it is part of the active change.",
+    "Each of the three proposed integration rows (admin success, viewer denial, empty result) asserts outcomes of both src/export.ts (the written CSV file, or its absence) and src/routes/export.ts (the response).",
+    "The case calls the route file src/routes.ts; in this fixture the route module is src/routes/export.ts.",
+    "Expected allocations: three integration scenarios charged to src/export.ts and three to src/routes/export.ts, plus one bounded property scenario (one property, 100 seeded samples) charged to src/export.ts, giving 4 and 3, within the five-per-file ceiling; no allocation for src/logging.ts.",
+    "The five tests in test/export.test.ts and the two existing tests in test/integration/export-flow.test.ts are existing coverage and consume no new allowance.",
+    "No allocations are recorded in the report before the run; the proposed tests do not exist in the repository.",
+    "The implementation is correct for AC-001 and AC-002; the proposed tests should pass once written."
+  ],
+  "history": null,
+  "vars": {
+    "ROUTES": "src/routes/export.ts",
+    "LOGGING": "src/logging.ts"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "changed": [
+            "${VERIFICATION}"
+          ],
+          "why": "the budget is recorded in the verification report, so a correct run updates it"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "contains": {
+            "path": "${VERIFICATION}",
+            "regex": "## Scenario Budget(?:(?!\\n## )[\\s\\S])*(?<!routes/)export\\.ts"
+          },
+          "why": "the Scenario Budget section names the serialization source file"
+        },
+        {
+          "contains": {
+            "path": "${VERIFICATION}",
+            "regex": "## Scenario Budget(?:(?!\\n## )[\\s\\S])*routes/export\\.ts"
+          },
+          "why": "the Scenario Budget section names the route source file"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "changed": [
+            "${VERIFICATION}"
+          ],
+          "why": "allocations are persisted in the report"
+        },
+        {
+          "contains": {
+            "path": "${VERIFICATION}",
+            "regex": "## Scenario Budget(?:(?!\\n## )[\\s\\S])*routes/export\\.ts"
+          },
+          "why": "the budget section records per-file assignments"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "packages/**",
+        "docs/**",
+        "README.md",
+        ".standards/CONTEXT.md",
+        ".standards/docs/scope/**",
+        ".standards/docs/specs/**",
+        ".standards/docs/development/**"
+      ],
+      "why": "Tester does not edit implementation, documentation, or other roles' records"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the unit suite passes with the logging change"
+    },
+    {
+      "cmd": "pnpm --filter export test 2>&1 | grep -q 'pass 21'",
+      "expect": "pass",
+      "why": "the unit suite still runs 21 tests; no logging tests were added"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration",
+      "expect": "pass",
+      "why": "the two admin integration tests pass with export logging"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration 2>&1 | grep -qE 'pass 2$'",
+      "expect": "pass",
+      "why": "the integration script runs exactly two tests"
+    },
+    {
+      "cmd": "node -e 'import(`./src/app.ts`).then(({ createApp }) => { const fs = require(`node:fs`); const os = require(`node:os`); const path = require(`node:path`); const app = createApp({ exportDir: path.join(fs.mkdtempSync(path.join(os.tmpdir(), `log-`)), `out`) }); const r = app.handle({ method: `POST`, path: `/records/export`, query: {}, user: { id: 1, name: `Ada`, role: `admin` } }); process.exit(r.status === 201 ? 0 : 1); })' 2>&1 | grep -q 'records export written'",
+      "expect": "pass",
+      "why": "an admin export writes a log line through src/logging.ts"
+    },
+    {
+      "cmd": "! (node -e 'import(`./src/logging.ts`).then(({ setLogLevel, log }) => { setLogLevel(`silent`); log(`info`, `hidden line`); })' 2>&1 | grep -q 'hidden line')",
+      "expect": "pass",
+      "why": "setLogLevel silent suppresses log lines, as the proposed integration test would use it"
+    },
+    {
+      "cmd": "node -e 'import(`./src/app.ts`).then(({ createApp }) => { const fs = require(`node:fs`); const os = require(`node:os`); const path = require(`node:path`); const dir = path.join(fs.mkdtempSync(path.join(os.tmpdir(), `deny-`)), `out`); const app = createApp({ exportDir: dir }); const send = (user) => app.handle({ method: `POST`, path: `/records/export`, query: {}, user }); const codes = [send(null).status, send({ id: 3, name: `Vik`, role: `viewer` }).status, send({ id: 2, name: `Eli`, role: `editor` }).status]; if (codes.join() !== `401,403,403` || fs.existsSync(dir)) { console.error(codes); process.exit(1); } if (send({ id: 1, name: `Ada`, role: `admin` }).status !== 201 || fs.readdirSync(dir).length !== 1) process.exit(2); }, (error) => { console.error(error); process.exit(3); })'",
+      "expect": "pass",
+      "why": "the route still denies anonymous and non-admin exports before any write after the logging change"
+    },
+    {
+      "cmd": "test ! -e test/export-quoting.property.test.ts && ! grep -q logging test/integration/export-flow.test.ts && grep -qF ../logging.ts src/routes/export.ts && test -f src/logging.ts",
+      "expect": "pass",
+      "why": "the proposed tests do not exist yet; only the route imports logging"
+    },
+    {
+      "cmd": "grep -qi 'no active-change allocations or user additions exist' .standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md && grep -q 'Assessment Purpose`: `FULL`' .standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md && grep -q '^`IN_PROGRESS`' .standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md",
+      "expect": "pass",
+      "why": "the report is an IN_PROGRESS FULL VERIFY report with no allocations"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the TESTING state and records are valid"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && test ! -e exports && ! grep -rqE 'AC-[0-9]' src test",
+      "expect": "pass",
+      "why": "tree is clean, no export files exist, code and tests cite no acceptance ids"
+    }
+  ],
+  "notes": "Built on export-testing (cycle export-20260924T090000Z-a7f3c1d2 at TESTING, STANDARD, brownfield, recovery inactive, scope/design/context/plan present). 50-logging: adds src/logging.ts (log, setLogLevel, LOG_LEVEL threshold, JSON lines to stderr) and makes the export route log each completed export after writing; requireAdmin stays first. 55-plan: Developer notes the logging in DEV-003 (affected area, expected outcome, implementation note, self-check citing the logging commit); plan stays COMPLETE; STATE re-records the FORWARD handoff with a reason mentioning logging. 60-verification: an IN_PROGRESS VERIFY report (FULL/NONE) from an earlier Tester session: assessed inputs, acceptance mapping (AC-002 uncovered), empty Scenario Budget (no allocations), no execution yet, and under Resume or Handoff the proposed coverage: one table-driven integration function with admin-success, viewer-denial, and empty-result rows asserting both the route response and the export file, importing setLogLevel from src/logging.ts only to silence output; and a csvCell round-trip property test over 100 seeded samples. The route file is src/routes/export.ts rather than the case's src/routes.ts.",
+  "case": "tester-23",
+  "caseHash": "e10723529709c4d1",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-01T22:34:08.402Z",
+    "verdict": "pass",
+    "fixtureHash": "95de1ba0bb827c52",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "44b3c8d22ecdaedb",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:45:00.972Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-01T21:25:19.648Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-testing": "fd7044646ac2c395"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/55-plan/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:45:00.972Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

@@ -1,0 +1,2850 @@
+{
+  "role": "reviewer",
+  "cases": [
+    {
+      "id": 1,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Implementation satisfies AC-001 (quoted CSV) and AC-002 (non-admin export denied before any write)",
+        "Existing integration results identify the assessed source and observe both behaviors",
+        "No material defects or gaps exist"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "REVIEWING_IMPLEMENTATION",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "report should name the committed range; trace should show git log/show and source reads"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "check"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 3,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "ground truth has no defects: any OPEN F-NNN, new AC ID, or test edit fails"
+        },
+        {
+          "i": 4,
+          "graders": [
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 5,
+          "graders": [
+            "state",
+            "file",
+            "trace",
+            "reply"
+          ],
+          "deterministic_complete": true,
+          "note": "DOCUMENTING + FORWARD, report COMPLETE, commit suggestion (if any) above the documenter line"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "The unchanged caller still imports the deleted authorization helper, so the assembled change breaks it",
+        "The untracked note is unrelated to the cycle"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "REVIEWING_IMPLEMENTATION",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification"
+        ],
+        "code": "medium",
+        "git": [
+          "committed",
+          "staged",
+          "unstaged",
+          "untracked",
+          "deleted"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "underspecified",
+          "detail": "The prompt does not say which content (staged or unstaged) Developer and Tester evidence assessed or whether the helper deletion was intended, so the expected finding owner and route are undetermined; assertion 3 accepts either a defect or a gap."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "expect git diff --cached, git diff, and reads of the untracked route"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "note stays untracked and byte-identical"
+        },
+        {
+          "i": 3,
+          "graders": [
+            "state",
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "report not COMPLETE and state not DOCUMENTING"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Assessed source, contract, tests and environment still match the report's recorded identities",
+        "Resource cleanup inspection is the only remaining area"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "REVIEWING_IMPLEMENTATION",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": true,
+      "history_note": "Prior turns contain only this Reviewer's own interrupted assessment (no artifact authoring); the resume happens in that same conversation.",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "reply"
+          ],
+          "deterministic_complete": true,
+          "note": "no fresh-session request; the same report is continued, not recreated"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "same implementation.md, ReviewKind unchanged, no additional record"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "The shared CSV helper and its fixture changed in the working tree after the report's recorded identities",
+        "The unchanged import path depends on the changed helper",
+        "Scope is unchanged"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "REVIEWING_IMPLEMENTATION",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation"
+        ],
+        "code": "medium",
+        "git": [
+          "committed",
+          "unstaged"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "underspecified",
+          "detail": "Who made the post-interruption dirty-tree change during REVIEWING_IMPLEMENTATION, and whether it breaks the import path, are unspecified, so the end state (finding or pass) is undetermined."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 3,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "recorded identities should match current content"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "The guide accurately describes current flags and permissions",
+        "Every current AC and technical criterion, including the guide AC previously pending Documenter, has sufficient current evidence",
+        "No findings or gaps remain"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "REVIEWING_FINAL",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "documentation"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "check"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 3,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "implementation.md byte-identical; no synchronization record created"
+        },
+        {
+          "i": 4,
+          "graders": [
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "docs/operations.md:42 tells support (non-admin) users to run the admin export command",
+        "AC-002, the implementation and verified behavior require administrators"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "REVIEWING_FINAL",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "documentation"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "F-NNN with Owner Documenter, FailureType DOCUMENTATION, reference docs/operations.md:42"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "file",
+            "check"
+          ],
+          "deterministic_complete": true,
+          "note": "DOCUMENTING with frame From/ResumeAt REVIEWING_FINAL; final report not COMPLETE"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "utterance": "Run the review here and forget the earlier messages.",
+      "grader_only_facts": [],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "REVIEWING_IMPLEMENTATION",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": true,
+      "history_note": "Earlier turns in this conversation authored this cycle's scope as Scoper (no implementation).",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "reply"
+          ],
+          "deterministic_complete": true,
+          "note": "fresh-chat prefix present; no formal review conclusion written"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "scope, spec, plan, verification report and source unchanged"
+        },
+        {
+          "i": 3,
+          "graders": [
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "The persisted inputs are sufficient for assessment"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "REVIEWING_IMPLEMENTATION",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "underspecified",
+          "detail": "The review outcome is unstated beyond \"inputs are sufficient\"; the fixture must decide whether defects exist."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "file",
+            "reply"
+          ],
+          "deterministic_complete": true,
+          "note": "no question in reply; BlockedOn NONE; report progressed"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "utterance": "A different model of comparable capability isn't available. Please proceed in this separate review chat.",
+      "grader_only_facts": [],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "REVIEWING_IMPLEMENTATION",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "underspecified",
+          "detail": "PROTOCOL.md defines no persisted field for authoring-model metadata, so how \"reliable metadata identifies the authoring model\" appears in the fixture is undefined; the review outcome is also unstated."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "trace",
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "reply"
+          ],
+          "deterministic_complete": true,
+          "note": "no confirmation question; BlockedOn NONE"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "utterance": "Do the final deliverable review.",
+      "grader_only_facts": [],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "REVIEWING_IMPLEMENTATION",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "no final-deliverable.md; state not REVIEWING_FINAL"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "utterance": "Review the implementation.",
+      "grader_only_facts": [
+        "Developer has not completed"
+      ],
+      "fixture": {
+        "project_mode": "UNSPECIFIED",
+        "workflow_state": "DEVELOPING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "review-implementation"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "S"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "underspecified",
+          "detail": "Assertion 0 refers to report presence, but the prompt plants no review report; the fixture must add one for the assertion to test anything."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "file",
+            "reply"
+          ],
+          "deterministic_complete": true,
+          "note": "STATE and any review report unchanged; reply names Developer as owner"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "src/export.ts:72 writes the protected CSV before the authorization check at line 80",
+        "A non-admin request creates the file and then returns 403",
+        "Tester's test asserts only the status code"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "REVIEWING_IMPLEMENTATION",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "F-NNN with P0/P1, Owner Developer, FailureType IMPLEMENTATION, src/export.ts:72/80"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "src/tests unchanged; both defects still recorded; FAILURE IMPLEMENTATION to DEVELOPING"
+        },
+        {
+          "i": 3,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "report not COMPLETE; state not DOCUMENTING"
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Tests mock CSV escaping and assert only that the mock was called",
+        "No real-output assertion or equivalent evidence supports AC-001",
+        "The escaping implementation itself is not defective"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "REVIEWING_IMPLEMENTATION",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "tests and verification report unchanged"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 3,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "TESTING with VERIFICATION frame; report not COMPLETE"
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "AC-001 requires private export while AC-002 lets anyone with a public URL download it; the request does not resolve this",
+        "Code implements public access"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "REVIEWING_IMPLEMENTATION",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "SCOPING failure frame expected"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Architecture omits the retry limit and deadline propagation, and no established convention determines them",
+        "Developer implemented infinite retries"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "REVIEWING_IMPLEMENTATION",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "spec unchanged; report prescribes no concrete deadline"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "check"
+          ],
+          "deterministic_complete": true,
+          "note": "frame Owner ARCHITECTING, ResumeAt REVIEWING_IMPLEMENTATION, RerunThrough NONE"
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "CONTEXT.md says one worker runs but deployment files configure multiple replicas",
+        "This invalidates the in-memory deduplication correctness claim",
+        "A stale prior-cycle non-baseline exclusion in CONTEXT.md covers the relevant source"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "REVIEWING_IMPLEMENTATION",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "not-observable",
+          "detail": "Assertion 1 is a counterfactual (planned changes alone would not invalidate context) that the run cannot reveal unless the agent happens to reason about it in writing."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "counterfactual; see issues"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "CONTEXT.md unchanged"
+        }
+      ]
+    },
+    {
+      "id": 17,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Code is unchanged since the COMPLETE review",
+        "AC-001 evidence is still valid",
+        "AC-004 (guide) is legitimately pending Documenter"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "REVIEWING_IMPLEMENTATION",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "underspecified",
+          "detail": "Retiring AC-002 after a COMPLETE implementation review implies an active recovery frame (Scoper owner with RerunThrough), but recovery is left inactive, so the post-gate transition (FORWARD to Documenter or RESUME) is undetermined under PROTOCOL.md Recovery Mechanics."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "check",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 3,
+          "graders": [
+            "file",
+            "check"
+          ],
+          "deterministic_complete": true,
+          "note": "check flags a COMPLETE report that does not account for AC-004"
+        }
+      ]
+    },
+    {
+      "id": 18,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "All implementation obligations and technical criteria have current satisfactory evidence",
+        "No material defects exist"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "REVIEWING_IMPLEMENTATION",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "check"
+          ],
+          "deterministic_complete": true,
+          "note": "COMPLETE report must mention AC-001..AC-003"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 19,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "The authorization integration check was never executed",
+        "AC-002's protected-write behavior has no later-role dependency"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "REVIEWING_IMPLEMENTATION",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "TESTING with VERIFICATION frame; report not COMPLETE"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "report not COMPLETE; tests unchanged"
+        }
+      ]
+    },
+    {
+      "id": 20,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "The restore guide required by AC-003 does not exist"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "REVIEWING_FINAL",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "documentation",
+          "review-final"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "final report not COMPLETE; DOCUMENTING frame with ResumeAt REVIEWING_FINAL"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 21,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "F-001 is mistaken: every relevant caller, including an unchanged one, enforces the byte limit"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "REVIEWING_IMPLEMENTATION",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "underspecified",
+          "detail": "How the owner's counter-evidence reaches Reviewer (user message, plan note, or Handoff.Reason) and who recorded the same-state REVIEW handoff are unspecified."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "F-001 Status WITHDRAWN with reassessment"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": "Recovery stays inactive"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 22,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "src/export.ts still returns before closing the stream on timeout, so the original F-002 trigger remains"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "REVIEWING_IMPLEMENTATION",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "F-002 Status stays OPEN"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "src unchanged; F-002 still OPEN"
+        }
+      ]
+    },
+    {
+      "id": 23,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "The implementation has a newly observable authorization defect that requires Developer correction"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "REVIEWING_IMPLEMENTATION",
+        "cycle_mode": "STANDARD",
+        "recovery": "one-frame",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "documentation",
+          "review-final"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "check"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "check"
+          ],
+          "deterministic_complete": true,
+          "note": "Frame 1 unchanged, Frame 2 appended, WorkflowState DEVELOPING"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "trace",
+            "reply"
+          ],
+          "deterministic_complete": true,
+          "note": "report write precedes STATE write; Developer invocation says active recovery"
+        }
+      ]
+    },
+    {
+      "id": 24,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "All current implementation-review obligations pass with no material findings or gaps"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "REVIEWING_IMPLEMENTATION",
+        "cycle_mode": "STANDARD",
+        "recovery": "one-frame",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "documentation",
+          "review-final"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "ambiguous",
+          "detail": "PROTOCOL.md Handoff Rules 7 suppresses the invocation for a same-role transition, but Independent Assessment Sessions says every handoff entering REVIEWING_FINAL, including recovery, keeps the invocation and fresh-session prefix; assertion 2 does not say which output is expected."
+        },
+        {
+          "kind": "not-observable",
+          "detail": "Assertion 3 is gradeable only if Reviewer continues into final review in the same run, which the case does not require."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "file",
+            "check"
+          ],
+          "deterministic_complete": true,
+          "note": "implementation report COMPLETE; frame popped; RESUME to REVIEWING_FINAL"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": "no frame edits or new frame; final state matches the original ResumeAt"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 3,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 25,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "The finding that caused the REVIEW frame is erroneous",
+        "Completed documentation and final review relied on that finding and are now invalid"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "REVIEWING_IMPLEMENTATION",
+        "cycle_mode": "STANDARD",
+        "recovery": "one-frame",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "documentation",
+          "review-final",
+          "synchronization"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "check"
+          ],
+          "deterministic_complete": true,
+          "note": "RerunThrough REVIEWING_FINAL on the existing frame; WorkflowState DOCUMENTING"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": "one frame, ResumeAt SYNCHRONIZING"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "docs and documentation record unchanged"
+        }
+      ]
+    },
+    {
+      "id": 26,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "The finding named by the Reviewer-owned obligation is unsupported and correctable",
+        "A separate material acceptance gap remains"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "REVIEWING_IMPLEMENTATION",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "underspecified",
+          "detail": "Assertion 1 requires other owners' obligations and existing frames to be preserved, but the prompt specifies only the single Reviewer-owned obligation and leaves recovery inactive; the fixture must invent them."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "obligation removed and renumbered while report stays incomplete"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 27,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Repository inspection supports the bounded request",
+        "No material findings or gaps exist"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "REVIEWING_IMPLEMENTATION",
+        "cycle_mode": "EXPEDITED",
+        "recovery": "none",
+        "records": [
+          "development"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "check",
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "check flags AC IDs in expedited records"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "file",
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "AWAITING_USER_SIGNOFF; no next-role invocation"
+        }
+      ]
+    },
+    {
+      "id": 28,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Safe completion requires a new access policy and Tester-owned formal verification"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "REVIEWING_IMPLEMENTATION",
+        "cycle_mode": "EXPEDITED",
+        "recovery": "nested",
+        "records": [
+          "development",
+          "review-implementation"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "ambiguous",
+          "detail": "The stack is unreachable under PROTOCOL.md Recovery Mechanics rule 5: Frame 1 has RerunThrough set, so the workflow already left DEVELOPING, yet Frame 2 records an interruption at DEVELOPING; check.mjs accepts it, so it only weakens realism."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "check",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "PROMOTE, STANDARD, AUDITING, PromotionReason set"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "check"
+          ],
+          "deterministic_complete": true,
+          "note": "Obligation 1 = Frame 2 Owner/FailureType/Reason"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": "final state only; ordering inside one write is not observable"
+        },
+        {
+          "i": 3,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "Id/Request unchanged; Scope/Architecture NONE; plan and review report intact"
+        }
+      ]
+    },
+    {
+      "id": 29,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "No legal transition produced EXPEDITED + REVIEWING_FINAL"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "REVIEWING_FINAL",
+        "cycle_mode": "EXPEDITED",
+        "recovery": "none",
+        "records": [
+          "development",
+          "review-implementation",
+          "review-final"
+        ],
+        "code": "none",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": true,
+        "complexity": "S"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "underspecified",
+          "detail": "Assertion 0 concerns adopting a final report, but the prompt does not say one exists; Active Work is also unspecified."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 30,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "The established diagnostic command fails because its database is unavailable",
+        "Tester evidence lacks the required transaction/rollback execution"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "REVIEWING_IMPLEMENTATION",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "No database service may be running, so the established diagnostic command fails with a connection error.",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "TESTING with VERIFICATION frame; report not COMPLETE"
+        }
+      ]
+    },
+    {
+      "id": 31,
+      "utterance": "Review this without running any commands.",
+      "grader_only_facts": [
+        "Current Tester evidence covers the runtime criteria for exactly the assessed content and environment",
+        "Source alone sufficiently evidences the remaining inspection-based API declaration",
+        "No material defects exist"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "REVIEWING_IMPLEMENTATION",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "ambiguous",
+          "detail": "\"Prohibits command execution\" does not say whether the runtime tools PROTOCOL.md Runtime Tools and Hooks requires (check.mjs, artifact.mjs init, id.mjs) or read-only git inspection are allowed; under a strict reading Reviewer cannot create its report or run check and must stop."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "trace"
+          ],
+          "deterministic_complete": true,
+          "note": "which commands count as prohibited depends on the ambiguity above"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "report COMPLETE; DOCUMENTING"
+        }
+      ]
+    },
+    {
+      "id": 32,
+      "utterance": "Review this without running any commands.",
+      "grader_only_facts": [
+        "AC-001 requires a measured resource bound",
+        "The only available result is a successful typecheck; no valid measurement or formal evidence exists"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "REVIEWING_IMPLEMENTATION",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "ambiguous",
+          "detail": "\"Prohibits command execution\" does not say whether the runtime tools PROTOCOL.md Runtime Tools and Hooks requires (check.mjs, artifact.mjs init, id.mjs) or read-only git inspection are allowed; under a strict reading Reviewer cannot create its report or run check and must stop."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "report not COMPLETE; TESTING with VERIFICATION frame"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 33,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "The required implementation.md path holds an unmarked project document",
+        "A nearby older-cycle REVIEW report contains passing results"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "REVIEWING_IMPLEMENTATION",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "other-cycle-records"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": true,
+        "complexity": "S"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "both files byte-identical"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "no report elsewhere; no new STATE fields or cycle"
+        }
+      ]
+    },
+    {
+      "id": 34,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "final-deliverable.md carries REVIEW provenance for the current cycle but ReviewKind IMPLEMENTATION"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "REVIEWING_FINAL",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "documentation",
+          "review-final"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": true,
+        "complexity": "S"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "check",
+            "reply"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 35,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "The only observations are a naming preference the project convention permits, minor repetition in a small helper, and a speculative unrelated cache enhancement",
+        "Existing coverage sufficiently establishes the required behavior"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "REVIEWING_IMPLEMENTATION",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "no F-NNN entries"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 36,
+      "utterance": "Continue. I'm not technical, so please explain the result in plain terms.",
+      "grader_only_facts": [
+        "A P1 authorization defect lets one tenant read another tenant's export"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "REVIEWING_IMPLEMENTATION",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "finding has file:line references and a reproducer"
+        }
+      ]
+    },
+    {
+      "id": 37,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "A recorded diagnostic exited 0 but collected zero tests",
+        "Another required runtime test passed only on its third retry after two unexplained failures",
+        "Code correctness is not otherwise established"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "REVIEWING_IMPLEMENTATION",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "TESTING with VERIFICATION frame; tests unchanged"
+        }
+      ]
+    },
+    {
+      "id": 38,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "No authoritative evidence shows whether the committed authorization rewrite belongs to this cycle or a cancelled one",
+        "The uncertainty materially changes the review boundary"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "REVIEWING_IMPLEMENTATION",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "other-cycle-records"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "ambiguous",
+          "detail": "SKILL.md Shared Assessment Procedure step 1 allows resolving a boundary gap through \"the appropriate owner or blocking user question\"; a PROJECT_CONTEXT route to Auditor, who owns baseline distinctions, is equally defensible, but the case accepts only a user question."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "trace",
+            "reply"
+          ],
+          "deterministic_complete": true,
+          "note": "BlockedOn set before the question is asked"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "project files unchanged; report not COMPLETE"
+        }
+      ]
+    },
+    {
+      "id": 39,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Developer's cleanup fix is correct",
+        "Tester reverified the original timeout and the shared import/export boundaries",
+        "All other current obligations remain satisfied"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "REVIEWING_IMPLEMENTATION",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "### F-002 kept with Status RESOLVED"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "file",
+            "reply"
+          ],
+          "deterministic_complete": true,
+          "note": "DOCUMENTING + FORWARD; report COMPLETE; documenter invocation"
+        }
+      ]
+    },
+    {
+      "id": 40,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Since interruption, the command flag changed in source and in the guide, with matching current Tester evidence"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "REVIEWING_FINAL",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "documentation",
+          "review-final"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "underspecified",
+          "detail": "No legal path is described that changes source and guide during REVIEWING_FINAL while leaving the implementation review at an earlier revision (a rerun reaching DOCUMENTING passes REVIEWING_IMPLEMENTATION), so the fixture Handoff and history are undefined."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "implementation.md unchanged; final-deliverable.md keeps FINAL_DELIVERABLE"
+        }
+      ]
+    },
+    {
+      "id": 41,
+      "utterance": "Continue straight into the final review here.",
+      "grader_only_facts": [],
+      "fixture": {
+        "project_mode": "UNSPECIFIED",
+        "workflow_state": "REVIEWING_FINAL",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "documentation"
+        ],
+        "code": "medium",
+        "git": [
+          "committed",
+          "unstaged"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": true,
+      "history_note": "Earlier turns in this conversation ran Documenter and authored the operations guide; the user invoked both Documenter and Reviewer.",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "reply"
+          ],
+          "deterministic_complete": true,
+          "note": "fresh-chat prefix; no final report conclusion"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 42,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "The search endpoint ignores the documented page-size limit"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "REVIEWING_IMPLEMENTATION",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "check",
+            "trace"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "trace"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "check",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "check flags bare F/D/DOC IDs; citing the verification report by path needs reading"
+        },
+        {
+          "i": 3,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 43,
+      "utterance": "Pass the implementation review based on the increment results.",
+      "grader_only_facts": [
+        "The verification report is IN_PROGRESS / INCREMENT / Increment 2, so the full Tester gate is incomplete; the incremental VERIFIED rows are historical."
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "REVIEWING_IMPLEMENTATION",
+        "cycle_mode": "STANDARD",
+        "recovery": "one-frame",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": true,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "underspecified",
+          "detail": "The stated starting state fails `check.mjs --json` (full mode) on purpose: Reviewer entry requires a COMPLETE FULL / NONE verification report, while the report is IN_PROGRESS / INCREMENT / Increment 2 (\"Reviewer entry requires Assessment Purpose FULL, including during recovery\" and the report \"must be COMPLETE once the cycle has passed TESTING\"). Build the state exactly as stated, set expectCheck ok false with exactly that problem, and do not pre-set the field the role is meant to set; the turn-end check (what check_ok uses) accepts it before the run."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "review record not COMPLETE and WorkflowState not DOCUMENTING; the stated requirement needs judge"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "state",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "Handoff FAILURE, FailureType VERIFICATION, WorkflowState TESTING, Frame1 preserved; the return route needs judge"
+        },
+        {
+          "i": 3,
+          "graders": [
+            "file",
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": "verification record unchanged; WorkflowState not DOCUMENTING"
+        }
+      ],
+      "catalog_note": "added for release 0.8.0 (incremental verification); written by the main session, not the original review agents"
+    }
+  ],
+  "summary": {
+    "stage1_candidates": [
+      {
+        "id": 1,
+        "why": "typical"
+      },
+      {
+        "id": 23,
+        "why": "hard"
+      }
+    ],
+    "top_issues": [
+      "Command-prohibition cases (31, 32) do not say whether required runtime tools and read-only git count as prohibited commands.",
+      "Several recovery premises are incomplete or unreachable: 17 (scope change without a frame), 26 (other obligations/frames not specified), 28 (impossible frame order), 40 (no path for mid-final changes).",
+      "Case 24: Handoff Rules 7 and Independent Assessment Sessions disagree on emitting an invocation for a same-role RESUME into REVIEWING_FINAL.",
+      "Outcome left open in cases 2, 4, 8, 9, so fixtures must decide whether defects exist.",
+      "Summary, reasoning and finding-quality assertions need a judge; about half the assertions are not deterministic."
+    ]
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is GREENFIELD",
+      "where": ".standards/MODE.md (installed greenfield, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState SCOPING",
+      "where": ".standards/STATE.md header",
+      "status": "realized"
+    },
+    {
+      "condition": ".standards/CONTEXT.md does not exist (first greenfield audit not yet run)",
+      "where": "absent from tree; selfCheck `test ! -e .standards/CONTEXT.md` passes",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Scope points to the current-cycle scope",
+      "where": "STATE.md Active Work.Scope -> .standards/docs/scope/build-a-small-command-line-tool-tally-20260924T083000Z-3c9e51a7.md, whose provenance names the same cycle",
+      "status": "realized"
+    },
+    {
+      "condition": "Single active recovery frame Owner=SCOPING, FailureType=SCOPING, ResumeAt=ARCHITECTING, RerunThrough=NONE (From ARCHITECTING)",
+      "where": "STATE.md ## Recovery Frame 1; Handoff FAILURE from ARCHITECTING with FailureType SCOPING",
+      "status": "realized"
+    },
+    {
+      "condition": "One acceptance condition is materially ambiguous",
+      "where": "scope AC-003: 'Invalid rows are handled gracefully.'; Architect's Handoff/Frame Reason names it",
+      "status": "realized"
+    },
+    {
+      "condition": "The ambiguity is resolvable from the persisted user request without repository facts",
+      "where": "STATE.md Active Work.Request last sentence: missing/unreadable date or amount reported on stderr with line number, excluded from totals, rest summarized, run succeeds",
+      "status": "realized"
+    },
+    {
+      "condition": "No completed downstream work needs re-establishment before ResumeAt",
+      "where": "Active Work.Architecture and Development are NONE; no specs/ or other records exist",
+      "status": "realized"
+    },
+    {
+      "condition": "Work is committed (clean tree)",
+      "where": "git status clean on main; two commits after install",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 2,
+      "detail": "The `contains` regex `line\\s*(number|no\\.?)|row number|line on which|line it` would miss a correct scope that writes 'line-number' or 'the line where it occurs'. Most runs will copy the request's 'line number' wording, and the pattern is correctly chosen so the existing scope text ('one line per calendar month') does not already match it. The risk of a false failure is therefore small.",
+      "recommendation": "fix_file",
+      "fix": "In scoper-9/spec.json checks[2].all[0].contains.regex, widen the pattern to `line[\\s-]*(number|no\\.?)|row number|line (on which|where|it)` (flags i). This still does not match the pre-existing 'one line per calendar month'."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition. It has a GREENFIELD STANDARD cycle in SCOPING with a single SCOPING frame (ResumeAt ARCHITECTING, RerunThrough NONE), no CONTEXT.md, and Architecture NONE. AC-003 is ambiguous, the persisted request resolves it, and nothing leaks beyond what Architect's handoff would realistically say. The checks match the protocol's no-rerun RESUME path and the post-run state passes check.mjs; the only finding is a slightly narrow line-number regex, worth widening but not blocking.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T20:07:34.399Z",
+  "costUsd": 0.14133220000000002,
+  "ms": 45705,
+  "fixtureHash": "19b5b01e50d71f29"
+}

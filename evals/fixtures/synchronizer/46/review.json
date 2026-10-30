@@ -1,0 +1,94 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState SYNCHRONIZING",
+      "where": ".standards/STATE.md header",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Synchronization record exists with valid current-cycle provenance",
+      "where": ".standards/docs/synchronization/export-20260924T090000Z-a7f3c1d2.md (SYNCHRONIZATION block, IN_PROGRESS)",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery active; active frame Owner SYNCHRONIZING, ResumeAt REVIEWING_FINAL, RerunThrough NONE",
+      "where": ".standards/STATE.md Frame 2 (Frame 1 is the earlier REVIEW frame needed to reach this state legally)",
+      "status": "realized"
+    },
+    {
+      "condition": "Outstanding obligations inactive, no blocked user question",
+      "where": ".standards/STATE.md (`Active`: `false`, `BlockedOn`: `NONE`)",
+      "status": "realized"
+    },
+    {
+      "condition": "Reviewer awaits correction of an unsupported evidence identity",
+      "where": "final-deliverable.md Status BLOCKED, check C6 and the gap naming sync record #D-001 and hash 5b8e0f3a…; Handoff FAILURE From REVIEWING_FINAL, FailureType SYNCHRONIZATION",
+      "status": "realized"
+    },
+    {
+      "condition": "Synchronizer cannot establish the correct identity from available artifacts",
+      "where": "Sync record cites only a hash and a diff stat for the unstaged edit; the blob is in no object, commit, stash, index entry, or working-tree file (selfCheck 4 passes); clean tree",
+      "status": "realized"
+    },
+    {
+      "condition": "User asserts the record was probably right (no evidence)",
+      "where": "prompt.utterance",
+      "status": "realized"
+    },
+    {
+      "condition": "Full set of cycle records (scope, design, context, plan, verification, both reviews, documentation) present and coherent",
+      "where": ".standards/CONTEXT.md and .standards/docs/**; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "Small committed code with passing tests",
+      "where": "src/**, test/**; selfCheck 2 passes",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "The catalog says one-frame recovery, but the fixture uses two frames. The case's frame facts all hold for the active frame (Frame 2), and the generator correctly notes that a single frame from REVIEWING_FINAL cannot legally coexist with an existing sync record. Checks use Recovery.Top and FrameCount 2, which is consistent.",
+      "recommendation": "run_as_is",
+      "fix": "None; the two-frame choice is the only legal realization."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "A model could argue that the clean tree, with HEAD's docs/usage.md equal to the assessed blob, is enough to withdraw D-001 and resume. The skill's rule that 'a materially ambiguous active boundary goes to a blocking user question', the vanished edit, and the user's 'probably right' (implying the edit was real) make blocking the better reading. Both assertions are complete:false, so the judge weighs this.",
+      "recommendation": "run_as_is",
+      "fix": "None needed; the judge handles the nuance."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "Every commit's author is 'Fixture <fixture@example.invalid>' (harness-wide git config). This is a weak signal that the repo is synthetic, but it does not hint at the answer.",
+      "recommendation": "run_as_is",
+      "fix": "Harness-level; no fixture change."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized. The active SYNCHRONIZING-owned frame resumes at REVIEWING_FINAL, the BLOCKED final review asks for correction of D-001's evidence identity, and that identity is provably unrecoverable from the repository; check.mjs and all selfChecks pass. The checks (no RESUME, frames preserved, sync record updated but not COMPLETE, BlockedOn set) are necessary conditions for a correct blocked outcome, and the invariants fit a Synchronizer run.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T14:42:38.461Z",
+  "costUsd": 0.36051279999999997,
+  "ms": 60981,
+  "fixtureHash": "5a79684c137bb549"
+}

@@ -1,0 +1,89 @@
+{
+  "conditions": [
+    {
+      "condition": "Brownfield project with meaningful existing implementation",
+      "where": ".standards/MODE.md (BROWNFIELD); pre-install commit 'Initial account API' with src/ and test/",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode EXPEDITED, WorkflowState DEVELOPING",
+      "where": ".standards/STATE.md header",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery active with exactly one frame: Owner DEVELOPING, FailureType IMPLEMENTATION, Reason 'an error response leaks an internal exception', ResumeAt REVIEWING_IMPLEMENTATION, RerunThrough NONE",
+      "where": ".standards/STATE.md ## Recovery, Frame 1 (From REVIEWING_IMPLEMENTATION)",
+      "status": "realized"
+    },
+    {
+      "condition": "Handoff reflects the implementation-review failure that pushed the frame",
+      "where": ".standards/STATE.md Handoff: FAILURE from REVIEWING_IMPLEMENTATION, IMPLEMENTATION",
+      "status": "realized"
+    },
+    {
+      "condition": "An error response actually leaks an internal exception",
+      "where": "src/handlers.js catch returns error.message; selfChecks show JSON parser and 'no signing key for kid k9' messages in 401 bodies",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation review recorded the leak as an open Developer-owned finding",
+      "where": ".standards/docs/reviews/<id>/implementation.md F-001 OPEN, Status BLOCKED",
+      "status": "realized"
+    },
+    {
+      "condition": "Outstanding Obligations initially inactive and PromotionReason NONE",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Expedited cycle has a Developer plan and no scope/architecture/context records",
+      "where": ".standards/docs/development/<id>.md (EXPEDITED_REQUEST mappings); Scope/Architecture NONE; no CONTEXT.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Safe correction needs an Architect-owned authentication-error contract",
+      "where": "user utterance (catalog-directed); plausible given the request requires distinguishing expiry while hiding other failures",
+      "status": "realized"
+    },
+    {
+      "condition": "Clean git tree, check.mjs ok",
+      "where": "git status clean; gate checkMjs ok:true",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 0,
+      "detail": "Assertions 0 and 1 require Obligations.Item1.Reason to equal the frame Reason verbatim. The protocol says to preserve the converted frame's Reason, so a correct run copies it; a run that appends a finding reference would fail, but that departs from 'preserve'.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 1,
+      "detail": "Assertion 1's 'before clearing Recovery' ordering is not observable from final state; complete:true decides it from end state only. A single STATE.md edit that does both is the normal correct path, so this is acceptable.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 6,
+      "detail": "`unchanged: src/**` assumes a correct Developer promotes without coding a partial fix. The user states the fix needs an Architect contract and the skill says not to keep coding around an upstream need, so this is a sound necessary condition.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes the expedited DEVELOPING state with a single RerunThrough=NONE IMPLEMENTATION frame, a real leaking error response confirmed by selfChecks, and a coherent BLOCKED review with finding F-001. Checks match fixed state values that a correct promotion must produce, and the obligation-section regex is anchored correctly. A traced post-promotion STATE passes check.mjs, so nothing blocks the run.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T02:16:32.100Z",
+  "costUsd": 0.2083306,
+  "ms": 48383,
+  "fixtureHash": "3948b000d9c46db1"
+}

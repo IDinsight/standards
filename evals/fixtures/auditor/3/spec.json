@@ -1,0 +1,244 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial monorepo"
+    },
+    {
+      "dir": "layers/60-due-dates",
+      "action": "commit",
+      "message": "Add invoice due dates"
+    },
+    {
+      "action": "delete",
+      "paths": [
+        "scripts/build.mjs",
+        "packages/shared/package.json",
+        "packages/shared/src/index.js",
+        "packages/shared/test/money.test.js"
+      ],
+      "stage": true
+    },
+    {
+      "dir": "layers/71-pnpm",
+      "action": "commit",
+      "message": "Move to pnpm workspaces on Node 22 and rename shared to money",
+      "pnpmInstall": true
+    },
+    {
+      "dir": "layers/80-cycle",
+      "action": "commit",
+      "message": "Start plan-change proration cycle"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "auditor",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    ".standards/CONTEXT.md was written for the earlier signed-off cycle add-due-dates-to-invoices-based-on-20260311T101500Z-3c9e51a7, before the commit 'Move to pnpm workspaces on Node 22 and rename shared to money'. Its project-wide claims are now wrong: it says Node 18 (now Node 22 per .nvmrc and engines >=22); npm workspaces declared in package.json with a scripts/build.mjs build into dist/ and main dist/index.js (now pnpm workspaces declared in pnpm-workspace.yaml with workspace:* links, scripts/build.mjs deleted, workspaces export src/index.js with no build step); npm run build then npm test, which runs npm test --workspaces (now pnpm test, which runs pnpm -r test, or pnpm --filter <name> test; npm run build no longer exists); and packages/shared / @tally/shared (now packages/money / @tally/money, a dependency of both ledger and billing).",
+    "CONTEXT.md also predates the invoice due dates (dueOn, termsDays defaulting to 30) that the earlier cycle added to services/billing.",
+    "Active Work.AuditTarget services/billing was persisted by an earlier Auditor session of this cycle after the user asked to focus the audit there. CONTEXT.md looks complete and names services/billing, so subtree mode is the natural first selection; the staleness only shows on inspection (billing's package.json, imports, .nvmrc, pnpm-workspace.yaml, git log).",
+    "Expected: start in subtree for services/billing, find the project-level baseline unreliable, escalate to whole-repo and continue only under it, clear AuditTarget to NONE, rewrite CONTEXT.md from current evidence as one coherent baseline, and, with no recovery active, hand off AUDITING -> SCOPING. No scope, design, plan, or code changes.",
+    "No other defects are planted; every workspace's tests pass with pnpm test."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "prorate-charges-when-a-customer-changes-20260923T161500Z-8d41b0e2",
+    "PRIOR": "add-due-dates-to-invoices-based-on-20260311T101500Z-3c9e51a7",
+    "CONTEXT": ".standards/CONTEXT.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 3,
+      "complete": true,
+      "all": [
+        {
+          "state": "ActiveWork.AuditTarget",
+          "equals": "NONE",
+          "why": "the services/billing target no longer represents the audit focus after escalating to whole-repo"
+        }
+      ]
+    },
+    {
+      "assertion": 4,
+      "complete": false,
+      "all": [
+        {
+          "changed": [
+            ".standards/CONTEXT.md"
+          ],
+          "why": "the stale context must be rewritten"
+        },
+        {
+          "contains": {
+            "path": "${CONTEXT}",
+            "regex": "pnpm"
+          },
+          "why": "the corrected build system and commands are pnpm"
+        },
+        {
+          "contains": {
+            "path": "${CONTEXT}",
+            "regex": "(^|[^0-9.])22([^0-9]|$)"
+          },
+          "why": "the corrected Node version is 22"
+        },
+        {
+          "contains": {
+            "path": "${CONTEXT}",
+            "regex": "packages/money|@tally/money"
+          },
+          "why": "the corrected workspace list names the money package"
+        }
+      ]
+    },
+    {
+      "assertion": 5,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "services/**",
+            "packages/**",
+            "package.json",
+            "pnpm-workspace.yaml",
+            "pnpm-lock.yaml",
+            "README.md",
+            ".nvmrc",
+            "AGENTS.md",
+            "CLAUDE.md"
+          ],
+          "why": "Auditor does not change project code, configuration, or documentation"
+        },
+        {
+          "state": "ActiveWork.Scope",
+          "equals": "NONE"
+        },
+        {
+          "state": "ActiveWork.Architecture",
+          "equals": "NONE"
+        },
+        {
+          "state": "ActiveWork.Development",
+          "equals": "NONE"
+        },
+        {
+          "absent": ".standards/docs/scope/${ID}.md"
+        },
+        {
+          "absent": ".standards/docs/specs/${ID}.md"
+        },
+        {
+          "absent": ".standards/docs/development/${ID}.md"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "Auditor suggests commits but does not make them"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Auditor inspects version control without changing it"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm test",
+      "expect": "pass",
+      "why": "the current root test command (pnpm -r test) runs every workspace suite offline"
+    },
+    {
+      "cmd": "pnpm --filter @tally/billing test",
+      "expect": "pass",
+      "why": "the billing workspace tests pass on their own, including due dates"
+    },
+    {
+      "cmd": "pnpm run build",
+      "expect": "fail",
+      "expectOutput": "Missing script|NO_SCRIPT",
+      "why": "the build step the context describes no longer exists"
+    },
+    {
+      "cmd": "npm test --workspaces",
+      "expect": "fail",
+      "expectOutput": "No workspaces found|ENOWORKSPACES",
+      "why": "the test command the context describes no longer works: npm workspaces are gone"
+    },
+    {
+      "cmd": "grep -qx 22 .nvmrc && test -f pnpm-workspace.yaml && test ! -e packages/shared && test ! -e scripts/build.mjs && test -f packages/money/src/index.js",
+      "expect": "pass",
+      "why": "Node 22, pnpm workspace file, shared renamed to money, build script removed"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 50-project (pre-install): tally monorepo as it was, with npm workspaces (services/*, packages/*), Node 18 .nvmrc, scripts/build.mjs copying src to dist, workspaces using main dist/index.js, packages/shared, packages/ledger, services/billing. 60-due-dates: an earlier STANDARD cycle (PRIOR id) that added invoice due dates: its code, README section, the full set of signed-off cycle records, CONTEXT.md written at that cycle's audit (matches the old layout and predates due dates), and STATE.md SIGNED_OFF. Delete layer + 71-pnpm: later non-workflow migration to pnpm workspaces (pnpm-workspace.yaml, workspace:* deps, lockfile via pnpmInstall), Node 22, no build step, packages/shared renamed packages/money, README updated. 80-cycle: new STANDARD cycle (ID) in AUDITING, Handoff NEW_CYCLE from SIGNED_OFF, AuditTarget services/billing persisted by an earlier Auditor session, recovery and obligations inactive. CONTEXT.md therefore names services/billing and looks complete, but its language version, build system, test command, and workspace claims are stale. JS avoids template literals so no dollar-brace text appears in layer files except the COMMIT substitutions in prior-cycle records.",
+  "case": "auditor-3",
+  "caseHash": "441823e659635b08",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T21:06:30.906Z",
+    "verdict": "pass",
+    "fixtureHash": "7dca69c8c68f122e",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "7b6cec35b6bdb7b7",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:05:47.285Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T20:52:27.107Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/60-due-dates/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/80-cycle/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:05:47.285Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+# Browser variant of the runner image, for cases whose contract needs a real
+# browser (tester-25). Built on the runner image (RUNNER_IMAGE), so everything
+# else is identical; only cases whose runtime block says `"image": "browser"`
+# use it. Build: pnpm eval image build (or node image.mjs build-browser)
+ARG RUNNER_IMAGE=standards-eval:latest
+FROM ${RUNNER_IMAGE}
+ARG PLAYWRIGHT_VERSION=1.63.0
+USER root
+# Browsers go to a shared path readable by the runner. Playwright and its
+# Chromium are installed globally; /node_modules links the global modules so a
+# fixture's ESM `import('playwright')` resolves from any project directory
+# (ESM ignores NODE_PATH but walks up to /node_modules).
+ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+RUN npm install -g "playwright@${PLAYWRIGHT_VERSION}" \
+ && playwright install --with-deps chromium \
+ && npm cache clean --force \
+ && rm -rf /var/lib/apt/lists/* \
+ && ln -s /usr/local/lib/node_modules /node_modules \
+ && chmod -R a+rX /ms-playwright
+USER runner
+WORKDIR /work

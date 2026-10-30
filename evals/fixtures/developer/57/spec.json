@@ -1,0 +1,315 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial expense report tool"
+    },
+    {
+      "dir": "layers/10-plan",
+      "action": "commit",
+      "message": "Plan JSON output for the monthly report"
+    },
+    {
+      "dir": "layers/20-impl",
+      "action": "commit",
+      "message": "Add JSON output to the monthly report"
+    },
+    {
+      "dir": "layers/30-review",
+      "action": "commit",
+      "message": "Record implementation review of JSON output"
+    },
+    {
+      "dir": "layers/40-reopen",
+      "action": "commit",
+      "message": "Reopen JSON renderer step after review"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "developer",
+    "utterance": "Use incremental verification for this cycle."
+  },
+  "graderOnly": [
+    "Recovery frame 1 (From REVIEWING_IMPLEMENTATION, Owner DEVELOPING, FailureType IMPLEMENTATION, RerunThrough NONE) is the unsatisfied Developer-owned corrective obligation from expedited recovery: the committed renderJson in src/render.js still emits formatted amount strings such as 1,422.45 instead of integer cents, and DEV-002 is reopened but not yet corrected.",
+    "Outstanding Obligations is inactive before the run; the corrective work exists only as recovery frame 1.",
+    "No scope, technical design, verification report, or .standards/CONTEXT.md exists for this cycle, and no AC identifiers exist anywhere in the repository.",
+    "The approved plan is STEPWISE with User Style NONE and User Style Locked true, cadence AFTER_IMPLEMENTATION with Current Increment NONE, every step mapped to EXPEDITED_REQUEST; DEV-001 and DEV-003 are DONE and DEV-002 is PENDING."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "add-a-format-json-option-to-the-monthly-20260921T141500Z-6c1e9a04",
+    "PLAN": ".standards/docs/development/add-a-format-json-option-to-the-monthly-20260921T141500Z-6c1e9a04.md",
+    "SCOPE_RECORD": ".standards/docs/scope/add-a-format-json-option-to-the-monthly-20260921T141500Z-6c1e9a04.md",
+    "SPEC_RECORD": ".standards/docs/specs/add-a-format-json-option-to-the-monthly-20260921T141500Z-6c1e9a04.md",
+    "VERIFICATION_RECORD": ".standards/docs/verification/add-a-format-json-option-to-the-monthly-20260921T141500Z-6c1e9a04.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "state": "CycleMode",
+          "equals": "STANDARD",
+          "why": "promotion sets STANDARD"
+        },
+        {
+          "state": "ActiveWork.PromotionReason",
+          "not": "NONE",
+          "why": "promotion persists its reason"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "PROMOTE",
+          "why": "promotion is recorded as PROMOTE, not FAILURE or USER_REWORK"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "state": "ActiveWork.PendingVerificationCadence",
+          "equals": "INCREMENTAL",
+          "why": "the request stays pending through promotion"
+        },
+        {
+          "state": "Handoff.Kind",
+          "not": "CHECKPOINT",
+          "why": "no checkpoint inside EXPEDITED"
+        },
+        {
+          "field": {
+            "path": "${PLAN}",
+            "name": "Verification Cadence",
+            "equals": "AFTER_IMPLEMENTATION"
+          },
+          "why": "effective cadence is not switched during promotion"
+        },
+        {
+          "field": {
+            "path": "${PLAN}",
+            "name": "Current Increment",
+            "equals": "NONE"
+          },
+          "why": "no increment is scheduled before the standard contract exists"
+        },
+        {
+          "absent": "${VERIFICATION_RECORD}",
+          "why": "no Tester assessment is started"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "AUDITING",
+          "why": "promotion restarts the standard brownfield topology at AUDITING"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "DEVELOPING"
+        },
+        {
+          "state": "ActiveWork.Id",
+          "unchanged": true
+        },
+        {
+          "state": "ActiveWork.Development",
+          "unchanged": true
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "false",
+          "why": "the expedited recovery stack is cleared after conversion"
+        },
+        {
+          "state": "Obligations.Active",
+          "equals": "true"
+        },
+        {
+          "state": "Obligations.Count",
+          "equals": "1"
+        },
+        {
+          "state": "Obligations.Item1.Owner",
+          "equals": "DEVELOPING"
+        },
+        {
+          "state": "Obligations.Item1.FailureType",
+          "equals": "IMPLEMENTATION"
+        },
+        {
+          "provenance": {
+            "path": "${PLAN}",
+            "artifact": "DEVELOPMENT",
+            "cycle": "${ID}"
+          }
+        },
+        {
+          "heading_ids": {
+            "path": "${PLAN}",
+            "prefix": "DEV",
+            "min": 3
+          }
+        },
+        {
+          "field": {
+            "path": "${PLAN}",
+            "name": "Mode",
+            "equals": "STEPWISE"
+          }
+        },
+        {
+          "field": {
+            "path": "${PLAN}",
+            "name": "User Style",
+            "equals": "NONE"
+          }
+        },
+        {
+          "field": {
+            "path": "${PLAN}",
+            "name": "User Style Locked",
+            "equals": "true"
+          }
+        },
+        {
+          "unchanged": [
+            "src/**",
+            "bin/**",
+            "test/**",
+            "data/**",
+            "package.json",
+            "README.md"
+          ],
+          "why": "the correction is not made before promotion; implementation is not touched once the state is AUDITING"
+        },
+        {
+          "reply_matches": "/auditor",
+          "why": "a Claude Code next-role invocation for Auditor"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.Scope",
+          "equals": "NONE",
+          "why": "promotion does not fabricate scope"
+        },
+        {
+          "state": "ActiveWork.Architecture",
+          "equals": "NONE",
+          "why": "promotion does not fabricate architecture"
+        },
+        {
+          "absent": "${SCOPE_RECORD}"
+        },
+        {
+          "absent": "${SPEC_RECORD}"
+        },
+        {
+          "field": {
+            "path": "${PLAN}",
+            "name": "Status",
+            "not": "COMPLETE"
+          },
+          "why": "no standard-plan completion claim"
+        }
+      ]
+    },
+    {
+      "assertion": 4,
+      "na": true,
+      "na_reason": "decision 8: counterfactual, future, or optional behavior"
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/money.test.js test/records.test.js test/report.test.js",
+      "expect": "pass",
+      "why": "the existing tests pass on the committed implementation"
+    },
+    {
+      "cmd": "node bin/report.js data/sample.csv 2026-08 --format json | grep -E 'total.: .[0-9,]+[.][0-9]{2}.'",
+      "expect": "pass",
+      "why": "the JSON output still emits formatted amount strings, so the review finding (the corrective obligation) is unsatisfied"
+    },
+    {
+      "cmd": "node bin/report.js data/sample.csv 2026-08 --format xml",
+      "expect": "fail",
+      "expectOutput": "Usage: report",
+      "why": "an unknown format prints usage and exits 2, as the review records"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 00-project (pre-install): small Node ESM expense-report CLI (src/money.js, src/records.js, src/report.js, bin/report.js, three node:test files, data/sample.csv). 10-plan: first cycle started EXPEDITED at DEVELOPING (Handoff INITIAL with expedited-entry reason) with an APPROVED STEPWISE plan, User Style NONE locked true, AFTER_IMPLEMENTATION / NONE, steps mapped to EXPEDITED_REQUEST. 20-impl: implementation (summary.js, render.js with renderJson, report.js wrapper, --format option), plan COMPLETE with self-check evidence, state REVIEWING_IMPLEMENTATION after FORWARD. 30-review: implementation review report BLOCKED with OPEN F-001 (JSON amounts are formatted strings, not integer cents); state DEVELOPING with FAILURE handoff and expedited recovery frame 1 (From REVIEWING_IMPLEMENTATION, Owner DEVELOPING, IMPLEMENTATION, RerunThrough NONE). 40-reopen: Developer reconciliation in a previous session reopened DEV-002 to PENDING, plan IN_PROGRESS, Plan Notes record the next action. Per the catalog issue, the Developer-owned corrective obligation is the active expedited recovery frame, not an Outstanding Obligations entry; promotion is what converts it. No CONTEXT.md, scope, design, or verification record exists.",
+  "case": "developer-57",
+  "caseHash": "8f2d76b0dfc3a7e6",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T02:26:19.846Z",
+    "verdict": "pass",
+    "fixtureHash": "372890d77478ecd9",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "514803bf8a3463ad",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:09:10.544Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T02:13:04.605Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/10-plan/.standards/STATE.md: NONE",
+        "layers/20-impl/.standards/STATE.md: NONE",
+        "layers/30-review/.standards/STATE.md: NONE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:09:10.544Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

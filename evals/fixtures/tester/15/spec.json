@@ -1,0 +1,314 @@
+{
+  "base": "export-project",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-context",
+      "action": "commit",
+      "message": "Record project context for CSV export"
+    },
+    {
+      "dir": "layers/55-scope",
+      "action": "commit",
+      "message": "Define CSV export scope"
+    },
+    {
+      "dir": "layers/60-design",
+      "action": "commit",
+      "message": "Design CSV export"
+    },
+    {
+      "dir": "layers/65-plan",
+      "action": "commit",
+      "message": "Plan CSV export implementation"
+    },
+    {
+      "dir": "layers/70-export",
+      "action": "commit",
+      "message": "Add CSV export of filtered records"
+    },
+    {
+      "dir": "layers/75-complete",
+      "action": "commit",
+      "message": "Mark CSV export plan complete"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "tester",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "All required AC-001 checks and every technical acceptance criterion in the design pass on the committed implementation: pnpm --filter export test passes 21 tests and pnpm --filter export test:integration passes 4 tests, including refused anonymous, viewer, and editor export requests with no folder created and an invalid status rejected without a file.",
+    "No implementation, scope, design, context, or test defect exists in this fixture.",
+    "AC-002 (the operations guide) cannot be satisfied in TESTING: no operations guide exists yet, and the design assigns it to Documenter during DOCUMENTING. docs/usage.md and README.md do not describe exports."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "export-20260924T090000Z-a7f3c1d2",
+    "SCOPE": ".standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md",
+    "ARCH": ".standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md",
+    "DEV": ".standards/docs/development/export-20260924T090000Z-a7f3c1d2.md",
+    "VERIFICATION": ".standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md",
+    "CONTEXT": ".standards/CONTEXT.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${VERIFICATION}",
+          "why": "the dispositions live in the verification report"
+        },
+        {
+          "contains": {
+            "path": "${VERIFICATION}",
+            "regex": "AC-001"
+          },
+          "why": "AC-001 must be accounted for"
+        },
+        {
+          "contains": {
+            "path": "${VERIFICATION}",
+            "regex": "AC-002"
+          },
+          "why": "AC-002 must be accounted for even though it has no architectural impact"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "unchanged": [
+            "docs/**",
+            "*.md"
+          ],
+          "why": "Tester does not write the operations guide or other project documentation"
+        },
+        {
+          "unchanged": [
+            "${SCOPE}",
+            "${ARCH}"
+          ],
+          "why": "Tester does not edit scope or design records"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "field": {
+            "path": "${VERIFICATION}",
+            "name": "Status",
+            "equals": "COMPLETE"
+          }
+        },
+        {
+          "field": {
+            "path": "${VERIFICATION}",
+            "name": "Assessment Purpose",
+            "equals": "FULL"
+          }
+        },
+        {
+          "field": {
+            "path": "${VERIFICATION}",
+            "name": "Assessment Target",
+            "equals": "NONE"
+          }
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "contains": {
+            "path": "${VERIFICATION}",
+            "regex": "AC-002"
+          }
+        },
+        {
+          "contains": {
+            "path": "${VERIFICATION}",
+            "regex": "document",
+            "flags": "i"
+          },
+          "why": "the pending owner (Documenter / DOCUMENTING) must be named"
+        },
+        {
+          "state": "WorkflowState",
+          "not": "AWAITING_USER_SIGNOFF"
+        }
+      ]
+    },
+    {
+      "assertion": 4,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "REVIEWING_IMPLEMENTATION"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FORWARD"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "TESTING"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "NONE"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "false"
+        },
+        {
+          "reply_matches": "/reviewer",
+          "why": "Claude Code invocation for the next role"
+        },
+        {
+          "reply_matches": "fresh (chat|session|conversation)",
+          "flags": "i",
+          "why": "independent Reviewer session prefix"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Tester does not change git state"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "packages/**"
+      ],
+      "why": "Tester does not edit implementation"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the established unit suite passes offline"
+    },
+    {
+      "cmd": "pnpm --filter export test 2>&1 | grep -q 'pass 21'",
+      "expect": "pass",
+      "why": "the unit suite runs 21 tests: 16 pre-cycle plus five serialization tests"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration",
+      "expect": "pass",
+      "why": "the end-to-end export suite passes"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration 2>&1 | grep -qE 'pass 4$'",
+      "expect": "pass",
+      "why": "the integration suite runs four tests"
+    },
+    {
+      "cmd": "grep -q forbidden test/integration/export-flow.test.ts && grep -q 'unknown status: deleted' test/integration/export-flow.test.ts && grep -q existsSync test/integration/export-flow.test.ts",
+      "expect": "pass",
+      "why": "the integration suite covers refused requests and invalid filters without writing files"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the TESTING state and records are valid"
+    },
+    {
+      "cmd": "test ! -e docs/operations.md && ! grep -rqi csv README.md docs",
+      "expect": "pass",
+      "why": "no operations guide or export documentation exists yet"
+    },
+    {
+      "cmd": "! grep -rqE 'AC-[0-9]' src test packages docs README.md",
+      "expect": "pass",
+      "why": "code, tests, and docs cite no acceptance identifiers"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `TESTING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Id`: `export-20260924T090000Z-a7f3c1d2`$' .standards/STATE.md && grep -q '^`Kind`: `FORWARD` `From`: `DEVELOPING` `FailureType`: `NONE`' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md && grep -q '^`PendingVerificationCadence`: `NONE`$' .standards/STATE.md && grep -q 'ProjectMode`: `BROWNFIELD' .standards/MODE.md",
+      "expect": "pass",
+      "why": "STATE.md holds the stated TESTING state with recovery inactive"
+    },
+    {
+      "cmd": "test -f .standards/CONTEXT.md && grep -q '^- `AC-002`: No architectural impact' .standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md && grep -q '^- `AC-002`:' .standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md && grep -q '`Status`: `COMPLETE`$' .standards/docs/development/export-20260924T090000Z-a7f3c1d2.md && test $(grep -c '^`Status`: `DONE`' .standards/docs/development/export-20260924T090000Z-a7f3c1d2.md) -eq 3 && test ! -e .standards/docs/verification && test ! -e .standards/docs/reviews && test ! -e .standards/docs/documentation",
+      "expect": "pass",
+      "why": "context, scope with AC-002, design marking AC-002 no architectural impact, and a COMPLETE plan exist; no verification or later record exists"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && test ! -e exports && grep -qx 'exports/' .gitignore",
+      "expect": "pass",
+      "why": "the tree is clean and no export files exist"
+    }
+  ],
+  "notes": "Built on export-project (not export-testing, whose AC-002 is an authorization condition that contradicts this case). Six post-install commits follow the brownfield order for cycle export-20260924T090000Z-a7f3c1d2. 50-context: Auditor CONTEXT.md (notes no operations guide exists) and STATE at SCOPING. 55-scope: scope with AC-001 (admin CSV export of filtered records with RFC 4180 quoting; other roles or anonymous refused without a file) and AC-002 (an operations guide explaining exports exists before sign-off); STATE ARCHITECTING. 60-design: design with AC-001 coverage and three technical criteria, and AC-002 'No architectural impact' depending on Documenter during DOCUMENTING; STATE DEVELOPING. 65-plan: APPROVED AUTONOMOUS plan, AFTER_IMPLEMENTATION, three PENDING steps for AC-001, Plan Notes saying AC-002 has no implementation step. 70-export: src/export.ts, src/routes/export.ts, createApp options, exports/ in .gitignore, test:integration script, five unit tests, four integration tests (admin filtered, admin unfiltered, refused anonymous/viewer/editor with no folder, invalid status with no file). 75-complete: plan COMPLETE with self-check evidence citing the implementation commit; STATE TESTING with FORWARD from DEVELOPING. All AC-001 and technical checks pass; no defect is planted. No verification report exists, so the Tester starts in VERIFY.",
+  "case": "tester-15",
+  "caseHash": "67b918a2ad6233f2",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-01T22:29:23.366Z",
+    "verdict": "pass",
+    "fixtureHash": "c91ff8dc1e62de3d",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "2e2465980f6e8827",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:43:43.462Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-01T21:12:07.797Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-context/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/55-scope/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/60-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/65-plan/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/75-complete/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:43:43.462Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

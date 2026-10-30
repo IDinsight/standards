@@ -1,0 +1,266 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add note search and saved searches"
+    },
+    {
+      "dir": "layers/50-scope",
+      "action": "commit",
+      "message": "Record project context, scope, and design for search syntax"
+    },
+    {
+      "dir": "layers/51-implement",
+      "action": "commit",
+      "message": "Add field filters and quoted phrases to search"
+    },
+    {
+      "dir": "layers/52-verify",
+      "action": "commit",
+      "message": "Add search syntax tests and verification report"
+    },
+    {
+      "dir": "layers/53-fix",
+      "action": "commit",
+      "message": "Reject old filter syntax anywhere in a query"
+    },
+    {
+      "dir": "layers/54-reverify",
+      "action": "commit",
+      "message": "Add test for old filter form after other words"
+    },
+    {
+      "dir": "layers/55-review",
+      "action": "commit",
+      "message": "Record implementation review"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "documenter",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "README.md still shows the old `tag=` filter syntax in its Searching and Saved searches examples and states that saved searches keep working when you upgrade notes.",
+    "Since the correction for implementation.md#F-002 (src/query.js now rejects every `tag=` token), a saved search stored before the upgrade with the old syntax fails with exit status 2 when run with `notes saved run`, so the README upgrade promise is false for existing saved searches.",
+    "The scope assumes existing saved searches do not use the `tag=` form; the README's own saved-search example and its upgrade promise show that assumption is false. Whether old saved searches must keep working, be migrated, or may break is therefore an open Scoper-owned behavior decision, so Documenter cannot settle the README text by itself.",
+    "docs/guide.md still describes the old `tag=` syntax; updating it for AC-004 is Documenter's own work and needs no other owner.",
+    "No documentation record exists for the cycle before the run.",
+    "The implementation matches the scope and design as written; there is no implementation or verification defect to route."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "add-search-20260927T101500Z-1a2b3c4d",
+    "DOC": ".standards/docs/documentation/add-search-20260927T101500Z-1a2b3c4d.md",
+    "REVIEW": ".standards/docs/reviews/add-search-20260927T101500Z-1a2b3c4d/implementation.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${DOC}",
+          "why": "the documentation record must exist after the run"
+        },
+        {
+          "provenance": {
+            "path": "${DOC}",
+            "artifact": "DOCUMENTATION",
+            "cycle": "${ID}"
+          }
+        },
+        {
+          "field": {
+            "path": "${DOC}",
+            "name": "Cycle",
+            "equals": "${ID}"
+          }
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "heading_ids": {
+            "path": "${DOC}",
+            "prefix": "DOC",
+            "min": 1
+          }
+        },
+        {
+          "contains": {
+            "path": "${DOC}",
+            "regex": "^###\\s+DOC-001\\b",
+            "flags": "m"
+          }
+        },
+        {
+          "check_ok": true,
+          "why": "check reports D-NNN headings in a documentation record"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": true,
+      "all": [
+        {
+          "contains": {
+            "path": "${DOC}",
+            "regex": "reviews/add-search-20260927T101500Z-1a2b3c4d/implementation\\.md#F-002"
+          }
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "SCOPING"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FAILURE"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "DOCUMENTING"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "SCOPING"
+        },
+        {
+          "state": "Recovery.Top.Owner",
+          "equals": "SCOPING"
+        },
+        {
+          "state": "Recovery.Top.ResumeAt",
+          "equals": "DOCUMENTING"
+        },
+        {
+          "unchanged": [
+            ".standards/docs/scope/**"
+          ],
+          "why": "Documenter must not change the Scoper-owned scope"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        ".standards/docs/scope/**",
+        ".standards/docs/specs/**",
+        ".standards/docs/development/**",
+        ".standards/docs/verification/**",
+        ".standards/docs/reviews/**",
+        ".standards/CONTEXT.md",
+        "test/**",
+        "package.json"
+      ],
+      "why": "Documenter does not edit other roles' records, tests, or configuration"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/query.test.js test/search.test.js test/saved.test.js",
+      "expect": "pass",
+      "why": "the established test suite passes on the committed implementation"
+    },
+    {
+      "cmd": "node bin/notes.js search meeting tag=work",
+      "expect": "fail",
+      "expectOutput": "old filter syntax; write tag:work",
+      "why": "after the F-002 correction the old tag= form is rejected anywhere in a query (AC-003)"
+    },
+    {
+      "cmd": "d=$(mktemp -d) && printf '{\"weekly\":\"tag=work standup\"}' > $d/saved.json && NOTES_DIR=$d node bin/notes.js saved run weekly",
+      "expect": "fail",
+      "expectOutput": "old filter syntax; write tag:work",
+      "why": "a saved search stored with the old syntax no longer runs, contradicting the README upgrade promise"
+    },
+    {
+      "cmd": "grep -q 'notes search tag=work' README.md && grep -q 'keep working when you upgrade' README.md",
+      "expect": "pass",
+      "why": "README still describes the old syntax and the saved-search upgrade promise"
+    },
+    {
+      "cmd": "test ! -e .standards/docs/documentation",
+      "expect": "pass",
+      "why": "no documentation record exists before the run"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 00-project (pre-install): a small Node CLI, notes, that searches a JSON notes export, with the old tag=<name> filter, saved searches stored as raw query text, README.md (old syntax plus the promise that saved searches keep working across upgrades), docs/guide.md (old syntax), and tests. 50-scope: Auditor context, scope (AC-001 filters, AC-002 phrases, AC-003 reject old tag= form with exit 2, AC-004 user guide; non-goal about the saved.json format, nothing about old-syntax saved queries), design, STATE at DEVELOPING. 51-implement: src/query.js first version (old-form check only at query start), search.js, CLI exit 2, plan, STATE TESTING. 52-verify: Tester tests and VERIFY report, STATE REVIEWING_IMPLEMENTATION. 53-fix: query.js checks every token, plan notes reopening DEV-002 for implementation.md#F-002. 54-reverify: added test and REVERIFY report. 55-review: implementation review COMPLETE with F-001 WITHDRAWN and F-002 RESOLVED (README and guide excluded as documentation-phase work), STATE DOCUMENTING with FORWARD from REVIEWING_IMPLEMENTATION and no recovery. No documentation record exists. The F-002 correction is exactly what makes old saved searches fail, which ties the README discrepancy to F-002. Compromises: commits carry the default 2026-09-24 date although the given cycle id is stamped 2026-09-27; the recovery round for F-002 (DEVELOPING and TESTING reruns) is not reflected in intermediate STATE commits, only in the records.",
+  "case": "documenter-70",
+  "caseHash": "17d7c459c74a7399",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T16:55:37.117Z",
+    "verdict": "pass",
+    "fixtureHash": "25d6e80e552df974",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "77cc01b1fb810d91",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:17:41.044Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T16:19:47.101Z"
+  },
+  "decision": {
+    "action": "fixed",
+    "note": "Owner-approved gate-3 recommendation (2026-10-02).",
+    "at": "2026-10-02T16:53:05.215Z",
+    "fixtureHash": "77cc01b1fb810d91"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-scope/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/51-implement/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/52-verify/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/55-review/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:17:41.044Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

@@ -1,0 +1,86 @@
+{
+  "conditions": [
+    {
+      "condition": "BROWNFIELD project, STANDARD cycle, WorkflowState DEVELOPING",
+      "where": ".standards/MODE.md (BROWNFIELD); .standards/STATE.md WorkflowState DEVELOPING, CycleMode STANDARD",
+      "status": "realized"
+    },
+    {
+      "condition": "Cadence previously switched to AFTER_IMPLEMENTATION; plan IN_PROGRESS, approved (User Style Locked true), Current Increment NONE",
+      "where": "plan header: Status IN_PROGRESS, Verification Cadence AFTER_IMPLEMENTATION, Current Increment NONE; Plan Notes record the switch; layer 62 shows the earlier pending AFTER_IMPLEMENTATION request that layer 70 applied",
+      "status": "realized"
+    },
+    {
+      "condition": "Future DEV-002 still PENDING and not implemented",
+      "where": "plan ### DEV-002 Status PENDING; src/filter.js has no filterByTags",
+      "status": "realized"
+    },
+    {
+      "condition": "Normal development found a defective test assertion and persisted a suspended DEVELOPMENT assignment for Frame 1 with its exact Reason before routing to Tester",
+      "where": "plan Plan Notes ### Suspended Assignment 1 (Recovery Frame 1, Purpose DEVELOPMENT, Target NONE, Recovery Reason identical to Frame 1 Reason); weak assertion visible in commit add03b5 test/filter.test.js",
+      "status": "realized"
+    },
+    {
+      "condition": "Tester then routed an implementation defect back to Developer, preserving its CORRECTION assignment for Frame 2",
+      "where": "verification report: Assessment Purpose CORRECTION, ### Suspended Assignment 1 (Recovery Frame 2, Purpose CORRECTION, Reason identical to Frame 2); STATE Handoff FAILURE TESTING IMPLEMENTATION",
+      "status": "realized"
+    },
+    {
+      "condition": "Frame 2 topmost, Owner DEVELOPING, ResumeAt TESTING; Frame 1 Owner TESTING ResumeAt DEVELOPING",
+      "where": ".standards/STATE.md Recovery frames 1 and 2",
+      "status": "realized"
+    },
+    {
+      "condition": "A pending INCREMENTAL cadence request",
+      "where": ".standards/STATE.md Active Work PendingVerificationCadence INCREMENTAL",
+      "status": "realized"
+    },
+    {
+      "condition": "The implementation defect exists and the corrected test exposes it",
+      "where": "src/filter.js normalizes only the query; selfCheck shows test/filter.test.js fails 'matches tags regardless of case' (expected [1,3], actual [1])",
+      "status": "realized"
+    },
+    {
+      "condition": "Upstream scope, design, and context exist and establish both-sides normalization",
+      "where": ".standards/docs/scope/...md AC-001/AC-002; .standards/docs/specs/...md Technical Acceptance Criteria AC-001; .standards/CONTEXT.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Offline Node test runner so self-checks run",
+      "where": "node:test with explicit files, no dependencies; selfChecks ran",
+      "status": "realized"
+    },
+    {
+      "condition": "Committed, clean git state",
+      "where": "git status clean on main",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 2,
+      "detail": "I traced check.mjs on the expected post-run state (TESTING, RESUME from DEVELOPING, Frame 1 only). recoveryScope still finds the plan's Suspended Assignment for Frame 1 with the matching Reason, so scoped=true and partialDevelopment=true. mustBeComplete is false, and the CORRECTION report satisfies the partial-assessment coverage at both turn end and non-turn-end. check_ok and the Developer's own pre-handoff check should both pass for a correct run.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The verification report's Open Findings states the defect's mechanism plainly ('normalizes the requested tag but not the stored tags'). This is legitimate Tester-authored routing content the case implies, not a leak. It makes the fix easy, but the case tests recovery routing, not defect discovery.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized in the files: the nested Frame 1/Frame 2 recovery with exactly matching suspended-assignment Reasons in the plan and report, the AFTER_IMPLEMENTATION plan with DEV-002 PENDING, the pending INCREMENTAL request, and a real implementation defect confirmed by a failing test. The deterministic checks (RESUME to TESTING, FrameCount 1, Frame 1 and the outer suspended assignment intact, the pending cadence unchanged, the plan not COMPLETE, /tester in the reply) are necessary conditions of any correct run. A simulation of check.mjs on the expected end state shows no false problems.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T02:25:37.962Z",
+  "costUsd": 0.2844266,
+  "ms": 60588,
+  "fixtureHash": "e9459210f39264bf"
+}

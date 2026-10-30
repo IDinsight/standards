@@ -1,0 +1,337 @@
+{
+  "base": "export-project",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-contributing",
+      "action": "commit",
+      "message": "Add contributing notes for route handlers"
+    },
+    {
+      "dir": "layers/52-context",
+      "action": "commit",
+      "message": "Record project context for CSV export"
+    },
+    {
+      "dir": "layers/54-scope",
+      "action": "commit",
+      "message": "Define CSV export scope"
+    },
+    {
+      "dir": "layers/56-design",
+      "action": "commit",
+      "message": "Design CSV export"
+    },
+    {
+      "dir": "layers/58-plan",
+      "action": "commit",
+      "message": "Plan CSV export implementation"
+    },
+    {
+      "dir": "layers/60-serialization",
+      "action": "commit",
+      "message": "Add CSV serialization and export file writing"
+    },
+    {
+      "dir": "layers/62-doc-failure",
+      "action": "commit",
+      "message": "Hand contributing-notes conflict to documentation"
+    },
+    {
+      "dir": "layers/64-guide-fix",
+      "action": "commit",
+      "message": "Correct response guidance in contributing notes"
+    },
+    {
+      "dir": "layers/65-doc-return",
+      "action": "commit",
+      "message": "Record documentation correction and resume development"
+    },
+    {
+      "dir": "layers/66-route",
+      "action": "commit",
+      "message": "Add administrator-only CSV export route"
+    },
+    {
+      "dir": "layers/68-complete",
+      "action": "commit",
+      "message": "Mark CSV export plan complete"
+    },
+    {
+      "dir": "layers/70-access-test",
+      "action": "commit",
+      "message": "Add integration test for denied exports"
+    },
+    {
+      "dir": "layers/72-verification",
+      "action": "commit",
+      "message": "Record CSV export verification"
+    },
+    {
+      "dir": "layers/74-review",
+      "action": "commit",
+      "message": "Record CSV export implementation review"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "documenter",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The earlier Documenter Corrective Return fixed one bullet of CONTRIBUTING.md (DOC-001 in the documentation record). CONTRIBUTING.md, src/http/router.ts, src/http/messages.ts, and src/routes/records.ts are byte-identical to the versions the documentation record cites, so that correction evidence is still applicable.",
+    "The documentation record was written when the plan was IN_PROGRESS and no export route existed; since then the plan was completed, src/routes/export.ts, src/app.ts, the test:integration script and integration tests were added, and the verification and implementation review records were written. The record's cited plan blob is not the current plan.",
+    "The export route returns an AppResponse it builds itself with content-type text/csv, which is consistent with the corrected CONTRIBUTING.md guidance.",
+    "docs/api/export.md does not exist and no project document describes the export; AC-003 is unsatisfied until the guide is written.",
+    "Scope, design, implementation and owner evidence are current: the design's Interfaces and Contracts accurately describe the implementation, which satisfies AC-001 and AC-002 with no material defects.",
+    "There are no outstanding obligations, independent defects, or blocking user questions."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "export-20260924T090000Z-a7f3c1d2",
+    "SCOPE": ".standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md",
+    "ARCH": ".standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md",
+    "DEV": ".standards/docs/development/export-20260924T090000Z-a7f3c1d2.md",
+    "VERIFICATION": ".standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md",
+    "REVIEW_IMPL": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md",
+    "REVIEW_FINAL": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md",
+    "DOC": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md",
+    "GUIDE": "docs/api/export.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${GUIDE}",
+          "why": "the scope fixes the AC-003 guide at docs/api/export.md and it does not exist yet; a correct autonomous run writes it"
+        },
+        {
+          "changed": [
+            ".standards/docs/documentation/**"
+          ],
+          "why": "new guide evidence must be persisted in the documentation record"
+        },
+        {
+          "heading_ids": {
+            "path": "${DOC}",
+            "prefix": "DOC",
+            "min": 1
+          },
+          "why": "the resolved correction entry is history that is retained, not deleted"
+        },
+        {
+          "contains": {
+            "path": "${DOC}",
+            "regex": "AC-003"
+          },
+          "why": "guide evidence is recorded against the same AC-003"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "REVIEWING_FINAL"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FORWARD"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "DOCUMENTING"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "false"
+        },
+        {
+          "field": {
+            "path": "${DOC}",
+            "name": "Status",
+            "equals": "COMPLETE"
+          },
+          "why": "normal success requires the full Documenter gate"
+        },
+        {
+          "reply_matches": "FINAL[_ ]DELIVERABLE|final[- ]deliverable",
+          "flags": "i",
+          "why": "names the review kind"
+        },
+        {
+          "reply_matches": "fresh (chat|session)",
+          "flags": "i",
+          "why": "independent Reviewer session prefix"
+        },
+        {
+          "reply_matches": "/reviewer",
+          "why": "Claude Code invocation for Reviewer"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "test/**",
+        "package.json",
+        "pnpm-lock.yaml",
+        "packages/**",
+        ".standards/CONTEXT.md",
+        ".standards/docs/scope/**",
+        ".standards/docs/specs/**",
+        ".standards/docs/development/**",
+        ".standards/docs/verification/**",
+        ".standards/docs/reviews/*/implementation.md"
+      ],
+      "why": "Documenter does not edit tests, configuration, or other roles' records"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the unit suite passes offline"
+    },
+    {
+      "cmd": "pnpm --filter export test 2>&1 | grep -qE 'pass 21$'",
+      "expect": "pass",
+      "why": "the unit suite runs 21 tests, as the records state"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration",
+      "expect": "pass",
+      "why": "the integration script passes"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration 2>&1 | grep -qE 'pass 3$' && pnpm --filter export test:integration 2>&1 | grep -q 'without an administrator are denied and write no file'",
+      "expect": "pass",
+      "why": "test:integration runs three tests including the denied-export test"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the DOCUMENTING state and records are valid"
+    },
+    {
+      "cmd": "test ! -e docs/api && ! grep -qi export docs/usage.md && ! grep -rqE 'AC-[0-9]' src test packages docs README.md CONTRIBUTING.md",
+      "expect": "pass",
+      "why": "the API guide is absent, the usage guide has no export section, and project files cite no acceptance identifiers"
+    },
+    {
+      "cmd": "c=$(git log --format=%H -1 --fixed-strings --grep='Correct response guidance in contributing notes') && git cat-file -e $c && git diff --quiet $c HEAD -- CONTRIBUTING.md src/http src/routes/records.ts && d=.standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md && grep -q $(git rev-parse HEAD:CONTRIBUTING.md) $d && grep -q $(git rev-parse HEAD:src/http/router.ts) $d && grep -q $(git rev-parse HEAD:src/http/messages.ts) $d && grep -q $c $d",
+      "expect": "pass",
+      "why": "the correction's cited identities are unchanged, so its evidence is still applicable"
+    },
+    {
+      "cmd": "grep -q 'Return an `AppResponse`' CONTRIBUTING.md && ! grep -q 'only sends JSON' CONTRIBUTING.md && grep -q 'body: csv' src/routes/export.ts && grep -q 'text/csv; charset=utf-8' src/routes/export.ts",
+      "expect": "pass",
+      "why": "the corrected guidance is in place and the export route builds a text/csv AppResponse consistent with it"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `DOCUMENTING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Kind`: `FORWARD` `From`: `REVIEWING_IMPLEMENTATION` `FailureType`: `NONE`' .standards/STATE.md && grep -q '^`PromotionReason`: `NONE` `AuditTarget`: `NONE` `BlockedOn`: `NONE`$' .standards/STATE.md && grep -q '^`PendingVerificationCadence`: `NONE`$' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md && grep -q 'ProjectMode`: `BROWNFIELD' .standards/MODE.md",
+      "expect": "pass",
+      "why": "DOCUMENTING after a normal forward handoff, recovery and obligations inactive, nothing blocked"
+    },
+    {
+      "cmd": "d=.standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md && grep -q '`Status`: `IN_PROGRESS`' $d && grep -q '^### DOC-001 ' $d && test $(grep -c '^### DOC-' $d) -eq 1 && grep -q 'AC-003' $d && ! grep -q $(git rev-parse HEAD:.standards/docs/development/export-20260924T090000Z-a7f3c1d2.md) $d",
+      "expect": "pass",
+      "why": "the documentation record is IN_PROGRESS with one resolved correction, AC-003 deferred, and it predates the current plan"
+    },
+    {
+      "cmd": "v=.standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md && r=.standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md && p=.standards/docs/development/export-20260924T090000Z-a7f3c1d2.md && grep -q '`Mode`: `VERIFY` `Status`: `COMPLETE`' $v && grep -q '`Assessment Purpose`: `FULL` `Assessment Target`: `NONE`' $v && ! grep -q AWAITING_IMPLEMENTATION $v && grep -q 'AC-003' $v && grep -q '^`Status`: `COMPLETE` `User Style`: `NONE`$' $r && ! grep -qE '^### F-' $r && grep -q '`Status`: `COMPLETE`$' $p && test $(grep -c '^`Status`: `DONE`' $p) -eq 3 && grep -q '^### Suspended Assignment 1$' $p",
+      "expect": "pass",
+      "why": "owner evidence is complete: COMPLETE plan, FULL verification, finding-free implementation review"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && test ! -e exports && ! grep -rqE 'COMMIT:|BLOB:' .standards/docs .standards/CONTEXT.md",
+      "expect": "pass",
+      "why": "clean committed tree, no export files, no unresolved placeholders"
+    },
+    {
+      "cmd": "test ! -e .standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md && test ! -e .standards/docs/synchronization && test ! -e .standards/user-styles",
+      "expect": "pass",
+      "why": "no final review, synchronization record, or user styles exist"
+    },
+    {
+      "cmd": "git log -14 --format=%s | paste -s -d '|' - | grep -qx 'Record CSV export implementation review|Record CSV export verification|Add integration test for denied exports|Mark CSV export plan complete|Add administrator-only CSV export route|Record documentation correction and resume development|Correct response guidance in contributing notes|Hand contributing-notes conflict to documentation|Add CSV serialization and export file writing|Plan CSV export implementation|Design CSV export|Define CSV export scope|Record project context for CSV export|Add contributing notes for route handlers'",
+      "expect": "pass",
+      "why": "history reads in the order the story requires"
+    }
+  ],
+  "notes": "Built on export-project (pre-install records service) rather than export-documenting, because the case needs an AC-003 API guide and an earlier corrective return that the export-documenting history cannot contain. 50: post-install, pre-cycle commit adds CONTRIBUTING.md with route-handler notes whose response bullet wrongly says handlers return json() and the router only sends JSON. 52: Auditor context (mentions CONTRIBUTING.md) and STATE SCOPING. 54: scope AC-001 (filtered CSV with RFC 4180), AC-002 (server-side denial before any file), AC-003 (API guide docs/api/export.md). 56: design (POST /records/export, handler builds a text/csv AppResponse directly), AC-003 No architectural impact. 58: APPROVED plan, DEV-001..003. 60: src/export.ts, unit tests, .gitignore. 62: plan IN_PROGRESS (DEV-001/002 DONE, DEV-003 IN_PROGRESS, Suspended Assignment 1) and STATE DOCUMENTING via FAILURE DOCUMENTATION from DEVELOPING with Frame 1. 64: CONTRIBUTING.md corrected. 65: documentation record IN_PROGRESS (DOC-001 RESOLVED with inspection evidence C1/C2 citing BLOBs of CONTRIBUTING.md, router.ts, messages.ts, records.ts and the then-current plan; AC-003 guide deferred until DEV-003; Documenter Corrective Return reasoning) and STATE back to DEVELOPING via RESUME, recovery inactive. 66: route, createApp options, test:integration, two integration tests (same as export-documenting). 68: plan COMPLETE, STATE TESTING. 70: Tester's denied-export test. 72: COMPLETE FULL verification (AC-001, AC-002 verified, AC-003 pending Documenter). 74: COMPLETE implementation review, no findings, AC-003 permitted dependency; STATE DOCUMENTING, FORWARD from REVIEWING_IMPLEMENTATION. Implementation code is byte-identical to export-documenting's. docs/api/export.md does not exist; docs/usage.md and README.md are unchanged from export-project.",
+  "case": "documenter-68",
+  "caseHash": "54ae4a0ea4c99084",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T16:45:15.125Z",
+    "verdict": "pass",
+    "fixtureHash": "5a45bc1cb548a13f",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "c91fb6a8d0118241",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:19:12.993Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T16:12:22.254Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/52-context/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/54-scope/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/56-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/58-plan/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/62-doc-failure/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/65-doc-return/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/68-complete/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/72-verification/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/74-review/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:19:12.993Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

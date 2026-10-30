@@ -1,0 +1,66 @@
+{
+  "conditions": [
+    {
+      "condition": "Navigator is resumed in the same conversation after an interruption, with GRILL_ME in progress",
+      "where": "spec history: the user invokes /navigator to be grilled; Q1 is asked and answered; Q2 is asked; the user leaves; the assistant acknowledges. The utterance 'Okay, done. Let's resume. ...' follows.",
+      "status": "realized"
+    },
+    {
+      "condition": "A pending question and its topic are known",
+      "where": "history: the topic is how retry() stops and waits; Question 2 (calls and waits for retry(fn) with no options) is pending and restated in the last assistant turn",
+      "status": "realized"
+    },
+    {
+      "condition": "The user edited the relevant file after the question was asked",
+      "where": "layer 60-edit leaves an unstaged change to src/retry.js line 17 (attempts 5, maxDelayMs 300); git status shows ' M src/retry.js'; the history has the user saying they will bump the default",
+      "status": "realized"
+    },
+    {
+      "condition": "The edit makes the earlier premise or answer stale",
+      "where": "HEAD: 3 calls, waits 100,200. Working tree: 5 calls, waits 100,200,300,300 (selfChecks 2 and 3 confirm). The user's answer in the utterance matches HEAD only.",
+      "status": "realized"
+    },
+    {
+      "condition": "Some earlier context stays valid and is worth preserving",
+      "where": "history Q1 feedback cites src/retry.js:21 and :23; those lines are unchanged in the working tree (verified by line count)",
+      "status": "realized"
+    },
+    {
+      "condition": "A completion label from the user is present",
+      "where": "the utterance begins 'Okay, done.'",
+      "status": "realized"
+    },
+    {
+      "condition": "Workflow state is valid or irrelevant (no active cycle)",
+      "where": ".standards/STATE.md is a fresh brownfield install; check.mjs ok:true",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 1,
+      "detail": "The history never quotes the old default values. The role therefore has no cached source content to wrongly trust and must read src/retry.js to judge the answer at all. A run that reads only the current file and simply marks '3 times' wrong, without noticing that the answer matches HEAD, would show weaker evidence of the 'prior source may be stale' behavior. The README (old defaults) and the user's answer still give the judge a clear signal, so the assertion stays gradeable.",
+      "recommendation": "run_as_is",
+      "fix": "Optional: have the Q1 assistant turn mention the defaults it read (attempts 3, maxDelayMs 2000) so that stale prior source is visible in the context."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The user says they bumped the default, then answers '3 times' to the question as originally posed. This is plausible: the user answers the question asked before the edit. The ambiguity is part of what the role must resolve.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes a GRILL_ME resume with a pending question, an unstaged edit to the topic file that changes the correct answer, preserved valid line citations, and a user completion label. The Navigator invariants are present (check_ok is correctly omitted), there are no leaks, and both assertions are left to the judge with no over-strict checks. Only minor notes on how strong the stale-source signal is.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T15:41:59.785Z",
+  "costUsd": 0.121792,
+  "ms": 37026,
+  "fixtureHash": "dcfb1aee230a42b3"
+}

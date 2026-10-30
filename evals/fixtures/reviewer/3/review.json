@@ -1,0 +1,94 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState REVIEWING_IMPLEMENTATION, Handoff FORWARD from TESTING",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Current scope, architecture, context, development plan and Tester report with valid ownership",
+      "where": ".standards/docs/scope|specs|development|verification/export-20260924T090000Z-a7f3c1d2.md, .standards/CONTEXT.md; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and outstanding obligations inactive",
+      "where": ".standards/STATE.md Recovery/Outstanding Obligations Active false",
+      "status": "realized"
+    },
+    {
+      "condition": "Interrupted IN_PROGRESS IMPLEMENTATION report recording inspected authorization (R1) and quoting (R2)",
+      "where": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md Checks and Results",
+      "status": "realized"
+    },
+    {
+      "condition": "Exactly one actual diagnostic result recorded",
+      "where": "implementation.md C1 ([403,400,false]); selfCheck reproduces it",
+      "status": "realized"
+    },
+    {
+      "condition": "Resource cleanup inspection remains, not yet assessed",
+      "where": "implementation.md row 'file location, folder creation, and file write' = Not yet assessed; Progress and Conclusion Remaining",
+      "status": "realized"
+    },
+    {
+      "condition": "Assessed source, contract, tests and environment unchanged since recorded identities",
+      "where": "report blob/commit hashes match HEAD (selfChecks); only commit after assessed revision adds the report",
+      "status": "realized"
+    },
+    {
+      "condition": "This chat contains only Reviewer work",
+      "where": "history: four turns of the Reviewer's own interrupted assessment and pause",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation has no material defects, including resource cleanup",
+      "where": "src/export.ts writeExport synchronous mkdir/write; integration test after() removes temp root",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "blocking",
+      "kind": "check-wrong",
+      "assertion": 1,
+      "detail": "Assertion 1 is marked complete:true with checks (provenance, ReviewKind, Cycle fields, final-deliverable absent) that all already hold in the built fixture. A run that does not resume at all (e.g. stops to request a fresh chat, or does nothing) leaves the report untouched and passes assertion 1 automatically with no judge, so the assertion passes vacuously and the checks do not fully decide it.",
+      "recommendation": "fix_file",
+      "fix": "In reviewer-3/spec.json, add {\"changed\": [\"${REVIEW}\"], \"why\": \"the review continues in the same IMPLEMENTATION report\"} to checks[assertion 1].all (a correct run always persists the remaining inspection to this report). Optionally add the same check to assertion 0's all."
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 0,
+      "detail": "reply_not_matches on the verbatim protocol prefix 'Open a fresh chat separate from the conversations that produced' could in principle fail a correct run that quotes the protocol rule while explaining why it does not apply here. Unlikely; a passing run hands off to Documenter, whose invocation carries no such prefix.",
+      "recommendation": "run_as_is",
+      "fix": "None required; acceptable residual risk."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "History ends with the assistant suggesting a commit, and the report commit exists at HEAD without a user turn saying they committed it. This is plausible (the user committed during the break) and consistent with the files.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "issues",
+  "summary": "The fixture realizes every stated condition: a valid REVIEWING_IMPLEMENTATION state, an IN_PROGRESS IMPLEMENTATION report with R1/R2 inspections, one reproducible diagnostic, a not-yet-assessed resource-cleanup row, unchanged input identities, and a Reviewer-only history. Nothing leaks, and the invariants fit. One blocking issue: assertion 1 is complete:true, but its checks already pass on the unmodified fixture, so a non-resuming run would pass it vacuously. Adding a `changed` check on the report fixes this.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T15:43:09.008Z",
+  "costUsd": 0.31917059999999997,
+  "ms": 57392,
+  "fixtureHash": "7a4e1cb1a04ec89f"
+}

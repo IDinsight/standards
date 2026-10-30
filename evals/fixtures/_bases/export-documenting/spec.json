@@ -1,0 +1,204 @@
+{
+  "base": "export-project",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/20-context",
+      "action": "commit",
+      "message": "Record project context for CSV export"
+    },
+    {
+      "dir": "layers/25-scope",
+      "action": "commit",
+      "message": "Define CSV export scope"
+    },
+    {
+      "dir": "layers/30-design",
+      "action": "commit",
+      "message": "Design CSV export"
+    },
+    {
+      "dir": "layers/35-plan",
+      "action": "commit",
+      "message": "Plan CSV export implementation"
+    },
+    {
+      "dir": "layers/40-export",
+      "action": "commit",
+      "message": "Add CSV export of filtered records"
+    },
+    {
+      "dir": "layers/42-complete",
+      "action": "commit",
+      "message": "Mark CSV export plan complete"
+    },
+    {
+      "dir": "layers/44-access-test",
+      "action": "commit",
+      "message": "Add integration test for denied exports"
+    },
+    {
+      "dir": "layers/46-verification",
+      "action": "commit",
+      "message": "Record CSV export verification"
+    },
+    {
+      "dir": "layers/48-review",
+      "action": "commit",
+      "message": "Record CSV export implementation review"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "vars": {
+    "ID": "export-20260924T090000Z-a7f3c1d2",
+    "SCOPE": ".standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md",
+    "ARCH": ".standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md",
+    "DEV": ".standards/docs/development/export-20260924T090000Z-a7f3c1d2.md",
+    "VERIFICATION": ".standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md",
+    "REVIEW_IMPL": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md",
+    "REVIEW_FINAL": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md",
+    "DOC": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md",
+    "SYNC": ".standards/docs/synchronization/export-20260924T090000Z-a7f3c1d2.md",
+    "CONTEXT": ".standards/CONTEXT.md",
+    "USAGE": "docs/usage.md",
+    "BASELINE_COMMIT": "${COMMIT:Document listing and filtering records}",
+    "IMPL_COMMIT": "${COMMIT:Add CSV export of filtered records}",
+    "VERIFIED_COMMIT": "${COMMIT:Add integration test for denied exports}",
+    "REVIEWED_COMMIT": "${COMMIT:Record CSV export verification}"
+  },
+  "notes": "Shared base for the export cycle at DOCUMENTING, built on export-project. Nine post-install commits in the brownfield order. 20-context: Auditor's .standards/CONTEXT.md (same text as export-testing) and STATE starting cycle export-20260924T090000Z-a7f3c1d2 as STANDARD, FORWARD AUDITING to SCOPING. 25-scope: scope record with AC-001 (admin-only filtered CSV export with RFC 4180 quoting; non-admin or anonymous requests denied by server-side authorization before any export file is written) and AC-002 (docs/usage.md accurately describes the export); STATE to ARCHITECTING. 30-design: technical design (same contract as export-testing: POST /records/export, requireAdmin first, CSV format, file location) with AC-001 technical coverage and criteria and AC-002 'No architectural impact' depending on Documenter; STATE to DEVELOPING. 35-plan: APPROVED AUTONOMOUS plan, three PENDING steps all mapped to AC-001, AFTER_IMPLEMENTATION / NONE; STATE records Development. 40-export: implementation and tests byte-identical to export-testing's 40-export layer (src/export.ts, src/routes/export.ts, src/app.ts, package.json with test:integration, .gitignore with exports/, test/export.test.ts, two-test integration file). 42-complete: plan COMPLETE with self-check evidence citing the implementation commit; STATE TESTING. 44-access-test: Tester's integration test file, byte-identical to export-reviewing-impl's 46-access-test (adds the anonymous/viewer/editor denial test). 46-verification: COMPLETE FULL verification record (AC-001 four criteria Verified, AC-002 a pending later-role dependency on Documenter, no AWAITING_IMPLEMENTATION); STATE REVIEWING_IMPLEMENTATION. 48-review: COMPLETE IMPLEMENTATION review with no material findings and AC-002 recorded as a permitted dependency; STATE DOCUMENTING with FORWARD from REVIEWING_IMPLEMENTATION. Records cite revisions with COMMIT placeholders and content with BLOB placeholders. Neither the verification nor the review record cites docs/usage.md content or claims what the guide currently says, so cases may overlay the guide without contradicting them. docs/usage.md and README.md are unchanged from export-project, so the guide has no export section. No documentation, final-review, or synchronization record exists; the tree is clean.",
+  "baseFacts": [
+    "Everything export-project states about the project outside the export feature remains true: src/records (store, parseFilter), src/auth (roles, authorize, requireAdmin), src/http (HttpError, messages, Router), GET /records for every signed-in role, the six seed records (record 1 title has a comma, record 3 title has double quotes), the pnpm workspace with @records/seed, and README.md.",
+    "docs/usage.md is byte-identical to export-project: it documents roles, GET /records, its response shape, the status/owner/q filters, and error responses, has no export section, and does not contain the word export. It does not describe the export implementation, so the guide needs reconciliation with it.",
+    "Cycle export-20260924T090000Z-a7f3c1d2 is active: ProjectMode BROWNFIELD, CycleMode STANDARD, WorkflowState DOCUMENTING, PendingCycleMode UNSET, PendingCycleRequest UNSET, PendingCycleBlockedOn NONE. Active Work: Request `Let administrators export the filtered records list as CSV; non-admins must not be able to export. Document the export in the usage guide.`; Scope, Architecture, Development at vars SCOPE, ARCH, DEV; PromotionReason, AuditTarget, BlockedOn, PendingVerificationCadence, and BaselineReconciliation NONE. Handoff: Kind FORWARD, From REVIEWING_IMPLEMENTATION, FailureType NONE, Reason `Implementation review passed with no open findings; AC-002 is pending documentation.` Recovery and Outstanding Obligations are inactive (Active false, no frames or obligations).",
+    ".standards/CONTEXT.md is the Auditor context committed first in the cycle (same text as export-testing): baseline, stack, structure, the command `pnpm --filter export test`, the convention that handlers call authorize first, seed data notes, the testing baseline, and that GET /records behavior is documented in docs/usage.md. It predates the implementation.",
+    "The scope record (vars SCOPE, SCOPE provenance for this cycle) defines exactly two current conditions and no retired ones: AC-001 administrators can export the currently filtered records as CSV with RFC 4180 quoting of fields containing a comma, double quote, or newline (embedded quotes doubled), and an export request from a non-administrator or no signed-in user is denied by server-side authorization before any export file is written; AC-002 the usage guide docs/usage.md accurately describes how administrators export records as CSV, including who may export, the filters an export accepts, what it returns and writes, and its error responses. Constraints say the guide stays in docs/usage.md.",
+    "The technical design (vars ARCH, ARCHITECTURE provenance) specifies POST /records/export with the GET /records filters via parseFilter; requireAdmin first (401 authentication required, 403 forbidden); 400 for an invalid status with no file; 201 with content-type text/csv; charset=utf-8, content-disposition attachment naming the file, body equal to the file; header id,title,owner,status,createdAt, rows in ascending id, CRLF after every row, RFC 4180 quoting for comma, double quote, CR, LF; file <exportDir>/records-<YYYYMMDDTHHMMSSZ>.csv (UTC from now()), exportDir default exports, created when missing, gitignored. Acceptance Coverage: AC-001 technical; AC-002 No architectural impact (Documenter updates docs/usage.md against the design's contract). Technical Acceptance Criteria exist only for AC-001. The same-second overwrite and unremoved export files are accepted risks.",
+    "The development plan (vars DEV) has Mode AUTONOMOUS, User Style NONE, User Style Locked true, Status COMPLETE, Verification Cadence AFTER_IMPLEMENTATION, Current Increment NONE, no Verification Increments section. DEV-001 CSV serialization (AC-001), DEV-002 export file naming and writing (depends on DEV-001, AC-001), DEV-003 administrator-only export route (depends on DEV-002, AC-001), all DONE with self-checks citing the commit 'Add CSV export of filtered records'. Plan Notes state that no Developer step covers AC-002 because the usage guide is Documenter's work.",
+    "Implementation files (src/, packages/, package.json, .gitignore, pnpm-lock.yaml) are byte-identical to the commit 'Add CSV export of filtered records' and to the export-testing and export-reviewing-impl bases. src/export.ts provides csvCell, toCsv, exportFileName, writeExport; src/routes/export.ts registers POST /records/export calling requireAdmin(request.user) first, then store.list(parseFilter(request.query)), writeExport, and a 201 text/csv response; createApp accepts records, exportDir (default 'exports'), and now. The implementation satisfies AC-001 and has no material defects.",
+    "test/integration/export-flow.test.ts is byte-identical to export-reviewing-impl's version (commit 'Add integration test for denied exports'): two admin export tests plus 'export requests without an administrator are denied and write no file' (no user 401, viewer and editor 403, export folder never created). test/export.test.ts has the five serialization tests.",
+    "package.json scripts: test = node --test test/*.test.ts; test:integration = node --test test/integration/export-flow.test.ts. `pnpm --filter export test` passes 21 tests; `pnpm --filter export test:integration` passes 3 tests. .gitignore lists node_modules, *.log, exports/. No exports directory exists.",
+    "The verification record (vars VERIFICATION) has Mode VERIFY, Status COMPLETE, User Style NONE, Assessment Purpose FULL, Assessment Target NONE; it cites the commit 'Add integration test for denied exports' and BLOB identities of the scope, design, context, plan, and implementation and test files. Acceptance Evidence: four AC-001 rows (quoting, rows equal GET /records, response headers and body equal to file, denial with no folder or file) Verified via E1 (unit suite, 21 passed), E2 (integration, 3 passed), and inspection I1; one AC-002 row as a pending later-role dependency owned by Documenter. Open Findings and Dependencies lists only that dependency; no defects, no AWAITING_IMPLEMENTATION, no Increment Assessments section.",
+    "The implementation review (vars REVIEW_IMPL, REVIEW provenance with ReviewKind IMPLEMENTATION) has Status COMPLETE and User Style NONE, cites the commit 'Record CSV export verification' as the assessed revision and 'Document listing and filtering records' as the pre-cycle baseline, accounts for AC-001 (four criteria Supported) and AC-002 (permitted dependency on Documenter, evidence required: the documentation record and final-deliverable review), records Reviewer runs R1 (21 passed) and R2 (3 passed) plus inspections, and has No material findings (no F-NNN entries).",
+    "Neither the verification record nor the review record cites docs/usage.md content identity or describes what the guide currently says.",
+    "There is no documentation record (vars DOC), final-deliverable review, or synchronization record; .standards/docs/documentation and .standards/docs/synchronization do not exist. No .standards/user-styles directory exists.",
+    "No file under src/, test/, packages/, docs/, or README.md contains an AC identifier.",
+    "Commit subjects after the installer commit, oldest first: 'Record project context for CSV export', 'Define CSV export scope', 'Design CSV export', 'Plan CSV export implementation', 'Add CSV export of filtered records', 'Mark CSV export plan complete', 'Add integration test for denied exports', 'Record CSV export verification', 'Record CSV export implementation review'.",
+    "The working tree is clean (git diff empty, nothing untracked), and node .standards/bin/check.mjs passes."
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the unit suite passes offline"
+    },
+    {
+      "cmd": "pnpm --filter export test 2>&1 | grep -qE 'pass 21$'",
+      "expect": "pass",
+      "why": "the unit suite runs 21 tests"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration",
+      "expect": "pass",
+      "why": "the integration script passes, including the denied-export test"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration 2>&1 | grep -qE 'pass 3$' && pnpm --filter export test:integration 2>&1 | grep -q 'without an administrator are denied and write no file'",
+      "expect": "pass",
+      "why": "test:integration runs three tests, one of which covers denied exports"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the DOCUMENTING state and records are valid"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && git diff --quiet HEAD && test ! -e exports",
+      "expect": "pass",
+      "why": "all work is committed and no export files exist"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `DOCUMENTING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Id`: `export-20260924T090000Z-a7f3c1d2`$' .standards/STATE.md && grep -q '^`Kind`: `FORWARD` `From`: `REVIEWING_IMPLEMENTATION` `FailureType`: `NONE`' .standards/STATE.md && grep -q '^`PromotionReason`: `NONE` `AuditTarget`: `NONE` `BlockedOn`: `NONE`$' .standards/STATE.md && grep -q '^`PendingVerificationCadence`: `NONE`$' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md && grep -q 'ProjectMode`: `BROWNFIELD' .standards/MODE.md",
+      "expect": "pass",
+      "why": "STATE.md holds DOCUMENTING with FORWARD from REVIEWING_IMPLEMENTATION, nothing blocked, recovery and obligations inactive"
+    },
+    {
+      "cmd": "v=.standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md && r=.standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md && d=.standards/docs/development/export-20260924T090000Z-a7f3c1d2.md && grep -q '`Mode`: `VERIFY` `Status`: `COMPLETE`' $v && grep -q '`Assessment Purpose`: `FULL` `Assessment Target`: `NONE`' $v && ! grep -q AWAITING_IMPLEMENTATION $v && head -5 $r | grep -qx 'ReviewKind: IMPLEMENTATION' && grep -q '^`Status`: `COMPLETE` `User Style`: `NONE`$' $r && ! grep -qE '^### F-' $r && grep -q '`Status`: `COMPLETE`$' $d && grep -q '^`Verification Cadence`: `AFTER_IMPLEMENTATION` `Current Increment`: `NONE`$' $d && test $(grep -c '^`Status`: `DONE`' $d) -eq 3",
+      "expect": "pass",
+      "why": "COMPLETE plan, FULL verification, and finding-free implementation review exist with the default cadence"
+    },
+    {
+      "cmd": "test ! -e .standards/docs/documentation && test ! -e .standards/docs/synchronization && test ! -e .standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md && test ! -e .standards/user-styles",
+      "expect": "pass",
+      "why": "no documentation, final-review, or synchronization record exists yet"
+    },
+    {
+      "cmd": "! grep -qi export docs/usage.md && ! grep -rqE 'AC-[0-9]' src test packages docs README.md",
+      "expect": "pass",
+      "why": "the usage guide has no export section and project files cite no acceptance identifiers"
+    },
+    {
+      "cmd": "c=$(git log --format=%H -1 --fixed-strings --grep='Add CSV export of filtered records') && test -n $c && git diff --quiet $c HEAD -- src packages package.json .gitignore pnpm-lock.yaml docs README.md && test $(git diff --name-only $c HEAD -- test) = test/integration/export-flow.test.ts",
+      "expect": "pass",
+      "why": "implementation and docs are unchanged since the implementation commit; only the integration test changed"
+    },
+    {
+      "cmd": "grep -q $(git log --format=%H -1 --fixed-strings --grep='Add integration test for denied exports') .standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md && grep -q $(git log --format=%H -1 --fixed-strings --grep='Record CSV export verification') .standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md && ! grep -rqE 'COMMIT:|BLOB:' .standards/docs .standards/CONTEXT.md",
+      "expect": "pass",
+      "why": "records cite real revision hashes and no placeholder is left"
+    },
+    {
+      "cmd": "git log -9 --format=%s | paste -s -d '|' - | grep -qx 'Record CSV export implementation review|Record CSV export verification|Add integration test for denied exports|Mark CSV export plan complete|Add CSV export of filtered records|Plan CSV export implementation|Design CSV export|Define CSV export scope|Record project context for CSV export'",
+      "expect": "pass",
+      "why": "commit history follows the brownfield order and the subjects are available for COMMIT references"
+    }
+  ],
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-01T17:39:34.318Z",
+    "verdict": "pass",
+    "fixtureHash": "8cfc866c763451e1",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "5353002e5b09004a",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:03:47.593Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-01T17:25:39.584Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/20-context/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/25-scope/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/30-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/35-plan/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/42-complete/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/46-verification/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/48-review/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:03:47.593Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

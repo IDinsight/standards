@@ -1,0 +1,244 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial logprune tool"
+    },
+    {
+      "dir": "layers/10-dry-run",
+      "action": "commit",
+      "message": "Add --dry-run flag to logprune"
+    },
+    {
+      "dir": "layers/20-review",
+      "action": "commit",
+      "message": "Record implementation review for --dry-run"
+    },
+    {
+      "dir": "layers/30-rework",
+      "action": "commit",
+      "message": "Route missing-directory review request back to Reviewer"
+    },
+    {
+      "dir": "layers/40-review-reopened",
+      "action": "commit",
+      "message": "Reopen implementation review"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "documenter",
+    "utterance": "I need the full documentation guarantee before sign-off."
+  },
+  "graderOnly": [
+    "README.md's usage section does not mention --dry-run; no documentation record, scope, design, or .standards/CONTEXT.md exists for this cycle.",
+    "The user's message explicitly requires the Documentation guarantee that the EXPEDITED topology omits, which authorizes Expedited Promotion under the User Decisions rules even though Reviewer owns the current state.",
+    "The only recovery frame (Frame 1: From AWAITING_USER_SIGNOFF, Owner REVIEWING_IMPLEMENTATION, FailureType REVIEW, RerunThrough NONE) is an unresolved corrective obligation; canonical promotion converts it into Outstanding Obligation 1 with the same Owner, FailureType, and Reason, then clears the recovery stack.",
+    "Canonical promotion here sets CycleMode STANDARD, WorkflowState AUDITING, Handoff PROMOTE from REVIEWING_IMPLEMENTATION with FailureType NONE, sets PromotionReason, keeps Id, Request, Scope NONE and Architecture NONE, and stops with an Auditor invocation."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "add-a-dry-run-flag-to-the-prune-command-20260924T081500Z-5c8e2a91",
+    "REASON": "User asked for the review to cover --dry-run with a missing log directory.",
+    "REVIEW": ".standards/docs/reviews/add-a-dry-run-flag-to-the-prune-command-20260924T081500Z-5c8e2a91/implementation.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "state": "ActiveWork.Id",
+          "equals": "${ID}",
+          "why": "same cycle"
+        },
+        {
+          "state": "ActiveWork.Request",
+          "unchanged": true,
+          "why": "assertion requires the request preserved"
+        },
+        {
+          "state": "CycleMode",
+          "equals": "STANDARD"
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "AUDITING"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "PROMOTE"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "REVIEWING_IMPLEMENTATION",
+          "why": "From is the interrupted state"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "NONE"
+        },
+        {
+          "state": "ActiveWork.PromotionReason",
+          "not": "NONE",
+          "why": "promotion persists its reason"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "state": "ActiveWork.Scope",
+          "equals": "NONE"
+        },
+        {
+          "state": "ActiveWork.Architecture",
+          "equals": "NONE"
+        },
+        {
+          "absent": ".standards/docs/documentation/${ID}.md"
+        },
+        {
+          "absent": ".standards/docs/scope/${ID}.md"
+        },
+        {
+          "absent": ".standards/docs/specs/${ID}.md"
+        },
+        {
+          "unchanged": [
+            ".standards/docs/**",
+            "README.md",
+            "src/**",
+            "bin/**"
+          ],
+          "why": "no documentation work, record, or review change is made"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": true,
+      "all": [
+        {
+          "state": "Recovery.Active",
+          "equals": "false"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "0"
+        },
+        {
+          "state": "Obligations.Active",
+          "equals": "true"
+        },
+        {
+          "state": "Obligations.Count",
+          "equals": "1"
+        },
+        {
+          "state": "Obligations.Item1.Owner",
+          "equals": "REVIEWING_IMPLEMENTATION"
+        },
+        {
+          "state": "Obligations.Item1.FailureType",
+          "equals": "REVIEW"
+        },
+        {
+          "state": "Obligations.Item1.Reason",
+          "equals": "${REASON}",
+          "why": "promotion preserves the converted frame's Reason"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "bin/**",
+        "test/**",
+        "package.json"
+      ],
+      "why": "promotion is coordination only; no implementation or test changes"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/prune.test.js test/cli.test.js",
+      "expect": "pass",
+      "why": "the project's tests pass, as the plan and review record"
+    },
+    {
+      "cmd": "d=$(mktemp -d) && touch -d '30 days ago' \"$d/app.log.1\" && node bin/logprune.js \"$d\" --dry-run | grep -q 'would remove app.log.1' && test -f \"$d/app.log.1\"",
+      "expect": "pass",
+      "why": "--dry-run lists the expired file and deletes nothing, as the records state"
+    },
+    {
+      "cmd": "! grep -q -- '--dry-run' README.md",
+      "expect": "pass",
+      "why": "the README has not been updated for --dry-run (documentation was skipped in the expedited cycle)"
+    }
+  ],
+  "notes": "Brownfield project `logprune` (plain Node ESM, node:test). 00-project: pre-install code, README, tests. 10-dry-run: expedited cycle implementation (src/cli.js, src/prune.js) plus COMPLETE development plan (EXPEDITED_REQUEST) and STATE at REVIEWING_IMPLEMENTATION. 20-review: COMPLETE implementation review (no material findings; notes README lacks --dry-run as an out-of-contract limitation) and STATE at AWAITING_USER_SIGNOFF. 30-rework: user rework at sign-off routed to Reviewer: Handoff USER_REWORK/REVIEW and recovery Frame 1 (From AWAITING_USER_SIGNOFF, Owner REVIEWING_IMPLEMENTATION, RerunThrough NONE). 40-review-reopened: Reviewer reopened its report to IN_PROGRESS. Final state: BROWNFIELD, EXPEDITED, REVIEWING_IMPLEMENTATION, Scope/Architecture NONE, no documentation record or CONTEXT.md. The recovery frame is planted (the catalog said recovery none and flagged assertion 2 as vacuous) so that assertion 2 tests frame-to-obligation conversion; it is the only frame shape a STANDARD check allows at REVIEWING_IMPLEMENTATION with RerunThrough NONE in an expedited cycle.",
+  "case": "documenter-51",
+  "caseHash": "122c5551038902f2",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T16:38:34.004Z",
+    "verdict": "pass",
+    "fixtureHash": "8badbec8138db8b0",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "5129142591afcfa6",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:15:32.946Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T15:35:35.503Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/10-dry-run/.standards/STATE.md: NONE",
+        "layers/20-review/.standards/STATE.md: NONE",
+        "layers/30-rework/.standards/STATE.md: NONE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:15:32.946Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

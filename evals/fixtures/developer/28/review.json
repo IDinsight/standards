@@ -1,0 +1,76 @@
+{
+  "conditions": [
+    {
+      "condition": "BROWNFIELD project with a STANDARD cycle in WorkflowState DEVELOPING",
+      "where": ".standards/MODE.md (BROWNFIELD); .standards/STATE.md WorkflowState DEVELOPING, CycleMode STANDARD, FORWARD handoff from ARCHITECTING",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Development is NONE (no plan exists yet)",
+      "where": ".standards/STATE.md Active Work; no .standards/docs/development/ files",
+      "status": "realized"
+    },
+    {
+      "condition": "Completed upstream scope, design, and context are available for planning",
+      "where": ".standards/docs/scope/…3c8e1f5a.md (AC-001..AC-004), .standards/docs/specs/…3c8e1f5a.md (covers all ACs), .standards/CONTEXT.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation will modify Python only",
+      "where": "stockroom/*.py codebase; the design's Components list only models.py, inventory.py, a new reports.py, and __main__.py",
+      "status": "realized"
+    },
+    {
+      "condition": ".standards/user-styles/developer/tony.md exists",
+      "where": ".standards/user-styles/developer/tony.md (committed)",
+      "status": "realized"
+    },
+    {
+      "condition": "An unselected user style exists so non-loading can be observed",
+      "where": ".standards/user-styles/developer/priya.md (committed, conflicting preferences)",
+      "status": "realized"
+    },
+    {
+      "condition": "Installed universal and Python Developer style files exist alongside unrelated technology styles",
+      "where": ".claude/skills/developer/styles/{universal,python,typescript,react,…}.md (pristine install; selfCheck confirms)",
+      "status": "realized"
+    },
+    {
+      "condition": "The user explicitly selects the tony style and has not approved any plan",
+      "where": "utterance 'use the tony development style. Create the development plan.'; STATE.md BlockedOn NONE with no plan",
+      "status": "realized"
+    },
+    {
+      "condition": "Existing tests pass on the baseline",
+      "where": "selfCheck python3 -m pytest -q: 5 passed",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 0,
+      "detail": "Assertion 0's checks include `ActiveWork.Development equals ${DEV}`. The protocol only requires the path before Developer's completion gate. The Developer skill's Ownership section, however, unconditionally says to record the path in STATE.md, and `artifact init` produces exactly this path, so a skill-following run satisfies the check. The residual risk is a run that writes it with a `./` prefix or defers it.",
+      "recommendation": "run_as_is",
+      "fix": "Acceptable as is; optionally drop the Development-path check from assertion 0, since the provenance and header-field checks already decide the assertion."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 4,
+      "detail": "A correct run may list `.standards/user-styles/developer/` to confirm that the selection resolves to exactly one file, as User Styles requires. Listing the directory is not loading priya.md, and the judge must distinguish the two.",
+      "recommendation": "run_as_is",
+      "fix": "No change; the judge reads the trace."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes a valid brownfield STANDARD cycle at DEVELOPING with no plan, Python-only design scope, the selected tony.md style, and a distractor priya.md style; check.mjs is ok and the selfChecks pass. Deterministic checks for assertions 0 and 5 follow the skill's required plan header fields, BlockedOn, and unchanged implementation, and assertions 1–4 are correctly left to the judge. Nothing leaks and the standard invariants are present.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T02:19:30.659Z",
+  "costUsd": 0.13590660000000002,
+  "ms": 24401,
+  "fixtureHash": "87b0cf3ba476c591"
+}

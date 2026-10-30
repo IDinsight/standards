@@ -1,0 +1,86 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD, CycleMode STANDARD, WorkflowState DOCUMENTING",
+      "where": ".standards/MODE.md; .standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id is export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, architecture, context, development, verification and implementation review exist with matching provenance and current evidence",
+      "where": ".standards/docs/{scope,specs,development,verification,reviews/.../implementation}.md, .standards/CONTEXT.md; check.mjs ok; the later wiki-import commit touches only docs/operators",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-001 covers CSV export behavior; AC-002 requires an accurate usage guide",
+      "where": ".standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md (AC-002 names docs/usage.md)",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and obligations inactive, no blocked user question",
+      "where": ".standards/STATE.md (Recovery Active false, Obligations Active false, BlockedOn NONE)",
+      "status": "realized"
+    },
+    {
+      "condition": "Editing is unrestricted",
+      "where": "No restriction in the utterance or the records",
+      "status": "realized"
+    },
+    {
+      "condition": "User selects FOLDER target docs/operators",
+      "where": "utterance 'Update the documentation in the docs/operators folder.'",
+      "status": "realized"
+    },
+    {
+      "condition": "The folder's runbook needs an update for this cycle",
+      "where": "docs/operators/runbook.md says 'The service writes nothing to disk', but src/export.ts writeExport creates exportDir (default 'exports') and writes CSV files",
+      "status": "realized"
+    },
+    {
+      "condition": "The folder's migration page needs an update for this cycle",
+      "where": "docs/operators/migration.md has no entry for POST /records/export or the new writable export folder",
+      "status": "realized"
+    },
+    {
+      "condition": "An unrelated old essay exists in the folder",
+      "where": "docs/operators/the-quiet-pager.md (2024 on-call essay)",
+      "status": "realized"
+    },
+    {
+      "condition": "No documentation record exists yet",
+      "where": "selfCheck confirms .standards/docs/documentation is absent",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "package.json remains at 0.3.0 and migration.md is organized by release. A Documenter has to add an 'Unreleased'/next-release entry or justify one, which is reasonable. No check requires the edit (assertion 1 only requires the word 'migration' in the record), so a run that defers the entry pending a version label would be left to the judge.",
+      "recommendation": "run_as_is",
+      "fix": "Optional: none needed; the judge can weigh it."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 1,
+      "detail": "docs/usage.md (AC-002) lies outside the folder target. Assertion 1's 'required cycle inventory' is therefore concretely observable, and the checks deliberately leave state, status, and usage.md edits unconstrained. The quiet-pager regex assumes the record names the essay by file or title, which a run recording excluded content would naturally do.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition. The runbook's 'writes nothing to disk' claim is now false, the migration page lacks the export entry, and an unrelated wiki essay sits in docs/operators; nothing leaks and check.mjs reports a valid DOCUMENTING state. Checks are necessary conditions a correct FOLDER/AUTONOMOUS run satisfies, and the invariants fit a Documenter run.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T16:21:02.227Z",
+  "costUsd": 0.820299,
+  "ms": 35189,
+  "fixtureHash": "f04830fda0c5345c"
+}

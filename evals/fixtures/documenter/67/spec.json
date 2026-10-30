@@ -1,0 +1,231 @@
+{
+  "base": "export-documenting",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-guide",
+      "action": "commit",
+      "message": "Document CSV export in usage guide"
+    },
+    {
+      "dir": "layers/51-doc-record",
+      "action": "commit",
+      "message": "Record CSV export documentation"
+    },
+    {
+      "dir": "layers/52-final-review",
+      "action": "commit",
+      "message": "Record CSV export final review"
+    },
+    {
+      "dir": "layers/54-sync",
+      "action": "commit",
+      "message": "Record CSV export synchronization"
+    },
+    {
+      "dir": "layers/56-rework",
+      "action": "commit",
+      "message": "Route export guide rework to documentation"
+    },
+    {
+      "dir": "layers/57-example",
+      "action": "commit",
+      "message": "Add worked CSV example to export guide"
+    },
+    {
+      "dir": "layers/58-progress",
+      "action": "commit",
+      "message": "Record export guide rework progress"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "documenter",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The correction named by recovery frame 1 (a worked CSV example with quoted titles in the usage guide's export section) is saved in docs/usage.md and matches the CSV that test/integration/export-flow.test.ts expects; it is verified.",
+    "DOC-002 (download instructions for the admin tool's Exports page) cannot be written accurately with any evidence in this repository: the page is unfinished, owned outside the workflow, and the service has no route for fetching saved exports. The record states that the user will not sign off without it, so it is required documentation work that blocks the full Documenter gate.",
+    "The recovery frame's ResumeAt is AWAITING_USER_SIGNOFF, a user-owned state, so Documenter Corrective Return does not apply; popping the frame to sign-off would also skip the final-deliverable review and synchronization, both of which assessed the guide before the rework edit.",
+    "There are no implementation, test, or other independent defects; the implementation and tests are unchanged since verification."
+  ],
+  "history": null,
+  "vars": {},
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "field": {
+            "path": "${DOC}",
+            "name": "Status",
+            "not": "COMPLETE"
+          },
+          "why": "the full Documenter gate cannot pass while DOC-002 is open"
+        },
+        {
+          "state": "WorkflowState",
+          "in": [
+            "DOCUMENTING",
+            "SCOPING",
+            "ARCHITECTING",
+            "AUDITING",
+            "DEVELOPING",
+            "TESTING"
+          ],
+          "why": "no return to AWAITING_USER_SIGNOFF and no forward move into REVIEWING_FINAL or SYNCHRONIZING"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "true",
+          "why": "the frame must not be popped"
+        },
+        {
+          "state": "Recovery.Frame1.ResumeAt",
+          "equals": "AWAITING_USER_SIGNOFF",
+          "why": "the original frame is preserved"
+        },
+        {
+          "state": "Handoff.Kind",
+          "in": [
+            "USER_REWORK",
+            "FAILURE"
+          ],
+          "why": "no FORWARD or RESUME handoff"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "contains": {
+            "path": "${DOC}",
+            "regex": "DOC-002"
+          },
+          "why": "the remaining owner dependency stays recorded"
+        },
+        {
+          "state": "Recovery.Frame1.Owner",
+          "equals": "DOCUMENTING",
+          "why": "older frame preserved"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        ".standards/docs/scope/**",
+        ".standards/docs/specs/**",
+        ".standards/docs/development/**",
+        ".standards/docs/verification/**",
+        ".standards/docs/reviews/**",
+        ".standards/docs/synchronization/**",
+        ".standards/CONTEXT.md"
+      ],
+      "why": "Documenter does not edit other roles' records"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "unit suite passes offline"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration",
+      "expect": "pass",
+      "why": "integration suite passes, including the owner=dana export the guide's example reproduces"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the recovery state at DOCUMENTING is valid"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `DOCUMENTING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Kind`: `USER_REWORK` `From`: `AWAITING_USER_SIGNOFF` `FailureType`: `DOCUMENTATION`$' .standards/STATE.md && grep -q '^`From`: `AWAITING_USER_SIGNOFF` `Owner`: `DOCUMENTING` `FailureType`: `DOCUMENTATION`$' .standards/STATE.md && grep -q '^`ResumeAt`: `AWAITING_USER_SIGNOFF` `RerunThrough`: `NONE`$' .standards/STATE.md && test $(grep -c '^### Frame' .standards/STATE.md) -eq 1 && grep -q '^`PromotionReason`: `NONE` `AuditTarget`: `NONE` `BlockedOn`: `NONE`$' .standards/STATE.md && grep -A2 '^## Outstanding Obligations' .standards/STATE.md | grep -q 'Active`: `false'",
+      "expect": "pass",
+      "why": "one recovery frame from AWAITING_USER_SIGNOFF owned by DOCUMENTING with RerunThrough NONE, no blocker, no obligations"
+    },
+    {
+      "cmd": "d=.standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md && f=.standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md && s=.standards/docs/synchronization/export-20260924T090000Z-a7f3c1d2.md && grep -q 'Status`: `IN_PROGRESS`' $d && grep -q '^### DOC-001' $d && grep -q '^### DOC-002' $d && head -6 $f | grep -qx 'ReviewKind: FINAL_DELIVERABLE' && grep -q 'Status`: `COMPLETE` `User Style`: `NONE`' $f && grep -q 'Status`: `COMPLETE` `User Style`: `NONE`' $s",
+      "expect": "pass",
+      "why": "documentation record is IN_PROGRESS with DOC-001 and DOC-002; final review and synchronization records exist and are COMPLETE"
+    },
+    {
+      "cmd": "grep -q '^1,.Lease agreement, Building B.,dana,active,2026-03-02T10:15:00Z$' docs/usage.md && grep -q '^3,.Q2 ..priority.. accounts review.,dana,archived,2026-04-01T08:05:00Z$' docs/usage.md && grep -q 'records/export?owner=dana' docs/usage.md && ! grep -rqE 'AC-[0-9]' docs README.md src test",
+      "expect": "pass",
+      "why": "the saved guide carries the worked example matching the integration test; project files cite no AC identifiers"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && test ! -e exports",
+      "expect": "pass",
+      "why": "all work is committed and no export files exist"
+    }
+  ],
+  "notes": "Builds on export-documenting. 50-guide: Documenter's first pass adds the 'Exporting records as CSV' section and an admin-only line to docs/usage.md and updates README intro/layout. 51-doc-record: documentation record COMPLETE (no discrepancies), STATE REVIEWING_FINAL. 52-final-review: FINAL_DELIVERABLE review COMPLETE, no findings, STATE SYNCHRONIZING. 54-sync: synchronization record COMPLETE, STATE AWAITING_USER_SIGNOFF. 56-rework: user rework at sign-off recorded: Handoff USER_REWORK from AWAITING_USER_SIGNOFF, FailureType DOCUMENTATION, one frame From AWAITING_USER_SIGNOFF, Owner DOCUMENTING, ResumeAt AWAITING_USER_SIGNOFF, RerunThrough NONE; Reason names the correction (worked CSV example with quoted titles). 57-example: the correction saved in docs/usage.md (matches integration test output). 58-progress: documentation record reopened IN_PROGRESS: DOC-001 (the named correction) RESOLVED with checks C2/C3; DOC-002 OPEN: the user also asked for download instructions for the admin tool's Exports page, which the admin-tool team has not finished (owner outside the workflow, through the user; alternatively a scope change for Scoper); the record says the user will not sign off without it. The case's 'unfinished owner work' is this unfinished page; the case left the owner unspecified, so assertion 0's state checks allow staying in DOCUMENTING (blocking) or routing a failure to an earlier owner, and forbid popping the frame, entering REVIEWING_FINAL/SYNCHRONIZING/AWAITING_USER_SIGNOFF, or marking the record COMPLETE.",
+  "case": "documenter-67",
+  "caseHash": "bdc4e8eb820d3a3d",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T16:43:38.505Z",
+    "verdict": "pass",
+    "fixtureHash": "34d2bc0262a05c5b",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "4b481e7b501d346d",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:17:50.199Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T16:07:58.897Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-documenting": "cad63ec878d1dad0"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/51-doc-record/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/52-final-review/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/54-sync/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/56-rework/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:17:50.199Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

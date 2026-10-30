@@ -1,0 +1,226 @@
+{
+  "base": "export-documenting",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-guide",
+      "action": "commit",
+      "message": "Document CSV export in usage guide"
+    },
+    {
+      "dir": "layers/52-doc-record",
+      "action": "commit",
+      "message": "Record CSV export documentation"
+    },
+    {
+      "dir": "layers/54-final-review",
+      "action": "commit",
+      "message": "Record CSV export final review"
+    },
+    {
+      "dir": "layers/56-sync",
+      "action": "commit",
+      "message": "Record CSV export synchronization discrepancy"
+    },
+    {
+      "dir": "layers/58-design-fix",
+      "action": "commit",
+      "message": "Define empty export result in design"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "documenter",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "docs/usage.md and README.md already describe the CSV export accurately, including the header-only 201 result for an export that matches no records, which is exactly what the corrected design now states; no documentation edit is needed and every required documentation surface passes the Documenter gate.",
+    "The last commit changed only the technical design (one sentence defining the empty-result export); implementation, tests, the guide, and README are unchanged since the documentation pass, so the earlier documentation evidence still applies once the new design identity is reconciled.",
+    "Architect, the active frame's owner, already planned resumption by setting RerunThrough to DOCUMENTING. The correct outcome is to pass the Documenter gate, pop Frame 1, and transition to SYNCHRONIZING with Handoff.Kind RESUME, not to hand off forward to REVIEWING_FINAL or re-plan the route."
+  ],
+  "history": null,
+  "vars": {},
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "SYNCHRONIZING",
+          "why": "the rerun boundary passed, so the role returns to ResumeAt"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "RESUME",
+          "why": "a frame return is a RESUME handoff"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "DOCUMENTING"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "false",
+          "why": "the only frame is popped at its RerunThrough boundary"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "0"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "not": "REVIEWING_FINAL",
+          "why": "no normal forward handoff to final review"
+        },
+        {
+          "state": "Handoff.Kind",
+          "not": "FORWARD"
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "SYNCHRONIZING",
+          "why": "the saved boundary routes to ResumeAt"
+        },
+        {
+          "reply_not_matches": "/reviewer([^a-z/._-]|$)",
+          "flags": "m",
+          "why": "no Reviewer invocation is offered"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        ".standards/docs/scope/**",
+        ".standards/docs/specs/**",
+        ".standards/docs/development/**",
+        ".standards/docs/verification/**",
+        ".standards/docs/reviews/**",
+        ".standards/docs/synchronization/**",
+        ".standards/CONTEXT.md"
+      ],
+      "why": "Documenter does not edit other roles' records"
+    },
+    {
+      "unchanged": [
+        "test/**",
+        "packages/**",
+        "package.json",
+        "pnpm-lock.yaml"
+      ],
+      "why": "Documenter does not change tests, dependencies, or configuration"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the recovery rerun state at DOCUMENTING is valid"
+    },
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the unit suite passes offline"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration",
+      "expect": "pass",
+      "why": "the integration suite passes, including the exact CSV the guide's example shows"
+    },
+    {
+      "cmd": "node --input-type=module -e \"import { toCsv } from './src/export.ts'; import { createApp } from './src/app.ts'; const r = createApp().handle({ method: 'GET', path: '/records/export', query: {}, user: { id: 1, name: 'Ada', role: 'admin' } }); if (toCsv([]) !== ['id,title,owner,status,createdAt', ''].join(String.fromCharCode(13, 10)) || r.status !== 405) process.exit(1);\"",
+      "expect": "pass",
+      "why": "the guide's statements that an empty export is header-only and GET /records/export returns 405 match the implementation"
+    },
+    {
+      "cmd": "grep -q 'POST /records/export' docs/usage.md && grep -q 'only the header row' docs/usage.md && grep -q 'only the header row' .standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md && grep -q 'src/export.ts' README.md",
+      "expect": "pass",
+      "why": "guide and README describe the export and the corrected design defines the empty result"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `DOCUMENTING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '`Kind`: `RESUME` `From`: `ARCHITECTING` `FailureType`: `NONE`' .standards/STATE.md && grep -q '`From`: `SYNCHRONIZING` `Owner`: `ARCHITECTING` `FailureType`: `ARCHITECTURE`' .standards/STATE.md && grep -q '`ResumeAt`: `SYNCHRONIZING` `RerunThrough`: `DOCUMENTING`' .standards/STATE.md && grep -q '^### Frame 1$' .standards/STATE.md && ! grep -q '^### Frame 2' .standards/STATE.md",
+      "expect": "pass",
+      "why": "STATE.md holds the one-frame recovery with the Architect-planned rerun boundary"
+    },
+    {
+      "cmd": "grep -q '`Status`: `COMPLETE`' .standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md && grep -q '`Status`: `COMPLETE`' .standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md && grep -q '`Status`: `BLOCKED`' .standards/docs/synchronization/export-20260924T090000Z-a7f3c1d2.md && grep -q '^### D-001' .standards/docs/synchronization/export-20260924T090000Z-a7f3c1d2.md && ! grep -rqE 'COMMIT:|BLOB:' .standards/docs",
+      "expect": "pass",
+      "why": "documentation, final review, and synchronization records exist with the stated statuses and resolved placeholders"
+    },
+    {
+      "cmd": "c=$(git log --format=%H -1 --fixed-strings --grep='Add CSV export of filtered records') && git diff --quiet $c HEAD -- src packages package.json .gitignore pnpm-lock.yaml && d=$(git log --format=%H -1 --fixed-strings --grep='Document CSV export in usage guide') && git diff --quiet $d HEAD -- docs README.md test && ! git status --porcelain | grep -q . && test ! -e exports",
+      "expect": "pass",
+      "why": "implementation is unchanged since the implementation commit, docs and tests unchanged since the documentation pass, and the tree is clean"
+    }
+  ],
+  "notes": "Built on export-documenting (cycle export-20260924T090000Z-a7f3c1d2 at DOCUMENTING after implementation review). 50-guide: commits the export section in docs/usage.md (route, admin-only, filters, 201 response, file location, CSV format, header-only empty result, same-second replacement, no cleanup, 405 for GET) and README updates (layout lists src/export.ts, test:integration command). 52-doc-record: COMPLETE AUTONOMOUS/ACTIVE_CHANGE documentation record citing input blobs and checks; STATE to REVIEWING_FINAL (FORWARD from DOCUMENTING). 54-final-review: COMPLETE FINAL_DELIVERABLE review, no findings, AC-001 and AC-002 supported; STATE to SYNCHRONIZING. 56-sync: BLOCKED synchronization record with D-001 (design does not define the export result when no record matches; owner Architect, ARCHITECTURE); STATE to ARCHITECTING with FAILURE from SYNCHRONIZING and Frame 1 (From SYNCHRONIZING, Owner ARCHITECTING, ResumeAt SYNCHRONIZING, RerunThrough NONE). 58-design-fix: design adds one sentence defining the header-only empty result; STATE to DOCUMENTING with RESUME from ARCHITECTING and Frame 1 RerunThrough DOCUMENTING. Recovery active (one frame), obligations inactive, nothing blocked. The guide already matches the corrected design, so documentation passes. The case premise that Architect skipped a final-review rerun is reflected in the sync record's resume note (Synchronizer will reassess final review applicability).",
+  "case": "documenter-46",
+  "caseHash": "cd5760bcc226b3fb",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T16:36:52.795Z",
+    "verdict": "pass",
+    "fixtureHash": "fc29396787baf5c4",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "27a85ffe452f555b",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:13:53.967Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T15:26:20.819Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-documenting": "cad63ec878d1dad0"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/52-doc-record/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/54-final-review/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/56-sync/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/58-design-fix/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:13:53.967Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

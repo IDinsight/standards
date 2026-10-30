@@ -1,0 +1,16 @@
+import type { RecordItem } from './records/store.ts';
+
+const COLUMNS: readonly (keyof RecordItem)[] = ['id', 'title', 'owner', 'status', 'createdAt'];
+
+// RFC 4180: a field containing a comma, double quote, CR, or LF is enclosed in
+// double quotes, and every double quote inside it is doubled.
+export function csvCell(value: string | number): string {
+  const text = String(value);
+  return /[",\r\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
+}
+
+// Header row, then one row per record in the given order. Every row ends with CRLF.
+export function toCsv(records: readonly RecordItem[]): string {
+  const rows = records.map((record) => COLUMNS.map((column) => csvCell(record[column])).join(','));
+  return [COLUMNS.join(','), ...rows].map((row) => `${row}\r\n`).join('');
+}

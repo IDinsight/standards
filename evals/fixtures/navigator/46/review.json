@@ -1,0 +1,53 @@
+{
+  "conditions": [
+    {
+      "condition": "A request flow exists in the project that a GRILL_ME quiz can cover",
+      "where": "src/server.js (POST /signups, readJson) -> src/handlers/signup.js createSignup -> src/validate.js validateSignup -> src/store.js SignupStore.insert",
+      "status": "realized"
+    },
+    {
+      "condition": "Source is readable (nothing hidden or unreadable)",
+      "where": "all src/ and test/ files committed with mode 644; no runtime.unreadable",
+      "status": "realized"
+    },
+    {
+      "condition": "Source shows validation before persistence",
+      "where": "src/handlers/signup.js: validateSignup and the 400 return come first, then the duplicate check, then store.insert; test/signup.test.js 'rejects an invalid signup without storing it' asserts count 0",
+      "status": "realized"
+    },
+    {
+      "condition": "No prior answers exist (first turn of the quiz)",
+      "where": "history: null",
+      "status": "realized"
+    },
+    {
+      "condition": "Small committed codebase with a clean working tree",
+      "where": "git log shows the project commit and the install commit; git status is clean",
+      "status": "realized"
+    },
+    {
+      "condition": "A valid installed runtime (state left unspecified, so the default is reasonable)",
+      "where": ".standards/STATE.md is the pristine brownfield install; check.mjs ok:true",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 0,
+      "detail": "reply_not_matches `^\\s*\\**(User|Learner|Student|Me|Answer)\\**\\s*:` (flags mi) also fails a correct reply that has a line starting with 'Answer:', for example an instruction such as 'Answer: in your own words…'. The risk is low because GRILL_ME phrasing rarely puts 'Answer:' at the start of a line, and it does catch simulated learner turns.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally drop `Answer` from the alternation in navigator-46/spec.json checks[0], keeping User|Learner|Student|Me."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The small signup service shows a clear request flow in which validation and the 400 return come before store.insert, with no history and a clean committed tree, so every stated condition holds. Nothing leaks, and the invariants (unchanged **, HEAD unchanged, no mutating git) fit Navigator. The checks are reasonable necessary conditions, with only a minor theoretical over-match on an 'Answer:' line.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T01:42:29.087Z",
+  "costUsd": 0.0916882,
+  "ms": 24998,
+  "fixtureHash": "2dcc1aa3a62f851c"
+}

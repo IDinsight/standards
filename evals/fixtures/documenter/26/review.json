@@ -1,0 +1,99 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState DOCUMENTING, Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, architecture, context, development plan, FULL verification and IMPLEMENTATION review exist with matching provenance and current evidence",
+      "where": ".standards/docs/{scope,specs,development,verification,reviews/.../implementation.md}, .standards/CONTEXT.md; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-001 covers CSV export behavior; AC-002 requires an accurate usage guide",
+      "where": ".standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and obligations inactive; nothing blocked",
+      "where": ".standards/STATE.md (Recovery.Active false, Obligations false, BlockedOn NONE)",
+      "status": "realized"
+    },
+    {
+      "condition": "Editing unrestricted (no target or restriction persisted)",
+      "where": "no documentation record yet; utterance 'Continue.'",
+      "status": "realized"
+    },
+    {
+      "condition": "All export work committed on release-work",
+      "where": "git status '## release-work', clean tree; selfCheck 1-2",
+      "status": "realized"
+    },
+    {
+      "condition": "There is no main or master",
+      "where": "top-level spec 'branch': 'release-work'; git branches shows only release-work; selfCheck 7",
+      "status": "realized"
+    },
+    {
+      "condition": "git diff is empty",
+      "where": "clean working tree, nothing staged; selfCheck 2",
+      "status": "realized"
+    },
+    {
+      "condition": "Development plan and history establish the pre-cycle baseline and later relevant commits",
+      "where": "git log (52b1b38 baseline, dbf0b1e install, cycle commits through 41ce14c); plan self-checks cite abc3b59; CONTEXT.md Evidence and review cite 52b1b38",
+      "status": "realized"
+    },
+    {
+      "condition": "Usage guide does not yet document the export (AC-002 needs work)",
+      "where": "docs/usage.md has no export section; selfCheck 6",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation has no material defects; tests pass",
+      "where": "src/export.ts, src/routes/export.ts; selfChecks 3-4 pass (21 and 3 tests)",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "spec notes and generator notes_for_reviewer are stale: they describe 'two git actions' (branch/checkout layers) and say no selfCheck exists for the missing main/master, but layers is [] and the top-level \"branch\": \"release-work\" plus selfCheck 7 now make release-work the only branch. The built tree is correct; only the prose is out of date.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally update spec.json notes to say the fixture adds no layers and relies on top-level branch release-work."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "Local git config user.name=Fixture / user.email=fixture@example.invalid will show as the commit author in git log. This is harness-wide builder behavior, not specific to this fixture, and does not point at the expected answer.",
+      "recommendation": "run_as_is",
+      "fix": "Harness-level: consider a neutral author identity for all fixtures."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "Every commit carries the identical timestamp 2026-09-24T09:00:00Z. Ordering is still clear from parentage, so a correct range reconstruction is unaffected.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition. Release-work is the only branch with a clean tree, so the default-branch and empty-diff shortcuts are observably wrong. The history and records establish the baseline (52b1b38) and the cycle commits, and docs/usage.md still lacks the export section. The checks (record existence and provenance) and invariants cannot fail a correct Documenter run; only stale notes and harness-wide realism nits remain.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T16:54:23.804Z",
+  "costUsd": 0.794546,
+  "ms": 32610,
+  "fixtureHash": "5353002e5b09004a"
+}

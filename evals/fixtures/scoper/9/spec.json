@@ -1,0 +1,218 @@
+{
+  "base": null,
+  "install": {
+    "mode": "greenfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-scope",
+      "action": "commit",
+      "message": "Record tally scope"
+    },
+    {
+      "dir": "layers/60-recovery",
+      "action": "commit",
+      "message": "Return tally scope to Scoper for AC-003"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "scoper",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "No .standards/CONTEXT.md exists because the first scheduled greenfield audit has not run; its absence is intentional and is not a PROJECT_CONTEXT defect.",
+    "The single recovery frame is From ARCHITECTING, Owner SCOPING, FailureType SCOPING, ResumeAt ARCHITECTING, RerunThrough NONE.",
+    "AC-003 ('Invalid rows are handled gracefully.') is the materially ambiguous condition. The persisted Active Work.Request resolves it without any repository facts: a row whose date or amount is missing or unreadable is reported on standard error with its line number, left out of the totals, the rest of the file is still summarized, and the run still succeeds.",
+    "No architecture artifact exists yet (Active Work.Architecture is NONE) and no downstream state ever completed, so after the Scoper gate the frame is popped and the workflow resumes at ARCHITECTING with Handoff.Kind RESUME; no rerun is needed.",
+    "The project has no implementation; only STANDARDS files and the scope record exist."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "build-a-small-command-line-tool-tally-20260924T083000Z-3c9e51a7",
+    "SCOPE": ".standards/docs/scope/build-a-small-command-line-tool-tally-20260924T083000Z-3c9e51a7.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.Scope",
+          "equals": "${SCOPE}",
+          "why": "REPLAN continues at the existing current-cycle scope path"
+        },
+        {
+          "changed": [
+            "${SCOPE}"
+          ],
+          "why": "correcting the ambiguity edits the existing scope"
+        },
+        {
+          "provenance": {
+            "path": "${SCOPE}",
+            "artifact": "SCOPE",
+            "cycle": "${ID}"
+          }
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "not": "AUDITING"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "not": "PROJECT_CONTEXT"
+        },
+        {
+          "absent": ".standards/CONTEXT.md",
+          "why": "Scoper does not create Auditor-owned context"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "contains": {
+            "path": "${SCOPE}",
+            "regex": "line\\s*(number|no\\.?)|row number|line on which|line it",
+            "flags": "i"
+          },
+          "why": "the request's resolution (report with line number) must reach the scope"
+        },
+        {
+          "unchanged": [
+            ".standards/docs/specs/**"
+          ],
+          "why": "Scoper writes no technical design"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "ARCHITECTING"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "RESUME"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "SCOPING"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "false"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "0"
+        },
+        {
+          "state": "ActiveWork.BlockedOn",
+          "equals": "NONE"
+        },
+        {
+          "check_ok": true
+        }
+      ]
+    },
+    {
+      "assertion": 4,
+      "complete": false,
+      "all": [
+        {
+          "state": "Handoff.Kind",
+          "equals": "RESUME"
+        },
+        {
+          "reply_matches": "/architect\\b",
+          "why": "Claude Code invocation for Architect"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the built recovery state is valid"
+    },
+    {
+      "cmd": "test ! -e .standards/CONTEXT.md",
+      "expect": "pass",
+      "why": "no Auditor context exists before the first greenfield audit"
+    },
+    {
+      "cmd": "grep -q 'GREENFIELD' .standards/MODE.md",
+      "expect": "pass",
+      "why": "ProjectMode is GREENFIELD"
+    }
+  ],
+  "notes": "Standalone greenfield fixture with no project code (empty initial commit, greenfield install). Layer 50 commits MODE.md (GREENFIELD), the scope record created by Scoper with AC-001..AC-004 where AC-003 reads 'Invalid rows are handled gracefully.', and STATE.md at ARCHITECTING after a FORWARD from SCOPING. Layer 60 commits STATE.md in SCOPING with a FAILURE handoff from ARCHITECTING (FailureType SCOPING) and Recovery Frame 1 (From ARCHITECTING, Owner SCOPING, ResumeAt ARCHITECTING, RerunThrough NONE). Active Work.Request holds the user's full request, whose last sentence resolves AC-003 (report unreadable rows on stderr with line number, exclude from totals, keep summarizing, run succeeds). Active Work.Architecture is NONE (Architect stopped before writing a design), no CONTEXT.md exists, so no downstream state needs a rerun: the correct outcome pops the frame and RESUMEs at ARCHITECTING.",
+  "case": "scoper-9",
+  "caseHash": "16c4fe9a5f0e4563",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T20:07:34.399Z",
+    "verdict": "pass",
+    "fixtureHash": "bdb8ec6089ded795",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "19b5b01e50d71f29",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:32:22.875Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T19:45:35.072Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-scope/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/60-recovery/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:32:22.875Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

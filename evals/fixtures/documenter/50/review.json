@@ -1,0 +1,66 @@
+{
+  "conditions": [
+    {
+      "condition": "Active cycle is STANDARD",
+      "where": ".standards/STATE.md `CycleMode`: `STANDARD` with a generated cycle Id",
+      "status": "realized"
+    },
+    {
+      "condition": "WorkflowState is DEVELOPING, owned by Developer",
+      "where": ".standards/STATE.md `WorkflowState`: `DEVELOPING`, Handoff FORWARD from ARCHITECTING",
+      "status": "realized"
+    },
+    {
+      "condition": "User supplies a file argument (docs/usage.md) and the file exists",
+      "where": "prompt.utterance 'Update docs/usage.md.'; docs/usage.md committed in layer 00",
+      "status": "realized"
+    },
+    {
+      "condition": "No control-plane rework request in the utterance",
+      "where": "prompt.utterance contains only the file request",
+      "status": "realized"
+    },
+    {
+      "condition": "Upstream records exist (context, scope, architecture, development plan)",
+      "where": ".standards/CONTEXT.md, .standards/docs/scope/<id>.md, .standards/docs/specs/<id>.md, .standards/docs/development/<id>.md (IN_PROGRESS, DEV-001 DONE, DEV-002 PENDING)",
+      "status": "realized"
+    },
+    {
+      "condition": "No documentation record exists for the cycle",
+      "where": "no .standards/docs/documentation/ directory in built tree",
+      "status": "realized"
+    },
+    {
+      "condition": "Valid, committed state with clean working tree",
+      "where": "git status clean; check.mjs ok:true",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "Plan Notes line 'AC-004 (usage guide) has no Developer step; the design assigns it to the documentation phase.' and the design's AC-004 disposition point toward the later documentation phase. This is ordinary Developer/Architect record content and does not state the expected refusal; the role can derive state ownership from STATE.md regardless.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 1,
+      "detail": "`reply_matches: developer` (i) would fail a reply naming only the DEVELOPING state, but the expected output explicitly requires identifying Developer, and a correct Documenter reply will name the owner or emit a /developer invocation.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture builds a valid STANDARD brownfield cycle at DEVELOPING with complete upstream records, a partially implemented plan, no documentation record, and a plausible reason to want docs/usage.md updated. The checks are necessary conditions for a correct refusal: nothing under .standards, docs, src, bin, or test may change, and the reply must name Developer. Invariants are standard and nothing leaks the answer.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T16:37:35.370Z",
+  "costUsd": 0.14711660000000001,
+  "ms": 24436,
+  "fixtureHash": "263f9da6e78120cc"
+}

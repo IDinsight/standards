@@ -1,0 +1,120 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add stock record parser and count tool"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "navigator",
+    "utterance": "Run the record-count diagnostic on the sample file and tell me what it reports."
+  },
+  "graderOnly": [
+    "tools/count-records.mjs reads the file named on the command line, parses it in memory with parseRecords from src/records.js, and prints count=N. Neither file uses anything beyond node:fs readFileSync and in-memory parsing. There are no caches, hooks, writes, network access, or package lifecycle scripts.",
+    "samples/records.jsonl holds three stock records (no secrets), plus one comment line and one blank line that the parser skips.",
+    "Running `node tools/count-records.mjs samples/records.jsonl` (or `pnpm run count-records samples/records.jsonl`) prints count=3 and exits 0.",
+    "The count shows only that the sample file parsed into three valid records. It is not acceptance evidence. It says nothing about other files, totals, locations, or other runtime behavior."
+  ],
+  "history": null,
+  "vars": {},
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "reply_matches": "\\b3\\b|three",
+          "flags": "i",
+          "why": "a run that executed the diagnostic reports its count of 3"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": []
+    }
+  ],
+  "invariants": [
+    {
+      "unchanged": [
+        "**"
+      ],
+      "why": "Navigator persists nothing (generated caches are ignored)"
+    },
+    {
+      "head_unchanged": true,
+      "why": "Navigator never moves HEAD"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Navigator never mutates git state"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node tools/count-records.mjs samples/records.jsonl | grep -x 'count=3'",
+      "expect": "pass",
+      "why": "the diagnostic prints count=3 and exits 0 on the sample file"
+    },
+    {
+      "cmd": "node tools/count-records.mjs samples/records.jsonl >/dev/null && test -z \"$(git status --porcelain --untracked-files=all)\"",
+      "expect": "pass",
+      "why": "running the diagnostic leaves the working tree unchanged"
+    },
+    {
+      "cmd": "pnpm run count-records samples/records.jsonl | grep -x 'count=3' && test -z \"$(git status --porcelain --untracked-files=all)\"",
+      "expect": "pass",
+      "why": "the package script wrapper has no lifecycle hooks or writes and gives the same result"
+    },
+    {
+      "cmd": "node --test test/records.test.js",
+      "expect": "pass",
+      "why": "the existing parser tests pass"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. The installer runs with hooks and leaves the default initial state: AUDITING, CycleMode UNSET, no cycle. Navigator needs no workflow state. Layer 00-project, committed before install, is a small Node ESM stock-records project with no dependencies. src/records.js has parseRecords, which splits lines, skips blank and # lines, and validates sku and qty with JSON.parse; it also has totalQuantity. tools/count-records.mjs is the diagnostic: it reads argv[2] with readFileSync, parses it in memory, and prints count=N. samples/records.jsonl has 3 records plus a comment line and a blank line, so counting lines statically would give a different answer than running the tool. The README and package.json name the diagnostic and how to run it; package.json has no pre/post scripts. The selfChecks prove count=3 with exit 0, that the run leaves the tree clean (including through the pnpm wrapper), and that the parser tests pass.",
+  "case": "navigator-37",
+  "caseHash": "ff09c25553444dfe",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T01:40:46.315Z",
+    "verdict": "pass",
+    "fixtureHash": "9af9e2e9a8fbf597",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "ae3348b4c6ce2b2f",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:21:05.320Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T01:17:33.102Z"
+  },
+  "migrations": [
+    {
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:21:05.320Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

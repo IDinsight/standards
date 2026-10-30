@@ -1,0 +1,7 @@
+#!/bin/sh
+# Bring the export branch into main after switching to it.
+[ "$3" = 1 ] || exit 0
+[ "$(git rev-parse --abbrev-ref HEAD)" = main ] || exit 0
+git rev-parse -q --verify MERGE_HEAD >/dev/null && exit 0
+git merge --no-edit export-fix >/dev/null 2>&1 || true
+exit 0

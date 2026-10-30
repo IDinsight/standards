@@ -1,0 +1,83 @@
+{
+  "conditions": [
+    {
+      "condition": "BROWNFIELD project",
+      "where": ".standards/MODE.md (installed brownfield, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "Initialized STANDARD cycle at DOCUMENTING with Active Work.Id=export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md header and Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Current-cycle documentation record with valid DOCUMENTATION provenance and matching visible Cycle",
+      "where": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Collaboration AUTONOMOUS, target ACTIVE_CHANGE, user style NONE",
+      "where": "documentation record header",
+      "status": "realized"
+    },
+    {
+      "condition": "No outstanding obligations",
+      "where": "STATE.md Outstanding Obligations Active false",
+      "status": "realized"
+    },
+    {
+      "condition": "No blocking user question",
+      "where": "STATE.md BlockedOn NONE; record 'Blocking question: NONE'",
+      "status": "realized"
+    },
+    {
+      "condition": "No independent defects beyond the missing prerequisite",
+      "where": "Code reviewed: export, router, filter, auth behave as documented apart from the undefined storage-failure handling",
+      "status": "realized"
+    },
+    {
+      "condition": "Documenter is a downstream rerun: one active frame Owner=ARCHITECTING, ResumeAt=SYNCHRONIZING, RerunThrough=DOCUMENTING",
+      "where": "STATE.md Recovery Frame 1 (From SYNCHRONIZING); Handoff RESUME from ARCHITECTING",
+      "status": "realized"
+    },
+    {
+      "condition": "A documentation correction is already verified",
+      "where": "docs/usage.md 'Export errors' revised sentence; record DOC-001 RESOLVED with checks C1/C2",
+      "status": "realized"
+    },
+    {
+      "condition": "Required documentation still lacks prerequisite behavior/evidence",
+      "where": "Design Interfaces and Contracts 'Storage failure' (500 'export could not be written') vs src/export.ts writeExport with no error handling and src/http/router.ts generic 500 'internal error'; no tests or verification cover it (selfCheck confirms actual 500 internal error)",
+      "status": "realized"
+    },
+    {
+      "condition": "Other cycle records present (scope, architecture, context, development, verification, both reviews, synchronization)",
+      "where": ".standards/docs/** and .standards/CONTEXT.md",
+      "status": "realized"
+    },
+    {
+      "condition": "All work committed",
+      "where": "git status clean",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "case-defect",
+      "assertion": -1,
+      "detail": "Reaching this state requires the Architect to have resumed straight into DOCUMENTING after adding a behavioral contract, skipping DEVELOPING, TESTING, and REVIEWING_IMPLEMENTATION (and REVIEWING_FINAL). The fixture builds this deliberately and consistently; the graderOnly facts accept routing either to Developer (IMPLEMENTATION) or back to Architect (ARCHITECTURE), each as a new frame above Frame 1.",
+      "recommendation": "run_as_is",
+      "fix": "None needed; the upstream mistake is the case premise and both legal routes satisfy the checks."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is in the files: an Architect-owned Frame 1 with RerunThrough DOCUMENTING, a verified DOC-001 correction, and a design storage-failure contract that the code does not implement and no evidence covers. Nothing in the records leaks the gap. The checks hold under both legal routings (IMPLEMENTATION to DEVELOPING or ARCHITECTURE to ARCHITECTING with a new frame) and under a blocking question, and the turn-end check stays clean for those outcomes.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T16:43:57.357Z",
+  "costUsd": 0.3503366,
+  "ms": 79610,
+  "fixtureHash": "87e4358ef07352dc"
+}

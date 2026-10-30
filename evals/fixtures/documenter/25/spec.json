@@ -1,0 +1,243 @@
+{
+  "base": "export-project",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-context",
+      "action": "commit",
+      "message": "Record project context for CSV export"
+    },
+    {
+      "dir": "layers/52-scope",
+      "action": "commit",
+      "message": "Define CSV export scope"
+    },
+    {
+      "dir": "layers/54-design",
+      "action": "commit",
+      "message": "Design CSV export"
+    },
+    {
+      "dir": "layers/56-plan",
+      "action": "commit",
+      "message": "Plan CSV export implementation"
+    },
+    {
+      "dir": "layers/58-export",
+      "action": "commit",
+      "message": "Add CSV export of filtered records and export panel"
+    },
+    {
+      "dir": "layers/60-complete",
+      "action": "commit",
+      "message": "Mark CSV export plan complete"
+    },
+    {
+      "dir": "layers/62-verification",
+      "action": "commit",
+      "message": "Record CSV export verification"
+    },
+    {
+      "dir": "layers/64-review",
+      "action": "commit",
+      "message": "Record CSV export implementation review"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "documenter",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "No material defects exist: the implementation matches the technical design and the full test suite (31 tests) passes.",
+    "The TypeScript documentation surface is RecordExporter.exportRecords(user, query), reached as createApp().exporter.exportRecords: an async method whose failures are promise rejections, never synchronous throws (HttpError 401 authentication required, 403 forbidden, 400 unknown status, all before any folder or file is written; file-system errors reject with the unchanged Node error). It resolves to fileName, path, count, and csv.",
+    "The HTML documentation surface is the fragment from renderExportPanel({ action, filter, count }) in src/views/exportPanel.ts: a section labelled by its h2 through aria-labelledby, a summary paragraph referenced by the button through aria-describedby, one escaped hidden input per set filter, and a submit button that is disabled when count is 0. Its element ids are fixed, so a page holds at most one panel, and the fragment performs no authorization.",
+    "The CSS documentation surface is src/views/export-panel.css with nine --export-panel-* custom properties whose defaults are declared on .export-panel itself, so values set on :root or another ancestor do not reach the panel; overrides go on .export-panel in a later stylesheet. The design also states contrast (on-accent over accent, text over surface at least 4.5:1) and layout constraints (single-column grid, max width, right-aligned button, 2.5rem minimum height, accent focus outline).",
+    "There is no Python code or Python documentation surface anywhere in the repository; loading the Documenter python.md style is unrelated work.",
+    "docs/usage.md has no export section, and README.md's Layout section does not list src/export/ or src/views/."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "export-20260924T090000Z-a7f3c1d2",
+    "SCOPE": ".standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md",
+    "ARCH": ".standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md",
+    "DEV": ".standards/docs/development/export-20260924T090000Z-a7f3c1d2.md",
+    "VERIFICATION": ".standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md",
+    "REVIEW_IMPL": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md",
+    "DOC": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md",
+    "USAGE": "docs/usage.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "changed": [
+            "docs/usage.md"
+          ],
+          "why": "the guide has no export section and AC-002 requires it there, so a correct autonomous run edits it"
+        },
+        {
+          "contains": {
+            "path": "docs/usage.md",
+            "regex": "exportRecords"
+          },
+          "why": "an accurate guide must name the async method admin-tool developers call"
+        },
+        {
+          "contains": {
+            "path": "docs/usage.md",
+            "regex": "--export-panel-"
+          },
+          "why": "an accurate guide must name the panel's custom properties to explain styling it"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "test/**",
+            "package.json",
+            "packages/**",
+            "pnpm-lock.yaml",
+            "pnpm-workspace.yaml",
+            ".gitignore",
+            ".standards/CONTEXT.md",
+            "${SCOPE}",
+            "${ARCH}",
+            "${DEV}",
+            "${VERIFICATION}",
+            "${REVIEW_IMPL}"
+          ],
+          "why": "Documenter does not change tests, tooling, configuration, or other roles' records"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the established test command passes offline"
+    },
+    {
+      "cmd": "pnpm --filter export test 2>&1 | grep -qE 'pass 31$'",
+      "expect": "pass",
+      "why": "the suite runs the 31 tests the plan, verification, and review records cite"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the DOCUMENTING state and all records are valid"
+    },
+    {
+      "cmd": "! git ls-files | grep -q '[.]py$'",
+      "expect": "pass",
+      "why": "no Python surface exists in the repository"
+    },
+    {
+      "cmd": "! grep -qi export docs/usage.md && ! grep -q 'src/export' README.md && ! grep -q 'src/views' README.md",
+      "expect": "pass",
+      "why": "the guide has no export section and README's layout does not list the new folders"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && test ! -e exports",
+      "expect": "pass",
+      "why": "the tree is clean and no export files exist"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `DOCUMENTING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Kind`: `FORWARD` `From`: `REVIEWING_IMPLEMENTATION` `FailureType`: `NONE`' .standards/STATE.md && grep -q '`BlockedOn`: `NONE`' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md && grep -q 'ProjectMode`: `BROWNFIELD' .standards/MODE.md",
+      "expect": "pass",
+      "why": "DOCUMENTING after a forward handoff from implementation review, nothing blocked, recovery and obligations inactive"
+    },
+    {
+      "cmd": "test ! -e .standards/docs/documentation && test ! -e .standards/docs/synchronization && test ! -e .standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md && test ! -e .standards/user-styles",
+      "expect": "pass",
+      "why": "no documentation, final-review, or synchronization record and no user styles exist"
+    },
+    {
+      "cmd": "grep -q 'async exportRecords' src/export/exporter.ts && grep -q '<section class=.export-panel. aria-labelledby=.export-panel-title.>' src/views/exportPanel.ts && test $(grep -c -- '--export-panel-[a-z-]*:' src/views/export-panel.css) -eq 9",
+      "expect": "pass",
+      "why": "the async method, the HTML fragment, and the nine custom-property declarations exist as described"
+    },
+    {
+      "cmd": "! grep -rqE 'COMMIT:|BLOB:' .standards/docs .standards/CONTEXT.md",
+      "expect": "pass",
+      "why": "revision placeholders were all resolved"
+    },
+    {
+      "cmd": "test -e .claude/skills/documenter/styles/universal.md && test -e .claude/skills/documenter/styles/typescript.md && test -e .claude/skills/documenter/styles/html.md && test -e .claude/skills/documenter/styles/css.md && test -e .claude/skills/documenter/styles/python.md",
+      "expect": "pass",
+      "why": "all Documenter style files, including the unrelated python.md, are installed"
+    }
+  ],
+  "notes": "Built on export-project (the pre-install records service) rather than export-documenting, because export-documenting's synchronous route and its scope non-goal excluding front-end work cannot hold a TypeScript async public method, an HTML component, and CSS custom properties without invalidating its verification and review evidence. Eight post-install commits write the same cycle id in brownfield order. 50-context: Auditor CONTEXT.md (no views, no stylesheets, front end outside the repo, short // comments and no doc generator) and STATE SCOPING. 52-scope: AC-001 (admin-only filtered CSV export started from an embeddable export panel, RFC 4180 quoting, server-side denial before any file) and AC-002 (docs/usage.md describes who may export, filters, how the admin tool starts an export and what it returns, writes, and fails with, and how to embed and style the panel); STATE ARCHITECTING. 54-design: async RecordExporter.exportRecords contract with rejection semantics, CSV format, file location, renderExportPanel fragment structure and accessibility attributes, stylesheet custom properties with defaults, cascade, contrast, and layout constraints; AC-002 No architectural impact; STATE DEVELOPING. 56-plan: APPROVED plan, three PENDING steps for AC-001, AFTER_IMPLEMENTATION/NONE. 58-export: src/export/csv.ts, src/export/exporter.ts, src/views/exportPanel.ts, src/views/export-panel.css, createApp exposes exporter, .gitignore exports/, three new test files (15 tests, 31 total). 60-complete: plan COMPLETE with self-check evidence, STATE TESTING. 62-verification: COMPLETE FULL verification, AC-002 pending Documenter; STATE REVIEWING_IMPLEMENTATION. 64-review: COMPLETE IMPLEMENTATION review with no material findings, AC-002 permitted dependency; STATE DOCUMENTING. docs/usage.md and README.md are unchanged from export-project. No Python file exists. No user style is selected.",
+  "case": "documenter-25",
+  "caseHash": "06e9a5f7df95c584",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T16:28:37.263Z",
+    "verdict": "pass",
+    "fixtureHash": "ba957c4220c36912",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "a4d7c110c5fbac26",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:12:10.023Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T14:41:56.398Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-context/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/52-scope/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/54-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/56-plan/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/60-complete/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/62-verification/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/64-review/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:12:10.023Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

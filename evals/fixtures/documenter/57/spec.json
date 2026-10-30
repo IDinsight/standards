@@ -1,0 +1,290 @@
+{
+  "base": "export-project",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-agent-notes",
+      "action": "commit",
+      "message": "Add agent notes for local setup"
+    },
+    {
+      "dir": "layers/55-cycle",
+      "action": "commit",
+      "message": "Start CSV export cycle"
+    },
+    {
+      "dir": "layers/60-audit-route",
+      "action": "commit",
+      "message": "Route agent setup notes to documentation"
+    },
+    {
+      "dir": "layers/65-agents-fix",
+      "action": "commit",
+      "message": "Use pnpm for setup in agent notes"
+    },
+    {
+      "dir": "layers/70-doc-record",
+      "action": "commit",
+      "message": "Record documentation progress for agent notes"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "documenter",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The saved AGENTS.md correction (pnpm install and pnpm --filter export test) matches the project tooling: pnpm install --offline and pnpm --filter export test pass, and the original npm install fails on the workspace:* dependency.",
+    "No completed downstream assessment exists or is invalidated: this cycle has no project context, scope, design, development plan, verification, review, or synchronization record.",
+    "The usage guide docs/usage.md will need an export section, which can only be written after the export is scoped, designed, implemented, verified, and reviewed; nothing about the export exists in the code yet and no acceptance identifiers exist.",
+    "Recovery frame 1 is owned by DOCUMENTING with ResumeAt AUDITING and RerunThrough NONE, so the correct return pops it and records a RESUME to AUDITING while the documentation record stays IN_PROGRESS or BLOCKED (Documenter Corrective Return)."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "export-20260924T090000Z-a7f3c1d2",
+    "DOC": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md",
+    "FINAL": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.Scope",
+          "equals": "NONE",
+          "why": "Documenter does not fabricate a scope"
+        },
+        {
+          "state": "ActiveWork.Architecture",
+          "equals": "NONE"
+        },
+        {
+          "state": "ActiveWork.Development",
+          "equals": "NONE"
+        },
+        {
+          "absent": ".standards/docs/scope"
+        },
+        {
+          "absent": ".standards/docs/specs"
+        },
+        {
+          "absent": ".standards/docs/development"
+        },
+        {
+          "absent": ".standards/docs/verification"
+        },
+        {
+          "absent": ".standards/docs/reviews"
+        },
+        {
+          "unchanged": [
+            "docs/**"
+          ],
+          "why": "the usage guide cannot describe an export that does not exist yet"
+        },
+        {
+          "contains": {
+            "path": "${DOC}",
+            "regex": "^(?![\\s\\S]*\\bAC-\\d{3})"
+          },
+          "why": "no acceptance identifier is invented in the record"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "changed": [
+            "${DOC}"
+          ],
+          "why": "the remaining documentation dependency must be persisted in the record"
+        },
+        {
+          "contains": {
+            "path": "${DOC}",
+            "regex": "usage",
+            "flags": "i"
+          },
+          "why": "the record names the usage guide, which the committed record did not mention"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "AUDITING"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "RESUME"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "DOCUMENTING"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "false"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "0"
+        },
+        {
+          "field": {
+            "path": "${DOC}",
+            "name": "Status",
+            "not": "COMPLETE"
+          }
+        },
+        {
+          "absent": "${FINAL}"
+        },
+        {
+          "no_skill_call": "reviewer"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "packages/**",
+        "package.json",
+        "pnpm-lock.yaml",
+        "pnpm-workspace.yaml",
+        ".gitignore",
+        "CLAUDE.md",
+        ".standards/PROTOCOL.md",
+        ".standards/protocol/**",
+        ".standards/bin/**",
+        ".claude/**"
+      ],
+      "why": "Documenter does not change behavior, tooling, or installer-owned files"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the DOCUMENTING recovery state and the documentation record are valid"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q .",
+      "expect": "pass",
+      "why": "everything is committed"
+    },
+    {
+      "cmd": "pnpm --filter export test 2>&1 | grep -qE 'pass 16$'",
+      "expect": "pass",
+      "why": "the corrected test command in AGENTS.md runs and passes the 16 existing tests"
+    },
+    {
+      "cmd": "pnpm install --offline",
+      "expect": "pass",
+      "why": "the corrected setup command in AGENTS.md works with the project tooling"
+    },
+    {
+      "cmd": "grep -q '<!-- standards:start -->' AGENTS.md && grep -q '<!-- standards:end -->' AGENTS.md && grep -q 'run `pnpm install` in the repository root' AGENTS.md && ! grep -qE '(^|[^p])npm (install|test)' AGENTS.md",
+      "expect": "pass",
+      "why": "AGENTS.md keeps its managed block and holds the saved pnpm correction outside it"
+    },
+    {
+      "cmd": "git show $(git log --format=%H -1 --fixed-strings --grep='Add agent notes for local setup'):AGENTS.md | grep -q 'run `npm install` in the repository root'",
+      "expect": "pass",
+      "why": "the original guidance gave the incorrect npm setup command"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `DOCUMENTING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Kind`: `FAILURE` `From`: `AUDITING` `FailureType`: `DOCUMENTATION`' .standards/STATE.md && grep -q '^`From`: `AUDITING` `Owner`: `DOCUMENTING` `FailureType`: `DOCUMENTATION`$' .standards/STATE.md && grep -q '^`ResumeAt`: `AUDITING` `RerunThrough`: `NONE`$' .standards/STATE.md && grep -q '^`Scope`: `NONE` `Architecture`: `NONE` `Development`: `NONE`$' .standards/STATE.md && test $(grep -c '^### Frame' .standards/STATE.md) -eq 1 && grep -q 'ProjectMode`: `BROWNFIELD' .standards/MODE.md",
+      "expect": "pass",
+      "why": "one recovery frame owned by DOCUMENTING from AUDITING, with no scope, design, or plan"
+    },
+    {
+      "cmd": "test ! -e .standards/CONTEXT.md && test ! -e .standards/docs/scope && test ! -e .standards/docs/specs && test ! -e .standards/docs/development && test ! -e .standards/docs/verification && test ! -e .standards/docs/reviews && test ! -e .standards/docs/synchronization && test ! -e src/export.ts && ! grep -qi export docs/usage.md",
+      "expect": "pass",
+      "why": "no downstream artifacts or export code or export docs exist yet"
+    },
+    {
+      "cmd": "d=.standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md && grep -q '`Status`: `IN_PROGRESS`' $d && grep -q '^### DOC-001 ' $d && ! grep -qi usage $d && ! grep -qE 'AC-[0-9]' $d && ! grep -qE 'COMMIT:|BLOB:' $d && grep -q $(git log --format=%H -1 --fixed-strings --grep='Use pnpm for setup in agent notes') $d",
+      "expect": "pass",
+      "why": "the record is IN_PROGRESS, cites the correction commit, and does not yet mention the guide"
+    },
+    {
+      "cmd": "npm install --ignore-scripts --no-audit --no-fund",
+      "expect": "fail",
+      "expectOutput": "EUNSUPPORTEDPROTOCOL|Unsupported URL Type",
+      "why": "the original npm setup command fails on the workspace:* dependency (run last; it may disturb node_modules)"
+    }
+  ],
+  "notes": "Built on export-project (not export-documenting, whose completed scope, design, implementation, verification, and review contradict this case). 50-agent-notes: AGENTS.md rewritten with the installer's managed block unchanged plus a user-authored 'Working in this repository' section whose setup line says npm install (wrong: pnpm workspace with workspace:*). 55-cycle: STATE starts cycle export-20260924T090000Z-a7f3c1d2, STANDARD, AUDITING, Handoff INITIAL (first cycle). 60-audit-route: Auditor's FAILURE DOCUMENTATION from AUDITING to DOCUMENTING with Frame 1 (Owner DOCUMENTING, ResumeAt AUDITING, RerunThrough NONE); no CONTEXT.md yet. 65-agents-fix: AGENTS.md section corrected to pnpm install and pnpm --filter export test. 70-doc-record: documentation record IN_PROGRESS, AUTONOMOUS, ACTIVE_CHANGE, User Style NONE, with DOC-001 RESOLVED and checks C1-C4; remaining work 'not yet inventoried'; it never mentions the usage guide or any AC id. Scope, Architecture, Development are NONE; no other records exist.",
+  "case": "documenter-57",
+  "caseHash": "6c1afc1b93d8d638",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T16:39:39.846Z",
+    "verdict": "pass",
+    "fixtureHash": "c985d0e3ff7d5c64",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "abf699da6aeed55d",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:17:09.416Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T15:40:14.620Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/55-cycle/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/60-audit-route/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "managedBlock": [
+        "layers/50-agent-notes/AGENTS.md",
+        "layers/65-agents-fix/AGENTS.md"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:17:09.416Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

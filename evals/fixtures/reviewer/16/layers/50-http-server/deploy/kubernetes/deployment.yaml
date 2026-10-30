@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: records-admin
+  namespace: internal-tools
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: records-admin
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: records-admin
+    spec:
+      containers:
+        - name: records-admin
+          image: registry.internal/records-admin:0.4.0
+          command: ["node", "src/main.ts"]
+          ports:
+            - containerPort: 8080
+          env:
+            - name: PORT
+              value: "8080"
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080

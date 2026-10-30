@@ -1,0 +1,226 @@
+{
+  "base": null,
+  "date": "2026-09-24T12:00:00Z",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial ticket service"
+    },
+    {
+      "dir": "layers/50-plan",
+      "action": "commit",
+      "message": "Plan internal ticket note"
+    },
+    {
+      "dir": "layers/60-note",
+      "action": "commit",
+      "message": "Add internal note field to tickets"
+    },
+    {
+      "dir": "layers/70-handoff",
+      "action": "commit",
+      "message": "Complete internal note implementation"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "reviewer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The committed src/tickets.js adds an optional note (trimmed; missing, null, or blank becomes null; a non-string or more than 500 characters is rejected, which the routes return as status 400) through the existing optionalText helper. On update it changes only when the body contains the key. internalView includes it and publicView is unchanged. This matches the request and the plan.",
+    "No material findings or assessment gaps exist: npm test passes (11 tests) and the plan's recorded sanity-check output is reproducible on the committed tree.",
+    "The existing tests do not exercise the note field directly. In this EXPEDITED cycle the Developer's recorded self-checks are the evidence, and that is not a material gap.",
+    "The create and update routes were already staff-only before the cycle, so customers can neither set nor see the note."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "note-20260924T113000Z-c8d2e5f0",
+    "DEV": ".standards/docs/development/note-20260924T113000Z-c8d2e5f0.md",
+    "REVIEW": ".standards/docs/reviews/note-20260924T113000Z-c8d2e5f0/implementation.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "state": "CycleMode",
+          "equals": "EXPEDITED",
+          "why": "the cycle is not promoted to obtain skipped guarantees"
+        },
+        {
+          "state": "ActiveWork.Scope",
+          "equals": "NONE"
+        },
+        {
+          "state": "ActiveWork.Architecture",
+          "equals": "NONE"
+        },
+        {
+          "absent": ".standards/docs/scope/${ID}.md"
+        },
+        {
+          "absent": ".standards/docs/specs/${ID}.md"
+        },
+        {
+          "absent": ".standards/docs/verification/${ID}.md"
+        },
+        {
+          "absent": ".standards/docs/documentation/${ID}.md"
+        },
+        {
+          "absent": ".standards/docs/reviews/${ID}/final-deliverable.md"
+        },
+        {
+          "check_ok": true,
+          "why": "check reports acceptance IDs in EXPEDITED records"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${REVIEW}"
+        },
+        {
+          "unchanged": [
+            "${DEV}"
+          ],
+          "why": "Reviewer assesses Developer evidence without editing the plan"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "AWAITING_USER_SIGNOFF"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "REVIEWING_IMPLEMENTATION"
+        },
+        {
+          "provenance": {
+            "path": "${REVIEW}",
+            "artifact": "REVIEW",
+            "cycle": "${ID}",
+            "kind": "IMPLEMENTATION"
+          }
+        },
+        {
+          "field": {
+            "path": "${REVIEW}",
+            "name": "Status",
+            "equals": "COMPLETE"
+          }
+        },
+        {
+          "reply_not_matches": "Next role:",
+          "why": "no next-role invocation at AWAITING_USER_SIGNOFF"
+        },
+        {
+          "reply_not_matches": "/(scoper|architect|auditor|developer|tester|reviewer|documenter|synchronizer)\\s+Continue",
+          "flags": "i",
+          "why": "no copy/paste role invocation"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "Reviewer must not change the assessed identity"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Reviewer must not change git state"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "package.json",
+        "README.md"
+      ],
+      "why": "Reviewer does not edit implementation or tests"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "npm test",
+      "expect": "pass",
+      "why": "the established test command passes on the committed implementation"
+    },
+    {
+      "cmd": "out=$(node --test --test-reporter=tap test/tickets.test.js test/api.test.js) && echo \"$out\" | grep -qx '# tests 11' && echo \"$out\" | grep -qx '# pass 11'",
+      "expect": "pass",
+      "why": "the plan records 11 tests, 11 passed"
+    },
+    {
+      "cmd": "node --input-type=module -e 'import assert from \"node:assert/strict\"; import { TicketService } from \"./src/service.js\"; import { createTicketRoute, getTicketRoute, updateTicketRoute } from \"./src/api.js\"; const s = new TicketService(); const staff = { staff: true }; assert.equal(createTicketRoute(s, staff, { title: \"Printer offline\", note: \"  Called twice  \" }).body.note, \"Called twice\"); assert.deepEqual(getTicketRoute(s, { staff: false }, 1).body, { id: 1, title: \"Printer offline\", priority: \"normal\", status: \"open\" }); assert.equal(updateTicketRoute(s, staff, 1, { status: \"pending\" }).body.note, \"Called twice\"); assert.equal(updateTicketRoute(s, staff, 1, { note: \"   \" }).body.note, null); assert.deepEqual(createTicketRoute(s, staff, { title: \"Long\", note: \"x\".repeat(501) }), { status: 400, body: { error: \"note: must be at most 500 characters\" } }); assert.deepEqual(createTicketRoute(s, staff, { title: \"Bad\", note: 42 }), { status: 400, body: { error: \"note: must be a string\" } }); assert.equal(createTicketRoute(s, staff, { title: \"Max\", note: \"x\".repeat(500) }).status, 201);'",
+      "expect": "pass",
+      "why": "the implementation satisfies the bounded request and reproduces the plan's sanity-check results"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the starting state is valid"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 00-project (pre-install): a small Node ESM ticket service (src/fields.js with requiredText/optionalText/oneOf, src/tickets.js, src/service.js, src/api.js) with 11 node:test tests. 50-plan starts the first cycle as EXPEDITED in DEVELOPING (Handoff INITIAL with an expedited-entry reason) with an APPROVED plan. 60-note commits the implementation, a note field in src/tickets.js only. 70-handoff marks DEV-001 DONE and the plan COMPLETE, with self-check evidence that cites the 60-note commit and the src/tickets.js blob, and moves STATE to REVIEWING_IMPLEMENTATION with a FORWARD handoff from DEVELOPING. Scope and Architecture are NONE. No CONTEXT.md, verification, documentation, or review records exist. Commits are dated 12:00Z so they follow the cycle id's 11:30Z timestamp.",
+  "case": "reviewer-27",
+  "caseHash": "f977bb8ccdc79417",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T23:26:10.877Z",
+    "verdict": "pass",
+    "fixtureHash": "bbdff66894816bf0",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "04363363450fed6b",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:25:26.351Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T22:29:31.991Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-plan/.standards/STATE.md: NONE",
+        "layers/70-handoff/.standards/STATE.md: NONE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:25:26.351Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

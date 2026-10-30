@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Using the records service</title>
+</head>
+<body>
+  <main>
+    <h1>Using the records service</h1>
+    <p>The records service backs the internal records admin tool. Every request
+      carries the signed-in user; requests without one are rejected.</p>
+
+    <section id="roles">
+      <h2>Roles</h2>
+      <ul>
+        <li><code>admin</code>, <code>editor</code>, and <code>viewer</code> can all list records.</li>
+        <li>A request without a signed-in user gets <code>401</code>; a role that is not
+          allowed for a route gets <code>403</code>. Role checks run on the server in every handler.</li>
+      </ul>
+    </section>
+
+    <section id="listing">
+      <h2>Listing records</h2>
+      <p><code>GET /records</code> returns JSON:</p>
+      <pre><code>{ "count": 1, "records": [ { "id": 4, "title": "Insurance renewal 2026", "owner": "marco", "status": "active", "createdAt": "2026-04-18T16:20:00Z" } ] }</code></pre>
+      <p>Records are ordered by <code>id</code>. Each record has <code>id</code>, <code>title</code>,
+        <code>owner</code>, <code>status</code> (<code>active</code> or <code>archived</code>), and
+        <code>createdAt</code> (ISO 8601, UTC).</p>
+    </section>
+
+    <section id="filtering">
+      <h2>Filtering</h2>
+      <p>Query parameters narrow the list; all given filters must match:</p>
+      <dl>
+        <dt><code>status</code></dt>
+        <dd><code>active</code> or <code>archived</code>. Any other value returns <code>400</code>
+          with <code>{"error": "unknown status: &lt;value&gt;"}</code>.</dd>
+        <dt><code>owner</code></dt>
+        <dd>Exact owner username, for example <code>marco</code>.</dd>
+        <dt><code>q</code></dt>
+        <dd>Case-insensitive text that must appear in the title.</dd>
+      </dl>
+      <p>Blank values and other parameters are ignored.</p>
+      <p>Example: <code>GET /records?status=active&amp;owner=marco</code> lists marco's active records.</p>
+    </section>
+
+    <section id="errors">
+      <h2>Errors</h2>
+      <p>Errors are JSON objects of the form <code>{"error": "..."}</code>:</p>
+      <table>
+        <thead>
+          <tr><th scope="col">Status</th><th scope="col">Meaning</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>400</td><td>Invalid query parameter</td></tr>
+          <tr><td>401</td><td>No signed-in user</td></tr>
+          <tr><td>403</td><td>Role not allowed for this route</td></tr>
+          <tr><td>404</td><td>Unknown path</td></tr>
+          <tr><td>405</td><td>Known path, unsupported method</td></tr>
+          <tr><td>500</td><td>Unexpected server error</td></tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+</body>
+</html>

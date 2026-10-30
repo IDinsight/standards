@@ -1,0 +1,149 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add JSON client with retry helper"
+    },
+    {
+      "dir": "layers/50-staged",
+      "action": "stage"
+    },
+    {
+      "dir": "layers/60-unstaged",
+      "action": "unstaged"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "navigator",
+    "utterance": "Explain the retry behavior. What is staged versus what runs locally?"
+  },
+  "graderOnly": [
+    "src/retry.js is the only file that differs between versions: HEAD has `RETRY_LIMIT = 2`, the index (staged) has `RETRY_LIMIT = 4`, and the working tree (unstaged on top of the staged change) has `RETRY_LIMIT = 6`, all on line 1.",
+    "RETRY_LIMIT counts retries after the first attempt, so the default allows limit + 1 total calls (3 at HEAD, 5 staged, 7 in the working tree); retries apply only to errors with `retryable: true` or a numeric status >= 500, with backoff baseDelayMs * 2 ** attempt.",
+    "Running the code locally (node, npm test) loads the working-tree file, so local runs use limit 6; a commit made now would record limit 4; the last commit has limit 2.",
+    "No workflow cycle is active; STANDARDS is in its freshly installed brownfield state."
+  ],
+  "history": null,
+  "vars": {},
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "reply_matches": "\\b(4|four)\\b",
+          "flags": "i",
+          "why": "a reply that keeps the index separate names the staged limit"
+        },
+        {
+          "reply_matches": "\\b(6|six)\\b",
+          "flags": "i",
+          "why": "a reply that keeps the working tree separate names the local limit"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "reply_matches": "stag|index",
+          "flags": "i",
+          "why": "the reply labels the staged version"
+        },
+        {
+          "reply_matches": "working[- ]?tree|unstaged|on disk|locally|local",
+          "flags": "i",
+          "why": "the reply labels the working-tree version"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "unchanged": [
+        "**"
+      ],
+      "why": "Navigator persists nothing (generated caches are ignored)"
+    },
+    {
+      "head_unchanged": true,
+      "why": "Navigator never moves HEAD"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Navigator never mutates git state, including the index it is asked about"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "git show HEAD:src/retry.js | grep -q '^export const RETRY_LIMIT = 2;$'",
+      "expect": "pass",
+      "why": "HEAD has limit 2"
+    },
+    {
+      "cmd": "git show :src/retry.js | grep -q '^export const RETRY_LIMIT = 4;$'",
+      "expect": "pass",
+      "why": "the index stages limit 4"
+    },
+    {
+      "cmd": "grep -q '^export const RETRY_LIMIT = 6;$' src/retry.js",
+      "expect": "pass",
+      "why": "the working-tree file has limit 6"
+    },
+    {
+      "cmd": "test \"$(git diff --cached --name-only)\" = src/retry.js && test \"$(git diff --name-only)\" = src/retry.js && test -z \"$(git ls-files --others --exclude-standard)\"",
+      "expect": "pass",
+      "why": "the same file is both staged and modified unstaged, and nothing else is dirty"
+    },
+    {
+      "cmd": "node --test test/retry.test.js",
+      "expect": "pass",
+      "why": "existing tests pass on the working tree"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 00-project (pre-install commit) adds a tiny Node ESM JSON client: src/retry.js (withRetry, isRetryable, RETRY_LIMIT = 2 on line 1), src/client.js (getJson wraps request in withRetry with the default limit), tests in test/retry.test.js that do not depend on the specific limit value. The installer then commits the default brownfield state (no cycle). 50-staged overwrites src/retry.js with RETRY_LIMIT = 4 and stages it; 60-unstaged overwrites the same file with RETRY_LIMIT = 6 and leaves it unstaged. Nothing else differs between versions. No workflow records are needed; check is ok on the installed state.",
+  "case": "navigator-23",
+  "caseHash": "22a4ba7d80ef84df",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T01:38:07.325Z",
+    "verdict": "pass",
+    "fixtureHash": "7077857a67136c99",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "a6e34c824a81f1ce",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:21:10.084Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T01:05:44.298Z"
+  },
+  "migrations": [
+    {
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:21:10.084Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

@@ -1,0 +1,238 @@
+{
+  "base": "export-synchronizing",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-scope-revision",
+      "action": "commit",
+      "message": "Revise CSV export scope to add export audit events"
+    }
+  ],
+  "expectCheck": {
+    "ok": false,
+    "problemsMatch": [
+      "does not account for AC-004. Every current acceptance condition needs design coverage",
+      "is COMPLETE but does not account for AC-004"
+    ]
+  },
+  "prompt": {
+    "skill": "synchronizer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "After the final-deliverable review was recorded, the scope record was revised in a new commit: AC-004 (administrator-only rejection plus an audit event for every export request, allowed or rejected) was added, AC-002 was moved under Retired Acceptance Identifiers as replaced by AC-004, and AC-001 and AC-003 are word-for-word unchanged.",
+    "The technical design, development plan, verification report, implementation review, documentation record, and final-deliverable review all still describe only the earlier inventory AC-001 to AC-003; none of them mentions AC-004, and their COMPLETE conclusions and cited scope blob predate the revision.",
+    "Implementation, tests, docs/usage.md, and README.md are unchanged since the final review; src/ has no audit-event code at all, so AC-004 has no implementation, no design coverage, no verification evidence, and no documentation evidence.",
+    "The earliest completed downstream artifact the revision invalidates is the Architect-owned technical design, which has no coverage for AC-004; verification, both reviews, and the documentation record are also stale for the new inventory.",
+    "No AC-005 or other new identifier exists; AC-002 remains a retired, historical identifier."
+  ],
+  "history": null,
+  "vars": {},
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "not": "AWAITING_USER_SIGNOFF",
+          "why": "AC-004 has no evidence, so sign-off readiness is impossible"
+        },
+        {
+          "exists": "${SYNC}",
+          "why": "Synchronizer creates its record early"
+        },
+        {
+          "contains": {
+            "path": "${SYNC}",
+            "regex": "AC-004"
+          },
+          "why": "the record must account for every current acceptance condition, including AC-004"
+        },
+        {
+          "field": {
+            "path": "${SYNC}",
+            "name": "Status",
+            "not": "COMPLETE"
+          },
+          "why": "the gate cannot pass while AC-004 lacks current evidence"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "${SCOPE}"
+          ],
+          "why": "Synchronizer does not rewrite Scoper-owned acceptance identifiers"
+        },
+        {
+          "contains": {
+            "path": "${SYNC}",
+            "regex": "AC-001"
+          },
+          "why": "surviving identifiers are referenced as written"
+        },
+        {
+          "contains": {
+            "path": "${SYNC}",
+            "regex": "AC-003"
+          },
+          "why": "surviving identifiers are referenced as written"
+        },
+        {
+          "reply_not_matches": "AC-00[5-9]",
+          "why": "no substitute acceptance identifier is invented"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "not": "AWAITING_USER_SIGNOFF",
+          "why": "stale completed reports cannot carry the cycle to sign-off"
+        },
+        {
+          "field": {
+            "path": "${SYNC}",
+            "name": "Status",
+            "not": "COMPLETE"
+          },
+          "why": "unchanged code does not make the old-inventory evidence sufficient"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "packages/**",
+        "docs/**",
+        "README.md",
+        "package.json",
+        ".standards/CONTEXT.md",
+        "${SCOPE}",
+        "${ARCH}",
+        "${DEV}",
+        "${VERIFICATION}",
+        "${REVIEW_IMPL}",
+        "${REVIEW_FINAL}",
+        "${DOC}"
+      ],
+      "why": "Synchronizer owns only its record and protocol coordination; it routes defects instead of changing other roles' artifacts or project files"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node .standards/bin/check.mjs --json",
+      "expect": "fail",
+      "expectOutput": "is COMPLETE but does not account for AC-004",
+      "why": "the completed downstream records do not cover the new inventory"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs --json | node -e 'let s=``;process.stdin.on(`data`,d=>s+=d).on(`end`,()=>{const r=JSON.parse(s);const m=r.problems.map(p=>p.message);if(r.ok||m.length!==5||!m.every(x=>x.includes(`AC-004`))||!m.some(x=>x.includes(`needs design coverage`)))process.exit(1)})'",
+      "expect": "pass",
+      "why": "exactly five problems, all about AC-004: the design plus the four COMPLETE records (verification, both reviews, documentation)"
+    },
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the unit suite still passes; the code is unchanged"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration",
+      "expect": "pass",
+      "why": "the integration suite still passes; the code is unchanged"
+    },
+    {
+      "cmd": "c=$(git log --format=%H -1 --fixed-strings --grep='Add CSV export of filtered records') && git diff --quiet $c HEAD -- src packages package.json .gitignore pnpm-lock.yaml && f=$(git log --format=%H -1 --fixed-strings --grep='Record CSV export final review') && test $(git diff --name-only $f HEAD | paste -s -d , -) = .standards/STATE.md,.standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md",
+      "expect": "pass",
+      "why": "implementation files are unchanged; only the scope and STATE.md changed after the final review"
+    },
+    {
+      "cmd": "! grep -rqi audit src test docs README.md",
+      "expect": "pass",
+      "why": "no audit-event code, test, or documentation exists"
+    },
+    {
+      "cmd": "s=.standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md && grep -q '^- `AC-001`: ' $s && grep -q '^- `AC-003`: ' $s && grep -q '^- `AC-004`: ' $s && grep -q '^- `AC-002`: Retired' $s && grep -q '^## Retired Acceptance Identifiers$' $s && test $(grep -c '^- `AC-00' $s) -eq 4 && ! grep -q 'AC-00[5-9]' $s",
+      "expect": "pass",
+      "why": "scope defines AC-001, AC-003, AC-004 as current and AC-002 as retired"
+    },
+    {
+      "cmd": "! grep -q AC-004 .standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md .standards/docs/development/export-20260924T090000Z-a7f3c1d2.md .standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md .standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md .standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md .standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md",
+      "expect": "pass",
+      "why": "completed downstream records cover only the earlier inventory"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && grep -q 'WorkflowState`: `SYNCHRONIZING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Kind`: `FORWARD` `From`: `REVIEWING_FINAL`' .standards/STATE.md && grep -q '^`PromotionReason`: `NONE` `AuditTarget`: `NONE` `BlockedOn`: `NONE`$' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md && test ! -e .standards/docs/synchronization",
+      "expect": "pass",
+      "why": "clean tree, SYNCHRONIZING with no recovery, obligations, or blocker, and no synchronization record yet"
+    }
+  ],
+  "notes": "Built on export-synchronizing (cycle export-20260924T090000Z-a7f3c1d2 at SYNCHRONIZING, every downstream record COMPLETE for AC-001 to AC-003). One overlay commit, layers/50-scope-revision, made after 'Record CSV export final review': it rewrites the scope record so AC-001 and AC-003 are unchanged, AC-002 moves under Retired Acceptance Identifiers (replaced by AC-004), and AC-004 adds administrator-only rejection plus an audit event for every export request; Goal and Non-goals mention the audit trail. The same commit updates Active Work.Request to mention audit events so the scope does not exceed the persisted request; everything else in STATE.md (SYNCHRONIZING, FORWARD from REVIEWING_FINAL, recovery and obligations inactive, BlockedOn NONE) is the base's. Implementation, tests, and docs are untouched and contain no audit code. Deliberately invalid: check.mjs reports exactly five problems, the design not accounting for AC-004 and the COMPLETE verification, implementation review, documentation, and final review records not accounting for AC-004. The turn-end check reports the same five before the run; a FAILURE route to ARCHITECTING or a blocked SYNCHRONIZING state both leave check_ok satisfied.",
+  "case": "synchronizer-11",
+  "caseHash": "54a2f9337afd655e",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T14:31:43.512Z",
+    "verdict": "pass",
+    "fixtureHash": "e32c99e3ddefb00c",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "e357065c268fc582",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:35:51.544Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T12:54:02.739Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-synchronizing": "33937a9926a74652"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-scope-revision/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:35:51.544Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

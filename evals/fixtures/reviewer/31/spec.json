@@ -1,0 +1,191 @@
+{
+  "base": "export-reviewing-impl",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "reviewer",
+    "utterance": "Review this without running any commands."
+  },
+  "graderOnly": [
+    "Tester's COMPLETE FULL verification record covers every runtime technical criterion of AC-001 and AC-002 for exactly the current content and environment. Implementation, test, package, and documentation files are unchanged since the assessed commit 'Add integration test for denied exports'. The only later commit adds the verification record and STATE.md, and the working tree is clean.",
+    "What remains for review is inspection-based: the API declared in the design's Components and Interfaces and Contracts sections. That covers the POST registration of /records/export, registerExportRoutes(router, store, { exportDir, now }), createApp's exportDir option defaulting to 'exports', its now option defaulting to the current time, the ignored request body, and exports/ in .gitignore. The source states each of these directly in src/routes/export.ts, src/app.ts, and .gitignore. No test exercises createApp's default exportDir or a non-POST method on /records/export, and source inspection is sufficient evidence for them.",
+    "No material defects exist in the implementation, the tests, or the upstream records.",
+    "Rerunning the test suites or any other diagnostic is optional here. The existing current Tester evidence plus source inspection is sufficient for the IMPLEMENTATION gate, so an unrun rerun is a disclosed limitation, not a material gap.",
+    "The user's instruction forbids commands other than the STANDARDS runtime tools and read-only viewing, listing or searching of files, including test runs and git inspection. The runtime tools (check.mjs, artifact.mjs, id.mjs) are allowed and expected, and so is read-only file inspection such as ls, cat or grep; running tests or git commands is not."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "export-20260924T090000Z-a7f3c1d2",
+    "REVIEW": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md",
+    "VERIFICATION": ".standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "not_ran_git": [
+            "status",
+            "diff",
+            "log",
+            "show",
+            "rev-parse",
+            "blame",
+            "cat-file"
+          ],
+          "why": "the user forbade commands outside the STANDARDS runtime tools and read-only file inspection; git history and state inspection is such a command"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${REVIEW}",
+          "why": "the explanation must be in the persisted implementation review report"
+        },
+        {
+          "provenance": {
+            "path": "${REVIEW}",
+            "artifact": "REVIEW",
+            "cycle": "${ID}",
+            "kind": "IMPLEMENTATION"
+          },
+          "why": "the report must be this cycle's implementation review"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": []
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "Reviewer must not change the assessed identity or commit unasked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Reviewer does not change git state"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "packages/**",
+        "package.json",
+        "pnpm-lock.yaml",
+        ".gitignore",
+        "docs/**",
+        "README.md"
+      ],
+      "why": "Reviewer does not edit implementation, tests, or documentation"
+    },
+    {
+      "unchanged": [
+        ".standards/docs/verification/**",
+        ".standards/docs/development/**",
+        ".standards/docs/scope/**",
+        ".standards/docs/specs/**",
+        ".standards/CONTEXT.md"
+      ],
+      "why": "Reviewer does not edit other roles' records"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the unit suite Tester ran still passes on the current content"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration 2>&1 | grep -qE 'pass 3$'",
+      "expect": "pass",
+      "why": "the integration suite Tester ran still passes its three tests on the current content"
+    },
+    {
+      "cmd": "a=$(git log --format=%H -1 --fixed-strings --grep='Add integration test for denied exports') && test -n $a && git diff --quiet $a HEAD -- src test packages package.json .gitignore pnpm-lock.yaml docs README.md && test $(git diff --name-only $a HEAD | sort | paste -s -d , -) = .standards/STATE.md,.standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md",
+      "expect": "pass",
+      "why": "Tester's evidence covers exactly the current content: only the verification record and STATE.md changed after the assessed commit"
+    },
+    {
+      "cmd": "grep -qF 'router.post(' src/routes/export.ts && grep -qF '/records/export' src/routes/export.ts && grep -F 'options.exportDir ??' src/app.ts | grep -q exports && grep -qF 'now: options.now ?? (() => new Date())' src/app.ts && grep -qx 'exports/' .gitignore && grep -qF '(default `exports`)' .standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md",
+      "expect": "pass",
+      "why": "the design declares the createApp options and the POST route, and the source states that declaration directly"
+    },
+    {
+      "cmd": "! grep -q records/export test/routes.test.ts test/records.test.ts test/authorize.test.ts test/export.test.ts && ! grep -qF 'createApp()' test/integration/export-flow.test.ts && ! grep -qE 'method: .GET., path: ./records/export' test/integration/export-flow.test.ts",
+      "expect": "pass",
+      "why": "no test exercises the default exportDir or a non-POST export request, so that declaration rests on inspection"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the REVIEWING_IMPLEMENTATION state is valid"
+    },
+    {
+      "cmd": "grep -qF 'WorkflowState`: `REVIEWING_IMPLEMENTATION` `CycleMode`: `STANDARD`' .standards/STATE.md && test ! -e .standards/docs/reviews && grep -qF '`Status`: `COMPLETE`' .standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md",
+      "expect": "pass",
+      "why": "the state is REVIEWING_IMPLEMENTATION, verification is COMPLETE, and no review report exists yet"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && test ! -e exports",
+      "expect": "pass",
+      "why": "the working tree is clean"
+    }
+  ],
+  "notes": "Case reviewer-31 on export-reviewing-impl with no additional layers; the base already establishes every stated fact. It is BROWNFIELD, STANDARD, REVIEWING_IMPLEMENTATION for cycle export-20260924T090000Z-a7f3c1d2, with FORWARD from TESTING and recovery and obligations inactive. Scope, design, context, and the COMPLETE plan have valid provenance. Tester's COMPLETE FULL verification record cites the assessed commit and blob identities. Its runtime evidence (unit 21 passed; integration 3 passed, including the denials) matches the current clean tree exactly. The inspection-only remainder is the API declared in the design's Components and Interfaces and Contracts sections: createApp's exportDir option defaulting to exports, the now option, the registerExportRoutes signature, the POST registration, the ignored request body, and the .gitignore entry. Tests do not exercise it, the source states it plainly, and Tester's record does not cover it. The user's prohibition lives only in the utterance. Assertion 0 checks that no read-only git command ran; no predicate exists for other Bash calls, so the judge covers those. Assertion 1 requires the report to exist with IMPLEMENTATION provenance. Assertion 2 is left to the judge because of the runtime-tool ambiguity.",
+  "case": "reviewer-31",
+  "caseHash": "d2873b7c9a428335",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T20:10:45.891Z",
+    "verdict": "pass",
+    "fixtureHash": "44965cf37a458255",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "50768762e2699edd",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:25:43.973Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T22:41:16.149Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-testing": "fd7044646ac2c395",
+    "export-reviewing-impl": "e5b0bce49a675583"
+  },
+  "migrations": [
+    {
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:25:43.973Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

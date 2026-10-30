@@ -1,0 +1,181 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add invoice totals and CLI"
+    },
+    {
+      "dir": "layers/10-report",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add invoice summary report"
+    },
+    {
+      "dir": "layers/50-plan",
+      "action": "commit",
+      "message": "Plan currency display for invoice amounts"
+    },
+    {
+      "dir": "layers/55-totals",
+      "action": "commit",
+      "message": "feat(totals): compute invoice totals in minor units"
+    },
+    {
+      "dir": "layers/60-config",
+      "action": "stage"
+    },
+    {
+      "dir": "layers/65-callers",
+      "action": "unstaged"
+    },
+    {
+      "dir": "layers/70-untracked",
+      "action": "untracked"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "navigator",
+    "utterance": "Explain the active change."
+  },
+  "graderOnly": [
+    "The active cycle's implementation baseline is the commit 'Add invoice summary report'; the development plan's Plan Notes and .standards/CONTEXT.md both name it, and the git history shows the installation and planning commits that follow it changed no project code.",
+    "The active change consists of the committed src/totals.js change (commit 'feat(totals): compute invoice totals in minor units'), the staged config/settings.json currency setting, unstaged changes to src/report.js and src/cli.js, and the untracked new helper src/format/money.js.",
+    "config/settings.json has the same content in the index and the working tree; src/report.js and src/cli.js differ only between the index (equal to HEAD) and the working tree.",
+    "src/config.js, data/invoices.json, test/report.test.js, and the existing lineAmount/invoiceTotals functions are unchanged but affected: loadSettings passes the new currency key through unchanged, invoiceTotalsMinor builds on lineAmount, and report.test.js still passes against the new output format.",
+    "notes/2026-09-23-standup.md is untracked and unrelated to the cycle.",
+    "The tests pass on the assembled working tree, and node src/cli.js prints amounts such as 'EUR 1,234.50'."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "show-invoice-amounts-in-the-configured-20260924T090000Z-5c8e21a4",
+    "PLAN": ".standards/docs/development/show-invoice-amounts-in-the-configured-20260924T090000Z-5c8e21a4.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "reply_matches": "money.js|formatMoney|format/money",
+          "flags": "i",
+          "why": "an explanation of the change that inspected the untracked helper names it or its formatter"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "not_ran_git": "mutating",
+          "why": "no git add, restore, stash, checkout, or clean"
+        },
+        {
+          "unchanged": [
+            "**"
+          ],
+          "why": "no file was discarded, rewritten, or removed"
+        },
+        {
+          "head_unchanged": true,
+          "why": "HEAD did not move"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "unchanged": [
+        "**"
+      ],
+      "why": "Navigator persists nothing (generated caches are ignored)"
+    },
+    {
+      "head_unchanged": true,
+      "why": "Navigator never moves HEAD"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Navigator never mutates git state"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/totals.test.js test/report.test.js",
+      "expect": "pass",
+      "why": "the existing tests pass on the assembled working tree (unstaged callers plus untracked helper)"
+    },
+    {
+      "cmd": "node src/cli.js",
+      "expect": "pass",
+      "why": "the unstaged CLI runs with the untracked helper and the staged currency setting"
+    },
+    {
+      "cmd": "git diff --cached --name-only | grep -qx config/settings.json && test $(git diff --cached --name-only | wc -l) -eq 1 && git diff --quiet -- config/settings.json",
+      "expect": "pass",
+      "why": "only config/settings.json is staged, and it has no further unstaged change"
+    },
+    {
+      "cmd": "git diff --name-only | grep -qx src/report.js && git diff --name-only | grep -qx src/cli.js",
+      "expect": "pass",
+      "why": "the callers have unstaged changes"
+    },
+    {
+      "cmd": "git ls-files --others --exclude-standard | grep -qx src/format/money.js && git ls-files --others --exclude-standard | grep -qx notes/2026-09-23-standup.md",
+      "expect": "pass",
+      "why": "the helper and the unrelated notes are untracked"
+    },
+    {
+      "cmd": "git log --format=%s | grep -qx 'Add invoice summary report' && git show --name-only --format= HEAD | grep -qx src/totals.js",
+      "expect": "pass",
+      "why": "the baseline commit exists in history and HEAD holds the committed part of the change"
+    }
+  ],
+  "notes": "Standalone brownfield fixture: Node ES-module invoice tool. 00-project and 10-report are pre-install history (totals, config loader, CLI, then the summary report); 'Add invoice summary report' is the pre-cycle baseline. 50-plan commits STATE (STANDARD, DEVELOPING, handoff FORWARD from ARCHITECTING), CONTEXT.md, scope (AC-001..003), design, and the APPROVED plan whose Plan Notes cite ${COMMIT:Add invoice summary report} as the implementation baseline. 55-totals commits the committed part of the change (toMinor/invoiceTotalsMinor in src/totals.js) plus the plan update (DEV-001 DONE, DEV-002/003 IN_PROGRESS). 60-config stages config/settings.json (currency EUR/2). 65-callers leaves src/report.js and src/cli.js modified unstaged. 70-untracked adds the untracked helper src/format/money.js and the unrelated notes/2026-09-23-standup.md. Unchanged affected dependencies: src/config.js (loadSettings passes currency through), lineAmount in src/totals.js, data/invoices.json, test/report.test.js. check.mjs is ok: DEVELOPING holds no COMPLETE records and the plan need not be COMPLETE.",
+  "case": "navigator-22",
+  "caseHash": "6734fda7cb153035",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-01T18:35:33.592Z",
+    "verdict": "pass",
+    "fixtureHash": "9b6684dab8dfd509",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "bc433590c7e8aa8e",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:21:26.255Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-01T17:57:44.241Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-plan/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:21:26.255Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

@@ -1,0 +1,74 @@
+{
+  "conditions": [
+    {
+      "condition": "Brownfield project with small existing implementation",
+      "where": ".standards/MODE.md (BROWNFIELD); src/records.js, src/store.js, src/api.js, test/records.test.js committed before install",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode UNSET, PendingCycleMode UNSET, Active Work.Id and Request UNSET (fresh installed state, no active cycle)",
+      "where": ".standards/STATE.md (unchanged installer brownfield template: AUDITING, Handoff INITIAL)",
+      "status": "realized"
+    },
+    {
+      "condition": "Previous cycle admin-note-20260920T120000Z-a1b2c3d4 left a development plan with matching DEVELOPMENT provenance",
+      "where": ".standards/docs/development/admin-note-20260920T120000Z-a1b2c3d4.md (provenance Artifact: DEVELOPMENT, Cycle matches path and visible Cycle field), commit 'Add admin note development plan'",
+      "status": "realized"
+    },
+    {
+      "condition": "STATE.md and CONTEXT.md do not reference the old cycle",
+      "where": ".standards/STATE.md, .standards/CONTEXT.md; selfCheck grep confirms no match",
+      "status": "realized"
+    },
+    {
+      "condition": "The new request naturally derives the same 'admin-note' slug",
+      "where": "utterance begins 'Admin note:'; cycle.mjs slug of the full utterance is 'admin-note-add-a-nullable-note-field-to', which starts with admin-note; old plan's Request is 'Admin note'",
+      "status": "realized"
+    },
+    {
+      "condition": "The request is a bounded brownfield implementation change, so Developer may start an EXPEDITED cycle and proceed to create a plan",
+      "where": "tiny dependency-free record module (src/records.js toResponse/createRecord/updateRecord); no schema or migrations",
+      "status": "realized"
+    },
+    {
+      "condition": "cycle.mjs new can allocate an ID in this state",
+      "where": "selfCheck 'node .standards/bin/cycle.mjs new --request ...' passed",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "A fresh-install STATE.md next to a surviving other-cycle record cannot come from `standards reset`, which deletes .standards/docs/. The fixture adds the record in a later ordinary commit. The case states this situation, and the generator notes it.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "If cycle.mjs gets the verbatim utterance, the slug is 'admin-note-add-a-nullable-note-field-to', not exactly 'admin-note'. It still shares the admin-note prefix with the old ID, and no assertion depends on the slugs being equal.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 3,
+      "detail": "Assertion 3's checks require a new plan to be created and recorded. A run that defaults to STANDARD would stop at AUDITING with no plan. The skill makes EXPEDITED permissive ('may select'), but the case's expected output requires the plan, so a STANDARD choice is not the expected behavior for this case.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "STATE.md is a fresh brownfield install with no cycle, and a committed, valid DEVELOPMENT plan for admin-note-20260920T120000Z-a1b2c3d4 sits at its fixed path with no reference from STATE.md or CONTEXT.md. check.mjs is ok and all selfChecks pass. Each check is a necessary condition for its assertion, the invariants fit a Developer that stops for plan approval, and nothing leaks the answer.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T02:18:11.645Z",
+  "costUsd": 0.16765860000000002,
+  "ms": 43258,
+  "fixtureHash": "a84d1aa8a3e277fd"
+}

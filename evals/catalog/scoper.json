@@ -1,0 +1,1594 @@
+{
+  "role": "scoper",
+  "cases": [
+    {
+      "id": 1,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Active Work.Request: build a small internal web tool that lets support staff search customers by email, view the current plan and account status, and copy the customer ID; only authenticated support staff may use it"
+      ],
+      "fixture": {
+        "project_mode": "GREENFIELD",
+        "workflow_state": "SCOPING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [],
+        "code": "none",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "S"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "prompt-leaks-answer",
+          "detail": "\"Do not choose frameworks, storage, APIs, or UI libraries unless already established\" states assertions 1 and 4; dropped from the utterance."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "trace"
+          ],
+          "deterministic_complete": true,
+          "note": "reads modes/plan.md, not replan.md"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "check"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 3,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 4,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 5,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 6,
+          "graders": [
+            "state",
+            "check"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 7,
+          "graders": [
+            "state",
+            "reply"
+          ],
+          "deterministic_complete": true,
+          "note": "ARCHITECTING via FORWARD; Architect line"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Active Work.Scope docs/scope/export-audit-log.md holds AC-001 (admins export the audit log as CSV) and AC-002 (existing filters and permissions preserved)",
+        "Frame: From DEVELOPING, Owner SCOPING, FailureType SCOPING, ResumeAt DEVELOPING, RerunThrough NONE",
+        "The approved change adds JSON export with the same filters and permissions",
+        "The completed architecture defines a CSV-only export contract, so the JSON outcome invalidates it"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SCOPING",
+        "cycle_mode": "STANDARD",
+        "recovery": "one-frame",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "prompt-leaks-answer",
+          "detail": "\"Revise only what the new requirement invalidates\" states assertions 1-2; dropped from the utterance."
+        },
+        {
+          "kind": "underspecified",
+          "detail": "Does not say where the approved change is persisted (Active Work.Request, Handoff.Reason, or frame Reason); the fixture must choose."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "trace"
+          ],
+          "deterministic_complete": true,
+          "note": "reads modes/replan.md"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "check",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "AC-001/AC-002 lines unchanged; judge meaning if reworded"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "check",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 3,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 4,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 5,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 6,
+          "graders": [
+            "state",
+            "reply"
+          ],
+          "deterministic_complete": true,
+          "note": "FORWARD with frame kept; Architect line with active-recovery wording"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "No .standards/CONTEXT.md exists",
+        "Active Work.Request: add a background job to an existing service",
+        "Runtime, queueing mechanism, deployment shape, and commands were not audited for this cycle"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SCOPING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": "FAILURE with FailureType PROJECT_CONTEXT"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "no CONTEXT.md or scope written; limited repository reads"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "no scope file; Scope stays NONE"
+        },
+        {
+          "i": 3,
+          "graders": [
+            "state",
+            "check"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 4,
+          "graders": [
+            "state",
+            "check"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 5,
+          "graders": [
+            "trace",
+            "reply"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "utterance": "Continue the workflow.",
+      "grader_only_facts": [
+        "WorkflowState is ARCHITECTING with a completed scope",
+        "The user requested no rework or control-plane change"
+      ],
+      "fixture": {
+        "project_mode": "UNSPECIFIED",
+        "workflow_state": "ARCHITECTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope"
+        ],
+        "code": "none",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "S"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "duplicate",
+          "detail": "Assertion 3 restates assertions 0 and 1 (no artifact or state change)."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 3,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "utterance": "Replace the browser-close sign-out requirement: sessions must now survive browser restarts for up to 8 hours.",
+      "grader_only_facts": [
+        "Active Work.Scope docs/scope/session-policy.md holds AC-001 (sessions expire after 30 minutes of inactivity) and AC-002 (users are signed out when the browser closes)"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SCOPING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "context"
+        ],
+        "code": "none",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "S"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "prompt-leaks-answer",
+          "detail": "\"without reusing retired acceptance identity\" states assertion 2; dropped from the utterance."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "trace"
+          ],
+          "deterministic_complete": true,
+          "note": "reads modes/replan.md"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "check"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "check"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 3,
+          "graders": [
+            "file",
+            "check"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 4,
+          "graders": [
+            "file",
+            "check"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 5,
+          "graders": [
+            "file",
+            "check"
+          ],
+          "deterministic_complete": true,
+          "note": "check flags an ID that is both current and retired"
+        },
+        {
+          "i": 6,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Active Work.Scope docs/scope/report-export.md holds AC-001 (export a report as CSV) and AC-002 (filename includes the report date)",
+        "A completed architecture accounts for AC-001 and AC-002",
+        "Frame: From DEVELOPING, Owner SCOPING, FailureType SCOPING, ResumeAt DEVELOPING, RerunThrough NONE",
+        "The user removed only the filename requirement; no architecture decision changes"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SCOPING",
+        "cycle_mode": "STANDARD",
+        "recovery": "one-frame",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "underspecified",
+          "detail": "Does not say where the approved change is persisted (Active Work.Request, Handoff.Reason, or frame Reason); the fixture must choose."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "trace"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "check"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "no new AC ID"
+        },
+        {
+          "i": 3,
+          "graders": [
+            "state",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "RerunThrough ARCHITECTING shows it; the reason needs a judge"
+        },
+        {
+          "i": 4,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 5,
+          "graders": [
+            "state",
+            "reply"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Active Work.Request: add a command that exports an account backup archive, and ensure the project-facing operations guide documents how to restore that archive before sign-off"
+      ],
+      "fixture": {
+        "project_mode": "GREENFIELD",
+        "workflow_state": "SCOPING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [],
+        "code": "none",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "S"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "prompt-leaks-answer",
+          "detail": "\"Do not choose implementation technology\" states part of assertion 3; dropped from the utterance."
+        },
+        {
+          "kind": "duplicate",
+          "detail": "Assertions 1 and 2 are decided by the same observation (separate AC IDs for export and guide)."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "trace"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "check",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 3,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "no operations guide file created"
+        },
+        {
+          "i": 4,
+          "graders": [
+            "state",
+            "reply"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Active Work.Id shareable-report-links-20260925T100000Z-7e8f9a0b; Request: add shareable report links",
+        "PromotionReason: the former EXPEDITED implementation review found public share links require an unresolved access-policy decision",
+        "CONTEXT.md excludes the tentative share-link code as Active-Cycle Non-Baseline Work labeled with the current cycle",
+        "Public versus authenticated/revocable access materially changes user-visible scope"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SCOPING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "context",
+          "development",
+          "review-implementation"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "prompt-leaks-answer",
+          "detail": "The closing instruction states assertions 1-2; dropped from the utterance."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "PromotionReason unchanged"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "no verbatim PromotionReason text in any scope file"
+        },
+        {
+          "i": 3,
+          "graders": [
+            "state",
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "BlockedOn set"
+        },
+        {
+          "i": 4,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "no AC-NNN defined while blocked"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "No CONTEXT.md exists because the first scheduled audit has not run",
+        "Frame: From ARCHITECTING, Owner SCOPING, FailureType SCOPING, ResumeAt ARCHITECTING, RerunThrough NONE",
+        "One acceptance condition is materially ambiguous; the persisted request resolves it without repository facts"
+      ],
+      "fixture": {
+        "project_mode": "GREENFIELD",
+        "workflow_state": "SCOPING",
+        "cycle_mode": "STANDARD",
+        "recovery": "one-frame",
+        "records": [
+          "scope"
+        ],
+        "code": "none",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "underspecified",
+          "detail": "Does not name the ambiguous condition or the request text that resolves it; the fixture must plant both."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "trace"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": "no PROJECT_CONTEXT failure"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 3,
+          "graders": [
+            "state",
+            "check"
+          ],
+          "deterministic_complete": true,
+          "note": "frame popped; RESUME to ARCHITECTING"
+        },
+        {
+          "i": 4,
+          "graders": [
+            "trace",
+            "reply"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Active Work.Id improve-search-20260923T141500Z-9c2e4b71",
+        "docs/scope/user-search.md starts with provenance Artifact: SCOPE, Cycle: user-search-v1-old",
+        "No appropriate unmarked canonical scope document exists"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SCOPING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "context",
+          "other-cycle-records"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "old file unchanged; Scope does not point to it"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "check",
+            "trace"
+          ],
+          "deterministic_complete": true,
+          "note": "artifact.mjs init SCOPE in trace; provenance at the fixed path"
+        },
+        {
+          "i": 3,
+          "graders": [
+            "state",
+            "check"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Active Work.Id billing-copy-20260923T101500Z-4d7e9a13",
+        "docs/product/scope.md is an established unmarked project-owned canonical scope document, and the billing-copy change belongs in it"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SCOPING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "context"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "underspecified",
+          "detail": "Does not say whether docs/product/scope.md already holds earlier-cycle conditions, which would require a Previous Cycles move as in case 20."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 3,
+          "graders": [
+            "state",
+            "check",
+            "reply"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "utterance": "cancel this cycle",
+      "grader_only_facts": [
+        "Active Work.Id bootstrap-demo-20260927T101500Z-4a5b6c7d; no implementation has been created or modified",
+        "The global CLI matches .standards/VERSION.json; its dry-run removes .standards/CONTEXT.md and .standards/docs/, writes fresh STATE.md and MODE.md, and warns that 2 cycle records are deleted",
+        "docs/scope/demo.md is outside .standards/",
+        "Active Work.BlockedOn already holds an unrelated product question",
+        "The user has not approved the reset"
+      ],
+      "fixture": {
+        "project_mode": "GREENFIELD",
+        "workflow_state": "SCOPING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "context",
+          "other-cycle-records"
+        ],
+        "code": "none",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "global `standards` CLI matching .standards/VERSION.json (for example a shim to this repo's bin/standards.js); fixture must live at /work/bootstrap-demo or assertions must be rewritten",
+      "issues": [
+        {
+          "kind": "duplicate",
+          "detail": "Assertions 2 and 3 are identical."
+        },
+        {
+          "kind": "underspecified",
+          "detail": "The 2 cycle records under .standards/docs/ are unexplained for a first greenfield SCOPING cycle whose scope is docs/scope/demo.md."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "trace"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 3,
+          "graders": [
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 4,
+          "graders": [
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 5,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": "BlockedOn contains the target, the --yes command, and the original question"
+        },
+        {
+          "i": 6,
+          "graders": [
+            "state",
+            "file",
+            "trace"
+          ],
+          "deterministic_complete": true,
+          "note": "no reset without --dry-run; no rm; not CANCELLED"
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "utterance": "I approve running standards reset --project /work/bootstrap-demo --mode greenfield --yes.",
+      "grader_only_facts": [
+        "No implementation exists",
+        "Active Work.BlockedOn records the pending approval for that exact command and its preview",
+        "The global CLI matches the installed version",
+        "Eligibility and preview rechecks are unchanged; the reset succeeds"
+      ],
+      "fixture": {
+        "project_mode": "GREENFIELD",
+        "workflow_state": "SCOPING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "context",
+          "other-cycle-records"
+        ],
+        "code": "none",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "global `standards` CLI matching .standards/VERSION.json (for example a shim to this repo's bin/standards.js); fixture must live at /work/bootstrap-demo or assertions must be rewritten",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "trace"
+          ],
+          "deterministic_complete": true,
+          "note": "dry-run and repository check before --yes"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "trace"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "trace"
+          ],
+          "deterministic_complete": true,
+          "note": "--yes run happens in this turn"
+        },
+        {
+          "i": 3,
+          "graders": [
+            "trace",
+            "reply"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 4,
+          "graders": [
+            "state",
+            "file",
+            "trace"
+          ],
+          "deterministic_complete": true,
+          "note": "no writes after the reset"
+        },
+        {
+          "i": 5,
+          "graders": [
+            "state",
+            "trace"
+          ],
+          "deterministic_complete": true,
+          "note": "fresh template state; no cycle.mjs new"
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "utterance": "I approve running npx @idinsight/standards@0.6.0 reset --project /work/bootstrap-demo --mode greenfield --yes.",
+      "grader_only_facts": [
+        ".standards/VERSION.json records 0.6.0; the global standards CLI is 0.7.0",
+        "The npx dry-run was already previewed and disclosed; Active Work.BlockedOn records the pending approval",
+        "Eligibility and preview are unchanged; the npx command succeeds"
+      ],
+      "fixture": {
+        "project_mode": "GREENFIELD",
+        "workflow_state": "UNSPECIFIED",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope"
+        ],
+        "code": "none",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "npx with registry access to @idinsight/standards@0.6.0 (or an npx stub); global standards CLI 0.7.0; fixture at /work/bootstrap-demo",
+      "issues": [
+        {
+          "kind": "underspecified",
+          "detail": "VERSION.json 0.6.0 must pair with a runtime: the current runtime with a faked version is inconsistent, and a real 0.6.0 install changes the protocol under test."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "trace"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "trace"
+          ],
+          "deterministic_complete": true,
+          "note": "no `standards reset`, no @latest, no manual edits"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "trace"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 3,
+          "graders": [
+            "state",
+            "trace"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "utterance": "No, don't reset; keep this cycle.",
+      "grader_only_facts": [
+        "Active Work.BlockedOn holds the reset approval question and an unrelated product question",
+        "Workflow files are unchanged since the preview",
+        "The user gave no instruction to resume scoping"
+      ],
+      "fixture": {
+        "project_mode": "GREENFIELD",
+        "workflow_state": "UNSPECIFIED",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope"
+        ],
+        "code": "none",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "S"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "file",
+            "trace"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": "only the reset question removed from BlockedOn"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "trace",
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "no scope edits in the trace"
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "utterance": "I approve running standards reset --project /work/bootstrap-demo --mode greenfield --yes.",
+      "grader_only_facts": [
+        "Eligibility and preview rechecks match",
+        "The reset fails while writing .standards/STATE.md and reports incomplete recovery plus a retained backup directory and recovery mapping",
+        "Workflow files may be partly changed",
+        "The user has not authorized a retry"
+      ],
+      "fixture": {
+        "project_mode": "GREENFIELD",
+        "workflow_state": "UNSPECIFIED",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope"
+        ],
+        "code": "none",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": true,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "stub `standards` CLI whose --yes run fails mid-write and prints a backup location and mapping; fixture at /work/bootstrap-demo",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "trace",
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "reply"
+          ],
+          "deterministic_complete": true,
+          "note": "reply names the stub's backup path; backup directory still exists"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "trace"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 3,
+          "graders": [
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 17,
+      "utterance": "Cancel this cycle.",
+      "grader_only_facts": [
+        "A global standards CLI is available",
+        "Its dry-run refuses because .standards/VERSION.json is invalid",
+        "No reset has been approved"
+      ],
+      "fixture": {
+        "project_mode": "GREENFIELD",
+        "workflow_state": "UNSPECIFIED",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope"
+        ],
+        "code": "none",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": true,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "global `standards` CLI; fixture at /work/bootstrap-demo",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "trace"
+          ],
+          "deterministic_complete": true,
+          "note": "no npx call, VERSION.json unchanged, no rm"
+        }
+      ]
+    },
+    {
+      "id": 18,
+      "utterance": "Cancel this cycle.",
+      "grader_only_facts": [
+        "No global standards executable and no npx are available",
+        "The user has only requested cancellation"
+      ],
+      "fixture": {
+        "project_mode": "GREENFIELD",
+        "workflow_state": "UNSPECIFIED",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "context"
+        ],
+        "code": "none",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": true,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "PATH with node but without `standards` or `npx`",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "trace"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 19,
+      "utterance": "continue",
+      "grader_only_facts": [
+        "The user explicitly approved `standards reset --project /work/bootstrap-demo --mode greenfield --yes` for an earlier preview",
+        "The mandatory recheck shows one more cycle record to delete, so the warning changed"
+      ],
+      "fixture": {
+        "project_mode": "GREENFIELD",
+        "workflow_state": "UNSPECIFIED",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "other-cycle-records"
+        ],
+        "code": "none",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": true,
+      "history_note": "Prior turn: the user approved the exact --yes command for the preview recorded in Active Work.BlockedOn; a cycle record was added under .standards/docs/ after that preview, so the agent's recheck shows a changed warning. The graded turn is the user's next message, \"continue\".",
+      "client_specific": "none",
+      "external_dependency": "global `standards` CLI matching .standards/VERSION.json (for example a shim to this repo's bin/standards.js); fixture must live at /work/bootstrap-demo or assertions must be rewritten",
+      "issues": [
+        {
+          "kind": "ambiguous",
+          "detail": "Unclear whether the recheck and updated preview happen in the approval turn or the \"continue\" turn, so assertions 0-1 and 2 may belong to different turns."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "trace",
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "dry-run rerun in the trace"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "BlockedOn updated to the new preview"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "trace"
+          ],
+          "deterministic_complete": true,
+          "note": "no --yes run; cycle intact"
+        }
+      ]
+    },
+    {
+      "id": 20,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Active Work.Id search-filters-20260927T101500Z-9f8e7d6c",
+        "docs/product/search.md is the single canonical unmarked scope document, listing AC-001 to AC-003 from an earlier signed-off cycle and retired AC-004",
+        "Active Work.Request: add date filters to search"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SCOPING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "context"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "check"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "trace"
+          ],
+          "deterministic_complete": true,
+          "note": "id.mjs next AC in the trace; first new ID is AC-005"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 3,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "stage1_candidates": [
+      {
+        "id": 1,
+        "why": "typical"
+      },
+      {
+        "id": 2,
+        "why": "hard"
+      }
+    ],
+    "top_issues": [
+      "Reset cases 12-19 need a real or stub standards CLI (and npx at 0.6.0 for 14) and a fixture at /work/bootstrap-demo.",
+      "Case 12 assertions 2 and 3 are identical; 4.3 and 7.2 also restate other assertions.",
+      "Case 19 needs two turns and does not say which turn does the recheck.",
+      "Case 14 cannot pair VERSION.json 0.6.0 cleanly with the current runtime.",
+      "Guardrail sentences in prompts 1, 2, 5, 7, and 8 state the graded behavior; the utterances drop them."
+    ]
+  }
+}

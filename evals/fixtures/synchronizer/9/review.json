@@ -1,0 +1,89 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState SYNCHRONIZING, Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, architecture, context, plan, verification, and both review reports have valid ownership and content identities",
+      "where": ".standards/docs/** and .standards/CONTEXT.md; check.mjs ok; selfCheck confirms cited blobs match HEAD",
+      "status": "realized"
+    },
+    {
+      "condition": "Documentation evidence available",
+      "where": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md (COMPLETE) and docs/usage.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and outstanding obligations inactive; no blocked user question",
+      "where": ".standards/STATE.md (Recovery/Obligations Active false, BlockedOn NONE)",
+      "status": "realized"
+    },
+    {
+      "condition": "An old uncommitted migration exists",
+      "where": "migrations/0001-created-at-millis.ts, untracked (git status)",
+      "status": "realized"
+    },
+    {
+      "condition": "Active request and plan disagree about whether the migration belongs to this cycle",
+      "where": "STATE.md Request '...together with the pending records migration...'; plan Implementation Contract omits it and Plan Notes say it predates the cycle and is excluded",
+      "status": "realized"
+    },
+    {
+      "condition": "History cannot establish the migration's origin",
+      "where": "untracked file with no git history (selfCheck), nothing imports or mentions it",
+      "status": "realized"
+    },
+    {
+      "condition": "Evidence applicability depends on the migration's status",
+      "where": "migration up() rewrites createdAt to millisecond form, which would change the guide's CSV example and integration expectations; all assessment records explicitly excluded it per the plan",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope never decides the migration (basis for routing to Scoper)",
+      "where": ".standards/docs/scope/... silent on any migration while the request includes it since SCOPING",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "case-defect",
+      "assertion": 1,
+      "detail": "The Synchronizer skill (Shared Reconciliation Procedure step 1) allows resolving a materially ambiguous boundary 'through its owner or a blocking user question'; the case narrows this to routing a SCOPING failure. The fixture faithfully supports the case's choice (request includes the migration, scope silent), so a run that asks the user instead would fail assertion 1 by the case's design, not the fixture's.",
+      "recommendation": "run_as_is",
+      "fix": "None for the fixture; the case's expected route is reasonable given the scope's silence."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "generator_notes_for_reviewer and the catalog entry's assertion-1 note describe an older design (BlockedOn set, state stays SYNCHRONIZING, user question). The spec's checks and graderOnly now match the case (SCOPING failure, frame resuming at SYNCHRONIZING). Neither is visible to the role.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally refresh the stale notes; no effect on the run."
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 0,
+      "detail": "contains '0001-created-at-millis' in the synchronization record assumes the record names the migration file. The template requires the affected path for each discrepancy, so a correct run should include it; a run saying only 'the untracked migration' would fail. Low risk.",
+      "recommendation": "run_as_is",
+      "fix": "Could loosen to 'migrations/|0001-created-at-millis' if false failures appear."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition: a valid SYNCHRONIZING standard brownfield cycle whose request includes a pending migration while the plan excludes the untracked, history-less migrations/0001-created-at-millis.ts, the scope is silent on it, and applying it would change the exported createdAt values the evidence covers. Checks for the SCOPING failure route, the recovery frame, and the non-COMPLETE record are necessary conditions, and the invariants fit. Only minor notes remain: the case narrows a choice the skill leaves open, and the generator notes are stale.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T19:39:25.491Z",
+  "costUsd": 0.3896312,
+  "ms": 36965,
+  "fixtureHash": "775ba2ca57ef7cf6"
+}

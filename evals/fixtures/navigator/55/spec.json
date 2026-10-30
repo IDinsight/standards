@@ -1,0 +1,155 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add inventory model and environment-based settings"
+    },
+    {
+      "dir": "layers/10-config-file",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Read server settings from shelf.ini"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "navigator",
+    "utterance": "Switch to INVESTIGATE, because that observed output contradicts the explanation."
+  },
+  "graderOnly": [
+    "In shelf/config.py, load() applies from_env() first and then from_file(), so values from shelf.ini override SHELF_* environment variables. The load() docstring and the README Configuration section both say the opposite: environment variables are meant to win.",
+    "The earlier EXPLAIN answer that SHELF_PORT=9000 overrides shelf.ini was wrong. Its numbered steps listed the file before the environment, which is not the order in load(). Its later suggestion that the variable may not have reached the process is unsupported. An inline SHELF_PORT=9000 does reach the process, and no installed copy of shelf exists.",
+    "The pasted output (port = 5050 with SHELF_PORT=9000) is exactly what the committed code produces from the repository root with the committed shelf.ini.",
+    "No existing test sets an environment variable and a file value for the same key. The env test uses a missing file, so the suite passes.",
+    "The env-before-file order was introduced in the commit 'Read server settings from shelf.ini', which also added the README text saying environment variables win.",
+    "The code and the documented intent disagree. The likely owner is implementation (Developer) if the README and docstring express the intended rule, but the project has no recorded decision that settles the intent."
+  ],
+  "history": {
+    "turns": [
+      {
+        "role": "user",
+        "text": "/navigator How does shelf decide which port the server uses? I want to point it at 9000 on my machine without editing shelf.ini."
+      },
+      {
+        "role": "assistant",
+        "text": "Short answer: set `SHELF_PORT=9000` when you start it. The environment variable wins over `shelf.ini`, so you don't need to touch the file.\n\nHow it works (`shelf/config.py`, `load()`):\n\n1. It starts from `DEFAULTS`, where the port is 8080.\n2. It reads the `[server]` section of `shelf.ini` if that file exists in the working directory. The committed file sets `port = 5050`.\n3. It applies any `SHELF_*` environment variables on top. `from_env()` strips the `SHELF_` prefix and lowercases the rest, so `SHELF_PORT` becomes `port`. The `load()` docstring and the README's Configuration section both say environment variables take precedence.\n4. `coerce()` turns `port` into an int and `debug` into a bool.\n\nSo `SHELF_PORT=9000 python3 -m shelf.show_config` should print `port = 9000`. I haven't run that; it is what the code path predicts."
+      },
+      {
+        "role": "user",
+        "text": "I tried it:\n\n```\n$ SHELF_PORT=9000 python3 -m shelf.show_config\ndebug = False\nhost = 127.0.0.1\nport = 5050\n```"
+      },
+      {
+        "role": "assistant",
+        "text": "That's surprising given the precedence above. The documented rule is still that `SHELF_*` variables override `shelf.ini`. When an override seems to be ignored like this, the usual causes are the variable not reaching the Python process (for example, it was set in a different shell or session), or Python importing a different, installed copy of `shelf` instead of the one in this repository."
+      }
+    ]
+  },
+  "vars": {},
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "**"
+          ],
+          "why": "Navigator writes nothing"
+        },
+        {
+          "head_unchanged": true,
+          "why": "Navigator never moves HEAD"
+        },
+        {
+          "not_ran_git": "mutating",
+          "why": "Navigator never mutates git state"
+        },
+        {
+          "reply_matches": "config\\.py",
+          "why": "the settings precedence lives only in shelf/config.py, and a supported finding must cite it"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "unchanged": [
+        "**"
+      ],
+      "why": "Navigator persists nothing (generated caches are ignored)"
+    },
+    {
+      "head_unchanged": true,
+      "why": "Navigator never moves HEAD"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Navigator never mutates git state"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "python3 -m pytest -q",
+      "expect": "pass",
+      "why": "the existing suite passes; no test covers env-versus-file precedence"
+    },
+    {
+      "cmd": "SHELF_PORT=9000 python3 -m shelf.show_config | grep -qx 'port = 5050'",
+      "expect": "pass",
+      "why": "the output the user pasted in history is what the code really produces from the repository root"
+    },
+    {
+      "cmd": "SHELF_PORT=9000 python3 -m shelf.show_config | grep -qx 'debug = False'",
+      "expect": "pass",
+      "why": "the other pasted lines match the real output too"
+    }
+  ],
+  "notes": "Standalone brownfield fixture with the default installed state (no cycle). layers/00-project (pre-install commit) is a small Python package: shelf/inventory.py, shelf/config.py with defaults and SHELF_* environment overrides only, shelf/show_config.py, tests, README, and pyproject with pytest pythonpath. layers/10-config-file (pre-install commit 'Read server settings from shelf.ini') adds from_file() and a committed shelf.ini with port 5050. In that commit, load() calls settings.update(from_env(...)) before settings.update(from_file(...)), so the file wins, while the docstring and the README still say environment variables take precedence. History: the user asks via /navigator how the port is chosen. The assistant (EXPLAIN) wrongly says SHELF_PORT wins and predicts port = 9000, without running anything. The user pastes the real output of `SHELF_PORT=9000 python3 -m shelf.show_config` (port = 5050). The assistant then offers unsupported excuses that keep the earlier claim. The run's message asks to switch to INVESTIGATE. A correct run re-reads load() and corrects the explanation: the file overrides the environment, contrary to the docs and docstring. It ties the claim to config.py lines, and may cite the introducing commit and the missing test. It names the likely owner without fixing anything. All commands use python3, the interpreter the runner image provides, and the selfChecks prove the pasted output is real.",
+  "case": "navigator-55",
+  "caseHash": "9b60ef7fb82e36f0",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T15:41:22.765Z",
+    "verdict": "pass",
+    "fixtureHash": "244495929d810e11",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "fc2b4664af207c01",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:23:12.037Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T15:24:47.763Z"
+  },
+  "migrations": [
+    {
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:23:12.037Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

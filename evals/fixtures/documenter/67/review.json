@@ -1,0 +1,99 @@
+{
+  "conditions": [
+    {
+      "condition": "BROWNFIELD project",
+      "where": ".standards/MODE.md (ProjectMode BROWNFIELD)",
+      "status": "realized"
+    },
+    {
+      "condition": "Initialized STANDARD cycle at DOCUMENTING with Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md header and Active Work.Id",
+      "status": "realized"
+    },
+    {
+      "condition": "Current-cycle documentation record with valid DOCUMENTATION provenance and matching visible Cycle",
+      "where": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md provenance block and header `Cycle`",
+      "status": "realized"
+    },
+    {
+      "condition": "Collaboration AUTONOMOUS, target ACTIVE_CHANGE, user style NONE",
+      "where": "documentation record header",
+      "status": "realized"
+    },
+    {
+      "condition": "No outstanding obligations",
+      "where": "STATE.md Outstanding Obligations Active false",
+      "status": "realized"
+    },
+    {
+      "condition": "No blocking user question",
+      "where": "STATE.md BlockedOn NONE; record 'Blocking question: NONE'",
+      "status": "realized"
+    },
+    {
+      "condition": "No independent defects",
+      "where": "implementation/tests unchanged since verification; selfChecks pass; reviews have no findings",
+      "status": "realized"
+    },
+    {
+      "condition": "Active frame Owner=DOCUMENTING, ResumeAt=AWAITING_USER_SIGNOFF, RerunThrough=NONE",
+      "where": "STATE.md Recovery Frame 1 (From AWAITING_USER_SIGNOFF, FailureType DOCUMENTATION)",
+      "status": "realized"
+    },
+    {
+      "condition": "The named correction is verified",
+      "where": "docs/usage.md Example subsection (commit 'Add worked CSV example...'); DOC-001 RESOLVED with checks C2/C3; matches test/integration/export-flow.test.ts",
+      "status": "realized"
+    },
+    {
+      "condition": "Feature guide still depends on unfinished owner work",
+      "where": "documentation record DOC-002 OPEN: admin tool's unfinished Exports page, owner outside workflow via user (or Scoper scope change); user will not sign off without it",
+      "status": "realized"
+    },
+    {
+      "condition": "Earlier-phase records exist (scope, design, context, plan, verification, both reviews, synchronization)",
+      "where": ".standards/docs/** and .standards/CONTEXT.md, all COMPLETE except the reopened documentation record",
+      "status": "realized"
+    },
+    {
+      "condition": "All work committed",
+      "where": "git status clean",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The user's added request for download instructions (DOC-002) lives only in the documentation record; the USER_REWORK Handoff/Frame Reason and Active Work.Request mention only the worked CSV example, though the protocol says to update Active Work.Request when the request changes. A run may notice this, but every resulting legal path (block with BlockedOn, or route a nested SCOPING failure) is allowed by the checks.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "record-format",
+      "assertion": -1,
+      "detail": "DOC-002 has `Owner`: `User`. The template expects a role or installer/protocol. This is plausible for an outside-workflow dependency and is harmless to check.mjs.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "hint-leak",
+      "assertion": -1,
+      "detail": "The record's conclusion states that the full gate has not passed and that the final review and synchronization predate the rework edit. These are factual progress notes a prior Documenter session would keep, and they do not state the answer: whether the Corrective Return to a user-owned state is allowed.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized: one DOCUMENTING-owned frame resuming at AWAITING_USER_SIGNOFF with RerunThrough NONE, a verified DOC-001 correction, and an open DOC-002 owner dependency the user requires before sign-off. check.mjs and the selfChecks pass. The assertion 0 state checks allow both legal outcomes (blocking in DOCUMENTING or routing a nested failure) and forbid popping the frame, a forward move, or COMPLETE. Remaining items are minor realism notes only.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T16:43:38.505Z",
+  "costUsd": 0.3411646,
+  "ms": 47565,
+  "fixtureHash": "4b481e7b501d346d"
+}

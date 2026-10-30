@@ -1,0 +1,63 @@
+{
+  "conditions": [
+    {
+      "condition": "Project mode is BROWNFIELD",
+      "where": ".standards/MODE.md (brownfield install, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "Active cycle is EXPEDITED",
+      "where": ".standards/STATE.md `CycleMode`: `EXPEDITED`",
+      "status": "realized"
+    },
+    {
+      "condition": "Workflow state is AWAITING_USER_SIGNOFF (user-owned)",
+      "where": ".standards/STATE.md `WorkflowState`: `AWAITING_USER_SIGNOFF`, Handoff FORWARD from REVIEWING_IMPLEMENTATION",
+      "status": "realized"
+    },
+    {
+      "condition": "Expedited path completed through Developer and implementation Reviewer, with no recovery, obligations, or blocker",
+      "where": "COMPLETE development plan; COMPLETE implementation review at the fixed path; Recovery and Obligations inactive; BlockedOn NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "No synchronization record (or other skipped-role records) exists, as the expedited topology intends",
+      "where": ".standards/docs contains only development/ and reviews/<id>/implementation.md",
+      "status": "realized"
+    },
+    {
+      "condition": "No promotion has occurred (PromotionReason NONE, Scope/Architecture NONE)",
+      "where": ".standards/STATE.md Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "User asks only what synchronization would add; no promotion or rework requested",
+      "where": "prompt.utterance \"What would synchronization add here?\"",
+      "status": "realized"
+    },
+    {
+      "condition": "Work is committed; clean tree",
+      "where": "git status clean; five commits after the pre-install commit",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The local git config sets user.name=Fixture and user.email=fixture@example.invalid, so `git log` shows a 'Fixture' author. This setting is harness-wide and hints only weakly that the repo is a test. It reveals nothing about the expected answer.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally use a neutral author identity in the builder; no change is needed for this case."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes a clean, check-valid BROWNFIELD EXPEDITED cycle at AWAITING_USER_SIGNOFF with only the plan and implementation review present, and the utterance asks only an informational question. Both assertions are decided correctly by deterministic checks: the synchronization record stays absent, .standards/docs is unchanged, and the state, mode, promotion reason, and handoff stay as built. No correct run could fail these checks. Invariants are standard and appropriate, and nothing leaks the answer.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T14:29:27.894Z",
+  "costUsd": 0.1238928,
+  "ms": 22913,
+  "fixtureHash": "0a04ca678437c23b"
+}

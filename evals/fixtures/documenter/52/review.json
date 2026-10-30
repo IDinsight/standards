@@ -1,0 +1,54 @@
+{
+  "conditions": [
+    {
+      "condition": "Brownfield project mode",
+      "where": ".standards/MODE.md (installed brownfield, BROWNFIELD)",
+      "status": "realized"
+    },
+    {
+      "condition": "Active cycle is EXPEDITED",
+      "where": ".standards/STATE.md CycleMode EXPEDITED, Scope/Architecture NONE, PromotionReason NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Workflow is at user-owned AWAITING_USER_SIGNOFF after a passed implementation review",
+      "where": ".standards/STATE.md WorkflowState AWAITING_USER_SIGNOFF, Handoff FORWARD from REVIEWING_IMPLEMENTATION; recovery and obligations inactive",
+      "status": "realized"
+    },
+    {
+      "condition": "Records present: development plan and implementation review, both complete",
+      "where": ".standards/docs/development/<id>.md (Status COMPLETE, DEV-001 DONE, EXPEDITED_REQUEST) and .standards/docs/reviews/<id>/implementation.md (Status COMPLETE, no material findings)",
+      "status": "realized"
+    },
+    {
+      "condition": "No Documenter, Tester, final-review, or synchronization records exist (omitted roles)",
+      "where": "built tree has only development and implementation review under .standards/docs/",
+      "status": "realized"
+    },
+    {
+      "condition": "Small committed code change that documentation could describe",
+      "where": "src/slug.js adds optional maxLength; README.md documents slugify(input) only; selfChecks confirm tests pass and README lacks maxLength",
+      "status": "realized"
+    },
+    {
+      "condition": "Git state committed and clean",
+      "where": "git status clean on main; three commits after install",
+      "status": "realized"
+    },
+    {
+      "condition": "User asks only a question, no promotion/rework/sign-off request",
+      "where": "prompt.utterance 'What would documentation add to this change?'",
+      "status": "realized"
+    }
+  ],
+  "issues": [],
+  "verdict": "pass",
+  "summary": "The fixture builds a legal EXPEDITED brownfield cycle at AWAITING_USER_SIGNOFF with a complete plan and implementation review, no omitted-role records, and an undocumented maxLength option that gives the Documenter something concrete to explain; check.mjs and all selfChecks pass. Checks for both assertions are necessary conditions that a correct answer-only run satisfies (no state, record, or doc changes; no sign-off; no fabricated records), and the invariants are standard and appropriate. Nothing in files, commits, or the utterance leaks the expected answer.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T16:38:19.971Z",
+  "costUsd": 0.1314006,
+  "ms": 30909,
+  "fixtureHash": "c420493a0a38b1b7"
+}

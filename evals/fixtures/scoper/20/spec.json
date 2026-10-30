@@ -1,0 +1,214 @@
+{
+  "base": null,
+  "date": "2026-09-27T10:30:00Z",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial catalog search library"
+    },
+    {
+      "dir": "layers/10-keyword-scope",
+      "action": "commit",
+      "message": "Scope and design keyword search"
+    },
+    {
+      "dir": "layers/11-keyword-impl",
+      "action": "commit",
+      "message": "Add ranked keyword search"
+    },
+    {
+      "dir": "layers/12-keyword-signoff",
+      "action": "commit",
+      "message": "Record keyword search verification, reviews, and sign-off"
+    },
+    {
+      "dir": "layers/20-cycle",
+      "action": "commit",
+      "message": "Start search filters cycle"
+    },
+    {
+      "dir": "layers/30-context",
+      "action": "commit",
+      "message": "Record project context for search filters"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "scoper",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "Active Work.Id is search-filters-20260927T101500Z-9f8e7d6c and Active Work.Request asks to add date filters (from and/or to publishedOn date) to search.",
+    "Before the run, docs/product/search.md is the project's single canonical, unmarked (no STANDARDS provenance) scope document; it defines AC-001 to AC-003 as current list items and AC-004 under Retired Acceptance Identifiers, all from the earlier keyword-search cycle keyword-search-20260915T140000Z-3c5a9e21, which was signed off before this cycle started.",
+    "Before the run, `node .standards/bin/id.mjs next AC docs/product/search.md` prints AC-005.",
+    "The existing search() in src/search.js has no date filtering; every catalog record carries publishedOn as a YYYY-MM-DD string.",
+    "Before the run, Active Work.Scope is NONE."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "search-filters-20260927T101500Z-9f8e7d6c",
+    "OLD": "keyword-search-20260915T140000Z-3c5a9e21",
+    "SCOPE": "docs/product/search.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "contains": {
+            "path": "${SCOPE}",
+            "regex": "^##[ \\t]+Previous Cycles(?=[\\s\\S]*AC-001)(?=[\\s\\S]*AC-002)(?=[\\s\\S]*AC-003)(?=[\\s\\S]*AC-004)",
+            "flags": "m"
+          },
+          "why": "a Previous Cycles heading exists and the earlier identifiers appear below it"
+        },
+        {
+          "contains": {
+            "path": "${SCOPE}",
+            "regex": "(?<![\\s\\S])(?![\\s\\S]*^[ \\t]*[-*+0-9.)]+[ \\t]+[^\\w\\n]*AC-00[1-4]\\b[\\s\\S]*^##[ \\t]+Previous Cycles)",
+            "flags": "m"
+          },
+          "why": "no list item defining AC-001..AC-004 remains above the Previous Cycles heading"
+        },
+        {
+          "check_ok": true,
+          "why": "the checker accepts the reused document's history placement and preserved identifiers"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "contains": {
+            "path": "${SCOPE}",
+            "regex": "^[ \\t]*[-*+0-9.)]+[ \\t]+[^\\w\\n]*AC-005\\b[\\s\\S]*^##[ \\t]+Previous Cycles",
+            "flags": "m"
+          },
+          "why": "AC-005 is defined as a current condition above Previous Cycles"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": true,
+      "all": [
+        {
+          "exists": "${SCOPE}"
+        },
+        {
+          "contains": {
+            "path": "${SCOPE}",
+            "regex": "(?<![\\s\\S])(?![\\s\\S]*<!--\\s*STANDARDS)"
+          },
+          "why": "no STANDARDS provenance block anywhere in the canonical document"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": true,
+      "all": [
+        {
+          "state": "ActiveWork.Scope",
+          "equals": "${SCOPE}"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "package.json"
+      ],
+      "why": "Scoper writes no production code or tests"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/search.test.js",
+      "expect": "pass",
+      "why": "the established test command passes on the baseline keyword search"
+    },
+    {
+      "cmd": "node .standards/bin/id.mjs next AC docs/product/search.md | grep -qx AC-005",
+      "expect": "pass",
+      "why": "the next free acceptance identifier in the canonical document is AC-005"
+    },
+    {
+      "cmd": "! grep -q STANDARDS docs/product/search.md",
+      "expect": "pass",
+      "why": "the canonical scope document is unmarked"
+    },
+    {
+      "cmd": "git show HEAD~2:.standards/STATE.md | grep -q 'docs/product/search.md'",
+      "expect": "pass",
+      "why": "the signed-off keyword-search state recorded the canonical document as its Scope"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 00-project (pre-install): small Node ES-module catalog search library (case-sensitive title-only search) and a prose docs/product/search.md. Installer commit follows. 10-keyword-scope/11-keyword-impl/12-keyword-signoff: the earlier STANDARD cycle keyword-search-20260915T140000Z-3c5a9e21 run on main: Scoper reused the unmarked docs/product/search.md (rewritten in template form, AC-001..AC-003 current, AC-004 retired, no provenance), Architect design, Developer plan and code, Tester report (with a retired-identifier note for AC-004), both reviews, documentation and synchronization records, ending with STATE SIGNED_OFF whose Active Work.Scope is docs/product/search.md. 20-cycle: NEW_CYCLE from SIGNED_OFF starts search-filters-20260927T101500Z-9f8e7d6c at AUDITING with Scope NONE. 30-context: Auditor's refreshed CONTEXT.md (names docs/product/search.md as the canonical unmarked scope document holding the signed-off cycle's AC-001..AC-004; documents publishedOn format) and STATE at SCOPING, FORWARD from AUDITING, recovery inactive. Spec date set to 2026-09-27T10:30Z so commits follow the new cycle id timestamp (old-cycle commits share that date, a cosmetic compromise).",
+  "case": "scoper-20",
+  "caseHash": "ea9df38e568c61e6",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T20:10:44.113Z",
+    "verdict": "pass",
+    "fixtureHash": "c32888eb601aaca7",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "90fe81018c1db840",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:30:12.176Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T20:05:22.415Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/10-keyword-scope/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/11-keyword-impl/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/12-keyword-signoff/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/20-cycle/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/30-context/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:30:12.176Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

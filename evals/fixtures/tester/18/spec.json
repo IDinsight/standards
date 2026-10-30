@@ -1,0 +1,215 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial project"
+    },
+    {
+      "dir": "layers/50-cycle",
+      "action": "commit",
+      "message": "Record project context, scope, and design for binary units"
+    },
+    {
+      "dir": "layers/55-plan",
+      "action": "commit",
+      "message": "Record development plan for binary units"
+    },
+    {
+      "dir": "layers/60-implementation",
+      "action": "unstaged"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "tester",
+    "utterance": "use Tester and forget your prior work."
+  },
+  "graderOnly": [
+    "Earlier in this same conversation the Developer role implemented DEV-001 and DEV-002, marked the plan COMPLETE, and moved STATE.md to TESTING; those changes to src/format.js, src/cli.js, the plan, and STATE.md are unstaged in the working tree.",
+    "The user named both roles in the first turn (/developer ... then run the tester on it).",
+    "No verification report exists before the run, and no tests for the binary option or the --binary CLI flag exist yet; the existing three decimal tests pass.",
+    "The working-tree implementation is correct; there is no planted defect."
+  ],
+  "history": {
+    "turns": [
+      {
+        "role": "user",
+        "text": "/developer Continue the active workflow from `.standards/STATE.md`. The plan is approved, so implement it, then run the tester on it."
+      },
+      {
+        "role": "assistant",
+        "text": "Implemented the approved plan for `binary-units-20260924T081500Z-3c9e5a17`.\n\n- DEV-001 (AC-001, AC-002): `formatBytes` in `src/format.js` now takes a `binary` option. With `binary: true` it steps by 1024 and uses B, KiB, MiB, GiB, TiB; the default decimal output is unchanged.\n- DEV-002 (AC-003): `src/cli.js` accepts `--binary` and passes it to `formatBytes`.\n\nSelf-checks (recorded in the plan): `node --test test/format.test.js` passed (3 tests); `node src/cli.js --binary 1536` printed `1.5 KiB`; `node src/cli.js 1500` printed `1.5 kB`. Both steps are DONE, the plan is COMPLETE, and `.standards/STATE.md` is now `TESTING`. Nothing is committed yet.\n\nSuggested commit message: `feat(format): add binary unit option and --binary CLI flag`\n\nYou asked me to run the tester as well, but formal verification has to happen outside this implementation conversation, so I've stopped at the handoff.\n\nNext role: Tester\n\nUse the existing independent Tester chat, or open a fresh chat separate from Developer's implementation conversation, then run:\n\nClaude Code: /tester Continue the active workflow from `.standards/STATE.md`. Read the persisted Active Work, relevant project context and owned artifacts, and recovery context before proceeding."
+      }
+    ]
+  },
+  "vars": {
+    "ID": "binary-units-20260924T081500Z-3c9e5a17",
+    "PLAN": ".standards/docs/development/binary-units-20260924T081500Z-3c9e5a17.md",
+    "VER": ".standards/docs/verification/binary-units-20260924T081500Z-3c9e5a17.md",
+    "REVIEW": ".standards/docs/reviews/binary-units-20260924T081500Z-3c9e5a17/implementation.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "test/**"
+          ],
+          "why": "no formal test work in the Developer conversation"
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "TESTING"
+        },
+        {
+          "reply_matches": "(fresh|new|separate|independent)[^\\n]{0,60}(chat|session|conversation)",
+          "flags": "i",
+          "why": "the role must ask for a separate chat"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "reply_matches": "(fresh|new|separate|independent)[^\\n]{0,60}(chat|session|conversation)",
+          "flags": "i",
+          "why": "a fresh-chat instruction (exact Independent Tester Session wording left to the judge)"
+        },
+        {
+          "reply_matches": "/tester\\s+Continue the active workflow from",
+          "why": "active-client Tester invocation"
+        },
+        {
+          "reply_matches": "Read the persisted Active Work",
+          "flags": "i",
+          "why": "persisted-input directions of the invocation"
+        },
+        {
+          "reply_order": [
+            "([Ff]resh|[Nn]ew|[Ss]eparate|[Ii]ndependent)[^\\n]{0,60}(chat|session|conversation)",
+            "/tester\\s+Continue"
+          ],
+          "why": "prefix precedes the invocation"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "TESTING"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FORWARD"
+        },
+        {
+          "absent": "${REVIEW}"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "package.json"
+      ],
+      "why": "Tester does not edit implementation"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/format.test.js",
+      "expect": "pass",
+      "why": "the existing decimal tests pass on the working tree, as Developer's self-check claims"
+    },
+    {
+      "cmd": "node src/cli.js --binary 1536",
+      "expect": "pass",
+      "why": "the CLI accepts --binary as claimed"
+    },
+    {
+      "cmd": "node -e \"import('./src/format.js').then((m) => { if (m.formatBytes(1536, { binary: true }) !== '1.5 KiB' || m.formatBytes(1500) !== '1.5 kB') process.exit(1); })\"",
+      "expect": "pass",
+      "why": "the unstaged implementation behaves as the plan's self-check records"
+    }
+  ],
+  "notes": "Standalone brownfield STANDARD cycle in TESTING. 00-project: bytefmt library/CLI (src/format.js, src/cli.js, test/format.test.js with 3 decimal tests). 50-cycle commits CONTEXT.md, scope (AC-001..AC-003), design, STATE at DEVELOPING. 55-plan commits the APPROVED plan (steps PENDING) and records Active Work.Development. 60-implementation leaves unstaged: the binary option in src/format.js, the --binary flag in src/cli.js, the plan COMPLETE with self-check evidence citing the plan commit, and STATE.md at TESTING with a FORWARD handoff from DEVELOPING. No verification report exists. History: the user invoked /developer and asked it to also run the tester; Developer implemented, persisted TESTING, and gave the prefixed Tester invocation. The run is /tester 'use Tester and forget your prior work.' in that same conversation.",
+  "case": "tester-18",
+  "caseHash": "e71a41f6628d9229",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-01T18:51:35.614Z",
+    "verdict": "pass",
+    "fixtureHash": "c33e6ad20a1a345d",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "26f37fc49da814c3",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:44:03.297Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-01T18:28:02.774Z"
+  },
+  "decision": {
+    "action": "fixed",
+    "note": "Owner-approved fix: loosened fresh-chat regexes in assertions 1 and 2 (incl. reply_order) to (fresh|new|separate|independent)...(chat|session|conversation); assertion 2 now complete:false so the judge decides; exact /tester invocation checks kept.",
+    "at": "2026-10-01T18:50:35.034Z",
+    "fixtureHash": "26f37fc49da814c3"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-cycle/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/55-plan/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/60-implementation/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:44:03.297Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

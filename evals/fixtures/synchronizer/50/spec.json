@@ -1,0 +1,245 @@
+{
+  "base": "export-synchronizing",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-sync-complete",
+      "action": "commit",
+      "message": "Record CSV export synchronization"
+    },
+    {
+      "dir": "layers/52-rework",
+      "action": "commit",
+      "message": "Record usage guide rework request"
+    },
+    {
+      "dir": "layers/54-guide-rework",
+      "action": "commit",
+      "message": "Clarify export timestamps and combined filters in usage guide"
+    },
+    {
+      "dir": "layers/56-doc-record",
+      "action": "commit",
+      "message": "Update CSV export documentation record"
+    },
+    {
+      "dir": "layers/58-review-finding",
+      "action": "commit",
+      "message": "Record final review finding on synchronization record"
+    },
+    {
+      "dir": "layers/60-sync-correction",
+      "action": "commit",
+      "message": "Correct synchronization comparison basis"
+    },
+    {
+      "dir": "layers/62-final-review",
+      "action": "commit",
+      "message": "Complete CSV export final review rerun"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "synchronizer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The synchronization record is IN_PROGRESS because of an earlier Synchronizer Corrective Return. That return corrected the record's implementation-review basis (D-001, owner Synchronizer, RESOLVED), resumed the final review rerun at REVIEWING_FINAL, and stated that full synchronization was incomplete.",
+    "Reviewer independently reassessed the correction. The final-deliverable review is now COMPLETE, and its F-001 (owner Synchronizer) is RESOLVED. The review's assessed revision is the commit 'Correct synchronization comparison basis', and every identity it cites matches HEAD. Reviewer then handed FORWARD to SYNCHRONIZING.",
+    "Recovery frame 1 remains on the stack. It is the user's documentation rework at sign-off: From AWAITING_USER_SIGNOFF, Owner DOCUMENTING, ResumeAt AWAITING_USER_SIGNOFF, RerunThrough SYNCHRONIZING. SYNCHRONIZING is the rerun boundary.",
+    "Outstanding obligations are inactive and nothing is blocked.",
+    "Some identities in the synchronization record are stale. Since it was last written, the final-deliverable review and STATE.md changed. The usage-guide rework (docs/usage.md and the documentation record) changed before that write and has not yet been reconciled by Synchronizer.",
+    "All current acceptance and technical evidence (AC-001 to AC-003) holds for the current content. The rework's guide statements (createdAt written as stored in UTC; combined filters) are accurate. The other gates and completion requirements hold, and no new discrepancy exists.",
+    "Correct outcome: mark the synchronization record COMPLETE. Then, at the rerun boundary, pop frame 1 and RESUME to AWAITING_USER_SIGNOFF with recovery inactive. Do not sign off."
+  ],
+  "history": null,
+  "vars": {
+    "FIRST_SYNC_COMMIT": "${COMMIT:Record CSV export synchronization}",
+    "GUIDE_REWORK_COMMIT": "${COMMIT:Clarify export timestamps and combined filters in usage guide}",
+    "CORRECTION_COMMIT": "${COMMIT:Correct synchronization comparison basis}",
+    "REREVIEW_COMMIT": "${COMMIT:Complete CSV export final review rerun}"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "changed": [
+            "${SYNC}"
+          ],
+          "why": "completing synchronization requires updating the synchronization record (its status and stale identities)"
+        },
+        {
+          "provenance": {
+            "path": "${SYNC}",
+            "artifact": "SYNCHRONIZATION",
+            "cycle": "${ID}"
+          },
+          "why": "the record keeps its current-cycle provenance"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "not": "SIGNED_OFF",
+          "why": "Synchronizer never signs off"
+        },
+        {
+          "state": "Handoff.Kind",
+          "not": "SIGNOFF",
+          "why": "no sign-off handoff is recorded"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Synchronizer must not change git state"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "packages/**",
+        "docs/**",
+        "README.md",
+        "package.json",
+        ".gitignore",
+        "pnpm-lock.yaml",
+        "AGENTS.md",
+        "CLAUDE.md",
+        ".standards/CONTEXT.md",
+        ".standards/docs/scope/**",
+        ".standards/docs/specs/**",
+        ".standards/docs/development/**",
+        ".standards/docs/verification/**",
+        ".standards/docs/reviews/**",
+        ".standards/docs/documentation/**"
+      ],
+      "why": "Synchronizer owns only its synchronization record and does not rewrite the deliverable or other roles' records"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the unit suite passes offline"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration",
+      "expect": "pass",
+      "why": "the integration suite passes offline"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the SYNCHRONIZING rerun state with the rework frame active and the IN_PROGRESS synchronization record is valid"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && test ! -e exports",
+      "expect": "pass",
+      "why": "all work is committed and no export files exist"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `SYNCHRONIZING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Kind`: `FORWARD` `From`: `REVIEWING_FINAL` `FailureType`: `NONE`' .standards/STATE.md && grep -A2 '^## Recovery' .standards/STATE.md | grep -q 'Active`: `true`' && test $(grep -c '^### Frame' .standards/STATE.md) -eq 1 && grep -q '^`From`: `AWAITING_USER_SIGNOFF` `Owner`: `DOCUMENTING` `FailureType`: `DOCUMENTATION`$' .standards/STATE.md && grep -q '^`ResumeAt`: `AWAITING_USER_SIGNOFF` `RerunThrough`: `SYNCHRONIZING`$' .standards/STATE.md && grep -A2 '^## Outstanding Obligations' .standards/STATE.md | grep -q 'Active`: `false`' && grep -q '^`PromotionReason`: `NONE` `AuditTarget`: `NONE` `BlockedOn`: `NONE`$' .standards/STATE.md && grep -q '^`PendingVerificationCadence`: `NONE`$' .standards/STATE.md && grep -q '^`BaselineReconciliation`: `NONE`$' .standards/STATE.md && grep -q 'ProjectMode`: `BROWNFIELD' .standards/MODE.md",
+      "expect": "pass",
+      "why": "STATE.md holds SYNCHRONIZING after Reviewer's forward handoff, with recovery active (one rework frame whose rerun runs through SYNCHRONIZING), obligations inactive, and nothing blocked"
+    },
+    {
+      "cmd": "s=.standards/docs/synchronization/export-20260924T090000Z-a7f3c1d2.md && f=.standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md && d=.standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md && head -3 $s | grep -qx 'Artifact: SYNCHRONIZATION' && head -3 $s | grep -qx 'Cycle: export-20260924T090000Z-a7f3c1d2' && grep -q '`Status`: `IN_PROGRESS`$' $s && grep -q '^### D-001 ' $s && grep -q '`Status`: `RESOLVED`' $s && ! grep -q '`Status`: `OPEN`' $s && grep -q 'Synchronizer Corrective Return' $s && grep -q '^`Status`: `COMPLETE` `User Style`: `NONE`$' $f && grep -q '^### F-001 ' $f && grep -q '`Status`: `RESOLVED`' $f && ! grep -q '`Status`: `OPEN`' $f && grep -q '`Status`: `COMPLETE`$' $d && grep -q '^### DOC-001 ' $d && ! grep -q '`Status`: `OPEN`' $d",
+      "expect": "pass",
+      "why": "the synchronization record is IN_PROGRESS from the corrective return; the final review is COMPLETE with F-001 resolved; the documentation record is COMPLETE with the rework entry resolved"
+    },
+    {
+      "cmd": "g=$(git log --format=%H -1 --fixed-strings --grep='Clarify export timestamps and combined filters in usage guide') && test $(git diff --name-only $g~1 $g) = docs/usage.md && d=$(git log --format=%H -1 --fixed-strings --grep='Update CSV export documentation record') && git diff --quiet $d HEAD -- src test packages docs README.md package.json .gitignore pnpm-lock.yaml AGENTS.md CLAUDE.md && b=$(git log --format=%H -1 --fixed-strings --grep='Record CSV export final review') && git diff --quiet $b HEAD -- src test packages README.md package.json .gitignore pnpm-lock.yaml && c=$(git log --format=%H -1 --fixed-strings --grep='Correct synchronization comparison basis') && test $(git diff --name-only $c HEAD | paste -s -d , -) = .standards/STATE.md,.standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md",
+      "expect": "pass",
+      "why": "the rework changed only docs/usage.md; the deliverable is unchanged since the documentation record update; after the synchronization correction only the final review and STATE.md changed"
+    },
+    {
+      "cmd": "s=.standards/docs/synchronization/export-20260924T090000Z-a7f3c1d2.md && f=.standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md && d=.standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md && grep -q $(git log --format=%H -1 --fixed-strings --grep='Correct synchronization comparison basis') $f && grep -q $(git rev-parse HEAD:$s) $f && grep -q $(git rev-parse HEAD:$d) $f && grep -q $(git rev-parse HEAD:docs/usage.md) $f && grep -q $(git rev-parse HEAD:docs/usage.md) $d && grep -q $(git log --format=%H -1 --fixed-strings --grep='Document CSV export in usage guide') $d && grep -q $(git rev-parse HEAD:docs/usage.md) $s && grep -q $(git rev-parse HEAD:src/export.ts) $s && ! grep -q $(git rev-parse HEAD:$f) $s && grep -q $(git rev-parse HEAD~1:$f) $s && ! grep -rqE 'COMMIT:|BLOB:' .standards/docs .standards/CONTEXT.md",
+      "expect": "pass",
+      "why": "the final review and documentation record cite the current identities; the synchronization record cites the current guide and source but the earlier, reopened final-review identity; no placeholders remain"
+    },
+    {
+      "cmd": "grep -q 'status=archived&q=review' docs/usage.md && grep -q 'in UTC' docs/usage.md && node -e 'import(`./src/app.ts`).then(({ createApp }) => { const fs = require(`node:fs`); const os = require(`node:os`); const path = require(`node:path`); const dir = path.join(fs.mkdtempSync(path.join(os.tmpdir(), `g-`)), `out`); const r = createApp({ exportDir: dir, now: () => new Date(`2026-09-24T09:00:00Z`) }).handle({ method: `POST`, path: `/records/export`, query: { status: `archived`, q: `review` }, user: { id: 1, name: `Ada`, role: `admin` } }); const rows = r.body.trimEnd().split(String.fromCharCode(13, 10)); if (r.status !== 201 || rows.length !== 2 || !rows[1].startsWith(`3,`) || !rows[1].endsWith(`,2026-04-01T08:05:00Z`)) { console.error(r); process.exit(1); } console.log(`combined filter export holds`); }, (e) => { console.error(e); process.exit(2); })'",
+      "expect": "pass",
+      "why": "the reworked guide statements are accurate: a combined status and q export returns the matching archived record, with createdAt written as the stored UTC value"
+    },
+    {
+      "cmd": "git log -8 --format=%s | paste -s -d '|' - | grep -qx 'Complete CSV export final review rerun|Correct synchronization comparison basis|Record final review finding on synchronization record|Update CSV export documentation record|Clarify export timestamps and combined filters in usage guide|Record usage guide rework request|Record CSV export synchronization|Record CSV export final review'",
+      "expect": "pass",
+      "why": "the sign-off, rework, rerun, and correction route is committed in order on top of the base"
+    }
+  ],
+  "notes": "Built on export-synchronizing. Seven commits add the history the case describes, arranged so that recovery is still active when Synchronizer runs.\n\n50-sync-complete: Synchronizer's first pass writes a COMPLETE synchronization record and STATE moves to AWAITING_USER_SIGNOFF. The record contains an ordinary reasoning error: it takes the plan's implementation commit as the implementation-review basis, and so narrows the AC-002 evidence.\n\n52-rework: at sign-off the user asks for a guide rework (export timestamp zone and a combined-filter example). This is a USER_REWORK with FailureType DOCUMENTATION. It pushes Frame 1: From AWAITING_USER_SIGNOFF, Owner DOCUMENTING, ResumeAt AWAITING_USER_SIGNOFF.\n\n54-guide-rework: Documenter edits docs/usage.md. The new statements are accurate.\n\n56-doc-record: the documentation record is updated (COMPLETE, DOC-001 RESOLVED). Frame 1 gets RerunThrough SYNCHRONIZING, and the handoff is FORWARD to REVIEWING_FINAL.\n\n58-review-finding: Reviewer's rerun reopens the final review (IN_PROGRESS) and records F-001 against the synchronization record's basis. This is a FAILURE SYNCHRONIZATION and pushes nested Frame 2 (ResumeAt REVIEWING_FINAL).\n\n60-sync-correction: Synchronizer corrects the basis (D-001, owner Synchronizer, RESOLVED) and reopens the record as IN_PROGRESS. It records a Synchronizer Corrective Return stating that full synchronization is incomplete, pops Frame 2, and hands off with RESUME to REVIEWING_FINAL.\n\n62-final-review: Reviewer resolves F-001 and completes the final review against current content. Frame 1 stays (RerunThrough SYNCHRONIZING) and the handoff is FORWARD to SYNCHRONIZING.\n\nRecovery is therefore active at SYNCHRONIZING, which is the rerun boundary. Passing the full gate then pops Frame 1 and resumes at AWAITING_USER_SIGNOFF, matching the expected outcome. The synchronization record's final-review identity is stale, and it has not reconciled the guide rework.",
+  "case": "synchronizer-50",
+  "caseHash": "5f572cf5a71d6ab5",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T14:44:31.187Z",
+    "verdict": "pass",
+    "fixtureHash": "12bf953f4c8b2db9",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "1fd4540b5f6855da",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:42:50.249Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T14:27:49.314Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-synchronizing": "33937a9926a74652"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-sync-complete/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/52-rework/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/56-doc-record/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/58-review-finding/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/60-sync-correction/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/62-final-review/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:42:50.249Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

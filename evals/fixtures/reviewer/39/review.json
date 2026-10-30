@@ -1,0 +1,69 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installer brownfield, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md header and Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "WorkflowState REVIEWING_IMPLEMENTATION after recovery returned to review",
+      "where": ".standards/STATE.md: Handoff RESUME From TESTING, Recovery Active false; history in commits 'Record implementation review findings', 'Record transfer cleanup correction', 'Record export timeout reverification'",
+      "status": "realized"
+    },
+    {
+      "condition": "No blockers, active recovery frames, or outstanding obligations",
+      "where": ".standards/STATE.md: BlockedOn NONE, Recovery Active false, Outstanding Obligations Active false",
+      "status": "realized"
+    },
+    {
+      "condition": "F-002 reported a timeout stream leak and is still OPEN for Reviewer to resolve",
+      "where": ".standards/docs/reviews/<id>/implementation.md ### F-002 (P1, OPEN), with R2 reproduction; report Status BLOCKED",
+      "status": "realized"
+    },
+    {
+      "condition": "The original implementation really leaked streams on timeout",
+      "where": "src/io/transfer.js at commit 'Add timeout to export transfers' (Promise.race, no teardown); selfCheck 3 prints 'streams left open'",
+      "status": "realized"
+    },
+    {
+      "condition": "Developer corrected cleanup and the correction is sound",
+      "where": "src/io/transfer.js at HEAD (pipeline with AbortSignal, abort reason rethrown, clearTimeout in finally, untimed path plain pipeline); selfCheck 4 shows both streams destroyed; plan DEV-001 self-check and notes",
+      "status": "realized"
+    },
+    {
+      "condition": "Tester independently reverified the original timeout and shared import/export boundaries",
+      "where": ".standards/docs/verification/<id>.md: REVERIFY, COMPLETE, FULL/NONE, E1 15 passes, E2 original reproduction, slow-source import test; test/timeout.test.js new scenarios",
+      "status": "realized"
+    },
+    {
+      "condition": "Reviewer inspection and established diagnostics support the fix",
+      "where": "npm test passes 15 (selfChecks 1-2); R2 reproduction now destroys both streams (selfCheck 4)",
+      "status": "realized"
+    },
+    {
+      "condition": "All other current obligations satisfied (AC-001..003 evidenced, no other defect, F-001 legitimately withdrawn, plan COMPLETE)",
+      "where": "scope/design/plan/verification records; src/import.js, csv.js, store.js unchanged since pre-cycle (selfCheck 5); no other defect found on reading the code",
+      "status": "realized"
+    },
+    {
+      "condition": "Everything committed; clean tree",
+      "where": "git status clean; selfCheck 7",
+      "status": "realized"
+    }
+  ],
+  "issues": [],
+  "verdict": "pass",
+  "summary": "The fixture faithfully builds a brownfield STANDARD cycle resumed into REVIEWING_IMPLEMENTATION with F-002 open, a correct AbortSignal-based cleanup fix, and a COMPLETE FULL reverification that covers the original failure case and the shared import path; selfChecks confirm the old leak and the fixed teardown, and check.mjs passes. Checks are necessary conditions a correct run must meet (F-002 RESOLVED within its entry, DOCUMENTING/FORWARD, report COMPLETE, '/documenter' invocation), and invariants appropriately protect implementation, tests, and other roles' records.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T23:31:46.198Z",
+  "costUsd": 0.34180879999999997,
+  "ms": 43765,
+  "fixtureHash": "5c9f1be60b136b4a"
+}

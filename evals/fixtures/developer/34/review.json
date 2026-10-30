@@ -1,0 +1,49 @@
+{
+  "conditions": [
+    {
+      "condition": "Workflow is in DEVELOPING with an active STANDARD brownfield cycle",
+      "where": ".standards/STATE.md (WorkflowState DEVELOPING, CycleMode STANDARD); .standards/MODE.md BROWNFIELD",
+      "status": "realized"
+    },
+    {
+      "condition": "An initial development plan exists and is PROPOSED",
+      "where": ".standards/docs/development/filter-notes-by-tag-20260923T141200Z-5c8e2a91.md header Status PROPOSED; STATE Active Work.Development points to it",
+      "status": "realized"
+    },
+    {
+      "condition": "Plan User Style is tony and User Style Locked is false",
+      "where": "plan header `User Style`: `tony` `User Style Locked`: `false`",
+      "status": "realized"
+    },
+    {
+      "condition": "Plan has never been approved (all steps PENDING, approval blocker outstanding)",
+      "where": "plan DEV-001/DEV-002 Status PENDING, self-checks 'Not yet run'; STATE BlockedOn 'Approval of the proposed development plan before implementation begins.'",
+      "status": "realized"
+    },
+    {
+      "condition": "Selected style tony resolves to a real user-style file",
+      "where": ".standards/user-styles/developer/tony.md (selfCheck passes)",
+      "status": "realized"
+    },
+    {
+      "condition": "Upstream inputs needed for Developer in STANDARD (scope, design, context) are valid",
+      "where": ".standards/docs/scope/..., .standards/docs/specs/..., .standards/CONTEXT.md; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "Clean committed git state",
+      "where": "git status clean on main; 5 plausible commits",
+      "status": "realized"
+    }
+  ],
+  "issues": [],
+  "verdict": "pass",
+  "summary": "The fixture realizes a never-approved PROPOSED plan with User Style tony and Locked false at DEVELOPING, with a matching approval blocker in STATE.md and a resolvable tony.md; check.mjs passes and nothing leaks the answer. Checks (same Id/plan, User Style NONE, Locked false, Status PROPOSED, BlockedOn not NONE, implementation unchanged) are necessary under every correct run and fully decide these state/file assertions, and the standard invariants plus an unchanged user-styles guard fit the case.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T02:20:25.826Z",
+  "costUsd": 0.1224346,
+  "ms": 18685,
+  "fixtureHash": "b1bd9084c61dddd0"
+}

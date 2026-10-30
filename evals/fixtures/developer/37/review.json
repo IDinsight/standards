@@ -1,0 +1,73 @@
+{
+  "conditions": [
+    {
+      "condition": "BROWNFIELD project, cycle active in DEVELOPING",
+      "where": ".standards/MODE.md (BROWNFIELD); .standards/STATE.md WorkflowState DEVELOPING",
+      "status": "realized"
+    },
+    {
+      "condition": "Cycle was expedited and has been promoted to STANDARD",
+      "where": "layer 10 STATE (EXPEDITED) and plan with EXPEDITED_REQUEST; final STATE CycleMode STANDARD, PromotionReason set, FORWARD from ARCHITECTING; CONTEXT.md Active-Cycle Non-Baseline entry; design Context section",
+      "status": "realized"
+    },
+    {
+      "condition": "Plan was approved during the expedited path (lock set at first approval)",
+      "where": "layer 10 plan: Status IN_PROGRESS, DEV-001 DONE, User Style tony, User Style Locked true",
+      "status": "realized"
+    },
+    {
+      "condition": "User Style is tony and User Style Locked is true",
+      "where": "final development plan header",
+      "status": "realized"
+    },
+    {
+      "condition": "Selected style file exists so the selection is valid",
+      "where": ".standards/user-styles/developer/tony.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Revised architecture materially changes DEV-002",
+      "where": "specs file Decision/Alternatives (fixed 1 s rejected for capped backoff + Retry-After); plan DEV-002 rewritten; Plan Notes explain the material change",
+      "status": "realized"
+    },
+    {
+      "condition": "Plan has returned to PROPOSED awaiting approval",
+      "where": "plan Status PROPOSED; STATE BlockedOn asks for approval of the revised plan",
+      "status": "realized"
+    },
+    {
+      "condition": "Promotion reconciliation already done (contract paths, AC mappings, DEV-001 kept DONE)",
+      "where": "plan Implementation Contract, Acceptance fields AC-001..AC-004, Plan Notes",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation of DEV-001 exists; DEV-002 not implemented",
+      "where": "src/webhook.js retry loop without sleep/429; selfCheck confirms 503x3, 404x1",
+      "status": "realized"
+    },
+    {
+      "condition": "Upstream records valid and consistent; check passes",
+      "where": "scope AC-001..AC-004, design Acceptance Coverage covers all; check.mjs ok",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "All commits share the same timestamp and the commit 'Add context, scope, and design for webhook retries' bundles Auditor, Scoper, and Architect output in one commit; harmless for what the run tests.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes the promoted STANDARD cycle with a PROPOSED plan whose User Style tony is locked from the expedited first approval, a materially revised DEV-002, and a pending approval blocker, with no leaks. Checks (lock true, style tony, BlockedOn non-NONE, status PROPOSED, no src/test changes, upstream records untouched) are all necessary for any correct run, and the standard invariants are present.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T02:21:10.180Z",
+  "costUsd": 0.17315460000000002,
+  "ms": 28601,
+  "fixtureHash": "bad9cf1920d383ca"
+}

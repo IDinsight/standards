@@ -1,0 +1,209 @@
+{
+  "base": "export-documenting",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-style",
+      "action": "commit",
+      "message": "Add personal documentation style"
+    },
+    {
+      "dir": "layers/55-docs-draft",
+      "action": "commit",
+      "message": "Draft CSV export section of the usage guide"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "documenter",
+    "utterance": "Clear my documentation style; use NONE from now on."
+  },
+  "graderOnly": [
+    "The saved export section of docs/usage.md (Exporting records as CSV) is accurate against the implementation; only its presentation (bold summary line, second person, parameter table, 'Heads up:' paragraph) follows the tony style. It is the documentation the style change can affect.",
+    "README.md and the Listing records, Filtering, and Errors sections of docs/usage.md are completed documentation that was not written under the tony style; the style change gives no reason to edit them.",
+    "The README.md changes made earlier in this cycle (link sentence and src/export.ts layout bullet) are accurate and complete.",
+    "Documentation records have no approval status or style-lock field; clearing a documenter user style needs no plan approval, new cycle, or workflow transition.",
+    "The remaining export documentation work (CSV format, worked example, denied requests) is genuinely unfinished and may be continued in this run."
+  ],
+  "history": null,
+  "vars": {
+    "STYLE": ".standards/user-styles/documenter/tony.md",
+    "README": "README.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "exists": "${DOC}",
+          "why": "the documentation record still exists"
+        },
+        {
+          "contains": {
+            "path": "${DOC}",
+            "regex": "^(?![\\s\\S]*Style\\s+Locked)",
+            "flags": "i"
+          },
+          "why": "the documentation record has no User Style Locked field"
+        },
+        {
+          "contains": {
+            "path": ".standards/STATE.md",
+            "regex": "^(?![\\s\\S]*Style\\s+Locked)",
+            "flags": "i"
+          },
+          "why": "no lock field is added to the workflow state"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "contains": {
+            "path": "README.md",
+            "regex": "^See \\[docs/usage\\.md\\]\\(docs/usage\\.md\\) for how to list, filter, and export records\\.$",
+            "flags": "m"
+          },
+          "why": "README link line kept"
+        },
+        {
+          "contains": {
+            "path": "README.md",
+            "regex": "^- `src/export\\.ts`: CSV serialization and export file writing$",
+            "flags": "m"
+          },
+          "why": "README layout line kept"
+        },
+        {
+          "contains": {
+            "path": "docs/usage.md",
+            "regex": "^Records are ordered by `id`\\. Each record has `id`, `title`, `owner`,$",
+            "flags": "m"
+          },
+          "why": "the Listing records section keeps its text"
+        },
+        {
+          "contains": {
+            "path": "docs/usage.md",
+            "regex": "^- `q`: case-insensitive text that must appear in the title\\.$",
+            "flags": "m"
+          },
+          "why": "the Filtering section keeps its text"
+        },
+        {
+          "contains": {
+            "path": "docs/usage.md",
+            "regex": "^Example: `GET /records\\?status=active&owner=marco` lists marco's active records\\.$",
+            "flags": "m"
+          },
+          "why": "the Filtering example keeps its text"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the unit suite still passes"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration",
+      "expect": "pass",
+      "why": "the export behavior the draft describes is exercised and passes"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the DOCUMENTING state with an IN_PROGRESS documentation record is valid"
+    },
+    {
+      "cmd": "d=.standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md && head -4 $d | grep -qx 'Artifact: DOCUMENTATION' && grep -q '`User Style`: `tony`' $d && grep -q '`Status`: `IN_PROGRESS`' $d && grep -q '`Collaboration`: `AUTONOMOUS`' $d && ! grep -qi 'style locked' $d && ! grep -qE 'COMMIT:|BLOB:' $d && test -f .standards/user-styles/documenter/tony.md",
+      "expect": "pass",
+      "why": "the in-progress documentation record persists User Style tony, the style file exists, and no lock field or placeholder is present"
+    },
+    {
+      "cmd": "grep -qxF 'Records are ordered by `id`. Each record has `id`, `title`, `owner`,' docs/usage.md && grep -qxF -- '- `q`: case-insensitive text that must appear in the title.' docs/usage.md && grep -qF 'Example: `GET /records?status=active&owner=marco` lists marco' docs/usage.md",
+      "expect": "pass",
+      "why": "the unrelated listing and filtering text the checks look for is present before the run"
+    },
+    {
+      "cmd": "grep -q 'POST /records/export' docs/usage.md && grep -q '^## Exporting records as CSV$' docs/usage.md && grep -q 'list, filter, and export records' README.md && grep -q 'src/export.ts' README.md",
+      "expect": "pass",
+      "why": "the draft export section and the completed README update are committed"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && grep -q 'WorkflowState`: `DOCUMENTING`' .standards/STATE.md && grep -q '`BlockedOn`: `NONE`' .standards/STATE.md",
+      "expect": "pass",
+      "why": "clean tree, DOCUMENTING, nothing blocked"
+    }
+  ],
+  "notes": "Built on export-documenting (DOCUMENTING, STANDARD, brownfield, recovery and obligations inactive, BlockedOn NONE, complete scope/design/context/plan/verification/implementation review). 50-style commits the user-owned style file .standards/user-styles/documenter/tony.md (bold summary line per section, second person, parameter tables, 'Heads up:' side-effect paragraphs, worked examples). 55-docs-draft commits documentation progress made under that style: docs/usage.md gains a Roles bullet for export and an accurate 'Exporting records as CSV' section written in tony's style (CSV format, worked example, and denied-request description still to write); README.md gets an accurate link sentence and a src/export.ts layout bullet (complete); and the documentation record (IN_PROGRESS, AUTONOMOUS, ACTIVE_CHANGE, User Style tony) records inputs with BLOB/COMMIT identities, surfaces and dispositions, checks, no discrepancies, and remaining work. STATE.md is unchanged from the base. The unrelated completed documentation the case needs is README.md and the Listing records, Filtering, and Errors sections of docs/usage.md, none written under tony's rules. Assertion 0 uses negative-lookahead contains regexes (no lock field in the record or STATE). Assertion 1 checks README unchanged and key listing/filtering lines intact, leaving the rest of the usage.md diff to the judge.",
+  "case": "documenter-22",
+  "caseHash": "5aec46feee460213",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T16:27:33.335Z",
+    "verdict": "issues",
+    "fixtureHash": "b8de500b97ee1bb6",
+    "fixedBy": "owner decision",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "0dba1801f987d5c1",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:11:04.775Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T14:34:07.672Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-documenting": "cad63ec878d1dad0"
+  },
+  "decision": {
+    "action": "fixed",
+    "note": "Owner-approved gate-3 recommendation (2026-10-02).",
+    "at": "2026-10-02T16:51:42.947Z",
+    "fixtureHash": "0dba1801f987d5c1"
+  },
+  "migrations": [
+    {
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:11:04.775Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

@@ -1,0 +1,89 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is BROWNFIELD",
+      "where": ".standards/MODE.md (brownfield install)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState AUDITING, recovery inactive, a new cycle started from SIGNED_OFF",
+      "where": ".standards/STATE.md (layer 30-cycle): Handoff NEW_CYCLE from SIGNED_OFF, Recovery.Active false",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.AuditTarget is NONE",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "A generally usable .standards/CONTEXT.md exists",
+      "where": ".standards/CONTEXT.md, written by the prior signed-off cycle's Auditor (commit 'Add notesWithAllTags filter')",
+      "status": "realized"
+    },
+    {
+      "condition": "The current cycle depends on the runtime version and the test command",
+      "where": "Active Work.Request: replace the set helpers with built-in Set methods (which need Node 22) and keep the existing tests passing",
+      "status": "realized"
+    },
+    {
+      "condition": "The baseline still describes runtime 20 and `npm test`",
+      "where": "CONTEXT.md Stack and Tooling (Node.js 20, .nvmrc 20, engines >=20), Commands (`npm test`), Testing (the `test` script, CI runs `npm test`), Evidence",
+      "status": "realized"
+    },
+    {
+      "condition": "Current manifests and scripts establish runtime 22 and `npm run test:unit`",
+      "where": "package.json (engines >=22, only a test:unit script), .nvmrc 22, .github/workflows/ci.yml, README; selfChecks confirm that `npm test` fails with Missing script",
+      "status": "realized"
+    },
+    {
+      "condition": "The rest of the project-level context remains accurate",
+      "where": "CONTEXT.md module boundaries, conventions, test framework, and behavior match src/, test/, and README; the notes.js filters are described generically",
+      "status": "realized"
+    },
+    {
+      "condition": "No baseline reconciliation or prior-cycle non-baseline entries complicate the audit",
+      "where": "STATE.md BaselineReconciliation NONE; CONTEXT.md has no Active-Cycle Non-Baseline Work section",
+      "status": "realized"
+    },
+    {
+      "condition": "Clean committed git state",
+      "where": "git status clean on main",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": 0,
+      "detail": "Active Work.Request names `src/tags.js` explicitly. A run could read this as a persisted target area and choose subtree mode instead of gapfill. The stale claims (runtime, test command) are project-level and src/tags.js needs no refresh, so gapfill remains the defensible choice. The judge may still see some ambiguity.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally reword the request in layers/30-cycle/.standards/STATE.md to 'Replace the hand-written set helpers with the built-in Set methods and keep the existing tests passing.' This removes the subtree temptation. Note that the slug-based cycle ID would then no longer match the request perfectly, though check.mjs does not enforce that."
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 1,
+      "detail": "The `contains npm run test:unit` check, also used for assertion 2, assumes the refreshed Commands entry names the npm invocation rather than only the script name `test:unit` or the raw `node --test` command. This is the established invocation in the README and CI and is quoted in the case, so a correct run will almost certainly reproduce it.",
+      "recommendation": "run_as_is",
+      "fix": "None needed. If the check misfires, relax it to `test:unit`."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The prior cycle (dated 2026-09-11 in its ID) is squashed into one commit with all its records and its SIGNED_OFF state. Every commit carries the same timestamp. This is a harmless compression of history.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition. A usable CONTEXT.md is stale only on the Node 20 / `npm test` claims, while package.json, .nvmrc, CI, and README establish Node 22 and `npm run test:unit`, and the state is a clean STANDARD AUDITING cycle with AuditTarget NONE and check.mjs ok. The checks are necessary conditions for a correct gapfill refresh and the AUDITING->SCOPING FORWARD handoff, the invariants fit an Auditor run, and the only concerns are minor notes.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T21:06:36.704Z",
+  "costUsd": 0.851108,
+  "ms": 59648,
+  "fixtureHash": "983199b8aebe7e89"
+}

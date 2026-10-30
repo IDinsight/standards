@@ -1,0 +1,249 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add helpdesk sign-in routes and session store"
+    },
+    {
+      "dir": "layers/10-notes",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add session policy notes"
+    },
+    {
+      "dir": "layers/50-context",
+      "action": "commit",
+      "message": "Record project context for session lifetime work"
+    },
+    {
+      "dir": "layers/60-scope",
+      "action": "commit",
+      "message": "Draft session policy scope"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "scoper",
+    "utterance": "Replace the browser-close sign-out requirement: sessions must now survive browser restarts for up to 8 hours."
+  },
+  "graderOnly": [
+    "docs/scope/session-policy.md is an unmarked project-owned scope document (no provenance block) that this cycle's Scoper reused. It defines AC-001 (sessions expire after 30 minutes of inactivity) and AC-002 (users are signed out when the browser closes) and has no Retired Acceptance Identifiers or Previous Cycles section, so the next unused identifier is AC-003.",
+    "The scope was persisted but not yet handed off: WorkflowState is SCOPING after a FORWARD handoff from AUDITING, Architecture and Development are NONE, and recovery and outstanding obligations are inactive.",
+    "The scope's Goal, Constraints, Non-goals, and Assumptions do not depend on the browser-close condition; only AC-002 is replaced by the user's request.",
+    "The existing code keeps sessions for a fixed 12 hours from sign-in and sets a 12-hour sid cookie; no code change belongs to this run."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "session-policy-expire-idle-web-sessions-20260924T083000Z-5c1e9a47",
+    "SCOPE": "docs/scope/session-policy.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.Scope",
+          "equals": "${SCOPE}",
+          "why": "REPLAN continues at the existing scope path"
+        },
+        {
+          "absent": ".standards/docs/scope/${ID}.md",
+          "why": "no new scope record is created, as PLAN would"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "contains": {
+            "path": "${SCOPE}",
+            "regex": "^ *(?:[-*+]|[0-9]+[.)]) +[*_`]*AC-001[*_`]* *(?::|—|–|- )(?:[^\\n]|\\n(?! *(?:[-*+]|[0-9]+[.)]) | *#| *\\n| *[*][*]))*?30[ -]?min",
+            "flags": "m"
+          },
+          "why": "AC-001 is still defined as a list item with its 30-minute condition"
+        },
+        {
+          "check_ok": true,
+          "why": "AC-001 is not also listed as retired and nothing was deleted"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": true,
+      "all": [
+        {
+          "contains": {
+            "path": "${SCOPE}",
+            "regex": "^## +Retired Acceptance Identifiers *:? *$(?:(?!\\n## )[\\s\\S])*?\\n *(?:[-*+]|[0-9]+[.)]) +[*_`]*AC-002[*_`]* *(?::|—|–|- )",
+            "flags": "mi"
+          },
+          "why": "AC-002 is listed under Retired Acceptance Identifiers"
+        },
+        {
+          "contains": {
+            "path": "${SCOPE}",
+            "regex": "^ *(?:[-*+]|[0-9]+[.)]) +[*_`]*AC-(?!00[12][^0-9])[0-9]{3,}[*_`]* *(?::|—|–|- )(?:[^\\n]|\\n(?! *(?:[-*+]|[0-9]+[.)]) | *#| *\\n| *[*][*]))*?(?:8|eight)[ -]?hours?",
+            "flags": "mi"
+          },
+          "why": "the 8-hour condition is defined under an identifier other than AC-001 or AC-002"
+        },
+        {
+          "check_ok": true,
+          "why": "check reports an ID that is both current and retired"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": true,
+      "all": [
+        {
+          "contains": {
+            "path": "${SCOPE}",
+            "regex": "^ *(?:[-*+]|[0-9]+[.)]) +[*_`]*AC-(?!00[12][^0-9])[0-9]{3,}[*_`]* *(?::|—|–|- )(?:[^\\n]|\\n(?! *(?:[-*+]|[0-9]+[.)]) | *#| *\\n| *[*][*]))*?(?:8|eight)[ -]?hours?",
+            "flags": "mi"
+          },
+          "why": "the 8-hour browser-restart condition has a new identifier; only AC-001 and AC-002 were ever used"
+        },
+        {
+          "check_ok": true,
+          "why": "the new identifier is well formed and not a duplicate"
+        }
+      ]
+    },
+    {
+      "assertion": 4,
+      "complete": true,
+      "all": [
+        {
+          "contains": {
+            "path": "${SCOPE}",
+            "regex": "^## +Retired Acceptance Identifiers *:? *$(?:(?!\\n## )[\\s\\S])*?\\n *(?:[-*+]|[0-9]+[.)]) +[*_`]*AC-002[*_`]* *(?::|—|–|- )",
+            "flags": "mi"
+          },
+          "why": "AC-002 is a list item under the Retired Acceptance Identifiers heading"
+        },
+        {
+          "check_ok": true,
+          "why": "check reports an identifier deleted since the last commit"
+        }
+      ]
+    },
+    {
+      "assertion": 5,
+      "complete": false,
+      "all": [
+        {
+          "contains": {
+            "path": "${SCOPE}",
+            "regex": "^## +Retired Acceptance Identifiers *:? *$(?:(?!\\n## )[\\s\\S])*?\\n *(?:[-*+]|[0-9]+[.)]) +[*_`]*AC-002[*_`]* *(?::|—|–|- )",
+            "flags": "mi"
+          },
+          "why": "AC-002 is recorded only as retired"
+        },
+        {
+          "check_ok": true,
+          "why": "AC-002 is not both current and retired"
+        }
+      ]
+    },
+    {
+      "assertion": 6,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "src/**",
+            "test/**",
+            "package.json",
+            "README.md",
+            ".gitignore",
+            ".standards/CONTEXT.md",
+            ".standards/docs/**"
+          ],
+          "why": "Scoper writes no code, tests, context, or design records"
+        },
+        {
+          "contains": {
+            "path": "${SCOPE}",
+            "regex": "^ *(?:[-*+]|[0-9]+[.)]) +[*_`]*AC-001[*_`]* *(?::|—|–|- )(?:[^\\n]|\\n(?! *(?:[-*+]|[0-9]+[.)]) | *#| *\\n| *[*][*]))*?30[ -]?min",
+            "flags": "m"
+          },
+          "why": "the unaffected AC-001 condition survives"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/sessions.test.js test/cookies.test.js",
+      "expect": "pass",
+      "why": "CONTEXT.md records the established tests as passing"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 00-project (pre-install): small Node helpdesk app with an in-memory SessionStore (fixed 12-hour lifetime), a sid cookie with Max-Age 12 hours, http routes, and 5 node:test tests. 10-notes (pre-install): an informal project doc docs/scope/session-policy.md, so the scope later lives in an existing unmarked project document. 50-context: Auditor-style .standards/CONTEXT.md for the active cycle and STATE.md at SCOPING (STANDARD, FORWARD from AUDITING, Scope NONE). 60-scope: the Scoper rewrote docs/scope/session-policy.md with Goal, Constraints, Non-goals, one work item defining AC-001 (30-minute inactivity) and AC-002 (browser-close sign-out), and Assumptions; STATE.md now records Active Work.Scope docs/scope/session-policy.md, still SCOPING, recovery and obligations inactive. No Retired section or Previous Cycles exist, so id.mjs yields AC-003. check.mjs passes.",
+  "case": "scoper-5",
+  "caseHash": "b4ff16064d51ca14",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T20:06:44.748Z",
+    "verdict": "pass",
+    "fixtureHash": "de53fe329d953548",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "910fb728f149161c",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:32:16.724Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T19:43:43.986Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-context/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/60-scope/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:32:16.724Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

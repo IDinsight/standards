@@ -1,0 +1,61 @@
+{
+  "conditions": [
+    {
+      "condition": "Two candidate designs with different tradeoffs exist for the user to be quizzed on",
+      "where": "docs/report-performance-options.md (Option 1: cache computed report with expiry; Option 2: running totals on write)",
+      "status": "realized"
+    },
+    {
+      "condition": "Current requirements do not select either design",
+      "where": ".standards/docs/scope/make-the-category-report-fast-for-large-20260923T141000Z-5c8e2a14.md AC-001..AC-003. A 30 s staleness allowance admits a cache whose expiry is at most 30 s, and running totals also satisfy every AC; neither constraint nor non-goal picks one",
+      "status": "realized"
+    },
+    {
+      "condition": "No approved architecture exists; the design choice is an open Architect decision",
+      "where": ".standards/STATE.md WorkflowState ARCHITECTING, Active Work.Architecture NONE, FORWARD from SCOPING; no .standards/docs/specs/ file",
+      "status": "realized"
+    },
+    {
+      "condition": "A scope record exists (catalog fixture.records: scope)",
+      "where": "completed SCOPE record with provenance matching Active Work.Id",
+      "status": "realized"
+    },
+    {
+      "condition": "Small committed code base the designs apply to",
+      "where": "src/report.js recomputes totals per call; src/ledger.js; src/handlers.js; test/report.test.js passes (selfCheck)",
+      "status": "realized"
+    },
+    {
+      "condition": "Git state is clean and committed",
+      "where": "git status clean on main; check.mjs ok",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The 50-audit layer commits an intermediate STATE at AUDITING with Kind INITIAL. The Auditor's FORWARD to SCOPING is never committed separately; the 60-scope commit jumps straight to ARCHITECTING. Only the final state is visible as a file and it is coherent, so this does not affect the run.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 1,
+      "detail": "`unchanged ['**']` together with `complete: true` fully decides 'no architecture file, acceptance condition, or workflow approval is created'. A correct Navigator persists nothing, so these checks cannot fail a correct run. The only safe diagnostics, node --test and check.mjs, write nothing outside the ignored caches.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes the case. Two documented candidate designs exist, the completed scope's acceptance conditions admit both, and the workflow sits in ARCHITECTING with no design, so the choice is an open Architect decision. Nothing leaks the expected behavior. Checks and invariants (no Skill dispatch, everything unchanged, HEAD unchanged, no mutating git) cannot fail a correct non-mutating Navigator run.\n",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T01:43:07.726Z",
+  "costUsd": 0.1249362,
+  "ms": 30659,
+  "fixtureHash": "9e2f8ec441a15487"
+}

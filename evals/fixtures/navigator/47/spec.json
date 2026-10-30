@@ -1,0 +1,125 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add contact service with input validation"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "navigator",
+    "utterance": "Validation happens before persistence, so invalid input returns without saving anything."
+  },
+  "graderOnly": [
+    "Current source confirms the user's answer: app/service.py add_contact calls validate_contact first and, when it returns any errors, returns (400, {'errors': ...}) immediately, before store.save is ever called, so nothing is persisted (tests/test_service.py test_invalid_contact_is_not_saved also shows store.all() stays empty).",
+    "The user's answer is accurate in plain language; it does not need terms such as 'guard clause' or 'early return' to be correct, and it does not mention the 400 status, which is a detail rather than an error.",
+    "Natural deeper follow-ups exist in the source: name/email normalization (strip, lowercase) happens only after validation passes; and a duplicate email passes validation but is rejected by ContactStore.save raising DuplicateEmail, which add_contact turns into a 409 without saving.",
+    "The earlier assistant turn in this conversation was a GRILL_ME question about invalid input; the run's user message is the answer to it."
+  ],
+  "history": {
+    "turns": [
+      {
+        "role": "user",
+        "text": "/navigator Grill me on how adding a contact works in this project. Start with the basics."
+      },
+      {
+        "role": "assistant",
+        "text": "Sure, let's do a comprehension check on adding a contact, starting with the big picture. I've read `app/service.py`, `app/validation.py`, and `app/store.py`, so my feedback will be based on the current code.\n\nFirst question: when `add_contact` is called with invalid input, for example an empty name, what happens to that input?"
+      }
+    ]
+  },
+  "vars": {},
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "reply_matches": "\\?",
+          "why": "a correct run asks a next question"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "unchanged": [
+        "**"
+      ],
+      "why": "Navigator persists nothing (generated caches are ignored)"
+    },
+    {
+      "head_unchanged": true,
+      "why": "Navigator never moves HEAD"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Navigator never mutates git state"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "python3 -m pytest -q tests/test_service.py",
+      "expect": "pass",
+      "why": "the project's tests pass on the committed source"
+    },
+    {
+      "cmd": "python3 -c \"from app.service import add_contact; from app.store import ContactStore; s = ContactStore(); r = add_contact(s, {'name': '', 'email': 'x'}); assert r[0] == 400 and s.all() == [], r\"",
+      "expect": "pass",
+      "why": "invalid input returns before anything is saved, confirming the user's answer"
+    },
+    {
+      "cmd": "python3 -c \"from app.service import add_contact; from app.store import ContactStore; s = ContactStore(); add_contact(s, {'name': 'Ada', 'email': 'ada@example.org'}); r = add_contact(s, {'name': 'B', 'email': 'ADA@example.org'}); assert r[0] == 409 and len(s.all()) == 1, r\"",
+      "expect": "pass",
+      "why": "duplicate email passes validation but is rejected at the store, a deeper topic for the next question"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. Layer 00-project (pre-install commit) holds a small stdlib Python contacts service: app/validation.py (validate_contact returns field errors), app/service.py (add_contact validates first and returns 400 early without calling store.save; otherwise normalizes and saves, mapping DuplicateEmail to 409), app/store.py (in-memory ContactStore), and tests/test_service.py. STANDARDS is installed with the default brownfield initial state (AUDITING, CycleMode UNSET, no cycle); the case leaves workflow state unspecified and Navigator needs none. history holds the earlier GRILL_ME turn: the user asked to be grilled on adding a contact, and the assistant asked a beginner question about what happens to invalid input. The run's utterance is the user's (accurate) answer. selfChecks use python3 (the image has no `python` command).",
+  "case": "navigator-47",
+  "caseHash": "162c349fc2dd9ef8",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T15:39:56.574Z",
+    "verdict": "pass",
+    "fixtureHash": "9f61c37cec4b4c47",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "1d6d5d3f9505bdfa",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:22:50.392Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T15:16:27.919Z"
+  },
+  "migrations": [
+    {
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:22:50.392Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "conditions": [
+    {
+      "condition": "Navigator is installed and invocable (STANDARDS installed in the project)",
+      "where": ".standards/ and .claude/skills/navigator/ (pristine install commit 'Install STANDARDS')",
+      "status": "realized"
+    },
+    {
+      "condition": "There is an in-progress change to explain, with committed baseline history",
+      "where": "commit 'Add invoice totals module with tax support' (src/totals.js, test, README); in-progress discountRate change on top",
+      "status": "realized"
+    },
+    {
+      "condition": "Some work is staged",
+      "where": "git status 'M  src/totals.js' (layer 50-staged)",
+      "status": "realized"
+    },
+    {
+      "condition": "Some work is unstaged",
+      "where": "git status ' M README.md', ' M test/totals.test.js' (layer 60-unstaged)",
+      "status": "realized"
+    },
+    {
+      "condition": "Some work is untracked",
+      "where": "git status '?? src/rounding.js' (layer 70-untracked)",
+      "status": "realized"
+    },
+    {
+      "condition": "Workflow state is unspecified; a valid state that check.mjs accepts",
+      "where": ".standards/STATE.md installed brownfield initial (AUDITING, CycleMode UNSET); check.mjs ok:true",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "blocking",
+      "kind": "check-too-strict",
+      "assertion": 0,
+      "detail": "Assertion 0's explicit not_ran_git list includes 'stash' (and 'checkout', 'reset', 'rm', 'mv', 'clean', 'switch'). It matches any such git subcommand in command position, so a correct read-only inspection such as `git stash list` or `git stash show` fails it. Navigator's shared procedure asks it to reconstruct the full repository state, so a stash listing is a plausible correct action. The list adds nothing that the `not_ran_git: \"mutating\"` check, the `unchanged: [\"**\"]` check, and the head_unchanged check do not already cover.",
+      "recommendation": "fix_file",
+      "fix": "In navigator-62/spec.json, checks[0].all, delete the check object {\"not_ran_git\": [\"add\",\"commit\",\"restore\",\"reset\",\"stash\",\"checkout\",\"rm\",\"mv\",\"clean\",\"switch\"]}. If you keep an explicit list, reduce it to [\"add\",\"commit\",\"restore\"]."
+    },
+    {
+      "severity": "note",
+      "kind": "case-defect",
+      "assertion": -1,
+      "detail": "The expected output says Navigator does not suggest a commit message (PROTOCOL.md Commit Message Guidance: NAVIGATOR never suggests a commit), but no assertion grades this. The fixture correctly leaves it to graderOnly and adds no brittle reply check.",
+      "recommendation": "run_as_is",
+      "fix": "Consider adding an assertion to the case later; the fixture needs no change."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The local git config has user.name=Fixture and user.email=fixture@example.invalid, so the commit author in `git log` reads 'Fixture'. This is harness-wide and does not hint at the answer.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "issues",
+  "summary": "The repository realizes the staged/unstaged/untracked split around one coherent discountRate change, check.mjs passes, and the Navigator invariants are correct. One check is blocking: assertion 0's explicit not_ran_git list includes 'stash', which would fail a correct read-only `git stash list`. Delete that check (the 'mutating', unchanged, and head_unchanged checks already cover the assertion) and the fixture is fit to run.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T01:43:03.952Z",
+  "costUsd": 0.1114042,
+  "ms": 30315,
+  "fixtureHash": "41929fc35888beca"
+}

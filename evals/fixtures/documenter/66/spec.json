@@ -1,0 +1,273 @@
+{
+  "base": "export-documenting",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-guide",
+      "action": "commit",
+      "message": "Document CSV export in usage guide"
+    },
+    {
+      "dir": "layers/51-doc-record",
+      "action": "commit",
+      "message": "Record CSV export documentation"
+    },
+    {
+      "dir": "layers/52-final-review",
+      "action": "commit",
+      "message": "Record CSV export final review"
+    },
+    {
+      "dir": "layers/54-sync",
+      "action": "commit",
+      "message": "Record export synchronization discrepancy"
+    },
+    {
+      "dir": "layers/56-design",
+      "action": "commit",
+      "message": "Define export storage-failure response"
+    },
+    {
+      "dir": "layers/58-guide-fix",
+      "action": "commit",
+      "message": "Correct export failure wording in usage guide"
+    },
+    {
+      "dir": "layers/59-doc-progress",
+      "action": "commit",
+      "message": "Record usage guide correction progress"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "documenter",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The corrected design (Interfaces and Contracts, Storage failure) requires that a failure to create the export folder or write the export file returns 500 with error 'export could not be written' and keeps no export file. The implementation has no such handling: writeExport calls mkdirSync then writeFileSync with no error handling or cleanup, so a storage failure reaches the router as a plain error and returns 500 with error 'internal error'.",
+    "No test, verification evidence, or review evidence covers storage failures.",
+    "The required storage-failure documentation for AC-002 therefore lacks its prerequisite behavior and evidence: documenting the design's response would describe behavior that does not exist, and documenting the actual response would silently change the contract. The owner of the missing behavior is Developer (IMPLEMENTATION), with Tester evidence after it; the Architect's rerun plan (RerunThrough DOCUMENTING, entered directly from ARCHITECTING) omitted DEVELOPING, TESTING, and REVIEWING_IMPLEMENTATION, so routing an ARCHITECTURE failure back to the Architect is also an owner route.",
+    "The DOC-001 correction (replacing the unsupported sentence 'A failed export never writes a file.' with a statement limited to 400, 401, and 403 rejections) is accurate and verified.",
+    "Documenter Corrective Return does not apply: Documenter does not own recovery frame 1 (Owner ARCHITECTING, RerunThrough DOCUMENTING); it is a downstream rerun and must pass its applicable gate before the frame can be popped.",
+    "Acceptable handling includes routing a failure to the owner of the missing prerequisite with a new frame pushed above frame 1, or persisting a blocking question; frame 1 must stay unchanged, the documentation record must not be marked COMPLETE, and the workflow must not RESUME to SYNCHRONIZING."
+  ],
+  "history": null,
+  "vars": {},
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "state": "Recovery.Frame1.Owner",
+          "unchanged": true,
+          "why": "the Architect-owned frame is still frame 1"
+        },
+        {
+          "state": "Recovery.Frame1.From",
+          "unchanged": true
+        },
+        {
+          "state": "Recovery.Frame1.FailureType",
+          "unchanged": true
+        },
+        {
+          "state": "Recovery.Frame1.ResumeAt",
+          "unchanged": true
+        },
+        {
+          "state": "Recovery.Frame1.RerunThrough",
+          "unchanged": true,
+          "why": "Documenter does not replan the frame it does not own"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "true"
+        },
+        {
+          "state": "WorkflowState",
+          "not": "SYNCHRONIZING",
+          "why": "the frame was not popped to ResumeAt"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "state": "Recovery.Frame1.Owner",
+          "unchanged": true
+        },
+        {
+          "state": "Recovery.Frame1.ResumeAt",
+          "unchanged": true
+        },
+        {
+          "state": "Recovery.Frame1.RerunThrough",
+          "unchanged": true
+        },
+        {
+          "exists": "${DOC}"
+        },
+        {
+          "field": {
+            "path": "${DOC}",
+            "name": "Status",
+            "not": "COMPLETE"
+          },
+          "why": "required documentation remains, so the record stays incomplete"
+        },
+        {
+          "unchanged": [
+            "${SYNC}",
+            "${REVIEW_FINAL}",
+            "${REVIEW_IMPL}",
+            "${VERIFICATION}",
+            "${SCOPE}",
+            "${ARCH}",
+            "${DEV}",
+            "${CONTEXT}"
+          ],
+          "why": "other owners' records, including the open synchronization discrepancy, are preserved"
+        },
+        {
+          "contains": {
+            "path": "${USAGE}",
+            "regex": "## Exporting records as CSV"
+          },
+          "why": "the existing export documentation is kept"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "test/**",
+        "package.json",
+        "packages/**"
+      ],
+      "why": "Documenter does not change tests or project configuration"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the unit suite still passes"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration",
+      "expect": "pass",
+      "why": "the integration suite still passes"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the DOCUMENTING rerun state and all records are valid"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && test ! -e exports",
+      "expect": "pass",
+      "why": "all work is committed"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `DOCUMENTING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Kind`: `RESUME` `From`: `ARCHITECTING` `FailureType`: `NONE`' .standards/STATE.md && grep -q '^`From`: `SYNCHRONIZING` `Owner`: `ARCHITECTING` `FailureType`: `ARCHITECTURE`$' .standards/STATE.md && grep -q '^`ResumeAt`: `SYNCHRONIZING` `RerunThrough`: `DOCUMENTING`$' .standards/STATE.md && test $(grep -c '^### Frame' .standards/STATE.md) -eq 1 && grep -q '^`Active`: `true`$' .standards/STATE.md",
+      "expect": "pass",
+      "why": "one Architect-owned frame with ResumeAt SYNCHRONIZING and RerunThrough DOCUMENTING; state DOCUMENTING after a RESUME from ARCHITECTING"
+    },
+    {
+      "cmd": "grep -q 'export could not be written' .standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md && ! grep -rq 'could not be written' src test docs README.md",
+      "expect": "pass",
+      "why": "the corrected design defines the storage-failure response, but no implementation, test, or guide text provides it"
+    },
+    {
+      "cmd": "node --input-type=module -e 'const { createApp } = await import(`./src/app.ts`); const r = createApp({ exportDir: `package.json/out` }).handle({ method: `POST`, path: `/records/export`, query: {}, user: { id: 1, name: `Ada`, role: `admin` } }); console.log(r.status, r.body); if (r.status !== 500 || JSON.parse(r.body).error !== `internal error`) process.exit(1);'",
+      "expect": "pass",
+      "why": "a storage failure actually returns the router's generic 500 internal error, not the design's response"
+    },
+    {
+      "cmd": "grep -q '^## Exporting records as CSV$' docs/usage.md && ! grep -q 'never writes a file' docs/usage.md && grep -q 'writes no file and creates no export folder' docs/usage.md",
+      "expect": "pass",
+      "why": "the guide has the export section with the verified DOC-001 correction applied"
+    },
+    {
+      "cmd": "d=.standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md && s=.standards/docs/synchronization/export-20260924T090000Z-a7f3c1d2.md && grep -q '`Status`: `IN_PROGRESS`' $d && grep -q '^### DOC-001' $d && grep -q '^`Status`: `RESOLVED` `Owner`: `Documenter`$' $d && grep -q '`Status`: `COMPLETE` `User Style`: `NONE`' .standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md && grep -q '`Status`: `BLOCKED`' $s && grep -q '^`Status`: `OPEN` `Owner`: `Architect` `FailureType`: `ARCHITECTURE`$' $s",
+      "expect": "pass",
+      "why": "documentation record IN_PROGRESS with a resolved correction; final review COMPLETE; synchronization BLOCKED with an open Architect discrepancy"
+    },
+    {
+      "cmd": "! grep -rqE 'COMMIT:|BLOB:' .standards/docs .standards/CONTEXT.md",
+      "expect": "pass",
+      "why": "all revision placeholders were resolved"
+    },
+    {
+      "cmd": "git log -7 --format=%s | paste -s -d '|' - | grep -qx 'Record usage guide correction progress|Correct export failure wording in usage guide|Define export storage-failure response|Record export synchronization discrepancy|Record CSV export final review|Record CSV export documentation|Document CSV export in usage guide'",
+      "expect": "pass",
+      "why": "overlay commit history in order"
+    }
+  ],
+  "notes": "Built on export-documenting (cycle export-20260924T090000Z-a7f3c1d2 at DOCUMENTING after a passing implementation review). Overlay replays the rest of the first pass and a recovery: 50-guide adds the export section to docs/usage.md (with the sentence 'A failed export never writes a file.') and a README layout entry. 51-doc-record: first-pass documentation record COMPLETE; STATE REVIEWING_FINAL. 52-final-review: final-deliverable review COMPLETE, no findings; STATE SYNCHRONIZING. 54-sync: synchronization record BLOCKED with D-001 (Owner Architect, ARCHITECTURE): the design never defined the export's response or on-disk outcome when storage fails, so the guide's sentence is unsupported; STATE ARCHITECTING with FAILURE from SYNCHRONIZING and Frame 1 (From SYNCHRONIZING, Owner ARCHITECTING, ResumeAt SYNCHRONIZING, RerunThrough NONE). 56-design: Architect adds a Storage failure contract (500 'export could not be written', no export file kept) to Interfaces and Contracts and resumes straight into DOCUMENTING (Handoff RESUME from ARCHITECTING, Frame 1 RerunThrough DOCUMENTING). 58-guide-fix: previous Documenter rerun session's verified correction (DOC-001) in docs/usage.md. 59-doc-progress: documentation record reopened IN_PROGRESS with DOC-001 RESOLVED and the storage-failure response listed as not yet assessed. The implementation was never changed, so the design's storage-failure response does not exist (selfCheck shows the actual 500 'internal error'). Upstream mistakes are deliberate and are the case premise: the Architect's rerun plan skips DEVELOPING/TESTING/REVIEWING_IMPLEMENTATION (and REVIEWING_FINAL) despite a behavioral contract change.",
+  "case": "documenter-66",
+  "caseHash": "41e78ef21d16d0b6",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T16:43:57.357Z",
+    "verdict": "pass",
+    "fixtureHash": "22a934bdcc5efa20",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "87e4358ef07352dc",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:16:37.520Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T16:06:49.732Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-documenting": "cad63ec878d1dad0"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/51-doc-record/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/52-final-review/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/54-sync/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/56-design/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:16:37.520Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

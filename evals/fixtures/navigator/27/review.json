@@ -1,0 +1,61 @@
+{
+  "conditions": [
+    {
+      "condition": "An earlier turn explained the timeout as 10 from the working tree, which then matched HEAD",
+      "where": "spec history assistant turn; HEAD:config/default.json line 4 has timeoutSeconds 10; the cited lines (config/default.json:4, src/config.js:5-7, src/sync.js:4/7/9, src/client.js:11/17/19/22) match the committed files",
+      "status": "realized"
+    },
+    {
+      "condition": "The user has since saved timeout 20 in the config",
+      "where": "working tree config/default.json (unstaged), timeoutSeconds 20; selfCheck confirms",
+      "status": "realized"
+    },
+    {
+      "condition": "The user changed the caller, and the change matters to the earlier explanation",
+      "where": "working tree src/sync.js (unstaged) now uses a run-wide deadline, passes the remaining seconds per request, and skips symbols once the deadline passes; this makes the per-request and ~30s claims stale",
+      "status": "realized"
+    },
+    {
+      "condition": "HEAD is unchanged between turns and the edits are saved but uncommitted",
+      "where": "git log shows the same two commits; git status shows ' M' on both files; nothing is staged (selfCheck git diff --cached --quiet)",
+      "status": "realized"
+    },
+    {
+      "condition": "The conversation continues: the user asks to continue the explanation",
+      "where": "history ends with an offer to explain what happens after a timeout; utterance is 'Continue the explanation.'",
+      "status": "realized"
+    },
+    {
+      "condition": "No workflow cycle is required for Navigator",
+      "where": ".standards/STATE.md is the installed brownfield default; check.mjs ok",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 0,
+      "detail": "The precondition reply_matches '(?<![\\d.])20(?!\\d)|twenty' requires the reply to state the saved value. Any explanation updated from the saved files would very likely state 20, so the risk of a false failure is minimal. It is a field value a correct run reproduces, not a paraphrasable word.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The injected history has no tool calls, so Claude Code will not raise its usual 'file modified' reminder. The role gets no hint that files changed and must re-check on its own, as Navigator step 7 requires. This is fair and is exactly what assertion 0 tests.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes the case faithfully. The history's 10-second explanation matches HEAD at every cited line, and the unstaged working tree holds timeout 20 plus a semantically different caller, so the earlier claims are verifiably stale while HEAD is unchanged. Checks and invariants are necessary conditions for a correct non-mutating Navigator run, nothing leaks, and the self-checks confirm every stated fact.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T15:40:17.936Z",
+  "costUsd": 0.709107,
+  "ms": 38845,
+  "fixtureHash": "ab14fdd8febd7e2e"
+}

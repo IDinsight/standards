@@ -1,0 +1,261 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial export service"
+    },
+    {
+      "dir": "layers/10-purge",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add scheduled purge of finished exports"
+    },
+    {
+      "dir": "layers/50-audit",
+      "action": "commit",
+      "message": "Record project context for correlation IDs"
+    },
+    {
+      "dir": "layers/60-scope",
+      "action": "commit",
+      "message": "Define correlation ID scope"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "architect",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "Existing project structure remains valid and no staged compatibility migration is a primary concern, so CROSS_CUTTING is the correct mode.",
+    "No project architecture or specification document exists in the repository; README.md is client-facing user documentation, so the design is expected as a new ARCHITECTURE record at .standards/docs/specs/propagate-correlation-ids-across-the-api-20260923T141200Z-5b7e2c19.md.",
+    "The existing x-request-id response header is generated per request, used only in API log lines, and not documented to clients, so folding it into or replacing it with the correlation contract is not a compatibility migration.",
+    "The completed scope and project context are sufficient to design without a blocking user question. Material exceptions the design should address: the scheduled purge job has no external caller (AC-003), caller-supplied identifiers need a validation rule (AC-002), and callbacks are HMAC-signed over the exact body, which existing receivers verify.",
+    "All ten existing tests pass at HEAD."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "propagate-correlation-ids-across-the-api-20260923T141200Z-5b7e2c19",
+    "SCOPE": ".standards/docs/scope/propagate-correlation-ids-across-the-api-20260923T141200Z-5b7e2c19.md",
+    "SPEC": ".standards/docs/specs/propagate-correlation-ids-across-the-api-20260923T141200Z-5b7e2c19.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 4,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "src/**",
+            "test/**",
+            "package.json"
+          ],
+          "why": "Architect does not restructure or edit the project itself"
+        }
+      ]
+    },
+    {
+      "assertion": 5,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.Architecture",
+          "equals": "${SPEC}",
+          "why": "the design is persisted and referenced from Active Work"
+        },
+        {
+          "provenance": {
+            "path": "${SPEC}",
+            "artifact": "ARCHITECTURE",
+            "cycle": "${ID}"
+          }
+        },
+        {
+          "contains": {
+            "path": "${SPEC}",
+            "regex": "^## Acceptance Coverage.*$(?:(?!^## )[\\s\\S])*?AC-001",
+            "flags": "mi"
+          },
+          "why": "AC-001 accounted for in Acceptance Coverage"
+        },
+        {
+          "contains": {
+            "path": "${SPEC}",
+            "regex": "^## Acceptance Coverage.*$(?:(?!^## )[\\s\\S])*?AC-002",
+            "flags": "mi"
+          },
+          "why": "AC-002 accounted for in Acceptance Coverage"
+        },
+        {
+          "contains": {
+            "path": "${SPEC}",
+            "regex": "^## Acceptance Coverage.*$(?:(?!^## )[\\s\\S])*?AC-003",
+            "flags": "mi"
+          },
+          "why": "AC-003 accounted for in Acceptance Coverage"
+        },
+        {
+          "unchanged": [
+            "${SCOPE}"
+          ],
+          "why": "Architect does not edit Scoper-owned acceptance conditions"
+        }
+      ]
+    },
+    {
+      "assertion": 6,
+      "complete": false,
+      "all": [
+        {
+          "contains": {
+            "path": "${SPEC}",
+            "regex": "^## Technical Acceptance Criteria.*$(?:(?!^## )[\\s\\S])*?AC-00[1-3]",
+            "flags": "mi"
+          },
+          "why": "technical acceptance criteria cite at least one current AC"
+        }
+      ]
+    },
+    {
+      "assertion": 7,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.Architecture",
+          "equals": "${SPEC}"
+        },
+        {
+          "provenance": {
+            "path": "${SPEC}",
+            "artifact": "ARCHITECTURE",
+            "cycle": "${ID}"
+          }
+        },
+        {
+          "contains": {
+            "path": "${SPEC}",
+            "regex": "^## Acceptance Coverage",
+            "flags": "mi"
+          },
+          "why": "template section heading"
+        },
+        {
+          "contains": {
+            "path": "${SPEC}",
+            "regex": "^## Decision",
+            "flags": "mi"
+          },
+          "why": "template section heading"
+        },
+        {
+          "check_ok": true,
+          "why": "no second ARCHITECTURE record or provenance problem"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "package.json",
+        "README.md",
+        ".standards/CONTEXT.md",
+        ".standards/docs/scope/**"
+      ],
+      "why": "Architect writes no production code, tests, user documentation, project context, or scope"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/api.test.js test/bus.test.js test/worker.test.js test/scheduler.test.js",
+      "expect": "pass",
+      "why": "Project context states the four test files (10 tests) pass at HEAD."
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "The starting workflow state is valid."
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 00-project (pre-install): a dependency-free Node 22 ES-module service: HTTP API (src/api/server.js), in-process MemoryBus with an unused headers field (src/bus), export worker, signed outbound callbacks (src/callbacks/notifier.js), JSON-lines logger with child(), in-memory store, report catalog, tests. The API already mints an undocumented per-request x-request-id used only in API logs. 10-purge (pre-install): hourly scheduler publishing exports.purge plus purge worker and test (an internally initiated asynchronous job). 50-audit: Auditor-written .standards/CONTEXT.md for the active cycle and STATE at SCOPING (FORWARD from AUDITING). 60-scope: completed scope record with AC-001 (case wording), AC-002 (caller-supplied id reused or one assigned and returned), AC-003 (scheduled jobs get their own id), and STATE at ARCHITECTING, STANDARD, FORWARD from SCOPING, recovery inactive, Architecture NONE. The case prompt's 'existing structure remains valid / no staged migration' is not stated in any file (it would name the mode); it is grader-only and reflected only by the context describing a stable, tested structure. No project architecture document exists, so the design is expected at the fixed specs path.",
+  "case": "architect-4",
+  "caseHash": "ab3a69070db022f0",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T00:29:44.825Z",
+    "verdict": "pass",
+    "fixtureHash": "f3da9dabe2cd9747",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "90f6e2b9695b15a6",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:05:20.320Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T00:22:11.284Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-audit/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/60-scope/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:05:20.320Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

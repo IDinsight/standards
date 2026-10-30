@@ -1,0 +1,244 @@
+{
+  "base": "export-reviewing-impl",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-review-progress",
+      "action": "commit",
+      "message": "docs(review): record in-progress export implementation review"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "reviewer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The earlier turns of this conversation contain only this Reviewer's own interrupted IMPLEMENTATION assessment. Nothing under review (scope, design, context, implementation, tests, verification evidence, documentation) was authored in it, so the session does not need to be discarded.",
+    "Every input identity recorded in the review report still matches the fixture: the assessed revision is the commit 'Record CSV export verification', and every blob hash listed in the report equals the current blob of that path. The only commit after the assessed revision adds the review report itself.",
+    "Resource cleanup inspection is the only remaining area: writeExport's folder creation and file write, its failure paths and whether a failed request leaves a partial file or folder, and temporary folder cleanup in test/integration/export-flow.test.ts. It had not been performed before the interruption, and the row for the export file location and write is recorded as not yet assessed.",
+    "The implementation has no material defects, including in resource cleanup: writeExport uses synchronous mkdirSync and writeFileSync with no open handles, denied and invalid-status requests create no folder or file, an exception from the write becomes a 500 through the router, and the integration test removes its temporary root in an after hook. The same-second overwrite and the absence of export retention are accepted risks recorded in the design.",
+    "The recorded diagnostic C1 still reproduces: it prints [403,400,false]."
+  ],
+  "history": {
+    "turns": [
+      {
+        "role": "user",
+        "text": "/reviewer Continue the active workflow from `.standards/STATE.md`. Read the persisted Active Work, relevant project context and owned artifacts, and recovery context before proceeding."
+      },
+      {
+        "role": "assistant",
+        "text": "I'm running the IMPLEMENTATION review for cycle `export-20260924T090000Z-a7f3c1d2` (STANDARD, `REVIEWING_IMPLEMENTATION`, no recovery). `check` passed. This chat contains only Reviewer work; I can't see session or model metadata, so I've recorded that as a limitation rather than an attestation.\n\nI created the report at `.standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md` and recorded the assessed inputs: commit `Record CSV export verification` with a clean tree, plus content hashes for the scope, design, context, plan, verification report, the changed source and tests, and the unchanged auth, filter, store, and router files they depend on.\n\nDone so far:\n- Authorization: `requireAdmin(request.user)` is the export handler's first statement, so the 401/403 response happens before filters are parsed, records are listed, or anything touches the disk.\n- Quoting: `csvCell` quotes values containing a comma, double quote, CR, or LF and doubles embedded quotes; `toCsv` ends every row with CRLF. That matches the design.\n- One diagnostic: an export with `status=deleted` returns 403 for a viewer and 400 for an admin, and the export folder is never created (`[403,400,false]`).\n- Tester's runs E1 and E2 apply to the same implementation and test content, so I'm relying on them as formal evidence.\n\nNo material findings so far. Still to do: the resource-cleanup inspection of `writeExport` (folder creation, file write, and failure paths) and of the integration test's temporary folders. The file-writing row in the report is marked not yet assessed."
+      },
+      {
+        "role": "user",
+        "text": "Hold on, I have to jump into a meeting. Save where you are and stop there; we'll pick it up later."
+      },
+      {
+        "role": "assistant",
+        "text": "Saved and stopped. The review report is `IN_PROGRESS`, not passing yet. It holds the assessed inputs, the authorization and quoting inspections, the diagnostic result, and the one remaining area: the resource-cleanup inspection of `writeExport` and the integration test's temporary folders, with the next action written down. `STATE.md` is unchanged; the workflow stays in `REVIEWING_IMPLEMENTATION`.\n\nSuggested commit:\n\n`docs(review): record in-progress export implementation review`"
+      }
+    ]
+  },
+  "vars": {
+    "REVIEW": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md",
+    "FINAL": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md",
+    "CYCLE": "export-20260924T090000Z-a7f3c1d2"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${REVIEW}",
+          "why": "the saved report is continued, not discarded"
+        },
+        {
+          "provenance": {
+            "path": "${REVIEW}",
+            "artifact": "REVIEW",
+            "cycle": "${CYCLE}",
+            "kind": "IMPLEMENTATION"
+          },
+          "why": "the same cycle-owned implementation report is kept"
+        },
+        {
+          "reply_not_matches": "Open a fresh chat separate from the conversations that produced",
+          "why": "no independent-Reviewer fresh-session prefix is needed when resuming Reviewer's own assessment"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "provenance": {
+            "path": "${REVIEW}",
+            "artifact": "REVIEW",
+            "cycle": "${CYCLE}",
+            "kind": "IMPLEMENTATION"
+          }
+        },
+        {
+          "field": {
+            "path": "${REVIEW}",
+            "name": "ReviewKind",
+            "equals": "IMPLEMENTATION"
+          }
+        },
+        {
+          "field": {
+            "path": "${REVIEW}",
+            "name": "Cycle",
+            "equals": "${CYCLE}"
+          }
+        },
+        {
+          "absent": "${FINAL}",
+          "why": "no other review kind is started"
+        },
+        {
+          "changed": [
+            "${REVIEW}"
+          ],
+          "why": "the review continues in the same IMPLEMENTATION report"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "changed": [
+            "${REVIEW}"
+          ],
+          "why": "the remaining inspection and its result are persisted in the same report"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "Reviewer must not change the assessed identity"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Reviewer must not change git state"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "packages/**",
+        "package.json",
+        ".gitignore",
+        "pnpm-lock.yaml",
+        "docs/**",
+        "README.md",
+        ".standards/CONTEXT.md",
+        ".standards/docs/scope/**",
+        ".standards/docs/specs/**",
+        ".standards/docs/development/**",
+        ".standards/docs/verification/**"
+      ],
+      "why": "Reviewer does not edit implementation, tests, documentation, or other roles' records"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the state with the IN_PROGRESS review report is valid"
+    },
+    {
+      "cmd": "pnpm --filter export test && pnpm --filter export test:integration",
+      "expect": "pass",
+      "why": "the established test commands still pass (environment and tests unchanged)"
+    },
+    {
+      "cmd": "node -e 'import(\"./src/app.ts\").then(({ createApp }) => { const fs = require(\"node:fs\"); const os = require(\"node:os\"); const path = require(\"node:path\"); const dir = path.join(fs.mkdtempSync(path.join(os.tmpdir(), \"review-\")), \"out\"); const app = createApp({ exportDir: dir }); const send = (role) => app.handle({ method: \"POST\", path: \"/records/export\", query: { status: \"deleted\" }, user: { id: 9, name: \"Rae\", role } }).status; console.log(JSON.stringify([send(\"viewer\"), send(\"admin\"), fs.existsSync(dir)])); })' | grep -qx '\\[403,400,false\\]'",
+      "expect": "pass",
+      "why": "the diagnostic C1 recorded in the report reproduces its recorded result"
+    },
+    {
+      "cmd": "c=$(git log --format=%H -1 --fixed-strings --grep='Record CSV export verification') && test -n \"$c\" && git diff --quiet $c HEAD -- src test packages package.json .gitignore pnpm-lock.yaml docs README.md .standards/CONTEXT.md .standards/STATE.md .standards/docs/scope .standards/docs/specs .standards/docs/development .standards/docs/verification && test \"$(git diff --name-only $c HEAD)\" = .standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md",
+      "expect": "pass",
+      "why": "assessed source, contract, tests, and records are unchanged since the assessed revision; only the review report was added"
+    },
+    {
+      "cmd": "f=.standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md && grep -q $(git log --format=%H -1 --fixed-strings --grep='Record CSV export verification') $f && grep -q $(git rev-parse HEAD:src/export.ts) $f && grep -q $(git rev-parse HEAD:src/routes/export.ts) $f && grep -q $(git rev-parse HEAD:src/app.ts) $f && grep -q $(git rev-parse HEAD:test/integration/export-flow.test.ts) $f && grep -q $(git rev-parse HEAD:.standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md) $f && grep -q $(git rev-parse HEAD:.standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md) $f && grep -q $(git rev-parse HEAD:.standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md) $f",
+      "expect": "pass",
+      "why": "the identities recorded in the report match the current content"
+    },
+    {
+      "cmd": "f=.standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md && head -4 $f | grep -qx 'ReviewKind: IMPLEMENTATION' && grep -q '`Status`: `IN_PROGRESS`' $f && grep -q '`ReviewKind`: `IMPLEMENTATION`' $f && ! grep -qE 'COMMIT:|BLOB:' $f && grep -q 'Not yet assessed' $f && ! grep -qE '^### F-' $f && test ! -e .standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md",
+      "expect": "pass",
+      "why": "the interrupted IN_PROGRESS IMPLEMENTATION report exists with no findings and a not-yet-assessed remaining row"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && test ! -e exports && grep -q 'WorkflowState`: `REVIEWING_IMPLEMENTATION`' .standards/STATE.md && grep -q '^`Kind`: `FORWARD` `From`: `TESTING`' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md",
+      "expect": "pass",
+      "why": "clean tree; state is REVIEWING_IMPLEMENTATION with no recovery or obligations"
+    }
+  ],
+  "notes": "Built on export-reviewing-impl (cycle export-20260924T090000Z-a7f3c1d2 at REVIEWING_IMPLEMENTATION, STANDARD, BROWNFIELD, COMPLETE plan and COMPLETE FULL verification, recovery and obligations inactive, correct implementation). One added commit, 50-review-progress, adds the Reviewer's interrupted IMPLEMENTATION report (Status IN_PROGRESS, User Style NONE) with the commit subject the assistant suggested in history. The report records the assessed revision as the commit 'Record CSV export verification' (COMMIT placeholder) plus blob identities of the scope, design, context, plan, verification report, changed source and tests, and affected unchanged files; inspections R1 (authorization ordering, filter path, response) and R2 (quoting); one actual diagnostic C1 (node -e probe, output [403,400,false]); Tester E1/E2 reuse justified by matching content; one row 'file location, folder creation, and file write' marked Not yet assessed; remaining area: resource cleanup inspection; no findings; gate undecided. STATE.md is unchanged from the base. History has four turns: the original /reviewer invocation, the Reviewer's progress report, the user asking to pause, and the Reviewer confirming the saved IN_PROGRESS report; the run's message 'Continue.' resumes in that same conversation. HEAD at run time is the report commit, whose only change since the assessed revision is the report itself, so a careful Reviewer can confirm identities are unchanged.",
+  "case": "reviewer-3",
+  "caseHash": "db992c1497f21e00",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T15:43:09.008Z",
+    "verdict": "issues",
+    "fixtureHash": "5b91000434a6eae3",
+    "fixedBy": "owner decision",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "7a4e1cb1a04ec89f",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:21:39.550Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T15:29:55.422Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-testing": "fd7044646ac2c395",
+    "export-reviewing-impl": "e5b0bce49a675583"
+  },
+  "decision": {
+    "action": "fixed",
+    "note": "Owner-approved (2026-10-03, stage 3): gate-3 recommendation applied.",
+    "at": "2026-10-03T16:14:24.488Z",
+    "fixtureHash": "7a4e1cb1a04ec89f"
+  },
+  "migrations": [
+    {
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:21:39.550Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

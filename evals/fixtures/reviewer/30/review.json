@@ -1,0 +1,84 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (brownfield install, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState REVIEWING_IMPLEMENTATION after a FORWARD from TESTING",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md and every record's provenance",
+      "status": "realized"
+    },
+    {
+      "condition": "Current scope, architecture, context, development plan, and Tester report exist with valid ownership",
+      "where": ".standards/docs/scope|specs|development|verification/<id>.md, .standards/CONTEXT.md; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and outstanding obligations inactive",
+      "where": ".standards/STATE.md Recovery/Outstanding Obligations Active false",
+      "status": "realized"
+    },
+    {
+      "condition": "Established diagnostic command fails because its database is unavailable",
+      "where": "npm run test:db (README, CONTEXT Commands) fails ECONNREFUSED; no sqld/docker, registries and Turso hosts blocked (selfChecks)",
+      "status": "realized"
+    },
+    {
+      "condition": "Current Tester evidence lacks required transaction/rollback execution",
+      "where": "verification report marks AC-002 Verified from fakeDb tests (test/exports.service.test.js) and inspection only; no test/db test touches exports; the AC-002 technical criterion is about database state afterwards",
+      "status": "realized"
+    },
+    {
+      "condition": "No implementation defect (the gap is evidence, not code)",
+      "where": "src/db/client.js transaction/ROLLBACK/close, src/exports/*, migration 002 read as correct against the design",
+      "status": "realized"
+    },
+    {
+      "condition": "Independent Reviewer session with no prior history",
+      "where": "history null, fresh headless run",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 2,
+      "detail": "Assertion 2's text concerns the report (remaining check, owner, no passing claim), but its checks also require the routing outcome: WorkflowState TESTING, FAILURE/VERIFICATION, and a frame with Owner TESTING and ResumeAt REVIEWING_IMPLEMENTATION. A run that writes a good report but only blocks on a user question would fail it. The expected output and the catalog note define routing to Tester as the correct behavior. The skill also says to route defective claims or missing evidence to their owners (the COMPLETE report claims AC-002 Verified without database execution). So the check is consistent with the case.",
+      "recommendation": "run_as_is",
+      "fix": "None needed; routing is the case's defined correct behavior."
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 0,
+      "detail": "contains `test:db|test/db/` assumes the report names the database suite. A reviewer that attempted only `npm run db:migrate` or an ad-hoc probe would need to mention test:db/test/db elsewhere in the report. This is very likely because the suite is the established database command in CONTEXT and README and is central to the evidence gap. The risk is low.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally widen to `test:db|test/db/|db:migrate|127\\.0\\.0\\.1:8080`."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "In the development plan, DEV-002 has Developer author test/exports.csv.test.js as a 'self-check harness', which the developer template discourages. The Tester report records these as reused coverage. A reviewer may remark on it, but it is not an implementation defect that a check penalizes.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized: test:db fails with ECONNREFUSED because no server is reachable and installs are blocked, and the COMPLETE FULL verification report verifies AC-002 rollback only through fakeDb, with no planted implementation defect. Records are coherent, check.mjs passes, and a simulated FAILURE/VERIFICATION route to TESTING passes the turn-end check. The checks are necessary conditions under the case's expected routing; only minor notes remain.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T23:28:59.379Z",
+  "costUsd": 0.4196128,
+  "ms": 101952,
+  "fixtureHash": "5a17165e609f6b54"
+}

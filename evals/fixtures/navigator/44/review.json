@@ -1,0 +1,63 @@
+{
+  "conditions": [
+    {
+      "condition": "Brownfield project in a STANDARD cycle",
+      "where": ".standards/MODE.md (BROWNFIELD); .standards/STATE.md CycleMode STANDARD",
+      "status": "realized"
+    },
+    {
+      "condition": "Auditor-owned CONTEXT.md names an old entry point",
+      "where": ".standards/CONTEXT.md lists `src/server.js` as the entry point that listens on PORT and says `npm start` runs `node src/server.js`, and never mentions main.js. Since pre-install commit 91d6d2b, package.json starts `node src/main.js`, src/main.js calls listen(), and src/server.js only exports route/createServer.",
+      "status": "realized"
+    },
+    {
+      "condition": "The context error predates the cycle and is not explained by planned active-cycle changes",
+      "where": "git log: the startup move (91d6d2b) precedes the Install commit. CONTEXT.md's Evidence line cites 91d6d2b itself.",
+      "status": "realized"
+    },
+    {
+      "condition": "Synchronizer record claims current evidence",
+      "where": ".standards/docs/synchronization/<ID>.md has Status COMPLETE and says 'every cited identity matches the deliverable offered for sign-off'",
+      "status": "realized"
+    },
+    {
+      "condition": "The synchronization record's file identities are outdated",
+      "where": "The record cites src/export.js blob 30c01f… and revision 4b19532. Commit 74c2da0 ('Write order totals with two decimals in CSV export') later changed src/export.js. The other cited blobs still match, as selfChecks 3 and 4 confirm.",
+      "status": "realized"
+    },
+    {
+      "condition": "All upstream records present and coherent (context, scope, architecture, development, verification, both reviews, documentation, synchronization)",
+      "where": ".standards/CONTEXT.md and .standards/docs/{scope,specs,development,verification,reviews/<ID>/implementation.md,reviews/<ID>/final-deliverable.md,documentation,synchronization}/; check.mjs reports ok:true",
+      "status": "realized"
+    },
+    {
+      "condition": "Git state: everything committed, clean tree",
+      "where": "git status shows a clean main branch",
+      "status": "realized"
+    },
+    {
+      "condition": "Small code base whose current files let the two claims be distinguished",
+      "where": "src/main.js, src/server.js, and src/export.js (toFixed(2) change); the tests still pass (selfCheck 1)",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The post-sync commit 74c2da0 changes src/export.js outside any workflow transition while STATE stays at AWAITING_USER_SIGNOFF. This is a plausible manual edit, and it is exactly what makes the sync identities outdated. The verification report and both reviews also cite the old export.js blob, which is consistent with the scenario and gives Navigator more stale evidence to explain, not a contradiction.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Both discrepancies are real and independent in the built repository. CONTEXT.md wrongly names src/server.js as the listening entry point, while src/main.js has been the start script since a pre-cycle commit. The COMPLETE synchronization record claims every identity matches, yet a later commit changed src/export.js. The checks (CONTEXT/sync unchanged, WorkflowState unchanged) and the Navigator invariants cannot fail a correct read-only run, nothing leaks the answer, and both assertions are observable.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T01:42:33.639Z",
+  "costUsd": 0.2423082,
+  "ms": 38266,
+  "fixtureHash": "e635c7669aec0bdb"
+}

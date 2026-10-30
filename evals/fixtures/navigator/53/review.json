@@ -1,0 +1,39 @@
+{
+  "conditions": [
+    {
+      "condition": "Navigator is in a GRILL_ME conversation with a pending question on a topic other than config loading",
+      "where": "spec history: the user turn '/navigator Grill me…', Question 1 answered with feedback, then a pending Question 2 about retry behavior in send_with_retry",
+      "status": "realized"
+    },
+    {
+      "condition": "The project has config-loading code for Navigator to inspect and quiz on at a simpler level",
+      "where": "notifier/config.py (DEFAULTS, then the JSON file or NOTIFIER_CONFIG, then NOTIFIER_* env vars, with unknown keys rejected); README.md Configuration section; tests/test_config.py",
+      "status": "realized"
+    },
+    {
+      "condition": "The history's claims match the code (the main() flow and the answer to Question 2)",
+      "where": "notifier/cli.py main(); notifier/sender.py send_with_retry with RETRYABLE {429,502,503,504}; the third selfCheck confirms 3 posts, sleeps of 0.5 and 1.0, then DeliveryError",
+      "status": "realized"
+    },
+    {
+      "condition": "Git state is committed and clean",
+      "where": "git status '## main' with no changes; two commits (project, then the install)",
+      "status": "realized"
+    },
+    {
+      "condition": "Workflow state is unspecified; any valid state works",
+      "where": ".standards/STATE.md is the fresh brownfield install (AUDITING, no cycle); check.mjs ok",
+      "status": "realized"
+    }
+  ],
+  "issues": [],
+  "verdict": "pass",
+  "summary": "The history establishes a GRILL_ME session with a pending retry question, and the small Python project gives Navigator real config-loading code to quiz on at a simpler level. Every check is a necessary condition for a correct non-mutating Navigator run: no files change, STATE.md is unchanged, and Auditor is not dispatched. Both assertions are correctly left to the judge with complete:false. Invariants match the Navigator standard set, and nothing leaks.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T15:41:16.400Z",
+  "costUsd": 0.098072,
+  "ms": 27886,
+  "fixtureHash": "f40fbc0b73f6999c"
+}

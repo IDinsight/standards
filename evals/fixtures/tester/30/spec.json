@@ -1,0 +1,258 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial contacts directory"
+    },
+    {
+      "dir": "layers/10-import-design",
+      "action": "commit",
+      "message": "Record contact import scope and design"
+    },
+    {
+      "dir": "layers/11-import-code",
+      "action": "commit",
+      "message": "Validate contact imports and add saveDirectory"
+    },
+    {
+      "dir": "layers/12-import-tests",
+      "action": "commit",
+      "message": "Add import and save tests"
+    },
+    {
+      "dir": "layers/13-import-docs",
+      "action": "commit",
+      "message": "Document contact import and saving"
+    },
+    {
+      "dir": "layers/14-import-signoff",
+      "action": "commit",
+      "message": "Sign off contact import cycle"
+    },
+    {
+      "dir": "layers/20-search-design",
+      "action": "commit",
+      "message": "Record contact search context, scope, and design"
+    },
+    {
+      "dir": "layers/30-search-plan",
+      "action": "commit",
+      "message": "Plan contact search implementation"
+    },
+    {
+      "dir": "layers/40-search",
+      "action": "commit",
+      "message": "Add contact search"
+    },
+    {
+      "dir": "layers/50-handoff",
+      "action": "commit",
+      "message": "Complete contact search development plan"
+    }
+  ],
+  "expectCheck": {
+    "ok": false,
+    "problemsMatch": [
+      "DEV-003 depends on DEV-008, which is not a step in this plan"
+    ]
+  },
+  "prompt": {
+    "skill": "tester",
+    "utterance": "Continue the active STANDARDS workflow."
+  },
+  "graderOnly": [
+    "The active cycle's development plan defines only DEV-001, DEV-002, and DEV-003, and its DEV-003 lists Depends On DEV-002, DEV-008.",
+    "The only DEV-008 in the repository is a step of the earlier, signed-off contact-import cycle's development plan, so the active plan's dependency on DEV-008 is a dangling reference that only Developer may correct.",
+    "That dangling dependency is the only problem check.mjs reports before the run; the active plan is otherwise valid and COMPLETE.",
+    "src/search.js and src/directory.js otherwise implement the active cycle's AC-001 to AC-003; no search tests and no verification report for the active cycle exist yet."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "add-search-20260927T101500Z-1a2b3c4d",
+    "PLAN": ".standards/docs/development/add-search-20260927T101500Z-1a2b3c4d.md",
+    "VER": ".standards/docs/verification/add-search-20260927T101500Z-1a2b3c4d.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "reply_matches": "Developer",
+          "flags": "i",
+          "why": "the defect is attributed to the Developer-owned plan"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "unchanged": [
+            "${PLAN}"
+          ],
+          "why": "the plan must stay byte-identical"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "DEVELOPING"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FAILURE"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "TESTING"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "IMPLEMENTATION"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "true"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "1"
+        },
+        {
+          "state": "Recovery.Top.From",
+          "equals": "TESTING"
+        },
+        {
+          "state": "Recovery.Top.Owner",
+          "equals": "DEVELOPING"
+        },
+        {
+          "state": "Recovery.Top.FailureType",
+          "equals": "IMPLEMENTATION"
+        },
+        {
+          "state": "Recovery.Top.ResumeAt",
+          "equals": "TESTING"
+        },
+        {
+          "state": "Recovery.Top.RerunThrough",
+          "equals": "NONE"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "not": "REVIEWING_IMPLEMENTATION",
+          "why": "no forward handoff to Reviewer"
+        }
+      ]
+    },
+    {
+      "assertion": 4,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "test/**"
+          ],
+          "why": "no tests created or modified before routing"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no problem that was not there before the run"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "package.json"
+      ],
+      "why": "Tester does not edit implementation"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/directory.test.js test/import.test.js",
+      "expect": "pass",
+      "why": "the established test suites pass on the committed implementation"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "fail",
+      "expectOutput": "DEV-003 depends on DEV-008, which is not a step in this plan",
+      "why": "the preflight check reports the dangling dependency stated in the case"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 00-project (pre-install): small Node ESM contacts library. Layers 10-14 are an earlier STANDARD cycle (contact-import-20260915T140000Z-5e6f7a8b) run to SIGNED_OFF with all eight records: it added import validation and saveDirectory, test/import.test.js, and a README section; its development plan has steps DEV-001 to DEV-008, which is where DEV-008 is defined. Layers 20-50 are the active cycle add-search-20260927T101500Z-1a2b3c4d: refreshed CONTEXT.md, scope (AC-001..AC-003), design, an APPROVED plan, the search implementation, then the COMPLETE plan (all steps DONE, self-checks citing the 'Add contact search' commit) and STATE at TESTING after FORWARD from DEVELOPING, recovery and obligations inactive, no verification report. The active plan's DEV-003 has Depends On DEV-002, DEV-008, so check.mjs reports exactly that one problem; other-cycle records are only checked for malformed provenance. Compromise: all commits carry the builder default date while the cycle IDs are stamped 2026-09-15 and 2026-09-27.",
+  "case": "tester-30",
+  "caseHash": "a0ddaab31b7f7328",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-01T22:36:05.050Z",
+    "verdict": "pass",
+    "fixtureHash": "fdf1d88bb237e357",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "7f8e91ccd2553d5d",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:45:52.835Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-01T21:41:25.469Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/10-import-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/11-import-code/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/12-import-tests/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/13-import-docs/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/14-import-signoff/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/20-search-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/30-search-plan/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/50-handoff/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:45:52.835Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

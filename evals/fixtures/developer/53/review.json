@@ -1,0 +1,73 @@
+{
+  "conditions": [
+    {
+      "condition": "BROWNFIELD project, STANDARD cycle, WorkflowState DEVELOPING with no recovery",
+      "where": ".standards/MODE.md (BROWNFIELD); .standards/STATE.md (DEVELOPING, STANDARD, Recovery.Active false)",
+      "status": "realized"
+    },
+    {
+      "condition": "Normal DEVELOPING after Tester's CHECKPOINT return for Increment 1",
+      "where": ".standards/STATE.md Handoff Kind CHECKPOINT, From TESTING, FailureType NONE, Reason names Increment 1",
+      "status": "realized"
+    },
+    {
+      "condition": "Approved, locked STEPWISE plan, IN_PROGRESS, INCREMENTAL cadence, Current Increment 2",
+      "where": "development plan header: Mode STEPWISE, User Style NONE, User Style Locked true, Status IN_PROGRESS, Verification Cadence INCREMENTAL, Current Increment 2; Plan Notes record the approval",
+      "status": "realized"
+    },
+    {
+      "condition": "Increment 2 selected but never assigned to Tester",
+      "where": "Handoff is the TESTING->DEVELOPING return for Increment 1; there is no later DEVELOPING->TESTING handoff; DEV-002/DEV-003 PENDING and unimplemented (selfCheck 3)",
+      "status": "realized"
+    },
+    {
+      "condition": "Increment definitions exist to be retained",
+      "where": "plan ## Verification Increments: ### Increment 1 (DEV-001/AC-001) and ### Increment 2 (DEV-002, DEV-003/AC-002, AC-003)",
+      "status": "realized"
+    },
+    {
+      "condition": "Verification report IN_PROGRESS / INCREMENT / Increment 1 with current passing evidence",
+      "where": "verification report header and Increment Assessments row VERIFIED; src/expenses.js unchanged since the assessed commit; selfCheck 1 passes 9/9",
+      "status": "realized"
+    },
+    {
+      "condition": "User selects AFTER_IMPLEMENTATION; no pending request persisted beforehand",
+      "where": "utterance; STATE.md PendingVerificationCadence NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Unanswered STEPWISE continuation blocker for DEV-002",
+      "where": "STATE.md Active Work.BlockedOn 'Stepwise pause: continue with DEV-002 ...'; Plan Notes last bullet",
+      "status": "realized"
+    },
+    {
+      "condition": "Upstream scope, design, and context present and valid",
+      "where": ".standards/docs/scope/..., .standards/docs/specs/..., .standards/CONTEXT.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Committed, clean git state",
+      "where": "git status clean on main",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "ungradeable-assertion",
+      "assertion": 4,
+      "detail": "PendingVerificationCadence starts NONE because the selection arrives in the utterance. That matches the case. A run that writes the plan directly without first recording the request in Active Work.PendingVerificationCadence makes the 'clear only after saving' ordering nearly vacuous. Step 3 of Switch verification cadence ('Persist the latest request') normally produces an observable pending write followed by the plan save and the clear, so the judge can still grade the order from the tool timeline. The deterministic checks (final NONE, plan AFTER_IMPLEMENTATION) are correct necessary conditions.",
+      "recommendation": "run_as_is",
+      "fix": "None needed. The judge should grade the order from the tool timeline and treat a skipped pending write as a protocol question, not as an automatic pass."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition. It has a locked, approved STEPWISE INCREMENTAL plan at Current Increment 2 that was never assigned, the Tester's IN_PROGRESS INCREMENT/Increment 1 report with current passing evidence, the CHECKPOINT return handoff, and the unanswered DEV-002 STEPWISE blocker, and check.mjs passes. No check can fail a correct run: the switch preserves the CHECKPOINT handoff and DEVELOPING state, keeps both increment definitions and the report, and leaves BlockedOn non-NONE. The only note is that assertion 4's ordering depends on the judge reading the timeline.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T02:24:47.279Z",
+  "costUsd": 0.2463706,
+  "ms": 44027,
+  "fixtureHash": "bf5b97c695c78ad7"
+}

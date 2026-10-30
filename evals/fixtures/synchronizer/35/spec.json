@@ -1,0 +1,285 @@
+{
+  "base": "export-project",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-context",
+      "action": "commit",
+      "message": "Record project context for CSV export"
+    },
+    {
+      "dir": "layers/52-scope",
+      "action": "commit",
+      "message": "Define CSV export scope"
+    },
+    {
+      "dir": "layers/54-design",
+      "action": "commit",
+      "message": "Design CSV export"
+    },
+    {
+      "dir": "layers/56-plan",
+      "action": "commit",
+      "message": "Plan CSV export implementation"
+    },
+    {
+      "dir": "layers/58-export",
+      "action": "commit",
+      "message": "Add CSV export of filtered records"
+    },
+    {
+      "dir": "layers/60-complete",
+      "action": "commit",
+      "message": "Mark CSV export plan complete"
+    },
+    {
+      "dir": "layers/62-access-test",
+      "action": "commit",
+      "message": "Add integration test for denied exports"
+    },
+    {
+      "dir": "layers/64-verification",
+      "action": "commit",
+      "message": "Record CSV export verification"
+    },
+    {
+      "dir": "layers/66-review",
+      "action": "commit",
+      "message": "Record CSV export implementation review"
+    },
+    {
+      "dir": "layers/68-guide",
+      "action": "commit",
+      "message": "Document CSV export in usage guide"
+    },
+    {
+      "dir": "layers/70-documentation",
+      "action": "commit",
+      "message": "Record CSV export documentation"
+    },
+    {
+      "dir": "layers/72-final-review",
+      "action": "commit",
+      "message": "Record final review finding on export method error"
+    },
+    {
+      "dir": "layers/74-guide-fix",
+      "action": "commit",
+      "message": "Correct export method error in usage guide"
+    },
+    {
+      "dir": "layers/76-documentation-fix",
+      "action": "commit",
+      "message": "Record usage guide correction"
+    },
+    {
+      "dir": "layers/78-final-review-rerun",
+      "action": "commit",
+      "message": "Record final review reassessment"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "synchronizer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "Recovery Frame 1 is From REVIEWING_FINAL, Owner DOCUMENTING, FailureType DOCUMENTATION, ResumeAt REVIEWING_FINAL, RerunThrough SYNCHRONIZING. The current state SYNCHRONIZING is the rerun boundary; Synchronizer does not own the frame (its Owner is DOCUMENTING).",
+    "The documentation correction (the guide now says GET /records/export returns 405, which is what the router returns) is complete and verified: the documentation record is COMPLETE with DOC-001 RESOLVED, and the rerun final-deliverable review is COMPLETE with F-001 RESOLVED on the current content.",
+    "Implementation, tests, verification, implementation review, documentation, and the final review all agree with the current tree; no material discrepancy exists and the synchronization gate passes.",
+    "Correct routing at this boundary: after the gate passes, pop Frame 1 (recovery becomes inactive) and transition to REVIEWING_FINAL with Handoff.Kind RESUME and From SYNCHRONIZING, instead of the normal forward handoff to AWAITING_USER_SIGNOFF."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "export-20260924T090000Z-a7f3c1d2",
+    "SCOPE": ".standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md",
+    "ARCH": ".standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md",
+    "DEV": ".standards/docs/development/export-20260924T090000Z-a7f3c1d2.md",
+    "VERIFICATION": ".standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md",
+    "REVIEW_IMPL": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md",
+    "REVIEW_FINAL": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md",
+    "DOC": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md",
+    "SYNC": ".standards/docs/synchronization/export-20260924T090000Z-a7f3c1d2.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "state": "Recovery.Active",
+          "equals": "false",
+          "why": "at the rerun boundary the frame is popped, not re-planned"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "0",
+          "why": "the only frame is popped"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "RESUME",
+          "why": "the boundary returns to ResumeAt with RESUME"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "SYNCHRONIZING",
+          "why": "the return is made from the boundary state"
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "REVIEWING_FINAL",
+          "why": "the frame's ResumeAt, unchanged"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "REVIEWING_FINAL",
+          "why": "not AWAITING_USER_SIGNOFF"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "RESUME",
+          "why": "not the normal FORWARD edge"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "packages/**",
+        "docs/**",
+        "README.md",
+        "package.json"
+      ],
+      "why": "Synchronizer does not edit implementation, tests, or project documentation"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the unit suite passes offline"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration 2>&1 | grep -qE 'pass 3$'",
+      "expect": "pass",
+      "why": "the integration script runs and passes three tests"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the SYNCHRONIZING recovery state and records are valid"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && test ! -e exports && test ! -e .standards/docs/synchronization && test ! -e .standards/user-styles",
+      "expect": "pass",
+      "why": "tree is clean, no export files, no synchronization record yet"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `SYNCHRONIZING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Kind`: `FORWARD` `From`: `REVIEWING_FINAL` `FailureType`: `NONE`' .standards/STATE.md && grep -q '^`From`: `REVIEWING_FINAL` `Owner`: `DOCUMENTING` `FailureType`: `DOCUMENTATION`$' .standards/STATE.md && grep -q '^`ResumeAt`: `REVIEWING_FINAL` `RerunThrough`: `SYNCHRONIZING`$' .standards/STATE.md && test $(grep -c '^### Frame' .standards/STATE.md) -eq 1 && grep -q '^`PromotionReason`: `NONE` `AuditTarget`: `NONE` `BlockedOn`: `NONE`$' .standards/STATE.md && grep -q 'ProjectMode`: `BROWNFIELD' .standards/MODE.md",
+      "expect": "pass",
+      "why": "one recovery frame owned by DOCUMENTING with ResumeAt REVIEWING_FINAL and RerunThrough SYNCHRONIZING; nothing blocked"
+    },
+    {
+      "cmd": "node -e 'import(`./src/app.ts`).then(({ createApp }) => { const r = createApp({ exportDir: `/tmp/sync-check-exports` }).handle({ method: `GET`, path: `/records/export`, query: {}, user: { id: 1, name: `Ada`, role: `admin` } }); if (r.status !== 405 || JSON.parse(r.body).error !== `method not allowed`) { console.error(r); process.exit(1); } console.log(`405`); }, (e) => { console.error(e); process.exit(2); })'",
+      "expect": "pass",
+      "why": "the service answers GET /records/export with 405, as the corrected guide says"
+    },
+    {
+      "cmd": "grep -q '^- `GET /records/export`: `405`; the export must be requested with `POST`.$' docs/usage.md && git show $(git log --format=%H -1 --fixed-strings --grep='Document CSV export in usage guide'):docs/usage.md | grep -q '^- `GET /records/export`: `404`'",
+      "expect": "pass",
+      "why": "the first guide said 404 and the corrected guide says 405"
+    },
+    {
+      "cmd": "f=.standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md && d=.standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md && grep -q $(git log --format=%H -1 --fixed-strings --grep='Record usage guide correction') $f && grep -q $(git log --format=%H -1 --fixed-strings --grep='Correct export method error in usage guide') $d && grep -q $(git rev-parse HEAD:docs/usage.md) $f && grep -q $(git rev-parse HEAD:docs/usage.md) $d && grep -q $(git rev-parse HEAD:$d) $f && ! grep -rqE 'COMMIT:|BLOB:' .standards/docs .standards/CONTEXT.md",
+      "expect": "pass",
+      "why": "records cite real hashes matching the current content and no placeholder remains"
+    },
+    {
+      "cmd": "f=.standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md && d=.standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md && grep -q '^`Status`: `COMPLETE` `User Style`: `NONE`$' $f && grep -q '^### F-001' $f && grep -q '`Status`: `RESOLVED`' $f && grep -q '`Status`: `COMPLETE`$' $d && grep -q '^### DOC-001' $d && grep -q '`Status`: `RESOLVED`' $d",
+      "expect": "pass",
+      "why": "the rerun final review is COMPLETE with F-001 resolved and the documentation record is COMPLETE with DOC-001 resolved"
+    },
+    {
+      "cmd": "c=$(git log --format=%H -1 --fixed-strings --grep='Add integration test for denied exports') && git diff --quiet $c HEAD -- src test packages package.json .gitignore pnpm-lock.yaml",
+      "expect": "pass",
+      "why": "implementation and tests are unchanged since the verified revision"
+    }
+  ],
+  "notes": "Builds on export-project, not export-synchronizing: that base commits a clean, passing final review with no recovery, so it cannot carry a frame interrupted at REVIEWING_FINAL. Layers 50-66 reproduce export-synchronizing 20-36 byte for byte (context, scope with AC-001 to AC-003, design, plan, implementation, denied-export test, COMPLETE FULL verification, COMPLETE implementation review). 68-guide is the export-synchronizing guide and README except one line: the first guide says GET /records/export returns 404, while the router returns 405. 70-documentation: Documenter record COMPLETE, no DOC entries, checks that do not exercise GET; STATE REVIEWING_FINAL. 72-final-review: final-deliverable review BLOCKED with F-001 OPEN (Documenter, DOCUMENTATION); STATE DOCUMENTING, FAILURE from REVIEWING_FINAL, Frame 1 From REVIEWING_FINAL Owner DOCUMENTING ResumeAt REVIEWING_FINAL RerunThrough NONE. 74-guide-fix: guide line changed to 405. 76-documentation-fix: documentation record COMPLETE with DOC-001 RESOLVED and new checks; STATE REVIEWING_FINAL, FORWARD from DOCUMENTING, Frame 1 RerunThrough SYNCHRONIZING (Documenter's rerun plan). 78-final-review-rerun: final review COMPLETE, F-001 RESOLVED, assessed revision Record usage guide correction; STATE SYNCHRONIZING, FORWARD from REVIEWING_FINAL, Frame 1 unchanged. No synchronization record. Every cited identity matches HEAD, so the sync gate passes; the expected outcome is pop and RESUME to REVIEWING_FINAL. The rerun route begins at REVIEWING_FINAL, which is also ResumeAt; that is unusual but is exactly the frame the case states.",
+  "case": "synchronizer-35",
+  "caseHash": "99c7bfe51482caa7",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T14:40:08.761Z",
+    "verdict": "pass",
+    "fixtureHash": "473abe97f28c9e93",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "af13f65251b54a18",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:41:01.518Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T13:49:24.217Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-context/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/52-scope/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/54-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/56-plan/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/60-complete/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/64-verification/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/66-review/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/70-documentation/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/72-final-review/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/76-documentation-fix/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/78-final-review-rerun/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:41:01.518Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

@@ -1,0 +1,292 @@
+{
+  "base": "export-project",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-context",
+      "action": "commit",
+      "message": "Record project context for CSV export"
+    },
+    {
+      "dir": "layers/52-scope",
+      "action": "commit",
+      "message": "Define CSV export scope"
+    },
+    {
+      "dir": "layers/54-design",
+      "action": "commit",
+      "message": "Design CSV export"
+    },
+    {
+      "dir": "layers/56-plan",
+      "action": "commit",
+      "message": "Plan CSV export implementation"
+    },
+    {
+      "dir": "layers/58-export",
+      "action": "commit",
+      "message": "Add CSV export of filtered records"
+    },
+    {
+      "dir": "layers/60-complete",
+      "action": "commit",
+      "message": "Mark CSV export plan complete"
+    },
+    {
+      "dir": "layers/62-access-test",
+      "action": "commit",
+      "message": "Add integration test for denied exports"
+    },
+    {
+      "dir": "layers/64-verification",
+      "action": "commit",
+      "message": "Record CSV export verification"
+    },
+    {
+      "dir": "layers/66-review",
+      "action": "commit",
+      "message": "Record CSV export implementation review"
+    },
+    {
+      "dir": "layers/68-guide",
+      "action": "commit",
+      "message": "Document CSV export in usage guide"
+    },
+    {
+      "dir": "layers/70-doc-record",
+      "action": "commit",
+      "message": "Record documentation progress for CSV export"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "documenter",
+    "utterance": "We no longer need the migration guarantee; drop it from this change."
+  },
+  "graderOnly": [
+    "The migration guarantee the user wants dropped is AC-003 in the completed scope: migration guidance in docs/usage.md for admin-tool developers moving off the browser-built CSV download. Dropping it changes Scoper-owned acceptance, so the correct route is USER_REWORK with FailureType SCOPING to SCOPING.",
+    "docs/usage.md already contains the section 'Moving the admin tool to the service export' written for AC-003; deleting or weakening it in DOCUMENTING would silently redefine AC-003.",
+    "Before the run there are no recovery frames and no outstanding obligations (the case states recovery is inactive). The correct transition pushes exactly one frame: From DOCUMENTING, Owner SCOPING, FailureType SCOPING, ResumeAt DOCUMENTING, RerunThrough NONE.",
+    "The documentation record has two open Documenter-owned discrepancies, DOC-001 (README layout omits src/export.ts and the export folder) and DOC-002 (README omits the test:integration command). They are unrelated to the migration change and must stay recorded and open.",
+    "The implementation has no defects and no agent-discovered failure exists; the change is user-requested."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "export-20260924T090000Z-a7f3c1d2",
+    "SCOPE": ".standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md",
+    "ARCH": ".standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md",
+    "DEV": ".standards/docs/development/export-20260924T090000Z-a7f3c1d2.md",
+    "VERIFICATION": ".standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md",
+    "REVIEW_IMPL": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md",
+    "DOC": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md",
+    "USAGE": "docs/usage.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "${SCOPE}"
+          ],
+          "why": "AC identity and wording are Scoper-owned; Documenter must not edit the scope"
+        },
+        {
+          "unchanged": [
+            "${USAGE}"
+          ],
+          "why": "removing the migration section from the guide would silently redefine AC-003 before Scoper decides"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "1",
+          "why": "no frames existed before; the rework pushes exactly one and loses none"
+        },
+        {
+          "state": "Obligations.Active",
+          "equals": "false"
+        },
+        {
+          "exists": "${DOC}"
+        },
+        {
+          "contains": {
+            "path": "${DOC}",
+            "regex": "^### DOC-001 ",
+            "flags": "m"
+          },
+          "why": "open README discrepancy stays recorded"
+        },
+        {
+          "contains": {
+            "path": "${DOC}",
+            "regex": "^### DOC-002 ",
+            "flags": "m"
+          },
+          "why": "open README discrepancy stays recorded"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "SCOPING"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "USER_REWORK"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "DOCUMENTING"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "SCOPING"
+        },
+        {
+          "state": "Recovery.Top.From",
+          "equals": "DOCUMENTING"
+        },
+        {
+          "state": "Recovery.Top.Owner",
+          "equals": "SCOPING"
+        },
+        {
+          "state": "Recovery.Top.FailureType",
+          "equals": "SCOPING"
+        },
+        {
+          "state": "Recovery.Top.ResumeAt",
+          "equals": "DOCUMENTING"
+        },
+        {
+          "state": "Recovery.Top.RerunThrough",
+          "equals": "NONE"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the unit suite passes offline"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration 2>&1 | grep -qE 'pass 3$'",
+      "expect": "pass",
+      "why": "the integration script runs and passes three tests, including denied exports"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the DOCUMENTING state and records are valid"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && test ! -e exports",
+      "expect": "pass",
+      "why": "everything is committed and no export files exist"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `DOCUMENTING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Kind`: `FORWARD` `From`: `REVIEWING_IMPLEMENTATION` `FailureType`: `NONE`' .standards/STATE.md && grep -q '`BlockedOn`: `NONE`' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md && grep -q 'ProjectMode`: `BROWNFIELD' .standards/MODE.md",
+      "expect": "pass",
+      "why": "DOCUMENTING after implementation review, nothing blocked, recovery and obligations inactive"
+    },
+    {
+      "cmd": "s=.standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md && grep -q '^- `AC-001`:' $s && grep -q '^- `AC-002`:' $s && grep -q '^- `AC-003`: The usage guide `docs/usage.md` includes migration guidance' $s && ! grep -q 'Retired' $s",
+      "expect": "pass",
+      "why": "the completed scope holds the migration guarantee as AC-003"
+    },
+    {
+      "cmd": "grep -q '^## Exporting records as CSV' docs/usage.md && grep -q '^## Moving the admin tool to the service export' docs/usage.md",
+      "expect": "pass",
+      "why": "the guide already has the export and migration sections"
+    },
+    {
+      "cmd": "d=.standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md && grep -q '^### DOC-001 ' $d && grep -q '^### DOC-002 ' $d && grep -q '`Status`: `IN_PROGRESS`' $d && test $(grep -c '^`Status`: `OPEN`' $d) -eq 2 && test ! -e .standards/docs/synchronization && test ! -e .standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md",
+      "expect": "pass",
+      "why": "the documentation record is in progress with two open discrepancies; no later records exist"
+    },
+    {
+      "cmd": "! grep -rqE 'COMMIT:|BLOB:' .standards/docs .standards/CONTEXT.md",
+      "expect": "pass",
+      "why": "all revision placeholders were resolved"
+    }
+  ],
+  "notes": "Built on export-project (not export-documenting) because the case needs a scope with a migration guarantee from the start; rewriting export-documenting's scope after its verification and review would break their content citations and the history. Layers 50-66 follow export-documenting's cycle almost verbatim (same context, implementation, tests, and record structure) with one addition: scope work item 3 and AC-003, migration guidance in docs/usage.md for admin-tool developers moving off the browser-built CSV download (Request mentions migration notes). Design gives AC-002 and AC-003 no architectural impact; verification (COMPLETE, FULL) and implementation review (COMPLETE, no findings) record both as pending/permitted dependencies on Documenter. 68-guide adds the export section and the migration section to docs/usage.md. 70-doc-record adds the IN_PROGRESS documentation record citing assessed identities, with DOC-001 and DOC-002 open README gaps (Documenter-owned). STATE stays DOCUMENTING with FORWARD from REVIEWING_IMPLEMENTATION, recovery and obligations inactive as the case states. Compromise: because the case says recovery is inactive, 'existing recovery frames survive' can only be checked as FrameCount 1 after the push; the discrepancy half is exercised by DOC-001/DOC-002.",
+  "case": "documenter-55",
+  "caseHash": "64c34e039e88eb3d",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T16:39:30.583Z",
+    "verdict": "pass",
+    "fixtureHash": "32e34f1391c0ec4b",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "2112a5912c352cba",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:15:47.762Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T15:41:51.618Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-context/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/52-scope/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/54-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/56-plan/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/60-complete/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/64-verification/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/66-review/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:15:47.762Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

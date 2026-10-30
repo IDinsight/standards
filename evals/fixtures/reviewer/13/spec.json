@@ -1,0 +1,273 @@
+{
+  "base": "export-project",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-context",
+      "action": "commit",
+      "message": "Record project context for CSV export"
+    },
+    {
+      "dir": "layers/52-scope",
+      "action": "commit",
+      "message": "Define CSV export scope"
+    },
+    {
+      "dir": "layers/54-design",
+      "action": "commit",
+      "message": "Design CSV export"
+    },
+    {
+      "dir": "layers/56-plan",
+      "action": "commit",
+      "message": "Plan CSV export implementation"
+    },
+    {
+      "dir": "layers/58-export",
+      "action": "commit",
+      "message": "Add CSV export of filtered records"
+    },
+    {
+      "dir": "layers/60-complete",
+      "action": "commit",
+      "message": "Mark CSV export plan complete"
+    },
+    {
+      "dir": "layers/62-verification",
+      "action": "commit",
+      "message": "Record CSV export verification"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "reviewer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "test/export.test.ts never calls csvCell and never calls toCsv with its default encoder: every test replaces the cell encoder with mock.fn and asserts only the call count, the raw values passed to the mock, the row layout of the mock's output, and the export file name.",
+    "Every test in test/integration/export-flow.test.ts injects a mock serialize function into createApp, so no test observes the real CSV text or the quoting of the seeded comma and double-quote titles. The integration tests do genuinely observe which records are exported and in what order, the 201 status and headers, that the written file equals the response body, and the denials.",
+    "The verification record's AC-001 claim that titles containing a comma or double quotes come out quoted with embedded quotes doubled is not supported by any recorded test, run, or inspection; no real-output assertion or equivalent formal evidence exists for the RFC 4180 quoting part of AC-001.",
+    "The escaping implementation is not defective: csvCell and toCsv produce correct RFC 4180 output, and the rest of the implementation satisfies AC-001 and AC-002.",
+    "Disabling quoting in csvCell leaves both test suites passing.",
+    "AC-002 is genuinely evidenced by the denied-export integration test."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "export-20260924T090000Z-a7f3c1d2",
+    "SCOPE": ".standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md",
+    "ARCH": ".standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md",
+    "DEV": ".standards/docs/development/export-20260924T090000Z-a7f3c1d2.md",
+    "VERIFICATION": ".standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md",
+    "REVIEW": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md",
+    "CONTEXT": ".standards/CONTEXT.md",
+    "ASSESSED_COMMIT": "${COMMIT:Mark CSV export plan complete}",
+    "IMPL_COMMIT": "${COMMIT:Add CSV export of filtered records}"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${REVIEW}",
+          "why": "Reviewer creates its implementation report early; the judge decides whether it examined what the tests actually observe"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "unchanged": [
+            "test/**"
+          ],
+          "why": "Reviewer adds or changes no tests"
+        },
+        {
+          "unchanged": [
+            "${VERIFICATION}"
+          ],
+          "why": "Reviewer does not amend Tester's verification record"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "not": "DOCUMENTING",
+          "why": "a passing forward handoff would treat diagnostics as a substitute for formal evidence"
+        },
+        {
+          "field": {
+            "path": "${REVIEW}",
+            "name": "Status",
+            "not": "COMPLETE"
+          },
+          "why": "the review cannot pass on Reviewer diagnostics"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "not": "DOCUMENTING",
+          "why": "the gate did not pass, so no forward handoff to Documenter"
+        },
+        {
+          "field": {
+            "path": "${REVIEW}",
+            "name": "Status",
+            "not": "COMPLETE"
+          },
+          "why": "a material assessment gap prevents a COMPLETE review"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "Reviewer must not change the assessed identity"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Reviewer must not change git state"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "packages/**",
+        "package.json",
+        "pnpm-lock.yaml",
+        ".gitignore",
+        "docs/**",
+        "README.md"
+      ],
+      "why": "Reviewer does not edit implementation, tests, or documentation"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the unit suite passes offline"
+    },
+    {
+      "cmd": "pnpm --filter export test 2>&1 | grep -qE 'pass 20$'",
+      "expect": "pass",
+      "why": "the unit suite runs 20 tests: 16 pre-cycle plus four in test/export.test.ts"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration 2>&1 | grep -qE 'pass 3$'",
+      "expect": "pass",
+      "why": "the integration script passes three tests, including the denied-export test"
+    },
+    {
+      "cmd": "cp src/export.ts /tmp/export.orig.ts && sed -i 's/return needsQuotes ?/return false ?/' src/export.ts && grep -q 'return false ?' src/export.ts && pnpm --filter export test && pnpm --filter export test:integration; status=$?; cp /tmp/export.orig.ts src/export.ts; exit $status",
+      "expect": "pass",
+      "why": "with quoting disabled in csvCell both suites still pass: no test observes the real escaped output"
+    },
+    {
+      "cmd": "node -e 'import(`./src/export.ts`).then(({ toCsv }) => { const out = toCsv([{ id: 1, title: `Q2 \"priority\", draft\\nnotes`, owner: `dana`, status: `active`, createdAt: `2026-04-01T08:05:00Z` }]); const want = `id,title,owner,status,createdAt\\r\\n1,\"Q2 \"\"priority\"\", draft\\nnotes\",dana,active,2026-04-01T08:05:00Z\\r\\n`; if (out !== want) { console.error(JSON.stringify(out)); process.exit(1); } console.log(`quoted`); }, (error) => { console.error(error); process.exit(2); })'",
+      "expect": "pass",
+      "why": "the real escaping implementation is correct (comma, embedded quotes doubled, newline quoted)"
+    },
+    {
+      "cmd": "! grep -rq csvCell test && grep -q 'mock.fn' test/export.test.ts && test $(grep -c 'createApp(' test/integration/export-flow.test.ts) -eq 3 && test $(grep -c 'createApp({ exportDir, now: fixedNow, serialize })' test/integration/export-flow.test.ts) -eq 3",
+      "expect": "pass",
+      "why": "unit tests mock the encoder and every integration test injects a mock serializer"
+    },
+    {
+      "cmd": "! grep -rqE 'AC-[0-9]' src test packages docs README.md",
+      "expect": "pass",
+      "why": "code and tests cite no acceptance identifiers"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the REVIEWING_IMPLEMENTATION state and records are valid"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && git diff --quiet HEAD && test ! -e exports",
+      "expect": "pass",
+      "why": "all work is committed and no export files exist"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `REVIEWING_IMPLEMENTATION` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Id`: `export-20260924T090000Z-a7f3c1d2`$' .standards/STATE.md && grep -q '^`Kind`: `FORWARD` `From`: `TESTING` `FailureType`: `NONE`' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md && grep -q 'ProjectMode`: `BROWNFIELD' .standards/MODE.md",
+      "expect": "pass",
+      "why": "STATE.md holds REVIEWING_IMPLEMENTATION after a FORWARD from TESTING with recovery and obligations inactive"
+    },
+    {
+      "cmd": "f=.standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md && head -3 $f | grep -qx 'Artifact: VERIFICATION' && grep -q '`Status`: `COMPLETE`' $f && grep -q '`Assessment Purpose`: `FULL` `Assessment Target`: `NONE`' $f && grep -q $(git log --format=%H -1 --fixed-strings --grep='Mark CSV export plan complete') $f && ! grep -qE 'COMMIT:|BLOB:|AWAITING_IMPLEMENTATION' $f",
+      "expect": "pass",
+      "why": "Tester's COMPLETE FULL verification record exists and cites the assessed commit"
+    },
+    {
+      "cmd": "test ! -e .standards/docs/reviews && test ! -e .standards/docs/documentation && test ! -e .standards/docs/synchronization && grep -q '`Status`: `COMPLETE`' .standards/docs/development/export-20260924T090000Z-a7f3c1d2.md",
+      "expect": "pass",
+      "why": "no review or later record exists; the plan is COMPLETE"
+    }
+  ],
+  "notes": "Built on export-project (not export-reviewing-impl): the suggested base's history already commits tests with real CSV output assertions, which would contradict the case's 'no actual output assertion or valid equivalent evidence exists'. So the cycle is rebuilt as seven post-install commits. 50-context: Auditor CONTEXT.md (same as export-testing) and STATE SCOPING. 52-scope: scope with AC-001 (filtered CSV export with RFC 4180 quoting) and AC-002 (non-admin/anonymous denied before any file); STATE ARCHITECTING. 54-design: technical design (same as export-testing); STATE DEVELOPING. 56-plan: APPROVED AUTONOMOUS plan, three PENDING steps, AFTER_IMPLEMENTATION/NONE. 58-export: correct implementation (csvCell, toCsv with an optional cell encoder, writeExport with an optional serializer, route, createApp serialize option, exports/ gitignored, test:integration script), test/export.test.ts (four tests: three use mock.fn as the cell encoder and assert only calls and layout, one checks the file name) and test/integration/export-flow.test.ts (three tests, each injecting a mock serializer: owner-filtered admin export, unfiltered admin export, and denials for no user/viewer/editor). 60-complete: plan COMPLETE with self-checks citing the implementation commit; STATE TESTING. 62-verification: Tester's COMPLETE FULL VERIFY record whose AC-001 quoting row claims titles with commas and quotes are quoted, citing only the mocked unit tests; STATE REVIEWING_IMPLEMENTATION with FORWARD from TESTING. Nothing in the repository is defective except the verification evidence gap.",
+  "case": "reviewer-13",
+  "caseHash": "03308a2a6151d049",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T23:20:39.463Z",
+    "verdict": "pass",
+    "fixtureHash": "ca2069857fa4cf9f",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "66baa37ba19a1f98",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:27:09.187Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T21:49:44.274Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-context/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/52-scope/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/54-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/56-plan/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/60-complete/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/62-verification/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:27:09.187Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

@@ -1,0 +1,94 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (brownfield install, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState TESTING, recovery inactive, no obligations",
+      "where": ".standards/STATE.md (FORWARD from DEVELOPING)",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id = export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, Architecture, Development reference current-cycle artifacts",
+      "where": ".standards/docs/scope|specs|development/export-20260924T090000Z-a7f3c1d2.md with matching provenance; plan COMPLETE",
+      "status": "realized"
+    },
+    {
+      "condition": "Valid Auditor context exists",
+      "where": ".standards/CONTEXT.md (pre-cycle baseline, commands, test baseline)",
+      "status": "realized"
+    },
+    {
+      "condition": "Interrupted initial VERIFY report, IN_PROGRESS",
+      "where": ".standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md header Mode VERIFY, Status IN_PROGRESS, FULL/NONE; Resume or Handoff says interrupted after run 1",
+      "status": "realized"
+    },
+    {
+      "condition": "Source, contract, tests, fixtures and environment match recorded identities",
+      "where": "Report Assessed Inputs blob/commit hashes resolved at build; no commits after layer 55 touch those files; git status clean",
+      "status": "realized"
+    },
+    {
+      "condition": "Three scenarios allocated to src/export.ts",
+      "where": "Report Scenario Budget row src/export.ts: 3 of 5 (S1, S2, S3)",
+      "status": "realized"
+    },
+    {
+      "condition": "Two actual passing results recorded",
+      "where": "Report Execution Evidence run 1 (S1, S2 passed); selfCheck reproduces 'pass 2'",
+      "status": "realized"
+    },
+    {
+      "condition": "One written but unrun scenario",
+      "where": "test/export-files.test.ts S3 (lone CR); report says not executed; selfCheck shows it passes",
+      "status": "realized"
+    },
+    {
+      "condition": "Fresh chat (no Developer history)",
+      "where": "history null; headless fresh session",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "ungradeable-assertion",
+      "assertion": 0,
+      "detail": "Assertion 0 is complete:true on `Mode` equals VERIFY. A run that stops before touching the report, or that reasons toward REVERIFY but never rewrites the header, would also pass. Since nothing changed, a correct run keeps VERIFY, so the check cannot fail a correct run.",
+      "recommendation": "run_as_is",
+      "fix": "Acceptable. Optionally set complete:false so the judge confirms the run actually resumed VERIFY rather than passing by inaction."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 2,
+      "detail": "AC-002 is genuinely uncovered (inherited from the base), so a correct run also writes route-level denial scenarios. This is more work than the expected output's 'execute the remaining scenario', and a judge could misread the new tests as extra budget. graderOnly explains that these are charged to src/routes/export.ts (0 of 5 used), and that even double-charging them leaves src/export.ts at or under 5. The fixture is consistent and realistic.",
+      "recommendation": "run_as_is",
+      "fix": "None needed; graderOnly already covers it."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The base has Developer authoring test/export.test.ts and the integration test as a 'self-check harness'. The Developer template discourages creating Tester-owned tests, but the report treats them as reused coverage, which is coherent. This comes from the base and does not affect what this case tests.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized: an interrupted VERIFY/IN_PROGRESS/FULL report whose recorded identities match the clean tree, 3 of 5 src/export.ts allocations, two recorded passing results reproduced by a selfCheck, and an unrun S3 that passes. The record does not leak the answer, check.mjs passes, and the invariants and the minimal deterministic checks cannot fail a correct run. Only minor notes remain: assertion 0 could pass by inaction, and the inherited AC-002 gap means extra route-level work, which graderOnly explains.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-01T22:25:45.577Z",
+  "costUsd": 0.822184,
+  "ms": 40714,
+  "fixtureHash": "14f62a6ac90c37c6"
+}

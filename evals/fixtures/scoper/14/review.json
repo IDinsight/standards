@@ -1,0 +1,89 @@
+{
+  "conditions": [
+    {
+      "condition": "Project is GREENFIELD at /work/bootstrap-demo",
+      "where": ".standards/MODE.md (installed GREENFIELD); runtime.projectPath /work/bootstrap-demo",
+      "status": "realized"
+    },
+    {
+      "condition": "Active STANDARD cycle before any implementation, so bootstrap reset eligibility holds",
+      "where": ".standards/STATE.md (SCOPING, STANDARD, Development NONE); only the draft scope record under .standards/docs/scope/; README says nothing is built",
+      "status": "realized"
+    },
+    {
+      "condition": ".standards/VERSION.json records 0.6.0",
+      "where": ".standards/VERSION.json (layer 50-version); selfCheck 2",
+      "status": "realized"
+    },
+    {
+      "condition": "Global standards CLI is 0.7.0 and does not match the installed version",
+      "where": "runtime/standards stub on PATH; selfChecks 1 and 5",
+      "status": "realized"
+    },
+    {
+      "condition": "The npx @idinsight/standards@0.6.0 dry-run was already previewed and its deletes and keeps disclosed",
+      "where": "history assistant turn quoting the exact stub dry-run output; selfCheck 4 shows a re-run prints the same preview",
+      "status": "realized"
+    },
+    {
+      "condition": "Pending approval is persisted in Active Work.BlockedOn",
+      "where": "unstaged .standards/STATE.md BlockedOn naming the exact --yes command and the preview",
+      "status": "realized"
+    },
+    {
+      "condition": "User explicitly approves the exact npx --yes command",
+      "where": "prompt.utterance",
+      "status": "realized"
+    },
+    {
+      "condition": "Eligibility and preview are unchanged when rechecked",
+      "where": "no implementation files; the dry-run output is deterministic and matches history",
+      "status": "realized"
+    },
+    {
+      "condition": "The npx 0.6.0 reset succeeds offline and leaves a fresh greenfield state that passes check",
+      "where": "ignored node_modules/@idinsight/standards 0.6.0; selfChecks 3, 4, 7",
+      "status": "realized"
+    },
+    {
+      "condition": "@latest and other versions are unavailable",
+      "where": "runtime.blockHosts includes registry.npmjs.org; selfCheck 6",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The history disclosure, and the stub's 'Kept:' line, omit `.standards/project-references/`, which installation.md says reset keeps and Greenfield Bootstrap Cancellation step 2 says to mention. The deletion set and warnings are unaffected, so fresh approval is not required. A careful role might mention the omission, but nothing in the case changes.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally add project references to the kept list in the history turn and the stub's KEPT string."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "VERSION.json is set to 0.6.0 by a separate 'Record installed STANDARDS version' commit after the installer commit, while the installed protocol and tools are the pinned 0.15.0 release. The catalog acknowledges this compromise. The commit message does not hint at the answer.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 0,
+      "detail": "Assertions 0, 1, and 3 depend on the exact command lines: npx at 0.6.0, absolute --project, --yes, no global CLI or @latest, and no cycle.mjs new. The check vocabulary cannot see these, so they correctly use complete:false with state preconditions. The catalog marks them deterministic_complete, but leaving them to the judge is correct.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition: a GREENFIELD pre-implementation cycle, VERSION.json 0.6.0, a global 0.7.0 CLI that refuses, an offline-resolvable npx 0.6.0 that succeeds, the earlier preview in history, and the pending approval in BlockedOn. The selfChecks prove all of these. The checks are necessary conditions on the fresh post-reset state, a correct run cannot fail them, and the remaining issues are minor realism notes.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-30T20:06:20.059Z",
+  "costUsd": 1.014181,
+  "ms": 44792,
+  "fixtureHash": "4673c3fbd772078b"
+}

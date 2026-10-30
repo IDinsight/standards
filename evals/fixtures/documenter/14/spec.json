@@ -1,0 +1,181 @@
+{
+  "base": "export-documenting",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-styles",
+      "action": "commit",
+      "message": "Track user styles and record developer style in plan"
+    },
+    {
+      "dir": "layers/52-verification",
+      "action": "commit",
+      "message": "Update verification inputs after plan header correction"
+    },
+    {
+      "dir": "layers/54-review",
+      "action": "commit",
+      "message": "Update implementation review inputs after plan header correction"
+    },
+    {
+      "action": "git-config",
+      "config": {
+        "user.name": "Tony Mensah",
+        "user.email": "tony.mensah@example.com"
+      }
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "documenter",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The user is Tony: the repository's git user.name is Tony Mensah.",
+    ".standards/user-styles/documenter/tony.md exists, but nobody explicitly selected a documenter user style; the message is only 'Continue.' and there is no earlier conversation.",
+    "The development plan's User Style tony (locked) is Developer's own selection and does not carry over to Documenter.",
+    "No documentation record exists yet, so there is no persisted documenter selection to resume; the correct documentation record uses User Style NONE.",
+    "docs/usage.md has no export section; documenting POST /records/export for AC-002 is the actual documentation work."
+  ],
+  "history": null,
+  "vars": {
+    "DOC_STYLE": ".standards/user-styles/documenter/tony.md",
+    "DEV_STYLE": ".standards/user-styles/developer/tony.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${DOC}",
+          "why": "Documenter creates or resumes its record early on Continue in DOCUMENTING"
+        },
+        {
+          "field": {
+            "path": "${DOC}",
+            "name": "User Style",
+            "equals": "NONE"
+          },
+          "why": "no explicit documenter style selection, so the record persists NONE"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": []
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        ".standards/user-styles/**"
+      ],
+      "why": "user styles are user-owned files"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the established unit suite passes"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration",
+      "expect": "pass",
+      "why": "the integration suite passes"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the DOCUMENTING state and records are valid"
+    },
+    {
+      "cmd": "test \"$(ls .standards/user-styles/documenter)\" = tony.md && test -f .standards/user-styles/developer/tony.md",
+      "expect": "pass",
+      "why": "tony.md is the only documenter style and a developer style of the same name exists"
+    },
+    {
+      "cmd": "git config user.name | grep -q '^Tony'",
+      "expect": "pass",
+      "why": "the user identity is Tony"
+    },
+    {
+      "cmd": "grep -q '^`User Style`: `tony` `User Style Locked`: `true` `Status`: `COMPLETE`$' .standards/docs/development/export-20260924T090000Z-a7f3c1d2.md",
+      "expect": "pass",
+      "why": "Developer selected tony earlier and locked it"
+    },
+    {
+      "cmd": "p=.standards/docs/development/export-20260924T090000Z-a7f3c1d2.md && v=.standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md && r=.standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md && grep -q $(git rev-parse HEAD:$p) $v && grep -q $(git rev-parse HEAD:$p) $r && grep -q $(git rev-parse HEAD:$v) $r && grep -q '`Status`: `COMPLETE` `User Style`: `NONE`' $r && ! grep -rqE 'COMMIT:|BLOB:' .standards/docs",
+      "expect": "pass",
+      "why": "verification and review cite the current plan and verification content"
+    },
+    {
+      "cmd": "test ! -e .standards/docs/documentation && ! grep -qi export docs/usage.md && ! git status --porcelain | grep -q .",
+      "expect": "pass",
+      "why": "no documentation record yet, guide lacks export section, clean tree"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `DOCUMENTING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`PromotionReason`: `NONE` `AuditTarget`: `NONE` `BlockedOn`: `NONE`$' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md && grep -q 'ProjectMode`: `BROWNFIELD' .standards/MODE.md",
+      "expect": "pass",
+      "why": "DOCUMENTING, nothing blocked, recovery and obligations inactive"
+    }
+  ],
+  "notes": "Built on export-documenting (DOCUMENTING, STANDARD, brownfield, cycle export-20260924T090000Z-a7f3c1d2, no documentation record). 50-styles commits .standards/user-styles/documenter/tony.md and .standards/user-styles/developer/tony.md and rewrites the development plan header to `User Style`: `tony` (locked true), otherwise byte-identical to the base's completed plan; this is Developer's earlier selection. 52-verification rewrites the verification record so its plan BLOB matches the new plan (noting the header-only change); 54-review rewrites the implementation review so its plan and verification BLOBs and assessed revision match. Both keep User Style NONE and all evidence otherwise unchanged. A final git-config layer sets user.name Tony Mensah (the user's identity). STATE.md is untouched from the base. Compromise: the plan's style change appears as a later header-correction commit, because base layers cannot be rewritten.",
+  "case": "documenter-14",
+  "caseHash": "d5d998c268d8593b",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T16:24:27.757Z",
+    "verdict": "pass",
+    "fixtureHash": "643bf9f607abcde6",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "3c78f52fd147e07d",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:10:17.835Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T14:20:42.388Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-documenting": "cad63ec878d1dad0"
+  },
+  "migrations": [
+    {
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:10:17.835Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

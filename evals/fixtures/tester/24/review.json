@@ -1,0 +1,94 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (brownfield install, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState TESTING, Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, Architecture, Development reference current-cycle artifacts",
+      "where": "STATE.md Active Work paths; .standards/docs/scope|specs|development/export-20260924T090000Z-a7f3c1d2.md with matching provenance",
+      "status": "realized"
+    },
+    {
+      "condition": "Valid Auditor context exists",
+      "where": ".standards/CONTEXT.md (pre-cycle baseline at 52b1b38; active-cycle changes are planned work, not staleness)",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery inactive",
+      "where": "STATE.md Recovery Active false, Handoff FORWARD from DEVELOPING",
+      "status": "realized"
+    },
+    {
+      "condition": "Production configuration excludes a route, causing a test failure",
+      "where": "config/production.ts routes ['records'] omits 'export'; test:integration fails with 404 !== 201 (selfCheck)",
+      "status": "realized"
+    },
+    {
+      "condition": "Tests import the same shared configuration",
+      "where": "test/integration/export-flow.test.ts imports and spreads `production` from config/production.ts",
+      "status": "realized"
+    },
+    {
+      "condition": "Changing the config changes deployed behavior",
+      "where": "src/main.ts (package.json main) builds the deployed app from config/production.ts; selfCheck shows the production app returns 404",
+      "status": "realized"
+    },
+    {
+      "condition": "Missing route is reproducible",
+      "where": "selfChecks: integration suite fails 2/2 deterministically; main.ts app returns 404 for POST /records/export",
+      "status": "realized"
+    },
+    {
+      "condition": "No verification report exists yet",
+      "where": "selfCheck confirms .standards/docs/verification absent",
+      "status": "realized"
+    },
+    {
+      "condition": "Git state committed, clean tree",
+      "where": "git status clean; layers 50/55 committed",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "Commits 'Load service settings from shared production config' and 'Note production config in development plan' land after 'Mark CSV export plan complete' while STATE.md already records TESTING with a FORWARD from DEVELOPING, so Developer appears to have edited code after handing off. The plan is updated consistently, and a Tester reconstructing the change still reaches the same routing, so this does not change what is tested.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The case says 'production build configuration', but the project has no build step. The fixture models it as a deployed-settings module (config/production.ts consumed by the src/main.ts entry point). This is a reasonable stand-in and keeps the essential property: shared application config whose change alters deployed routes.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 0,
+      "detail": "The check `contains 404|not found` assumes the report cites the HTTP result. A correct Tester records the actual failing result, which is '404 !== 201', so the risk of a false fail is low.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized: config/production.ts omits the export route, and it is imported by both the deployed entry point and the integration tests. The selfChecks prove the failure is reproducible and that only changing the config, which alters deployed routes, fixes it. The checks and invariants fit a correct IMPLEMENTATION routing with one recovery frame, and the turn-end check would accept that state; the only issues are minor realism notes.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-01T22:33:42.301Z",
+  "costUsd": 0.2381832,
+  "ms": 83346,
+  "fixtureHash": "99676260e484b95f"
+}

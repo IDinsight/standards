@@ -1,0 +1,76 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield template)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState SYNCHRONIZING, Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, architecture, context, development plan, verification, implementation review, and final review have valid ownership and content identities",
+      "where": ".standards/docs/{scope,specs,development,verification,reviews}/export-20260924T090000Z-a7f3c1d2*, .standards/CONTEXT.md; check.mjs ok; cited blobs resolved and match the tree",
+      "status": "realized"
+    },
+    {
+      "condition": "Documentation evidence is available",
+      "where": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md (COMPLETE, G1–G4), docs/usage.md, README.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and outstanding obligations inactive; no blocked user question",
+      "where": ".standards/STATE.md (Recovery/Obligations Active false, BlockedOn NONE)",
+      "status": "realized"
+    },
+    {
+      "condition": "Final review claims current authorization evidence for AC-002",
+      "where": "final-deliverable.md: AC-002 row cites only A1; A1 labelled 'current authorization evidence'",
+      "status": "realized"
+    },
+    {
+      "condition": "The cited result belongs to a different cycle",
+      "where": "A1 = E3 in .standards/docs/verification/prototype-csv-export-20260915T103000Z-4c19e7b2.md (provenance Cycle prototype-..., assessed tmp/exports and test/export-route.test.ts, absent here)",
+      "status": "realized"
+    },
+    {
+      "condition": "No valid current applicability justification exists",
+      "where": "final-deliverable.md gives none for A1; its own C2 runs only the two admin tests; C5 covers only current-cycle identities",
+      "status": "realized"
+    },
+    {
+      "condition": "Other-cycle records exist to be (not) adopted",
+      "where": "layer 50 prototype verification and implementation review records",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The final-deliverable review is modified (commit 'Update CSV export final review') after the base commit that already recorded the FORWARD handoff REVIEWING_FINAL -> SYNCHRONIZING, and its assessed revision (fb0878e) postdates that handoff, with no state transition. A careful Synchronizer may note that the review changed after handoff; since the report remains Reviewer-owned this still points to a REVIEW/FINAL_DELIVERABLE route rather than a user-only stop, so it does not change what the run tests.",
+      "recommendation": "run_as_is",
+      "fix": "Optional: none needed; the anomaly is Reviewer-owned and consistent with the expected route."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "Var FINAL_ASSESSED_COMMIT and base var HEAD_COMMIT are unused by checks; harmless.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes the case: a valid SYNCHRONIZING standard cycle whose final-deliverable review rests AC-002 solely on E3 from another (cancelled) cycle's verification report with no applicability justification, while all other records are current and consistent. Assertion 0's state checks and the /reviewer invocation are protocol-mandated for the expected REVIEW failure to REVIEWING_FINAL, and assertion 1's checks (prototype records unchanged, current-cycle synchronization record) are necessary for any correct run. Invariants fit and check_ok will accept an IN_PROGRESS/BLOCKED synchronization record during recovery.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T14:35:31.880Z",
+  "costUsd": 0.3302728,
+  "ms": 56204,
+  "fixtureHash": "a09009676e392d14"
+}

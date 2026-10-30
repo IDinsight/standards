@@ -1,0 +1,79 @@
+{
+  "conditions": [
+    {
+      "condition": "Fresh session resuming Developer (no prior conversation)",
+      "where": "spec history: null",
+      "status": "realized"
+    },
+    {
+      "condition": "WorkflowState is DEVELOPING in an active STANDARD brownfield cycle with valid upstream artifacts",
+      "where": ".standards/STATE.md (DEVELOPING, STANDARD, FORWARD from ARCHITECTING); MODE.md BROWNFIELD; CONTEXT.md, scope, design present",
+      "status": "realized"
+    },
+    {
+      "condition": "Persisted approved development plan records User Style tony",
+      "where": ".standards/docs/development/<ID>.md header: `User Style`: `tony`, `User Style Locked`: `true`, Status IN_PROGRESS, Plan Notes record approval including tony",
+      "status": "realized"
+    },
+    {
+      "condition": ".standards/user-styles/developer/tony.md exists and states Python preferences",
+      "where": ".standards/user-styles/developer/tony.md (committed in 'Add personal developer style')",
+      "status": "realized"
+    },
+    {
+      "condition": "The next approved step modifies Python",
+      "where": "plan DEV-002 (parcels/summary.py) PENDING, depends on DONE DEV-001; DEV-003 parcels/cli.py",
+      "status": "realized"
+    },
+    {
+      "condition": "User does not repeat the style selection",
+      "where": "prompt.utterance 'Continue implementation.'",
+      "status": "realized"
+    },
+    {
+      "condition": "A higher authority conflicts with tony's Python preference (needed for assertion 3)",
+      "where": "tony.md prefers float/round() and single quotes; AGENTS.md and the design require Decimal ROUND_HALF_UP and black double quotes",
+      "status": "realized"
+    },
+    {
+      "condition": "Workflow records valid so Developer can proceed",
+      "where": "check.mjs --json ok:true; selfChecks show 7 tests pass and DEV-001 implemented, DEV-002 not",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": 3,
+      "detail": "DEV-001's committed parcels/rates.py already uses Decimal and double quotes, which shows how an earlier session resolved the tony/project conflict. This is unavoidable, because the design mandates Decimal, and it is realistic. It does mildly model the expected resolution for the remaining steps.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "check-wrong",
+      "assertion": 1,
+      "detail": "The `changed: parcels/**` check assumes a correct run implements at least DEV-002. A cautious run could treat the tony-versus-AGENTS.md conflict as a material conflict under Instruction Layering and stop to ask. However, User Styles states plainly that a user style never overrides project instructions and governs discretionary choices only. The expected output also requires continuing under the approved plan, so the check is consistent with the case.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 3,
+      "detail": "The `contains Decimal` check on parcels/rates.py is nearly always satisfied, because DEV-001 already wrote Decimal there. It is a harmless precondition, and the judge decides the substance (Decimal and quote handling in summary.py and cli.py).",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized: a DEVELOPING STANDARD cycle, an approved and locked plan persisting User Style tony, tony.md present with Python preferences, a PENDING Python step, and an utterance that never mentions style. A deliberate conflict between tony's float/single-quote preferences and the Decimal/black requirements in the design and AGENTS.md makes assertion 3 gradeable. Checks and invariants cannot fail a correct run, check.mjs passes, and the selfChecks confirm the stated code state.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T02:20:04.157Z",
+  "costUsd": 0.1896146,
+  "ms": 46966,
+  "fixtureHash": "bf380a3daaf2f369"
+}

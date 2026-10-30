@@ -1,0 +1,54 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is BROWNFIELD",
+      "where": ".standards/MODE.md (brownfield install; layer 60-audit rewrites the same value)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode is STANDARD",
+      "where": ".standards/STATE.md (layer 65-scope) `CycleMode`: `STANDARD`",
+      "status": "realized"
+    },
+    {
+      "condition": "WorkflowState is ARCHITECTING, owned by Architect",
+      "where": ".standards/STATE.md `WorkflowState`: `ARCHITECTING`, Handoff FORWARD from SCOPING",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work is already initialized (Id and Request set)",
+      "where": ".standards/STATE.md Active Work Id `add-a-low-stock-report-that-lists-items-20260923T141500Z-3e9a71c4`, Request set, Scope path set",
+      "status": "realized"
+    },
+    {
+      "condition": "No user-authorized transition is pending or requested (no recovery, obligations, pending cadence, pending cycle request, or blocker)",
+      "where": ".standards/STATE.md: Recovery inactive, Obligations inactive, PendingVerificationCadence NONE, PendingCycleRequest UNSET, BlockedOn NONE; utterance 'start coding now.'",
+      "status": "realized"
+    },
+    {
+      "condition": "Completed scope and Auditor context exist; no design or development plan yet",
+      "where": ".standards/docs/scope/<id>.md (AC-001..AC-003), .standards/CONTEXT.md; Architecture and Development NONE; no specs/ or development/ files",
+      "status": "realized"
+    },
+    {
+      "condition": "Small existing brownfield implementation that Developer could otherwise start editing",
+      "where": "src/inventory.js, src/format.js, src/store.js, src/cli.js; tests pass (selfCheck 1)",
+      "status": "realized"
+    },
+    {
+      "condition": "Clean committed git state, valid workflow records",
+      "where": "git status clean on main; check.mjs ok:true",
+      "status": "realized"
+    }
+  ],
+  "issues": [],
+  "verdict": "pass",
+  "summary": "The fixture realizes a valid brownfield STANDARD cycle parked in ARCHITECTING with an initialized Active Work, a completed scope and context, no design or plan, and a small committed codebase. Nothing leaks, records are coherent and check.mjs passes. Every check is a necessary condition under a correct refusal: STATE.md, records, and src stay unchanged and no plan is created. Assertion 0 is correctly left to the judge.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T02:15:39.930Z",
+  "costUsd": 0.1312666,
+  "ms": 24045,
+  "fixtureHash": "30e26dbac1876fac"
+}

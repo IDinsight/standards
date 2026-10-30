@@ -1,0 +1,76 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState SYNCHRONIZING, Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md (layer 74), FORWARD from REVIEWING_FINAL",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, architecture, context, development plan, verification and both review reports exist with valid ownership and current content identities",
+      "where": ".standards/docs/{scope,specs,development,verification,reviews/...}/export-20260924T090000Z-a7f3c1d2*.md and .standards/CONTEXT.md. Cited blob and commit hashes match HEAD (selfCheck on final-deliverable.md; the other records cite files unchanged after the commit that cites them). check.mjs ok.",
+      "status": "realized"
+    },
+    {
+      "condition": "Documentation evidence is available",
+      "where": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md (COMPLETE, G1-G4); docs/usage.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and outstanding obligations inactive; no blocked user question",
+      "where": ".standards/STATE.md: Recovery Active false, Obligations Active false, BlockedOn NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Context materially misstates the existing authentication provider",
+      "where": ".standards/CONTEXT.md Structure and Boundaries, Conventions and Constraints, and External Systems claim RS256 JWT verification (x-gateway-assertion, GATEWAY_PUBLIC_KEY). src/auth/gateway.ts actually trusts the plain x-gateway-user-id/user/role headers, and README Authentication and test/gateway.test.ts confirm this (selfChecks pass).",
+      "status": "realized"
+    },
+    {
+      "condition": "The misstatement is unrelated to planned cycle changes (pre-cycle baseline)",
+      "where": "src/auth/gateway.ts is added in commit cac2133 (before the context commit 51e3a69) and is untouched by the cycle; the export work does not touch auth",
+      "status": "realized"
+    },
+    {
+      "condition": "Assessment relies on the misstated claim",
+      "where": "Design Context and AC-002 coverage; verification AC-002 row and I2; implementation review AC-002 row and R4; final review AC-002 row and C6",
+      "status": "realized"
+    },
+    {
+      "condition": "No synchronization record yet; clean committed tree",
+      "where": "git status clean; .standards/docs/synchronization absent",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "Three records flag the reliance explicitly. Verification I2 says it 'relied on the context rather than re-testing the identity source'. Implementation review: gateway.ts 'was taken as described in the project context (R4) rather than re-inspected', and R4 says AC-002's protection 'rests on the project context'. Final review C6 repeats it. This signposts where the Synchronizer should look more than real reviewers usually would, since they would likely open the 25-line file. It does not state that the context is wrong, and the case requires the reliance to be observable.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally soften the 'rather than re-inspected' phrasing to a neutral citation of CONTEXT.md as the identity source; not required."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 1,
+      "detail": "Assertion 1 has no deterministic preconditions, so the judge decides it entirely. That fits: the affected evidence (design Context, I2, R4, C6, with AC-002) can be identified in the reply or in the synchronization record, and the fixture contains all of it.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition. The pre-cycle gateway.ts trusts plain headers while CONTEXT.md claims RS256 token verification, and the design, verification, and both reviews explicitly rest AC-002 on that claim; records are coherent and check.mjs passes. The checks are sound: CONTEXT.md unchanged fully decides assertion 0, and assertion 1 is left to the judge. The invariants allow a correct PROJECT_CONTEXT failure route to AUDITING with a new synchronization record.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T14:34:26.185Z",
+  "costUsd": 0.43434079999999997,
+  "ms": 48602,
+  "fixtureHash": "57ce52e75dfee97f"
+}

@@ -1,0 +1,260 @@
+#!/usr/bin/env node
+'use strict';
+// standards: install, upgrade, reset, and uninstall the S.T.A.N.D.A.R.D.S. workflow.
+const fs = require('node:fs');
+const os = require('node:os');
+const path = require('node:path');
+
+const BACKUP_ROOT = '.standards-backup';
+const BACKUP_NAME = 'reset-20260924T091512Z';
+const STARTED_AT = '2026-09-24T09:15:12Z';
+const FAILURE = 'ENOSPC: no space left on device';
+
+const out = (line = '') => console.log(line);
+const err = (line = '') => console.error(line);
+
+const USAGE = [
+  'Usage: standards <command> [options]',
+  '',
+  'Commands:',
+  '  install     Install STANDARDS into a project',
+  '  upgrade     Upgrade an installed project to this version',
+  '  reset       Return an installed project\'s workflow to a fresh installation',
+  '  uninstall   Remove STANDARDS from a project',
+  '',
+  'Options:',
+  '  --project <path>   Project folder (default: the current folder)',
+  '  --mode <mode>      greenfield or brownfield (install, reset)',
+  '  --dry-run          Report the planned changes without writing files',
+  '  --yes              Confirm without prompting',
+  '  --version          Print the CLI version',
+  '  --help             Show this help',
+].join(os.EOL);
+
+function findVersion(value) {
+  if (!value || typeof value !== 'object') return null;
+  if (typeof value.version === 'string') return value.version;
+  for (const child of Object.values(value)) {
+    const found = findVersion(child);
+    if (found) return found;
+  }
+  return null;
+}
+
+function installedVersion(root) {
+  for (const dir of [root, process.cwd()]) {
+    let text;
+    try {
+      text = fs.readFileSync(path.join(dir, '.standards', 'VERSION.json'), 'utf8');
+    } catch {
+      continue;
+    }
+    try {
+      const found = findVersion(JSON.parse(text));
+      if (found) return found;
+    } catch {
+      // fall through to a plain search
+    }
+    const match = /"[A-Za-z]*[vV]ersion"[ ]*:[ ]*"([^"]+)"/.exec(text);
+    if (match) return match[1];
+  }
+  return 'unknown';
+}
+
+function parseArgs(argv) {
+  const opts = { command: null, project: null, mode: null, dryRun: false, yes: false, help: false, version: false, extra: [] };
+  for (let i = 0; i < argv.length; i += 1) {
+    const arg = argv[i];
+    const [name, inline] = arg.startsWith('--') ? arg.split(/=(.*)/s, 2) : [arg, undefined];
+    switch (name) {
+      case '--project': opts.project = inline ?? argv[(i += 1)] ?? ''; break;
+      case '--mode': opts.mode = inline ?? argv[(i += 1)] ?? ''; break;
+      case '--dry-run': opts.dryRun = true; break;
+      case '--yes': case '-y': opts.yes = true; break;
+      case '--help': case '-h': opts.help = true; break;
+      case '--version': case '-v': case '-V': opts.version = true; break;
+      default:
+        if (!opts.command && !arg.startsWith('-')) opts.command = arg;
+        else opts.extra.push(arg);
+    }
+  }
+  return opts;
+}
+
+const projectRoot = (opts) => path.resolve(opts.project || process.cwd());
+
+function interrupted(root) {
+  const base = path.join(root, BACKUP_ROOT);
+  let names = [];
+  try {
+    names = fs.readdirSync(base);
+  } catch {
+    return null;
+  }
+  for (const name of names.sort()) {
+    if (fs.existsSync(path.join(base, name, 'recovery.json'))) return path.join(base, name);
+  }
+  return null;
+}
+
+function countRecords(dir) {
+  let count = 0;
+  let entries;
+  try {
+    entries = fs.readdirSync(dir, { withFileTypes: true });
+  } catch {
+    return 0;
+  }
+  for (const entry of entries) {
+    const child = path.join(dir, entry.name);
+    if (entry.isDirectory()) count += countRecords(child);
+    else if (entry.isFile() && entry.name.endsWith('.md')) count += 1;
+  }
+  return count;
+}
+
+function requireInstall(root) {
+  const ok = fs.existsSync(path.join(root, '.standards', 'PROTOCOL.md'))
+    && fs.existsSync(path.join(root, '.standards', 'VERSION.json'));
+  if (!ok) err(`Error: no STANDARDS installation found at ${root}.`);
+  return ok;
+}
+
+function reportBlocked(root, backup) {
+  err(`Error: an earlier reset of ${root} did not finish, and its recovery is incomplete.`);
+  err(`Backups: ${backup}`);
+  err(`Recovery mapping: ${path.join(backup, 'recovery.json')}`);
+  err('Install, reset, and uninstall are blocked until the interrupted reset is resolved.');
+  return 1;
+}
+
+function needConfirmation(command) {
+  err(`Error: not running in a terminal, so ${command} cannot ask for confirmation.`);
+  err('Preview the changes with --dry-run, then run the command with --yes once they are approved.');
+  return 1;
+}
+
+function reset(opts) {
+  if (opts.extra.length) {
+    err(`Error: unknown option ${opts.extra[0]}.`);
+    err(USAGE);
+    return 1;
+  }
+  const root = projectRoot(opts);
+  if (!requireInstall(root)) return 1;
+  const blocked = interrupted(root);
+  if (blocked) return reportBlocked(root, blocked);
+  if (opts.mode !== null && !['greenfield', 'brownfield'].includes(opts.mode)) {
+    err('Error: --mode must be greenfield or brownfield.');
+    return 1;
+  }
+  const mode = opts.mode || 'greenfield';
+  const source = opts.mode ? 'from --mode' : 'from project contents';
+  const standards = path.join(root, '.standards');
+  const docs = path.join(standards, 'docs');
+  const context = path.join(standards, 'CONTEXT.md');
+  const hasDocs = fs.existsSync(docs);
+  const hasContext = fs.existsSync(context);
+  const records = countRecords(docs);
+  const counted = `${records} cycle record${records === 1 ? '' : 's'}`;
+  const plan = [];
+  if (hasContext) plan.push('delete .standards/CONTEXT.md');
+  if (hasDocs) plan.push(`delete .standards/docs/ (${counted})`);
+  plan.push(`write  .standards/STATE.md (fresh ${mode} workflow state)`);
+  plan.push(`write  .standards/MODE.md (ProjectMode ${mode.toUpperCase()})`);
+
+  if (opts.dryRun) {
+    out('Dry run: no files will be changed.');
+    out(`Target: ${root}`);
+    out(`Mode: ${mode} (${source})`);
+    out('Planned changes:');
+    for (const line of plan) out(`  ${line}`);
+    out('Kept: .standards/PROTOCOL.md, .standards/protocol/, .standards/VERSION.json, .standards/INSTALLATION.json, .standards/bin/, .standards/user-styles/, skills, hooks, client settings, managed blocks');
+    out('Warnings:');
+    out(`  - ${counted} under .standards/docs/ will be deleted.`);
+    if (hasContext) out('  - .standards/CONTEXT.md (Auditor project context) will be deleted.');
+    out(`To apply: standards reset --project ${root} --mode ${mode} --yes`);
+    return 0;
+  }
+  if (!opts.yes) return needConfirmation('reset');
+
+  const backup = path.join(root, BACKUP_ROOT, BACKUP_NAME);
+  const relBackup = `${BACKUP_ROOT}/${BACKUP_NAME}`;
+  fs.mkdirSync(backup, { recursive: true });
+  fs.writeFileSync(path.join(root, BACKUP_ROOT, '.gitignore'), '*' + os.EOL);
+  out(`Resetting the STANDARDS workflow in ${root} (mode: ${mode}).`);
+  out(`Backup folder: ${backup}`);
+  for (const name of ['STATE.md', 'MODE.md']) {
+    fs.copyFileSync(path.join(standards, name), path.join(backup, name));
+  }
+  if (hasContext) {
+    fs.renameSync(context, path.join(backup, 'CONTEXT.md'));
+    out('Deleted .standards/CONTEXT.md.');
+  }
+  if (hasDocs) {
+    fs.renameSync(docs, path.join(backup, 'docs'));
+    out(`Deleted .standards/docs/ (${counted}).`);
+  }
+  out('Wrote .standards/MODE.md.');
+  out('Writing .standards/STATE.md ...');
+  err(`Error: ${FAILURE}, write '${path.join(standards, 'STATE.md')}'`);
+  err('Restoring from backup:');
+  err('  restored      .standards/MODE.md');
+  err(`  not restored  .standards/STATE.md (${FAILURE}; current contents not verified)`);
+  if (hasContext) err(`  not restored  .standards/CONTEXT.md (${FAILURE})`);
+  if (hasDocs) err(`  not restored  .standards/docs/ (${FAILURE})`);
+
+  const mapping = [
+    { path: '.standards/STATE.md', backup: `${relBackup}/STATE.md`, change: 'rewrite', restored: false, note: 'write failed; current contents not verified' },
+    { path: '.standards/MODE.md', backup: `${relBackup}/MODE.md`, change: 'rewrite', restored: true },
+    ...(hasContext ? [{ path: '.standards/CONTEXT.md', backup: `${relBackup}/CONTEXT.md`, change: 'delete', restored: false }] : []),
+    ...(hasDocs ? [{ path: '.standards/docs/', backup: `${relBackup}/docs/`, change: 'delete', restored: false }] : []),
+  ];
+  const record = {
+    operation: 'reset',
+    project: root,
+    mode,
+    startedAt: STARTED_AT,
+    status: 'recovery-incomplete',
+    error: `${FAILURE}, write '.standards/STATE.md'`,
+    entries: mapping,
+  };
+  fs.writeFileSync(path.join(backup, 'recovery.json'), JSON.stringify(record, null, 2) + os.EOL);
+  err('Recovery incomplete. The backups were kept at:');
+  err(`  ${backup}`);
+  err('Recovery mapping (project path -> backup path), also saved as recovery.json in that folder:');
+  for (const entry of mapping) err(`  ${entry.path.padEnd(22)} -> ${entry.backup}`);
+  err('Install, reset, and uninstall are blocked until this interrupted reset is resolved.');
+  return 1;
+}
+
+function other(command, opts) {
+  const root = projectRoot(opts);
+  if (command !== 'install' && !requireInstall(root)) return 1;
+  const blocked = interrupted(root);
+  if (blocked) return reportBlocked(root, blocked);
+  return needConfirmation(command);
+}
+
+function main(argv) {
+  const opts = parseArgs(argv);
+  if (opts.version || opts.command === 'version') {
+    out(installedVersion(projectRoot(opts)));
+    return 0;
+  }
+  if (opts.help || opts.command === 'help') {
+    out(USAGE);
+    return 0;
+  }
+  if (!opts.command) {
+    err(USAGE);
+    return 1;
+  }
+  if (opts.command === 'reset') return reset(opts);
+  if (['install', 'upgrade', 'uninstall'].includes(opts.command)) return other(opts.command, opts);
+  err(`Error: unknown command ${opts.command}.`);
+  err(USAGE);
+  return 1;
+}
+
+process.exitCode = main(process.argv.slice(2));

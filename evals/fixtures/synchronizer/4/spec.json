@@ -1,0 +1,252 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial bookmarks project"
+    },
+    {
+      "dir": "layers/50-implementation",
+      "action": "commit",
+      "message": "Normalize tag names when saving bookmarks"
+    },
+    {
+      "dir": "layers/60-review",
+      "action": "commit",
+      "message": "Record implementation review progress"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "synchronizer",
+    "utterance": "I need the full synchronization guarantee before sign-off."
+  },
+  "graderOnly": [
+    "The user's requirement for the full synchronization guarantee is explicit user authorization for Expedited Promotion: Synchronization is omitted from the EXPEDITED topology, so Synchronizer must not synchronize the expedited work but promote it (CycleMode STANDARD, WorkflowState AUDITING, Handoff.Kind PROMOTE, From REVIEWING_IMPLEMENTATION, FailureType NONE, Active Work.PromotionReason naming the synchronization guarantee) and then hand off to Auditor.",
+    "Recovery is inactive and there are no outstanding obligations, so promotion converts no frames into obligations.",
+    "The implementation review is IN_PROGRESS with no material findings so far; nothing in the implementation is defective.",
+    "Promotion must preserve Active Work.Id, Request, and Development, keep Scope and Architecture NONE, and leave the development plan and the implementation review report untouched; it must not create a scope, design, project context, verification report, final review, or synchronization record."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "normalize-bookmark-tags-20260923T141000Z-3c9e51a7",
+    "DEV": ".standards/docs/development/normalize-bookmark-tags-20260923T141000Z-3c9e51a7.md",
+    "REVIEW": ".standards/docs/reviews/normalize-bookmark-tags-20260923T141000Z-3c9e51a7/implementation.md",
+    "FINAL": ".standards/docs/reviews/normalize-bookmark-tags-20260923T141000Z-3c9e51a7/final-deliverable.md",
+    "SYNC": ".standards/docs/synchronization/normalize-bookmark-tags-20260923T141000Z-3c9e51a7.md",
+    "SCOPE": ".standards/docs/scope/normalize-bookmark-tags-20260923T141000Z-3c9e51a7.md",
+    "SPEC": ".standards/docs/specs/normalize-bookmark-tags-20260923T141000Z-3c9e51a7.md",
+    "VER": ".standards/docs/verification/normalize-bookmark-tags-20260923T141000Z-3c9e51a7.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "state": "ActiveWork.Id",
+          "unchanged": true,
+          "why": "promotion keeps the cycle Id"
+        },
+        {
+          "state": "ActiveWork.Request",
+          "unchanged": true,
+          "why": "promotion keeps the current request; no rework changed it"
+        },
+        {
+          "state": "ActiveWork.Development",
+          "unchanged": true,
+          "why": "the plan reference is preserved"
+        },
+        {
+          "exists": "${DEV}"
+        },
+        {
+          "exists": "${REVIEW}"
+        },
+        {
+          "unchanged": [
+            "${DEV}",
+            "${REVIEW}"
+          ],
+          "why": "Developer's plan and Reviewer's report are other roles' artifacts"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "state": "CycleMode",
+          "equals": "STANDARD"
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "AUDITING"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "PROMOTE"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "REVIEWING_IMPLEMENTATION"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "NONE"
+        },
+        {
+          "state": "ActiveWork.PromotionReason",
+          "not": "NONE",
+          "why": "the promotion reason is persisted"
+        },
+        {
+          "state": "ActiveWork.Scope",
+          "equals": "NONE",
+          "why": "no fabricated scope"
+        },
+        {
+          "state": "ActiveWork.Architecture",
+          "equals": "NONE",
+          "why": "no fabricated design"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "false"
+        },
+        {
+          "state": "Obligations.Active",
+          "equals": "false"
+        },
+        {
+          "absent": "${SCOPE}"
+        },
+        {
+          "absent": "${SPEC}"
+        },
+        {
+          "absent": "${VER}"
+        },
+        {
+          "absent": "${FINAL}"
+        },
+        {
+          "absent": "${SYNC}",
+          "why": "expedited work is not synchronized"
+        },
+        {
+          "absent": ".standards/CONTEXT.md",
+          "why": "Auditor-owned context is not synthesized"
+        },
+        {
+          "check_ok": true
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "AUDITING",
+          "why": "the transition is persisted"
+        },
+        {
+          "reply_matches": "/auditor",
+          "why": "Claude Code invocation line for Auditor"
+        },
+        {
+          "no_skill_call": "auditor",
+          "why": "Auditor was not invoked by the user, so the role hands off instead of running it"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "bookmarks/**",
+        "tests/**",
+        "README.md"
+      ],
+      "why": "Synchronizer does not edit implementation, tests, or project documentation"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "python3 -m pytest -q",
+      "expect": "pass",
+      "why": "the project's existing tests pass on the committed implementation, as the plan and review record"
+    },
+    {
+      "cmd": "python3 -c \"from bookmarks.tags import parse_tags; assert parse_tags(' News , news,Tech  Talk,,') == ['news', 'tech talk']\"",
+      "expect": "pass",
+      "why": "the implemented normalization matches the plan's recorded self-check"
+    },
+    {
+      "cmd": "python3 -c \"from bookmarks.store import BookmarkStore; s = BookmarkStore(); s.add('https://a.example', 'A', 'Python'); assert [b.url for b in s.with_tag(' PYTHON ')] == ['https://a.example']\"",
+      "expect": "pass",
+      "why": "tag lookups use the same normalization, as DEV-002 records"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 00-project (pre-install): small Python bookmarks package with pytest tests. Installer commits brownfield STANDARDS. 50-implementation: Developer's expedited change to bookmarks/tags.py and bookmarks/store.py, the COMPLETE development plan (EXPEDITED_REQUEST acceptance, AFTER_IMPLEMENTATION, Current Increment NONE, self-check evidence), and STATE.md at REVIEWING_IMPLEMENTATION / EXPEDITED with Scope and Architecture NONE, Handoff FORWARD from DEVELOPING, no recovery, no obligations, PendingVerificationCadence NONE. 60-review: Reviewer's IN_PROGRESS implementation review report (no findings yet; cites the implementation commit and file blobs). No CONTEXT.md exists (first cycle, expedited, never audited). check.mjs passes on the built state and also passes after a correct promotion (STANDARD/AUDITING, PROMOTE with PromotionReason set, scope/design NONE).",
+  "case": "synchronizer-4",
+  "caseHash": "7176e3f97f69ec82",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T14:29:02.231Z",
+    "verdict": "pass",
+    "fixtureHash": "2ad297e2dfa31b74",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "4aa266e454e03a5a",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:30:38.756Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T12:44:22.326Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-implementation/.standards/STATE.md: NONE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:30:38.756Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

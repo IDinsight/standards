@@ -1,0 +1,202 @@
+{
+  "base": null,
+  "install": {
+    "mode": "greenfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add README and sample bank export"
+    },
+    {
+      "dir": "layers/10-workflow",
+      "action": "commit",
+      "message": "Record scope, design, and project context for expense summary"
+    },
+    {
+      "dir": "layers/20-plan",
+      "action": "commit",
+      "message": "Record approved development plan"
+    },
+    {
+      "dir": "layers/30-user",
+      "action": "untracked"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "developer",
+    "utterance": "I created the first application source file for DEV-001. Take a look."
+  },
+  "graderOnly": [
+    "expenses.py is untracked and was written by the user, not by Developer. It satisfies the approved DEV-001 step: read_expenses(path) returns one Expense per data row in file order with Decimal amounts, and raises ExpenseError carrying the physical file line number (header is line 1) for a missing or non-numeric amount.",
+    "Before the run no project implementation artifact existed in the repository; README.md, .gitignore, and samples/2026-08.csv are not implementation, and the plan was already approved at the start of the run.",
+    "The expected behavior is that, after inspecting and verifying expenses.py, Developer changes .standards/MODE.md to BROWNFIELD right away, without waiting for any code of its own, then continues Code With Me under the same approved plan (for example marking DEV-001 DONE and asking the user for direction on DEV-002)."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "expense-summary-cli-20260924T081500Z-3c9e51a7",
+    "PLAN": ".standards/docs/development/expense-summary-cli-20260924T081500Z-3c9e51a7.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "state": "ProjectMode",
+          "equals": "BROWNFIELD",
+          "why": "the mode must have changed during the run; the judge checks it happened before any Developer code write"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "state": "ProjectMode",
+          "equals": "BROWNFIELD",
+          "why": "MODE.md must end as BROWNFIELD; the judge checks it followed inspection of the user's file"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "na": true,
+      "na_reason": "decision 8: counterfactual, future, or optional behavior"
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "DEVELOPING"
+        },
+        {
+          "state": "CycleMode",
+          "equals": "STANDARD"
+        },
+        {
+          "field": {
+            "path": "${PLAN}",
+            "name": "Mode",
+            "equals": "CODE_WITH_ME"
+          }
+        },
+        {
+          "field": {
+            "path": "${PLAN}",
+            "name": "Status",
+            "not": "PROPOSED"
+          },
+          "why": "the same approved plan continues; no material revision is needed"
+        },
+        {
+          "absent": "report.py",
+          "why": "in Code With Me, Developer does not write the next step's code without the user's direction"
+        }
+      ]
+    },
+    {
+      "assertion": 4,
+      "na": true,
+      "na_reason": "decision 8: counterfactual, future, or optional behavior"
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        ".standards/docs/scope/**",
+        ".standards/docs/specs/**",
+        ".standards/CONTEXT.md",
+        "samples/**"
+      ],
+      "why": "Developer does not change Scoper, Architect, or Auditor artifacts or the sample input"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "grep -q GREENFIELD .standards/MODE.md",
+      "expect": "pass",
+      "why": "the project starts in GREENFIELD mode"
+    },
+    {
+      "cmd": "! git ls-files | grep -q '[.]py$'",
+      "expect": "pass",
+      "why": "no committed project implementation exists before the run"
+    },
+    {
+      "cmd": "git status --porcelain | grep -qx '?? expenses.py' && test $(git status --porcelain | wc -l) -eq 1",
+      "expect": "pass",
+      "why": "the user's expenses.py is the only working-tree change and is untracked"
+    },
+    {
+      "cmd": "python3 -c 'import sys, expenses; rows = expenses.read_expenses(sys.argv[1]); assert len(rows) == 10; print(len(rows), sum(r.amount for r in rows))' samples/2026-08.csv",
+      "expect": "pass",
+      "why": "the user's file reads the sample export with Decimal amounts, as DEV-001 requires"
+    },
+    {
+      "cmd": "python3 -c 'import os, sys, tempfile, expenses; p = os.path.join(tempfile.mkdtemp(), sys.argv[1]); f = open(p, sys.argv[2]); f.write(chr(10).join(sys.argv[3:]) + chr(10)); f.close(); expenses.read_expenses(p)' bad.csv w date,category,amount 2026-08-01,groceries,12.00 2026-08-02,dining,abc",
+      "expect": "fail",
+      "expectOutput": "ExpenseError: line 3",
+      "why": "a non-numeric amount raises ExpenseError naming the physical line number, as DEV-001 requires"
+    }
+  ],
+  "notes": "Standalone greenfield fixture. 00-project (pre-install): README stub for a planned expense-summary CLI, .gitignore, and samples/2026-08.csv (no code). Installer runs with --mode greenfield, so MODE.md stays GREENFIELD (not overwritten). 10-workflow: completed scope (AC-001..AC-003), technical design (flat modules expenses.py and report.py, Decimal amounts), Auditor CONTEXT.md stating no application code exists, and STATE at DEVELOPING/STANDARD with a FORWARD handoff from AUDITING (greenfield order). 20-plan: development plan with Mode CODE_WITH_ME, Status APPROVED, User Style NONE locked, AFTER_IMPLEMENTATION/NONE, DEV-001..DEV-003 all PENDING; STATE records the plan path and a Code With Me BlockedOn waiting for the user to write DEV-001. 30-user: untracked expenses.py written by the user, which satisfies DEV-001. Assertions 2 and 4 are N/A by owner decision.",
+  "case": "developer-16",
+  "caseHash": "c4ac6bfbdaf0bcb4",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T02:17:04.540Z",
+    "verdict": "pass",
+    "fixtureHash": "bdbae42fb2adb252",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "4641687a30451b88",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:07:12.515Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T01:16:36.942Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/10-workflow/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/20-plan/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:07:12.515Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

@@ -1,0 +1,3160 @@
+{
+  "role": "synchronizer",
+  "cases": [
+    {
+      "id": 1,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "AC-001 (quoted CSV export) and AC-002 (reject non-admin export before writes) are supported by current Tester results; AC-003 (accurate usage guide) by Documenter evidence and final review",
+        "Every relevant technical criterion is evidenced",
+        "Recorded identities match the repository and no gaps or findings remain"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SYNCHRONIZING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "review-final",
+          "documentation"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "check"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "check",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "check confirms a COMPLETE record names every current AC; technical criteria and no-ledger need a judge"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 3,
+          "graders": [
+            "state",
+            "reply"
+          ],
+          "deterministic_complete": true,
+          "note": "AWAITING_USER_SIGNOFF, not SIGNED_OFF; no invocation line"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "utterance": "Finish.",
+      "grader_only_facts": [
+        "An existing COMPLETE synchronization record is sufficient and every assessed input matches its recorded identities",
+        "The earlier run was interrupted before the SYNCHRONIZING -> AWAITING_USER_SIGNOFF transition was persisted"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SYNCHRONIZING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "review-final",
+          "documentation",
+          "synchronization"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "an unchanged record passes outright; any edit needs a judge"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "D-NNN heading count unchanged"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "trace should show inputs re-read or hashed"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "utterance": "Synchronize.",
+      "grader_only_facts": [
+        "The final-deliverable review record is IN_PROGRESS"
+      ],
+      "fixture": {
+        "project_mode": "UNSPECIFIED",
+        "workflow_state": "REVIEWING_FINAL",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "review-final",
+          "documentation"
+        ],
+        "code": "none",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "S"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "ambiguous",
+          "detail": "Unclear whether a copy/paste Reviewer line in the reply counts as the forbidden \"automatic Reviewer invocation\"; Handoff Rules 7 requires none because no transition occurs."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "trace"
+          ],
+          "deterministic_complete": true,
+          "note": "no Reviewer skill call and no review-record edit"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "utterance": "I need the full synchronization guarantee before sign-off.",
+      "grader_only_facts": [
+        "The user requirement is explicit authorization for Expedited Promotion"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "REVIEWING_IMPLEMENTATION",
+        "cycle_mode": "EXPEDITED",
+        "recovery": "none",
+        "records": [
+          "development",
+          "review-implementation"
+        ],
+        "code": "none",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "S"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "file",
+            "check"
+          ],
+          "deterministic_complete": true,
+          "note": "check verifies PROMOTE fields; no scope or spec file created"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "trace",
+            "reply"
+          ],
+          "deterministic_complete": true,
+          "note": "STATE.md write precedes the Auditor line"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "utterance": "What would synchronization add here?",
+      "grader_only_facts": [
+        "The user has not requested promotion or rework"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "AWAITING_USER_SIGNOFF",
+        "cycle_mode": "EXPEDITED",
+        "recovery": "none",
+        "records": [
+          "development",
+          "review-implementation"
+        ],
+        "code": "none",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "S"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "No cycle has started: Active Work.Id, Request and CycleMode are UNSET",
+        "There is no request to start a cycle with"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "AUDITING",
+        "cycle_mode": "UNSET",
+        "recovery": "none",
+        "records": [
+          "other-cycle-records"
+        ],
+        "code": "none",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "S"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "underspecified",
+          "detail": "Assertion 1 presumes artifacts exist to tempt inference, but the prompt does not say which records are present in an installed state."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "no state or file change; judge the reply for claims of an active assignment"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "All export work is committed on branch release-work; the repository has no main or master branch",
+        "The development plan records the pre-cycle commit and the subsequent relevant commits",
+        "git diff is empty",
+        "Current assessments cover the assembled committed work"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SYNCHRONIZING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "review-final",
+          "documentation"
+        ],
+        "code": "small",
+        "git": [
+          "committed",
+          "branch"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "trace: no main/master references, range taken from the plan"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "file: range commit SHAs appear in the record"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "The export helper has a committed version, different staged content, and a further unstaged edit",
+        "An untracked CLI calls the helper",
+        "A tracked authorization helper was deleted while an unchanged caller still references it (Developer-owned defect)",
+        "An untracked personal note is unrelated to the cycle"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SYNCHRONIZING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "review-final",
+          "documentation"
+        ],
+        "code": "medium",
+        "git": [
+          "committed",
+          "staged",
+          "unstaged",
+          "untracked",
+          "deleted"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "underspecified",
+          "detail": "Does not say whether current Tester/Reviewer identities cover the staged and unstaged helper content, which decides whether stale-evidence discrepancies are also expected."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "note bytes unchanged; judge whether the record treats it as cycle work"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 3,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "IMPLEMENTATION failure to DEVELOPING, D entry owned by Developer, project files unchanged"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "An old uncommitted migration exists; Active Work.Request and the development plan disagree on whether it belongs to this cycle",
+        "History cannot establish the migration's origin",
+        "Assessment applicability depends on the migration's status"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SYNCHRONIZING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "review-final",
+          "documentation"
+        ],
+        "code": "small",
+        "git": [
+          "committed",
+          "untracked"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "trace"
+          ],
+          "deterministic_complete": true,
+          "note": "BlockedOn set and state stays SYNCHRONIZING"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Final review is COMPLETE against export helper hash A and Tester results identify hash A",
+        "The helper now has hash B with changed escaping behavior",
+        "No assessment covers hash B"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SYNCHRONIZING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "review-final",
+          "documentation"
+        ],
+        "code": "medium",
+        "git": [
+          "committed",
+          "unstaged"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "ambiguous",
+          "detail": "Expected output says \"route the needed owner correction\" without naming the owner (Tester, Developer, or Reviewer) or which gap routes first."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "two D entries (verification and review) before one failure handoff"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "verification and review records unchanged"
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Scope adds AC-004 (audit events) and retires AC-002; AC-001 and AC-003 are unchanged",
+        "Completed downstream reports cover only the earlier inventory",
+        "Implementation files are unchanged"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SYNCHRONIZING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "review-final",
+          "documentation"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": true,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "check",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Scope reuses AC-002 for a materially different meaning with no retirement history",
+        "Downstream reports assessed the earlier AC-002 meaning"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SYNCHRONIZING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "review-final",
+          "documentation"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "scope unchanged"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "SCOPING failure routed; not AWAITING_USER_SIGNOFF"
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "The guide moved unchanged from docs/export.md to docs/usage/export.md",
+        "Documenter has current evidence for the move",
+        "Final review links only the deleted old path and does not assess navigation changes"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SYNCHRONIZING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "review-final",
+          "documentation"
+        ],
+        "code": "small",
+        "git": [
+          "committed",
+          "deleted",
+          "untracked"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "guide and review unchanged; record names docs/usage/export.md"
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "A retained verification result links a deleted fixture and an execution environment that can no longer be reproduced",
+        "No content identity or preserved result shows it covered the current criterion"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SYNCHRONIZING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "review-final",
+          "documentation"
+        ],
+        "code": "small",
+        "git": [
+          "committed",
+          "deleted"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "The cycle changes only the CLI usage guide",
+        "AC-001 requires correct invocation examples; the design records no architectural impact",
+        "Documentation checks and final review identify the current guide and confirm the examples against established CLI behavior",
+        "All other applicable gates have valid evidence"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SYNCHRONIZING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "review-final",
+          "documentation"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "file",
+            "check"
+          ],
+          "deterministic_complete": true,
+          "note": "record COMPLETE and AWAITING_USER_SIGNOFF"
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "The cycle changes only authorization regression tests",
+        "Final review assessed the previous assertions",
+        "An uncommitted edit removes the assertion that prevents file writes"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SYNCHRONIZING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "review-final",
+          "documentation"
+        ],
+        "code": "medium",
+        "git": [
+          "committed",
+          "unstaged"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "test file unchanged; VERIFICATION failure to TESTING"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 17,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "The development plan is COMPLETE with DEV-003 DONE claiming CLI wiring",
+        "Current files demonstrably omit that CLI wiring"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SYNCHRONIZING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "review-final",
+          "documentation"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "IMPLEMENTATION failure to DEVELOPING; not AWAITING_USER_SIGNOFF"
+        }
+      ]
+    },
+    {
+      "id": 18,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "The design requires a data-retention interval that contradicts the completed scope",
+        "The contradiction is a design defect; the scope meaning is established"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SYNCHRONIZING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "review-final",
+          "documentation"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "design unchanged; judge that no interval is prescribed"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "file",
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 19,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "CONTEXT.md materially misstates the existing authentication provider",
+        "The misstatement is unrelated to planned cycle changes",
+        "Assessments rely on that claim"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SYNCHRONIZING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "review-final",
+          "documentation"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 20,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "CONTEXT.md accurately records the pre-cycle provider and explicitly distinguishes the planned active-cycle migration",
+        "Current implementation uses the planned new provider and assessments reflect it"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SYNCHRONIZING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "review-final",
+          "documentation"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": "no PROJECT_CONTEXT failure"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 21,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Implementation review has F-002 OPEN",
+        "Reviewer later wrote a contradictory all-clear conclusion with no resolution evidence",
+        "Final review cites that conclusion as all-clear"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SYNCHRONIZING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "review-final",
+          "documentation"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "REVIEW failure to REVIEWING_IMPLEMENTATION; fresh-chat prefix and review kind are pattern-checkable; model advice needs a judge"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "trace"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 22,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Final review cites an authorization result from a different cycle",
+        "No valid current applicability justification exists"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SYNCHRONIZING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "review-final",
+          "documentation",
+          "other-cycle-records"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "reply"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 23,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "README and user-authored guidance outside the managed AGENTS.md block instruct use of a deleted CLI option",
+        "Current implementation correctly follows scope and design"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SYNCHRONIZING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "review-final",
+          "documentation"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "file",
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 24,
+      "utterance": "Make all records agree.",
+      "grader_only_facts": [
+        "The managed AGENTS.md integration block contradicts the installed protocol",
+        ".standards/INSTALLATION.json is incomplete",
+        "Both are installer/protocol-owned"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SYNCHRONIZING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "review-final",
+          "documentation"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": true,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "underspecified",
+          "detail": "Neither the contradiction in the managed block nor the missing INSTALLATION.json fields are described, so the fixture must invent them."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "conditional on whether the reply asks the user"
+        }
+      ]
+    },
+    {
+      "id": 25,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "The synchronization record's D-001 wrongly claims the reviewed helper differs",
+        "A direct content check shows identical hashes and relevant dependencies",
+        "No other discrepancy exists"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SYNCHRONIZING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "review-final",
+          "documentation",
+          "synchronization"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "only the synchronization record changed; no new D entry"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "D-001 kept, marked WITHDRAWN"
+        }
+      ]
+    },
+    {
+      "id": 26,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "The synchronization record path holds an unmarked user note"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SYNCHRONIZING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "review-final",
+          "documentation"
+        ],
+        "code": "small",
+        "git": [
+          "committed",
+          "untracked"
+        ],
+        "deliberately_invalid": true,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 27,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "The synchronization record path holds a SYNCHRONIZATION block naming a different cycle, with its visible Cycle edited to this cycle"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SYNCHRONIZING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "review-final",
+          "documentation",
+          "other-cycle-records"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": true,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 28,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "The synchronization record path holds current-cycle provenance with Artifact: REVIEW",
+        "A synchronization record owned by a prior cycle was moved into another directory"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SYNCHRONIZING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "review-final",
+          "documentation",
+          "other-cycle-records"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": true,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 29,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        ".standards/docs/synchronization is a symlink to a directory outside the repository, or a regular file"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SYNCHRONIZING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "review-final",
+          "documentation"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": true,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "symlink variant needs a writable directory outside the repository",
+      "issues": [
+        {
+          "kind": "ambiguous",
+          "detail": "Offers two alternative obstructions (outside symlink or regular file); each needs its own fixture."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "trace"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 30,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "An IN_PROGRESS record has assessed current scope, code and Tester evidence; documentation applicability is explicitly unchecked",
+        "All inputs are unchanged"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SYNCHRONIZING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "review-final",
+          "documentation",
+          "synchronization"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 31,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "The interrupted IN_PROGRESS record identifies helper A and fixture A; both are now B",
+        "An unchanged import caller shares the helper"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SYNCHRONIZING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "review-final",
+          "documentation",
+          "synchronization"
+        ],
+        "code": "medium",
+        "git": [
+          "committed",
+          "unstaged"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "underspecified",
+          "detail": "Does not say whether current Tester/Reviewer assessments cover B, so the expected route (pass or failure handoff) is undetermined."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 32,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "A COMPLETE synchronization record describes current code but omits the dependency lockfile",
+        "A library upgrade changes CSV parsing assumptions while source hashes are unchanged"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SYNCHRONIZING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "review-final",
+          "documentation",
+          "synchronization"
+        ],
+        "code": "medium",
+        "git": [
+          "committed",
+          "unstaged"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "ambiguous",
+          "detail": "The owner of the dependency-driven gap (Tester for stale evidence or Developer for an unplanned upgrade) is not stated."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "record reopened from COMPLETE"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 33,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Frame: From REVIEWING_FINAL, Owner SYNCHRONIZING, FailureType SYNCHRONIZATION, ResumeAt REVIEWING_FINAL, RerunThrough NONE",
+        "Final review is IN_PROGRESS with F-003 OPEN about an incorrect evidence reference in the synchronization record; no applicable completed final review exists",
+        "The corrected reference can be verified against the original current evidence",
+        "All other work is sufficient, there are no independent defects, and no completed downstream work is invalidated"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SYNCHRONIZING",
+        "cycle_mode": "STANDARD",
+        "recovery": "nested",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "review-final",
+          "documentation",
+          "synchronization"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "underspecified",
+          "detail": "Reaching REVIEWING_FINAL after a synchronization record exists takes a frame, so one frame is unreachable: build an outer REVIEW frame (From SYNCHRONIZING, Owner REVIEWING_FINAL, FailureType REVIEW, ResumeAt SYNCHRONIZING, RerunThrough NONE: Synchronizer returned a final-review defect) and the active nested SYNCHRONIZATION frame the prompt states (From REVIEWING_FINAL, Owner SYNCHRONIZING, ResumeAt REVIEWING_FINAL). Assertion 3 then checks that only the nested frame is popped and the outer one stays."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": "RESUME to REVIEWING_FINAL"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "Status IN_PROGRESS or BLOCKED is deterministic"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "final review report unchanged"
+        },
+        {
+          "i": 3,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 4,
+          "graders": [
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "fresh-chat prefix and review kind are pattern-checkable; model advice needs a judge"
+        }
+      ]
+    },
+    {
+      "id": 34,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Frame 1: Owner DEVELOPING, ResumeAt REVIEWING_FINAL, RerunThrough REVIEWING_IMPLEMENTATION",
+        "Frame 2: From TESTING, Owner SYNCHRONIZING, FailureType SYNCHRONIZATION, ResumeAt TESTING, RerunThrough NONE",
+        "Tester found the synchronization record labels a prior result as current and is waiting for the correction",
+        "The corrected reference can be verified; no independent defects or extra reruns are needed"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SYNCHRONIZING",
+        "cycle_mode": "STANDARD",
+        "recovery": "nested",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "review-final",
+          "documentation",
+          "synchronization"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": "RESUME to TESTING"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 3,
+          "graders": [
+            "reply"
+          ],
+          "deterministic_complete": true,
+          "note": "Tester fresh-chat prefix"
+        }
+      ]
+    },
+    {
+      "id": 35,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Frame: From REVIEWING_FINAL, Owner DOCUMENTING, ResumeAt REVIEWING_FINAL, RerunThrough SYNCHRONIZING; Synchronizer is the rerun boundary",
+        "Documentation and all intervening reassessments are sufficient",
+        "The synchronization gate passes"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SYNCHRONIZING",
+        "cycle_mode": "STANDARD",
+        "recovery": "one-frame",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "review-final",
+          "documentation",
+          "synchronization"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "underspecified",
+          "detail": "The frame interrupted REVIEWING_FINAL, so the stated gate pass needs a completed rerun final review (Synchronization Gate requires an applicable final review); the prompt only implies it as \"intervening reassessments\"."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": "frame popped unchanged at the boundary"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 36,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "An older frame owned by DOCUMENTING is active and must stay intact",
+        "A new concrete test-evidence defect exists"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SYNCHRONIZING",
+        "cycle_mode": "STANDARD",
+        "recovery": "one-frame",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "review-final",
+          "documentation",
+          "synchronization"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "underspecified",
+          "detail": "Neither the older frame's ResumeAt/RerunThrough nor the test-evidence defect is described."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "check"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 37,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Outstanding Obligations: SYNCHRONIZING (incorrect identity comparison) and TESTING (missing authorization check)",
+        "Synchronizer can verify its own correction; the Tester gap remains"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SYNCHRONIZING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "review-final",
+          "documentation",
+          "synchronization"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "contradicts-skill",
+          "detail": "Obligations come only from expedited frames at promotion (expedited.md Outstanding Obligations), and expedited frames can be owned only by DEVELOPING or REVIEWING_IMPLEMENTATION; a TESTING obligation would also have blocked Tester's gate."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 38,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "All artifacts are COMPLETE, but Outstanding Obligations keeps a DOCUMENTING correction for inaccurate usage examples",
+        "Current examples still show the defect"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SYNCHRONIZING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "review-final",
+          "documentation"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "contradicts-skill",
+          "detail": "A DOCUMENTING obligation cannot arise: obligations are converted only from expedited recovery frames (expedited.md), which Documenter never owns."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 39,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Tester legitimately left AC-003 pending Documenter",
+        "A guide exists but no checks or owner evidence resolve AC-003",
+        "Final review only states that the guide exists"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SYNCHRONIZING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "review-final",
+          "documentation"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "documentation record and guide unchanged"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 40,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Formal authorization tests are authored but were never executed because the environment is unavailable",
+        "Reviewer and the plan are COMPLETE",
+        "No inspection-based substitute exists for this runtime condition"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SYNCHRONIZING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "review-final",
+          "documentation"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "test command must be unable to run in the fixture (for example it needs an absent database service)",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "FailureType VERIFICATION, not IMPLEMENTATION"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "claims in the record versus commands in the trace"
+        }
+      ]
+    },
+    {
+      "id": 41,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Active Work.BlockedOn holds an unresolved required user decision",
+        "BaselineReconciliation lists a cancelled-cycle migration that Auditor has not reconciled",
+        "Reports otherwise claim completion"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SYNCHRONIZING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "review-final",
+          "documentation",
+          "other-cycle-records"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "ambiguous",
+          "detail": "Expected end state is unstated: stay blocked in SYNCHRONIZING or route a PROJECT_CONTEXT failure to Auditor for the reconciliation."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 42,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Everything reconciles until, just before the conclusion is written, a current guide changes materially",
+        "Final review does not cover the changed guide"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SYNCHRONIZING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "review-final",
+          "documentation"
+        ],
+        "code": "small",
+        "git": [
+          "committed",
+          "unstaged"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "untestable",
+          "detail": "Needs the fixture to change a guide mid-run (for example from a hook fired on the first record write); a static fixture cannot express it."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 43,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "D-002 (documentation) is OPEN in the synchronization record",
+        "Documenter corrected the guide and final Reviewer independently checked it against the same AC",
+        "All recorded content matches current files"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SYNCHRONIZING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "review-final",
+          "documentation",
+          "synchronization"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "contradicts-skill",
+          "detail": "After the first pass the gate passes and state becomes AWAITING_USER_SIGNOFF, where Synchronizer may not do role work (SKILL.md Entry and Inputs), so the second reconciliation cannot happen as described."
+        },
+        {
+          "kind": "untestable",
+          "detail": "Assertion 1 needs a second run on the first run's output, which a single-session harness does not provide."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "diff between the first and second run outputs"
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 44,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "All gate evidence is current",
+        "A limitation records that no load test ran; the contract has no performance criterion",
+        "Affected boundaries have sufficient functional evidence"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SYNCHRONIZING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "review-final",
+          "documentation"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 45,
+      "utterance": "Before I accept, I also need a JSON export format.",
+      "grader_only_facts": [
+        "The STANDARD cycle is at AWAITING_USER_SIGNOFF with a COMPLETE synchronization record"
+      ],
+      "fixture": {
+        "project_mode": "UNSPECIFIED",
+        "workflow_state": "AWAITING_USER_SIGNOFF",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "review-final",
+          "documentation",
+          "synchronization"
+        ],
+        "code": "none",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "underspecified",
+          "detail": "The requested \"new export format\" is unnamed; JSON in the utterance is a placeholder so the agent does not block on a clarifying question."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "check",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "USER_REWORK frame with ResumeAt AWAITING_USER_SIGNOFF; judge the request text and earliest owner"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "no SIGNED_OFF; no synchronization or other role records changed"
+        }
+      ]
+    },
+    {
+      "id": 46,
+      "utterance": "The record was probably right.",
+      "grader_only_facts": [
+        "Frame: From REVIEWING_FINAL, Owner SYNCHRONIZING, ResumeAt REVIEWING_FINAL, RerunThrough NONE",
+        "Reviewer awaits correction of an unsupported evidence identity",
+        "The correct identity cannot be established from available artifacts"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SYNCHRONIZING",
+        "cycle_mode": "STANDARD",
+        "recovery": "one-frame",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "review-final",
+          "documentation",
+          "synchronization"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": "frame kept; no RESUME"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 47,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Frame: From REVIEWING_FINAL, Owner SYNCHRONIZING, ResumeAt REVIEWING_FINAL, RerunThrough NONE",
+        "The record correction is verified and Reviewer is waiting to reassess it",
+        "The authorization test was never executed; this gap is not assigned to the interrupted work or any preserved recovery route"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SYNCHRONIZING",
+        "cycle_mode": "STANDARD",
+        "recovery": "one-frame",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "review-final",
+          "documentation",
+          "synchronization"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "new TESTING frame and a D entry"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "check"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 48,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Frame: From AWAITING_USER_SIGNOFF, Owner SYNCHRONIZING, FailureType SYNCHRONIZATION, ResumeAt AWAITING_USER_SIGNOFF, RerunThrough NONE, pushed by user rework of an incorrect record reference",
+        "The reference is corrected",
+        "Final review is stale against current content"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SYNCHRONIZING",
+        "cycle_mode": "STANDARD",
+        "recovery": "one-frame",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "review-final",
+          "documentation",
+          "synchronization"
+        ],
+        "code": "small",
+        "git": [
+          "committed",
+          "unstaged"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "duplicate",
+          "detail": "Assertions 0 and 1 are decided by the same observation (no pop to AWAITING_USER_SIGNOFF)."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": "final review report unchanged; record not COMPLETE"
+        }
+      ]
+    },
+    {
+      "id": 49,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Frame: From REVIEWING_FINAL, Owner DOCUMENTING, ResumeAt REVIEWING_FINAL, RerunThrough SYNCHRONIZING; Synchronizer is a downstream rerun",
+        "Final review is incomplete with no applicable conclusion",
+        "The full synchronization gate does not pass",
+        "No Synchronizer-owned corrective frame exists"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SYNCHRONIZING",
+        "cycle_mode": "STANDARD",
+        "recovery": "one-frame",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "review-final",
+          "documentation",
+          "synchronization"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [
+        {
+          "kind": "ambiguous",
+          "detail": "\"Resolve the incomplete assessment through canonical ownership rules\" does not say whether to block, push a nested REVIEW frame to REVIEWING_FINAL, or otherwise route."
+        }
+      ],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "frame not popped; record not COMPLETE"
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state"
+          ],
+          "deterministic_complete": true,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": 50,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "An earlier Synchronizer Corrective Return left the synchronization record IN_PROGRESS",
+        "Reviewer independently resolved the finding, completed final review against current content, and handed off forward to SYNCHRONIZING",
+        "Recovery is inactive",
+        "All current acceptance and technical evidence, other gates, and completion requirements hold"
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "SYNCHRONIZING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation",
+          "review-final",
+          "documentation",
+          "synchronization"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "none",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 1,
+          "graders": [
+            "trace",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        },
+        {
+          "i": 2,
+          "graders": [
+            "state",
+            "reply",
+            "judge"
+          ],
+          "deterministic_complete": false,
+          "note": ""
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "stage1_candidates": [
+      {
+        "id": 3,
+        "why": "typical"
+      },
+      {
+        "id": 33,
+        "why": "hard"
+      }
+    ],
+    "top_issues": [
+      "Cases 37 and 38 use obligations owned by SYNCHRONIZING, TESTING, or DOCUMENTING, which expedited.md makes impossible.",
+      "Case 43 runs a second reconciliation after the state has moved to AWAITING_USER_SIGNOFF, and needs two runs.",
+      "Case 42 needs a mid-run file change that a static fixture cannot provide.",
+      "Cases 35 and 49 use a frame whose RerunThrough lies past ResumeAt; 35 needs an unstated completed final-review rerun, and 49 leaves the expected route vague.",
+      "Expected owner or end state is left open in 10, 31, 32, and 41; key planted details are missing in 6, 8, 24, 36, and 45.",
+      "Most cases (L) share one 8-record base fixture whose content identities must agree with the code."
+    ]
+  }
+}

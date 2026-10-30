@@ -1,0 +1,223 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add records listing API"
+    },
+    {
+      "dir": "layers/52-guide",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add admin guide"
+    },
+    {
+      "dir": "layers/60-cycle-start",
+      "action": "commit",
+      "message": "Record audit, scope, and design for CSV export"
+    },
+    {
+      "dir": "layers/62-implementation",
+      "action": "commit",
+      "message": "Add CSV export endpoint"
+    },
+    {
+      "dir": "layers/64-verification",
+      "action": "commit",
+      "message": "Add CSV export tests and verification report"
+    },
+    {
+      "dir": "layers/66-implementation-review",
+      "action": "commit",
+      "message": "Record implementation review"
+    },
+    {
+      "dir": "layers/68-documentation",
+      "action": "commit",
+      "message": "Document CSV export in admin guide"
+    },
+    {
+      "dir": "layers/70-final-review",
+      "action": "commit",
+      "message": "Record final deliverable review"
+    },
+    {
+      "dir": "layers/72-synchronization",
+      "action": "commit",
+      "message": "Record synchronization"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "synchronizer",
+    "utterance": "Before I accept, I also need a JSON export format."
+  },
+  "graderOnly": [
+    "The STANDARD brownfield cycle let-administrators-export-records-as-csv-20260921T141200Z-5b8e2f17 is at AWAITING_USER_SIGNOFF with every record COMPLETE, including the synchronization record; recovery and outstanding obligations are inactive.",
+    "The scope lists 'Formats other than CSV' as a non-goal and defines AC-001 to AC-004 only for CSV, so a JSON export changes Scoper-owned acceptance: the earliest invalidated owner is SCOPING (FailureType SCOPING).",
+    "The expected transition is Handoff.Kind USER_REWORK from AWAITING_USER_SIGNOFF to SCOPING, an updated Active Work.Request that includes the JSON export, and a recovery frame From AWAITING_USER_SIGNOFF, Owner SCOPING, ResumeAt AWAITING_USER_SIGNOFF, RerunThrough NONE.",
+    "The existing GET /records endpoint returns paginated JSON pages; it is not a downloadable export and does not satisfy the user's request.",
+    "Synchronizer owns no work in AWAITING_USER_SIGNOFF; it should not edit its synchronization record, other records, code, tests, or docs, and should not sign off or treat the earlier readiness as acceptance."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "let-administrators-export-records-as-csv-20260921T141200Z-5b8e2f17",
+    "SCOPE": ".standards/docs/scope/let-administrators-export-records-as-csv-20260921T141200Z-5b8e2f17.md",
+    "SYNC": ".standards/docs/synchronization/let-administrators-export-records-as-csv-20260921T141200Z-5b8e2f17.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "state": "Handoff.Kind",
+          "equals": "USER_REWORK",
+          "why": "user-requested change of contract is recorded as canonical rework"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "AWAITING_USER_SIGNOFF"
+        },
+        {
+          "state": "ActiveWork.Request",
+          "changed": true,
+          "why": "the request changed, so Active Work.Request must be updated"
+        },
+        {
+          "state": "WorkflowState",
+          "not": "AWAITING_USER_SIGNOFF",
+          "why": "rework routes to the owner of the earliest invalidated artifact"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "true"
+        },
+        {
+          "state": "Recovery.Top.From",
+          "equals": "AWAITING_USER_SIGNOFF"
+        },
+        {
+          "state": "Recovery.Top.ResumeAt",
+          "equals": "AWAITING_USER_SIGNOFF"
+        },
+        {
+          "state": "Recovery.Top.RerunThrough",
+          "equals": "NONE"
+        },
+        {
+          "check_ok": true
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "not": "SIGNED_OFF"
+        },
+        {
+          "state": "Handoff.Kind",
+          "not": "SIGNOFF"
+        },
+        {
+          "unchanged": [
+            ".standards/docs/**",
+            ".standards/CONTEXT.md",
+            "src/**",
+            "test/**",
+            "docs/**",
+            "README.md",
+            "package.json"
+          ],
+          "why": "no role-owned work (records, implementation, tests, docs) is done in the user-owned state"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**"
+      ],
+      "why": "Synchronizer never edits implementation"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "npm test",
+      "expect": "pass",
+      "why": "the records and CSV export tests pass, as the verification report and synchronization record state"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the AWAITING_USER_SIGNOFF state and all COMPLETE records are valid"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 50-project (pre-install): Node ESM records service (src/records.js store, src/auth.js isAdmin, src/routes.js handle with GET /records JSON pages, GET /records/<id>, admin-only POST /records) and test/records.test.js. 52-guide (pre-install): docs/admin-guide.md. After install: 60 commits CONTEXT.md, scope (AC-001..AC-004, Non-goals include 'Formats other than CSV'), design, STATE at DEVELOPING; 62 adds src/export.js toCsv, the admin-only GET /records/export route, the COMPLETE development plan, STATE TESTING; 64 adds test/export.test.js, package.json test script, COMPLETE FULL verification report, STATE REVIEWING_IMPLEMENTATION; 66 COMPLETE implementation review, STATE DOCUMENTING; 68 guide 'Exporting records' section and COMPLETE documentation record, STATE REVIEWING_FINAL; 70 COMPLETE final-deliverable review, STATE SYNCHRONIZING; 72 COMPLETE synchronization record and STATE AWAITING_USER_SIGNOFF (FORWARD from SYNCHRONIZING, recovery inactive). Records cite assessed commits and blobs with COMMIT/BLOB placeholders from earlier layers only. The prompt is the catalog utterance naming JSON as the new format. Expected behavior: USER_REWORK to SCOPING with a frame resuming at AWAITING_USER_SIGNOFF; WorkflowState equality to SCOPING is left to the judge, the checks only require a rework frame that resumes at sign-off.",
+  "case": "synchronizer-45",
+  "caseHash": "adc09097c5120d16",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T14:42:22.942Z",
+    "verdict": "pass",
+    "fixtureHash": "7dbc7aa3fbeecea0",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "46e700039788f685",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:41:23.446Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T14:04:31.273Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/60-cycle-start/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/62-implementation/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/64-verification/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/66-implementation-review/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/68-documentation/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/70-final-review/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/72-synchronization/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:41:23.446Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

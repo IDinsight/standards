@@ -1,0 +1,247 @@
+{
+  "base": "export-documenting",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-guide",
+      "action": "commit",
+      "message": "Document CSV export in usage guide"
+    },
+    {
+      "dir": "layers/52-documentation",
+      "action": "commit",
+      "message": "Record CSV export documentation"
+    },
+    {
+      "dir": "layers/55-final-review",
+      "action": "commit",
+      "message": "Record CSV export final review"
+    },
+    {
+      "dir": "layers/60-sync",
+      "action": "commit",
+      "message": "Record CSV export synchronization findings"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "documenter",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "docs/usage.md says a successful export returns 200, shows the header example filename records-20260924.csv, and says files are named records-<YYYYMMDD>.csv with a later same-day export replacing that day's file. The implementation returns 201 and names files records-<YYYYMMDDTHHMMSSZ>.csv by UTC time to the second, so only a same-second export replaces a file. This is the only documentation defect.",
+    "The completed final-deliverable review assessed docs/usage.md at its current (defective) content and marked AC-002 Supported, so correcting the guide invalidates that completed final review.",
+    "After the guide is corrected, the full Documenter gate passes: every other documentation surface and AC disposition in the documentation record remains accurate.",
+    "Correct routing: Documenter owns Frame 1 (RerunThrough NONE). After correcting and passing its gate it keeps the frame, sets RerunThrough to REVIEWING_FINAL, and transitions to REVIEWING_FINAL for a FINAL_DELIVERABLE rerun; Synchronizer resumes only after that rerun pops the frame."
+  ],
+  "history": null,
+  "vars": {},
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "state": "Recovery.Active",
+          "equals": "true"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "1"
+        },
+        {
+          "state": "Recovery.Top.From",
+          "equals": "SYNCHRONIZING"
+        },
+        {
+          "state": "Recovery.Top.Owner",
+          "equals": "DOCUMENTING"
+        },
+        {
+          "state": "Recovery.Top.ResumeAt",
+          "equals": "SYNCHRONIZING"
+        },
+        {
+          "state": "Recovery.Top.RerunThrough",
+          "equals": "REVIEWING_FINAL"
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "REVIEWING_FINAL",
+          "why": "the rerun boundary is the earliest required rerun state, so the frame owner transitions there"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "reply_matches": "/reviewer",
+          "why": "Claude Code invocation for the Reviewer"
+        },
+        {
+          "reply_matches": "(fresh|new|separate) (chat|session)",
+          "flags": "i",
+          "why": "independent Reviewer session prefix"
+        },
+        {
+          "reply_matches": "FINAL_DELIVERABLE|final[- ]deliverable",
+          "flags": "i",
+          "why": "names the review kind"
+        },
+        {
+          "reply_matches": "recovery frame|active frame|active recovery",
+          "flags": "i",
+          "why": "directs the Reviewer to the active recovery frame"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "not": "AWAITING_USER_SIGNOFF"
+        },
+        {
+          "state": "WorkflowState",
+          "not": "SYNCHRONIZING"
+        },
+        {
+          "unchanged": [
+            "${SYNC}"
+          ],
+          "why": "Documenter does not write the synchronization record or close its discrepancy"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "packages/**",
+        "package.json",
+        "pnpm-lock.yaml"
+      ],
+      "why": "Documenter does not change behavior or tests"
+    },
+    {
+      "unchanged": [
+        "${SCOPE}",
+        "${ARCH}",
+        "${DEV}",
+        "${VERIFICATION}",
+        "${REVIEW_IMPL}",
+        "${REVIEW_FINAL}"
+      ],
+      "why": "Documenter does not edit other roles' records"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "unit suite passes offline"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration",
+      "expect": "pass",
+      "why": "integration suite passes, including the 201 and file-name assertions"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the DOCUMENTING recovery state and records are valid"
+    },
+    {
+      "cmd": "grep -qF 'On success the service returns `200`' docs/usage.md && grep -qF 'records-<YYYYMMDD>.csv' docs/usage.md && grep -qF 'records-20260924.csv' docs/usage.md && grep -qF 'same day replaces' docs/usage.md",
+      "expect": "pass",
+      "why": "the guide states the wrong success status and date-only file naming"
+    },
+    {
+      "cmd": "grep -qF 'status: 201' src/routes/export.ts && grep -qF 'assert.equal(response.status, 201)' test/integration/export-flow.test.ts && grep -qF 'records-20260924T090000Z.csv' test/integration/export-flow.test.ts",
+      "expect": "pass",
+      "why": "the implementation returns 201 and names files to the second"
+    },
+    {
+      "cmd": "grep -qF 'WorkflowState`: `DOCUMENTING`' .standards/STATE.md && grep -qF '`Kind`: `FAILURE` `From`: `SYNCHRONIZING` `FailureType`: `DOCUMENTATION`' .standards/STATE.md && grep -qF '`Owner`: `DOCUMENTING`' .standards/STATE.md && grep -qF '`ResumeAt`: `SYNCHRONIZING` `RerunThrough`: `NONE`' .standards/STATE.md && test $(grep -c '^### Frame' .standards/STATE.md) -eq 1 && grep -qF '`BlockedOn`: `NONE`' .standards/STATE.md",
+      "expect": "pass",
+      "why": "one recovery frame owned by DOCUMENTING, resuming SYNCHRONIZING, RerunThrough NONE"
+    },
+    {
+      "cmd": "f=.standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md && s=.standards/docs/synchronization/export-20260924T090000Z-a7f3c1d2.md && d=.standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md && grep -qx 'ReviewKind: FINAL_DELIVERABLE' $f && grep -qF '`Status`: `COMPLETE`' $f && grep -qF '`Status`: `IN_PROGRESS`' $s && grep -q '^### D-001' $s && grep -qF '`Status`: `COMPLETE`' $d",
+      "expect": "pass",
+      "why": "completed documentation and final review, in-progress synchronization with one discrepancy"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && test ! -e exports && ! grep -rqE 'COMMIT:|BLOB:' .standards/docs",
+      "expect": "pass",
+      "why": "clean tree, no export files, placeholders resolved"
+    }
+  ],
+  "notes": "Built on export-documenting. 50-guide commits docs/usage.md with a new 'Exporting records as CSV' section (roles note, filters, response, saved file, CSV format, export errors, Errors-table note) and a README link sentence naming exports; the section wrongly says success returns 200 and files are records-<YYYYMMDD>.csv replaced by same-day exports. 52-documentation commits a COMPLETE documentation record (AUTONOMOUS, ACTIVE_CHANGE, NONE style) accounting for AC-001 and AC-002, citing BLOB/COMMIT identities; STATE to REVIEWING_FINAL FORWARD from DOCUMENTING. 55-final-review commits a COMPLETE FINAL_DELIVERABLE review with no findings that assessed docs/usage.md at its current blob and marked AC-002 Supported; STATE to SYNCHRONIZING. 60-sync commits an IN_PROGRESS synchronization record with D-001 (OPEN, Owner Documenter, FailureType DOCUMENTATION) describing the status and file-name mismatch, and STATE DOCUMENTING with Handoff FAILURE from SYNCHRONIZING and Frame 1 From SYNCHRONIZING, Owner DOCUMENTING, ResumeAt SYNCHRONIZING, RerunThrough NONE. No record says which downstream work must rerun; the Documenter must infer from the final review's assessed guide identity that it is invalidated. check.mjs passes (only the current state's COMPLETE documentation record is held during recovery, and it covers both ACs).",
+  "case": "documenter-47",
+  "caseHash": "bf5269815b10d732",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T16:37:44.882Z",
+    "verdict": "pass",
+    "fixtureHash": "6d67a62b3de3bbc6",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "e07b4af27846c56e",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:14:59.896Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T15:29:54.604Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-documenting": "cad63ec878d1dad0"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/52-documentation/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/55-final-review/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/60-sync/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:14:59.896Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

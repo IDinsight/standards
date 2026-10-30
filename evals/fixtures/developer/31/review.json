@@ -1,0 +1,61 @@
+{
+  "conditions": [
+    {
+      "condition": "Workflow is in DEVELOPING with an active cycle Developer may work in",
+      "where": ".standards/STATE.md: WorkflowState DEVELOPING, CycleMode STANDARD, Handoff FORWARD from ARCHITECTING",
+      "status": "realized"
+    },
+    {
+      "condition": "The user explicitly selected the tony user style, and it resolves to exactly one file",
+      "where": "plan header `User Style`: `tony`; Plan Notes; .standards/user-styles/developer/tony.md (selfCheck confirms the file exists)",
+      "status": "realized"
+    },
+    {
+      "condition": "An applicable technology style exists for the code Developer would change",
+      "where": "Python project (inventory/*.py) with installed .claude/skills/developer/styles/python.md",
+      "status": "realized"
+    },
+    {
+      "condition": "The conflict is purely discretionary: no repo-enforced tooling or project instructions on style",
+      "where": "no formatter or linter config; CONTEXT.md states none is configured; AGENTS.md has only the managed block; graderOnly records the fact",
+      "status": "realized"
+    },
+    {
+      "condition": "Development record exists with a valid header and the 0.8.0 fields",
+      "where": ".standards/docs/development/low-stock-report-20260924T090000Z-3c9e1f42.md (PROPOSED, User Style Locked false, AFTER_IMPLEMENTATION/NONE); check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "Git state is committed and clean",
+      "where": "git status clean on main",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "tony.md does not instantiate a concrete conflict with styles/python.md. The utterance is general, so the expected precedence answer does not depend on one. A run that inspects both files may still name a specific clash or ask which choice the user means; the judge can handle either.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The plan is PROPOSED with BlockedOn awaiting approval, so a correct run may also re-present the plan or remind the user that approval is pending. This is consistent with the skill and does not conflict with any invariant or check.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes a brownfield STANDARD cycle at DEVELOPING with an unlocked PROPOSED plan whose User Style is tony, a real tony.md, an applicable Python technology style, and no repo-enforced style tooling, and check.mjs passes. The only deterministic check (User Style stays tony) cannot fail a correct run, and the invariants fit an answer-only turn on an unapproved plan. Nothing leaks the precedence answer, and all four assertions are left to the judge, which suits this case.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T02:19:57.452Z",
+  "costUsd": 0.12403460000000001,
+  "ms": 23371,
+  "fixtureHash": "ebed89a1f22c171b"
+}

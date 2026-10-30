@@ -1,0 +1,222 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial order pricing module"
+    },
+    {
+      "dir": "layers/51-export",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add invoice CSV export"
+    },
+    {
+      "action": "branch",
+      "name": "develop"
+    },
+    {
+      "action": "branch",
+      "name": "release-a"
+    },
+    {
+      "action": "checkout",
+      "name": "develop"
+    },
+    {
+      "dir": "layers/61-discount-catalogue",
+      "action": "commit",
+      "message": "Add discount code catalogue"
+    },
+    {
+      "dir": "layers/62-apply-discount",
+      "action": "commit",
+      "message": "Apply discount codes before tax"
+    },
+    {
+      "dir": "layers/63-receipt-discount",
+      "action": "commit",
+      "message": "Show discount line on receipts"
+    },
+    {
+      "dir": "layers/64-release-notes",
+      "action": "commit",
+      "message": "Release 1.3.0"
+    },
+    {
+      "action": "branch",
+      "name": "release-b"
+    },
+    {
+      "action": "checkout",
+      "name": "develop"
+    },
+    {
+      "dir": "layers/71-cap-fixed",
+      "action": "commit",
+      "message": "Cap fixed discounts at the order subtotal"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "navigator",
+    "utterance": "Explain this feature between release-a and release-b."
+  },
+  "graderOnly": [
+    "The feature between release-a and release-b is discount codes: four commits add src/discounts.js, apply the discount before tax in totals() in src/pricing.js, add a discount line to receipts in src/receipt.js, and bump the version and changelog to 1.3.0.",
+    "All feature changes are committed between release-a and release-b; the staged and working-tree diffs are empty.",
+    "HEAD is on branch develop, one commit after release-b; the default branch (main or master) still points at the installer commit, the same commit as release-a, so a comparison against main or master mixes the later follow-up commit into the feature and the working tree and index show nothing.",
+    "release-a and release-b are branches, not tags, because the fixture builder cannot create tags; they point at the commits a tag would.",
+    "src/invoice-export.js is unchanged in the range but is an affected consumer: it calls totals() without a code, so exported invoice totals ignore discounts and differ from the receipt for discounted orders; its existing test still passes.",
+    "At release-b a fixed discount larger than the subtotal (WELCOME5 on a 2.40 order) produces a negative total; the later commit on develop, Cap fixed discounts at the order subtotal, changes src/discounts.js so the current content differs from release-b."
+  ],
+  "history": null,
+  "vars": {},
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "reply_matches": "discount",
+          "flags": "i",
+          "why": "the only feature in the range is discount codes; a reply reporting an empty assignment would not describe it"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "reply_matches": "release-a",
+          "why": "an explanation of the range names its starting revision"
+        },
+        {
+          "reply_matches": "release-b",
+          "why": "an explanation of the range names its ending revision"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "unchanged": [
+        "**"
+      ],
+      "why": "Navigator persists nothing (generated caches are ignored)"
+    },
+    {
+      "head_unchanged": true,
+      "why": "Navigator never moves HEAD"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Navigator never mutates git state"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "git rev-parse --verify --quiet refs/heads/release-a && git rev-parse --verify --quiet refs/heads/release-b",
+      "expect": "pass",
+      "why": "both release refs exist"
+    },
+    {
+      "cmd": "test $(git rev-list --count release-a..release-b) -eq 4",
+      "expect": "pass",
+      "why": "the range holds exactly the four feature commits"
+    },
+    {
+      "cmd": "test $(git rev-parse release-b) = $(git rev-parse HEAD~1)",
+      "expect": "pass",
+      "why": "HEAD is one commit past release-b"
+    },
+    {
+      "cmd": "test $(git symbolic-ref --short HEAD) = develop",
+      "expect": "pass",
+      "why": "HEAD is on develop, not a release ref"
+    },
+    {
+      "cmd": "git diff --quiet && git diff --cached --quiet && test $(git status --porcelain | wc -l) -eq 0",
+      "expect": "pass",
+      "why": "staged and working-tree diffs are empty and nothing is untracked"
+    },
+    {
+      "cmd": "git diff --name-only release-a release-b | grep -qx src/discounts.js && git diff --name-only release-a release-b | grep -qx src/pricing.js && git diff --name-only release-a release-b | grep -qx src/receipt.js",
+      "expect": "pass",
+      "why": "the feature files change in the range"
+    },
+    {
+      "cmd": "git diff --quiet release-a release-b -- src/invoice-export.js test/invoice-export.test.js",
+      "expect": "pass",
+      "why": "the invoice export consumer is unchanged in the range"
+    },
+    {
+      "cmd": "git diff --name-only release-b HEAD | grep -qx src/discounts.js",
+      "expect": "pass",
+      "why": "current discounts.js differs from release-b"
+    },
+    {
+      "cmd": "node --test test/discounts.test.js test/pricing.test.js test/receipt.test.js test/invoice-export.test.js",
+      "expect": "pass",
+      "why": "the current test suite passes"
+    },
+    {
+      "cmd": "d=$(mktemp -d) && git archive release-b src | tar -x -C $d && node --input-type=module -e 'const { totals } = await import(process.argv[1] + `/src/pricing.js`); const t = totals([{ name: `Pen`, unitPrice: 120, quantity: 2 }], { code: `WELCOME5` }); console.log(t.total); if (t.total >= 0) process.exit(1);' $d",
+      "expect": "pass",
+      "why": "at release-b a fixed discount above the subtotal gives a negative total"
+    },
+    {
+      "cmd": "node --input-type=module -e 'const { totals } = await import(process.cwd() + `/src/pricing.js`); const t = totals([{ name: `Pen`, unitPrice: 120, quantity: 2 }], { code: `WELCOME5` }); console.log(t.total); if (t.total !== 0) process.exit(1);'",
+      "expect": "pass",
+      "why": "on HEAD the fixed discount is capped and the total is zero"
+    },
+    {
+      "cmd": "node --input-type=module -e 'const { toCsv } = await import(process.cwd() + `/src/invoice-export.js`); const csv = toCsv([{ id: `A-1`, customer: `Ruiz`, taxRate: 0.08, discountCode: `WELCOME5`, items: [{ name: `Notebook`, unitPrice: 450, quantity: 2 }, { name: `Pen`, unitPrice: 120, quantity: 5 }] }]); console.log(csv); if (!csv.endsWith(`A-1,Ruiz,1500,120,1620`)) process.exit(1);'",
+      "expect": "pass",
+      "why": "the invoice export ignores the order discount code"
+    }
+  ],
+  "notes": "Standalone brownfield Node project (order pricing, integer cents). Two pre-install commits build the baseline: totals, receipts, and invoice CSV export. After the installer commit, the branch action (which switches to the new branch) creates develop and then release-a at the installer commit, and the checkout action returns to develop. Four commits on develop add discount codes: the catalogue, applying the discount before tax, the receipt line, and the 1.3.0 release notes. release-b is then created at that commit, and the checkout action returns to develop again. One later commit on develop caps fixed discounts in src/discounts.js, so the current content differs from release-b. The default branch stays at the installer commit, which is also release-a. The working tree and index are clean. src/invoice-export.js is an unchanged consumer of totals() that never passes a code. The workflow state is the installer default with no cycle, since the case leaves it unspecified. Compromise: release-a and release-b are branches, not tags, because the builder has no tag action; the utterance drops the word tags to stay truthful.",
+  "case": "navigator-21",
+  "caseHash": "207be51615d15b15",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T01:38:14.509Z",
+    "verdict": "pass",
+    "fixtureHash": "b0cc837110991b49",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "97b1987991935a48",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:19:34.970Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T01:09:47.036Z"
+  },
+  "migrations": [
+    {
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:19:34.970Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

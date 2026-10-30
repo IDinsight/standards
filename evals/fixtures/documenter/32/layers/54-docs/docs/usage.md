@@ -1,0 +1,53 @@
+# Using the records service
+
+The records service backs the internal records admin tool. The admin tool
+calls `App.handle(method, path, user, query)` from `recordsvc.api`, which
+returns `(status, headers, body)`. Every request carries the signed-in user;
+requests without one are rejected.
+
+## Roles
+
+- `admin`, `editor`, and `viewer` can all list records.
+- A request without a signed-in user gets `401`; a role that is not allowed
+  for a route gets `403`. Role checks run on the server in every handler.
+
+## Listing records
+
+`GET /records` returns JSON:
+
+```json
+{"count": 1, "records": [{"id": 4, "title": "Insurance renewal 2026", "owner": "marco", "status": "active", "created_at": "2026-04-18T16:20:00Z"}]}
+```
+
+Records are ordered by `id`. Each record has `id`, `title`, `owner`,
+`status` (`active` or `archived`), and `created_at` (ISO 8601, UTC).
+
+## Filtering
+
+Query parameters narrow the list; all given filters must match:
+
+- `status`: `active` or `archived`. Any other value returns `400` with
+  `{"error": "unknown status: <value>"}`.
+- `owner`: exact owner username, for example `marco`.
+- `q`: case-insensitive text that must appear in the title.
+
+Blank values and other parameters are ignored.
+
+Example: `GET /records?status=active&owner=marco` lists marco's active records.
+
+## Errors
+
+Errors are JSON objects of the form `{"error": "..."}`:
+
+| Status | Meaning                         |
+| ------ | ------------------------------- |
+| 400    | Invalid query parameter         |
+| 401    | No signed-in user               |
+| 403    | Role not allowed for this route |
+| 404    | Unknown path                    |
+| 405    | Known path, unsupported method  |
+
+## Python API
+
+The modules behind these routes are described in the generated
+[API reference](api/reference.md).

@@ -1,0 +1,295 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial invoicing service"
+    },
+    {
+      "dir": "layers/01-payments",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add payments and line item edits"
+    },
+    {
+      "dir": "layers/50-hotfix-records",
+      "action": "commit",
+      "message": "docs(workflow): scope and design invoice cache invalidation"
+    },
+    {
+      "dir": "layers/51-hotfix-payment",
+      "action": "commit",
+      "message": "fix(cache): drop cached invoice when a payment is recorded"
+    },
+    {
+      "dir": "layers/52-hotfix-progress",
+      "action": "commit",
+      "message": "chore(workflow): record invoice cache progress"
+    },
+    {
+      "dir": "layers/53-cancel",
+      "action": "commit",
+      "message": "chore(workflow): cancel invoice cache hotfix"
+    },
+    {
+      "dir": "layers/54-new-cycle",
+      "action": "commit",
+      "message": "chore(workflow): start overdue invoices cycle"
+    },
+    {
+      "dir": "layers/55-rework",
+      "action": "commit",
+      "message": "chore(workflow): clarify overdue invoices request"
+    },
+    {
+      "dir": "layers/60-working-tree",
+      "action": "unstaged"
+    },
+    {
+      "dir": "layers/61-new-files",
+      "action": "untracked"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "auditor",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The existing .standards/CONTEXT.md was written by the cancelled cycle's own audit and describes the cache before that cycle's changes: time-based expiry only, no explicit invalidation.",
+    "HEAD contains the commit 'fix(cache): drop cached invoice when a payment is recorded' (InvoiceCache.invalidate plus its call in recordPayment and a new test), which the cancelled cycle's development plan records as DEV-001 DONE; no file or commit records whether the user keeps or reverts it.",
+    "The unstaged edit to src/lineItems.js (calling service.cache.invalidate after a line-item edit) matches the cancelled plan's DEV-002, which was IN_PROGRESS when the cycle was cancelled.",
+    "The unstaged change of DEFAULT_TTL_MS in src/cache.js from five minutes to sixty seconds is not described in any record of the cancelled cycle (its design says time-based expiry stays unchanged), and README.md still says five minutes; its origin is unknown.",
+    "The untracked src/cacheMetrics.js and test/cacheMetrics.test.js are not mentioned in any record or commit; their origin is unknown.",
+    "The new request reports each overdue invoice's current balance, and InvoiceService.getInvoice serves balances through the invoice cache, so the status of the cache changes is material to the new cycle.",
+    "No file, commit, or record captures a user decision to adopt or revert any of the cancelled cycle's changes; the repository alone cannot settle their baseline status."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "list-overdue-invoices-for-reminders-20260924T083000Z-c4e81f29",
+    "OLD": "invoice-cache-hotfix-20260922T160000Z-5a6b7c8d"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.BaselineReconciliation",
+          "not": "NONE",
+          "why": "the obligation must survive this run"
+        },
+        {
+          "contains": {
+            "path": ".standards/STATE.md",
+            "regex": "${OLD}"
+          },
+          "why": "the cancelled source cycle stays listed"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "contains": {
+            "path": ".standards/STATE.md",
+            "regex": "${OLD}"
+          }
+        },
+        {
+          "contains": {
+            "path": ".standards/STATE.md",
+            "regex": "Change invoice-cache invalidation behavior"
+          }
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "contains": {
+            "path": ".standards/CONTEXT.md",
+            "regex": "^(?![\\s\\S]*Cycle: ?`?${ID})"
+          },
+          "why": "no residue entry labelled as current-cycle non-baseline work"
+        }
+      ]
+    },
+    {
+      "assertion": 4,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 5,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.BlockedOn",
+          "not": "NONE"
+        },
+        {
+          "state": "ActiveWork.BaselineReconciliation",
+          "not": "NONE"
+        },
+        {
+          "contains": {
+            "path": ".standards/STATE.md",
+            "regex": "${OLD}"
+          }
+        }
+      ]
+    },
+    {
+      "assertion": 6,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "AUDITING"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "USER_REWORK"
+        },
+        {
+          "absent": ".standards/docs/scope/${ID}.md"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Auditor must not change git state, including stashing or reverting the residue"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "package.json",
+        "README.md",
+        ".gitignore"
+      ],
+      "why": "Auditor does not mutate project artifacts"
+    },
+    {
+      "unchanged": [
+        ".standards/docs/**"
+      ],
+      "why": "Auditor never edits another cycle's records"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/cache.test.js test/invoices.test.js test/payments.test.js",
+      "expect": "pass",
+      "why": "the established test command passes on the working tree"
+    },
+    {
+      "cmd": "node --test test/cacheMetrics.test.js",
+      "expect": "pass",
+      "why": "the untracked metrics module and its test exist and run"
+    },
+    {
+      "cmd": "git diff --exit-code --stat -- src/cache.js",
+      "expect": "fail",
+      "expectOutput": "src/cache.js",
+      "why": "src/cache.js has an unstaged change (TTL)"
+    },
+    {
+      "cmd": "git diff --exit-code --stat -- src/lineItems.js",
+      "expect": "fail",
+      "expectOutput": "src/lineItems.js",
+      "why": "src/lineItems.js has an unstaged change (invalidation on edit)"
+    },
+    {
+      "cmd": "git ls-files --error-unmatch src/cacheMetrics.js",
+      "expect": "fail",
+      "expectOutput": "did not match",
+      "why": "src/cacheMetrics.js is untracked"
+    },
+    {
+      "cmd": "git grep -n invalidate HEAD -- src/payments.js src/cache.js",
+      "expect": "pass",
+      "why": "the payment invalidation from the cancelled cycle is committed at HEAD"
+    },
+    {
+      "cmd": "git log --oneline --grep=drop.cached.invoice",
+      "expect": "pass",
+      "why": "the cancelled cycle's implementation commit is in history"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 00/01 (pre-install): a small Node ESM invoicing core (store, read-through InvoiceCache with 5-minute TTL, InvoiceService, payments, line-item edits) with node:test tests. 50: the cancelled cycle invoice-cache-hotfix-20260922T160000Z-5a6b7c8d (STANDARD) with its CONTEXT.md, scope (AC-001..AC-003), design, approved plan, STATE in DEVELOPING. 51: committed DEV-001 implementation (InvoiceCache.invalidate, recordPayment calls it, new test). 52: plan update (DEV-001 DONE citing the commit, DEV-002 IN_PROGRESS). 53: STATE CANCELLED from DEVELOPING. 54: NEW_CYCLE STATE for list-overdue-invoices-for-reminders-20260924T083000Z-c4e81f29 in AUDITING with BaselineReconciliation listing the cancelled cycle (Request 'Change invoice-cache invalidation behavior.'); the NEW_CYCLE reason notes the user did not confirm that no changes remained. 55: USER_REWORK from AUDITING (FailureType PROJECT_CONTEXT, same-state so no frame) with the clarified, unrelated request; Reason no longer mentions the cancelled cycle. 60 (unstaged): src/cache.js TTL 5 min -> 60 s, src/lineItems.js invalidates on edit (matches DEV-002). 61 (untracked): src/cacheMetrics.js and its test, mentioned nowhere. The final check is ok: AUDITING is rank 0, so no new-cycle records are required.",
+  "case": "auditor-8",
+  "caseHash": "0342eeb70d8c1c74",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T21:07:51.159Z",
+    "verdict": "issues",
+    "fixtureHash": "8733bb3c236350e3",
+    "fixedBy": "owner decision",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "46081fcf302d417a",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:06:09.460Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T20:58:44.436Z"
+  },
+  "decision": {
+    "action": "fixed",
+    "note": "Owner-approved gate-3 recommendation (2026-10-02): over-strict check removed or narrowed; judge decides.",
+    "at": "2026-10-02T21:13:51.213Z",
+    "fixtureHash": "46081fcf302d417a"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-hotfix-records/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/53-cancel/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/54-new-cycle/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/55-rework/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:06:09.460Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

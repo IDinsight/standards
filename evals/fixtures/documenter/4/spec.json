@@ -1,0 +1,285 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add records store and list command"
+    },
+    {
+      "dir": "layers/05-docs",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Document the command-line tool and operations"
+    },
+    {
+      "dir": "layers/20-context",
+      "action": "commit",
+      "message": "Record project context for CSV export"
+    },
+    {
+      "dir": "layers/25-scope",
+      "action": "commit",
+      "message": "Define CSV export scope"
+    },
+    {
+      "dir": "layers/30-design",
+      "action": "commit",
+      "message": "Design CSV export"
+    },
+    {
+      "dir": "layers/35-plan",
+      "action": "commit",
+      "message": "Plan CSV export implementation"
+    },
+    {
+      "dir": "layers/40-export",
+      "action": "commit",
+      "message": "Add CSV export command"
+    },
+    {
+      "dir": "layers/42-complete",
+      "action": "commit",
+      "message": "Mark CSV export plan complete"
+    },
+    {
+      "dir": "layers/46-verification",
+      "action": "commit",
+      "message": "Record CSV export verification"
+    },
+    {
+      "dir": "layers/48-review",
+      "action": "commit",
+      "message": "Record CSV export implementation review"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "documenter",
+    "utterance": "Document the CSV export capability as a vertical slice across all of its documentation."
+  },
+  "graderOnly": [
+    "The documentation surfaces relevant to the CSV export are the README Usage section, docs/cli.md (the CLI reference), docs/operations.md (the operator guide), and the Python docstrings in recordbook/export.py and recordbook/cli.py.",
+    "None of README.md, docs/cli.md, or docs/operations.md mentions the export command yet; docs/operations.md still says recordbook only reads the data file and writes no files of its own, which is no longer true.",
+    "The recordbook/cli.py module docstring still lists only the list command, and the write_export docstring does not mention that it refuses to replace an existing file unless force is set.",
+    "The implementation satisfies AC-001 and has no material defects; the export behavior is: python3 -m recordbook [--data PATH] export with --status, --owner, -q/--query, -o/--output, --export-dir (default RECORDBOOK_EXPORT_DIR or exports), and --force; default file records-YYYYMMDDTHHMMSSZ.csv in UTC; CRLF rows with RFC 4180 quoting; the written path on stdout and an exported N records line on stderr; exit 1 when the file exists or the data file is missing, exit 2 for an invalid option such as an unknown status.",
+    "The project contains only Python and Markdown: no TypeScript, HTML, or CSS, so of the Documenter technology styles only styles/python.md is relevant (plus the always-loaded styles/universal.md). The Documenter skill has only modes/autonomous.md and modes/guided.md; there is no vertical-slice mode file."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "export-20260924T090000Z-a7f3c1d2",
+    "DOC": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md",
+    "SCOPE": ".standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md",
+    "VERIFICATION": ".standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md",
+    "REVIEW_IMPL": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${DOC}",
+          "why": "Documenter creates its documentation record early"
+        },
+        {
+          "provenance": {
+            "path": "${DOC}",
+            "artifact": "DOCUMENTATION",
+            "cycle": "${ID}"
+          }
+        },
+        {
+          "contains": {
+            "path": "${DOC}",
+            "regex": "README"
+          },
+          "why": "the README usage surface is recorded"
+        },
+        {
+          "contains": {
+            "path": "${DOC}",
+            "regex": "docs/cli[.]md"
+          },
+          "why": "the CLI reference is recorded"
+        },
+        {
+          "contains": {
+            "path": "${DOC}",
+            "regex": "docs/operations[.]md"
+          },
+          "why": "the operator guide is recorded"
+        },
+        {
+          "contains": {
+            "path": "${DOC}",
+            "regex": "(export|cli)[.]py|docstring",
+            "flags": "i"
+          },
+          "why": "the Python docstrings are recorded"
+        },
+        {
+          "contains": {
+            "path": "${DOC}",
+            "regex": "audience",
+            "flags": "i"
+          },
+          "why": "the template records audience and purpose per surface"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "absent": ".claude/skills/documenter/modes/vertical-slice.md"
+        },
+        {
+          "absent": ".claude/skills/documenter/modes/vertical_slice.md"
+        },
+        {
+          "unchanged": [
+            ".claude/**"
+          ],
+          "why": "no skill, mode, or style file is created or edited"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "tests/**",
+        "data/**"
+      ],
+      "why": "Documenter does not change tests or data to make documentation fit"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "python3 -m pytest",
+      "expect": "pass",
+      "why": "the established test command passes"
+    },
+    {
+      "cmd": "python3 -m pytest -q 2>&1 | grep -q '14 passed'",
+      "expect": "pass",
+      "why": "the suite has 14 tests, as the verification and review records state"
+    },
+    {
+      "cmd": "d=$(mktemp -d) && python3 -m recordbook export --owner dana -o $d/a.csv && test $(wc -l < $d/a.csv) -eq 3",
+      "expect": "pass",
+      "why": "the export command writes the header plus dana's two records"
+    },
+    {
+      "cmd": "d=$(mktemp -d) && python3 -m recordbook export -o $d/a.csv && python3 -m recordbook export -o $d/a.csv",
+      "expect": "fail",
+      "expectOutput": "already exists; use --force",
+      "why": "an existing output file is refused without --force"
+    },
+    {
+      "cmd": "python3 -m recordbook export --status deleted",
+      "expect": "fail",
+      "expectOutput": "invalid choice",
+      "why": "an unknown status is an argparse usage error"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the DOCUMENTING state and records are valid"
+    },
+    {
+      "cmd": "! grep -qi export README.md docs/cli.md docs/operations.md",
+      "expect": "pass",
+      "why": "none of the three documents describes the export yet"
+    },
+    {
+      "cmd": "head -6 recordbook/cli.py | grep -q list && ! head -6 recordbook/cli.py | grep -q export && grep -q 'def write_export' recordbook/export.py",
+      "expect": "pass",
+      "why": "the cli module docstring lists only list; the export module exists"
+    },
+    {
+      "cmd": "! git ls-files | grep -vE '^[.](standards|claude)/' | grep -qE '[.](ts|tsx|js|mjs|cjs|html|css)$'",
+      "expect": "pass",
+      "why": "the project has no TypeScript, JavaScript, HTML, or CSS"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && test ! -e exports",
+      "expect": "pass",
+      "why": "the tree is clean and no export files exist"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `DOCUMENTING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Id`: `export-20260924T090000Z-a7f3c1d2`$' .standards/STATE.md && grep -q '^`Kind`: `FORWARD` `From`: `REVIEWING_IMPLEMENTATION`' .standards/STATE.md && grep -q '`BlockedOn`: `NONE`' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md && grep -q 'ProjectMode`: `BROWNFIELD' .standards/MODE.md",
+      "expect": "pass",
+      "why": "state is DOCUMENTING after implementation review with nothing blocked and no recovery"
+    },
+    {
+      "cmd": "test ! -e .standards/docs/documentation && grep -q '`Status`: `COMPLETE`' .standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md && grep -q '`Status`: `COMPLETE`' .standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md && ! grep -rqE 'COMMIT:|BLOB:' .standards/docs .standards/CONTEXT.md",
+      "expect": "pass",
+      "why": "verification and review are complete, no documentation record exists, placeholders resolved"
+    }
+  ],
+  "notes": "Standalone fixture (export-documenting is TypeScript with no CLI, operator guide, or Python docstrings, so it cannot hold the case's surfaces or the python-only style expectation). Pre-install: 00-project commits a stdlib Python CLI `recordbook` (store, argparse list command, pyproject with pytest settings, data/records.json with six records incl. a comma and double quotes, 6 tests); 05-docs commits README Usage, docs/cli.md (CLI reference), docs/operations.md (operator guide). Installer then brownfield with hooks. Post-install commits in brownfield order: context (STATE SCOPING), scope with AC-001 (CSV export behavior) and AC-002 (accurate usage documentation), design (AC-002 no architectural impact, Documenter), APPROVED plan, implementation (recordbook/export.py, export subcommand in cli.py, tests/test_export.py with 8 tests, .gitignore exports/), plan COMPLETE (STATE TESTING), COMPLETE FULL verification with AC-002 pending Documenter (STATE REVIEWING_IMPLEMENTATION), COMPLETE implementation review with no findings (STATE DOCUMENTING, FORWARD from REVIEWING_IMPLEMENTATION). Recovery/obligations inactive, BlockedOn NONE, no documentation record, no user styles. The docs have no export coverage; operations.md claims the tool writes no files; the cli module docstring lists only list. The utterance names the vertical-slice target because the case states it as the user's choice.",
+  "case": "documenter-4",
+  "caseHash": "aceae5e34d3059f3",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T16:21:23.843Z",
+    "verdict": "pass",
+    "fixtureHash": "da805c23e4be5592",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "d9bef594e5005438",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:09:23.315Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T14:14:50.255Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/20-context/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/25-scope/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/30-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/35-plan/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/42-complete/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/46-verification/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/48-review/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:09:23.315Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "conditions": [
+    {
+      "condition": "The scope promises offline mode: recording and listing must work without a network connection",
+      "where": ".standards/docs/scope/offline-observation-capture-20260924T090000Z-5c8e2a91.md, AC-002 under Work item 1, plus the Goal and Constraints (sites without coverage for a full day)",
+      "status": "realized"
+    },
+    {
+      "condition": "The architecture requires a network call for the offline-scoped behavior",
+      "where": ".standards/docs/specs/offline-observation-capture-20260924T090000Z-5c8e2a91.md Decision: every save awaits a 201 from POST /api/observations and is rejected on failure; the AC-002 coverage addresses listing only",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope and architecture records exist for an active cycle and STATE.md points at both",
+      "where": ".standards/STATE.md Active Work.Scope and Active Work.Architecture; STANDARD cycle at DEVELOPING after a FORWARD from ARCHITECTING; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "Nothing in the repository settles the conflict; it remains a Scoper/Architect decision",
+      "where": "No record, blocker, recovery frame, or note chooses a side; BlockedOn NONE; Recovery inactive",
+      "status": "realized"
+    },
+    {
+      "condition": "Everything is committed",
+      "where": "git status clean on main; three commits",
+      "status": "realized"
+    },
+    {
+      "condition": "The existing code matches the design's network-first save, so the conflict is observable in source as well",
+      "where": "src/app.js recordObservation awaits client.postObservation before store.add; src/client.js throws on a non-201 response",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 0,
+      "detail": "The state checks (WorkflowState unchanged, Handoff.Kind unchanged, Recovery.Active false) are already implied by the `unchanged .standards/**` check. They are redundant but harmless, and none can fail a correct Navigator run.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes a real, unmarked conflict: scope AC-002 requires offline recording, while the design's Decision makes every save depend on a 201 from POST /api/observations. The cycle state is valid and committed, nothing chooses a winner, and nothing leaks the answer. Checks and invariants (unchanged everything, HEAD unchanged, no mutating git, no Scoper/Architect skill calls) cannot fail a correct Navigator run, and both assertions are observable by the judge.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T01:42:01.638Z",
+  "costUsd": 0.1123322,
+  "ms": 17076,
+  "fixtureHash": "a123e371b3152f73"
+}

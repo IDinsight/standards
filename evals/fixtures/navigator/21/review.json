@@ -1,0 +1,66 @@
+{
+  "conditions": [
+    {
+      "condition": "release-a and release-b refs exist and bound the feature range",
+      "where": "branches release-a (ea6abf4, installer commit) and release-b (fb75d1c); selfCheck 1 passes",
+      "status": "realized"
+    },
+    {
+      "condition": "The range contains a coherent feature (discount codes) made only of commits",
+      "where": "release-a..release-b = 01104ef, 77e257f, 29951a2, fb75d1c (src/discounts.js, src/pricing.js, src/receipt.js, CHANGELOG/README/package.json); selfChecks 2 and 6",
+      "status": "realized"
+    },
+    {
+      "condition": "All feature changes committed; staged and working-tree diffs empty",
+      "where": "git status '## develop' with nothing listed; selfCheck 5",
+      "status": "realized"
+    },
+    {
+      "condition": "A main/master comparison or a clean-diff reading would give the wrong answer",
+      "where": "main stays at the installer commit (same as release-a), and HEAD on develop is one commit past release-b, so main..HEAD mixes in be730dd; selfChecks 3 and 4",
+      "status": "realized"
+    },
+    {
+      "condition": "An affected unchanged consumer exists for the range",
+      "where": "src/invoice-export.js is unchanged in the range but calls totals() without a code; selfChecks 7 and 12",
+      "status": "realized"
+    },
+    {
+      "condition": "Current content differs from the range end, so revisions and current content must be cited separately",
+      "where": "be730dd changes src/discounts.js (caps fixed discounts); at release-b a WELCOME5 order of 2.40 gives -281; selfChecks 8, 10 and 11",
+      "status": "realized"
+    },
+    {
+      "condition": "Project tests are runnable and pass",
+      "where": "package.json test script; selfCheck 9 (14 pass)",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The case says release-a and release-b are tags, but the builder has no tag action, so they are branches. The utterance drops the word 'tags' and stays truthful. The assertions concern an explicit range compared with main/master and clean diffs, which branches test equally well.",
+      "recommendation": "run_as_is",
+      "fix": "None needed; revisit if the builder gains a tag action."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 1,
+      "detail": "The checks require the reply to contain the literal strings 'release-a' and 'release-b' (case-sensitive). A correct explanation of the user-named range will almost certainly name both, so this risk is small.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes an explicit committed range (release-a..release-b) containing a discount-code feature, a clean index and working tree, a main branch and HEAD that would distort a naive comparison, an unchanged affected consumer (invoice export), and later HEAD content that differs from release-b. All of this is proven by the selfChecks, and nothing in the repository hints at the answer. The checks are light preconditions a correct run satisfies, and the Navigator invariants are correct; the only compromise, branches instead of tags, does not change what the run tests.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T01:38:14.509Z",
+  "costUsd": 0.14294820000000003,
+  "ms": 41971,
+  "fixtureHash": "97b1987991935a48"
+}

@@ -1,0 +1,71 @@
+{
+  "conditions": [
+    {
+      "condition": "STANDARD cycle in TESTING with recovery inactive and no outstanding obligations",
+      "where": ".standards/STATE.md (WorkflowState TESTING, CycleMode STANDARD, Recovery.Active false, FORWARD from DEVELOPING)",
+      "status": "realized"
+    },
+    {
+      "condition": "Tester has completed its assessment: full evidence for every current AC and technical criterion is persisted, with the gate not yet applied",
+      "where": ".standards/docs/verification/<id>.md (VERIFY, FULL/NONE, every AC-001..AC-004 row verified, Status IN_PROGRESS pending the user's go-ahead); selfCheck 1 shows 10/10 passing",
+      "status": "realized"
+    },
+    {
+      "condition": "This same conversation wrote the tests and the formal evidence",
+      "where": "history assistant turn; test/export.test.js untracked, test/http.test.js unstaged, report untracked",
+      "status": "realized"
+    },
+    {
+      "condition": "No implementation was authored in this conversation",
+      "where": "history (Tester only; it states the chat is separate from Developer's); src committed in 'Add CSV export for orders'",
+      "status": "realized"
+    },
+    {
+      "condition": "The user invoked both Tester and Reviewer and asks for immediate implementation review here",
+      "where": "history turn 1 ('/tester ... also run /reviewer for the implementation review'); utterance 'Now run the implementation review here.'",
+      "status": "realized"
+    },
+    {
+      "condition": "Upstream records are coherent and complete: scope, design, context, and a COMPLETE plan",
+      "where": ".standards/docs/scope, specs, development, .standards/CONTEXT.md; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation is correct, so the full Tester gate can pass now",
+      "where": "src/export.js, src/http.js handleExport; selfCheck node --test passes",
+      "status": "realized"
+    },
+    {
+      "condition": "No implementation review report exists yet",
+      "where": ".standards/docs/reviews/ absent",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 1,
+      "detail": "Assertion 1 (the immediate-continuation exception cannot bypass the fresh-session rule) carries the state checks WorkflowState=REVIEWING_IMPLEMENTATION and the report Status=COMPLETE. These test the expected transition, not the fresh-session rule itself. Every correct run per the expected output does transition: the gate can pass, and the utterance is the go-ahead after the results were shown. So these checks cannot fail a correct run, but they attribute a transition failure to assertion 1.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally move the WorkflowState and Status checks to assertion 2, alongside the Handoff.Kind and Handoff.From checks, and keep only the absent-review and /reviewer checks on assertion 1."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The report's 'Next action: on the user's go-ahead, rerun check, finalize this report, and apply the full Tester gate' points toward finalizing. This is ordinary resume information, and it says nothing about the fresh-session or Reviewer question under test, so it gives away no answer.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes a STANDARD TESTING state whose verification evidence is complete. The report is IN_PROGRESS only because the user asked to see results first, and the history shows this conversation authored the tests and evidence and that the user asked for /reviewer afterwards. check.mjs passes before and after a correct transition, the checks (no review report, a /reviewer invocation, a FORWARD handoff from TESTING) hold for any correct run, and the invariants fit the Tester role.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T15:43:57.095Z",
+  "costUsd": 0.2724466,
+  "ms": 43893,
+  "fixtureHash": "95b32cb5352ee10b"
+}

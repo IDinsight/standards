@@ -1,0 +1,116 @@
+{
+  "conditions": [
+    {
+      "condition": "Cycle export-20260924T090000Z-a7f3c1d2 active, BROWNFIELD, STANDARD, WorkflowState SYNCHRONIZING",
+      "where": ".standards/STATE.md, .standards/MODE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Handoff FORWARD from REVIEWING_FINAL; recovery and obligations inactive; nothing blocked",
+      "where": ".standards/STATE.md Handoff, Recovery, Outstanding Obligations, BlockedOn NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope defines AC-001 (RFC 4180 quoted filtered export), AC-002 (non-admin/anonymous rejected server-side before any write), AC-003 (accurate guide in docs/usage.md)",
+      "where": ".standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Architecture COMPLETE-equivalent with coverage of all three ACs (AC-003 no architectural impact)",
+      "where": ".standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Auditor CONTEXT.md exists and is consistent (pre-cycle baseline)",
+      "where": ".standards/CONTEXT.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Development plan COMPLETE, AFTER_IMPLEMENTATION, Current Increment NONE, all steps DONE",
+      "where": ".standards/docs/development/export-20260924T090000Z-a7f3c1d2.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Verification COMPLETE, Assessment Purpose FULL, Target NONE, accounting for all ACs",
+      "where": ".standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation review COMPLETE, IMPLEMENTATION kind, no findings",
+      "where": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Documentation record COMPLETE in Documenter template, covering AC-003 and the guide update",
+      "where": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Final-deliverable review COMPLETE, FINAL_DELIVERABLE kind, no open findings",
+      "where": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Code, tests, and guide agree; implementation satisfies AC-001/AC-002",
+      "where": "src/export.ts, src/routes/export.ts, test/integration/export-flow.test.ts, docs/usage.md; selfChecks 1-5",
+      "status": "realized"
+    },
+    {
+      "condition": "No synchronization record",
+      "where": ".standards/docs/synchronization absent (selfCheck)",
+      "status": "realized"
+    },
+    {
+      "condition": "git diff empty, tree clean",
+      "where": "git status clean",
+      "status": "realized"
+    },
+    {
+      "condition": "History in brownfield order: context, scope, design, plan, implementation, verification, impl review, documentation, final review",
+      "where": "git log (extra Tester test commit and Documenter guide commit in plausible positions)",
+      "status": "realized"
+    },
+    {
+      "condition": "Records cite revisions/content via resolved COMMIT/BLOB identities matching HEAD",
+      "where": "record Assessed Inputs sections; selfCheck 12",
+      "status": "realized"
+    },
+    {
+      "condition": "0.8.0 fields present with defaults",
+      "where": "STATE PendingVerificationCadence NONE; plan cadence fields; verification Assessment Purpose/Target",
+      "status": "realized"
+    },
+    {
+      "condition": "check.mjs reports ok",
+      "where": "gate checkMjs ok:true",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "Both review records describe the baseline-to-assessed diff as project files listed 'the rest are cycle records under `.standards/`', but the range from 52b1b38 also contains the installer commit (AGENTS.md, CLAUDE.md, .claude/settings.json, .claude/skills/**). A meticulous Synchronizer could record this as a minor inaccuracy; it is not material to any gate.",
+      "recommendation": "fix_file",
+      "fix": "In layers/36-review/.standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md and layers/42-final-review/.standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md, replace 'the rest are cycle records under `.standards/`' with 'the rest are the STANDARDS installation (`.standards/`, `.claude/`, `AGENTS.md`, `CLAUDE.md`) and cycle records under `.standards/`'."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "CONTEXT.md still describes the pre-cycle baseline (no export, requireAdmin unused, createApp({ records? })). Per protocol, planned active-cycle implementation does not make context stale, so this is consistent, but cases relying on 'no discrepancies' should expect a Synchronizer may mention it as a limitation.",
+      "recommendation": "run_as_is",
+      "fix": "No change; cases built on this base should not treat a non-material mention of pre-cycle context as wrong."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The base realizes every described condition: SYNCHRONIZING with FORWARD from REVIEWING_FINAL, three ACs, all upstream records COMPLETE and mutually consistent with resolved commit/blob identities, guide accurate against the code (verified by selfChecks), no synchronization record, clean tree, and check.mjs passing. Only minor realism notes remain about the reviews' diff-range wording and the intentionally pre-cycle CONTEXT.md.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-01T17:39:47.710Z",
+  "costUsd": 0.6708558,
+  "ms": 50747,
+  "fixtureHash": "092803d603608e22"
+}
