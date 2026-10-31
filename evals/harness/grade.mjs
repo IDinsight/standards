@@ -287,7 +287,7 @@ export async function grade(runDir, specDir, { judge = 'off' } = {}) {
     const dir = path.join(runDir, 'judge-requests');
     mkdirSync(dir, { recursive: true });
     const { buildJudgeRequest, evidenceParts } = await import('./judge.mjs');
-    const parts = evidenceParts({ kase, spec, c });
+    const parts = evidenceParts({ kase, spec, c, readStart: readBefore(runDir, c) });
     // The evidence parts, once per run, for the judge checks (known wrong answers).
     writeFileSync(path.join(runDir, 'judge-evidence.json'), JSON.stringify(parts, null, 2));
     for (const a of assertions.filter((x) => x.verdict === 'NEEDS_JUDGE')) {

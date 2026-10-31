@@ -421,6 +421,14 @@ check('unparseable judge verdict -> ERROR -> case INCOMPLETE; NA excluded from t
     c: { before: { stateText: 's' }, after: { stateText: 's' }, diff: { added: [], changed: [], removed: [] }, read: () => null, trace: { texts: [], hooks: [], events: [], reply: 'r' } } });
   const { evidenceText } = await import('./judge.mjs');
   check('judge evidence: a history case shows the seeded prior turns', /<prior_conversation[^>]*>\n\[user\]\nGrill me\.\n\n\[assistant\]\nThe queue is FIFO\./.test(evidenceText(ev)));
+  // CLAUDE.md and the files it imports with @ reach the judge as loaded at
+  // start (nested imports resolve from the importing file; ones in code do not).
+  const start = { 'CLAUDE.md': '<!-- standards:start -->\n@AGENTS.md\nSee `@ignored.md`.\n', 'AGENTS.md': 'Use integer cents.\n@docs/rules.md\n', 'docs/rules.md': 'No dependencies.\n@style.md\n', 'docs/style.md': 'ISO dates.\n', 'ignored.md': 'never loaded' };
+  const evStart = evidenceText(evidenceParts({ kase: findCase('navigator-51'), spec: { graderOnly: [], prompt: { skill: 'navigator', utterance: 'u' } },
+    c: { before: { stateText: 's' }, after: { stateText: 's' }, diff: { added: [], changed: [], removed: [] }, read: () => null, trace: { texts: [], hooks: [], events: [], reply: 'r' } }, readStart: (p) => start[p] ?? null }));
+  check('judge evidence: CLAUDE.md and its @ imports are shown as loaded at start; an import inside code is not',
+    /<loaded_at_start[^>]*>\n--- CLAUDE\.md\n[\s\S]*--- AGENTS\.md\nUse integer cents\.[\s\S]*--- docs\/rules\.md\nNo dependencies\.[\s\S]*--- docs\/style\.md\nISO dates\./.test(evStart) && !evStart.includes('never loaded'));
+  check('judge evidence: without startup files there is no loaded_at_start block', !evidenceText(ev).includes('<loaded_at_start'));
   // summarize handles a run with a seeded history case (it used to crash).
   const sd = path.join(TMP, 'sum-seed');
   cpSync(path.join(os.tmpdir(), 'standards-eval-sim', 'navigator-3-good/run'), path.join(sd, 'cases/navigator-51/r1'), { recursive: true });

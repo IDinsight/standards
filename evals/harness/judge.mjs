@@ -46,6 +46,30 @@ function changedFiles(c) {
   return parts.join('\n\n') || '(no files changed)';
 }
 
+// Files Claude Code puts into the agent's context before its first turn: the
+// project's memory files and every file they import with @path (relative to
+// the importing file, up to five hops, not inside code). The agent saw them
+// without a tool call. `readStart` reads a project file as it was before the
+// run; a missing file or a directory is skipped.
+const MEMORY_FILES = ['CLAUDE.md', '.claude/CLAUDE.md', 'CLAUDE.local.md'];
+export function startupFiles(readStart) {
+  const loaded = new Map();
+  const load = (rel, hops) => {
+    if (loaded.has(rel) || hops > 5) return;
+    let text;
+    try { text = readStart(rel); } catch { return; }
+    if (typeof text !== 'string') return;
+    loaded.set(rel, text);
+    const prose = text.replace(/^(```|~~~)[^\n]*\n[\s\S]*?^\1[^\n]*$/gm, '').replace(/`[^`\n]*`/g, '');
+    for (const m of prose.matchAll(/(?:^|\s)@(\S+)/g)) {
+      const target = path.posix.normalize(path.posix.join(path.posix.dirname(rel), m[1].replace(/[.,;:)]+$/, '')));
+      if (target !== '..' && !target.startsWith('../') && !path.posix.isAbsolute(target)) load(target, hops + 1);
+    }
+  };
+  for (const f of MEMORY_FILES) load(f, 0);
+  return [...loaded].map(([f, text]) => `--- ${f}\n${clip(text)}`).join('\n\n');
+}
+
 // Tool outputs and hook events longer than OUTPUT_LIMIT characters (long test
 // logs, large file reads, long hook messages) keep their start and end with an
 // explicit marker saying how much was cut. Agent text and tool inputs are never cut.
@@ -74,7 +98,7 @@ function timeline(c) {
 // The evidence of one run, as named parts. Stored once per run
 // (judge-evidence.json) so the judge checks can rebuild a request with some
 // parts replaced (known wrong answers) without re-grading the run.
-export function evidenceParts({ kase, spec, c }) {
+export function evidenceParts({ kase, spec, c, readStart }) {
   return {
     scenario: kase.prompt,
     authorSummary: kase.expected,
@@ -82,6 +106,7 @@ export function evidenceParts({ kase, spec, c }) {
     // History cases: the earlier turns the run resumed, as the role saw them.
     priorTurns: (spec.history?.turns ?? []).map((t) => `[${t.role}]\n${t.text}`).join('\n\n'),
     userMessage: `/${spec.prompt.skill} ${spec.prompt.utterance}`,
+    startupFiles: readStart ? startupFiles(readStart) : '',
     stateBefore: c.before.stateText ?? JSON.stringify(c.before.state, null, 2),
     stateAfter: c.after.stateText ?? JSON.stringify(c.after.state, null, 2),
     changedFiles: changedFiles(c),
@@ -97,6 +122,7 @@ export function evidenceText(p) {
     '<ground_truth note="facts about the fixture the agent was not told">', p.groundTruth, '</ground_truth>',
     ...(p.priorTurns ? ['<prior_conversation note="earlier turns of the same conversation, seeded into the session the agent resumed">', p.priorTurns, '</prior_conversation>'] : []),
     '<user_message_sent_to_agent>', p.userMessage, '</user_message_sent_to_agent>',
+    ...(p.startupFiles ? ['<loaded_at_start note="files Claude Code put into the agent\'s context before its first turn (the project\'s CLAUDE.md and the files it imports with @), as they were before the run; the agent saw them without a tool call">', p.startupFiles, '</loaded_at_start>'] : []),
     '<state_before>', p.stateBefore, '</state_before>',
     '<state_after>', p.stateAfter, '</state_after>',
     '<changed_files>', p.changedFiles, '</changed_files>',
@@ -128,7 +154,7 @@ export function buildJudgeRequest(parts, assertionText, checks = []) {
   };
 }
 
-export const judgeRequest = ({ kase, spec, c, assertion }) => buildJudgeRequest(evidenceParts({ kase, spec, c }), assertion.text, assertion.checks);
+export const judgeRequest = ({ kase, spec, c, assertion, readStart }) => buildJudgeRequest(evidenceParts({ kase, spec, c, readStart }), assertion.text, assertion.checks);
 
 // The second judge (judge-checks.mjs): the same evidence and assertion,
 // graded by a different model (EVAL_SECOND_JUDGE_MODEL; "none" skips it).
