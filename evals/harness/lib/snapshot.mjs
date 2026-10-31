@@ -32,7 +32,9 @@ export function unsafeGitConfig(repo) {
 // Generated caches a correct run may create just by running code or tests.
 // They are listed separately and never count as a change to the project.
 // node_modules is listed with them: installed dependencies are not project
-// content, and pnpm workspaces link them in cycles.
+// content, and pnpm workspaces link them in cycles. So is a Python virtual
+// environment under any name (a directory holding pyvenv.cfg): thousands of
+// installed files, with links to directories such as lib64 -> lib.
 export const CACHE_DIRS = new Set(['__pycache__', '.pytest_cache', '.mypy_cache', '.ruff_cache', '.cache', '.eslintcache', 'node_modules']);
 
 // Recursive file list relative to root, skipping .git and caches.
@@ -40,12 +42,13 @@ function walk(root, rel = '', caches = []) {
   const out = [];
   for (const name of readdirSync(path.join(root, rel))) {
     if (name === '.git') continue;
-    if (CACHE_DIRS.has(name)) { caches.push(rel ? `${rel}/${name}` : name); continue; }
     const relPath = rel ? `${rel}/${name}` : name;
+    if (CACHE_DIRS.has(name)) { caches.push(relPath); continue; }
     // lstat: never follow symlinks (a link is recorded as itself, by target).
     const st = lstatSync(path.join(root, relPath), { throwIfNoEntry: false });
     if (!st) continue;
-    if (st.isDirectory()) out.push(...walk(root, relPath, caches));
+    if (st.isDirectory() && existsSync(path.join(root, relPath, 'pyvenv.cfg'))) caches.push(relPath);
+    else if (st.isDirectory()) out.push(...walk(root, relPath, caches));
     else out.push(relPath);
   }
   return out.sort();

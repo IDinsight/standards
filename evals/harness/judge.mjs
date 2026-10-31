@@ -38,10 +38,13 @@ export const VERDICT_SCHEMA = {
 };
 
 // Text of changed files after the run (framework files never change, so this
-// stays small). Nothing is truncated: a large diff is reported, not cut.
+// stays small). Nothing is truncated: a large diff is reported, not cut. A
+// path that cannot be read as text (a link to a directory, a file without
+// read permission) is shown as unreadable instead of failing the grade.
 function changedFiles(c) {
+  const text = (f) => { try { return c.read(f); } catch { return null; } };
   const parts = [];
-  for (const f of [...c.diff.added, ...c.diff.changed]) parts.push(`--- ${f} (${c.diff.added.includes(f) ? 'added' : 'changed'})\n${c.read(f) ?? '(binary or unreadable)'}`);
+  for (const f of [...c.diff.added, ...c.diff.changed]) parts.push(`--- ${f} (${c.diff.added.includes(f) ? 'added' : 'changed'})\n${text(f) ?? '(binary or unreadable)'}`);
   for (const f of c.diff.removed) parts.push(`--- ${f} (deleted)`);
   return parts.join('\n\n') || '(no files changed)';
 }

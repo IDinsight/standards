@@ -177,6 +177,18 @@ const after = await snapshot(fresh);
 chmodSync(path.join(fresh, 'locked.txt'), 0o644);
 check('snapshots read and check with the pinned framework\'s pristine runtime, never the project\'s edited copy; an unreadable file is recorded',
   before.checkTurnEnd.ok && !existsSync(marker) && after.check.problems.length === before.check.problems.length && after.state.WorkflowState === before.state.WorkflowState && 'locked.txt' in after.files);
+{
+  // A Python virtual environment, under any name, is a cache like
+  // node_modules; a directory without pyvenv.cfg is still project content.
+  const { manifest } = await import('./lib/snapshot.mjs');
+  const vr = path.join(TMP, 'venv-project');
+  for (const d of ['.venv/lib/python3.11/site-packages', 'env/lib', 'venv/lib']) mkdirSync(path.join(vr, d), { recursive: true });
+  for (const f of ['.venv/pyvenv.cfg', '.venv/lib/python3.11/site-packages/x.py', 'env/pyvenv.cfg', 'env/lib/y.py', 'venv/lib/z.py', 'app.py']) writeFileSync(path.join(vr, f), 'x\n');
+  const vc = [];
+  const vf = Object.keys(manifest(vr, vc));
+  check('snapshot: a Python virtual environment (a directory holding pyvenv.cfg), under any name, is a cache; a plain directory is not',
+    JSON.stringify(vf) === '["app.py","venv/lib/z.py"]' && JSON.stringify(vc.sort()) === '[".venv","env"]', `${JSON.stringify(vf)} ${JSON.stringify(vc)}`);
+}
 
 
 // 9. Judge merge and summary on simulated runs: unparseable verdict -> ERROR -> INCOMPLETE; NA excluded.
@@ -634,6 +646,27 @@ check('unparseable judge verdict -> ERROR -> case INCOMPLETE; NA excluded from t
   for (const d of ['developer/1', 'developer/1.staging']) writeFileSync(path.join(fxr, d, 'spec.json'), '{}');
   const ft = spawnSync('node', ['--input-type=module', '-e', `const { allTargets } = await import(${JSON.stringify(path.join(HERE, 'flags.mjs'))}); console.log(JSON.stringify(allTargets()));`], { encoding: 'utf8', env: { ...process.env, EVAL_FIXTURES_DIR: fxr } });
   check('flags.mjs lists only case dirs, never a leftover <id>.staging', ft.stdout.trim() === '["developer-1"]', `${ft.stdout}${ft.stderr.slice(-200)}`);
+}
+{
+  // A changed path that cannot be read as text (a virtual environment's
+  // lib64 -> lib link, a file without read permission) shows as unreadable in
+  // the judge evidence instead of failing the whole grade.
+  const { grade } = await import('./grade.mjs');
+  const { symlinkSync } = await import('node:fs');
+  const gl = path.join(TMP, 'grade-dir-link');
+  rmSync(gl, { recursive: true, force: true });
+  cpSync(path.join(os.tmpdir(), 'standards-eval-sim', 'developer-1-good', 'run'), gl, { recursive: true });
+  mkdirSync(path.join(gl, 'after/build/lib'), { recursive: true });
+  symlinkSync('lib', path.join(gl, 'after/build/lib64'));
+  writeFileSync(path.join(gl, 'after/locked.txt'), 'x');
+  chmodSync(path.join(gl, 'after/locked.txt'), 0o000);
+  editSpecFile(gl, 'after.json', (x) => { const j = JSON.parse(x); j.files['build/lib64'] = 'link'; j.files['locked.txt'] = 'locked'; return JSON.stringify(j); });
+  let gerr = '';
+  try { await grade(gl, fixture('developer', 1), { judge: 'dry' }); } catch (e) { gerr = e.message; }
+  chmodSync(path.join(gl, 'after/locked.txt'), 0o644);
+  const gev = existsSync(path.join(gl, 'judge-evidence.json')) ? JSON.parse(readFileSync(path.join(gl, 'judge-evidence.json'), 'utf8')).changedFiles : '';
+  check('grading: a changed link to a directory or an unreadable file does not fail the grade; the judge evidence shows each as unreadable',
+    !gerr && gev.includes('--- build/lib64 (added)\n(binary or unreadable)') && gev.includes('--- locked.txt (added)\n(binary or unreadable)'), gerr);
 }
 {
   // Records cite real revisions: ${COMMIT:<subject>} and ${BLOB:<path>} become the built repo's hashes; an unknown subject fails gate 1.
