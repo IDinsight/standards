@@ -1,0 +1,236 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add hours timesheet totals command"
+    },
+    {
+      "dir": "layers/51-docs",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add timesheet guide and docs check"
+    },
+    {
+      "dir": "layers/60-audit",
+      "action": "commit",
+      "message": "Record project context for guide review"
+    },
+    {
+      "dir": "layers/61-scope",
+      "action": "commit",
+      "message": "Scope timesheet guide review"
+    },
+    {
+      "dir": "layers/62-design",
+      "action": "commit",
+      "message": "Record existing CLI contract for guide review"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "documenter",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "docs/guide.md already satisfies AC-001: every statement about invocation, input columns, table and --json output, empty input, argument handling, error messages, and exit statuses matches bin/hours.js and src/summarize.js.",
+    "docs/guide.md already satisfies AC-002: its 'Who this guide is for' section names the audience (team leads and payroll staff running the command), lists what it does not cover, and points contributors to CONTRIBUTING.md.",
+    "README.md and CONTRIBUTING.md are accurate and their links resolve.",
+    "The established documentation check, npm run docs:check (node scripts/check-docs.js), passes on the current docs: it checks 4 relative links and runs the guide's 2 console examples; npm test also passes.",
+    "No legitimate documentation edit is needed; any change to docs/, README.md, or CONTRIBUTING.md would be cosmetic."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "guide-20261004T120000Z-1a2b3c4d",
+    "DOC": ".standards/docs/documentation/guide-20261004T120000Z-1a2b3c4d.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "unchanged": [
+            "docs/**",
+            "README.md",
+            "CONTRIBUTING.md",
+            "src/**",
+            "bin/**",
+            "scripts/**",
+            "examples/**",
+            "test/**",
+            "package.json",
+            ".gitignore"
+          ],
+          "why": "the guides are already accurate, so no project file outside .standards/ should change"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "provenance": {
+            "path": "${DOC}",
+            "artifact": "DOCUMENTATION",
+            "cycle": "${ID}"
+          }
+        },
+        {
+          "field": {
+            "path": "${DOC}",
+            "name": "Status",
+            "equals": "COMPLETE"
+          }
+        },
+        {
+          "contains": {
+            "path": "${DOC}",
+            "regex": "AC-001"
+          }
+        },
+        {
+          "contains": {
+            "path": "${DOC}",
+            "regex": "AC-002"
+          }
+        },
+        {
+          "contains": {
+            "path": "${DOC}",
+            "regex": "docs:check|check-docs"
+          },
+          "why": "the established documentation check must be recorded as run"
+        },
+        {
+          "check_ok": true
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "REVIEWING_FINAL"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FORWARD"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "DOCUMENTING"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "NONE"
+        },
+        {
+          "state": "CycleMode",
+          "equals": "DOCUMENTATION"
+        },
+        {
+          "state": "ActiveWork.CompletionPolicy",
+          "equals": "NONE"
+        },
+        {
+          "reply_matches": "fresh.chat.separate.from.the.conversations.that.produced.the.artifacts.under.review",
+          "flags": "is",
+          "why": "Independent Reviewer Session prefix, quoted verbatim from the protocol"
+        },
+        {
+          "reply_matches": "/reviewer",
+          "why": "Claude Code invocation of the Reviewer skill"
+        },
+        {
+          "reply_matches": "FINAL_DELIVERABLE|final[- ]deliverable",
+          "flags": "i",
+          "why": "the handoff names the review kind"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "bin/**",
+        "scripts/**",
+        "test/**",
+        "examples/**",
+        "package.json"
+      ],
+      "why": "a documentation cycle never changes behavior, tests, fixtures, or tooling"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "npm run docs:check",
+      "expect": "pass",
+      "why": "the established documentation check passes on the current guides (links and console examples)"
+    },
+    {
+      "cmd": "npm test",
+      "expect": "pass",
+      "why": "the established unit tests pass"
+    },
+    {
+      "cmd": "node bin/hours.js 2>/dev/null; test $? -eq 2",
+      "expect": "pass",
+      "why": "the guide states that running without a file exits with status 2"
+    },
+    {
+      "cmd": "node bin/hours.js",
+      "expect": "fail",
+      "expectOutput": "Usage: hours \\[--json\\] <timesheet.csv>",
+      "why": "the guide quotes this usage message"
+    },
+    {
+      "cmd": "node bin/hours.js package.json",
+      "expect": "fail",
+      "expectOutput": "hours: CSV header must include name and hours columns",
+      "why": "the guide states a bad header prints hours: <reason> and exits 1"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 50-project (pre-install) commits a small dependency-free Node CLI: bin/hours.js, src/summarize.js, unit tests, and examples/week.csv. 51-docs (pre-install) adds README.md, CONTRIBUTING.md, docs/guide.md, and scripts/check-docs.js (npm run docs:check: checks relative Markdown links and runs every console block, comparing output). After install, 60-audit commits .standards/CONTEXT.md with STATE at SCOPING, 61-scope commits the SCOPE record (AC-001 accurate usage, AC-002 audience limits) with STATE at ARCHITECTING, and 62-design commits the ARCHITECTURE record (existing CLI contract; AC-001 covered, AC-002 no architectural impact) with STATE at DOCUMENTING, CycleMode DOCUMENTATION, CompletionPolicy NONE, Development NONE, Handoff FORWARD from ARCHITECTING, no recovery. No documentation record exists yet. The guide documents edge cases (empty file, header-only file, case-sensitive names, CRLF, argument handling, line-numbered row errors) so that no legitimate edit remains. The spec does not set date, so commits carry the default 2026-09-24 date, earlier than the cycle ID timestamp.",
+  "case": "documenter-82",
+  "caseHash": "4ec8d596da94366a",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T02:58:43.087Z",
+    "verdict": "pass",
+    "fixtureHash": "cee286da02550c4b",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-31T00:00:24.759Z"
+  }
+}

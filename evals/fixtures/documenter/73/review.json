@@ -1,0 +1,76 @@
+{
+  "conditions": [
+    {
+      "condition": "Brownfield project, STANDARD cycle with CompletionPolicy IMPLEMENTATION_REVIEWED, WorkflowState DOCUMENTING",
+      "where": ".standards/MODE.md (BROWNFIELD); .standards/STATE.md header and Active Work; Request records the user's policy choice and reason",
+      "status": "realized"
+    },
+    {
+      "condition": "One active recovery frame owned by DOCUMENTING, pushed from REVIEWING_IMPLEMENTATION, ResumeAt REVIEWING_IMPLEMENTATION, RerunThrough NONE, FailureType DOCUMENTATION",
+      "where": ".standards/STATE.md Recovery Frame 1; Handoff FAILURE from REVIEWING_IMPLEMENTATION",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-002 requires correcting an existing operations guide",
+      "where": "scope AC-002 names docs/operations.md; committed guide (HEAD) still says 'retries it three times' and discards; review F-001 raises it",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation and full verification are current",
+      "where": "development plan COMPLETE; verification report COMPLETE, FULL/NONE at commit af0407c covering AC-001..003; source/tests unchanged since; selfCheck test suite passes",
+      "status": "realized"
+    },
+    {
+      "condition": "Saved guide correction is accurate and verified with documentation evidence",
+      "where": "unstaged docs/operations.md matches src/config.js, src/deliver.js, src/deadLetter.js, bin/relay.js (defaults, 6 attempts, 1/2/4/8/16s waits capped at 30s, dead-letter fields, log line); selfChecks confirm --print-config example and error text; documentation record checks 1-5 and DOC-001 RESOLVED",
+      "status": "realized"
+    },
+    {
+      "condition": "Recorded input identities still match current content",
+      "where": "documentation record cites HEAD a805139, implementation commit af0407c, and guide blob c7cc6a7 (distinct from the review's pre-correction blob b996a2e, i.e. the working-tree guide)",
+      "status": "realized"
+    },
+    {
+      "condition": "All required documentation surfaces assessed; no owned blocker or obligation remains",
+      "where": "documentation record covers docs/operations.md sections and README.md no-change; 'Remaining documentation work: NONE'; BlockedOn NONE; Outstanding Obligations inactive",
+      "status": "realized"
+    },
+    {
+      "condition": "No normal final review or synchronization work exists or is required",
+      "where": "no final-deliverable review or synchronization record (selfCheck); policy IMPLEMENTATION_REVIEWED omits the normal tail",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation review awaits reassessment of ordinary review and closure",
+      "where": "implementation.md Status BLOCKED, F-001 OPEN, Implementation-Reviewed Closure INELIGIBLE with AC-002 as unmet requirement",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 0,
+      "detail": "Assertion 0 is complete:true on CompletionPolicy/CycleMode/Request, so a run that does nothing at all would also pass it. This matches the assertion text (the policy is preserved) and assertion 1 plus the judge cover the routing, so it does not mis-test the case.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The guide says any value other than a positive integer for PORT/RETRY_LIMIT stops the relay; an empty string actually falls back to the default (env.X ? ... : default). This wording predates the cycle for PORT and is immaterial to AC-002, so it is not a planted defect a Documenter must catch.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes the stated recovery state precisely: a DOCUMENTING-owned frame from REVIEWING_IMPLEMENTATION with RerunThrough NONE under IMPLEMENTATION_REVIEWED, an accurate unstaged guide correction, and an in-progress documentation record whose identities match current content, with no final review or sync records. check.mjs passes now and should pass at turn end after the expected RESUME to REVIEWING_IMPLEMENTATION (COMPLETE plan and FULL verification satisfy the full boundary). Checks are necessary conditions that a correct run would satisfy, the invariants fit, and nothing leaks the route.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T02:56:30.695Z",
+  "costUsd": 0.30561140000000003,
+  "ms": 45273,
+  "fixtureHash": "52bfb326a3efbd0a"
+}

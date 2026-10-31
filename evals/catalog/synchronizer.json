@@ -3786,10 +3786,11 @@
           "i": 1,
           "graders": [
             "state",
-            "file"
+            "file",
+            "judge"
           ],
-          "deterministic_complete": true,
-          "note": "state: the Documenter frame unchanged; file: record not COMPLETE"
+          "deterministic_complete": false,
+          "note": "state: the Documenter frame unchanged; file: record not COMPLETE; judge: the run does not move on to REVIEWING_FINAL while the gate is incomplete (a run that does, but leaves Frame 1 in place, passes the state and file checks)"
         },
         {
           "i": 2,
@@ -3802,7 +3803,7 @@
           "note": "state: never REVIEWING_IMPLEMENTATION or AWAITING_USER_SIGNOFF; check: DOCUMENTATION states and frames; reply: no IMPLEMENTATION review kind"
         }
       ],
-      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0). Assertion 1 now needs the judge: gate 3 found that a run which resumes final review without popping the frame passes every state and file check."
     },
     {
       "id": 60,

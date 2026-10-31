@@ -1,0 +1,71 @@
+{
+  "conditions": [
+    {
+      "condition": "STANDARD cycle in REVIEWING_IMPLEMENTATION, BROWNFIELD project",
+      "where": ".standards/STATE.md (WorkflowState REVIEWING_IMPLEMENTATION, CycleMode STANDARD); .standards/MODE.md BROWNFIELD",
+      "status": "realized"
+    },
+    {
+      "condition": "Latest handoff is COMPLETION_CHANGE from DOCUMENTING with FailureType NONE and policy IMPLEMENTATION_REVIEWED",
+      "where": ".standards/STATE.md Handoff and Active Work.CompletionPolicy",
+      "status": "realized"
+    },
+    {
+      "condition": "User reselected IMPLEMENTATION_REVIEWED after an earlier withdrawal, with the explicit choice and new reason persisted",
+      "where": "Active Work.Request in .standards/STATE.md; history in commits 'Withdraw implementation-reviewed completion' (COMPLETION_CHANGE AWAITING_USER_SIGNOFF -> DOCUMENTING) and 'Return to implementation-reviewed completion'",
+      "status": "realized"
+    },
+    {
+      "condition": "No normal Documenter work ever began",
+      "where": "no .standards/docs/documentation/ record; only STATE.md changed in the last two commits",
+      "status": "realized"
+    },
+    {
+      "condition": "Earlier current closure section says ELIGIBLE and records the old (cycle-start) user choice and reason",
+      "where": ".standards/docs/reviews/<id>/implementation.md: single '## Implementation-Reviewed Closure' with Eligibility ELIGIBLE, User Choice citing cycle start, User Reason 'internal job'",
+      "status": "realized"
+    },
+    {
+      "condition": "Full verification and implementation evidence remain applicable to current inputs",
+      "where": "verification report COMPLETE/FULL, plan COMPLETE; src/test/package.json unchanged since the review commit (selfCheck git diff HEAD~2); tests pass 9/9",
+      "status": "realized"
+    },
+    {
+      "condition": "All closure requirements can pass on reassessment (no required documentation, no dependencies, recovery/obligations/blockers/cadence/baseline clear)",
+      "where": "scope Non-goals exclude README/documentation; STATE.md Recovery/Obligations inactive, BlockedOn NONE, PendingVerificationCadence NONE, BaselineReconciliation NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation actually satisfies AC-001..AC-004 (no material defects)",
+      "where": "src/digest.js matches design; test/digest.test.js observes all ACs",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-wrong",
+      "assertion": 1,
+      "detail": "The contains regex '^## Implementation-Reviewed Closure *$(?![\\s\\S]*^## Implementation-Reviewed Closure *$)' with the m flag matches at the last occurrence even when two headings exist, so it only proves at least one heading. It cannot fail a correct run; the duplicate case is still caught by check_ok (checkClosureAssessment reports repeated sections) and the judge.",
+      "recommendation": "run_as_is",
+      "fix": "Optional: rely on check_ok for uniqueness or anchor the regex with \\A-style logic; no change needed for correctness."
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 0,
+      "detail": "'^## Closure Assessment History[\\s\\S]*ELIGIBLE' is case-sensitive. If a correct run places the history after the current section and summarizes the old conclusion in prose as 'eligible' instead of copying the `ELIGIBLE` field, the check would fail. This is unlikely because the template says to preserve the conclusion, which naturally copies the field value.",
+      "recommendation": "fix_file",
+      "fix": "In reviewer-51/spec.json, checks[0].all[1].contains.flags: change \"m\" to \"mi\"."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition. The COMPLETION_CHANGE return from DOCUMENTING follows a real withdrawal, the existing ELIGIBLE closure records the old choice while the reselection lives only in Active Work.Request, evidence is unchanged and passing, and no documentation record exists; check.mjs passes. The checks and invariants are necessary conditions for a correct run, apart from a weak uniqueness regex and a case-sensitivity nit, both notes.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T03:05:23.898Z",
+  "costUsd": 0.2862418,
+  "ms": 63330,
+  "fixtureHash": "1e007aed6eaa02aa"
+}

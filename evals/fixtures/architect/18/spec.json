@@ -1,0 +1,180 @@
+{
+  "base": null,
+  "install": {
+    "mode": "greenfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial commit"
+    },
+    {
+      "dir": "layers/50-scope",
+      "action": "commit",
+      "message": "Define scope for survey response API"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "architect",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "Neither the user nor the scope names a language, framework, database, or hosting platform, so foundational technology choices are open.",
+    "The repository contains no code, manifest, project instructions, user styles, or architect project references that name a stack; only README.md, the installed STANDARDS files, STATE.md, MODE.md, and the scope record exist.",
+    "No .standards/CONTEXT.md exists; this is intentional before the first greenfield audit.",
+    "No acceptance condition needs a cache, vector search, or a repository layer."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "survey-response-api-for-field-staff-20260924T083000Z-5c1e9a7b",
+    "SCOPE": ".standards/docs/scope/survey-response-api-for-field-staff-20260924T083000Z-5c1e9a7b.md",
+    "ARCH": ".standards/docs/specs/survey-response-api-for-field-staff-20260924T083000Z-5c1e9a7b.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${ARCH}",
+          "why": "a new design record is created with artifact init at the fixed path; no project document exists to reuse"
+        },
+        {
+          "contains": {
+            "path": "${ARCH}",
+            "regex": "FastAPI",
+            "flags": "i"
+          },
+          "why": "FastAPI named as a decision"
+        },
+        {
+          "contains": {
+            "path": "${ARCH}",
+            "regex": "Postgre(SQL|s)",
+            "flags": "i"
+          },
+          "why": "PostgreSQL named as a decision"
+        },
+        {
+          "contains": {
+            "path": "${ARCH}",
+            "regex": "Alembic|migration",
+            "flags": "i"
+          },
+          "why": "migrations named"
+        },
+        {
+          "contains": {
+            "path": "${ARCH}",
+            "regex": "GitHub Actions",
+            "flags": "i"
+          },
+          "why": "CI named as a decision"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "contains": {
+            "path": "${ARCH}",
+            "regex": "^#{2,3}\\s*Build Plan",
+            "flags": "im"
+          },
+          "why": "a STANDARD foundation design has a Build Plan section"
+        },
+        {
+          "contains": {
+            "path": "${ARCH}",
+            "regex": "\\b(CREATE|CANDIDATE)\\b"
+          },
+          "why": "new paths in an empty repository are marked CREATE or CANDIDATE"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "test ! -e .standards/CONTEXT.md && test ! -e package.json && test ! -e pyproject.toml && test ! -e requirements.txt",
+      "expect": "pass",
+      "why": "no Auditor context and no project manifest exist"
+    },
+    {
+      "cmd": "! grep -rIilE 'fastapi|postgres|railway|django|flask|express|mongodb|kotlin|next\\.js|sqlite|alembic|github actions' --exclude-dir=.git --exclude-dir=.standards --exclude-dir=.claude .",
+      "expect": "pass",
+      "why": "no project file outside the framework names a stack"
+    },
+    {
+      "cmd": "! grep -iE 'fastapi|postgres|railway|python|django|flask|express|mongodb|sqlite|github|cloud run|gcp|aws' .standards/docs/scope/survey-response-api-for-field-staff-20260924T083000Z-5c1e9a7b.md",
+      "expect": "pass",
+      "why": "the scope names no language, framework, database, or hosting platform"
+    },
+    {
+      "cmd": "grep -q 'Target maturity: Level 3' .standards/docs/scope/survey-response-api-for-field-staff-20260924T083000Z-5c1e9a7b.md",
+      "expect": "pass",
+      "why": "the scope records the target maturity level"
+    },
+    {
+      "cmd": "test -z \"$(ls -A .standards/project-references/architect .standards/user-styles/architect 2>/dev/null)\"",
+      "expect": "pass",
+      "why": "no architect project references or user styles could supply a stack"
+    }
+  ],
+  "notes": "Standalone greenfield fixture. 00-project (pre-install) commits only a short README describing the purpose with no technology. The installer writes greenfield STANDARDS. 50-scope commits STATE.md (GREENFIELD project via MODE.md, STANDARD cycle in ARCHITECTING, FULL_DELIVERABLE, Handoff FORWARD from SCOPING, recovery and obligations inactive, Architecture/Development NONE) and the completed scope record with SCOPE provenance, 'Target maturity: Level 3 (internally testable)' under Constraints, and AC-001..AC-009 covering authenticated submission, validation, persistence, per-user access, admin provisioning, staging deployment with health check, a test suite, and README instructions. No CONTEXT.md, code, or manifest exists, and nothing names a language, framework, database, or host. Assertion 0 is about which files were read, which is left to the judge (no deterministic read check exists).",
+  "case": "architect-18",
+  "caseHash": "c31fd7e7a5839641",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-30T22:49:04.156Z",
+    "verdict": "issues",
+    "fixtureHash": "2779672f05403404",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "fixedBy": "owner decision"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-30T22:36:25.418Z"
+  },
+  "decision": {
+    "action": "fixed",
+    "note": "assertion 3 accepts CREATE or CANDIDATE",
+    "at": "2026-10-31T11:19:51.397Z",
+    "fixtureHash": "2779672f05403404"
+  }
+}

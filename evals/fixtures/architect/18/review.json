@@ -1,0 +1,81 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is GREENFIELD",
+      "where": ".standards/MODE.md (layer 50-scope)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState ARCHITECTING, CompletionPolicy FULL_DELIVERABLE",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery inactive, no outstanding obligations",
+      "where": ".standards/STATE.md Recovery/Outstanding Obligations Active: false",
+      "status": "realized"
+    },
+    {
+      "condition": "Scoper completed and handed off (legal greenfield SCOPING -> ARCHITECTING)",
+      "where": "STATE.md Handoff FORWARD From SCOPING; Active Work.Scope points to the scope record",
+      "status": "realized"
+    },
+    {
+      "condition": "No CONTEXT.md exists yet",
+      "where": "absent from tree; selfCheck 1",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope records 'Target maturity: Level 3'",
+      "where": "scope record Constraints: 'Target maturity: Level 3 (internally testable)'",
+      "status": "realized"
+    },
+    {
+      "condition": "ACs for an API that stores survey responses, requires authenticated field staff, and is deployable to a shared staging environment",
+      "where": "scope AC-001..AC-009",
+      "status": "realized"
+    },
+    {
+      "condition": "Neither user nor scope names a language, framework, database, or hosting platform",
+      "where": "scope, README.md, utterance 'Continue.'; selfChecks 2, 3, 5",
+      "status": "realized"
+    },
+    {
+      "condition": "No code, manifest, project references, or user styles that could supply a stack",
+      "where": "tree contains only README.md plus installed files and records",
+      "status": "realized"
+    },
+    {
+      "condition": "Committed, clean git state",
+      "where": "git status clean on main",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "blocking",
+      "kind": "check-too-strict",
+      "assertion": 3,
+      "detail": "The check `contains` regex `\\bCREATE\\b` requires at least one CREATE marker. Assertion 3 allows paths to be marked CREATE or CANDIDATE, and the template defines CANDIDATE as an unresolved location that Developer may settle. In an empty repository, a correct run could reasonably mark every proposed path CANDIDATE and would then fail this check.",
+      "recommendation": "fix_file",
+      "fix": "In architect-18/spec.json, change the second check of assertion 3 to `{\"contains\": {\"path\": \"${ARCH}\", \"regex\": \"\\\\b(CREATE|CANDIDATE)\\\\b\"}, \"why\": \"new paths in an empty repository are marked CREATE or CANDIDATE\"}`."
+    },
+    {
+      "severity": "note",
+      "kind": "check-wrong",
+      "assertion": 3,
+      "detail": "The CREATE/CANDIDATE regex matches anywhere in the design, for example SQL such as 'CREATE TABLE'. It is a loose precondition, and the judge still decides whether the Build Plan paths are marked.",
+      "recommendation": "run_as_is",
+      "fix": "None needed; the judge grades the marking within the Build Plan."
+    }
+  ],
+  "verdict": "issues",
+  "summary": "The fixture realizes the case: a greenfield STANDARD cycle in ARCHITECTING with a technology-neutral Level 3 scope, no CONTEXT.md, no stack hints, and a valid check. One deterministic check for assertion 3 requires a literal CREATE marker even though the assertion also accepts CANDIDATE, so a correct run could fail it. Widen that regex to CREATE|CANDIDATE.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-30T22:49:04.156Z",
+  "costUsd": 0.159031,
+  "ms": 34130,
+  "fixtureHash": "2779672f05403404"
+}

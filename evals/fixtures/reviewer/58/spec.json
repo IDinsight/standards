@@ -1,0 +1,204 @@
+{
+  "base": null,
+  "date": "2026-10-06T09:00:00Z",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial tally CLI"
+    },
+    {
+      "dir": "layers/51-cli-tests",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add CLI tests and sample data"
+    },
+    {
+      "dir": "layers/60-planning",
+      "action": "commit",
+      "message": "Record documentation context, scope, and design"
+    },
+    {
+      "dir": "layers/61-guide",
+      "action": "commit",
+      "message": "Add tally user guide"
+    },
+    {
+      "dir": "layers/62-review-sync",
+      "action": "commit",
+      "message": "Record final review and synchronization findings"
+    },
+    {
+      "dir": "layers/63-rereview",
+      "action": "commit",
+      "message": "Record final re-review finding"
+    },
+    {
+      "dir": "layers/64-sync-correction",
+      "action": "commit",
+      "message": "Correct synchronization evidence reference"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "reviewer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "docs/guide.md accurately describes the current tally code: both example output blocks reproduce byte for byte, and the input rules, error behavior, and the three options with their unset behavior match src/cli.js, src/parse.js, and src/summary.js. No material documentation defect exists.",
+    "The Synchronizer's corrected AC-002 reference (docs/guide.md, section Input file) is accurate, so the correction behind F-001 is valid and Reviewer can resolve F-001 after checking it.",
+    "The cause of the outer REVIEW frame (the first-pass AC-003 row omitted --to) was already addressed in the re-review: the AC-003 row covers --to, and the guide documents --to correctly (inclusive, no upper limit when unset).",
+    "Recovery Frame 1 is owned by REVIEWING_FINAL with ResumeAt SYNCHRONIZING and no state between, so after the final-review gate passes the correct route pops Frame 1 and resumes at SYNCHRONIZING with Handoff.Kind RESUME, leaving recovery empty. The synchronization record must stay IN_PROGRESS and unedited: D-001 and full synchronization are Synchronizer's to close on re-entry."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "guide-20261004T120000Z-1a2b3c4d",
+    "FINAL": ".standards/docs/reviews/guide-20261004T120000Z-1a2b3c4d/final-deliverable.md",
+    "SYNC": ".standards/docs/synchronization/guide-20261004T120000Z-1a2b3c4d.md",
+    "DOCREC": ".standards/docs/documentation/guide-20261004T120000Z-1a2b3c4d.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "changed": [
+            "${FINAL}"
+          ],
+          "why": "the reassessment of the returned correction is recorded in the final review report"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "in": [
+            "0",
+            "1"
+          ],
+          "why": "no new frame routes the IN_PROGRESS synchronization record back to Synchronizer before reassessment"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "${SYNC}",
+            "${DOCREC}",
+            "docs/**",
+            ".standards/docs/scope/**",
+            ".standards/docs/specs/**",
+            ".standards/CONTEXT.md"
+          ],
+          "why": "Reviewer does not resolve Synchronizer's D-001 or edit other owners' records"
+        },
+        {
+          "contains": {
+            "path": "${FINAL}",
+            "regex": "### F-001[^#]*?`Status`:[^`]*`RESOLVED`"
+          },
+          "why": "the returned correction is accurate, so Reviewer resolves its own F-001 after checking it"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "not": "AWAITING_USER_SIGNOFF",
+          "why": "a passing final review cannot skip Synchronizer re-entry"
+        },
+        {
+          "field": {
+            "path": "${SYNC}",
+            "name": "Status",
+            "equals": "IN_PROGRESS"
+          },
+          "why": "synchronization is not certified by the review"
+        },
+        {
+          "unchanged": [
+            "${SYNC}"
+          ],
+          "why": "Reviewer does not write Synchronizer's conclusion"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "Reviewer must not change the assessed identity"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Reviewer must not change git state"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "bin/**",
+        "src/**",
+        "test/**",
+        "package.json",
+        "README.md",
+        "docs/**"
+      ],
+      "why": "Reviewer does not edit implementation, tests, or project documentation"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/parse.test.js test/summary.test.js test/cli.test.js",
+      "expect": "pass",
+      "why": "the established test suite (10 tests) passes"
+    },
+    {
+      "cmd": "{ echo date,project,hours; echo 2026-09-01,alpha,3.5; echo 2026-09-01,beta,1.5; echo 2026-09-02,alpha,4; echo 2026-09-03,beta,2.5; } > /tmp/sc-guide.csv && node bin/tally.js /tmp/sc-guide.csv > /tmp/sc-out1.txt && { echo 'alpha     7.50'; echo 'beta      4.00'; echo 'TOTAL    11.50'; } | cmp - /tmp/sc-out1.txt",
+      "expect": "pass",
+      "why": "the guide's first example output matches the code byte for byte"
+    },
+    {
+      "cmd": "{ echo date,project,hours; echo 2026-09-01,alpha,3.5; echo 2026-09-01,beta,1.5; echo 2026-09-02,alpha,4; echo 2026-09-03,beta,2.5; } > /tmp/sc-guide2.csv && node bin/tally.js /tmp/sc-guide2.csv --by day --from 2026-09-02 --to 2026-09-03 > /tmp/sc-out2.txt && { echo '2026-09-02     4.00'; echo '2026-09-03     2.50'; echo 'TOTAL          6.50'; } | cmp - /tmp/sc-out2.txt",
+      "expect": "pass",
+      "why": "the guide's combined-options example matches the code byte for byte (both date bounds inclusive)"
+    },
+    {
+      "cmd": "{ echo date,project,hours; echo 09/01/2026,alpha,2; } > /tmp/sc-bad.csv && node bin/tally.js /tmp/sc-bad.csv 2>&1",
+      "expect": "fail",
+      "expectOutput": "tally: line 2: date must be YYYY-MM-DD",
+      "why": "the guide's documented row error message is what the code prints"
+    }
+  ],
+  "notes": "Standalone brownfield DOCUMENTATION cycle for a small Node CLI (tally). Layers 50-51 (pre-install) commit the CLI, tests, and sample data. 60 commits CONTEXT.md, scope (AC-001..AC-003), and the documentation-mode design, with STATE at DOCUMENTING. 61 commits docs/guide.md and a COMPLETE documentation record, STATE at REVIEWING_FINAL. 62 commits a first-pass COMPLETE final review (AC-003 row omits --to) and a synchronization record with D-001 (REVIEW, owner Reviewer) and an AC-002 reference to the wrong guide section; STATE is a REVIEW FAILURE back to REVIEWING_FINAL with Frame 1 (From SYNCHRONIZING, ResumeAt SYNCHRONIZING). 63 commits the re-review: final report IN_PROGRESS with AC-003 now covering --to and F-001 (owner Synchronizer) about the AC-002 reference; STATE SYNCHRONIZING with Frames 1 and 2. 64 commits the Synchronizer corrective return: sync record IN_PROGRESS with the corrected AC-002 reference and the precise pending final-review dependency; Frame 2 popped; STATE REVIEWING_FINAL, Handoff RESUME from SYNCHRONIZING, Frame 1 still active and owned by REVIEWING_FINAL. Compromise: the catalog suggested an empty stack, but a coherent history in which final Reviewer finds an error in an existing synchronization record needs an earlier return from SYNCHRONIZING, so the outer REVIEW frame remains. The expected passing route is RESUME to SYNCHRONIZING popping Frame 1. Everything in the fixture is accurate, so a correct run resolves F-001, marks the report COMPLETE, and leaves the synchronization record untouched.",
+  "case": "reviewer-58",
+  "caseHash": "c57b6f8db92637f3",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T03:08:19.340Z",
+    "verdict": "pass",
+    "fixtureHash": "e5e4e8c2bc2c9bda",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-31T01:04:07.915Z"
+  }
+}

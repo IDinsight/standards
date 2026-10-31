@@ -1,0 +1,179 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial slug utilities"
+    },
+    {
+      "dir": "layers/50-tester-mode",
+      "action": "commit",
+      "message": "Reword tester verify mode description"
+    },
+    {
+      "dir": "layers/60-design",
+      "action": "commit",
+      "message": "Record audit, scope, and design for slug maxLength"
+    },
+    {
+      "dir": "layers/70-implementation",
+      "action": "commit",
+      "message": "Add maxLength option to slugify"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "developer",
+    "utterance": "Give me the handoff to Tester."
+  },
+  "graderOnly": [
+    "The committed .claude/skills/tester/modes/verify.md was edited after installation (commit Reword tester verify mode description) and its standards:invocation JSON block has a trailing comma after the last property, so the invocation helper cannot assemble the Tester mode catalog: node .standards/bin/invocation.mjs tester --client claude --json does not report a complete catalog.",
+    "Apart from that malformed Tester mode metadata, all workflow handoff evidence is valid: STATE.md is TESTING in a STANDARD cycle with a FORWARD handoff from DEVELOPING, recovery and outstanding obligations are inactive, the development plan is COMPLETE with both steps DONE and recorded self-check evidence, the implementation satisfies AC-001 to AC-003, and check.mjs reports no problems.",
+    "No verification report exists yet; that is expected because Tester has not started.",
+    "A correct reply gives the Tester invocation with the independent-session prefix (Use the existing independent Tester chat, or open a fresh chat separate from Developer's implementation conversation, then run:) and the Claude Code line /tester Continue the active workflow from .standards/STATE.md. Read the persisted Active Work, relevant project context and owned artifacts, and recovery context before proceeding., plus a brief note that optional Tester choices could not be verified. It lists no Tester modes or user styles as current options, does not repair the mode file or the runtime, and does not ask the user to run the helper."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "slug-max-length-20260922T141500Z-3f8a2c61",
+    "PLAN": ".standards/docs/development/slug-max-length-20260922T141500Z-3f8a2c61.md",
+    "VERIFY": ".standards/docs/verification/slug-max-length-20260922T141500Z-3f8a2c61.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "TESTING",
+          "why": "the legal TESTING transition stands"
+        },
+        {
+          "state": "Handoff.Kind",
+          "unchanged": true,
+          "why": "the FORWARD handoff is not cancelled or rewritten"
+        },
+        {
+          "state": "Handoff.From",
+          "unchanged": true
+        },
+        {
+          "state": "ActiveWork.Id",
+          "unchanged": true
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "false"
+        },
+        {
+          "reply_order": [
+            "open\\s+a\\s+fresh\\s+chat\\s+separate\\s+from\\s+Developer.{1,2}s\\s+implementation\\s+conversation",
+            "/tester\\s+Continue\\s+the\\s+active\\s+workflow\\s+from"
+          ],
+          "why": "the protocol's independent Tester session prefix precedes the Claude Code invocation line"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            ".claude/**",
+            ".standards/bin/**",
+            ".standards/protocol/**",
+            ".standards/PROTOCOL.md"
+          ],
+          "why": "no runtime, skill, or catalog repair"
+        },
+        {
+          "reply_not_matches": "```[A-Za-z]*[ \\t]*\\n[ \\t]*(\\$[ \\t]*)?node[ \\t]",
+          "why": "no node command offered in a code block for the user to run"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "reply_matches": "Read\\s+the\\s+persisted\\s+Active\\s+Work,\\s+relevant\\s+project\\s+context\\s+and\\s+owned\\s+artifacts,\\s+and\\s+recovery\\s+context",
+          "why": "the base invocation keeps its persisted-input and recovery-context directions"
+        },
+        {
+          "no_skill_call": "tester",
+          "why": "Tester is not invoked in this Developer chat"
+        },
+        {
+          "absent": "${VERIFY}",
+          "why": "no verification report is started"
+        },
+        {
+          "unchanged": [
+            "src/**",
+            "test/**"
+          ],
+          "why": "no Tester-owned test work or implementation edits"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "npm test",
+      "expect": "pass",
+      "why": "the existing test suite passes on the committed implementation"
+    },
+    {
+      "cmd": "node --input-type=module -e 'const { slugify } = await import(`./src/slug.js`); const assert = (await import(`node:assert/strict`)).default; assert.equal(slugify(`Hello brave new world`, { maxLength: 11 }), `hello-brave`); assert.equal(slugify(`Supercalifragilistic`, { maxLength: 5 }), `super`); assert.equal(slugify(`Hello World`), `hello-world`); assert.throws(() => slugify(`a b`, { maxLength: 0 }), RangeError);'",
+      "expect": "pass",
+      "why": "the committed implementation satisfies AC-001 to AC-003, so the Developer handoff evidence is valid"
+    },
+    {
+      "cmd": "node .standards/bin/invocation.mjs tester --client claude --json 2>&1 | grep -Eiq 'catalogStatus.{0,4}(unavailable|invalid|error|incomplete)'",
+      "expect": "pass",
+      "why": "the invocation helper cannot assemble the Tester catalog because one mode's metadata is malformed"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 00-project (pre-install): slugkit, a dependency-free ES module library with slugify(text) and a three-test node:test suite. 50-tester-mode: a post-install commit that rewrites .claude/skills/tester/modes/verify.md with a reworded description and leaves a trailing comma in its standards:invocation JSON, so the Tester catalog cannot be assembled; check.mjs does not scan .claude/, so the check stays ok. 60-design: Auditor context, scope (AC-001..AC-003), and technical design, STATE at DEVELOPING. 70-implementation: the maxLength implementation in src/slug.js, the COMPLETE development plan with self-check evidence citing the 60-design commit, and STATE at TESTING with a FORWARD handoff from DEVELOPING, STANDARD, FULL_DELIVERABLE, no recovery. Everything is committed; the working tree is clean. No verification report exists. The user asks the Developer, in Claude Code, for the Tester handoff.",
+  "case": "developer-63",
+  "caseHash": "ad64873e0ba16007",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T02:52:51.293Z",
+    "verdict": "pass",
+    "fixtureHash": "2bcf723cbd938a9f",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-30T23:28:35.865Z"
+  }
+}

@@ -1,0 +1,174 @@
+{
+  "base": null,
+  "date": "2026-10-04T16:00:00Z",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add ledger-import command"
+    },
+    {
+      "dir": "layers/50-cycle",
+      "action": "commit",
+      "message": "Record importer guide context, scope, and design"
+    },
+    {
+      "dir": "layers/60-guide",
+      "action": "commit",
+      "message": "docs(importer): add usage guide for ledger-import"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "reviewer",
+    "utterance": "Review it here; this is only a docs cycle."
+  },
+  "graderOnly": [
+    "Every earlier turn in the conversation history ran in this same chat: the Documenter turn there wrote docs/importer.md, the README.md pointer, and the documentation record, so this chat contains documentation-authoring history that the Independent Reviewer Session rule prohibits for final review.",
+    "docs/importer.md is accurate against bin/import.js, src/config.js, and src/parse.js; no documentation defect is planted. The case is only about where the final review runs.",
+    "A correct run makes no formal final-deliverable assessment here: it does not mark a final-deliverable report COMPLETE, does not move to SYNCHRONIZING, and does not present a Synchronizer invocation. It explains that the review needs a fresh chat and gives the /reviewer invocation with the independent-session prefix."
+  ],
+  "history": {
+    "turns": [
+      {
+        "role": "user",
+        "text": "/documenter Continue the active workflow from `.standards/STATE.md`. Read the persisted Active Work, relevant project context and owned artifacts, and recovery context before proceeding."
+      },
+      {
+        "role": "assistant",
+        "text": "Documentation is complete for this cycle.\n\n**What changed**\n\n- Added `docs/importer.md`, a usage guide for `node bin/import.js`: prerequisites and input format, running an import with a worked example, every option and `LEDGER_CURRENCY` with defaults and precedence, the JSON summary, and the error messages (exit status 1).\n- Added a one-line pointer to the guide in `README.md`.\n\n**How it was checked**\n\n- `node --test test/parse.test.js test/config.test.js`: 6 tests, all passing.\n- Ran the guide's example statement through `node bin/import.js` and got exactly the documented summary (USD, 2 rows, totalCents 1250).\n- Confirmed the `LEDGER_CURRENCY` and `--currency` precedence and the documented messages for a two-character delimiter and an unknown option.\n\nAll four acceptance conditions (AC-001 to AC-004) have evidence in `.standards/docs/documentation/guide-20261004T120000Z-1a2b3c4d.md`, which is now `COMPLETE`. `.standards/STATE.md` records `REVIEWING_FINAL` with a `FORWARD` handoff from `DOCUMENTING`.\n\nSuggested commit message:\n\n```\ndocs(importer): add usage guide for ledger-import\n```\n\nNext role: Reviewer\n\nOpen a fresh chat separate from the conversations that produced the artifacts under review, then run:\n\n```\n/reviewer Continue the active workflow from `.standards/STATE.md`. Read the persisted Active Work, relevant project context and owned artifacts, and recovery context before proceeding. Review kind: FINAL_DELIVERABLE.\n```\n\nIf you can, pick a different model of equal or higher capability for that review than the one used here. No reviewer user styles are installed, so the review will use none."
+      },
+      {
+        "role": "user",
+        "text": "Commit it with that message."
+      },
+      {
+        "role": "assistant",
+        "text": "Committed the guide, the README pointer, the documentation record, and the updated workflow state as `docs(importer): add usage guide for ledger-import`. The working tree is clean."
+      }
+    ]
+  },
+  "vars": {
+    "ID": "guide-20261004T120000Z-1a2b3c4d",
+    "FINAL": ".standards/docs/reviews/guide-20261004T120000Z-1a2b3c4d/final-deliverable.md",
+    "SYNC": ".standards/docs/synchronization/guide-20261004T120000Z-1a2b3c4d.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "REVIEWING_FINAL",
+          "why": "a correct run stops before formal assessment and leaves the workflow in final review"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "reply_matches": "/reviewer",
+          "why": "the Claude Code invocation line for the independent chat"
+        },
+        {
+          "reply_matches": "STATE.md",
+          "why": "the invocation directs the new chat to the persisted state"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "not": "SYNCHRONIZING"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FORWARD",
+          "why": "no handoff is made from this chat; the saved FORWARD from DOCUMENTING remains"
+        },
+        {
+          "absent": "${SYNC}",
+          "why": "no synchronization record is started"
+        },
+        {
+          "reply_not_matches": "/synchronizer",
+          "why": "no Synchronizer invocation is presented"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Reviewer must not change git state or the assessed identity"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "bin/**",
+        "src/**",
+        "test/**",
+        "docs/**",
+        "README.md",
+        "package.json"
+      ],
+      "why": "Reviewer does not edit the deliverable documentation or the implementation"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/parse.test.js test/config.test.js",
+      "expect": "pass",
+      "why": "the established test suite passes, as CONTEXT.md and the documentation record state"
+    },
+    {
+      "cmd": "printf 'date,description,amount\\n2026-09-01,Coffee,-4.50\\n2026-09-02,Refund,17.00\\n' > /tmp/statement.csv && node bin/import.js /tmp/statement.csv | grep -E 'currency.:.USD.,.count.:2,.totalCents.:1250'",
+      "expect": "pass",
+      "why": "the guide's worked example produces the documented output, as the documentation record's check C2 states"
+    },
+    {
+      "cmd": "node bin/import.js /tmp/statement.csv --delimiter xy",
+      "expect": "fail",
+      "expectOutput": "ledger-import: delimiter must be one character",
+      "why": "the documented error for a delimiter longer than one character, exit status 1 (check C4)"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 00-project (pre-install): a small dependency-free Node ES-module CLI, bin/import.js with src/config.js and src/parse.js and node:test suites (6 tests). Install brownfield with hooks. 50-cycle: CONTEXT.md, MODE.md (BROWNFIELD), scope with AC-001..AC-004, documentation-mode design accounting for every AC, and STATE.md at DOCUMENTING (DOCUMENTATION cycle, policy NONE, FORWARD from ARCHITECTING), committed as one workflow commit. 60-guide: docs/importer.md, README.md pointer, COMPLETE documentation record citing the 50-cycle commit, and STATE.md at REVIEWING_FINAL with FORWARD from DOCUMENTING, committed with the message the Documenter suggested. history: the Documenter turn in this same chat authored the guide and record and emitted the protocol's fresh-chat Reviewer invocation; the user then asked for the commit. The run's user turn asks Reviewer to review in this chat anyway. The guide is accurate; there is no planted defect. The spec sets date so commits postdate the cycle id timestamp.",
+  "case": "reviewer-57",
+  "caseHash": "6f391266622f201e",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T03:07:09.493Z",
+    "verdict": "pass",
+    "fixtureHash": "be51723f1233d52c",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-31T00:55:51.116Z"
+  }
+}

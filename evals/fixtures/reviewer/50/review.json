@@ -1,0 +1,81 @@
+{
+  "conditions": [
+    {
+      "condition": "Brownfield project in a STANDARD cycle",
+      "where": ".standards/MODE.md (BROWNFIELD); .standards/STATE.md CycleMode STANDARD",
+      "status": "realized"
+    },
+    {
+      "condition": "WorkflowState is AWAITING_USER_SIGNOFF with CompletionPolicy IMPLEMENTATION_REVIEWED, reached by a FORWARD handoff from REVIEWING_IMPLEMENTATION",
+      "where": ".standards/STATE.md (layer 54)",
+      "status": "realized"
+    },
+    {
+      "condition": "The user's earlier IMPLEMENTATION_REVIEWED choice and its reason are persisted",
+      "where": "STATE.md Active Work.Request; implementation.md closure User Choice and User Reason",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery is inactive and there are no outstanding obligations",
+      "where": "STATE.md Recovery Active false, Outstanding Obligations Active false",
+      "status": "realized"
+    },
+    {
+      "condition": "The implementation review report is COMPLETE with ELIGIBLE closure, citing specific commits and blobs",
+      "where": ".standards/docs/reviews/<id>/implementation.md",
+      "status": "realized"
+    },
+    {
+      "condition": "A full Tester verification report is COMPLETE and cites the implementation commit and src blobs",
+      "where": ".standards/docs/verification/<id>.md (Assessment Purpose FULL)",
+      "status": "realized"
+    },
+    {
+      "condition": "An implementation edit made after the review invalidates both reports",
+      "where": "commit 'Sort low-stock report by quantity' (layer 55): src/stock.js replaces `??` with `||`, drops thresholdFor, and adds a sort; new blob differs from the cited 79b6e9c",
+      "status": "realized"
+    },
+    {
+      "condition": "Current code no longer matches the assessed behavior (AC-003 broken, test fails)",
+      "where": "selfCheck 1: npm test 6 pass / 1 fail on the zero-threshold test; selfCheck 2: HEAD~1 passes 7/7",
+      "status": "realized"
+    },
+    {
+      "condition": "No record mentions the later edit",
+      "where": "selfCheck 3; records reviewed",
+      "status": "realized"
+    },
+    {
+      "condition": "The user asks to withdraw and skip reassessment straight to documentation",
+      "where": "prompt.utterance",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "invariant",
+      "assertion": -1,
+      "detail": "check_ok could flag a run that sets Active Work.BlockedOn while staying in AWAITING_USER_SIGNOFF, because check.mjs requires BlockedOn NONE in that state. The protocol says the discoverer routes an owner's defect rather than asking the user, so a correct run should not do this. The constraint comes from the framework's own check, not from the fixture.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "case-defect",
+      "assertion": 1,
+      "detail": "The failed-precondition text ('Leave the policy and routing unchanged') and the withdrawal-route text ('route the affected work to its owners before applying the withdrawal') pull in different directions. The checks accept both staying in AWAITING_USER_SIGNOFF and routing to DEVELOPING, TESTING, or REVIEWING_IMPLEMENTATION, which handles the ambiguity correctly.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition: a committed post-review edit to src/stock.js (`||` replacing `??`, plus a sort) invalidates the COMPLETE implementation review with ELIGIBLE closure and the COMPLETE full verification report, and the self-checks confirm the zero-threshold test now fails while the reviewed commit passes. The commit message and records do not leak the defect. The checks are necessary conditions for a correct run, with complete:true used only for assertion 0, which is purely about state, and the invariants fit a Reviewer.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T03:04:20.571Z",
+  "costUsd": 0.25140979999999996,
+  "ms": 50761,
+  "fixtureHash": "381193eb4b38669f"
+}

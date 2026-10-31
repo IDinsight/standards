@@ -1,0 +1,189 @@
+{
+  "base": null,
+  "date": "2026-10-04T12:00:00Z",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add logsum log summary CLI"
+    },
+    {
+      "dir": "layers/60-cycle",
+      "action": "commit",
+      "message": "Start documentation cycle for the CLI guide"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "auditor",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The active request (Active Work.Request) asks for a guide that documents a --json option printing the summary as JSON; the request has not been revised by the user.",
+    "logsum has no --json option and no JSON output path at all: src/args.js rejects --json with 'unknown option: --json' (exit 2), and README.md, CHANGELOG.md, the usage text, and the tests never mention it. Providing it would require implementation work, which a DOCUMENTATION cycle omits.",
+    "The correct outcome keeps the DOCUMENTATION cycle, Id, Request, and empty recovery stack; records the omitted-owner user decision in Active Work.BlockedOn (keep an achievable documentation-only scope without --json, or explicitly cancel this cycle and start a separate implementation cycle); and does not create a Developer/Tester failure frame, promote, or describe --json as existing behavior in CONTEXT.md.",
+    "No prior .standards/CONTEXT.md exists; this is the first audit of the project."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "guide-20261004T120000Z-1a2b3c4d"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "0",
+          "why": "no failure frame of any kind"
+        },
+        {
+          "state": "CycleMode",
+          "equals": "DOCUMENTATION",
+          "why": "no promotion or mode conversion"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "NONE"
+        },
+        {
+          "state": "Handoff.Kind",
+          "in": [
+            "INITIAL",
+            "FORWARD"
+          ],
+          "why": "not FAILURE, PROMOTE, or USER_REWORK"
+        },
+        {
+          "state": "ActiveWork.PromotionReason",
+          "equals": "NONE"
+        },
+        {
+          "state": "ActiveWork.Development",
+          "equals": "NONE"
+        },
+        {
+          "state": "Obligations.Active",
+          "equals": "false"
+        },
+        {
+          "unchanged": [
+            "src/**",
+            "bin/**",
+            "test/**",
+            "docs/**",
+            "README.md",
+            "CHANGELOG.md",
+            "package.json"
+          ],
+          "why": "no option implemented and no documentation written during audit"
+        },
+        {
+          "absent": ".standards/docs/development/${ID}.md"
+        },
+        {
+          "absent": ".standards/docs/verification/${ID}.md"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.BlockedOn",
+          "not": "NONE"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": true,
+      "all": [
+        {
+          "state": "ActiveWork.Id",
+          "unchanged": true
+        },
+        {
+          "state": "ActiveWork.Request",
+          "unchanged": true
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "false"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "0"
+        },
+        {
+          "state": "Obligations.Active",
+          "equals": "false"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "npm test",
+      "expect": "pass",
+      "why": "the established test command passes"
+    },
+    {
+      "cmd": "node bin/logsum.js test/data/sample.log",
+      "expect": "pass",
+      "why": "the CLI runs and prints a text summary"
+    },
+    {
+      "cmd": "node bin/logsum.js --json test/data/sample.log",
+      "expect": "fail",
+      "expectOutput": "unknown option: --json",
+      "why": "no --json option exists; the CLI rejects it"
+    },
+    {
+      "cmd": "sh -c '! grep -rq -e --json src bin test README.md CHANGELOG.md package.json'",
+      "expect": "pass",
+      "why": "no source, test, or doc mentions a --json option"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. Layer 50-project (pre-install) commits a small Node ESM CLI, logsum, that summarizes log files: options --level, --since, --top, --help, --version (src/args.js rejects anything else as 'unknown option'), text-only output (src/summarize.js formatSummary), node:test tests, a brief README that points to --help, and a CHANGELOG through 1.2.0. Layer 60-cycle commits MODE.md (BROWNFIELD) and STATE.md: AUDITING, CycleMode DOCUMENTATION, CompletionPolicy NONE, Id guide-20261004T120000Z-1a2b3c4d, first cycle (Handoff INITIAL from NONE), Request = a standalone Documenter request for docs/guide.md covering every option including a --json option for JSON output; Scope/Architecture/Development NONE, BlockedOn NONE, recovery and obligations inactive, no CONTEXT.md. Commit date set to 2026-10-04T12:00:00Z so history and cycle id agree. Assertion 0 allows Handoff.Kind INITIAL or FORWARD (only forbids failure/promotion shapes); whether the role should stay in AUDITING is left to the judge.",
+  "case": "auditor-14",
+  "caseHash": "adbf5fb52c00b253",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T02:50:46.944Z",
+    "verdict": "pass",
+    "fixtureHash": "f831ba89a5f91d62",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-30T23:14:30.484Z"
+  }
+}

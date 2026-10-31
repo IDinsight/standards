@@ -1,0 +1,156 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial survey API with owner-scoped surveys"
+    },
+    {
+      "dir": "layers/51-responses",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add anonymous survey response submission"
+    },
+    {
+      "dir": "layers/60-design",
+      "action": "commit",
+      "message": "Record context, scope, and design for owner response listing"
+    },
+    {
+      "dir": "layers/70-dev-001",
+      "action": "commit",
+      "message": "Index survey responses by survey and submission time"
+    },
+    {
+      "dir": "layers/80-plan-revision",
+      "action": "commit",
+      "message": "Merge response listing steps in development plan"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "developer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The design fully specifies the endpoint, the authenticated owner check, the pagination bounds and ordering, and the response shape; no upstream defect exists and DEV-002 can be implemented without routing a failure.",
+    "The existing POST /surveys/{survey_id}/responses/ route is intentionally anonymous, so authentication for the new GET must be applied per route; adding an auth dependency to the whole responses router would break anonymous submission.",
+    "Ownership must be checked against the authenticated user (Survey.owner_id equal to the current user's id); a missing survey and another owner's survey should both produce 404.",
+    "The fixture contains no virtual environment and no installed project dependencies. FastAPI, SQLModel, pydantic-settings, PyJWT, ruff, and mypy are declared in pyproject.toml but are not expected to be present in the run image, so the established commands fail there unless the run installs the dev extra (PyPI is not blocked). A run that executes the established pytest, ruff, and mypy commands and records an unavailable environment as a limitation has still run them.",
+    "The composite index on survey_responses (survey_id, submitted_at) from DEV-001 supports the page query."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "let-survey-owners-list-the-responses-20260922T141500Z-3c9e0b7a",
+    "PLAN": ".standards/docs/development/let-survey-owners-list-the-responses-20260922T141500Z-3c9e0b7a.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "contains": {
+            "path": "app/responses/service.py",
+            "regex": "^(?![\\s\\S]*HTTPException)"
+          },
+          "why": "the responses service module (where the design puts the listing function) must not raise or import HTTPException"
+        },
+        {
+          "contains": {
+            "path": "app/surveys/service.py",
+            "regex": "^(?![\\s\\S]*HTTPException)"
+          },
+          "why": "no HTTP types leak into the surveys service either, in case the role touches it"
+        },
+        {
+          "contains": {
+            "path": "app/responses/router.py",
+            "regex": "get_current_user|CurrentUser"
+          },
+          "why": "the new route must use the project's existing auth dependency (the router had none before)"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 3,
+      "na": true,
+      "na_reason": "owner decision: runner image lacks FastAPI, SQLModel, ruff and mypy"
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "python3 -m compileall -q app tests migrations",
+      "expect": "pass",
+      "why": "The seeded FastAPI service, tests, and migrations are syntactically valid Python."
+    },
+    {
+      "cmd": "grep -qF '`pytest`' .standards/CONTEXT.md && grep -qF '`ruff check .`' .standards/CONTEXT.md && grep -qF '`mypy app`' .standards/CONTEXT.md",
+      "expect": "pass",
+      "why": "The pytest, ruff, and mypy commands are established in the Auditor-owned context."
+    },
+    {
+      "cmd": "grep -q 'le=100' app/surveys/router.py && grep -q 'def get_current_user' app/dependencies/auth.py && ! grep -q 'get_current_user' app/responses/router.py && ! grep -q 'HTTPException' app/responses/service.py",
+      "expect": "pass",
+      "why": "The analogues exist (capped owner list, shared auth dependency), the responses router starts without auth, and the responses service starts free of HTTP exceptions."
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 50-project and 51-responses (pre-install) build a small FastAPI/SQLModel survey service: app/<feature>/{model,schema,router,service}.py for users, surveys, responses; app/dependencies/auth.py get_current_user; owner-scoped, paginated GET /surveys/ (offset ge 0, limit 1..100); anonymous POST /surveys/{id}/responses/; Alembic migrations 0001-0002; pytest suite on in-memory SQLite. 60-design writes MODE (BROWNFIELD), CONTEXT.md (commands: pytest, ruff check ., mypy app; setup via venv + pip install -e .[dev]), the scope (AC-001..AC-003), the design (GET /surveys/{survey_id}/responses/, per-route get_current_user, list_survey_responses returning None for missing/unowned -> 404, offset/limit bounds, submitted_at,id ordering, ResponseRead reuse), and STATE at DEVELOPING/STANDARD/FULL_DELIVERABLE, FORWARD from ARCHITECTING, recovery inactive. 70-dev-001 commits DEV-001 (composite index + migration 0003) with plan v1 (IN_PROGRESS, DEV-001 DONE with self-check evidence citing the 60 commit, DEV-002 query and DEV-003 route PENDING) and sets Active Work.Development. 80-plan-revision merges DEV-002/DEV-003 into one DEV-002 at the user's request; the plan was re-approved, so it is APPROVED with User Style NONE locked, mode AUTONOMOUS, and DEV-002 is the only pending step. Compromise: the runner lacks FastAPI/SQLModel/ruff/mypy, so self-checks cannot be shown passing; PyPI is left open so a run may install the dev extra.",
+  "case": "developer-68",
+  "caseHash": "6a82272e6a801af9",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T02:55:15.675Z",
+    "verdict": "issues",
+    "fixtureHash": "0c0ab2dc4f904d8a",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-30T23:43:00.842Z"
+  },
+  "decision": {
+    "action": "na",
+    "note": "runner image lacks FastAPI, SQLModel, ruff and mypy",
+    "at": "2026-10-31T11:21:19.988Z",
+    "assertions": [
+      3
+    ]
+  }
+}

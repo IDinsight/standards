@@ -1,0 +1,79 @@
+{
+  "conditions": [
+    {
+      "condition": "Brownfield project with a STANDARD cycle in WorkflowState TESTING",
+      "where": ".standards/MODE.md (BROWNFIELD); .standards/STATE.md WorkflowState TESTING, CycleMode STANDARD, CompletionPolicy FULL_DELIVERABLE",
+      "status": "realized"
+    },
+    {
+      "condition": "State was reached by Developer's checkpoint handoff",
+      "where": ".standards/STATE.md Handoff Kind CHECKPOINT, From DEVELOPING, FailureType NONE, Reason naming Increment 1; plan has INCREMENTAL cadence, Current Increment 1, DEV-001 DONE with Self-Check",
+      "status": "realized"
+    },
+    {
+      "condition": "Fresh chat (no prior conversation)",
+      "where": "spec history: null",
+      "status": "realized"
+    },
+    {
+      "condition": "Discovery helper is available and runs",
+      "where": ".standards/bin/invocation.mjs installed unchanged; selfChecks run it with --client claude --json and exit 0",
+      "status": "realized"
+    },
+    {
+      "condition": "Helper reports VERIFY and REVERIFY as assessment-selected modes",
+      "where": ".claude/skills/tester/modes/verify.md and reverify.md metadata \"selection\": \"assessment\"; selfChecks grep both identifiers",
+      "status": "realized"
+    },
+    {
+      "condition": "Tester user-style inventory is empty and complete",
+      "where": ".standards/user-styles/tester/ exists and holds only .gitkeep (no Markdown files); selfCheck confirms no *.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Checkpoint assignment not yet started (nothing for help to consume)",
+      "where": "no verification report at .standards/docs/verification/low-stock-report-20260924T090000Z-3e9b71c4.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Clean committed git state",
+      "where": "git status clean on main; all layers committed",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "record-format",
+      "assertion": -1,
+      "detail": "expectCheck is ok:false with the single problem 'The assigned checkpoint requires Assessment Purpose INCREMENT and target Increment 1.' even though the catalog says deliberately_invalid=false. This is how the checker at this commit treats any legal TESTING state just after a Developer CHECKPOINT before Tester creates its INCREMENT report. Pre-creating the report would pre-set Tester-owned work. The problem is gated by !atTurnEnd, so check_ok is unaffected, and a help-only run never runs check (the stop hook only fires on uncommitted workflow changes).",
+      "recommendation": "run_as_is",
+      "fix": "None needed; the compromise is correct and expectCheck matches exactly."
+    },
+    {
+      "severity": "note",
+      "kind": "runtime",
+      "assertion": 0,
+      "detail": "The empty-but-complete style inventory relies on invocation.mjs listing only direct-child Markdown files and ignoring .gitkeep. The protocol defines the inventory as direct-child Markdown files, so this is very likely correct, but no selfCheck asserts the helper's reported inventory status.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally add a selfCheck that greps the helper JSON for an empty, complete userStyles inventory."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "Context, scope, and design land in one commit, and the plan, implementation, and STATE advance land in another. This is slightly compressed history but plausible, and it does not affect a help request.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is in the built tree: a TESTING/STANDARD state after a Developer CHECKPOINT, the helper reporting VERIFY and REVERIFY as assessment-selected, and an empty tester user-style folder. The checks are necessary conditions a correct help-only run satisfies (mode identifiers case-insensitive, no files changed, STATE unchanged), and assertion 1 correctly defers command use to the judge. The expected check failure is a legitimate checker artifact that a help run never triggers.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T03:16:04.883Z",
+  "costUsd": 0.1624194,
+  "ms": 34943,
+  "fixtureHash": "06ae6855497a9bcc"
+}

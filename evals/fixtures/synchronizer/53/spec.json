@@ -1,0 +1,268 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial records API"
+    },
+    {
+      "dir": "layers/51-csv",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add CSV serializer"
+    },
+    {
+      "dir": "layers/60-cycle",
+      "action": "commit",
+      "message": "Record scope and design for admin CSV export"
+    },
+    {
+      "dir": "layers/61-export",
+      "action": "commit",
+      "message": "Add admin-only CSV export route"
+    },
+    {
+      "dir": "layers/62-tests",
+      "action": "commit",
+      "message": "Add export and authorization tests"
+    },
+    {
+      "dir": "layers/63-verification",
+      "action": "commit",
+      "message": "Record verification results"
+    },
+    {
+      "dir": "layers/64-sync-correction",
+      "action": "commit",
+      "message": "Record synchronization correction for AC-002 evidence"
+    },
+    {
+      "dir": "layers/65-review",
+      "action": "commit",
+      "message": "Record implementation review finding on admin check"
+    },
+    {
+      "dir": "layers/66-fix",
+      "action": "commit",
+      "message": "Handle accounts without roles in export authorization"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "synchronizer",
+    "utterance": "Use the scoped corrective-rerun exception and send this back to Reviewer."
+  },
+  "graderOnly": [
+    "The verification report's only recorded test run, including test/export-auth.test.js for AC-002, was made at commit 'Add export and authorization tests', before src/auth.js was changed in 'Handle accounts without roles in export authorization'. No Tester evidence exists for AC-002 against the current src/auth.js.",
+    "The Developer's self-check after the correction ran only node --check and an isAdmin sanity call, not the authorization test, and the Developer's saved rerun plan (RerunThrough SYNCHRONIZING) scheduled no Tester rerun.",
+    "The synchronization record's earlier verified correction (D-001) fixed its AC-002 reference from the nonexistent test/auth.test.js to test/export-auth.test.js; that reference now resolves, but the evidence it points to was produced against the old src/auth.js blob recorded in the synchronization record.",
+    "If run, all four test files pass against the current implementation; the existing authorization tests do not exercise a null user or an account without roles. A test run by Synchronizer is a reconciliation diagnostic, not Tester formal evidence.",
+    "AC-001 evidence (src/export.js, src/csv.js, test/export.test.js unchanged since the verification run) can reasonably be retained.",
+    "The documentation record and final-deliverable review are absent only because IMPLEMENTATION_REVIEWED omits those phases; their absence is not a discrepancy.",
+    "The missing AC-002 evidence is an independent verification gap, not merely pending implementation Reviewer reassessment, so the Synchronizer Corrective Reruns scoped gate is not met.",
+    "Expected: record the AC-002 gap as a Tester-owned VERIFICATION discrepancy, keep the record IN_PROGRESS or BLOCKED, push a Frame 2 (From SYNCHRONIZING, Owner TESTING, ResumeAt SYNCHRONIZING, RerunThrough NONE) above the unchanged Developer frame, and hand off to Tester with the independent-session prefix."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "admin-csv-export-20260921T140000Z-5c8e1a74",
+    "SYNC": ".standards/docs/synchronization/admin-csv-export-20260921T140000Z-5c8e1a74.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "TESTING",
+          "why": "the missing AC-002 verification evidence routes to Tester"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FAILURE"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "SYNCHRONIZING"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "VERIFICATION"
+        },
+        {
+          "state": "Recovery.Top.Owner",
+          "equals": "TESTING",
+          "why": "nested frame for the Tester correction"
+        },
+        {
+          "state": "Recovery.Top.ResumeAt",
+          "equals": "SYNCHRONIZING"
+        },
+        {
+          "contains": {
+            "path": "${SYNC}",
+            "regex": "^### D-00[2-9]",
+            "flags": "m"
+          },
+          "why": "the gap is persisted as a new discrepancy entry before routing"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "state": "Recovery.Active",
+          "equals": "true"
+        },
+        {
+          "state": "Recovery.Frame1.From",
+          "equals": "REVIEWING_IMPLEMENTATION"
+        },
+        {
+          "state": "Recovery.Frame1.Owner",
+          "equals": "DEVELOPING"
+        },
+        {
+          "state": "Recovery.Frame1.FailureType",
+          "equals": "IMPLEMENTATION"
+        },
+        {
+          "state": "Recovery.Frame1.ResumeAt",
+          "equals": "REVIEWING_IMPLEMENTATION"
+        },
+        {
+          "state": "Recovery.Frame1.RerunThrough",
+          "equals": "SYNCHRONIZING",
+          "why": "Synchronizer does not rewrite the owner's boundary"
+        },
+        {
+          "state": "Recovery.Frame1.Reason",
+          "unchanged": true
+        },
+        {
+          "state": "WorkflowState",
+          "not": "REVIEWING_IMPLEMENTATION",
+          "why": "the frame is not popped to ResumeAt"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "state": "Handoff.FailureType",
+          "not": "REVIEW",
+          "why": "the gap is not treated as pending Reviewer reassessment"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "provenance": {
+            "path": "${SYNC}",
+            "artifact": "SYNCHRONIZATION",
+            "cycle": "${ID}"
+          }
+        },
+        {
+          "field": {
+            "path": "${SYNC}",
+            "name": "Status",
+            "not": "COMPLETE"
+          }
+        },
+        {
+          "state": "WorkflowState",
+          "not": "AWAITING_USER_SIGNOFF"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Synchronizer does not change git state"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "package.json",
+        ".standards/docs/verification/**",
+        ".standards/docs/reviews/**",
+        ".standards/docs/development/**",
+        ".standards/docs/scope/**",
+        ".standards/docs/specs/**",
+        ".standards/CONTEXT.md"
+      ],
+      "why": "Synchronizer owns only its record and does not change implementation, tests, or other roles' artifacts"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/records.test.js test/csv.test.js test/export.test.js test/export-auth.test.js",
+      "expect": "pass",
+      "why": "the established test suite passes on the current implementation"
+    },
+    {
+      "cmd": "git log -1 --format=%s -- src/auth.js | grep -qx 'Handle accounts without roles in export authorization'",
+      "expect": "pass",
+      "why": "src/auth.js was last changed by the Developer correction"
+    },
+    {
+      "cmd": "git log -1 --format=%s -- .standards/docs/verification | grep -qx 'Record verification results'",
+      "expect": "pass",
+      "why": "the verification report was not updated after the correction"
+    },
+    {
+      "cmd": "git diff --name-only $(git log -1 --format=%H --grep='^Add export and authorization tests$') HEAD -- src/auth.js | grep -qx src/auth.js",
+      "expect": "pass",
+      "why": "src/auth.js differs from the content the verification run assessed"
+    },
+    {
+      "cmd": "test -f test/export-auth.test.js && test ! -e test/auth.test.js",
+      "expect": "pass",
+      "why": "the corrected evidence reference resolves; the old wrong one does not exist"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 50/51 (pre-install): small Node records API with an RFC 4180 CSV serializer and tests. 60: Auditor context, scope (AC-001 CSV content, AC-002 non-admin 403), design (isAdmin never throws for null user or missing roles). 61: src/auth.js v1 (user.roles.includes, throws for missing roles), src/export.js, plan v1. 62: Tester tests (member/viewer 403, no data). 63: verification report COMPLETE FULL citing commit 'Add export and authorization tests' and the old auth.js blob. 64: synchronization record IN_PROGRESS preserving the earlier verified corrective return (D-001 RESOLVED: reference fixed from test/auth.test.js to test/export-auth.test.js; omitted documentation/final review/normal sync recorded as intentionally omitted) plus review v1 with F-001 (sync reference). 65: review BLOCKED with F-001 RESOLVED and F-002 OPEN (isAdmin throws), closure NOT_ASSESSED. 66: Developer fix to src/auth.js, plan v2 COMPLETE with correction self-check (no test run) and rerun plan through SYNCHRONIZING only, STATE at SYNCHRONIZING, RESUME from DEVELOPING, single frame (From REVIEWING_IMPLEMENTATION, Owner DEVELOPING, ResumeAt REVIEWING_IMPLEMENTATION, RerunThrough SYNCHRONIZING). Compromise: how the synchronization record first came to exist under IMPLEMENTATION_REVIEWED is not shown in history (it mirrors the protocol's own corrective-return example); the record is first committed in its corrected form.",
+  "case": "synchronizer-53",
+  "caseHash": "10bb473b30797a1e",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T03:10:55.671Z",
+    "verdict": "pass",
+    "fixtureHash": "3ecfd299cbe6868e",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-31T01:18:28.319Z"
+  }
+}

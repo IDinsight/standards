@@ -1,0 +1,89 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is BROWNFIELD",
+      "where": ".standards/MODE.md (brownfield install, rewritten in layers/60-design)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState DEVELOPING, recovery and obligations inactive",
+      "where": ".standards/STATE.md (layers/70-dev-001)",
+      "status": "realized"
+    },
+    {
+      "condition": "Development plan is APPROVED with User Style NONE locked",
+      "where": ".standards/docs/development/<ID>.md header: Status APPROVED, User Style NONE, User Style Locked true (re-approved revision in layers/80-plan-revision)",
+      "status": "realized"
+    },
+    {
+      "condition": "Next step DEV-002 adds GET /surveys/{id}/responses and is the only remaining step; DEV-001 is DONE",
+      "where": "development plan Build Steps; DEV-001 work committed in app/responses/model.py and migrations/versions/0003_*",
+      "status": "realized"
+    },
+    {
+      "condition": "Existing FastAPI service with routers, services, and SQLModel models",
+      "where": "app/{surveys,responses,users}/ with model/schema/router/service modules, app/dependencies/auth.py",
+      "status": "realized"
+    },
+    {
+      "condition": "Design requires an authenticated owner check and a paginated list, fully specified with no upstream defect",
+      "where": ".standards/docs/specs/<ID>.md Decision and Interfaces sections (per-route get_current_user, owner-scoped None->404, offset/limit 0../1..100, ordering in SQL)",
+      "status": "realized"
+    },
+    {
+      "condition": "The endpoint needs a new query over responses (so sql.md applies)",
+      "where": "app/responses/service.py has only submit_response; the design requires an ordered, paged select",
+      "status": "realized"
+    },
+    {
+      "condition": "An existing auth dependency and an owner field on surveys",
+      "where": "app/dependencies/auth.py get_current_user; app/surveys/model.py owner_id",
+      "status": "realized"
+    },
+    {
+      "condition": "pytest, ruff, and mypy commands are established",
+      "where": ".standards/CONTEXT.md Commands, README.md, pyproject.toml tool config",
+      "status": "realized"
+    },
+    {
+      "condition": "The established commands can actually be run as self-checks in the run environment (catalog external_dependency: FastAPI, SQLModel, pytest, ruff, mypy available)",
+      "where": "Not provided or proven: no venv or installed packages, ruff/mypy not in the image, no selfCheck showing `pip install -e .[dev]` and the three commands succeed with the run's network",
+      "status": "missing"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "blocking",
+      "kind": "runtime",
+      "assertion": 3,
+      "detail": "The catalog requires FastAPI, SQLModel, pytest, ruff, and mypy to be available so the self-checks run. The runner image has only Python 3 and pytest, so `pytest` fails importing fastapi and `ruff` and `mypy` are absent. PyPI is left open, but nothing proves a run can create a venv and install the dev extra: Debian bookworm may lack python3-venv, and PEP 668 blocks a plain pip install. Nothing proves the seeded code passes either. The DEV-001 record claims '7 passed', clean ruff, and clean mypy, but the generator says these are unverified. If the run cannot install, or finds pre-existing ruff, mypy, or pytest failures, it tests environment handling rather than the stated case and may block DEV-002 instead of completing it.",
+      "recommendation": "fix_file",
+      "fix": "In developer-68/spec.json add a selfCheck that runs with the run's network: {\"cmd\": \"python3 -m venv /tmp/v && /tmp/v/bin/pip install -q -e '.[dev]' && /tmp/v/bin/pytest -q && /tmp/v/bin/ruff check . && /tmp/v/bin/mypy app\", \"expect\": \"pass\", \"why\": \"The dev environment can be created and the established checks pass on the seeded code, as the DEV-001 record states.\"}. If venv or PyPI is unavailable in the image, fix any seeded lint or type errors the check reveals. If the environment cannot be provided at all, defer the case as needing a Python dependency runtime the harness lacks."
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 1,
+      "detail": "The negative-lookahead check fails app/responses/service.py if the word HTTPException appears anywhere, including a comment or docstring such as 'the router maps None to HTTPException'. A correct run is unlikely to write that, but it is possible.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally narrow the regex to an import or raise, e.g. ^(?![\\s\\S]*(?:import[^\\n]*HTTPException|raise\\s+HTTPException))."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The plan revision reuses DEV-002 as the merged step and withdraws DEV-003 without a retired-step note in the step list. This is acceptable and explained in Plan Notes, and check.mjs accepts it because DEV-003 was never DONE.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "issues",
+  "summary": "The workflow state, records, code, and design realize the case cleanly, with no leaks, and check.mjs passes. The checks are sound necessary conditions. However, the self-check environment the catalog requires (FastAPI, SQLModel, ruff, mypy runnable) is neither provided nor proven installable, and the seeded code's claimed clean ruff, mypy, and pytest results are unverified. A selfCheck proving the dev install and passing checks is needed before running.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T02:55:15.675Z",
+  "costUsd": 0.3851022,
+  "ms": 83681,
+  "fixtureHash": "0c0ab2dc4f904d8a"
+}

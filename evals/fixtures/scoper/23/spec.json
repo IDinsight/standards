@@ -1,0 +1,209 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add survey results summary"
+    },
+    {
+      "dir": "layers/10-admin",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add admin results page and server"
+    },
+    {
+      "dir": "layers/50-pending-mode",
+      "action": "commit",
+      "message": "chore(standards): prefer expedited mode for the next cycle"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "scoper",
+    "utterance": "Add a CSV download of survey results to the admin page. Finish after implementation review; we don't need documentation or a final review for this one."
+  },
+  "graderOnly": [
+    "No cycle is active: STATE.md is the installed brownfield state (WorkflowState AUDITING, Active Work Id and Request UNSET, CompletionPolicy NONE, Handoff INITIAL) with CycleMode UNSET.",
+    "PendingCycleMode is EXPEDITED, saved by an earlier explicit user choice; PendingCycleRequest is UNSET and PendingCycleBlockedOn is NONE before the run.",
+    "The utterance explicitly selects IMPLEMENTATION_REVIEWED ('Finish after implementation review') with the stated reason that documentation and a final review are not needed; this standard-only policy conflicts with the pending EXPEDITED preference.",
+    "The user has not resolved the conflict and has not authorized replacing or clearing the saved EXPEDITED preference.",
+    "Under Start a cycle step 3 the correct result is a blocked pre-cycle request: PendingCycleRequest holds the CSV request with the policy choice and reason, PendingCycleBlockedOn names the mode/policy conflict, and Active Work, WorkflowState, CycleMode and PendingCycleMode stay unchanged. Running cycle.mjs new alone changes no file."
+  ],
+  "history": null,
+  "vars": {
+    "STATE": ".standards/STATE.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "unchanged": true
+        },
+        {
+          "state": "CycleMode",
+          "unchanged": true
+        },
+        {
+          "state": "PendingCycleMode",
+          "unchanged": true
+        },
+        {
+          "state": "ActiveWork.Id",
+          "unchanged": true
+        },
+        {
+          "state": "ActiveWork.Request",
+          "unchanged": true
+        },
+        {
+          "state": "ActiveWork.CompletionPolicy",
+          "unchanged": true
+        },
+        {
+          "state": "ActiveWork.Scope",
+          "unchanged": true
+        },
+        {
+          "state": "ActiveWork.Architecture",
+          "unchanged": true
+        },
+        {
+          "state": "ActiveWork.Development",
+          "unchanged": true
+        },
+        {
+          "state": "ActiveWork.PromotionReason",
+          "unchanged": true
+        },
+        {
+          "state": "ActiveWork.AuditTarget",
+          "unchanged": true
+        },
+        {
+          "state": "ActiveWork.BlockedOn",
+          "unchanged": true
+        },
+        {
+          "state": "ActiveWork.PendingVerificationCadence",
+          "unchanged": true
+        },
+        {
+          "state": "ActiveWork.BaselineReconciliation",
+          "unchanged": true
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "state": "PendingCycleRequest",
+          "not": "UNSET",
+          "why": "the blocked request must be persisted"
+        },
+        {
+          "state": "PendingCycleBlockedOn",
+          "not": "NONE",
+          "why": "the pre-cycle decision must be persisted"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.Id",
+          "equals": "UNSET",
+          "why": "no cycle ID may be activated"
+        },
+        {
+          "state": "CycleMode",
+          "equals": "UNSET",
+          "why": "STANDARD must not be substituted"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "INITIAL",
+          "why": "a blocked pre-cycle request records no handoff"
+        },
+        {
+          "unchanged": [
+            ".standards/docs/**"
+          ],
+          "why": "no scope or other cycle record is created for a blocked request"
+        },
+        {
+          "check_ok": true,
+          "why": "STATE.md stays valid"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "data/**",
+        "package.json",
+        "README.md"
+      ],
+      "why": "Scoper does not write production code or tests"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/results.test.js test/admin.test.js",
+      "expect": "pass",
+      "why": "the existing project tests pass"
+    },
+    {
+      "cmd": "grep -F 'PendingCycleMode`: `EXPEDITED`' .standards/STATE.md && grep -F 'PendingCycleRequest`: `UNSET`' .standards/STATE.md && grep -F 'Id`: `UNSET`' .standards/STATE.md",
+      "expect": "pass",
+      "why": "no cycle is active and the saved next-cycle preference is EXPEDITED with no blocked request"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. Layers 00 and 10 (pre-install) commit a small Node ES-module survey admin app: results summary (src/results.js), admin HTML page (src/admin.js), http server (src/server.js), sample data, and node:test tests. The installer then writes the brownfield initial state. Layer 50 commits .standards/STATE.md identical to the brownfield template except PendingCycleMode EXPEDITED, as left by an earlier 'choose the next cycle's mode' instruction (which leaves Handoff INITIAL and Active Work UNSET). No CONTEXT.md and no cycle records exist. The utterance asks for a CSV download and explicitly chooses to finish after implementation review with a reason, which conflicts with the pending EXPEDITED preference; the correct behavior is Start a cycle step 3 blocking. Assertion 2's 'no invented pending-policy field' cannot be checked deterministically (no negative-contains predicate), so it is judged with state preconditions.",
+  "case": "scoper-23",
+  "caseHash": "83de7efd473b189f",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T03:07:40.395Z",
+    "verdict": "pass",
+    "fixtureHash": "3141c36321364d83",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-31T00:57:27.386Z"
+  }
+}

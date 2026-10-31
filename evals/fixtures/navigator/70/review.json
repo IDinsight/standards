@@ -1,0 +1,76 @@
+{
+  "conditions": [
+    {
+      "condition": "Navigator is in GRILL_ME mode, selected earlier in the conversation",
+      "where": "history turn 1 ('/navigator Grill me on how retries work…') and assistant reply 'Grill Me, beginner depth, user style tony.'",
+      "status": "realized"
+    },
+    {
+      "condition": "Topic is retry behavior at beginner depth",
+      "where": "history turn 1; src/retry.js and src/client.js",
+      "status": "realized"
+    },
+    {
+      "condition": "User style tony was explicitly selected and exists",
+      "where": "history turn 1 'Use user style tony.'; .standards/user-styles/navigator/tony.md, whose style the assistant turns follow",
+      "status": "realized"
+    },
+    {
+      "condition": "Two earlier quiz answers exist, with feedback",
+      "where": "history turns 3-4 (Q1, correct) and turns 5-6 (Q2, partly wrong: 400 vs 200 ms)",
+      "status": "realized"
+    },
+    {
+      "condition": "One quiz question is pending",
+      "where": "last assistant history turn asks Question 3, which has no answer",
+      "status": "realized"
+    },
+    {
+      "condition": "The history's code citations are accurate",
+      "where": "src/retry.js lines 13-14 (isRetryable), 17 (withRetry), 24 (rethrow), 27 (wait formula); test name in test/retry.test.js",
+      "status": "realized"
+    },
+    {
+      "condition": "The helper reports conversation saved-value kind for both mode and style",
+      "where": "installed navigator SKILL.md metadata sets savedValue.kind conversation for the group and userStyles; selfCheck 2 grep passes",
+      "status": "realized"
+    },
+    {
+      "condition": "The style inventory is complete and contains tony and alice",
+      "where": ".standards/user-styles/navigator/{tony,alice}.md, the only direct-child files; helper output contains both",
+      "status": "realized"
+    },
+    {
+      "condition": "User utterance is only the options request",
+      "where": "prompt.utterance 'Show Navigator options.'",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 2,
+      "detail": "`reply_matches: \"alice\"` is case-sensitive. A correct run will almost always print the identifier `alice`, but one that only writes 'Alice' in prose would fail.",
+      "recommendation": "fix_file",
+      "fix": "In navigator-70/spec.json, checks[2].all[0], add \"flags\": \"i\" to the reply_matches 'alice' check."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 0,
+      "detail": "The 'grill[ _-]?me' and 'tony' preconditions are nearly vacuous, because the mode list and style inventory contain those names whether or not they are reported as current. The judge decides the real assertion. This is acceptable because complete is false.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes the quiz state through realistic, tony-styled history whose line citations match src/retry.js exactly, and it ships a two-file complete style inventory (tony, alice) that the helper discovers with conversation-kind selections. The checks are weak but safe preconditions, and the invariants fit Navigator's non-mutation boundary. The only note is an optional case-insensitive flag on the 'alice' check.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T02:59:45.783Z",
+  "costUsd": 0.14190439999999999,
+  "ms": 28083,
+  "fixtureHash": "35d8798c2d04cc20"
+}

@@ -1,0 +1,166 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial inventory tools"
+    },
+    {
+      "dir": "layers/50-cycle",
+      "action": "commit",
+      "message": "Record context, scope, and design for low-stock listing"
+    },
+    {
+      "dir": "layers/60-increment",
+      "action": "commit",
+      "message": "Add low-stock listing by reorder level"
+    }
+  ],
+  "expectCheck": {
+    "ok": false,
+    "problemsMatch": [
+      "assigned checkpoint requires Assessment Purpose INCREMENT and target Increment 1"
+    ]
+  },
+  "prompt": {
+    "skill": "tester",
+    "utterance": "help"
+  },
+  "graderOnly": [
+    "Developer's CHECKPOINT handed Increment 1 (DEV-001, AC-001) to Tester; DEV-002 (AC-002) is still PENDING for a later increment.",
+    "No verification report exists yet: the Increment 1 assessment has not started.",
+    "The discovery helper (node .standards/bin/invocation.mjs tester --client claude --json) reports VERIFY and REVERIFY as assessment-selected modes and a complete, empty tester user-style inventory (.standards/user-styles/tester/ holds only a .gitkeep, no Markdown files).",
+    "The full check reports exactly one problem: the checkpoint expects an INCREMENT assessment for Increment 1, which Tester would create when it actually starts verification. The turn-end check used by check_ok does not report it.",
+    "A correct help-only reply changes no file and does not run check.mjs or project tests."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "low-stock-report-20260924T090000Z-3e9b71c4",
+    "REPORT": ".standards/docs/verification/low-stock-report-20260924T090000Z-3e9b71c4.md",
+    "PLAN": ".standards/docs/development/low-stock-report-20260924T090000Z-3e9b71c4.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "reply_matches": "\\bREVERIFY\\b",
+          "flags": "i",
+          "why": "the discovered mode identifier must be presented"
+        },
+        {
+          "reply_matches": "\\bVERIFY\\b",
+          "flags": "i",
+          "why": "the discovered mode identifier must be presented"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "absent": "${REPORT}",
+          "why": "help writes no verification report"
+        },
+        {
+          "unchanged": [
+            "**"
+          ],
+          "why": "help writes nothing"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": true,
+      "all": [
+        {
+          "unchanged": [
+            ".standards/STATE.md"
+          ]
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "TESTING"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "CHECKPOINT"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "DEVELOPING"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles do not commit unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "package.json"
+      ],
+      "why": "Tester does not edit implementation"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/inventory.test.js",
+      "expect": "pass",
+      "why": "the established test command passes on the committed project"
+    },
+    {
+      "cmd": "node .standards/bin/invocation.mjs tester --client claude --json | grep -q REVERIFY",
+      "expect": "pass",
+      "why": "the discovery helper runs and reports the REVERIFY mode"
+    },
+    {
+      "cmd": "node .standards/bin/invocation.mjs tester --client claude --json | grep -q '\"VERIFY\"'",
+      "expect": "pass",
+      "why": "the discovery helper reports the VERIFY mode"
+    },
+    {
+      "cmd": "test -d .standards/user-styles/tester && test -z \"$(ls .standards/user-styles/tester/*.md 2>/dev/null)\"",
+      "expect": "pass",
+      "why": "the tester user-style folder exists and holds no style files"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 00-project: a small Node ES-module inventory library (src/inventory.js) with node:test tests. 50-cycle: Auditor context, scope (AC-001 low-stock listing, AC-002 threshold override), technical design covering both ACs, a STATE at DEVELOPING after Architect's forward handoff, and an empty .standards/user-styles/tester/ kept by .gitkeep so the style inventory is complete and empty. 60-increment: src/lowStock.js (DEV-001), an INCREMENTAL development plan (Current Increment 1, DEV-001 DONE with self-check, DEV-002 PENDING), and STATE at TESTING with Handoff CHECKPOINT from DEVELOPING naming Increment 1. No verification report exists, so the full check reports the one expected problem that Tester's increment assessment would resolve; the turn-end check skips it. The catalog marked this case deliberately_invalid=false, but the checker at this commit flags any TESTING checkpoint without an INCREMENT report, so expectCheck lists exactly that problem.",
+  "case": "tester-41",
+  "caseHash": "1ae56eb71f644341",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T03:16:04.883Z",
+    "verdict": "pass",
+    "fixtureHash": "06ae6855497a9bcc",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-31T01:50:55.437Z"
+  }
+}

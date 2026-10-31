@@ -1,0 +1,232 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial time report tool"
+    },
+    {
+      "dir": "layers/50-planning",
+      "action": "commit",
+      "message": "Record project context, scope, and design for report --since"
+    },
+    {
+      "dir": "layers/60-implementation",
+      "action": "commit",
+      "message": "Add --since filter to report command"
+    },
+    {
+      "dir": "layers/70-verification",
+      "action": "commit",
+      "message": "Record verification of report --since"
+    },
+    {
+      "dir": "layers/80-review",
+      "action": "commit",
+      "message": "Record implementation review for report --since"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "reviewer",
+    "utterance": "I want to withdraw the implementation-reviewed completion choice."
+  },
+  "graderOnly": [
+    "The implementation review (COMPLETE), the FULL verification report (COMPLETE), and the ELIGIBLE Implementation-Reviewed Closure assessment all remain current: no project file changed after the commits they assessed.",
+    "No normal Documenter, final-review, or synchronization work has begun: no documentation record, final-deliverable review, or synchronization record exists for the cycle.",
+    "README.md does not yet describe --since; that is ordinary Documenter work once the full-deliverable tail resumes, not something the withdrawal itself should perform.",
+    "The correct result is CompletionPolicy FULL_DELIVERABLE, WorkflowState DOCUMENTING, Handoff COMPLETION_CHANGE from AWAITING_USER_SIGNOFF with FailureType NONE, no recovery frame, the Request's policy instruction replaced, review and verification records untouched, then a Documenter invocation and a stop."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "add-a-since-date-filter-to-the-report-20260924T090000Z-3e8b51c7",
+    "SCOPE": ".standards/docs/scope/add-a-since-date-filter-to-the-report-20260924T090000Z-3e8b51c7.md",
+    "SPEC": ".standards/docs/specs/add-a-since-date-filter-to-the-report-20260924T090000Z-3e8b51c7.md",
+    "DEV": ".standards/docs/development/add-a-since-date-filter-to-the-report-20260924T090000Z-3e8b51c7.md",
+    "VER": ".standards/docs/verification/add-a-since-date-filter-to-the-report-20260924T090000Z-3e8b51c7.md",
+    "IMPL": ".standards/docs/reviews/add-a-since-date-filter-to-the-report-20260924T090000Z-3e8b51c7/implementation.md",
+    "FINAL": ".standards/docs/reviews/add-a-since-date-filter-to-the-report-20260924T090000Z-3e8b51c7/final-deliverable.md",
+    "DOCREC": ".standards/docs/documentation/add-a-since-date-filter-to-the-report-20260924T090000Z-3e8b51c7.md",
+    "SYNC": ".standards/docs/synchronization/add-a-since-date-filter-to-the-report-20260924T090000Z-3e8b51c7.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "state": "Handoff.Kind",
+          "equals": "COMPLETION_CHANGE"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "AWAITING_USER_SIGNOFF"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "NONE"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "false"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "0"
+        },
+        {
+          "contains": {
+            "path": ".standards/STATE.md",
+            "regex": "`Reason`:(?=(?:(?!## Recovery).)*implementation[ _-]reviewed)(?=(?:(?!## Recovery).)*full[ _-]deliverable)",
+            "flags": "is"
+          },
+          "why": "the handoff reason names both the old and the new policy"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.CompletionPolicy",
+          "equals": "FULL_DELIVERABLE"
+        },
+        {
+          "state": "ActiveWork.Id",
+          "unchanged": true
+        },
+        {
+          "state": "ActiveWork.Scope",
+          "unchanged": true
+        },
+        {
+          "state": "ActiveWork.Architecture",
+          "unchanged": true
+        },
+        {
+          "state": "ActiveWork.Development",
+          "unchanged": true
+        },
+        {
+          "unchanged": [
+            "${SCOPE}",
+            "${SPEC}",
+            "${DEV}",
+            "${VER}",
+            "${IMPL}"
+          ],
+          "why": "existing records, including the review report's historical closure assessment, are preserved"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "DOCUMENTING"
+        },
+        {
+          "absent": "${DOCREC}"
+        },
+        {
+          "absent": "${FINAL}"
+        },
+        {
+          "absent": "${SYNC}"
+        },
+        {
+          "unchanged": [
+            "README.md",
+            ".standards/CONTEXT.md",
+            "${SCOPE}",
+            "${SPEC}",
+            "${DEV}",
+            "${VER}"
+          ]
+        },
+        {
+          "no_skill_call": "documenter"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "not": "SIGNED_OFF"
+        },
+        {
+          "state": "Handoff.Kind",
+          "not": "SIGNOFF"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "bin/**",
+        "test/**",
+        "package.json"
+      ],
+      "why": "Reviewer does not edit implementation or tests"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/report.test.js test/cli.test.js",
+      "expect": "pass",
+      "why": "the verified and reviewed test suite passes on the committed implementation"
+    },
+    {
+      "cmd": "node bin/report.js --since 2026-13-01 test/data/entries.csv",
+      "expect": "fail",
+      "expectOutput": "invalid --since date",
+      "why": "AC-002 behavior: an invalid --since date exits non-zero with an error"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 00-project: small Node ESM CLI (timesheet report) committed before install. 50-planning: CONTEXT.md, scope (AC-001..AC-003), design, STATE at DEVELOPING with CompletionPolicy IMPLEMENTATION_REVIEWED and the user's choice and reason recorded in Active Work.Request. 60-implementation: --since filter, src/args.js, CLI tests, COMPLETE development plan, STATE at TESTING. 70-verification: COMPLETE FULL verification report citing the implementation commit, STATE at REVIEWING_IMPLEMENTATION. 80-review: COMPLETE implementation review with an ELIGIBLE Implementation-Reviewed Closure section, STATE at AWAITING_USER_SIGNOFF (FORWARD from REVIEWING_IMPLEMENTATION). No blockers, recovery, obligations, pending cadence, or baseline reconciliation. No documentation, final review, or synchronization record exists. After a correct run, check still passes: COMPLETION_CHANGE AWAITING_USER_SIGNOFF -> DOCUMENTING is a valid route and the implementation review remains COMPLETE.",
+  "case": "reviewer-49",
+  "caseHash": "3545f431c74b7a38",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T03:04:27.130Z",
+    "verdict": "pass",
+    "fixtureHash": "bdc13e96c375ec57",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-31T00:35:07.072Z"
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed with --mode brownfield)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode DOCUMENTATION, CompletionPolicy NONE, Active Work.Id guide-20261004T120000Z-1a2b3c4d",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "WorkflowState SYNCHRONIZING after a normal FORWARD from REVIEWING_FINAL",
+      "where": ".standards/STATE.md Handoff (Kind FORWARD, From REVIEWING_FINAL)",
+      "status": "realized"
+    },
+    {
+      "condition": "Current Auditor context exists",
+      "where": ".standards/CONTEXT.md (layer 51); its description matches src/, bin/, and the 7 passing tests",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope with current ACs and technical coverage of every AC",
+      "where": ".standards/docs/scope/guide-…md (AC-001..AC-004); .standards/docs/specs/guide-…md Acceptance Coverage (AC-004 no architectural impact)",
+      "status": "realized"
+    },
+    {
+      "condition": "COMPLETE documentation record that identifies current content and checks",
+      "where": ".standards/docs/documentation/guide-…md: Status COMPLETE, commit and blob identities, recorded command results",
+      "status": "realized"
+    },
+    {
+      "condition": "Independent COMPLETE final-deliverable review that identifies current content and checks",
+      "where": ".standards/docs/reviews/guide-…/final-deliverable.md: Status COMPLETE, blobs match the current files, records separate-session note, no material findings",
+      "status": "realized"
+    },
+    {
+      "condition": "Every current AC is supported, and the guide accurately describes the code",
+      "where": "docs/import-guide.md and README.md compared with src/parse.js, src/import.js, bin/ledger.js; selfChecks confirm totals, cents, error messages, exit codes, and line numbering",
+      "status": "realized"
+    },
+    {
+      "condition": "No discrepancies, blockers, baseline reconciliation, recovery, or obligations",
+      "where": "STATE.md (BlockedOn NONE, BaselineReconciliation NONE, Recovery and Obligations inactive); both records list NONE remaining",
+      "status": "realized"
+    },
+    {
+      "condition": "No omitted-owner record and no synchronization record before the run",
+      "where": "selfCheck test ! -e for the dev, verification, implementation-review, and sync paths; STATE Development NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "All inputs committed, clean tree",
+      "where": "git status clean on main",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "Every commit, including the pre-install and install commits, carries the same timestamp, 2026-10-04 15:00:00. History reads plausibly otherwise, and nothing in the case depends on commit times.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally stagger layer dates. This is not required."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 2,
+      "detail": "The catalog marked assertion 2 deterministic_complete, but the spec uses complete:false so the judge can confirm the reply does not present readiness as acceptance. This is conservative and correct. The state checks (FORWARD From SYNCHRONIZING, CycleMode still DOCUMENTATION, policy NONE, sync Status COMPLETE) are necessary for the only legal successful path.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes a clean Brownfield DOCUMENTATION cycle at SYNCHRONIZING: context, scope, design, a COMPLETE documentation record, and an independent COMPLETE final review all cite current commit and blob identities, the guide matches the code, and no omitted-owner records exist. The checks are necessary conditions for a correct run: the AC mentions are enforced by check.mjs for a COMPLETE sync record at readiness, other roles' records stay unchanged, and the state values are those of the only legal forward path. The invariants fit Synchronizer, and nothing leaks.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T03:12:30.692Z",
+  "costUsd": 0.281286,
+  "ms": 57217,
+  "fixtureHash": "aafe2099f87167f2"
+}

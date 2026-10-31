@@ -1,0 +1,222 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Set up volunteer portal web app"
+    },
+    {
+      "dir": "layers/01-admin",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add admin pages for users, events, and settings"
+    },
+    {
+      "dir": "layers/50-workflow",
+      "action": "commit",
+      "message": "Record scope and design for remaining event spots"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "navigator",
+    "utterance": "Do a security review of the Next.js admin routes in web/app/admin."
+  },
+  "graderOnly": [
+    "An active STANDARD cycle (show-remaining-event-spots-20260923T141200Z-5c81e0a4) is in DEVELOPING for unrelated work: remaining spots on the public event list.",
+    "Every exported Server Action in web/lib/actions/admin.ts (setUserRole, deactivateUser, deleteEvent, updateSiteSettings) calls requireUser(), which only checks session?.user; none checks the admin role.",
+    "web/proxy.ts matches /admin/:path* and redirects signed-out users to /login and non-admins to /, but returns NextResponse.next() for every non-GET request, so Server Action POSTs are never redirected; Server Actions are reachable by direct POST regardless of the proxy.",
+    "Abuse path: any signed-in volunteer can invoke setUserRole with their own user id and role admin, then sign in again to get an admin session (role is read into the cookie at sign-in); they can also deactivate users, delete events, and change site settings.",
+    "web/app/admin/layout.tsx and the admin pages perform no role check of their own; page GETs are covered by the proxy.",
+    "web/.env.example sets NEXT_PUBLIC_ANALYTICS_KEY to a placeholder publishable-style value (pk_live_xxxxxxxxxxxxxxxx); it is used client-side in web/app/layout.tsx. NEXT_PUBLIC_ variables are inlined into the client bundle, which is acceptable only for a key meant to be public.",
+    "SQL queries are parameterized; sessions are HMAC-signed httpOnly cookies; passwords use scrypt with timingSafeEqual; sign-in has no rate limiting; next.config.ts sets no security headers; there is no lockfile and no automated test suite; admin actions are written to an admin_log table.",
+    "Navigator must change nothing; the correct result is a conversational ASSESS security assessment."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "show-remaining-event-spots-20260923T141200Z-5c81e0a4"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "reply_matches": "A0?1[^0-9]|access control",
+          "flags": "i",
+          "why": "A01 covered"
+        },
+        {
+          "reply_matches": "A0?2[^0-9]|misconfiguration",
+          "flags": "i",
+          "why": "A02 covered"
+        },
+        {
+          "reply_matches": "A0?3[^0-9]|supply.chain",
+          "flags": "i",
+          "why": "A03 covered"
+        },
+        {
+          "reply_matches": "A0?4[^0-9]|cryptograph",
+          "flags": "i",
+          "why": "A04 covered"
+        },
+        {
+          "reply_matches": "A0?5[^0-9]|injection",
+          "flags": "i",
+          "why": "A05 covered"
+        },
+        {
+          "reply_matches": "A0?6[^0-9]|insecure design",
+          "flags": "i",
+          "why": "A06 covered"
+        },
+        {
+          "reply_matches": "A0?7[^0-9]|authentication",
+          "flags": "i",
+          "why": "A07 covered"
+        },
+        {
+          "reply_matches": "A0?8[^0-9]|integrity",
+          "flags": "i",
+          "why": "A08 covered"
+        },
+        {
+          "reply_matches": "A0?9[^0-9]|logging",
+          "flags": "i",
+          "why": "A09 covered"
+        },
+        {
+          "reply_matches": "A10|exceptional condition",
+          "flags": "i",
+          "why": "A10 covered"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "reply_matches": "server.?action",
+          "flags": "i",
+          "why": "the gap concerns Server Actions"
+        },
+        {
+          "reply_matches": "actions/admin",
+          "why": "evidence cites the actions file path"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "reply_matches": "critical|high",
+          "flags": "i",
+          "why": "the missing role check is ranked with a severe conversational label"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "**"
+          ]
+        },
+        {
+          "state": "WorkflowState",
+          "unchanged": true
+        },
+        {
+          "head_unchanged": true
+        },
+        {
+          "not_ran_git": "mutating"
+        },
+        {
+          "no_skill_call": "developer"
+        },
+        {
+          "no_skill_call": "scoper"
+        },
+        {
+          "no_skill_call": "reviewer"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "unchanged": [
+        "**"
+      ],
+      "why": "Navigator persists nothing"
+    },
+    {
+      "head_unchanged": true,
+      "why": "Navigator never moves HEAD"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Navigator never mutates git state"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node .standards/bin/check.mjs --json",
+      "expect": "pass",
+      "why": "the active DEVELOPING cycle is a valid state"
+    },
+    {
+      "cmd": "grep -q 'session?.user' web/lib/actions/admin.ts && ! grep -Eq \"role (===|!==) 'admin'\" web/lib/actions/admin.ts",
+      "expect": "pass",
+      "why": "admin Server Actions check session?.user but not the admin role"
+    },
+    {
+      "cmd": "grep -q \"request.method !== 'GET'\" web/proxy.ts && grep -q \"role !== 'admin'\" web/proxy.ts && grep -q '/admin/:path' web/proxy.ts",
+      "expect": "pass",
+      "why": "proxy redirects non-admins away from /admin pages and only acts on GET requests"
+    },
+    {
+      "cmd": "grep -q '^NEXT_PUBLIC_ANALYTICS_KEY=' web/.env.example",
+      "expect": "pass",
+      "why": "NEXT_PUBLIC_ANALYTICS_KEY is set in web/.env.example"
+    },
+    {
+      "cmd": "! grep -q role web/app/admin/layout.tsx",
+      "expect": "pass",
+      "why": "the admin layout performs no role check of its own"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. Layer 00 (pre-install) commits a small Next.js 16 volunteer portal under web/ (root layout with analytics script reading NEXT_PUBLIC_ANALYTICS_KEY, public event list, login with scrypt and HMAC-signed session cookie, Postgres via pg with parameterized queries). Layer 01 (pre-install) adds web/app/admin pages, web/lib/actions/admin.ts (Server Actions that only call requireUser -> session?.user), and web/proxy.ts (matcher /admin/:path*, redirects non-admins on GET, passes non-GET through). Layer 50 commits an unrelated active STANDARD cycle in DEVELOPING (remaining spots on the event list) with STATE.md, MODE.md, CONTEXT.md, scope (AC-001, AC-002), and design; Development is NONE as Developer has not started. No dependencies are installed (no node_modules, no lockfile); Navigator assesses statically. The utterance omits the case's stated defects so the role must find them.",
+  "case": "navigator-79",
+  "caseHash": "c049c45fbc713c50",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T03:01:54.787Z",
+    "verdict": "pass",
+    "fixtureHash": "5a83a8548a2c3f41",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-31T00:18:12.305Z"
+  }
+}

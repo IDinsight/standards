@@ -1,0 +1,253 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial attendance tools"
+    },
+    {
+      "dir": "layers/10-design",
+      "action": "commit",
+      "message": "Record context, scope, and design for attendance export"
+    },
+    {
+      "dir": "layers/20-export",
+      "action": "commit",
+      "message": "Add attendance CSV export"
+    },
+    {
+      "dir": "layers/25-export-tests",
+      "action": "commit",
+      "message": "Add attendance export tests"
+    },
+    {
+      "dir": "layers/30-date-filter",
+      "action": "commit",
+      "message": "Add date-range filter to attendance export"
+    },
+    {
+      "dir": "layers/40-verification",
+      "action": "commit",
+      "message": "Record Increment 2 assessment progress"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "developer",
+    "utterance": "Change the completion policy to IMPLEMENTATION_REVIEWED."
+  },
+  "graderOnly": [
+    "No normal documentation, final-review, or synchronization work has begun in this cycle; no documentation, review, or synchronization record exists.",
+    "The earlier explicit policy instruction saved in Active Work.Request is the sentence 'Completion policy instruction: the user explicitly selected FULL_DELIVERABLE for this cycle.' A correct run replaces that instruction with the new IMPLEMENTATION_REVIEWED choice while keeping the implementation request text.",
+    "The saved Active Work.BlockedOn is a Tester scenario-budget question for the Increment 2 assessment and is unrelated to the completion policy; it must stay as saved.",
+    "PendingVerificationCadence AFTER_IMPLEMENTATION is a pending user cadence request that only Developer may apply at a safe normal DEVELOPING boundary after Tester returns the checkpoint; it must stay pending.",
+    "Changing between standard policies in TESTING is a same-state route: WorkflowState and the entire CHECKPOINT handoff are preserved, no COMPLETION_CHANGE handoff is recorded, and no recovery frame is pushed."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "attendance-export-20260921T140000Z-3f9a2c71",
+    "PLAN": ".standards/docs/development/attendance-export-20260921T140000Z-3f9a2c71.md",
+    "VER": ".standards/docs/verification/attendance-export-20260921T140000Z-3f9a2c71.md",
+    "SCOPE": ".standards/docs/scope/attendance-export-20260921T140000Z-3f9a2c71.md",
+    "SPEC": ".standards/docs/specs/attendance-export-20260921T140000Z-3f9a2c71.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "TESTING"
+        },
+        {
+          "state": "CycleMode",
+          "equals": "STANDARD"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "CHECKPOINT"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "DEVELOPING"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "NONE"
+        },
+        {
+          "state": "Handoff.Reason",
+          "unchanged": true
+        },
+        {
+          "state": "ActiveWork.PendingVerificationCadence",
+          "equals": "AFTER_IMPLEMENTATION"
+        },
+        {
+          "state": "ActiveWork.BlockedOn",
+          "unchanged": true
+        },
+        {
+          "state": "ActiveWork.Id",
+          "unchanged": true
+        },
+        {
+          "state": "ActiveWork.Scope",
+          "unchanged": true
+        },
+        {
+          "state": "ActiveWork.Architecture",
+          "unchanged": true
+        },
+        {
+          "state": "ActiveWork.Development",
+          "unchanged": true
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "false"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "0"
+        },
+        {
+          "state": "Obligations.Active",
+          "equals": "false"
+        },
+        {
+          "field": {
+            "path": "${PLAN}",
+            "name": "Current Increment",
+            "equals": "2"
+          }
+        },
+        {
+          "field": {
+            "path": "${PLAN}",
+            "name": "Verification Cadence",
+            "equals": "INCREMENTAL"
+          }
+        },
+        {
+          "unchanged": [
+            ".standards/docs/**",
+            ".standards/CONTEXT.md",
+            ".standards/MODE.md",
+            "src/**",
+            "test/**",
+            "package.json"
+          ],
+          "why": "role artifacts, records, and project files stay as saved"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.CompletionPolicy",
+          "equals": "IMPLEMENTATION_REVIEWED"
+        },
+        {
+          "state": "ActiveWork.Request",
+          "changed": true,
+          "why": "the earlier FULL_DELIVERABLE instruction must be replaced in the saved request"
+        },
+        {
+          "unchanged": [
+            ".standards/docs/scope/**"
+          ],
+          "why": "acceptance conditions are not revised"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.BlockedOn",
+          "unchanged": true
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "TESTING"
+        },
+        {
+          "unchanged": [
+            ".standards/docs/development/**",
+            ".standards/docs/verification/**",
+            "src/**",
+            "test/**"
+          ]
+        },
+        {
+          "no_skill_call": "tester"
+        },
+        {
+          "no_skill_call": "reviewer"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/csv.test.js test/export.test.js",
+      "expect": "pass",
+      "why": "the committed implementation passes the existing CSV tests and the Tester's Increment 1 export tests"
+    },
+    {
+      "cmd": "npm test",
+      "expect": "pass",
+      "why": "the established test script runs offline"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the saved TESTING checkpoint state, plan, and Increment 2 assessment target are valid"
+    }
+  ],
+  "notes": "Brownfield Node library (attendance-tools). 00-project: records/csv helpers and CSV tests. 10-design: CONTEXT.md, scope (AC-001 unfiltered export, AC-002 date-range filter, AC-003 site filter), design. 20-export: DEV-001 code. 25-export-tests: Tester's test/export.test.js for Increment 1. 30-date-filter: DEV-002 code and the development plan (AUTONOMOUS, User Style NONE locked, IN_PROGRESS, INCREMENTAL, Current Increment 2; DEV-001/DEV-002 DONE with self-check evidence, DEV-003 PENDING; Increments 1-3). 40-verification: verification report IN_PROGRESS with Assessment Purpose INCREMENT / target Increment 2 (Increment 1 VERIFIED, AC-003 AWAITING_IMPLEMENTATION) and STATE.md: TESTING, STANDARD, FULL_DELIVERABLE, CHECKPOINT from DEVELOPING naming only Increment 2, PendingVerificationCadence AFTER_IMPLEMENTATION, a Tester scenario-budget question in BlockedOn, recovery and obligations inactive. Active Work.Request carries the earlier explicit policy instruction ('Completion policy instruction: the user explicitly selected FULL_DELIVERABLE for this cycle.') for the new choice to replace. The Increment 2 assessment is opened in the report so the full check passes.",
+  "case": "developer-58",
+  "caseHash": "dd94ab00d30a2e07",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T02:52:02.518Z",
+    "verdict": "pass",
+    "fixtureHash": "33a9f95282554e84",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-30T23:23:30.532Z"
+  }
+}

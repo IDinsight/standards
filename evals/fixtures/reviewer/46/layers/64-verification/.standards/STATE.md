@@ -1,0 +1,34 @@
+# S.T.A.N.D.A.R.D.S. Workflow State
+
+`WorkflowState`: `REVIEWING_IMPLEMENTATION` `CycleMode`: `STANDARD`
+`PendingCycleMode`: `UNSET` `PendingCycleRequest`: `UNSET`
+`PendingCycleBlockedOn`: `NONE`
+
+## Active Work
+
+`CompletionPolicy`: `IMPLEMENTATION_REVIEWED` `Id`:
+`archive-retention-20260924T090000Z-5c81e2a7` `Request`:
+`Make the archive cleanup retention window configurable, add a dry-run option, and give operators a guide for both. Workflow instruction: the user explicitly selected IMPLEMENTATION_REVIEWED completion for this cycle, saying "it's a small internal change, so close it once implementation review passes."`
+`Scope`:
+`.standards/docs/scope/archive-retention-20260924T090000Z-5c81e2a7.md`
+`Architecture`:
+`.standards/docs/specs/archive-retention-20260924T090000Z-5c81e2a7.md`
+`Development`:
+`.standards/docs/development/archive-retention-20260924T090000Z-5c81e2a7.md`
+`PromotionReason`: `NONE` `AuditTarget`: `NONE` `BlockedOn`: `NONE`
+`PendingVerificationCadence`: `NONE`
+
+`BaselineReconciliation`: `NONE`
+
+## Handoff
+
+`Kind`: `FORWARD` `From`: `TESTING` `FailureType`: `NONE` `Reason`:
+`Full verification complete for AC-001 and AC-003; AC-002 remains with Documenter.`
+
+## Recovery
+
+`Active`: `false`
+
+## Outstanding Obligations
+
+`Active`: `false`

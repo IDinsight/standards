@@ -1,0 +1,66 @@
+{
+  "conditions": [
+    {
+      "condition": "Brownfield project in a STANDARD cycle with CompletionPolicy FULL_DELIVERABLE, currently in DOCUMENTING",
+      "where": ".standards/MODE.md (BROWNFIELD); .standards/STATE.md WorkflowState DOCUMENTING, CycleMode STANDARD, CompletionPolicy FULL_DELIVERABLE",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and outstanding obligations inactive",
+      "where": ".standards/STATE.md Recovery Active false, Outstanding Obligations Active false",
+      "status": "realized"
+    },
+    {
+      "condition": "Every other DOCUMENTING-route precondition holds: FORWARD from REVIEWING_IMPLEMENTATION, BlockedOn NONE, current passing implementation review, COMPLETE FULL verification",
+      "where": ".standards/STATE.md Handoff FORWARD from REVIEWING_IMPLEMENTATION and BlockedOn NONE; reviews/<id>/implementation.md Status COMPLETE with no findings and AC-003 as a permitted dependency; verification/<id>.md COMPLETE with Assessment Purpose FULL; src/rates.js unchanged since review",
+      "status": "realized"
+    },
+    {
+      "condition": "Normal documentation edits for this cycle are already saved in the project docs",
+      "where": "Unstaged README.md 'Free shipping' section and CHANGELOG.md Unreleased entry (layer 75-docs). They cover AC-003 accurately against src/rates.js and postdate the review, whose recorded README blob had no threshold section.",
+      "status": "realized"
+    },
+    {
+      "condition": "No documentation record exists yet",
+      "where": ".standards/docs/documentation/ absent (selfCheck confirms)",
+      "status": "realized"
+    },
+    {
+      "condition": "The user argues the missing record means Documenter has not begun",
+      "where": "prompt.utterance",
+      "status": "realized"
+    },
+    {
+      "condition": "The request is policy-only and does not change the implementation contract",
+      "where": "utterance plus unchanged Active Work.Request and scope ACs; graderOnly",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The documentation edits exist without any documentation record, although the Documenter skill says to create the record early. A run might reasonably ask who made the edits. This is the situation the case states, and the edits plainly match AC-003 and postdate the review, so 'begun' remains the natural reading. The judge can weigh a run that asks about authorship before refusing.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "There is no `unchanged` invariant on src/** or test/** for the Documenter. That is not one of the standard invariants for this role, but it would cheaply guard against behavior edits. Optional.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes a STANDARD/FULL_DELIVERABLE DOCUMENTING state with every route precondition met except that documentation has already begun, shown by unstaged README and CHANGELOG edits covering AC-003, with no documentation record. Nothing leaks, check.mjs is ok, and every check (policy stays FULL_DELIVERABLE, no COMPLETION_CHANGE, no move to REVIEWING_IMPLEMENTATION, Request unchanged, README still documents the option) is a necessary condition for any correct run. Assertion 2 is left to the judge with complete:false, which is appropriate.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T02:56:15.110Z",
+  "costUsd": 0.20903539999999998,
+  "ms": 42019,
+  "fixtureHash": "a2b982206f8eb020"
+}

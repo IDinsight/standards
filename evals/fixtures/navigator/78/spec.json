@@ -1,0 +1,185 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add survey responses API"
+    },
+    {
+      "dir": "layers/60-ci",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add CI workflow and contributing guide"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "navigator",
+    "utterance": "ASSESS mode: assess the FastAPI service in api/ against Level 4."
+  },
+  "graderOnly": [
+    "No STANDARDS cycle is active: STATE.md is the freshly installed brownfield state (WorkflowState AUDITING, CycleMode UNSET, Active Work.Id UNSET).",
+    "api/ separates HTTP routers (api/app/routers), business rules (api/app/services), and SQL persistence (api/app/persistence).",
+    "pytest covers auth failures in api/tests/test_auth.py (missing header, non-Bearer scheme, empty token, unknown key, revoked key) and HTTP 401 responses in api/tests/test_api.py; test_api.py runs in CI where FastAPI is installed and is skipped in the runner, where FastAPI is not installed.",
+    "Level 1-2 evidence is present: numbered SQL migrations in api/migrations applied by api/app/persistence/migrate.py and recorded in schema_migrations (tested in api/tests/test_migrations.py); environment-based configuration (api/app/config.py, api/.env.example, .env gitignored); a dev SQLite file (var/dev.sqlite3) separate from per-test temporary databases (api/tests/conftest.py uses tmp_path); setup, test, and migration docs in README.md; hashed API keys; pydantic input validation; a /health endpoint; pinned dependencies.",
+    "CI (.github/workflows/ci.yml) runs ruff, mypy, and pytest with a pip cache, prints and uploads a coverage report, and builds the container image with a layer cache; CONTRIBUTING.md states the test and image jobs are required checks before merge (branch protection itself is not visible in the repository).",
+    "CI has no dependency vulnerability scanning (no pip-audit, Dependabot, or similar), so the CI/CD area lacks Level 3 evidence and the service as a whole is Level 2.",
+    "Logging is plain-text print() calls; there is no structured logging, no rate limiting, no metrics or error tracking, and no staging deployment.",
+    "Distractors: slowapi is pinned in api/requirements.txt but never imported; api/app/main.py has a comment claiming per-client limits are enforced by slowapi; api/app/observability/ contains only a docstring. None of these is working evidence of rate limiting or observability."
+  ],
+  "history": null,
+  "vars": {},
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "reply_matches": "(level|L) ?(2|two)([^0-9]|$)",
+          "flags": "i",
+          "why": "a correct run states the assessed level, Level 2"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "**"
+          ],
+          "why": "Navigator writes no files"
+        },
+        {
+          "state": "WorkflowState",
+          "unchanged": true,
+          "why": "no cycle is started"
+        },
+        {
+          "state": "ActiveWork.Id",
+          "equals": "UNSET",
+          "why": "no cycle ID is created"
+        },
+        {
+          "no_skill_call": "scoper",
+          "why": "Scoper is suggested, not started"
+        },
+        {
+          "reply_matches": "scoper",
+          "flags": "i",
+          "why": "the assertion requires suggesting Scoper by name"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "unchanged": [
+        "**"
+      ],
+      "why": "Navigator persists nothing (generated caches are ignored)"
+    },
+    {
+      "head_unchanged": true,
+      "why": "Navigator never moves HEAD"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Navigator never mutates git state"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "cd api && python3 -m pytest -q",
+      "expect": "pass",
+      "why": "the established pytest suite passes (test_api.py is skipped without FastAPI)"
+    },
+    {
+      "cmd": "cd api && python3 -m pytest -q tests/test_auth.py",
+      "expect": "pass",
+      "why": "pytest covers auth failures"
+    },
+    {
+      "cmd": "cd api && python3 -m pytest -q tests/test_migrations.py",
+      "expect": "pass",
+      "why": "managed migrations apply to a fresh database and are recorded"
+    },
+    {
+      "cmd": "test -d api/app/routers && test -d api/app/services && test -d api/app/persistence",
+      "expect": "pass",
+      "why": "routers, services, and persistence modules are separated"
+    },
+    {
+      "cmd": "grep -q tmp_path api/tests/conftest.py && grep -q 'var/dev.sqlite3' api/app/config.py",
+      "expect": "pass",
+      "why": "tests use their own temporary database, separate from the dev database"
+    },
+    {
+      "cmd": "grep -q 'ruff check' .github/workflows/ci.yml && grep -q mypy .github/workflows/ci.yml && grep -q 'cache: pip' .github/workflows/ci.yml && grep -q 'docker/build-push-action' .github/workflows/ci.yml && grep -q 'cov-report' .github/workflows/ci.yml",
+      "expect": "pass",
+      "why": "CI runs ruff, mypy, and pytest with cached installs, reports coverage, and builds the image"
+    },
+    {
+      "cmd": "test ! -e .github/dependabot.yml && ! grep -rqiE 'pip-audit|dependabot|snyk|trivy|osv-scanner|safety' .github api",
+      "expect": "pass",
+      "why": "CI has no dependency vulnerability scanning"
+    },
+    {
+      "cmd": "grep -rq 'print(' api/app && ! grep -rqE 'import logging|structlog|loguru' api/app",
+      "expect": "pass",
+      "why": "logs are plain-text print statements"
+    },
+    {
+      "cmd": "grep -q '^slowapi==' api/requirements.txt && ! grep -rqE 'from slowapi|import slowapi|Limiter' api/app",
+      "expect": "pass",
+      "why": "slowapi is a dependency but no rate limiting is wired in"
+    },
+    {
+      "cmd": "! grep -rqE 'def |import ' api/app/observability && ! grep -rqiE 'prometheus|sentry|opentelemetry|statsd|datadog' .github api",
+      "expect": "pass",
+      "why": "no metrics or error tracking; the observability package is empty"
+    },
+    {
+      "cmd": "! grep -rqi staging .github api README.md CONTRIBUTING.md",
+      "expect": "pass",
+      "why": "there is no staging deployment"
+    }
+  ],
+  "notes": "Standalone brownfield fixture with no cycle (installer's initial STATE.md left as installed). Layer 50-project (pre-install commit) adds a FastAPI survey-responses service in api/: routers, services, and SQLite persistence separated; numbered SQL migrations with a runner; env-based config with .env.example; per-test temporary databases; hashed API keys with stdlib auth logic tested in tests/test_auth.py; a FastAPI TestClient file skipped when FastAPI is absent; print() logging; unused slowapi pin, a stale comment claiming slowapi limits, and an empty observability package as distractors for assertion 2. Layer 60-ci (pre-install commit) adds .github/workflows/ci.yml (ruff, mypy, pytest with pip cache, coverage report and artifact, docker build with cache; no dependency scanning, no deploy job) and CONTRIBUTING.md stating the CI jobs are required before merge. Nothing is staged or dirty. selfChecks use python3 because the runner image has no python alias.",
+  "case": "navigator-78",
+  "caseHash": "932167e7fe4e8a56",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T03:01:46.130Z",
+    "verdict": "pass",
+    "fixtureHash": "ab4c239f3d47b9d9",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-31T00:21:30.615Z"
+  }
+}

@@ -1,0 +1,130 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add contact sync client with retrying fetch"
+    },
+    {
+      "dir": "layers/10-styles",
+      "action": "commit",
+      "message": "Add navigator user styles"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "navigator",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "In the earlier turns Navigator ran GRILL_ME on retry behavior in syncer/. In the first turn the user explicitly selected user style brief and asked for medium depth: they know the basics of exponential backoff, so skip textbook definitions but stay out of the weeds.",
+    "Question 1 (how many times retry calls fn with the defaults when every call raises TransientError, and what the caller gets) and Question 2 (whether get_json retries a 404) were both answered correctly and received feedback.",
+    "Question 3 is the pending quiz question and has not been answered: get_json keeps getting 503s until it gives up; ignoring jitter, what are the waits between its attempts and the total wait, and what does the jitter do to those numbers.",
+    "The fourth user turn asked only for Navigator's modes and options. It is not an answer to Question 3 and requested no mode, style, topic, or depth change. The assistant listed the options and left Question 3 pending.",
+    "Ground truth for Question 3: get_json passes attempts=5, so there are four waits of 0.5, 1, 2, and 4 seconds (7.5 s in total; max_delay 8 is never reached). The jitter multiplies each wait by a factor in [0.5, 1), so the total lies between 3.75 s and just under 7.5 s.",
+    "Nothing under syncer/ or tests/ changed after the earlier turns. The file and line references in the earlier turns match the committed source."
+  ],
+  "history": {
+    "turns": [
+      {
+        "role": "user",
+        "text": "/navigator Use user style brief. Grill me on the retry behavior in syncer/. I know the basics of exponential backoff, so pitch it at medium depth: skip textbook definitions, but don't go into the weeds."
+      },
+      {
+        "role": "assistant",
+        "text": "Using style `brief`: GRILL_ME on retry behavior in `syncer/`, at medium depth. I read `syncer/retry.py`, `syncer/client.py`, and `tests/test_retry.py`. You can ask `/navigator help` for options at any time.\n\n**Question 1:** With the defaults of `retry` in `syncer/retry.py`, if `fn` raises `TransientError` on every call, how many times is `fn` called, and what does the caller get in the end?"
+      },
+      {
+        "role": "user",
+        "text": "Four calls. On the last one it doesn't return anything, it just raises the TransientError again."
+      },
+      {
+        "role": "assistant",
+        "text": "Correct. `attempts=4` and `range(1, attempts + 1)` give four tries (`syncer/retry.py:14`, `:20`), and `if attempt == attempts: raise` re-raises the last `TransientError` (`syncer/retry.py:24-25`). One detail worth keeping: there are three waits, not four, because nothing sleeps after the final failure.\n\n**Question 2:** `get_json` in `syncer/client.py` gets a 404 on its first request. Is it retried? Why or why not?"
+      },
+      {
+        "role": "user",
+        "text": "No. 404 isn't one of the retryable statuses, so once() raises PermanentError, and retry only catches TransientError, so it goes straight out after one call."
+      },
+      {
+        "role": "assistant",
+        "text": "Right on both points. A 404 is not in `RETRYABLE_STATUSES`, so `once()` raises `PermanentError` (`syncer/client.py:15-18`), and `retry` catches only `TransientError` (`syncer/retry.py:23`), so the error leaves after a single call. `test_get_json_does_not_retry_not_found` in `tests/test_retry.py` checks exactly that.\n\n**Question 3:** `get_json` keeps getting 503s until it gives up. Ignoring jitter, what are the waits between its attempts, and how long does it wait in total? Then: what does the jitter do to those numbers?"
+      },
+      {
+        "role": "user",
+        "text": "Hang on, before I answer that: what modes and options do you have?"
+      },
+      {
+        "role": "assistant",
+        "text": "Navigator's options, from the installed discovery helper:\n\n**You can choose** (conversation mode):\n- `EXPLAIN`: explain existing project behavior from evidence. Example: `/navigator Explain how get_json decides what to retry.`\n- `INVESTIGATE`: trace a concrete repository question through evidence. Example: `/navigator Investigate which errors can escape pull_contacts.`\n- `GRILL_ME`: check your understanding with a quiz. This is the current mode.\n- `ASSESS`: informally assess an area against a named checklist. Example: `/navigator Assess syncer/ against the Python stack conventions.`\n\n**User styles** (`.standards/user-styles/navigator/`): `brief` (selected in this conversation) and `detailed`. Switch with `Use user style detailed.` or clear with `Use user style NONE.` A style lasts only for this conversation.\n\n**Targets:** any file, folder, or area you name, such as `syncer/retry.py`.\n\nNothing has changed: still GRILL_ME on retry behavior, style `brief`, and Question 3 is waiting for your answer whenever you're ready."
+      }
+    ]
+  },
+  "vars": {},
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": []
+    }
+  ],
+  "invariants": [
+    {
+      "unchanged": [
+        "**"
+      ],
+      "why": "Navigator persists nothing (generated caches are ignored)"
+    },
+    {
+      "head_unchanged": true,
+      "why": "Navigator never moves HEAD"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Navigator never mutates git state"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "python3 -m pytest -q",
+      "expect": "pass",
+      "why": "the project's test suite passes on the committed source the quiz is about"
+    },
+    {
+      "cmd": "python3 -c 'from syncer.retry import backoff_delay; waits = [backoff_delay(n) for n in range(1, 5)]; assert waits == [0.5, 1.0, 2.0, 4.0]; assert sum(waits) == 7.5; print(waits)'",
+      "expect": "pass",
+      "why": "ground truth for the pending Question 3: get_json's four waits before jitter are 0.5, 1, 2, and 4 seconds, 7.5 s in total"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. Layer 00-project (pre-install) commits a small Python contact-sync package: syncer/retry.py (retry with exponential backoff, a cap, and jitter; only TransientError is retried), syncer/client.py (get_json retries 502/503/504 with attempts=5), syncer/sync.py (paged pull using get_json), and tests/test_retry.py (pytest). The installer then writes the default brownfield state with no active cycle, and Navigator needs nothing more. Layer 10-styles commits two navigator user styles, brief and detailed. The history carries the case: the user selected style brief and medium depth for GRILL_ME on retry behavior, answered Questions 1 and 2 correctly, was asked Question 3 (delays and jitter in get_json), then asked a help-only question; the assistant listed the options and left Question 3 pending. The run's message is 'Continue.' The source is unchanged since those turns, and the line references in history match the committed files. Both assertions are judged: re-presenting or awaiting Question 3 without onboarding, without reverting to EXPLAIN, and without grading the help turn needs semantic judgment.",
+  "case": "navigator-72",
+  "caseHash": "9bdd1ff11e415329",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T03:00:04.219Z",
+    "verdict": "pass",
+    "fixtureHash": "f99bc0ac6589a14a",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-31T00:12:41.207Z"
+  }
+}

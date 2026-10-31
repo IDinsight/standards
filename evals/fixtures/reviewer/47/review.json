@@ -1,0 +1,84 @@
+{
+  "conditions": [
+    {
+      "condition": "WorkflowState AWAITING_USER_SIGNOFF, CycleMode STANDARD, CompletionPolicy IMPLEMENTATION_REVIEWED",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Brownfield project with completed scope, design, context, development plan, and verification",
+      "where": ".standards/MODE.md (installed BROWNFIELD), .standards/CONTEXT.md, .standards/docs/scope|specs|development|verification/records-csv-export-20260923T141200Z-5c81e0a4.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Ordinary implementation review is COMPLETE and closure is ELIGIBLE with recorded content identities",
+      "where": ".standards/docs/reviews/records-csv-export-20260923T141200Z-5c81e0a4/implementation.md (Status COMPLETE; Implementation-Reviewed Closure Eligibility ELIGIBLE; Assessed Inputs cite commit c1c3730 and pre-change blobs af774fd for routes.js and ce70fb0 for access.json)",
+      "status": "realized"
+    },
+    {
+      "condition": "After that assessment, the endpoint and authorization configuration changed",
+      "where": "commit 8c151ae 'Use .csv export path and let managers export' modifies src/routes.js (route moves to /admin/records/export.csv) and config/access.json (records:export adds manager); selfChecks confirm old path 404 and manager 200",
+      "status": "realized"
+    },
+    {
+      "condition": "Tester evidence still refers to the old content",
+      "where": "verification report cites commit 7fa2127 and pre-change blobs; it is unchanged since c1c3730",
+      "status": "realized"
+    },
+    {
+      "condition": "Report labels have not changed, and check.mjs passes",
+      "where": "implementation.md and verification report unchanged after layer 40; gate checkMjs ok:true",
+      "status": "realized"
+    },
+    {
+      "condition": "No recovery frame is active and no outstanding obligations",
+      "where": ".standards/STATE.md Recovery Active false, Obligations Active false",
+      "status": "realized"
+    },
+    {
+      "condition": "Existing tests still pass on the changed content, so passing checks are misleading",
+      "where": "test/export.test.js calls exportRecordsHandler directly and never uses manager; selfCheck 1 passes with 12/12",
+      "status": "realized"
+    },
+    {
+      "condition": "Clean committed git state",
+      "where": "git status clean on main",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "hint-leak",
+      "assertion": 0,
+      "detail": "The closure prose in implementation.md ends with 'This eligibility holds only for the input identities listed above.' A Reviewer could plausibly write this, but it nudges the role to compare identities, which is exactly what assertion 0 tests.",
+      "recommendation": "fix_file",
+      "fix": "In layers/40-review/.standards/docs/reviews/records-csv-export-20260923T141200Z-5c81e0a4/implementation.md, delete the final sentence of the closure prose paragraph: 'This eligibility holds only for the input identities listed above.'"
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 3,
+      "detail": "The `unchanged` check covers .standards/docs/reviews/**, so a run that edits the review report fails assertion 3. For example, a run might move the ELIGIBLE closure to history or set it to NOT_ASSESSED. The check still holds up: Reviewer may do owned work only in a review state, the user asked for no new review, and the sign-off rule says the recording agent does not author a replacement review conclusion. Report edits at AWAITING_USER_SIGNOFF are therefore incorrect.",
+      "recommendation": "run_as_is",
+      "fix": "No change; the check matches the skill's entry rule and the sign-off rule."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 2,
+      "detail": "The state checks require exactly one frame, with From and ResumeAt AWAITING_USER_SIGNOFF and Owner DEVELOPING or TESTING. Under Recovery Mechanics, one push per corrective routing is the only legal shape, and check.mjs requires WorkflowState to equal the Owner while RerunThrough is NONE. The checks therefore fit every correct routing. A run that only explains and does not route would fail, but the case's expected output requires routing.",
+      "recommendation": "run_as_is",
+      "fix": "No change."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized: a STANDARD IMPLEMENTATION_REVIEWED cycle sits at AWAITING_USER_SIGNOFF with a COMPLETE, ELIGIBLE implementation review that cites pre-change identities, and an ordinary later commit changes the export path and access config. check.mjs passes and the tests still pass. The checks and invariants are necessary conditions for correct runs; the only notes are a mildly leading closing sentence in the review report and the deliberate strictness of assertion 3's unchanged-records check.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T03:03:23.435Z",
+  "costUsd": 0.32667779999999996,
+  "ms": 73581,
+  "fixtureHash": "844834de5bd922a1"
+}

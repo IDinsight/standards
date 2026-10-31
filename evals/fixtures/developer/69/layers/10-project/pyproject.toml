@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tally"
+version = "0.3.0"
+description = "Count word frequencies in text files."
+requires-python = ">=3.11"
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff==0.6.9"]
+
+[project.scripts]
+tally = "tally.cli:main"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F"]

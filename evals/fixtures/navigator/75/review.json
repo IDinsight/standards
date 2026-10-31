@@ -1,0 +1,69 @@
+{
+  "conditions": [
+    {
+      "condition": "Navigator's help discovery helper is installed and returns the four modes (EXPLAIN, INVESTIGATE, GRILL_ME, ASSESS)",
+      "where": ".standards/bin/invocation.mjs plus .claude/skills/navigator/modes/*.md (pristine install); selfCheck `invocation.mjs navigator ... | grep -q GRILL_ME` passes",
+      "status": "realized"
+    },
+    {
+      "condition": "Style inventory is unknown because the navigator style directory is unreadable",
+      "where": "runtime.unreadable: [.standards/user-styles/navigator] (mode 000 for the run)",
+      "status": "realized"
+    },
+    {
+      "condition": "Style files exist but their names cannot be learned from git",
+      "where": "layer 50-styles (untracked): maeve.md and kofi-walkthrough.md; selfCheck confirms `git ls-files .standards/user-styles` is empty",
+      "status": "realized"
+    },
+    {
+      "condition": "Earlier conversation selected INVESTIGATE and finished with no question pending, so a bare `help` asks for the option summary",
+      "where": "history: user turn `/navigator INVESTIGATE ...` and a complete assistant answer",
+      "status": "realized"
+    },
+    {
+      "condition": "History's citations match the repository",
+      "where": "src/timer/cli.py:15; src/timer/durations.py:4, 12, 15, 16; README.md:9-10; tests/test_durations.py:10-11 (all verified)",
+      "status": "realized"
+    },
+    {
+      "condition": "Workflow runtime is valid (no cycle needed)",
+      "where": "default brownfield STATE.md; check.mjs ok:true",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "blocking",
+      "kind": "check-too-strict",
+      "assertion": 1,
+      "detail": "The mode-name `reply_matches` patterns are case-sensitive. `GRILL_ME|Grill [Mm]e` fails a correct reply that writes \"grill me\", \"Grill-Me\", or \"GRILL ME\". The same applies to lowercase \"explain\", \"assess\", and \"investigate\". The catalog entry says the mode names should match case-insensitively, by id or label.",
+      "recommendation": "fix_file",
+      "fix": "In navigator-75/spec.json, checks[1].all: add `\"flags\": \"i\"` to all four reply_matches. Change the GRILL_ME pattern to `GRILL[_ -]?ME`, and the others to `EXPLAIN`, `INVESTIGATE`, and `ASSESS`, each with flags `i`."
+    },
+    {
+      "severity": "note",
+      "kind": "runtime",
+      "assertion": -1,
+      "detail": "The whole case depends on runtime.unreadable actually blocking directory listing for the run user. A root user ignores mode 000, so the helper would then report a complete inventory that includes maeve and kofi-walkthrough. No selfCheck shows that the directory is unreadable, or that the helper reports the style inventory as unknown or incomplete. The existing helper selfCheck shows only that the modes are discovered.",
+      "recommendation": "run_as_is",
+      "fix": "If the harness applies runtime.unreadable during selfChecks, add a selfCheck such as `{\"cmd\": \"ls .standards/user-styles/navigator\", \"expect\": \"fail\", \"expectOutput\": \"Permission denied\"}`. Also consider asserting that the helper's JSON output does not contain `maeve`."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 2,
+      "detail": "`unchanged: [\"**\"]` cannot detect a permission repair such as `chmod` on the directory, because a mode change on a directory is not a content change. That part, along with retaining INVESTIGATE and not reading style contents, correctly falls to the judge through the trace (complete:false).",
+      "recommendation": "run_as_is",
+      "fix": "None needed; the judge covers trace-only behaviors."
+    }
+  ],
+  "verdict": "issues",
+  "summary": "The fixture realizes the case well: the unreadable, untracked navigator style directory gives the helper an unknown inventory, and a realistic INVESTIGATE history turn with accurate line citations sets the mode. One blocking problem: the assertion 1 mode-name regexes are case-sensitive and narrow, so a correct reply using \"grill me\" or lowercase names could fail. Adding the `i` flag and a looser GRILL_ME pattern fixes it.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T03:00:56.877Z",
+  "costUsd": 0.14667239999999998,
+  "ms": 47260,
+  "fixtureHash": "54a97b6f5f6b3f3d"
+}

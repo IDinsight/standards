@@ -1,0 +1,101 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is BROWNFIELD",
+      "where": ".standards/MODE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode DOCUMENTATION with CompletionPolicy NONE",
+      "where": ".standards/STATE.md header and Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id is guide-20261004T120000Z-1a2b3c4d",
+      "where": ".standards/STATE.md Active Work.Id",
+      "status": "realized"
+    },
+    {
+      "condition": "WorkflowState DOCUMENTING after Architect",
+      "where": ".standards/STATE.md: WorkflowState DOCUMENTING, Handoff FORWARD From ARCHITECTING, no recovery",
+      "status": "realized"
+    },
+    {
+      "condition": "Saved standalone request records target FILE docs/usage.md, GUIDED collaboration, and style concise",
+      "where": ".standards/STATE.md Active Work.Request; repeated in the scope's Constraints",
+      "status": "realized"
+    },
+    {
+      "condition": "Selected user style exists",
+      "where": ".standards/user-styles/documenter/concise.md",
+      "status": "realized"
+    },
+    {
+      "condition": "No documentation record exists",
+      "where": ".standards/docs/documentation/ absent (selfCheck 5)",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope is current, with defined ACs",
+      "where": ".standards/docs/scope/guide-20261004T120000Z-1a2b3c4d.md (AC-001..AC-003)",
+      "status": "realized"
+    },
+    {
+      "condition": "Technical coverage is current for all ACs",
+      "where": ".standards/docs/specs/guide-20261004T120000Z-1a2b3c4d.md Acceptance Coverage",
+      "status": "realized"
+    },
+    {
+      "condition": "Auditor context is present, as the DOCUMENTATION route requires after AUDITING",
+      "where": ".standards/CONTEXT.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Source exists to support documentation evidence",
+      "where": "src/cli.js, src/filter.js, test/*.js, examples/sample.log; tests pass (selfCheck 1)",
+      "status": "realized"
+    },
+    {
+      "condition": "No omitted-owner (development/verification/implementation-review) record is present",
+      "where": ".standards/docs/{development,verification,reviews} absent; Active Work.Development NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Target file has real documentation work so a guided step has content",
+      "where": "docs/usage.md shows a warn default, case-sensitive --grep, and no --count, while the code differs (selfChecks 2-4)",
+      "status": "realized"
+    },
+    {
+      "condition": "check.mjs reports the state as valid",
+      "where": "gate checkMjs ok:true",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "hint-leak",
+      "assertion": -1,
+      "detail": ".standards/CONTEXT.md states that docs/usage.md \"was written with the first version of the CLI and has not been edited since; the CLI changed afterwards\". This partly reveals the staleness that graderOnly lists. An Auditor would plausibly record this, and the user's request already asks to make the guide match the current CLI. No assertion depends on discovering the staleness.",
+      "recommendation": "run_as_is",
+      "fix": "Optional: drop that bullet from .standards/CONTEXT.md if the staleness should be found purely from source inspection."
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 0,
+      "detail": "Assertion 0 is complete:true with exact equality on Target Detail `docs/usage.md` and User Style `concise`. The template asks for a repository-relative path, and the protocol prefers the unique stem, so a correct run should write exactly these values. Variants such as `./docs/usage.md` or `concise.md` are possible but unlikely.",
+      "recommendation": "run_as_is",
+      "fix": "None required."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition: a valid DOCUMENTATION cycle at DOCUMENTING after an Architect FORWARD handoff, saved FILE/GUIDED/concise choices in the request and scope, an existing style file, current scope, design, and context, real source, and no documentation or omitted-owner records. Checks and invariants are necessary conditions for a correct guided run (BlockedOn set, record not COMPLETE, docs unchanged, no fabricated omitted-owner records). Only minor notes remain: a mild staleness hint in CONTEXT.md and exact field equality on Target Detail and User Style.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T02:58:21.038Z",
+  "costUsd": 0.2088074,
+  "ms": 48087,
+  "fixtureHash": "0935a9f6b80d5fa7"
+}

@@ -1,0 +1,76 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield template, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode DOCUMENTATION, CompletionPolicy NONE, Active Work.Id guide-20261004T120000Z-1a2b3c4d",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "WorkflowState SYNCHRONIZING after a legal FORWARD from REVIEWING_FINAL, no recovery or obligations",
+      "where": ".standards/STATE.md Handoff/Recovery sections",
+      "status": "realized"
+    },
+    {
+      "condition": "Included upstream records exist: Auditor context, scope, design, COMPLETE documentation record, COMPLETE FINAL_DELIVERABLE review",
+      "where": ".standards/CONTEXT.md, .standards/docs/scope/…, .standards/docs/specs/…, .standards/docs/documentation/…, .standards/docs/reviews/…/final-deliverable.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Final Reviewer assessed docs/usage.md at hash A",
+      "where": "final-deliverable.md cites blob cf8d3a5… (HEAD:docs/usage.md); selfCheck confirms",
+      "status": "realized"
+    },
+    {
+      "condition": "Documenter checks identify hash A",
+      "where": "documentation record Checks and Applicability cites blob cf8d3a5…; selfCheck confirms",
+      "status": "realized"
+    },
+    {
+      "condition": "Saved guide is now hash B with a changed command",
+      "where": "unstaged docs/usage.md: check example now `check --strict`, plus an exit-status 1 bullet; git status shows ` M docs/usage.md`",
+      "status": "realized"
+    },
+    {
+      "condition": "No assessment covers hash B",
+      "where": "selfCheck `! grep -rq $(git hash-object docs/usage.md) .standards/docs` passes; no synchronization record exists",
+      "status": "realized"
+    },
+    {
+      "condition": "No synchronization record exists yet (fresh entry)",
+      "where": ".standards/docs/synchronization/ absent",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": 1,
+      "detail": "`.standards/CONTEXT.md` says docs/usage.md \"currently covers only the default `summary` invocation\". That was true before the cycle but is now false for both A and B. A Synchronizer could log it as an Auditor-owned discrepancy and route PROJECT_CONTEXT to AUDITING, which would fail the `WorkflowState in [DOCUMENTING, REVIEWING_FINAL]` check. Routing to AUDITING is unlikely to be judged correct, because in-cycle planned documentation changes do not stale context, so the risk is low.",
+      "recommendation": "fix_file",
+      "fix": "In layers/50-cycle/.standards/CONTEXT.md, Structure and Boundaries, change \"It currently covers only the default `summary` invocation.\" to \"Before this cycle it covered only the default `summary` invocation; this cycle updates it.\" The `${BLOB:.standards/CONTEXT.md}` references in later layers re-resolve automatically."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 1,
+      "detail": "The state checks assume the run routes rather than only blocking on a user question about the unstaged edit's provenance. That edit is inside the editing boundary, and the stale evidence is Documenter-owned whatever its origin. The protocol forbids asking the user to settle an owner's defect, so routing is the correct behavior and the check is a fair necessary condition.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized: both records cite blob A, B sits unstaged in the working tree with a changed `check` command that is accurate to the code, and check.mjs passes. The checks fit every legal routing path (FAILURE to DOCUMENTING or REVIEWING_FINAL with one frame resuming at SYNCHRONIZING), the invariants are standard, and I traced that the turn-end check accepts the routed state. The only note is a stale CONTEXT.md sentence that could tempt an extra Auditor discrepancy.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T03:13:37.335Z",
+  "costUsd": 0.256078,
+  "ms": 74492,
+  "fixtureHash": "6ef257cce91ba538"
+}

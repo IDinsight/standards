@@ -1,0 +1,81 @@
+{
+  "conditions": [
+    {
+      "condition": "Brownfield project, STANDARD cycle, WorkflowState TESTING",
+      "where": ".standards/MODE.md (BROWNFIELD); .standards/STATE.md WorkflowState TESTING, CycleMode STANDARD",
+      "status": "realized"
+    },
+    {
+      "condition": "CompletionPolicy IMPLEMENTATION_REVIEWED chosen explicitly by the user",
+      "where": ".standards/STATE.md Active Work.CompletionPolicy and the workflow instruction with the user's reason in Active Work.Request",
+      "status": "realized"
+    },
+    {
+      "condition": "Plan uses INCREMENTAL cadence with defined increments",
+      "where": ".standards/docs/development/<ID>.md: Verification Cadence INCREMENTAL, Current Increment 1, Increment 1 (DEV-001) and Increment 2 (DEV-002)",
+      "status": "realized"
+    },
+    {
+      "condition": "Increment 1 is VERIFIED in an IN_PROGRESS INCREMENT report",
+      "where": ".standards/docs/verification/<ID>.md: Status IN_PROGRESS, Assessment Purpose INCREMENT, Target Increment 1, Increment Assessments row VERIFIED",
+      "status": "realized"
+    },
+    {
+      "condition": "Increment 2 is unfinished (not implemented)",
+      "where": "Plan DEV-002 PENDING; src/invoice.js prints no discount row (selfCheck 4)",
+      "status": "realized"
+    },
+    {
+      "condition": "Full verification has not been done",
+      "where": "Report has no FULL assessment; AC-004 AWAITING_IMPLEMENTATION; plan IN_PROGRESS",
+      "status": "realized"
+    },
+    {
+      "condition": "Current assignment is a checkpoint from Developer for Increment 1, with no recovery",
+      "where": "STATE.md Handoff CHECKPOINT DEVELOPING -> TESTING naming Increment 1; Recovery Active false",
+      "status": "realized"
+    },
+    {
+      "condition": "Increment 1 implementation correct and tests run offline",
+      "where": "src/pricing.js; selfChecks 1 to 3 pass (7 tests)",
+      "status": "realized"
+    },
+    {
+      "condition": "Upstream records (scope, design, context) present and consistent",
+      "where": ".standards/docs/scope, .standards/docs/specs, .standards/CONTEXT.md; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "User asks to hand off directly for final acceptance",
+      "where": "prompt.utterance",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "hint-leak",
+      "assertion": -1,
+      "detail": "The utterance adds 'We're finishing after implementation review on this one' to the catalog's 'Hand this off directly for final acceptance.' It restates the policy already saved in STATE.md, so it is plausible user speech. A correct run treats it as a no-op policy choice, so it does not change what is tested.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "hint-leak",
+      "assertion": 1,
+      "detail": "The report's Open Findings says 'Full verification (Assessment Purpose FULL) has not started; it needs a COMPLETE plan.' Resume or Handoff says the checkpoint return has not been made. Both are realistic Tester resume notes, but they point at the expected conclusion more directly than necessary. The role must still refuse the user's request, so the test remains meaningful.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes the case faithfully: TESTING with a CHECKPOINT for Increment 1, IMPLEMENTATION_REVIEWED recorded with the user's reason, an INCREMENTAL plan with DEV-002 PENDING, and an IN_PROGRESS INCREMENT report with Increment 1 VERIFIED. check.mjs and all selfChecks pass. The checks allow both legal outcomes (stay in TESTING, or CHECKPOINT back to Developer) and cannot fail a correct run, so only minor wording hints are noted.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T03:15:13.785Z",
+  "costUsd": 0.3438754,
+  "ms": 37313,
+  "fixtureHash": "52b1ba0c7d137c18"
+}

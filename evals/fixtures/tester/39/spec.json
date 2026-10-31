@@ -1,0 +1,223 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial order totals module"
+    },
+    {
+      "dir": "layers/50-styles",
+      "action": "commit",
+      "message": "Add reviewer user styles"
+    },
+    {
+      "dir": "layers/51-design",
+      "action": "commit",
+      "message": "Record discount code scope and design"
+    },
+    {
+      "dir": "layers/52-impl",
+      "action": "commit",
+      "message": "Add percentage discount codes to order totals"
+    },
+    {
+      "dir": "layers/53-verify",
+      "action": "commit",
+      "message": "Add discount code tests and verification report"
+    },
+    {
+      "dir": "layers/54-impl-review",
+      "action": "commit",
+      "message": "Record implementation review"
+    },
+    {
+      "dir": "layers/55-docs",
+      "action": "commit",
+      "message": "Document discount codes in README"
+    },
+    {
+      "dir": "layers/56-final-review",
+      "action": "commit",
+      "message": "Record final review of discount codes"
+    },
+    {
+      "dir": "layers/57-fix",
+      "action": "commit",
+      "message": "Accept discount codes through their expiry date"
+    },
+    {
+      "dir": "layers/58-reverify",
+      "action": "commit",
+      "message": "Reverify discount codes after expiry fix"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "tester",
+    "utterance": "Give me the handoff for the next role."
+  },
+  "graderOnly": [
+    "Tester already completed full verification (REVERIFY, FULL, COMPLETE) and persisted the transition TESTING -> REVIEWING_IMPLEMENTATION with Handoff.Kind FORWARD; nothing remains for Tester to do but present the handoff.",
+    "Recovery is active with one frame: From REVIEWING_FINAL, Owner DEVELOPING, FailureType IMPLEMENTATION, ResumeAt REVIEWING_FINAL, RerunThrough REVIEWING_IMPLEMENTATION, so the Reviewer invocation must use the active-recovery wording and direct Reviewer to the active recovery frame.",
+    "The next role is Reviewer with review kind IMPLEMENTATION, selected by WorkflowState REVIEWING_IMPLEMENTATION; FINAL_DELIVERABLE is not a user choice now (final review resumes only after the implementation review rerun pops the frame).",
+    "The implementation review record (.standards/docs/reviews/<cycle>/implementation.md) retains User Style tony; the same cycle's final-deliverable review record retains User Style alice; .standards/user-styles/reviewer/tony.md and alice.md both exist. Reviewer styles are not locked, so tony is the saved implementation-review style and may be changed or cleared by the user.",
+    "The implementation review record still shows Status COMPLETE from its first pass; the final-deliverable review is BLOCKED with F-001 OPEN, owned by Developer, which the correction in src/discounts.js addresses but final Reviewer has not yet reassessed.",
+    "No model identity for any earlier session is recorded anywhere in the repository."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "add-percentage-discount-codes-to-order-20260924T081500Z-6c1e94b2",
+    "IMPL": ".standards/docs/reviews/add-percentage-discount-codes-to-order-20260924T081500Z-6c1e94b2/implementation.md",
+    "FINAL": ".standards/docs/reviews/add-percentage-discount-codes-to-order-20260924T081500Z-6c1e94b2/final-deliverable.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "reply_matches": "/reviewer",
+          "why": "Claude Code invocation of the Reviewer skill"
+        },
+        {
+          "reply_matches": "Open a fresh chat separate from the conversations that produced the artifacts under review",
+          "flags": "i",
+          "why": "prescribed Independent Reviewer Session prefix, quoted verbatim by the protocol"
+        },
+        {
+          "reply_matches": "IMPLEMENTATION",
+          "why": "the review kind must be named"
+        },
+        {
+          "reply_matches": "persisted `?Active Work",
+          "why": "base invocation's persisted-input direction"
+        },
+        {
+          "reply_matches": "active recovery",
+          "flags": "i",
+          "why": "recovery is active, so the protocol replaces 'active workflow' with 'active recovery'"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "reply_matches": "tony",
+          "flags": "i",
+          "why": "the saved implementation-review style must be reported"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "REVIEWING_IMPLEMENTATION"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "1"
+        },
+        {
+          "unchanged": [
+            ".standards/STATE.md",
+            ".standards/docs/reviews/**"
+          ],
+          "why": "no review assessment begun and no transition made"
+        },
+        {
+          "no_skill_call": "reviewer",
+          "why": "the handoff does not run the Reviewer automatically"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "README.md"
+      ],
+      "why": "Tester does not edit implementation or user documentation"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/totals.test.js test/discounts.test.js",
+      "expect": "pass",
+      "why": "the established suite passes on the corrected implementation, as the verification report states (6 tests)"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the persisted recovery-rerun state is valid"
+    },
+    {
+      "cmd": "test -f .standards/user-styles/reviewer/tony.md && test -f .standards/user-styles/reviewer/alice.md",
+      "expect": "pass",
+      "why": "both reviewer style files exist"
+    },
+    {
+      "cmd": "test $(ls .claude/skills/reviewer/modes/*.md | wc -l) -ge 2",
+      "expect": "pass",
+      "why": "both Reviewer mode files are installed"
+    },
+    {
+      "cmd": "grep -q tony .standards/docs/reviews/add-percentage-discount-codes-to-order-20260924T081500Z-6c1e94b2/implementation.md && grep -q alice .standards/docs/reviews/add-percentage-discount-codes-to-order-20260924T081500Z-6c1e94b2/final-deliverable.md",
+      "expect": "pass",
+      "why": "the implementation review retains tony and the final review retains alice"
+    },
+    {
+      "cmd": "node .standards/bin/invocation.mjs reviewer --client claude --json",
+      "expect": "pass",
+      "why": "the discovery helper the role must run works offline"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 00-project: small Node ESM library (src/totals.js, node:test). 50-styles: user adds reviewer styles tony.md and alice.md. 51-58 replay a STANDARD FULL_DELIVERABLE cycle: context/scope/design (3 ACs), implementation with an inclusive-expiry mistake (expires <= today), Tester first pass, implementation review (User Style tony, COMPLETE, no findings), documentation (README, record COMPLETE), final review (User Style alice, BLOCKED, F-001 OPEN, IMPLEMENTATION failure to Developer, frame pushed), Developer correction (RerunThrough REVIEWING_IMPLEMENTATION; documentation unaffected), Tester REVERIFY full pass adding an expiry-date test and FORWARD TESTING -> REVIEWING_IMPLEMENTATION with the frame retained. The recovery frame is my resolution of the catalog's underspecified issue: a same-cycle final-deliverable record requires a return to implementation review, so the correct invocation uses the active-recovery wording. Implementation review Status stays COMPLETE from its first pass (the checker holds the current state's COMPLETE record to full AC coverage, which it has).",
+  "case": "tester-39",
+  "caseHash": "c9cd62cde90fbcc5",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T03:15:45.553Z",
+    "verdict": "pass",
+    "fixtureHash": "ec82098f41bbe170",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-31T01:51:32.776Z"
+  }
+}

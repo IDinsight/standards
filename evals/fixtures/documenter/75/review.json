@@ -1,0 +1,71 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is BROWNFIELD",
+      "where": ".standards/MODE.md (installer brownfield template)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode UNSET and Active Work.Id UNSET (no cycle has started)",
+      "where": ".standards/STATE.md (unmodified installer template: AUDITING, UNSET, Handoff INITIAL, CompletionPolicy NONE)",
+      "status": "realized"
+    },
+    {
+      "condition": "No pending cycle preference or blocked pending request",
+      "where": ".standards/STATE.md: PendingCycleMode UNSET, PendingCycleRequest UNSET, PendingCycleBlockedOn NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Existing CLI implementation is present",
+      "where": "src/cli.js, src/count.js, test/count.test.js (committed pre-install; tests pass per selfCheck)",
+      "status": "realized"
+    },
+    {
+      "condition": "The named target file docs/usage.md exists",
+      "where": "docs/usage.md (commit 'Add usage guide')",
+      "status": "realized"
+    },
+    {
+      "condition": "User style 'concise' resolves to exactly one Documenter style file",
+      "where": ".standards/user-styles/documenter/concise.md (only file in that folder)",
+      "status": "realized"
+    },
+    {
+      "condition": "No documentation record (and no other cycle records or Auditor context) exists",
+      "where": "no .standards/docs/ and no .standards/CONTEXT.md (selfCheck confirms)",
+      "status": "realized"
+    },
+    {
+      "condition": "cycle.mjs can allocate an ID in this state",
+      "where": "selfCheck 'node .standards/bin/cycle.mjs new' passed",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 2,
+      "detail": "Assertion 2 is complete:true, but every check in it also holds for a run that initializes nothing: WorkflowState is already AUDITING, Handoff.Kind is already INITIAL, and Scope and Architecture are already NONE. A run that refuses and merely mentions '/auditor' would pass assertion 2 without the state ever 'becoming' AUDITING for a new cycle. Such a run still fails assertions 0 and 1, so the overall score is barely affected.",
+      "recommendation": "fix_file",
+      "fix": "In documenter-75/spec.json, checks[2].all, add {\"state\": \"ActiveWork.Id\", \"not\": \"UNSET\", \"why\": \"AUDITING must be the new cycle's entry state\"} and {\"state\": \"CycleMode\", \"equals\": \"DOCUMENTATION\"}."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "docs/usage.md omits --json and exit status 1 on read errors. This is realistic documentation lag; it is neither a hint nor graded, since entry must not start documentation work.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture is the installer's untouched brownfield state plus a small committed CLI, docs/usage.md, and the selected 'concise' Documenter style, which matches every stated condition with no leaks and a clean check.mjs. The checks are necessary conditions a correct standalone entry must meet: a DOCUMENTATION cycle with policy NONE, Handoff INITIAL, a request containing the identifiers, no record or edit, and a '/auditor' invocation. The only note is that assertion 2's complete:true checks are mostly satisfied by the starting state.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T02:56:56.919Z",
+  "costUsd": 0.15367139999999999,
+  "ms": 35283,
+  "fixtureHash": "2fc2b9171678bcc2"
+}

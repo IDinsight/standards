@@ -1,0 +1,124 @@
+{
+  "conditions": [
+    {
+      "condition": "No cycle is active",
+      "where": ".standards/STATE.md as installed (AUDITING, CycleMode UNSET, Active Work.Id UNSET); check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "FastAPI service lives in api/",
+      "where": "api/app/main.py, api/requirements.txt (fastapi==0.115.6)",
+      "status": "realized"
+    },
+    {
+      "condition": "Routers, services, and persistence modules are separated",
+      "where": "api/app/routers/, api/app/services/, api/app/persistence/; CONTRIBUTING.md layering rule",
+      "status": "realized"
+    },
+    {
+      "condition": "pytest covers auth failures",
+      "where": "api/tests/test_auth.py (missing, non-Bearer, empty, unknown, revoked); api/tests/test_api.py 401 cases; selfChecks pass",
+      "status": "realized"
+    },
+    {
+      "condition": "CI runs ruff, mypy, and pytest with cached installs",
+      "where": ".github/workflows/ci.yml test job (setup-python cache: pip, ruff check/format, mypy, pytest)",
+      "status": "realized"
+    },
+    {
+      "condition": "CI builds the container image",
+      "where": ".github/workflows/ci.yml image job (docker/build-push-action, push false); api/Dockerfile",
+      "status": "realized"
+    },
+    {
+      "condition": "CI reports coverage",
+      "where": "ci.yml pytest --cov-report=term-missing/xml and coverage artifact upload",
+      "status": "realized"
+    },
+    {
+      "condition": "CI must pass before merge",
+      "where": "CONTRIBUTING.md (test and image are required status checks)",
+      "status": "realized"
+    },
+    {
+      "condition": "No dependency vulnerability scanning",
+      "where": "ci.yml has no audit step; no .github/dependabot.yml; selfCheck confirms",
+      "status": "realized"
+    },
+    {
+      "condition": "Logs are plain-text print statements",
+      "where": "print() in main.py, deps.py, response_service.py, migrate.py; no logging import",
+      "status": "realized"
+    },
+    {
+      "condition": "No rate limiting",
+      "where": "slowapi pinned but never imported; only a comment in main.py",
+      "status": "realized"
+    },
+    {
+      "condition": "No metrics or error tracking",
+      "where": "api/app/observability/__init__.py is docstring-only; no prometheus/sentry/otel",
+      "status": "realized"
+    },
+    {
+      "condition": "No staging deployment",
+      "where": "no deploy job in ci.yml; no staging reference anywhere",
+      "status": "realized"
+    },
+    {
+      "condition": "Level 1-2 expectations have working evidence so Level 2 (not 1 or unverified) is correct",
+      "where": "api/migrations + migrate.py + test_migrations.py; config.py + .env.example; conftest.py tmp_path DBs vs var/dev.sqlite3; README setup/test/migration docs; pinned deps; /health; hashed keys; pydantic validation",
+      "status": "realized"
+    },
+    {
+      "condition": "Distractors that could be credited from dependency presence, folder names, or comments",
+      "where": "slowapi in requirements.txt, comment in main.py, empty observability package",
+      "status": "realized"
+    },
+    {
+      "condition": "Maturity ladder is available to read",
+      "where": ".claude/skills/scoper/references/maturity-levels.md (installed, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "Files are readable; history committed and clean",
+      "where": "git status clean on main; no runtime.unreadable",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 1,
+      "detail": "Neither the generator nor this review could see maturity-levels.md. If the ladder has a Level 1-2 expectation not planted here (for example a specific logging, secrets, or error-handling item at Level 2), Level 1 or 'unverified' could become defensible. The planted Level 1-2 evidence is broad: migrations, env config, separate dev and test DBs, setup docs, pinned deps, health check, CI gates, and auth tests. The risk looks low.",
+      "recommendation": "run_as_is",
+      "fix": "If a first run lands on Level 1 citing a specific Level 2 item, add evidence for that item to layers/50-project."
+    },
+    {
+      "severity": "note",
+      "kind": "case-defect",
+      "assertion": 3,
+      "detail": "A brownfield STANDARD cycle enters AUDITING first, so a careful run might mention Auditor as the entry state. The assertion and assess.md both name Scoper for a 'bring this API to Level 4' request, so `reply_matches: scoper` is a necessary condition for the assertion as written.",
+      "recommendation": "run_as_is",
+      "fix": "None needed; the judge can accept a reply that names Scoper and also explains the Auditor-first entry."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The git author is 'Fixture <fixture@example.invalid>' (builder-level config), which is visible in git log. This is shared harness behavior and does not hint at the answer.",
+      "recommendation": "run_as_is",
+      "fix": "None for this fixture."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition: a layered FastAPI service with Level 1-2 evidence, CI without dependency scanning, print logging, no rate limiting, observability, or staging, and planted distractors (unused slowapi pin, stale comment, empty observability package). It runs in a clean no-cycle brownfield install. The checks are necessary conditions (a Level 2 mention, a Scoper mention, no file or state changes, no Scoper skill call), and the Navigator invariants are correct. The only residual risk is that the ladder's exact Level 2 items could not be confirmed.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T03:01:46.130Z",
+  "costUsd": 0.2329524,
+  "ms": 57654,
+  "fixtureHash": "ab4c239f3d47b9d9"
+}

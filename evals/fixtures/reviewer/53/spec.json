@@ -1,0 +1,230 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add webhook delivery helper"
+    },
+    {
+      "dir": "layers/50-context-scope-design",
+      "action": "commit",
+      "message": "Record context, scope, and design for delivery retries"
+    },
+    {
+      "dir": "layers/51-retry-implementation",
+      "action": "commit",
+      "message": "Retry failed webhook deliveries with capped backoff"
+    },
+    {
+      "dir": "layers/52-verification",
+      "action": "commit",
+      "message": "Add delivery retry tests and verification report"
+    },
+    {
+      "dir": "layers/53-review-findings",
+      "action": "commit",
+      "message": "Record implementation review findings"
+    },
+    {
+      "dir": "layers/54-wait-fix",
+      "action": "commit",
+      "message": "Skip backoff wait after the final attempt"
+    },
+    {
+      "dir": "layers/55-reverify",
+      "action": "commit",
+      "message": "Reverify delivery retries after the wait fix"
+    },
+    {
+      "dir": "layers/56-review-update",
+      "action": "commit",
+      "message": "Update implementation review after the wait fix"
+    },
+    {
+      "dir": "layers/57-sync-correction",
+      "action": "commit",
+      "message": "Record corrective evidence reconciliation"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "reviewer",
+    "utterance": "Continue the active workflow from `.standards/STATE.md`. Synchronizer is omitted for this cycle, so ignore that synchronization record."
+  },
+  "graderOnly": [
+    "The synchronization record's D-001 is marked RESOLVED on a false basis: it says commit 'Skip backoff wait after the final attempt' changed only src/backoff.js and that verification run 1 (src at 'Retry failed webhook deliveries with capped backoff') remains current evidence for AC-001, AC-003, and AC-004. In fact that commit changed src/deliver.js (the retry loop) and did not touch src/backoff.js, and the verification report marks run 1 superseded for every AC. This is a material, unresolved Synchronizer-owned reconciliation error.",
+    "Apart from that error (and the open implementation-review finding F-002 that the faulty reconciliation was meant to answer), the implementation satisfies AC-001 to AC-004, and the verification report's run 2 is current, complete formal evidence; all 9 tests pass at HEAD.",
+    "No normal Documenter, final-review, or synchronization phase has started; the only downstream record is the IN_PROGRESS synchronization record produced by the earlier corrective return.",
+    "The correct outcome keeps CompletionPolicy IMPLEMENTATION_REVIEWED, records closure INELIGIBLE with the Synchronizer correction as the unmet requirement, and routes a SYNCHRONIZATION failure to SYNCHRONIZING with a frame that resumes REVIEWING_IMPLEMENTATION."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "retry-webhook-deliveries-20260924T081500Z-6c1e9a42",
+    "REVIEW": ".standards/docs/reviews/retry-webhook-deliveries-20260924T081500Z-6c1e9a42/implementation.md",
+    "SYNC": ".standards/docs/synchronization/retry-webhook-deliveries-20260924T081500Z-6c1e9a42.md",
+    "FINAL": ".standards/docs/reviews/retry-webhook-deliveries-20260924T081500Z-6c1e9a42/final-deliverable.md",
+    "DOCREC": ".standards/docs/documentation/retry-webhook-deliveries-20260924T081500Z-6c1e9a42.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            ".standards/docs/synchronization/**"
+          ],
+          "why": "Reviewer accounts for the Synchronizer record but never edits it"
+        },
+        {
+          "exists": "${REVIEW}"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${REVIEW}"
+        },
+        {
+          "contains": {
+            "path": "${REVIEW}",
+            "regex": "`Eligibility`:\\s*`INELIGIBLE`"
+          },
+          "why": "the prior report only held NOT_ASSESSED, so this value must come from the run"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "SYNCHRONIZING"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FAILURE"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "REVIEWING_IMPLEMENTATION"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "SYNCHRONIZATION"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "true"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "1"
+        },
+        {
+          "state": "Recovery.Top.From",
+          "equals": "REVIEWING_IMPLEMENTATION"
+        },
+        {
+          "state": "Recovery.Top.Owner",
+          "equals": "SYNCHRONIZING"
+        },
+        {
+          "state": "Recovery.Top.FailureType",
+          "equals": "SYNCHRONIZATION"
+        },
+        {
+          "state": "Recovery.Top.ResumeAt",
+          "equals": "REVIEWING_IMPLEMENTATION"
+        },
+        {
+          "state": "Recovery.Top.RerunThrough",
+          "equals": "NONE"
+        },
+        {
+          "state": "ActiveWork.CompletionPolicy",
+          "equals": "IMPLEMENTATION_REVIEWED"
+        },
+        {
+          "absent": "${FINAL}",
+          "why": "no final-review tail is invented"
+        },
+        {
+          "absent": "${DOCREC}",
+          "why": "no documentation phase is invented"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "Reviewer must not change the assessed identity"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Reviewer must not change git state"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "package.json",
+        "README.md"
+      ],
+      "why": "Reviewer does not edit implementation, tests, or project documentation"
+    }
+  ],
+  "runtime": null,
+  "selfChecks": [
+    {
+      "cmd": "node --test test/deliver.test.js test/backoff.test.js test/signature.test.js",
+      "expect": "pass",
+      "why": "full verification otherwise passes: the established tests pass at HEAD"
+    },
+    {
+      "cmd": "git log --format=%s -- src/deliver.js | grep -qx 'Skip backoff wait after the final attempt'",
+      "expect": "pass",
+      "why": "the correction commit changed src/deliver.js, contradicting the synchronization record"
+    },
+    {
+      "cmd": "test -z \"$(git log --format=%s -- src/backoff.js | grep -x 'Skip backoff wait after the final attempt')\"",
+      "expect": "pass",
+      "why": "the correction commit did not touch src/backoff.js, contrary to the synchronization record's D-001"
+    }
+  ],
+  "notes": "Brownfield STANDARD cycle with CompletionPolicy IMPLEMENTATION_REVIEWED (user choice and reason saved in Active Work.Request). 00-project: pre-existing single-attempt webhook helper. 50: context, scope (AC-001..AC-004), design; STATE DEVELOPING. 51 (commit A): backoff helper, defaults, retry loop that also waits after the final attempt; plan COMPLETE; STATE TESTING. 52: Tester tests and verification report run 1 at A; STATE REVIEWING_IMPLEMENTATION. 53: implementation review IN_PROGRESS with F-001 (wait after last attempt, Developer); STATE DEVELOPING with frame 1. 54 (commit B): DEV-003 guard in src/deliver.js; STATE TESTING rerun. 55: test assertions strengthened, verification REVERIFY COMPLETE with run 2 at B and run 1 marked superseded; STATE REVIEWING_IMPLEMENTATION via RESUME. 56: review updated (F-001 RESOLVED; F-002 OPEN, owner Synchronizer: evidence applicability unreconciled; closure section NOT_ASSESSED); STATE SYNCHRONIZING with a SYNCHRONIZATION frame. 57: Synchronizer corrective record IN_PROGRESS whose D-001 resolution falsely claims commit B changed only src/backoff.js and cites superseded run 1 as current for AC-001/003/004; frame popped, STATE REVIEWING_IMPLEMENTATION via RESUME from SYNCHRONIZING, recovery inactive. No documentation or final-deliverable records exist. Compromise: the earlier Reviewer's choice to route evidence reconciliation to Synchronizer (rather than reconcile itself) is a slightly over-cautious but legal prior decision; it is the only way to give the cycle a current-cycle synchronization record from corrective work with normal downstream phases never started.",
+  "case": "reviewer-53",
+  "caseHash": "f5a9419e4d5df866",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T03:05:48.063Z",
+    "verdict": "pass",
+    "fixtureHash": "e711cc6256d7f2ef",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-31T00:50:02.648Z"
+  }
+}

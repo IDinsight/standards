@@ -1,0 +1,81 @@
+{
+  "conditions": [
+    {
+      "condition": "STANDARD cycle with CompletionPolicy IMPLEMENTATION_REVIEWED, WorkflowState SYNCHRONIZING, brownfield",
+      "where": ".standards/STATE.md (WorkflowState SYNCHRONIZING, CycleMode STANDARD, CompletionPolicy IMPLEMENTATION_REVIEWED); .standards/MODE.md BROWNFIELD",
+      "status": "realized"
+    },
+    {
+      "condition": "An older recovery frame sits beneath the active Developer-owned frame",
+      "where": ".standards/STATE.md Recovery: Frame 1 (Owner SYNCHRONIZING, ResumeAt AWAITING_USER_SIGNOFF, RerunThrough REVIEWING_IMPLEMENTATION) beneath Frame 2 (Owner DEVELOPING)",
+      "status": "realized"
+    },
+    {
+      "condition": "Active frame resumes REVIEWING_IMPLEMENTATION with rerun boundary SYNCHRONIZING",
+      "where": ".standards/STATE.md Frame 2: ResumeAt REVIEWING_IMPLEMENTATION, RerunThrough SYNCHRONIZING; Handoff RESUME from TESTING",
+      "status": "realized"
+    },
+    {
+      "condition": "Active frame's saved rerun plan includes revalidating the synchronization record",
+      "where": "development plan, Plan Notes '### Recovery Frame 2 correction' (TESTING, then SYNCHRONIZING to revalidate the sync record's corrective evidence, then resume REVIEWING_IMPLEMENTATION)",
+      "status": "realized"
+    },
+    {
+      "condition": "Synchronization record left incomplete by an earlier verified corrective return",
+      "where": ".standards/docs/synchronization/<id>.md Status IN_PROGRESS, D-001 RESOLVED with verification, conclusion states Synchronizer Corrective Return under Frame 1",
+      "status": "realized"
+    },
+    {
+      "condition": "Record's assessed inputs predate the Frame 2 correction (so revalidation is real work)",
+      "where": "sync record cites src/cli.js blob 9d63f6b, review COMPLETE/ELIGIBLE, verification VERIFY; current cli.js and reports differ",
+      "status": "realized"
+    },
+    {
+      "condition": "Affected corrective evidence revalidates against current full implementation and Tester evidence",
+      "where": "verification report REVERIFY COMPLETE FULL with AC-002 row citing rejected-value scenarios in test/month.test.js (incl. 2026-13/2026-00); src/cli.js isMonth; selfChecks show 13/13 pass",
+      "status": "realized"
+    },
+    {
+      "condition": "Only the omitted final review/documentation and the pending Reviewer reassessment limit the full gate",
+      "where": "no documentation or final-deliverable records; implementation review BLOCKED with F-001 OPEN awaiting reassessment and closure INELIGIBLE naming the rerun route",
+      "status": "realized"
+    },
+    {
+      "condition": "No independent gap or blocker",
+      "where": "STATE BlockedOn NONE, obligations inactive, baseline NONE; plan COMPLETE; design and verification cover AC-001/AC-002",
+      "status": "realized"
+    },
+    {
+      "condition": "check.mjs reports a valid state",
+      "where": "gate results checkMjs ok: true",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "Git history shows the synchronization record first added in the same commit that records its D-001 correction (layer 54); there is no earlier version holding the erroneous AC-002 reference, and under IMPLEMENTATION_REVIEWED no normal synchronization phase would have created it. This mirrors the protocol's own Corrective Returns example and does not affect what the run tests, but an inquisitive role could notice it.",
+      "recommendation": "run_as_is",
+      "fix": "Acceptable; the case and protocol example presuppose an existing record."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 1,
+      "detail": "Assertion 1 is complete:true on Status != COMPLETE and unchanged policy, so a run that does nothing also passes it. This matches the assertion's preservation wording; assertions 0 (record must change) and 2 (judge on pop/RESUME) still catch a no-op run.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes the nested-recovery state faithfully: Frame 1 (earlier Synchronizer corrective return) under a Developer Frame 2 with RerunThrough SYNCHRONIZING and ResumeAt REVIEWING_IMPLEMENTATION, a saved rerun plan in the development plan, an IN_PROGRESS sync record with stale assessed inputs, and current FULL verification that lets D-001 revalidate. Checks are necessary conditions a correct Synchronizer Corrective Reruns outcome satisfies, invariants fit, and check.mjs should still pass after a correct RESUME to REVIEWING_IMPLEMENTATION; only minor realism notes remain.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T03:12:22.850Z",
+  "costUsd": 0.371534,
+  "ms": 71658,
+  "fixtureHash": "a5755038ae02e368"
+}

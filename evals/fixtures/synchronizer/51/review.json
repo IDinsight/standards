@@ -1,0 +1,94 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD, CycleMode STANDARD, CompletionPolicy IMPLEMENTATION_REVIEWED, WorkflowState SYNCHRONIZING, Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/MODE.md; .standards/STATE.md (layer 68)",
+      "status": "realized"
+    },
+    {
+      "condition": "Current-cycle synchronization record is IN_PROGRESS from an earlier verified corrective return, preserving correction evidence (D-001, S1–S3), assessed identities, and the intentionally omitted final-review guarantee",
+      "where": ".standards/docs/synchronization/export-20260924T090000Z-a7f3c1d2.md (layer 60): Status IN_PROGRESS, D-001 RESOLVED, Limitations section names omitted REVIEWING_FINAL",
+      "status": "realized"
+    },
+    {
+      "condition": "A later Developer correction changed the implementation inputs that evidence assessed",
+      "where": "commit 'Quote CSV fields containing a bare carriage return' changes src/export.ts csvCell; the sync record cites the old blob fa55538…, HEAD blob is 7f32c00…",
+      "status": "realized"
+    },
+    {
+      "condition": "Single active frame: Owner DEVELOPING, From REVIEWING_IMPLEMENTATION, FailureType IMPLEMENTATION, ResumeAt REVIEWING_IMPLEMENTATION, RerunThrough SYNCHRONIZING; no older frame",
+      "where": ".standards/STATE.md Recovery Frame 1",
+      "status": "realized"
+    },
+    {
+      "condition": "Saved rerun plan includes revalidating the existing synchronization evidence",
+      "where": ".standards/docs/development/…md Plan Notes 'Rerun plan for frame 1'",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation and full Tester evidence are current",
+      "where": "plan COMPLETE; verification report REVERIFY/COMPLETE/FULL citing current src/export.ts blob; selfChecks: 22 unit and 3 integration tests pass",
+      "status": "realized"
+    },
+    {
+      "condition": "Rechecking all affected prior corrective evidence against current inputs succeeds with sufficient results (the role records it in this run)",
+      "where": "only csvCell and test/export.test.ts changed since the prior assessment (selfCheck git diff); tests pass; the plan, verification, and review identities are consistent",
+      "status": "realized"
+    },
+    {
+      "condition": "No material defect, evidence gap, Synchronizer-owned obligation, or blocking question remains",
+      "where": "corrected csvCell quotes CR; Obligations inactive; BlockedOn NONE; F-002 open only for Reviewer reassessment on the saved route",
+      "status": "realized"
+    },
+    {
+      "condition": "Only the omitted final review and implementation Reviewer reassessment on resume prevent full synchronization",
+      "where": "no final-deliverable or documentation record exists; implementation review IN_PROGRESS with F-002 OPEN and closure INELIGIBLE",
+      "status": "realized"
+    },
+    {
+      "condition": "Entry arrives through the saved rerun route from Tester",
+      "where": "Handoff RESUME From TESTING FailureType NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Clean committed git state",
+      "where": "git status clean on main",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "blocking",
+      "kind": "check-too-strict",
+      "assertion": 1,
+      "detail": "The check `contains {path: ${SYNC}, regex: ${PRIOR_SYNC_COMMIT}}` requires the full 40-character hash of 'Record implementation review findings' (9e4f0ea24352…) to survive in the record. A correct resumption updates Assessed Inputs and the conclusion to current identities (skill step 6, template 'Assessed Inputs'). It can keep the prior correction's identities in a superseded or prior-correction note that uses a short hash (9e4f0ea) or the prior src/export.ts blob instead of the full commit hash. Such a run satisfies the assertion but fails this check, and no judge would look at it.",
+      "recommendation": "fix_file",
+      "fix": "In synchronizer-51/spec.json, checks[assertion 1].all: delete the object {\"contains\": {\"path\": \"${SYNC}\", \"regex\": \"${PRIOR_SYNC_COMMIT}\"}, ...}. Optionally drop the now-unused var PRIOR_SYNC_COMMIT. The judge assesses retention of prior identities, since complete is already false."
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 0,
+      "detail": "Assertions 0 and 3 require Handoff.FailureType NONE on the RESUME. The protocol says 'Use NONE for inapplicable fields', and every RESUME example and fixture uses NONE, so the requirement is well grounded. A run that copied the frame's IMPLEMENTATION type would be unusual.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The sync record refers to 'recovery frame 1 (owner SYNCHRONIZING…)', an earlier popped frame whose number is reused by the current Developer frame. The protocol anticipates this, and graderOnly explains it. The plan notes and verification Resume section state the saved route (then resume REVIEWING_IMPLEMENTATION); this is legitimate frame and rerun-plan state, not a leak of the scoped-exception answer.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "issues",
+  "summary": "The fixture faithfully builds the IMPLEMENTATION_REVIEWED rerun state: a Developer-owned frame with RerunThrough SYNCHRONIZING, a prior incomplete synchronization record with stale identities, current reverification, and no final review; check.mjs and all selfChecks pass. One deterministic check is too strict: assertion 1 requires the full prior commit hash to remain in the record, which a correct run that rewrites identities with short hashes or blobs could fail. Removing that check makes the fixture fit to run.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T03:11:22.258Z",
+  "costUsd": 0.49014040000000003,
+  "ms": 96824,
+  "fixtureHash": "b573b6faae1c4745"
+}

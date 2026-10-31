@@ -1,0 +1,84 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is BROWNFIELD",
+      "where": ".standards/MODE.md (`ProjectMode`: `BROWNFIELD`)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode DOCUMENTATION with CompletionPolicy NONE",
+      "where": ".standards/STATE.md header and Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id is guide-20261004T120000Z-1a2b3c4d",
+      "where": ".standards/STATE.md Active Work.Id",
+      "status": "realized"
+    },
+    {
+      "condition": "WorkflowState is REVIEWING_FINAL after a normal FORWARD from DOCUMENTING, no recovery",
+      "where": ".standards/STATE.md Handoff and Recovery sections",
+      "status": "realized"
+    },
+    {
+      "condition": "Reviewer is invoked in the same chat that authored the documentation (prohibited authoring history is known)",
+      "where": "spec history: the Documenter turn wrote docs/importer.md, the README pointer, and the record, then committed on request",
+      "status": "realized"
+    },
+    {
+      "condition": "Documentation-cycle prerequisites exist for final review: Auditor context, scope, design, and a COMPLETE documentation record covering all ACs",
+      "where": ".standards/CONTEXT.md, .standards/docs/scope/…, .standards/docs/specs/…, .standards/docs/documentation/guide-20261004T120000Z-1a2b3c4d.md",
+      "status": "realized"
+    },
+    {
+      "condition": "No omitted-owner records (development, verification, implementation review) and no final-deliverable or synchronization record yet",
+      "where": "built tree; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "The saved deliverable (guide and README pointer) is committed and the tree is clean",
+      "where": "commit e8b4c04; git status clean",
+      "status": "realized"
+    },
+    {
+      "condition": "The guide accurately describes existing behavior, with nothing planted",
+      "where": "docs/importer.md compared with src/config.js, src/parse.js, and bin/import.js; selfChecks 1–3",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "hint-leak",
+      "assertion": -1,
+      "detail": "The history's Documenter turn already shows the protocol's independent-Reviewer prefix and the /reviewer FINAL_DELIVERABLE invocation. Handoff Rules require Documenter to emit exactly this, so the turn is realistic. It does put the expected invocation text in context. The case still tests whether Reviewer holds the rule when the user pushes back.",
+      "recommendation": "run_as_is",
+      "fix": "Acceptable: this is realistic Documenter output, and the rule is in the protocol the role reads anyway."
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 2,
+      "detail": "`reply_not_matches: /synchronizer` could in principle catch a correct reply that names the later Synchronizer step in slash form while explaining what happens after the fresh-chat review. This is unlikely. A correct run should not present that invocation, and prose usually names the role without the slash.",
+      "recommendation": "run_as_is",
+      "fix": "Keep the check; at most tighten it to an invocation-line pattern such as `^\\s*/synchronizer\\s` with the m flag."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "Every commit, including the pre-install 'Add ledger-import command', has the same timestamp (2026-10-04T16:00:00Z), which is after the cycle id's 12:00 time. This is harmless to what the run tests.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes a committed DOCUMENTATION cycle at REVIEWING_FINAL, with valid records, a passing check.mjs, and history showing this chat authored the guide, so the independent-session rule is directly testable. Deterministic checks rely only on state, record absence, and fixed invocation text (/reviewer, STATE.md), and a correct run should pass them. The invariants fit a Reviewer run. Only minor notes remain: the history shows the expected invocation (realistic), there is a small regex risk on /synchronizer, and the commit timestamps are uniform.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T03:07:09.493Z",
+  "costUsd": 0.20980179999999998,
+  "ms": 35227,
+  "fixtureHash": "be51723f1233d52c"
+}

@@ -1,0 +1,96 @@
+{
+  "conditions": [
+    {
+      "condition": "Explicit user request to change completion policy to IMPLEMENTATION_REVIEWED (utterance only)",
+      "where": "prompt.utterance 'Change the completion policy to IMPLEMENTATION_REVIEWED.'",
+      "status": "realized"
+    },
+    {
+      "condition": "STANDARD cycle with CompletionPolicy FULL_DELIVERABLE",
+      "where": ".standards/STATE.md CycleMode STANDARD, CompletionPolicy FULL_DELIVERABLE",
+      "status": "realized"
+    },
+    {
+      "condition": "WorkflowState TESTING",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Saved handoff is CHECKPOINT from DEVELOPING for Increment 2",
+      "where": ".standards/STATE.md Handoff Kind CHECKPOINT, From DEVELOPING, FailureType NONE, Reason naming only Increment 2",
+      "status": "realized"
+    },
+    {
+      "condition": "Plan uses INCREMENTAL with Current Increment 2",
+      "where": ".standards/docs/development/<id>.md header",
+      "status": "realized"
+    },
+    {
+      "condition": "Unfinished future work",
+      "where": "plan DEV-003 PENDING, Increment 3 defined; verification AC-003 AWAITING_IMPLEMENTATION",
+      "status": "realized"
+    },
+    {
+      "condition": "Saved pending cadence request",
+      "where": "STATE.md PendingVerificationCadence AFTER_IMPLEMENTATION",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and outstanding obligations inactive",
+      "where": "STATE.md Recovery Active false, Obligations Active false",
+      "status": "realized"
+    },
+    {
+      "condition": "Unrelated BlockedOn question saved",
+      "where": "STATE.md BlockedOn (Tester scenario-budget question), mirrored in verification report Open Findings",
+      "status": "realized"
+    },
+    {
+      "condition": "No normal documentation, final-review, or synchronization phase begun",
+      "where": "no documentation/review/synchronization records exist; git history shows none",
+      "status": "realized"
+    },
+    {
+      "condition": "Earlier explicit policy instruction in Active Work.Request for the new choice to replace",
+      "where": "STATE.md Request '... Completion policy instruction: the user explicitly selected FULL_DELIVERABLE for this cycle.'",
+      "status": "realized"
+    },
+    {
+      "condition": "Tester's Increment 2 assessment assigned so the checkpoint state is check-valid",
+      "where": "verification report Assessment Purpose INCREMENT, Target Increment 2, IN_PROGRESS; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope with acceptance conditions that must not be revised",
+      "where": ".standards/docs/scope/<id>.md AC-001..AC-003",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "STATE.md is committed only in its final TESTING form; the intermediate workflow states (Increment 1 checkpoint exchange, earlier handoffs) are not in history. Records and plan notes are otherwise consistent, so this does not affect what the run tests.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 1,
+      "detail": "Deterministic preconditions (CompletionPolicy IMPLEMENTATION_REVIEWED, Request changed, scope unchanged) cannot distinguish replacing the earlier FULL_DELIVERABLE instruction from appending a contradictory one; that is correctly left to the judge with complete:false.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition: TESTING with a CHECKPOINT for Increment 2, an INCREMENTAL plan at Increment 2 with DEV-003 pending, a pending AFTER_IMPLEMENTATION cadence, an unrelated Tester BlockedOn, inactive recovery/obligations, no downstream records, and a planted earlier FULL_DELIVERABLE instruction in Request; check.mjs passes. Checks are necessary conditions for the protocol's same-state policy route (preserving handoff, blocker, cadence, and records), assertion 0's complete flag is justified, and the standard invariants fit; no leaks found.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T02:52:02.518Z",
+  "costUsd": 0.6364334,
+  "ms": 53090,
+  "fixtureHash": "33a9f95282554e84"
+}

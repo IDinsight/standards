@@ -1,0 +1,81 @@
+{
+  "conditions": [
+    {
+      "condition": "Brownfield project in a STANDARD cycle",
+      "where": ".standards/MODE.md BROWNFIELD; .standards/STATE.md CycleMode STANDARD, CompletionPolicy FULL_DELIVERABLE",
+      "status": "realized"
+    },
+    {
+      "condition": "Tester completed full verification",
+      "where": ".standards/docs/verification/<id>.md: Mode REVERIFY, Status COMPLETE, Assessment Purpose FULL, Target NONE, all three ACs verified; selfCheck shows 6/6 tests pass",
+      "status": "realized"
+    },
+    {
+      "condition": "A legal transition to REVIEWING_IMPLEMENTATION is persisted",
+      "where": "STATE.md WorkflowState REVIEWING_IMPLEMENTATION, Handoff FORWARD from TESTING; recovery frame RerunThrough REVIEWING_IMPLEMENTATION; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "A same-cycle final-deliverable review exists, so the state is reached through recovery (catalog issue resolved)",
+      "where": "STATE.md Recovery Frame 1 (From REVIEWING_FINAL, Owner DEVELOPING, ResumeAt REVIEWING_FINAL, RerunThrough REVIEWING_IMPLEMENTATION); final-deliverable.md BLOCKED with F-001",
+      "status": "realized"
+    },
+    {
+      "condition": "Both Reviewer mode files exist",
+      "where": ".claude/skills/reviewer/modes/implementation.md and final-deliverable.md (installed)",
+      "status": "realized"
+    },
+    {
+      "condition": "The implementation review record retains User Style tony",
+      "where": ".standards/docs/reviews/<id>/implementation.md header User Style tony; invocation.mjs reports savedValue tony from that file",
+      "status": "realized"
+    },
+    {
+      "condition": "The final-deliverable review record from the same cycle retains alice",
+      "where": ".standards/docs/reviews/<id>/final-deliverable.md header User Style alice",
+      "status": "realized"
+    },
+    {
+      "condition": "Both style files exist",
+      "where": ".standards/user-styles/reviewer/tony.md and alice.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Client is Claude Code",
+      "where": "Install uses --client claude; .claude/skills installed",
+      "status": "realized"
+    },
+    {
+      "condition": "No model identity is recorded for earlier sessions",
+      "where": "The review records state that model identity of earlier sessions is not available",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 0,
+      "detail": "`reply_matches: IMPLEMENTATION` is case-sensitive. A correct run that wrote the kind as \"implementation\" would still pass, because any mention of REVIEWING_IMPLEMENTATION (the current state) or the helper's IMPLEMENTATION mode matches. The other patterns require only protocol-verbatim text: the fresh-chat prefix, `/reviewer`, `persisted Active Work`, and the substitution 'active recovery' required when recovery is active.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The implementation review record keeps Status COMPLETE from its first pass even though src/discounts.js has changed since. This is consistent with recovery: Reviewer reopens the record on the rerun, and check.mjs accepts it. The verification report's 'Next: implementation review rerun (review kind IMPLEMENTATION)' is normal Tester handoff content and does not leak the style answer.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition. It is a STANDARD cycle at REVIEWING_IMPLEMENTATION after Tester's full REVERIFY, with a coherent recovery frame that explains the same-cycle final review. The implementation review retains tony, the final review retains alice, both style files exist, and the discovery helper reports tony as the saved value. The checks require only verbatim protocol text or necessary state, the invariants fit a Tester handoff-only turn, and every assertion is observable.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T03:15:45.553Z",
+  "costUsd": 0.2845114,
+  "ms": 40270,
+  "fixtureHash": "ec82098f41bbe170"
+}

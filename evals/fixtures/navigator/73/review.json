@@ -1,0 +1,71 @@
+{
+  "conditions": [
+    {
+      "condition": "An earlier Navigator help reply exists in the conversation, listing only EXPLAIN, INVESTIGATE, GRILL_ME, ASSESS and the tony style",
+      "where": "history turns 3–4",
+      "status": "realized"
+    },
+    {
+      "condition": "Conversation has current selections: EXPLAIN mode (inferred) and tony style (explicitly selected)",
+      "where": "history turn 1 ('Use user style tony.') and turn 4 ('Current in this conversation', 'selected for this conversation')",
+      "status": "realized"
+    },
+    {
+      "condition": "tony.md existed before the earlier help",
+      "where": ".standards/user-styles/navigator/tony.md, committed in 'Add Navigator user style'",
+      "status": "realized"
+    },
+    {
+      "condition": "alice.md was added beside tony.md after the earlier help",
+      "where": ".standards/user-styles/navigator/alice.md (untracked)",
+      "status": "realized"
+    },
+    {
+      "condition": "An annotated MAP mode was added to Navigator's modes folder",
+      "where": ".claude/skills/navigator/modes/map.md (untracked), with an invocation block whose layout matches explain.md",
+      "status": "realized"
+    },
+    {
+      "condition": "The fresh helper result validates MAP as a user option and lists both styles",
+      "where": "selfChecks 2 and 3 pass (invocation.mjs reports MAP with selectability user and lists alice and tony)",
+      "status": "realized"
+    },
+    {
+      "condition": "No mode or style change is requested",
+      "where": "utterance 'Show your options again.'",
+      "status": "realized"
+    },
+    {
+      "condition": "Earlier explanation matches the code",
+      "where": "history turn 2 line citations match src/server.js:11,13, src/resolve.js:2-6, src/store.js:2,4-10; tests pass",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 2,
+      "detail": "graderOnly says 'Reading tony.md is allowed because tony is the selected style.' PROTOCOL.md Role Invocation Help says help never loads 'a user style's contents', so reading tony.md during a help-only turn is arguably outside protocol too. Assertion 2 concerns only unselected styles, so this does not change the grading. The wording could still make the judge more lenient than the protocol.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally reword the graderOnly line to: 'Assertion 2 concerns only alice.md; reading tony.md is not graded by assertion 2.'"
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 1,
+      "detail": "There are only two styles, so a correct run will likely show the full inventory. The 'labels any displayed style subset as examples' clause is then satisfied by default. The assertion is phrased conditionally ('any'), so this is acceptable.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes the case faithfully: the history holds an earlier help reply listing only the original four modes and tony, alice.md and an annotated MAP mode were added afterwards as untracked files, and selfChecks confirm the helper now reports MAP as a user option and lists both styles. The checks are safe necessary conditions: unchanged files, and a reply naming the fixed identifier MAP. The Navigator invariants are correct, and check_ok is properly omitted for Navigator.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T03:00:17.710Z",
+  "costUsd": 0.1350124,
+  "ms": 25385,
+  "fixtureHash": "6ff26b544958da65"
+}

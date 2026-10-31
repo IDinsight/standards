@@ -1,0 +1,83 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode DOCUMENTATION, CompletionPolicy NONE, Active Work.Id guide-20261004T120000Z-1a2b3c4d",
+      "where": ".standards/STATE.md (layer 70-record)",
+      "status": "realized"
+    },
+    {
+      "condition": "WorkflowState REVIEWING_FINAL reached by a normal forward handoff from Documenter",
+      "where": ".standards/STATE.md: Handoff FORWARD from DOCUMENTING, FailureType NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Current scope with acceptance conditions",
+      "where": ".standards/docs/scope/guide-20261004T120000Z-1a2b3c4d.md (AC-001..AC-007), referenced by Active Work.Scope",
+      "status": "realized"
+    },
+    {
+      "condition": "Current architecture covering every AC in documentation mode",
+      "where": ".standards/docs/specs/guide-20261004T120000Z-1a2b3c4d.md (AC-007 marked no architectural impact)",
+      "status": "realized"
+    },
+    {
+      "condition": "Current Auditor context",
+      "where": ".standards/CONTEXT.md",
+      "status": "realized"
+    },
+    {
+      "condition": "COMPLETE documentation record identifying the saved guide and successful actual checks",
+      "where": ".standards/docs/documentation/guide-20261004T120000Z-1a2b3c4d.md (Status COMPLETE, commit/blob identities, command results)",
+      "status": "realized"
+    },
+    {
+      "condition": "Saved guide exists and is accurate against existing source (fixture's choice so the full gate passes)",
+      "where": "docs/guide.md and README.md link vs bin/summarize.js, src/csv.js, src/summarize.js; selfChecks confirm examples, exit codes, and messages",
+      "status": "realized"
+    },
+    {
+      "condition": "No Developer, Tester, or implementation-review records; Development NONE",
+      "where": "no files under .standards/docs/development, verification, or reviews; STATE Development NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "No recovery, obligations, or blockers",
+      "where": "STATE.md: Recovery Active false, Obligations Active false, BlockedOn NONE, BaselineReconciliation NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Fresh independent session (no authoring history)",
+      "where": "history null; headless fresh run",
+      "status": "realized"
+    },
+    {
+      "condition": "check.mjs reports ok",
+      "where": "gate results: ok true, no problems",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The documentation record's check line says the missing-file run produced a 'Node error beginning `Error: ENOENT: no such file or directory`', but the actual stderr begins with 'node:fs:440 ...' and contains the 'Error: ENOENT' line later (see selfCheck tail). A strict reviewer could log this as an evidence-wording discrepancy against Documenter's record instead of passing the gate. graderOnly says no material findings exist. The checks tolerate either outcome, but the judge's view of the expected handoff could be muddied.",
+      "recommendation": "fix_file",
+      "fix": "In layers/70-record/.standards/docs/documentation/guide-20261004T120000Z-1a2b3c4d.md, change 'exit 1; Node\n  error beginning `Error: ENOENT: no such file or directory`.' to 'exit 1; Node's uncaught\n  error output, including `Error: ENOENT: no such file or directory`.'"
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition holds: a brownfield DOCUMENTATION cycle at REVIEWING_FINAL with policy NONE, the named ID, current scope, design, context, and a COMPLETE documentation record, and no omitted-owner records, recovery, or blockers. I re-read the guide against the source and found it accurate, and the selfChecks prove every example and exit code. The checks and invariants are necessary conditions for a correct run, assertion 2's check_ok does catch a closure section in the final report, and the only issue is a minor wording inaccuracy in the documentation record's ENOENT check line.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T03:06:28.467Z",
+  "costUsd": 0.2666458,
+  "ms": 49055,
+  "fixtureHash": "2c789ac0265b7b26"
+}

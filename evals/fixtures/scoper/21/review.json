@@ -1,0 +1,71 @@
+{
+  "conditions": [
+    {
+      "condition": "Project is GREENFIELD",
+      "where": ".standards/MODE.md (installed greenfield template, `ProjectMode`: `GREENFIELD`); selfCheck confirms",
+      "status": "realized"
+    },
+    {
+      "condition": "No cycle is active (Active Work.Id and Request UNSET, CycleMode UNSET, WorkflowState SCOPING, Handoff INITIAL)",
+      "where": ".standards/STATE.md (installed greenfield template, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "CompletionPolicy NONE",
+      "where": ".standards/STATE.md `CompletionPolicy`: `NONE`",
+      "status": "realized"
+    },
+    {
+      "condition": "No pending mode preference or pending cycle request",
+      "where": ".standards/STATE.md `PendingCycleMode`: `UNSET`, `PendingCycleRequest`: `UNSET`, `PendingCycleBlockedOn`: `NONE`",
+      "status": "realized"
+    },
+    {
+      "condition": "No project implementation exists, so the greenfield bootstrap is genuine",
+      "where": "Repository holds only README.md (committed pre-install)",
+      "status": "realized"
+    },
+    {
+      "condition": "User asks for a small application and explicitly selects finishing after implementation review because no project documentation is needed",
+      "where": "prompt.utterance",
+      "status": "realized"
+    },
+    {
+      "condition": "Cycle tool can allocate an ID from the installed state",
+      "where": "selfCheck `cycle.mjs new` passes",
+      "status": "realized"
+    },
+    {
+      "condition": "Repository is committed and clean",
+      "where": "git status clean on main; two commits",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 0,
+      "detail": "Whether the ID came from `cycle.mjs new` and whether the initialization write recorded INITIAL is visible only in the trace. The state checks correctly accept INITIAL/NONE, or FORWARD/SCOPING when scoping completes. `complete: false` correctly leaves the trace evidence to the judge.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 2,
+      "detail": "The `WorkflowState in [SCOPING, ARCHITECTING]` check is repeated from assertion 1. This is harmless. None of the assertion 2 checks fails a correct run: the omitted-phase record globs are unchanged, Development stays NONE, and ProjectMode stays GREENFIELD.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture is the pristine installed greenfield state plus a one-line README, which realizes every stated condition: no active cycle, policy NONE, no pending preference. The utterance carries only the user's request, the policy choice, and the reason. Each deterministic check is a necessary condition under every legal correct path (still scoping, blocked on a scope question, or forwarded to Architect), and the standard invariants are present and fit the case.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T03:07:16.173Z",
+  "costUsd": 0.1620354,
+  "ms": 22611,
+  "fixtureHash": "e3990231ac645fce"
+}

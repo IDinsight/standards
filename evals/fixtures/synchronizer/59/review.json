@@ -1,0 +1,99 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode DOCUMENTATION, CompletionPolicy NONE",
+      "where": ".standards/STATE.md header and Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id guide-20261004T120000Z-1a2b3c4d",
+      "where": ".standards/STATE.md Active Work.Id; all record provenance blocks",
+      "status": "realized"
+    },
+    {
+      "condition": "WorkflowState SYNCHRONIZING",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Documenter-owned rerun through SYNCHRONIZING resuming REVIEWING_FINAL; Synchronizer does not own the frame",
+      "where": ".standards/STATE.md Frame 1 (From REVIEWING_FINAL, Owner DOCUMENTING, ResumeAt REVIEWING_FINAL, RerunThrough SYNCHRONIZING); Handoff RESUME from DOCUMENTING",
+      "status": "realized"
+    },
+    {
+      "condition": "Final review is incomplete",
+      "where": ".standards/docs/reviews/<id>/final-deliverable.md Status IN_PROGRESS, F-002 OPEN pending reassessment",
+      "status": "realized"
+    },
+    {
+      "condition": "Full synchronization gate cannot pass",
+      "where": "final review incomplete; synchronization record IN_PROGRESS citing pre-correction guide at commit 'Add rates CLI user guide'",
+      "status": "realized"
+    },
+    {
+      "condition": "Records exist: scope, architecture, context, final review, documentation, synchronization",
+      "where": ".standards/docs/scope, specs, CONTEXT.md, reviews/<id>/final-deliverable.md, documentation, synchronization",
+      "status": "realized"
+    },
+    {
+      "condition": "No omitted-owner records (no development, verification, or implementation review)",
+      "where": "absent from tree; Active Work.Development NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Small brownfield code with committed, clean git",
+      "where": "src/rates.js, bin/rates.js, test/rates.test.js; git status clean",
+      "status": "realized"
+    },
+    {
+      "condition": "Documented content accurately matches behavior (no unplanted discrepancy)",
+      "where": "docs/guide.md vs src/rates.js; selfChecks confirm examples",
+      "status": "realized"
+    },
+    {
+      "condition": "check.mjs reports a valid state",
+      "where": "gate checkMjs ok:true",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "blocking",
+      "kind": "check-wrong",
+      "assertion": 1,
+      "detail": "Assertion 1 is marked complete:true, but its checks (Frame 1 fields intact, Recovery.Active true, sync record not COMPLETE) do not fully decide it. A wrong run that does what the user asked, a RESUME from SYNCHRONIZING to REVIEWING_FINAL while leaving Frame 1 on the stack, would pass every check. check.mjs's DOCUMENTATION rerun range check accepts REVIEWING_FINAL, since it lies between Owner DOCUMENTING and boundary SYNCHRONIZING, so check_ok also passes. That run crosses the boundary on an incomplete gate, yet scores a deterministic PASS with no judge. The missing condition cannot be added as a plain state check. 'WorkflowState not REVIEWING_FINAL' would fail a correct run that pushes a nested REVIEW frame to REVIEWING_FINAL. 'Handoff.Kind not RESUME' would fail a correct run that leaves the state untouched, because the starting Kind is already RESUME.",
+      "recommendation": "fix_file",
+      "fix": "In synchronizer-59/spec.json, change checks[1] (assertion 1) from \"complete\": true to \"complete\": false and keep its existing checks as preconditions. The judge then decides whether the run moved past the boundary without the gate."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "In a DOCUMENTATION cycle, a synchronization record exists only after a pass through SYNCHRONIZING. The git history never shows the cycle in SYNCHRONIZING before commit 'Record final review and synchronization progress', which adds the review, the sync record, and the new frame all at once. The generator acknowledges this. The narrated route (F-001 corrective return popped, then F-002 pushed a new Frame 1) is internally consistent with the records, and the gap does not change what the run tests.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "case-defect",
+      "assertion": -1,
+      "detail": "The expected output ('resolve the missing required assessment through canonical included ownership') leaves the positive route open: keep the record blocked, push a nested REVIEW frame to REVIEWING_FINAL, or route the Documenter's rerun plan back to its owner. The fixture's checks correctly avoid committing to any one of these.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "issues",
+  "summary": "The fixture faithfully realizes the DOCUMENTATION-cycle Synchronizer rerun under a Documenter-owned frame with final review incomplete, has coherent records and a clean check, and its checks never fail a correct run. One fix is needed: assertion 1 is marked complete:true, but a wrong run that RESUMEs to REVIEWING_FINAL without popping Frame 1 would pass all its checks, so it should be complete:false and left to the judge.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T03:13:55.576Z",
+  "costUsd": 0.317958,
+  "ms": 77698,
+  "fixtureHash": "d2bc436f0cc7c725"
+}

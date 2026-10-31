@@ -1,0 +1,76 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode DOCUMENTATION, CompletionPolicy NONE, Active Work.Id guide-20261004T120000Z-1a2b3c4d",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "WorkflowState DOCUMENTING",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "One owned recovery frame: From/ResumeAt AWAITING_USER_SIGNOFF, Owner DOCUMENTING, RerunThrough NONE, with matching USER_REWORK/DOCUMENTATION handoff",
+      "where": ".standards/STATE.md Recovery Frame 1 and Handoff",
+      "status": "realized"
+    },
+    {
+      "condition": "One corrected paragraph is saved and verified against source",
+      "where": "docs/guide.md Rounding first paragraph (unstaged); record DOC-001 RESOLVED with report.py and test evidence",
+      "status": "realized"
+    },
+    {
+      "condition": "A required example (AC-002 worked example) has not been checked against source",
+      "where": "record DOC-002 OPEN; scope AC-002 and design technical criterion require shown output to match",
+      "status": "realized"
+    },
+    {
+      "condition": "The example can be checked now from available source, and is actually wrong",
+      "where": "docs/guide.md shows 4.25/7.50; python3 -m shiftlog week examples/shifts.txt prints 4.50/7.75 (selfChecks)",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, architecture, context, final-review and synchronization records exist and look owner-written; review/sync predate the rework",
+      "where": ".standards/docs/scope, specs, CONTEXT.md, reviews/.../final-deliverable.md, synchronization/...md",
+      "status": "realized"
+    },
+    {
+      "condition": "Git: committed history plus unstaged changes",
+      "where": "git status: docs/guide.md and documentation record modified, unstaged",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "hint-leak",
+      "assertion": 1,
+      "detail": "The record's Resume and Conclusion says 'Next action: resolve DOC-002, re-establish the full Documenter gate against current inputs, then plan the recovery route for frame 1', and DOC-002 lists Owner Documenter. This nudges toward the expected behavior for assertion 1. A Documenter-authored record would normally contain this resume context (the template requires 'Next concrete action'), and it does not reveal that the example is wrong.",
+      "recommendation": "run_as_is",
+      "fix": "Acceptable as realistic resume context. Optionally soften it to 'Next action: continue AC-002 work in the Rounding section.'"
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 2,
+      "detail": "contains 'shiftlog/report.py' on the record assumes a correct run keeps the source path in the paragraph's evidence. Any correct run that preserves the DOC-001 evidence will keep it, so this is low risk.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes the case: a DOCUMENTATION cycle in DOCUMENTING with an owned frame that resumes AWAITING_USER_SIGNOFF, a verified unstaged paragraph fix, and an unchecked worked example that is genuinely wrong (4.25/7.50 vs actual 4.50/7.75). check.mjs is ok, and the deterministic checks hold in every correct run: never AWAITING_USER_SIGNOFF, the frame is preserved while RerunThrough may change, and the DOC entries and evidence remain. Assertion 1 is left to the judge, and the invariants fit the scope's editing boundary.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T02:59:27.459Z",
+  "costUsd": 0.2492114,
+  "ms": 44375,
+  "fixtureHash": "0f2487e1c9793d93"
+}

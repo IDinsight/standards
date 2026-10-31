@@ -1,0 +1,97 @@
+{
+  "conditions": [
+    {
+      "condition": "BROWNFIELD project",
+      "where": ".standards/MODE.md (installer brownfield, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "STANDARD cycle at REVIEWING_IMPLEMENTATION, entered by FORWARD from TESTING",
+      "where": ".standards/STATE.md WorkflowState/CycleMode/Handoff",
+      "status": "realized"
+    },
+    {
+      "condition": "CompletionPolicy FULL_DELIVERABLE and no policy instruction from the user",
+      "where": ".standards/STATE.md Active Work.CompletionPolicy; Request is plain 'Add a free-shipping threshold to the shipping rate calculator.'",
+      "status": "realized"
+    },
+    {
+      "condition": "No project-facing documentation",
+      "where": "No README.md or docs/; AGENTS.md and CLAUDE.md hold only managed blocks (installed unchanged); CONTEXT.md records this",
+      "status": "realized"
+    },
+    {
+      "condition": "No documentation acceptance condition",
+      "where": "scope AC-001..AC-003, all behavioral; selfCheck grep confirms no 'document' in scope",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, architecture, context, development plan, and verification records present and coherent",
+      "where": ".standards/docs/scope|specs|development|verification/<id>.md and .standards/CONTEXT.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Full verification current and passing",
+      "where": "verification report COMPLETE, FULL/NONE, cites commit 73b9d92 and current test blobs; selfCheck shows 15/15 pass",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation satisfies the contract (no material defects)",
+      "where": "src/settings.js validates the threshold with null default; src/shipping.js returns 0 on rounded subtotal >= threshold, otherwise the unchanged formula",
+      "status": "realized"
+    },
+    {
+      "condition": "No recovery, obligations, blockers, pending cadence, or baseline reconciliation",
+      "where": ".standards/STATE.md Recovery/Obligations Active false; BlockedOn NONE; PendingVerificationCadence NONE; BaselineReconciliation NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Clean committed git state",
+      "where": "git status clean on main",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The design's AC-003 technical criterion requires rejection of 'non-finite' values and acceptance of explicit `null`. The tests cover only -5, the string '50', and omission. The verification report honestly says so ('for -5 and the string 50') but still claims every criterion is verified. A strict Reviewer could treat the untested NaN/Infinity and explicit-null branches as a formal evidence gap and route VERIFICATION to Tester. That run would then fail the `/documenter` reply check. The existing baseline tests the rate checks the same way (negative only), and code inspection plus a Reviewer diagnostic plausibly suffice, so this is unlikely to be treated as material.",
+      "recommendation": "run_as_is",
+      "fix": "Optional hardening: in layers/52-verification/test/settings.test.js, add tests rejecting freeShippingThreshold NaN and Infinity and accepting explicit null. Then update the verification report's AC-003 row, Scenario Budget (settings allocations 3→6), and counts (15→18), and update selfCheck 2 to '# pass 18'."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "In .standards/CONTEXT.md under Structure and Boundaries, the defaults line is garbled: 'merges defaults (base rate 4.5, 4.5 plus 1.2 per started kilogram, currency EUR)'. It is unlikely to provoke a PROJECT_CONTEXT route, but it reads oddly.",
+      "recommendation": "fix_file",
+      "fix": "layers/50-design/.standards/CONTEXT.md: change to 'merges defaults (base rate 4.5, per-kilogram rate 1.2, currency EUR)'."
+    },
+    {
+      "severity": "note",
+      "kind": "record-format",
+      "assertion": -1,
+      "detail": "In the development plan, the Implementation Contract bullets are written as '- Scope: `...`' rather than the template's '- `Scope`: `...`' field form. This is harmless to check.mjs and to grading.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "runtime",
+      "assertion": -1,
+      "detail": "selfCheck 2 pipes the TAP output into `grep -q`. Node then raises EPIPE, but the pipeline's exit status is grep's, so the check passes. It relies on the absence of pipefail.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes a clean BROWNFIELD STANDARD REVIEWING_IMPLEMENTATION state under FULL_DELIVERABLE. It has no project documentation, no documentation AC, current passing full verification, and no recovery or blockers; check.mjs and all selfChecks pass. The checks are necessary conditions for a correct run: policy and Request unchanged, no H2 closure section, no final-review, sync, or documentation records, and a `/documenter` invocation. The invariants are standard. Only minor realism notes remain, including a small risk that a strict Reviewer flags the untested non-finite threshold branch.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T03:03:10.794Z",
+  "costUsd": 0.2731298,
+  "ms": 76014,
+  "fixtureHash": "2866a31bb4c08ed3"
+}

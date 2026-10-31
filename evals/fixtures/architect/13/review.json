@@ -1,0 +1,89 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (brownfield install, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode DOCUMENTATION, CompletionPolicy NONE, Id guide-20261004T120000Z-1a2b3c4d, WorkflowState ARCHITECTING",
+      "where": ".standards/STATE.md (layer 30); FORWARD from SCOPING, Architecture NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "docs/architecture.md is the appropriate unmarked canonical design",
+      "where": "docs/architecture.md starts with '# portal-auth Technical Design' and has no provenance; AGENTS.md says to update it rather than add design files; README and CONTEXT.md name it",
+      "status": "realized"
+    },
+    {
+      "condition": "The design holds useful current system design",
+      "where": "docs/architecture.md Context/Decision/Components/Interfaces/Flow/Risks match src/auth/*.js",
+      "status": "realized"
+    },
+    {
+      "condition": "The design holds previous-cycle AC coverage (with IDs the current scope does not define)",
+      "where": "docs/architecture.md Acceptance Coverage AC-001..AC-005 and Technical Acceptance Criteria AC-002..AC-004; current scope defines only AC-001..AC-003",
+      "status": "realized"
+    },
+    {
+      "condition": "A historical implementation plan exists, so assertion 2 is not vacuous",
+      "where": "docs/architecture.md ## Build Plan (CREATE lockout.js, MODIFY errors.js/login.js)",
+      "status": "realized"
+    },
+    {
+      "condition": "Completed documentation scope about current authentication error messages",
+      "where": ".standards/docs/scope/guide-20261004T120000Z-1a2b3c4d.md AC-001..AC-003",
+      "status": "realized"
+    },
+    {
+      "condition": "Auditor context exists for the documentation cycle",
+      "where": ".standards/CONTEXT.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Code implements the error behavior the scope documents",
+      "where": "src/auth/errors.js, login.js, middleware.js, tokens.js; npm test passes (9 tests)",
+      "status": "realized"
+    },
+    {
+      "condition": "Clean committed git state",
+      "where": "git status clean on main",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "blocking",
+      "kind": "check-too-strict",
+      "assertion": 1,
+      "detail": "The check `^## Previous Cycles(?![\\s\\S]*^## )` (m) requires that no H2 follow Previous Cycles. The protocol says the moved content 'may keep its own headings', and template.md says it is moved 'unchanged, including their headings'. A correct run may therefore keep `## Acceptance Coverage` and `## Technical Acceptance Criteria` as H2 headings under `## Previous Cycles`. The runtime (withoutPreviousCycles, acceptanceInventory) explicitly treats everything after that heading as history, but this check would fail such a run.",
+      "recommendation": "fix_file",
+      "fix": "In architect-13/spec.json, checks[assertion 1], delete the contains check with regex `^## Previous Cycles(?![\\s\\S]*^## )`. The remaining `^## Previous Cycles[\\s\\S]*AC-005` check already requires the heading and the moved coverage below it. check_ok catches AC-004/AC-005 left above it, and any current AC missing coverage after handoff. Leave whether Previous Cycles is the final section to the judge."
+    },
+    {
+      "severity": "note",
+      "kind": "check-wrong",
+      "assertion": 0,
+      "detail": "Assertion 0 relies on `^(?!\\s*<!--\\s*STANDARDS)` without the m flag, so it is anchored at the start of the file. This is correct if the grader compiles the regex with only the given flags. With an implicit m flag it would almost always pass, because any line not starting with a provenance block would match.",
+      "recommendation": "run_as_is",
+      "fix": "Confirm that the grader does not add the m flag by default."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "Every commit, including the pre-install code and the lockout merge, is dated 2026-10-04T13:00:00Z, while docs/architecture.md cites lockout cycle login-lockout-20260915T101500Z-3c9e4f21. This is slightly implausible history, but it does not affect what the run tests.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "issues",
+  "summary": "The fixture realizes the case well: AGENTS.md makes docs/architecture.md the evident unmarked canonical design, it holds accurate current design plus previous-cycle coverage, criteria, and a Build Plan, and check passes. One assertion-1 check requires Previous Cycles to be the last H2. That would fail a correct run that keeps the moved sections' own H2 headings, which the protocol and template allow, so it should be removed.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-30T22:48:21.406Z",
+  "costUsd": 1.228695,
+  "ms": 54834,
+  "fixtureHash": "79df54f46875ea4d"
+}

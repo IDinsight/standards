@@ -1,0 +1,162 @@
+{
+  "base": null,
+  "date": "2026-10-04T13:00:00Z",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add sign-in handler and session tokens"
+    },
+    {
+      "dir": "layers/10-lockout",
+      "action": "commit",
+      "message": "Lock accounts after repeated failed sign-ins"
+    },
+    {
+      "dir": "layers/20-context",
+      "action": "commit",
+      "message": "Record project context for auth error guide"
+    },
+    {
+      "dir": "layers/30-scope",
+      "action": "commit",
+      "message": "Define scope for auth error guide"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "architect",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "docs/architecture.md is the project's canonical technical design (AGENTS.md: 'Technical design lives in docs/architecture.md. Update that document rather than adding separate design files.'). It has no STANDARDS provenance block and is project-owned.",
+    "The Acceptance Coverage (AC-001 to AC-005), Technical Acceptance Criteria (AC-002 to AC-004), and Build Plan in docs/architecture.md belong to the earlier login-lockout cycle (login-lockout-20260915T101500Z-3c9e4f21). That work is already implemented and merged; its STANDARDS records were removed by a project reset before the merge, so .standards/docs holds only the current cycle's scope.",
+    "The earlier coverage's AC-001 to AC-003 reuse the numbers of the current scope's AC-001 to AC-003 but mean different things (lockout behavior, not error documentation). AC-004 and AC-005 are not defined in the current scope.",
+    "The Context, Decision, Components, Interfaces and Contracts, Data and Control Flow, and Risks and Follow-up sections of docs/architecture.md accurately describe the current code.",
+    "Current auth errors (src/auth/errors.js): missing_credentials 400 'Email and password are required.'; invalid_credentials 401 'Email or password is incorrect.'; account_locked 423 'Too many failed sign-in attempts. Try again later.' with a Retry-After header and error.retryAfterSeconds; token_missing 401 'Sign in to continue.' (also returned when the Authorization header is not 'Bearer <token>'); token_invalid 401 'Your session is not valid. Sign in again.' (malformed token, bad signature, unreadable payload, or no numeric exp); token_expired 401 'Your session has expired. Sign in again.'. Error bodies are { error: { code, message } }.",
+    "No existing test exercises token_invalid."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "guide-20261004T120000Z-1a2b3c4d",
+    "ARCH": "docs/architecture.md",
+    "SCOPE": ".standards/docs/scope/guide-20261004T120000Z-1a2b3c4d.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "contains": {
+            "path": "${ARCH}",
+            "regex": "^(?!\\s*<!--\\s*STANDARDS)"
+          },
+          "why": "docs/architecture.md still exists and does not begin with a STANDARDS provenance block"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.Architecture",
+          "equals": "${ARCH}",
+          "why": "the cycle uses the canonical project design document"
+        },
+        {
+          "contains": {
+            "path": "${ARCH}",
+            "regex": "^## Previous Cycles[\\s\\S]*AC-005",
+            "flags": "m"
+          },
+          "why": "the earlier coverage (AC-005 exists only there) sits under Previous Cycles"
+        },
+        {
+          "check_ok": true,
+          "why": "check reports any earlier AC ID (AC-004, AC-005) left above Previous Cycles, and any current AC without design coverage after handoff"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "contains": {
+            "path": "${ARCH}",
+            "regex": "scrypt"
+          },
+          "why": "the established password component description survives (established design is not deleted)"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "package.json"
+      ],
+      "why": "Architect writes no production code or tests, and a documentation cycle permits no behavior change"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "npm test",
+      "expect": "pass",
+      "why": "the established test command passes on the built fixture (9 tests across test/auth.test.js and test/lockout.test.js)"
+    },
+    {
+      "cmd": "head -n 1 docs/architecture.md | grep -qx '# portal-auth Technical Design'",
+      "expect": "pass",
+      "why": "docs/architecture.md is unmarked: it starts with its title, not a provenance block"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. Layer 00 (pre-install): small Node ES-module sign-in/token library (src/auth/*), test/auth.test.js, README linking docs/architecture.md, AGENTS.md project instruction that technical design lives in docs/architecture.md (installer merges its managed block), and a first plain version of docs/architecture.md. Layer 10 (post-install commit): the login-lockout work as merged after a project reset (STATE stays fresh): lockout.js, updated errors/login/tests, and docs/architecture.md reused by that earlier cycle with template headings, an Acceptance Coverage section AC-001..AC-005, Technical Acceptance Criteria AC-002..AC-004, and a Build Plan, all now historical. Layer 20: Auditor CONTEXT.md and STATE at SCOPING (DOCUMENTATION cycle guide-20261004T120000Z-1a2b3c4d, first cycle, FORWARD from AUDITING). Layer 30: cycle-owned scope record with current AC-001..AC-003 about authentication error messages, STATE at ARCHITECTING (FORWARD from SCOPING), Active Work.Architecture NONE, CompletionPolicy NONE. The current scope deliberately defines only three ACs so the earlier AC-004/AC-005 are flagged by check if left above Previous Cycles once Architecture points at the document. Commit date set to 2026-10-04 to follow the cycle ID timestamp.",
+  "case": "architect-13",
+  "caseHash": "2ab420bca94344a3",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-30T22:48:21.406Z",
+    "verdict": "issues",
+    "fixtureHash": "79df54f46875ea4d",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "fixedBy": "owner decision"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-30T22:34:55.531Z"
+  },
+  "decision": {
+    "action": "fixed",
+    "note": "removed the check that Previous Cycles is the last H2; moved sections keep their own headings",
+    "at": "2026-10-31T11:19:42.577Z",
+    "fixtureHash": "79df54f46875ea4d"
+  }
+}

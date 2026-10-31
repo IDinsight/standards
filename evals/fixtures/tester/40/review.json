@@ -1,0 +1,94 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installer brownfield template)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState TESTING after a normal FORWARD from DEVELOPING, no recovery or obligations",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Change adds POST /surveys/{id}/responses to a FastAPI service backed by PostgreSQL",
+      "where": "app/surveys/router.py submit_response; app/database.py; pyproject.toml",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-001 owner submit 201, AC-002 other users 403, AC-003 missing required answers 422",
+      "where": ".standards/docs/scope/let-survey-owners-submit-responses-20260923T141200Z-5c8e2a17.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Design and context records exist with coverage for every AC; development plan COMPLETE",
+      "where": ".standards/docs/specs/...md, .standards/CONTEXT.md, .standards/docs/development/...md",
+      "status": "realized"
+    },
+    {
+      "condition": "Existing suite uses app.dependency_overrides",
+      "where": "tests/conftest.py client and login fixtures",
+      "status": "realized"
+    },
+    {
+      "condition": "Existing suite uses a PostgreSQL test container",
+      "where": "tests/conftest.py database_url (testcontainers postgres:16-alpine, or TEST_DATABASE_URL)",
+      "status": "realized"
+    },
+    {
+      "condition": "Only app/surveys/router.py carries the change",
+      "where": "commit 'Add survey response submission endpoint' (selfCheck confirms)",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation behaves as specified (no planted defect)",
+      "where": "app/surveys/router.py submit_response matches the design table",
+      "status": "realized"
+    },
+    {
+      "condition": "No verification report exists yet (fresh VERIFY)",
+      "where": ".standards/docs/verification/ absent",
+      "status": "realized"
+    },
+    {
+      "condition": "Tester styles fastapi.md and data-and-services.md available",
+      "where": ".claude/skills/tester/styles/ (installed)",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "runtime",
+      "assertion": -1,
+      "detail": "The runner has no FastAPI/SQLModel/testcontainers packages, no Docker and no PostgreSQL, so the established suite cannot run (selfChecks confirm conftest import fails, docker absent, pip/apt installs fail). The case does not state that the suite runs, and none of the four assertions requires an executed result; registries and Debian mirrors are blocked so the role cannot substitute an installed database. A correct run ends with an incomplete report in TESTING, which graderOnly tells the judge.",
+      "recommendation": "run_as_is",
+      "fix": "None; harness limitation documented in graderOnly."
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 3,
+      "detail": "contains 'app/surveys/router[.]py' assumes the report names the full path. The template's Source file column and Assessed Inputs make this near-certain, but a run writing only 'router.py' in the budget row would still almost surely name the full path elsewhere in the report.",
+      "recommendation": "run_as_is",
+      "fix": "Acceptable as is."
+    },
+    {
+      "severity": "note",
+      "kind": "ungradeable-assertion",
+      "assertion": 0,
+      "detail": "Reading styles has no deterministic predicate in the vocabulary; left to the judge with complete:false, which is correct.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition: a brownfield FastAPI/PostgreSQL survey service in TESTING after a FORWARD handoff, scope with AC-001..003, a single-file change in app/surveys/router.py, and a suite built on dependency_overrides and a testcontainers PostgreSQL. Checks are necessary conditions, and the invariants fit a Tester. The suite cannot execute in the runner, but the case does not require execution and graderOnly documents it.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T03:16:17.100Z",
+  "costUsd": 0.2606314,
+  "ms": 54005,
+  "fixtureHash": "818a83d5565512d1"
+}

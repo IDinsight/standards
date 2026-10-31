@@ -1,0 +1,61 @@
+{
+  "conditions": [
+    {
+      "condition": "The Navigator discovery helper (.standards/bin/invocation.mjs) is absent",
+      "where": "Commit d258bc0 git-rms .standards/; selfCheck `node .standards/bin/invocation.mjs` fails with MODULE_NOT_FOUND",
+      "status": "realized"
+    },
+    {
+      "condition": "There is no .standards runtime (PROTOCOL.md, protocol/, bin/, MODE.md, STATE.md)",
+      "where": "Delete layer plus commit d258bc0; selfCheck `test ! -e .standards` passes",
+      "status": "realized"
+    },
+    {
+      "condition": "The Navigator skill and its modes are available",
+      "where": ".claude/skills/navigator/SKILL.md and modes/*.md, unchanged installed files",
+      "status": "realized"
+    },
+    {
+      "condition": "The relevant source has a module a user would call the readable parser, with defined empty-input behavior",
+      "where": "pacer/readable.py parse_readable (strip; blank raises ValueError('duration is empty') unless default is given); README names it 'the readable parser'; pacer/iso.py is a distinct parser",
+      "status": "realized"
+    },
+    {
+      "condition": "Project is committed with a clean tree",
+      "where": "git status clean on main",
+      "status": "realized"
+    },
+    {
+      "condition": "No stop hook calls a missing runtime",
+      "where": "install.hooks false; .claude/settings.json has only skillOverrides",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 2,
+      "detail": "reply_matches 'readable[.]py' requires the reply to name the source file. Navigator's shared procedure step 5 requires exact file paths for material claims, and the file name is a fixed identifier, so a correct run will almost certainly cite pacer/readable.py. The risk of a false failure is small.",
+      "recommendation": "run_as_is",
+      "fix": "Keep the check. If observed runs cite only `parse_readable` without the path, drop it."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "AGENTS.md and CLAUDE.md keep managed blocks pointing at the missing .standards/PROTOCOL.md, and history shows an 'Install STANDARDS' commit followed by its removal. This is a plausible leftover and matches the case's 'no .standards runtime'. It does not hint at the expected answer.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition: the runtime and discovery helper are absent, the Navigator skill remains, and pacer/readable.py has clear, tested empty-input behavior that a disambiguating second parser keeps distinct. The checks and Navigator invariants (unchanged **, HEAD unchanged, no mutating git) cannot fail a correct run, and every assertion is observable. The only nit is the readable.py reply check, which is acceptable because the path is a fixed identifier the procedure requires citing.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T03:00:33.098Z",
+  "costUsd": 0.1185084,
+  "ms": 28882,
+  "fixtureHash": "fd57677c2b475859"
+}

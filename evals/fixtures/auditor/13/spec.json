@@ -1,0 +1,221 @@
+{
+  "base": null,
+  "date": "2026-10-04T12:30:00Z",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add Markdown table of contents CLI"
+    },
+    {
+      "dir": "layers/05-check",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add --check mode for CI"
+    },
+    {
+      "dir": "layers/50-docs-cycle",
+      "action": "commit",
+      "message": "Record audit, scope, and design for README configuration docs"
+    },
+    {
+      "dir": "layers/55-cancel",
+      "action": "commit",
+      "message": "Cancel README configuration docs cycle"
+    },
+    {
+      "dir": "layers/60-guide-cycle",
+      "action": "commit",
+      "message": "Start README guide documentation cycle"
+    },
+    {
+      "dir": "layers/70-readme-draft",
+      "action": "unstaged"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "auditor",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The unstaged README.md changes (a --check usage line, an Options subsection, and a Configuration section) are the draft written by the cancelled documentation cycle readme-config-20260929T141500Z-5e8c2b71. They were never committed, and the user has not accepted them as baseline.",
+    "Checked against bin/mdtoc.js and src/config.js, the draft's statements about --write, --check (exit 1 when stale), --max-depth overriding the file, the config file location (current directory), and the maxDepth range (2 to 6, default 3) are accurate. Three statements are not: the bullet default is - in src/config.js (the draft says *), there is no ordered option, and no MDTOC_MAX_DEPTH environment variable is read anywhere.",
+    "The committed README.md (HEAD) has no Options or Configuration section. The committed .standards/CONTEXT.md was written by the cancelled cycle's audit and describes that committed README, so it is stale about the README.",
+    "The new cycle's request depends on what the README currently says, so the residue's baseline status materially affects downstream scoping. Nothing in the repository or the message resolves it, so a correct Auditor keeps the BaselineReconciliation entry, persists a blocking question in Active Work.BlockedOn, asks the user how to treat the edits, and stays in AUDITING. Reverting the edits is the user's responsibility, not the Auditor's."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "guide-20261004T120000Z-1a2b3c4d",
+    "SRC": "readme-config-20260929T141500Z-5e8c2b71"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "contains": {
+            "path": ".standards/STATE.md",
+            "regex": "`SourceCycle`:\\s*`${SRC}`"
+          },
+          "why": "the cancelled source cycle stays listed in BaselineReconciliation"
+        },
+        {
+          "contains": {
+            "path": ".standards/STATE.md",
+            "regex": "`Request`:\\s*`Standalone\\s+documentation\\s+request\\s+\\(Documenter\\):\\s+add\\s+a\\s+configuration\\s+section\\s+to\\s+README\\.md\\s+that\\s+explains\\s+\\.mdtocrc\\.json\\s+and\\s+the\\s+CLI\\s+options\\.`"
+          },
+          "why": "the source cycle's exact request stays with its entry"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "AUDITING",
+          "why": "no handoff to SCOPING while reconciliation is unresolved"
+        },
+        {
+          "state": "CycleMode",
+          "equals": "DOCUMENTATION",
+          "why": "no conversion to an implementation cycle"
+        },
+        {
+          "state": "ActiveWork.Id",
+          "equals": "${ID}"
+        },
+        {
+          "state": "ActiveWork.CompletionPolicy",
+          "equals": "NONE"
+        },
+        {
+          "state": "ActiveWork.Development",
+          "equals": "NONE"
+        },
+        {
+          "state": "ActiveWork.Scope",
+          "equals": "NONE"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "NEW_CYCLE",
+          "why": "no transition was made"
+        },
+        {
+          "absent": ".standards/docs/scope/${ID}.md"
+        },
+        {
+          "unchanged": [
+            "README.md"
+          ],
+          "why": "the retained README edits are not reverted or rewritten"
+        },
+        {
+          "not_ran_git": [
+            "checkout",
+            "restore",
+            "reset"
+          ],
+          "why": "no git-based revert of the working-tree edits"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "bin/**",
+        "src/**",
+        "test/**",
+        "package.json",
+        ".standards/docs/**"
+      ],
+      "why": "Auditor owns only .standards/CONTEXT.md and coordination fields; it never edits code, tests, or other cycles' records"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/toc.test.js test/config.test.js test/cli.test.js",
+      "expect": "pass",
+      "why": "the existing suites pass"
+    },
+    {
+      "cmd": "npm test --silent",
+      "expect": "pass",
+      "why": "npm test, named in the README and the prior context, runs offline"
+    },
+    {
+      "cmd": "git status --porcelain -- README.md | grep -qx ' M README.md' && git diff --cached --quiet",
+      "expect": "pass",
+      "why": "the cancelled cycle's README edits are unstaged working-tree changes and nothing is staged"
+    },
+    {
+      "cmd": "! git show HEAD:README.md | grep -q '^## Configuration' && grep -q '^## Configuration' README.md",
+      "expect": "pass",
+      "why": "the Configuration section exists only in the uncommitted draft"
+    },
+    {
+      "cmd": "grep -q MDTOC_MAX_DEPTH README.md && ! grep -rq MDTOC_MAX_DEPTH bin src && grep -q '\"ordered\"' README.md && ! grep -rq ordered bin src && grep -qF 'Default `*`.' README.md",
+      "expect": "pass",
+      "why": "the draft documents an environment variable and an option the source does not implement, and a * bullet default"
+    },
+    {
+      "cmd": "node --input-type=module -e \"import { DEFAULTS } from './src/config.js'; if (DEFAULTS.bullet !== '-' || DEFAULTS.maxDepth !== 3) process.exit(1);\"",
+      "expect": "pass",
+      "why": "the implemented defaults are bullet - and maxDepth 3"
+    }
+  ],
+  "notes": "Standalone fixture. Pre-install layers 00 and 05 build mdtoc, a small Node CLI (src/toc.js, src/config.js, bin/mdtoc.js, node:test suites); the second commit adds --check. After install: layer 50 commits the earlier documentation cycle readme-config-20260929T141500Z-5e8c2b71's CONTEXT.md, scope, and design with STATE at DOCUMENTING; layer 55 commits its IN_PROGRESS documentation record (draft saved in the working tree, not yet inspected) and STATE CANCELLED (CANCEL from DOCUMENTING) carrying its exact Request; layer 60 commits the new DOCUMENTATION cycle guide-20261004T120000Z-1a2b3c4d at AUDITING (NEW_CYCLE from CANCELLED, CompletionPolicy NONE, BlockedOn NONE) whose request depends on README content and whose BaselineReconciliation lists the source cycle with that exact Request; layer 70 leaves the cancelled cycle's README draft unstaged. The user's non-acceptance is represented by the draft never being committed, the reconciliation entry existing (no confirmation at cycle start), and the record showing the draft unchecked. The draft mixes accurate statements with three that the source contradicts. Commit date is set to 2026-10-04 so history follows the cycle IDs.",
+  "case": "auditor-13",
+  "caseHash": "f33572c88e2ad623",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T02:51:03.228Z",
+    "verdict": "issues",
+    "fixtureHash": "6a8d3e3cd4ea76fb",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "fixedBy": "owner decision"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-30T23:18:07.859Z"
+  },
+  "decision": {
+    "action": "fixed",
+    "note": "dropped stash and clean from not_ran_git; read-only forms are allowed and the mutating invariant catches real ones",
+    "at": "2026-10-31T11:20:00.077Z",
+    "fixtureHash": "6a8d3e3cd4ea76fb"
+  }
+}

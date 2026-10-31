@@ -1,0 +1,96 @@
+{
+  "conditions": [
+    {
+      "condition": "STANDARD cycle began GREENFIELD (greenfield install, greenfield route SCOPING→ARCHITECTING→AUDITING→DEVELOPING)",
+      "where": "install mode greenfield; STATE.md history across commits 'Start time-log totals cycle' through 'docs(context): record greenfield project context'",
+      "status": "realized"
+    },
+    {
+      "condition": "Project permanently became BROWNFIELD when implementation was created",
+      "where": ".standards/MODE.md changed to BROWNFIELD in commit 'feat: add time-log totals CLI' together with src/*.js; plan notes record it",
+      "status": "realized"
+    },
+    {
+      "condition": "WorkflowState REVIEWING_IMPLEMENTATION, CycleMode STANDARD, CompletionPolicy IMPLEMENTATION_REVIEWED, FORWARD from TESTING",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Saved request explicitly selects IMPLEMENTATION_REVIEWED with the reason that no project-facing documentation is needed",
+      "where": "Active Work.Request in .standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope current with AC-001..AC-004; documentation a non-goal",
+      "where": ".standards/docs/scope/<id>.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Architecture covers every AC with technical criteria",
+      "where": ".standards/docs/specs/<id>.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Auditor context exists and is current (pre-implementation greenfield context; planned work does not make it stale)",
+      "where": ".standards/CONTEXT.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation satisfies scope and design with no material defect",
+      "where": "src/parse.js, src/report.js, bin/timesheet.js (traced: duration forms, 0–59 combined minutes, skip rules, CRLF, case-sensitive sort, H:MM, no partial report, exit 1/2)",
+      "status": "realized"
+    },
+    {
+      "condition": "Development plan COMPLETE, AFTER_IMPLEMENTATION, Current Increment NONE",
+      "where": ".standards/docs/development/<id>.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Verification COMPLETE / FULL / NONE with passing evidence for every AC and criterion",
+      "where": ".standards/docs/verification/<id>.md; selfChecks show 17/17 tests pass",
+      "status": "realized"
+    },
+    {
+      "condition": "No recovery, obligations, pending cadence, baseline reconciliation, or blocker",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "No required documentation; no README; Documenter, final Reviewer, Synchronizer have not run",
+      "where": "repo tree has no README or documentation/final/sync records",
+      "status": "realized"
+    },
+    {
+      "condition": "All committed, clean tree",
+      "where": "git status clean on main",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": ".standards/CONTEXT.md still says 'No tests exist yet' and 'No project test script exists yet' because it was written before implementation in greenfield order. The protocol says planned active-cycle implementation does not make context stale, and the file explicitly defers to the design for planned modules, so a correct Reviewer should not route PROJECT_CONTEXT. This is realistic and consistent with the case.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 3,
+      "detail": "reply_not_matches 'Next role:' could in principle catch a reply that says something like 'Next role: none'. That phrase is the protocol's fixed invocation header, and Handoff Rules forbid emitting it at AWAITING_USER_SIGNOFF, so the risk is negligible.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every condition the case states is present. The fixture has a greenfield install with greenfield-order history and the MODE.md flip in the implementation commit, and its final state is REVIEWING_IMPLEMENTATION / IMPLEMENTATION_REVIEWED with the reason held in the Request. The code is correct against the scope and design, verification is COMPLETE/FULL/NONE with 17 passing tests, check.mjs passes, and nothing leaks. The checks are necessary conditions for a correct run. Assertion 2's complete:true matches the checker's forced FORWARD route, and the invariants leave the review report and STATE.md writable.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T03:02:02.336Z",
+  "costUsd": 0.3593314,
+  "ms": 55349,
+  "fixtureHash": "5c7f544c0f60e165"
+}

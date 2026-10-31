@@ -1,0 +1,149 @@
+{
+  "base": null,
+  "install": {
+    "mode": "greenfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-cycle",
+      "action": "commit",
+      "message": "Start household registration mockup cycle"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "scoper",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "Active Work.Scope is NONE and no scope record exists for the cycle; the run should use PLAN.",
+    "Active Work.Request is: Put together a quick clickable mockup of the household registration flow to show the client next week; it will be thrown away.",
+    "The request names no maturity level; 'mockup' and 'thrown away' map to Level 1 (spike) in the Scoper maturity-levels reference, so the level can be inferred and recorded as an assumption without a blocking question.",
+    "The repository has no project implementation and no .standards/CONTEXT.md; in GREENFIELD before the first audit this absence is intentional and is not a PROJECT_CONTEXT defect."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "household-registration-mockup-20260924T090000Z-4e8a1c3f",
+    "SCOPE": ".standards/docs/scope/household-registration-mockup-20260924T090000Z-4e8a1c3f.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.BlockedOn",
+          "equals": "NONE",
+          "why": "the maturity inference is non-blocking, so no blocking question is persisted"
+        },
+        {
+          "state": "ActiveWork.Scope",
+          "equals": "${SCOPE}",
+          "why": "no project scope document exists, so the scope is created at the artifact init path"
+        },
+        {
+          "contains": {
+            "path": "${SCOPE}",
+            "regex": "Level\\s*1",
+            "flags": "i"
+          },
+          "why": "the inferred level is recorded in the scope"
+        },
+        {
+          "contains": {
+            "path": "${SCOPE}",
+            "regex": "^##\\s+Assumptions",
+            "flags": "im"
+          },
+          "why": "an inferred level is recorded as an assumption"
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "ARCHITECTING",
+          "why": "scoping completes and hands off to Architect instead of waiting on a question"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "provenance": {
+            "path": "${SCOPE}",
+            "artifact": "SCOPE",
+            "cycle": "${ID}"
+          }
+        },
+        {
+          "contains": {
+            "path": "${SCOPE}",
+            "regex": "AC-001"
+          },
+          "why": "acceptance conditions exist"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "contains": {
+            "path": "${SCOPE}",
+            "regex": "^##\\s+Non-?\\s?goals",
+            "flags": "im"
+          },
+          "why": "a Non-goals section exists"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the started greenfield cycle in SCOPING with Scope NONE is a valid state"
+    },
+    {
+      "cmd": "test ! -e .standards/CONTEXT.md && test ! -d .standards/docs",
+      "expect": "pass",
+      "why": "no Auditor context and no cycle records exist yet"
+    }
+  ],
+  "notes": "Standalone greenfield fixture. No pre-install layer, so the builder makes an empty initial commit and the installer writes a GREENFIELD MODE.md. Layer 50-cycle replaces STATE.md with the first STANDARD cycle already started: WorkflowState SCOPING, CompletionPolicy FULL_DELIVERABLE, Handoff INITIAL (first cycle keeps INITIAL per Start a cycle), Scope/Architecture/Development NONE, recovery and obligations inactive, and the request text in Active Work.Request. There is no project code, no CONTEXT.md, and no records, matching a greenfield cycle before its first audit. Checks require only the fixed scope path, provenance, an AC, a Level 1 mention, an Assumptions heading, a Non-goals heading, BlockedOn NONE, and the forward handoff to ARCHITECTING; the judge decides content.",
+  "case": "scoper-30",
+  "caseHash": "868944ebb91441a3",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T03:09:45.443Z",
+    "verdict": "pass",
+    "fixtureHash": "7a373d90e13e0ce4",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-31T01:05:27.811Z"
+  }
+}

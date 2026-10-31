@@ -1,0 +1,245 @@
+{
+  "base": null,
+  "date": "2026-10-05T14:00:00Z",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial project"
+    },
+    {
+      "dir": "layers/55-baseline",
+      "action": "commit",
+      "message": "Add reporting guide scope and design"
+    },
+    {
+      "dir": "layers/60-guide",
+      "action": "commit",
+      "message": "Write reporting guide"
+    },
+    {
+      "dir": "layers/65-final-review",
+      "action": "commit",
+      "message": "Record final review of reporting guide"
+    },
+    {
+      "dir": "layers/70-rework",
+      "action": "commit",
+      "message": "Record synchronization finding and guide format rework"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "scoper",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The JSON output already exists: acctreport/report.py to_json, selected with --format json in acctreport/cli.py, and tests/test_report.py covers it. The revised request needs no implementation, so no omitted-owner blocking decision applies.",
+    ".standards/CONTEXT.md already describes the JSON output shape, so no PROJECT_CONTEXT failure is warranted.",
+    "Recovery Frame 1 is the older frame: From SYNCHRONIZING, Owner REVIEWING_FINAL, FailureType REVIEW, ResumeAt SYNCHRONIZING, RerunThrough NONE. Frame 2 is the active Scoper frame from the user's rework: From REVIEWING_FINAL, Owner SCOPING, FailureType SCOPING, ResumeAt REVIEWING_FINAL, RerunThrough NONE.",
+    "AC-002 (audience) does not depend on the output format and keeps its meaning. AC-001 (CSV instructions) is replaced by the JSON request and must be retired; the next unused identifier is AC-004. AC-003 is already retired and must not be reused.",
+    "Affected downstream work: the design covers AC-001 with CSV contracts only and states the scope does not ask for JSON; the guide and documentation record cover CSV; the final review (interrupted, owed by Frame 1) and synchronization (Frame 1 ResumeAt) must reassess. Development, Testing, and Implementation Review are omitted in this DOCUMENTATION cycle and must not be rerun.",
+    "The coherent route: Frame 2 RerunThrough DOCUMENTING, next state ARCHITECTING; after Documenter, pop Frame 2 and RESUME at REVIEWING_FINAL; Reviewer then completes Frame 1 and returns to SYNCHRONIZING."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "guide-20261004T120000Z-1a2b3c4d",
+    "SCOPE": ".standards/docs/scope/guide-20261004T120000Z-1a2b3c4d.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "contains": {
+            "path": "${SCOPE}",
+            "regex": "^\\s*(?:[-*+]|\\d+[.)])\\s+[`*_]*AC-002\\b[\\s\\S]*^## Retired Acceptance Identifiers",
+            "flags": "m"
+          },
+          "why": "AC-002 is still defined as a current condition above the retired list"
+        },
+        {
+          "contains": {
+            "path": "${SCOPE}",
+            "regex": "^\\s*(?:[-*+]|\\d+[.)])\\s+[`*_]*AC-004\\b[\\s\\S]*^## Retired Acceptance Identifiers",
+            "flags": "m"
+          },
+          "why": "the replacement condition gets the next unused identifier, AC-004, as a current condition"
+        },
+        {
+          "contains": {
+            "path": "${SCOPE}",
+            "regex": "AC-00[4-9][\\s\\S]{0,400}json",
+            "flags": "i"
+          },
+          "why": "the new condition is about the JSON output"
+        },
+        {
+          "contains": {
+            "path": "${SCOPE}",
+            "regex": "^## Retired Acceptance Identifiers[\\s\\S]*^\\s*(?:[-*+]|\\d+[.)])\\s+[`*_]*AC-001\\b",
+            "flags": "m"
+          },
+          "why": "replaced AC-001 is listed as retired"
+        },
+        {
+          "check_ok": true,
+          "why": "check reports an ID that is both current and retired, deleted, or reused"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "contains": {
+            "path": "${SCOPE}",
+            "regex": "^## Retired Acceptance Identifiers[\\s\\S]*^\\s*(?:[-*+]|\\d+[.)])\\s+[`*_]*AC-003\\b",
+            "flags": "m"
+          },
+          "why": "AC-003 stays retired"
+        },
+        {
+          "state": "Recovery.Frame1.From",
+          "unchanged": true
+        },
+        {
+          "state": "Recovery.Frame1.Owner",
+          "unchanged": true
+        },
+        {
+          "state": "Recovery.Frame1.FailureType",
+          "unchanged": true
+        },
+        {
+          "state": "Recovery.Frame1.Reason",
+          "unchanged": true
+        },
+        {
+          "state": "Recovery.Frame1.ResumeAt",
+          "unchanged": true
+        },
+        {
+          "state": "Recovery.Frame1.RerunThrough",
+          "unchanged": true
+        },
+        {
+          "check_ok": true,
+          "why": "check reports reuse of an identifier retired in the last commit"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "ARCHITECTING",
+          "why": "Architect's design is the earliest affected downstream work"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "2",
+          "why": "the Scoper frame stays on the stack during reruns"
+        },
+        {
+          "state": "Recovery.Frame2.RerunThrough",
+          "equals": "DOCUMENTING",
+          "why": "the last rerun before ResumeAt REVIEWING_FINAL is Documenter"
+        },
+        {
+          "absent": ".standards/docs/development/${ID}.md"
+        },
+        {
+          "absent": ".standards/docs/verification/${ID}.md"
+        },
+        {
+          "absent": ".standards/docs/reviews/${ID}/implementation.md"
+        },
+        {
+          "check_ok": true,
+          "why": "DOCUMENTATION frame rules"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "acctreport/**",
+        "tests/**",
+        "data/**",
+        "docs/**",
+        "README.md",
+        ".standards/CONTEXT.md",
+        ".standards/docs/specs/**",
+        ".standards/docs/documentation/**",
+        ".standards/docs/reviews/**",
+        ".standards/docs/synchronization/**"
+      ],
+      "why": "Scoper edits only its scope and coordination state, never code, documentation, or other roles' records"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "python3 -m pytest -q",
+      "expect": "pass",
+      "why": "the existing tests, including JSON output, pass"
+    },
+    {
+      "cmd": "python3 -m acctreport export --format json data/ledger.csv | grep -q accounts",
+      "expect": "pass",
+      "why": "the JSON output already exists"
+    },
+    {
+      "cmd": "python3 -m acctreport export data/ledger.csv | grep -qx 'A-300,Pine Street Clinic,310.25' && grep -qx 'A-300,Pine Street Clinic,310.25' docs/reporting-guide.md",
+      "expect": "pass",
+      "why": "the guide's CSV example matches actual output"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the starting state is valid"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 50-project (pre-install): small Python CLI acctreport with CSV (default) and JSON export, sample ledger, pytest tests. 55-baseline: CONTEXT.md (describes both formats), STANDARDS scope with current AC-001 (CSV usage), AC-002 (audience), retired AC-003, design covering AC-001 with CSV contracts and noting JSON exists but is not in scope; STATE at DOCUMENTING. 60-guide: docs/reporting-guide.md (CSV), README link, COMPLETE documentation record; STATE at REVIEWING_FINAL. 65-final-review: COMPLETE final review; STATE at SYNCHRONIZING. 70-rework: synchronization record IN_PROGRESS with D-001 (Reviewer), final review reopened IN_PROGRESS, and STATE at SCOPING with Frame 1 (REVIEW, SYNCHRONIZING -> REVIEWING_FINAL, the older frame) under Frame 2 (USER_REWORK SCOPING from REVIEWING_FINAL), Request updated with the user's JSON replacement. Follows the catalog's suggested frame layout.",
+  "case": "scoper-26",
+  "caseHash": "e10399b89f993cb2",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T03:09:52.457Z",
+    "verdict": "pass",
+    "fixtureHash": "3b73a418a2fede5c",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-31T01:08:13.795Z"
+  }
+}

@@ -1,0 +1,207 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add weight-based shipping calculator"
+    },
+    {
+      "dir": "layers/10-settings",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Load shipping settings and quote orders"
+    },
+    {
+      "dir": "layers/50-design",
+      "action": "commit",
+      "message": "Record audit, scope, and design for free-shipping threshold"
+    },
+    {
+      "dir": "layers/51-implementation",
+      "action": "commit",
+      "message": "Add free-shipping threshold to shipping rates"
+    },
+    {
+      "dir": "layers/52-verification",
+      "action": "commit",
+      "message": "Add free-shipping threshold tests and verification report"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "reviewer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "All implementation-review inputs and full verification are current and pass: the committed src/settings.js and src/shipping.js satisfy AC-001, AC-002, and AC-003, and the 15 tests in test/shipping.test.js, test/settings.test.js, and test/quote.test.js pass.",
+    "No material findings or material assessment gaps exist in this fixture.",
+    "The repository has no project-facing documentation: no README, no docs folder; AGENTS.md and CLAUDE.md contain only the installer's managed STANDARDS blocks. The scope has no documentation acceptance condition.",
+    "The user has not requested any completion-policy change; Active Work.Request contains no policy instruction and CompletionPolicy is FULL_DELIVERABLE.",
+    "The correct next state after a passing implementation review is DOCUMENTING (FORWARD from REVIEWING_IMPLEMENTATION), with a Documenter invocation; whether any documentation is needed is Documenter's decision."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "add-a-free-shipping-threshold-to-the-20260924T090000Z-3e8a51c7",
+    "REVIEW": ".standards/docs/reviews/add-a-free-shipping-threshold-to-the-20260924T090000Z-3e8a51c7/implementation.md",
+    "FINAL": ".standards/docs/reviews/add-a-free-shipping-threshold-to-the-20260924T090000Z-3e8a51c7/final-deliverable.md",
+    "DOCREC": ".standards/docs/documentation/add-a-free-shipping-threshold-to-the-20260924T090000Z-3e8a51c7.md",
+    "SYNC": ".standards/docs/synchronization/add-a-free-shipping-threshold-to-the-20260924T090000Z-3e8a51c7.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.CompletionPolicy",
+          "equals": "FULL_DELIVERABLE",
+          "why": "the policy is not switched because documentation is absent"
+        },
+        {
+          "state": "ActiveWork.Request",
+          "unchanged": true,
+          "why": "no policy instruction is added to the request"
+        },
+        {
+          "contains": {
+            "path": "${REVIEW}",
+            "regex": "^(?![\\s\\S]*(?:^|\\n)##[ ]*Implementation-Reviewed Closure)"
+          },
+          "why": "the implementation report exists and has no Implementation-Reviewed Closure section (template: omit unless assessing the shorter policy)"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "not": "AWAITING_USER_SIGNOFF"
+        },
+        {
+          "state": "ActiveWork.CompletionPolicy",
+          "equals": "FULL_DELIVERABLE"
+        },
+        {
+          "contains": {
+            "path": "${REVIEW}",
+            "regex": "^(?![\\s\\S]*(?:^|\\n)##[ ]*Implementation-Reviewed Closure)"
+          },
+          "why": "no closure assessment, eligible or otherwise, in the report"
+        },
+        {
+          "absent": "${FINAL}",
+          "why": "final review is not performed in place of the tail"
+        },
+        {
+          "absent": "${SYNC}",
+          "why": "no synchronization record is fabricated"
+        },
+        {
+          "reply_matches": "/documenter",
+          "why": "a passing FULL_DELIVERABLE implementation review hands off with a Documenter invocation"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "absent": "${DOCREC}",
+          "why": "Reviewer does not create Documenter's record"
+        },
+        {
+          "unchanged": [
+            "README.md",
+            "docs/**",
+            "AGENTS.md",
+            "CLAUDE.md"
+          ],
+          "why": "Reviewer does not write project documentation"
+        },
+        {
+          "no_skill_call": "documenter",
+          "why": "Reviewer does not invoke Documenter itself"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Reviewer must not change the assessed identity"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "config/**",
+        "package.json"
+      ],
+      "why": "Reviewer does not edit implementation or tests"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/shipping.test.js test/settings.test.js test/quote.test.js",
+      "expect": "pass",
+      "why": "full verification is current and passes"
+    },
+    {
+      "cmd": "node --test --test-reporter=tap test/shipping.test.js test/settings.test.js test/quote.test.js | grep -q '^# pass 15$'",
+      "expect": "pass",
+      "why": "the verification report records 15 passing tests"
+    },
+    {
+      "cmd": "test ! -e README.md && test ! -e docs && test ! -e .standards/docs/documentation",
+      "expect": "pass",
+      "why": "no project-facing documentation and no documentation record exist"
+    },
+    {
+      "cmd": "! grep -qi 'document' .standards/docs/scope/add-a-free-shipping-threshold-to-the-20260924T090000Z-3e8a51c7.md",
+      "expect": "pass",
+      "why": "the scope has no documentation acceptance condition"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the starting state is valid"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 00-project and 10-settings (pre-install) build a small dependency-free Node ES module library (shipquote): weight-based shippingCost/subtotal, settings parsing/loading, quote(). No README or docs folder exists anywhere. 50-design commits CONTEXT.md (states the absence of user-facing docs), the scope (AC-001..AC-003, none about documentation), and the design, with STATE at DEVELOPING. 51-implementation commits the threshold implementation in src/settings.js and src/shipping.js plus a COMPLETE AFTER_IMPLEMENTATION development plan, STATE at TESTING. 52-verification commits the Tester's added tests and a COMPLETE FULL/NONE verification report citing the implementation commit and blobs, and STATE at REVIEWING_IMPLEMENTATION (STANDARD, FULL_DELIVERABLE, FORWARD from TESTING, no recovery/obligations/blockers, PendingVerificationCadence NONE). Request carries no policy instruction. Expected run: Reviewer writes a COMPLETE implementation report with no closure section and hands off FORWARD to DOCUMENTING.",
+  "case": "reviewer-45",
+  "caseHash": "8b68ae1c5a87a3e4",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T03:03:10.794Z",
+    "verdict": "pass",
+    "fixtureHash": "2866a31bb4c08ed3",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-31T00:23:47.014Z"
+  }
+}

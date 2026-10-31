@@ -1,0 +1,86 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installer, brownfield)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode DOCUMENTATION, CompletionPolicy NONE, WorkflowState AUDITING",
+      "where": ".standards/STATE.md header and Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id guide-20261004T120000Z-1a2b3c4d",
+      "where": ".standards/STATE.md Active Work.Id",
+      "status": "realized"
+    },
+    {
+      "condition": "Saved standalone Documenter request to create docs/usage.md for the existing CLI",
+      "where": ".standards/STATE.md Active Work.Request",
+      "status": "realized"
+    },
+    {
+      "condition": "Existing CLI with no documentation",
+      "where": "bin/logtally.js, src/*.js; no README, docs/, or CHANGELOG (selfCheck `test ! -e README.md && test ! -e docs` passes)",
+      "status": "realized"
+    },
+    {
+      "condition": "Source defines --format, an output path, and error exits",
+      "where": "src/args.js (--format/-f, --output/-o, UsageError), src/cli.js (exit 2 usage, exit 1 read/write failure)",
+      "status": "realized"
+    },
+    {
+      "condition": "Established checks in package.json",
+      "where": "package.json scripts `test` and `check`; both pass in selfChecks",
+      "status": "realized"
+    },
+    {
+      "condition": "No current-cycle Developer, Tester, or implementation review record",
+      "where": "no .standards/docs/ directory; Development NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "No recovery, no blockers, no baseline reconciliation",
+      "where": ".standards/STATE.md Recovery.Active false, BlockedOn NONE, PendingCycleBlockedOn NONE, BaselineReconciliation NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "No prior CONTEXT.md (first audit)",
+      "where": ".standards/CONTEXT.md absent",
+      "status": "realized"
+    },
+    {
+      "condition": "First-cycle DOCUMENTATION entry handoff",
+      "where": "Handoff INITIAL/From NONE with mode-entry reason; check.mjs ok",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "All four commits share the same timestamp (2026-10-04T12:00:00Z), including the pre-install project history and the cycle start. Harmless; it only keeps history from postdating the cycle ID.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally stagger dates per layer if the builder supports it; not required."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 1,
+      "detail": "The `contains` checks require the literal `--format` and `--output` in CONTEXT.md. These are fixed CLI identifiers from src/args.js and the usage string, and any context that records the CLI's evidenced behavior would name them. The risk of a false failure is low, but present only if a run describes the flags without spelling them.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture faithfully realizes a first Brownfield DOCUMENTATION cycle at AUDITING. It has a small undocumented logtally CLI whose source defines --format, --output, and exit codes 1 and 2, established test and check scripts in package.json, and no cycle records, recovery, or blockers; check.mjs is clean and the selfChecks confirm the behaviors. The checks are necessary conditions for a correct Auditor run (handoff FORWARD to SCOPING, CONTEXT.md written, implementation, docs, and records untouched, mode and policy preserved), and the standard invariants fit.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T02:50:56.105Z",
+  "costUsd": 0.979946,
+  "ms": 39246,
+  "fixtureHash": "978d64dd7a8e9052"
+}

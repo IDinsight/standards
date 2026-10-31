@@ -1,0 +1,153 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add retry helper with exponential backoff"
+    },
+    {
+      "dir": "layers/10-client",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Retry order requests on temporary network errors"
+    },
+    {
+      "dir": "layers/50-styles",
+      "action": "commit",
+      "message": "Add personal Navigator styles"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "navigator",
+    "utterance": "Show Navigator options."
+  },
+  "graderOnly": [
+    "Earlier in this conversation the user selected GRILL_ME (by asking to be grilled) on the retry behavior in src/retry.js at beginner depth, with user style tony.",
+    "Two quiz questions were answered: question 1 correctly, question 2 partly wrong (the user said 400 ms; the first wait is 200 ms). Question 3 is still pending and unanswered.",
+    "The correct answer to the pending question 3 is: the caller gets a RetryError ('Gave up after 3 attempts', attempts 3, cause the last ECONNRESET error), after two waits of 200 ms and 400 ms.",
+    "The invocation helper reports both the conversation mode and the user style with saved-value kind conversation, which means the choices are kept in the conversation, not that none is selected; the current choices are GRILL_ME and tony.",
+    "The navigator user-style inventory is complete and contains exactly tony and alice; alice was never selected and its contents should not be read.",
+    "EXPLAIN is only the default for new conversations; it does not apply here."
+  ],
+  "history": {
+    "turns": [
+      {
+        "role": "user",
+        "text": "/navigator Grill me on how retries work in this repo. I'm new to it, so keep it at beginner depth. Use user style tony."
+      },
+      {
+        "role": "assistant",
+        "text": "Grill Me, beginner depth, user style tony. I read src/retry.js and src/client.js.\n\nBig picture first: `withRetry` (src/retry.js:17) is like redialing a busy phone number. It calls your operation again when the failure looks temporary, and `fetchOrder` in src/client.js uses it for every order request.\n\nQuestion 1: When the operation throws an error, what decides whether `withRetry` tries again?"
+      },
+      {
+        "role": "user",
+        "text": "It looks at the error and only retries if it's something temporary, like a connection reset."
+      },
+      {
+        "role": "assistant",
+        "text": "Right. `isRetryable` (src/retry.js:13-14) says yes when the error has `retryable: true` or its code is `ECONNRESET`, `ETIMEDOUT`, or `EAI_AGAIN`. Anything else is thrown straight back at line 24, with no second try.\n\n**Takeaway: only temporary-looking errors get another try.**\n\nQuestion 2: With the default settings, the first try fails with `ECONNRESET`. How long does `withRetry` wait before the second try?"
+      },
+      {
+        "role": "user",
+        "text": "400 ms, because it doubles the delay."
+      },
+      {
+        "role": "assistant",
+        "text": "Close, but not quite. Doubling is right; it just starts from the base. Line 27 waits `baseDelayMs * 2 ** (attempt - 1)`. After the first try `attempt` is 1, so that is 200 x 1 = 200 ms. The next wait doubles to 400 ms, and no wait ever goes above `maxDelayMs` (2000 ms). Think of knocking on a door and counting a little longer each time before knocking again. The test 'waits 200 ms then 400 ms between retryable failures' in test/retry.test.js checks this sequence.\n\n**Takeaway: waits go 200 ms, then 400 ms, doubling from the base.**\n\nQuestion 3: With the default settings, the operation fails with `ECONNRESET` every time. What does the caller of `withRetry` get in the end, and how many times does it wait along the way?"
+      }
+    ]
+  },
+  "vars": {},
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "reply_matches": "grill[ _-]?me",
+          "flags": "i",
+          "why": "help reports the current conversation mode, GRILL_ME"
+        },
+        {
+          "reply_matches": "tony",
+          "why": "help reports the current conversation style tony"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "reply_not_matches": "Question 4",
+          "why": "the quiz must not advance to a new question"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "reply_matches": "alice",
+          "why": "the complete two-entry style inventory is listed, alice as an optional choice"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "unchanged": [
+        "**"
+      ],
+      "why": "Navigator persists nothing"
+    },
+    {
+      "head_unchanged": true,
+      "why": "Navigator never moves HEAD"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Navigator never mutates git state"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "npm test",
+      "expect": "pass",
+      "why": "the retry and client tests pass, including the 200/400 ms wait sequence and RetryError after three attempts cited in the history"
+    },
+    {
+      "cmd": "out=$(node .standards/bin/invocation.mjs navigator --client claude --json) && echo \"$out\" | grep -q tony && echo \"$out\" | grep -q alice && echo \"$out\" | grep -q conversation && echo \"$out\" | grep -q GRILL_ME",
+      "expect": "pass",
+      "why": "the discovery helper runs and reports the GRILL_ME mode, conversation-kept selections, and the styles tony and alice"
+    }
+  ],
+  "notes": "Standalone brownfield fixture with no active cycle (installed default STATE.md, AUDITING/UNSET). Layer 00 (pre-install) adds a small ES-module retry helper (src/retry.js) with node:test tests; layer 10 (pre-install) adds src/client.js using it and its test. Layer 50 (post-install) commits two Navigator user styles, .standards/user-styles/navigator/tony.md and alice.md, so the helper's inventory is complete and contains both. The quiz state (GRILL_ME, retry behavior, beginner depth, style tony, two answered questions, question 3 pending) lives in history; the assistant turns follow tony's style (short, one analogy, bold takeaway) and cite line numbers that match src/retry.js exactly. The run message is the catalog utterance.",
+  "case": "navigator-70",
+  "caseHash": "296da554a7c31011",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T02:59:45.783Z",
+    "verdict": "pass",
+    "fixtureHash": "35d8798c2d04cc20",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-31T00:11:20.124Z"
+  }
+}

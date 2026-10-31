@@ -1,0 +1,91 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installer brownfield)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode DOCUMENTATION, CompletionPolicy NONE, Active Work.Id guide-20261004T120000Z-1a2b3c4d",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "WorkflowState DOCUMENTING",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Single recovery frame From=REVIEWING_FINAL, Owner=DOCUMENTING, ResumeAt=REVIEWING_FINAL, RerunThrough=NONE, with FAILURE handoff from REVIEWING_FINAL",
+      "where": ".standards/STATE.md Recovery Frame 1 and Handoff",
+      "status": "realized"
+    },
+    {
+      "condition": "Saved guide correction exists in working tree (unstaged) and is accurate",
+      "where": "docs/operator-guide.md (retention_days 14 plus defaults doctest) vs reportkit/config.py DEFAULT_RETENTION_DAYS = 14; selfChecks grep/diff",
+      "status": "realized"
+    },
+    {
+      "condition": "Correction has sufficient current check evidence",
+      "where": "documentation record Checks and Applicability; selfChecks doctest and check_links pass on working tree",
+      "status": "realized"
+    },
+    {
+      "condition": "Final Reviewer interrupted (assessment unfinished)",
+      "where": ".standards/docs/reviews/<id>/final-deliverable.md Status IN_PROGRESS, F-001 OPEN, AC-003..AC-005 not yet assessed",
+      "status": "realized"
+    },
+    {
+      "condition": "A remaining documentation disposition depends solely on the unfinished final review",
+      "where": "AC-005 in scope + docs/CONTRIBUTING.md 'Corrections after review' (entry only once review finished, none while in progress); docs/ERRATA.md has no entry for this review",
+      "status": "realized"
+    },
+    {
+      "condition": "No independent actionable gap or blocker",
+      "where": "Exporting/Pruning/links accurate vs reportkit/export.py, prune.py; BlockedOn NONE; Outstanding Obligations inactive",
+      "status": "realized"
+    },
+    {
+      "condition": "Documentation record exists with valid current-cycle provenance and is incomplete",
+      "where": ".standards/docs/documentation/<id>.md Status IN_PROGRESS (unstaged reopen of committed COMPLETE first pass)",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, design, and Auditor context present and covering every AC",
+      "where": ".standards/docs/scope/<id>.md, .standards/docs/specs/<id>.md, .standards/CONTEXT.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Git: committed history plus unstaged changes",
+      "where": "git status: modified guide and documentation record",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The unstaged documentation record already spells out the AC-005 errata dependency and ends with 'settle the route for the active recovery frame'. The prompt states this dependency as a fact, so recording it is legitimate. It does not name the corrective-return route, the owner, or the evidence still required, so the role still has to decide the route and complete the persisted dependency. It makes the case somewhat easier but does not leak the answer.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": ".standards/CONTEXT.md says docs/operator-guide.md 'has not changed since the initial commit'. This was true at audit time and is stale after the first documentation pass. It is a normal Auditor snapshot and is harmless.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition. It has a DOCUMENTATION cycle in DOCUMENTING with the specified frame, a verified unstaged guide correction, and an interrupted IN_PROGRESS final review. Its remaining AC-005 errata entry is blocked solely by a project convention that forbids entries until the review finishes. I traced check.mjs: both the built state and the expected RESUME-to-REVIEWING_FINAL end state with an IN_PROGRESS record pass. The checks ('/reviewer' reply, untouched review report, Status not COMPLETE, not FORWARD) are necessary conditions that no correct run would fail.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T02:59:32.725Z",
+  "costUsd": 0.28924340000000004,
+  "ms": 59616,
+  "fixtureHash": "657692d2be91c625"
+}

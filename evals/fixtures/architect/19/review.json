@@ -1,0 +1,76 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is BROWNFIELD",
+      "where": ".standards/MODE.md (brownfield install); pre-install Django code commits",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState ARCHITECTING, CompletionPolicy FULL_DELIVERABLE, Architecture NONE",
+      "where": ".standards/STATE.md (layer 61-scope)",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery inactive, no outstanding obligations",
+      "where": ".standards/STATE.md Recovery/Outstanding Obligations Active false",
+      "status": "realized"
+    },
+    {
+      "condition": "Valid Auditor context records an established DRF service on MySQL deployed to AWS ECS",
+      "where": ".standards/CONTEXT.md (Stack and Tooling, Structure, External Systems), committed after a FORWARD handoff from AUDITING",
+      "status": "realized"
+    },
+    {
+      "condition": "Context matches the code: settings, requirements, and ECS task definition",
+      "where": "registry/settings.py (django.db.backends.mysql, DRF), requirements.txt (Django 4.2, DRF 3.15, mysqlclient), deploy/ecs/task-definition.json (FARGATE, RDS host), .github/workflows/ci.yml (ECR/ECS deploy)",
+      "status": "realized"
+    },
+    {
+      "condition": "Completed scope adds a bulk-import endpoint for beneficiary records",
+      "where": ".standards/docs/scope/add-a-bulk-import-endpoint-for-20260923T141500Z-5c1e9a47.md (AC-001..AC-008, well-formed list items)",
+      "status": "realized"
+    },
+    {
+      "condition": "Established tooling shared with the default stack (Redis broker, pytest, GitHub Actions) is recorded as baseline, per the catalog issue",
+      "where": "CONTEXT.md Stack and Tooling; requirements.txt; requirements-dev.txt; ci.yml",
+      "status": "realized"
+    },
+    {
+      "condition": "Bounded FEATURE problem with no scope or context defect",
+      "where": "Scope settles the user-facing choices (all-or-nothing, duplicates, 5,000-row cap, SMS); sync versus async remains an Architect-owned technical choice",
+      "status": "realized"
+    },
+    {
+      "condition": "Clean committed git state",
+      "where": "git status clean on main",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 0,
+      "detail": "The `contains` check for `MySQL|RDS` in the design file assumes a correct design names the database. A bulk-import design that relies on transactions and the national_id unique index will almost certainly name MySQL, and the catalog note expects the file to name all three components, so the false-failure risk is low.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally drop the `MySQL|RDS` contains check and leave that check to the judge."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "Both assertion-0 checks require the design to be written at the artifact-init path. This is correct: no reusable project architecture document exists, and the skill prescribes `artifact init` for a new design. A run that stops on a blocking question would fail those checks, but the case expects a completed design, and the open choices (sync versus Celery, load-balancer timeout) are Architect-owned or non-blocking Known Unknowns.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized. The code, CONTEXT.md, task definition, and CI consistently establish a DRF/MySQL/ECS service, the scope is complete and well formed, and check.mjs passes. Nothing leaks, the invariants are standard for Architect, and the checks are necessary conditions under any correct run, with only a minor note that the MySQL|RDS pattern is slightly narrow.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-30T22:49:28.241Z",
+  "costUsd": 0.268923,
+  "ms": 35531,
+  "fixtureHash": "403e23fbd9a0670f"
+}

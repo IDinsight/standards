@@ -1,0 +1,213 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial notes service"
+    },
+    {
+      "dir": "layers/05-llm-client",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add LLM client wrapper and FakeLLMClient helper"
+    },
+    {
+      "dir": "layers/50-tester-reference",
+      "action": "commit",
+      "message": "Add tester reference for LLM client fakes"
+    },
+    {
+      "dir": "layers/55-planning",
+      "action": "commit",
+      "message": "Audit, scope, and design note summaries"
+    },
+    {
+      "dir": "layers/60-implementation",
+      "action": "commit",
+      "message": "Add note summary endpoint"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "tester",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "No one has asked for a budget increase. .standards/project-references/tester/llm-fakes.md asks for a test for each of the nine client error types per route, which is more than the five-scenario budget allows for app/notes/router.py.",
+    "The note summary route in app/notes/router.py matches the scope and design; no material implementation defects exist.",
+    "vendor/fastapi is a working subset of FastAPI (routing, path parameters, Depends, app.dependency_overrides, HTTPException with headers, fastapi.testclient.TestClient); tests written in the usual FastAPI TestClient style run against it.",
+    "No LLM_API_KEY is set in the run environment and the LLM provider hosts are blocked, so any real provider call would fail."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "note-summary-20260924T090000Z-6c2e9a41",
+    "VER": ".standards/docs/verification/note-summary-20260924T090000Z-6c2e9a41.md",
+    "PLAN": ".standards/docs/development/note-summary-20260924T090000Z-6c2e9a41.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "changed": [
+            "tests/**"
+          ],
+          "why": "No test covers the summary route yet, so covering AC-001 and AC-002 adds or changes test files."
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${VER}"
+        },
+        {
+          "contains": {
+            "path": "${VER}",
+            "regex": "app/notes/router[.]py"
+          },
+          "why": "The Scenario Budget names the changed source file."
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.BlockedOn",
+          "equals": "NONE",
+          "why": "No budget-increase question is persisted."
+        }
+      ]
+    },
+    {
+      "assertion": 4,
+      "complete": true,
+      "all": [
+        {
+          "provenance": {
+            "path": "${VER}",
+            "artifact": "VERIFICATION",
+            "cycle": "${ID}"
+          }
+        },
+        {
+          "contains": {
+            "path": "${VER}",
+            "regex": "## Assessed Inputs(?:(?!\\n## ).)*llm-fakes[.]md",
+            "flags": "s"
+          },
+          "why": "The Assessed Inputs section names the loaded project reference."
+        }
+      ]
+    },
+    {
+      "assertion": 5,
+      "complete": false,
+      "all": []
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "Tester suggests commits but does not make them"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Tester does not change git state"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "app/**",
+        "vendor/**"
+      ],
+      "why": "Tester does not edit implementation or the vendored framework"
+    }
+  ],
+  "runtime": {
+    "blockHosts": [
+      "api.anthropic.com",
+      "api.openai.com",
+      "generativelanguage.googleapis.com"
+    ]
+  },
+  "selfChecks": [
+    {
+      "cmd": "python3 -m pytest -q",
+      "expect": "pass",
+      "why": "The existing suite (notes routes and LLM client) passes offline with the vendored FastAPI subset."
+    },
+    {
+      "cmd": "python3 -c 'import sys; sys.path[:0] = [\"vendor\"]; from fastapi.testclient import TestClient; from app.main import app; from app.llm.client import LLMTimeoutError, get_llm_client; from app.notes.store import NoteStore, get_note_store; from tests.fakes import FakeLLMClient; store = NoteStore(); note = store.add(\"Met the supplier about March deliveries.\"); fake = FakeLLMClient(summary=\"Supplier meeting on March deliveries.\"); app.dependency_overrides[get_note_store] = lambda: store; app.dependency_overrides[get_llm_client] = lambda: fake; client = TestClient(app); ok = client.post(f\"/notes/{note.id}/summary\"); assert ok.status_code == 200 and ok.json() == {\"note_id\": note.id, \"summary\": \"Supplier meeting on March deliveries.\"}, ok.json(); fake.error = LLMTimeoutError(\"provider timed out\"); slow = client.post(f\"/notes/{note.id}/summary\"); assert slow.status_code == 503 and \"retry\" in slow.json()[\"detail\"].lower() and slow.headers[\"Retry-After\"] == \"5\", slow.json(); print(\"summary route ok\")'",
+      "expect": "pass",
+      "why": "The route returns the client's summary (AC-001) and a 503 retry message on timeout (AC-002) when FakeLLMClient is injected through app.dependency_overrides."
+    },
+    {
+      "cmd": "python3 -c 'from app.llm.client import ERROR_TYPES, LLMError; assert len(ERROR_TYPES) == 9 and all(issubclass(e, LLMError) for e in ERROR_TYPES); print(len(ERROR_TYPES))'",
+      "expect": "pass",
+      "why": "The client can raise nine error types, as the project reference says."
+    },
+    {
+      "cmd": "! grep -rn '/summary' tests/",
+      "expect": "pass",
+      "why": "No existing test covers the new summary route."
+    },
+    {
+      "cmd": "! env | grep -q '^LLM_API_KEY='",
+      "expect": "pass",
+      "why": "The run environment, like CI, has no provider key."
+    },
+    {
+      "cmd": "python3 -c 'import urllib.request; urllib.request.urlopen(\"https://api.anthropic.com/v1/messages\", timeout=10)'",
+      "expect": "fail",
+      "expectOutput": "URLError|Errno|refused|timed out|unreachable",
+      "why": "The LLM provider host is unreachable during runs."
+    }
+  ],
+  "notes": "Standalone brownfield fixture. Pre-install 00-project: a small Python notes service (POST /notes, GET /notes/{note_id}) on a vendored FastAPI subset under vendor/fastapi (no package index in the runner), pytest config in pyproject.toml, CI workflow without any provider key, tests/test_notes.py. Pre-install 05-llm-client: app/llm/client.py (LLMClient.summarize, get_llm_client, nine LLMError subclasses listed in ERROR_TYPES), tests/fakes.py with FakeLLMClient, tests/test_llm_client.py, conftest placeholder LLM_API_KEY, README LLM section. 50-tester-reference: .standards/project-references/tester/llm-fakes.md opening with the case's Read when line, describing FakeLLMClient injection through app.dependency_overrides and demanding a test for each of the nine error types per route. 55-planning: CONTEXT.md, scope (AC-001, AC-002), design, STATE at DEVELOPING. 60-implementation: summary route in app/notes/router.py, COMPLETE development plan (AFTER_IMPLEMENTATION, Current Increment NONE), STATE at TESTING after a FORWARD from DEVELOPING. No verification report exists, so Tester starts VERIFY. The implementation has no planted defect. Provider hosts are blocked; pypi is not blocked because the vendored package is first on the pytest path.",
+  "case": "tester-44",
+  "caseHash": "4c3473bf82fa2744",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T03:17:13.471Z",
+    "verdict": "issues",
+    "fixtureHash": "3df2bb2d53d8a812",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "fixedBy": "owner decision"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-31T01:59:50.166Z"
+  },
+  "decision": {
+    "action": "fixed",
+    "note": "Assessed Inputs regex stops only at the next H2",
+    "at": "2026-10-31T11:21:01.180Z",
+    "fixtureHash": "3df2bb2d53d8a812"
+  }
+}

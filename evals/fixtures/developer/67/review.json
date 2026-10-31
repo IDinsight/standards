@@ -1,0 +1,71 @@
+{
+  "conditions": [
+    {
+      "condition": "STANDARD cycle at WorkflowState DEVELOPING, checker-valid",
+      "where": ".standards/STATE.md (DEVELOPING/STANDARD/FULL_DELIVERABLE, FORWARD from ARCHITECTING); gate check.mjs ok:true",
+      "status": "realized"
+    },
+    {
+      "condition": "Upstream scope, design, and Auditor context exist for the active cycle",
+      "where": ".standards/docs/scope/…3f9c2a71.md (AC-001, AC-002), .standards/docs/specs/…3f9c2a71.md, .standards/CONTEXT.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Current development plan is PROPOSED and has never been approved",
+      "where": ".standards/docs/development/…3f9c2a71.md header Status PROPOSED; committed only once as PROPOSED in commit 'Propose development plan for tag filtering'",
+      "status": "realized"
+    },
+    {
+      "condition": "Plan records User Style NONE and User Style Locked false",
+      "where": "development plan header",
+      "status": "realized"
+    },
+    {
+      "condition": "Developer user-style files <formal>.md, team | compact.md, and tony.md exist under their literal names",
+      "where": ".standards/user-styles/developer/ (selfCheck confirms all three)",
+      "status": "realized"
+    },
+    {
+      "condition": "No filename ambiguity among styles (distinct stems)",
+      "where": "three distinct stems: <formal>, team | compact, tony",
+      "status": "realized"
+    },
+    {
+      "condition": "Plan approval is pending (BlockedOn holds the approval request)",
+      "where": ".standards/STATE.md Active Work.BlockedOn",
+      "status": "realized"
+    },
+    {
+      "condition": "Small committed project code with passing tests and a clean tree",
+      "where": "src/readingList.js, test/readingList.test.js; git status clean; selfCheck passes",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-wrong",
+      "assertion": 1,
+      "detail": "Assertion 1 names installed discovery as well as the checker, but no predicate can run invocation.mjs. The fixture stands in with check_ok, the saved field, and unchanged .standards/bin/** and skills, and marks the assertion complete. That is sound: isUnfilledHeaderValue in records.mjs is shared by check and invocation discovery, so a value check accepts is also accepted by discovery under unchanged framework files. Still, the judge never sees this assertion.",
+      "recommendation": "run_as_is",
+      "fix": "None needed; the shared validator makes the proxy adequate."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 4,
+      "detail": "BlockedOn is already non-NONE before the run, so the `not NONE` check only shows that the approval blocker was not cleared, not that it was re-persisted. That is correct for a run that keeps the plan PROPOSED.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes the stated state: a checker-valid STANDARD cycle at DEVELOPING, with a never-approved PROPOSED plan (User Style NONE, Locked false) and the three literally named Developer style files. The deterministic checks (User Style `<formal>.md`, Status PROPOSED, Locked false, check_ok, unchanged framework, style, and source files) are necessary for any correct run and match the checker's placeholder rules. Assertion 2 and the content-read part of assertion 3 are left to the judge, and nothing in the repository leaks the answer.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T02:54:07.343Z",
+  "costUsd": 0.17425020000000002,
+  "ms": 27166,
+  "fixtureHash": "ea6f957b28d0115f"
+}

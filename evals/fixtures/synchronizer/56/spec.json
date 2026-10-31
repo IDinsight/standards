@@ -1,0 +1,267 @@
+{
+  "base": null,
+  "date": "2026-10-04T15:00:00Z",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial ledger import tool"
+    },
+    {
+      "dir": "layers/51-context",
+      "action": "commit",
+      "message": "Record project context for import guide"
+    },
+    {
+      "dir": "layers/52-scope",
+      "action": "commit",
+      "message": "Define import guide scope"
+    },
+    {
+      "dir": "layers/53-design",
+      "action": "commit",
+      "message": "Record import command contracts"
+    },
+    {
+      "dir": "layers/54-guide",
+      "action": "commit",
+      "message": "Add import command user guide"
+    },
+    {
+      "dir": "layers/55-docrecord",
+      "action": "commit",
+      "message": "Record import guide documentation evidence"
+    },
+    {
+      "dir": "layers/56-final-review",
+      "action": "commit",
+      "message": "Record final review of import guide"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "synchronizer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The cycle is a Brownfield DOCUMENTATION cycle with CompletionPolicy NONE and Active Work.Id guide-20261004T120000Z-1a2b3c4d.",
+    "The Auditor context, scope, technical design, COMPLETE documentation record, and COMPLETE final-deliverable review all name the current content (commit and blob identities) and the checks that were run.",
+    "docs/import-guide.md and the README Usage section accurately describe the implemented behavior in bin/ledger.js, src/import.js, and src/parse.js; every current acceptance condition (AC-001, AC-002, AC-003, AC-004) is supported by the documentation record and the final review.",
+    "No discrepancies, blockers, baseline reconciliation, recovery frames, or outstanding obligations exist.",
+    "No development plan, verification report, or implementation review exists for this cycle, and none is required by the documentation contract.",
+    "No synchronization record exists before the run; the working tree is clean and every input is committed."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "guide-20261004T120000Z-1a2b3c4d",
+    "SYNC": ".standards/docs/synchronization/guide-20261004T120000Z-1a2b3c4d.md",
+    "DEV": ".standards/docs/development/guide-20261004T120000Z-1a2b3c4d.md",
+    "VER": ".standards/docs/verification/guide-20261004T120000Z-1a2b3c4d.md",
+    "IMPLREV": ".standards/docs/reviews/guide-20261004T120000Z-1a2b3c4d/implementation.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "absent": "${DEV}",
+          "why": "no development plan fabricated for the omitted Developer"
+        },
+        {
+          "absent": "${VER}",
+          "why": "no verification report fabricated for the omitted Tester"
+        },
+        {
+          "absent": "${IMPLREV}",
+          "why": "no implementation review fabricated"
+        },
+        {
+          "check_ok": true,
+          "why": "check reports any current-cycle omitted-owner record"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${SYNC}"
+        },
+        {
+          "provenance": {
+            "path": "${SYNC}",
+            "artifact": "SYNCHRONIZATION",
+            "cycle": "${ID}"
+          }
+        },
+        {
+          "contains": {
+            "path": "${SYNC}",
+            "regex": "AC-001"
+          }
+        },
+        {
+          "contains": {
+            "path": "${SYNC}",
+            "regex": "AC-002"
+          }
+        },
+        {
+          "contains": {
+            "path": "${SYNC}",
+            "regex": "AC-003"
+          }
+        },
+        {
+          "contains": {
+            "path": "${SYNC}",
+            "regex": "AC-004"
+          }
+        },
+        {
+          "unchanged": [
+            ".standards/CONTEXT.md",
+            ".standards/docs/scope/**",
+            ".standards/docs/specs/**",
+            ".standards/docs/documentation/**",
+            ".standards/docs/reviews/**"
+          ],
+          "why": "Synchronizer does not redefine acceptance or edit other roles' records"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "AWAITING_USER_SIGNOFF"
+        },
+        {
+          "state": "CycleMode",
+          "equals": "DOCUMENTATION",
+          "why": "sign-off would reset CycleMode to UNSET"
+        },
+        {
+          "state": "ActiveWork.CompletionPolicy",
+          "equals": "NONE"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FORWARD"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "SYNCHRONIZING"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "false"
+        },
+        {
+          "field": {
+            "path": "${SYNC}",
+            "name": "Status",
+            "equals": "COMPLETE"
+          }
+        },
+        {
+          "check_ok": true
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "bin/**",
+        "test/**",
+        "docs/**",
+        "README.md",
+        "package.json"
+      ],
+      "why": "Synchronizer does not edit implementation, tests, or Documenter-owned documentation"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/parse.test.js test/cli.test.js",
+      "expect": "pass",
+      "why": "the existing tests cited by the documentation record and final review pass"
+    },
+    {
+      "cmd": "node bin/ledger.js import test/fixtures/sample.csv --dry-run | grep -qx '3 transactions, net 1372.60'",
+      "expect": "pass",
+      "why": "the guide's dry-run example output is accurate"
+    },
+    {
+      "cmd": "node bin/ledger.js import test/fixtures/sample.csv | grep -q 'amountCents.: -8240'",
+      "expect": "pass",
+      "why": "JSON output uses integer cents as the guide states"
+    },
+    {
+      "cmd": "node bin/ledger.js import missing.csv",
+      "expect": "fail",
+      "expectOutput": "import failed: ENOENT",
+      "why": "an unreadable file fails with the documented import failed message"
+    },
+    {
+      "cmd": "node bin/ledger.js import",
+      "expect": "fail",
+      "expectOutput": "usage: ledger import",
+      "why": "a missing file argument prints the documented usage line"
+    },
+    {
+      "cmd": "{ echo date,description,amount; echo; echo 2026-09-01,Coffee,abc; } > /tmp/ledger-blank.csv && node bin/ledger.js import /tmp/ledger-blank.csv",
+      "expect": "fail",
+      "expectOutput": "line 2: invalid amount",
+      "why": "line numbers skip blank lines, as the guide states"
+    },
+    {
+      "cmd": "test ! -e .standards/docs/development/guide-20261004T120000Z-1a2b3c4d.md && test ! -e .standards/docs/verification/guide-20261004T120000Z-1a2b3c4d.md && test ! -e .standards/docs/reviews/guide-20261004T120000Z-1a2b3c4d/implementation.md && test ! -e .standards/docs/synchronization/guide-20261004T120000Z-1a2b3c4d.md",
+      "expect": "pass",
+      "why": "no omitted-owner record and no synchronization record exist before the run"
+    }
+  ],
+  "notes": "Standalone Brownfield DOCUMENTATION cycle at SYNCHRONIZING. 50-project (pre-install): small Node ESM CLI ledger-import (bin/ledger.js, src/import.js, src/parse.js, tests, sample CSV fixture, three-line README). 51-context: Auditor CONTEXT.md plus STATE at SCOPING (FORWARD from AUDITING). 52-scope: scope record with AC-001..AC-004 plus STATE at ARCHITECTING. 53-design: documentation-mode technical design (existing contracts, coverage for every AC, AC-004 no architectural impact) plus STATE at DOCUMENTING. 54-guide: docs/import-guide.md and README Usage link. 55-docrecord: COMPLETE documentation record citing commit and blob identities and actual check results, plus STATE at REVIEWING_FINAL. 56-final-review: COMPLETE FINAL_DELIVERABLE review with no material findings, every AC Supported, plus final STATE at SYNCHRONIZING (FORWARD from REVIEWING_FINAL, policy NONE, Development NONE, no recovery, obligations inactive, baseline NONE). No synchronization, development, verification, or implementation-review record exists. JS sources avoid template literals so no dollar-brace text appears in layer files other than COMMIT/BLOB placeholders.",
+  "case": "synchronizer-56",
+  "caseHash": "1da33e8f8f52eb93",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T03:12:30.692Z",
+    "verdict": "pass",
+    "fixtureHash": "aafe2099f87167f2",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-31T01:28:42.223Z"
+  }
+}

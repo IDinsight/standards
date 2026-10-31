@@ -1,0 +1,54 @@
+{
+  "conditions": [
+    {
+      "condition": "Project is BROWNFIELD with pre-existing implementation",
+      "where": ".standards/MODE.md (`ProjectMode`: `BROWNFIELD`); pre-install commit 'Add tag parsing and in-memory tag store' (src/tags.js, src/store.js, test/tags.test.js)",
+      "status": "realized"
+    },
+    {
+      "condition": "An active cycle is EXPEDITED and the workflow is at DEVELOPING",
+      "where": ".standards/STATE.md (`WorkflowState`: `DEVELOPING`, `CycleMode`: `EXPEDITED`, Id `tag-whitespace-20260924T083000Z-5c9e1b74`)",
+      "status": "realized"
+    },
+    {
+      "condition": "CompletionPolicy is NONE",
+      "where": ".standards/STATE.md Active Work `CompletionPolicy`: `NONE`",
+      "status": "realized"
+    },
+    {
+      "condition": "No promotion has occurred or been authorized (PromotionReason NONE, no PROMOTE handoff)",
+      "where": ".standards/STATE.md (`PromotionReason`: `NONE`, Handoff `Kind`: `INITIAL`); utterance contains no promotion request",
+      "status": "realized"
+    },
+    {
+      "condition": "The request is a bounded implementation change that needs no omitted standard guarantee",
+      "where": ".standards/STATE.md Request (collapse whitespace in tag names); plan DEV-001 touches only src/tags.js normalizeTag",
+      "status": "realized"
+    },
+    {
+      "condition": "Developer cannot legitimately implement during this turn (plan awaits approval), so 'leave the cycle unchanged' is gradable",
+      "where": ".standards/docs/development/tag-whitespace-20260924T083000Z-5c9e1b74.md `Status`: `PROPOSED`, `User Style Locked`: `false`; STATE.md `BlockedOn` holds the plan-approval request",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope and Architecture are NONE, and no verification, review, documentation, or closure record exists",
+      "where": ".standards/STATE.md (`Scope`: `NONE`, `Architecture`: `NONE`); .standards/docs/ contains only the development plan",
+      "status": "realized"
+    },
+    {
+      "condition": "Workflow state is valid and committed with a clean tree",
+      "where": "check.mjs ok:true; git status clean on main",
+      "status": "realized"
+    }
+  ],
+  "issues": [],
+  "verdict": "pass",
+  "summary": "The fixture realizes an active BROWNFIELD EXPEDITED cycle at DEVELOPING with CompletionPolicy NONE and a PROPOSED plan blocking implementation, and nothing in it leaks the expected answer. Checks for assertions 0 and 1 cover only promotion state, policy, Request, and record files. A correct run, which keeps NONE and explains the expedited path under Change completion policy, cannot fail them, and assertion 2 is correctly left to the judge.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T02:52:08.794Z",
+  "costUsd": 0.15612220000000002,
+  "ms": 33523,
+  "fixtureHash": "390bd3689b31a88f"
+}

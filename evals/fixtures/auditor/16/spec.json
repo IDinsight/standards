@@ -1,0 +1,154 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-registry",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add household and beneficiary registry"
+    },
+    {
+      "dir": "layers/55-households-export",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add households CSV export"
+    },
+    {
+      "dir": "layers/60-cycle",
+      "action": "commit",
+      "message": "Start beneficiaries CSV export cycle"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "auditor",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "Active Work.Request is to add a beneficiaries CSV export; no scope, design, or development record exists yet, and .standards/CONTEXT.md does not exist before the run.",
+    "app/households/export.py is the existing households CSV export (COLUMNS, household_rows, export_households using csv.DictWriter); it skips archived households, sorts by household_id, writes ISO dates, a header row, and CRLF line endings. Its tests are in tests/households/test_export.py, and tests/test_cli.py covers the export-households CLI path in app/cli.py.",
+    "app/beneficiaries/ has a Beneficiary model and BeneficiaryRepository but no export module. Beneficiaries differ from households: they link to a household via household_id, use an active flag rather than archived, have an optional date_of_birth and enrolled_on date, and carry personal contact data (optional phone) plus a consent_to_contact flag.",
+    "The only established command for tests is python3 -m pytest (README and pyproject pytest config); the CLI usage python3 -m app.cli export-households is documented in README. The runner has python3 but no python command. No lint, format, type-check, or CI configuration exists in the repository.",
+    "Column choice, PII handling, filtering of inactive beneficiaries, and CLI wiring for a beneficiaries export are design decisions for later roles, not facts to record."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "add-a-beneficiaries-csv-export-20260924T090000Z-3e9b1c7a",
+    "CTX": ".standards/CONTEXT.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${CTX}",
+          "why": "the analogue must be recorded in the context artifact"
+        },
+        {
+          "contains": {
+            "path": "${CTX}",
+            "regex": "## Nearest Analogues(?:(?!\\n## )[\\s\\S])*app/households/export[.]py",
+            "flags": "i"
+          },
+          "why": "the households export path appears inside the template's Nearest Analogues section"
+        },
+        {
+          "contains": {
+            "path": "${CTX}",
+            "regex": "## Nearest Analogues(?:(?!\\n## )[\\s\\S])*tests/households/test_export[.]py",
+            "flags": "i"
+          },
+          "why": "its test file appears inside the Nearest Analogues section"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${CTX}",
+          "why": "findings are judged in the written context"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "app/**",
+            "tests/**",
+            "data/**",
+            "README.md",
+            "pyproject.toml"
+          ],
+          "why": "Auditor does not start implementing the export"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "python3 -m pytest -q",
+      "expect": "pass",
+      "why": "the established test command passes on the committed project"
+    },
+    {
+      "cmd": "python3 -m pytest -q tests/households/test_export.py",
+      "expect": "pass",
+      "why": "the households export has passing tests at the stated path"
+    },
+    {
+      "cmd": "python3 -m app.cli export-households --data data/sample_registry.json",
+      "expect": "pass",
+      "why": "the documented CLI export path works and writes to stdout"
+    },
+    {
+      "cmd": "python3 -c 'import app.beneficiaries.export'",
+      "expect": "fail",
+      "expectOutput": "ModuleNotFoundError",
+      "why": "no beneficiaries export exists yet"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. Layer 50 (pre-install) commits a small Python registry: Household and Beneficiary dataclasses, in-memory repositories, a JSON loader (app/registry.py), sample data, and tests. Layer 55 (pre-install) commits the households CSV export (app/households/export.py), an argparse CLI (app/cli.py), tests/households/test_export.py and tests/test_cli.py, and a README Exports section. After install, layer 60 commits STATE.md: first STANDARD cycle in AUDITING, Handoff INITIAL, CompletionPolicy FULL_DELIVERABLE, recovery inactive, Request 'Add a beneficiaries CSV export.'. No CONTEXT.md exists. The beneficiaries model gives the auditor concrete differences to note (household link, active flag, optional DOB, phone/consent PII). README documents python3 commands because the runner has no python alias. No lint/typecheck/CI config exists, so those commands cannot be established.",
+  "case": "auditor-16",
+  "caseHash": "e78fce00b650e7d2",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T02:51:30.855Z",
+    "verdict": "pass",
+    "fixtureHash": "b6ead6c2109463ed",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-30T23:18:49.202Z"
+  }
+}

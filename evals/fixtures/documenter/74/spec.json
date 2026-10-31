@@ -1,0 +1,215 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial hookrelay worker"
+    },
+    {
+      "dir": "layers/10-design",
+      "action": "commit",
+      "message": "Record project context, scope, and design for webhook retry limit"
+    },
+    {
+      "dir": "layers/20-implement",
+      "action": "commit",
+      "message": "Add configurable webhook retry limit"
+    },
+    {
+      "dir": "layers/30-verify",
+      "action": "commit",
+      "message": "Add retry limit tests and verification report"
+    },
+    {
+      "dir": "layers/35-review",
+      "action": "commit",
+      "message": "Record implementation review for webhook retry limit"
+    },
+    {
+      "dir": "layers/40-rework",
+      "action": "commit",
+      "message": "Route CONTRIBUTING.md correction to documentation"
+    },
+    {
+      "dir": "layers/50-guidance",
+      "action": "unstaged"
+    },
+    {
+      "dir": "layers/55-record",
+      "action": "unstaged"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "documenter",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The unstaged CONTRIBUTING.md edit (a WEBHOOK_MAX_ATTEMPTS row in the configuration table and a rewritten Retries section) is the Documenter's correction for recovery Frame 1; it matches src/config.js and src/delivery.js and is verified in saved content.",
+    "All required documentation is complete: README.md needs no change, no other project documentation exists, and no Documenter-owned defect or obligation remains.",
+    "The implementation review report's Implementation-Reviewed Closure (Eligibility ELIGIBLE) names CONTRIBUTING.md at its pre-correction blob in Assessed Inputs and relies on it in its documentation reasoning, so the correction changes an input of the saved closure assessment.",
+    "The correction requires implementation Reviewer reassessment of the ordinary review and closure eligibility before sign-off readiness can resume. The correct route keeps Frame 1 (ResumeAt AWAITING_USER_SIGNOFF), sets its RerunThrough to REVIEWING_IMPLEMENTATION, transitions to REVIEWING_IMPLEMENTATION (Handoff RESUME from DOCUMENTING per the protocol), and gives a fresh-chat Reviewer invocation naming the IMPLEMENTATION review kind.",
+    "Documenter may mark its record COMPLETE (its full gate can pass) or leave it IN_PROGRESS; either is acceptable as long as it does not claim closure eligibility, edit the review report, change the completion policy, or start final review or synchronization."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "make-the-webhook-delivery-attempt-limit-20260921T101500Z-6c2e9b4f",
+    "DOC": ".standards/docs/documentation/make-the-webhook-delivery-attempt-limit-20260921T101500Z-6c2e9b4f.md",
+    "REVIEW": ".standards/docs/reviews/make-the-webhook-delivery-attempt-limit-20260921T101500Z-6c2e9b4f/implementation.md",
+    "FINAL": ".standards/docs/reviews/make-the-webhook-delivery-attempt-limit-20260921T101500Z-6c2e9b4f/final-deliverable.md",
+    "SYNC": ".standards/docs/synchronization/make-the-webhook-delivery-attempt-limit-20260921T101500Z-6c2e9b4f.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "not": "AWAITING_USER_SIGNOFF",
+          "why": "the saved ELIGIBLE label cannot carry the cycle straight back to sign-off readiness"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "REVIEWING_IMPLEMENTATION"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "true"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "1"
+        },
+        {
+          "state": "Recovery.Frame1.From",
+          "equals": "AWAITING_USER_SIGNOFF"
+        },
+        {
+          "state": "Recovery.Frame1.Owner",
+          "equals": "DOCUMENTING"
+        },
+        {
+          "state": "Recovery.Frame1.FailureType",
+          "equals": "DOCUMENTATION"
+        },
+        {
+          "state": "Recovery.Frame1.ResumeAt",
+          "equals": "AWAITING_USER_SIGNOFF"
+        },
+        {
+          "state": "Recovery.Frame1.RerunThrough",
+          "equals": "REVIEWING_IMPLEMENTATION"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "not": "REVIEWING_FINAL"
+        },
+        {
+          "state": "ActiveWork.CompletionPolicy",
+          "equals": "IMPLEMENTATION_REVIEWED",
+          "why": "Documenter cannot switch to the full-deliverable tail"
+        },
+        {
+          "unchanged": [
+            "${REVIEW}"
+          ],
+          "why": "closure conclusions are Reviewer-owned"
+        },
+        {
+          "absent": "${FINAL}"
+        },
+        {
+          "absent": "${SYNC}"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "package.json"
+      ],
+      "why": "Documenter does not change behavior, tests, or configuration"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/config.test.js test/delivery.test.js",
+      "expect": "pass",
+      "why": "the established tests pass on the reviewed implementation"
+    },
+    {
+      "cmd": "git show HEAD:CONTRIBUTING.md | grep -q 'at most 5 times'",
+      "expect": "pass",
+      "why": "the committed guidance still describes the fixed five-attempt limit"
+    },
+    {
+      "cmd": "git diff --name-only | grep -qx CONTRIBUTING.md && grep -q WEBHOOK_MAX_ATTEMPTS CONTRIBUTING.md",
+      "expect": "pass",
+      "why": "the guidance correction is an unstaged working-tree change"
+    },
+    {
+      "cmd": "grep -qF $(git rev-parse HEAD:CONTRIBUTING.md) .standards/docs/reviews/make-the-webhook-delivery-attempt-limit-20260921T101500Z-6c2e9b4f/implementation.md",
+      "expect": "pass",
+      "why": "the saved closure assessment cites the pre-correction CONTRIBUTING.md blob"
+    },
+    {
+      "cmd": "grep -q 'Eligibility`: `ELIGIBLE' .standards/docs/reviews/make-the-webhook-delivery-attempt-limit-20260921T101500Z-6c2e9b4f/implementation.md",
+      "expect": "pass",
+      "why": "the saved closure assessment is ELIGIBLE"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 00-project: small Node ESM webhook worker (hookrelay) with a fixed 5-attempt limit; CONTRIBUTING.md documents config and the fixed limit. 10-design: CONTEXT, scope (AC-001..AC-003, no documentation AC), design, STATE at DEVELOPING with CompletionPolicy IMPLEMENTATION_REVIEWED (user choice and reason kept in Request). 20-implement: WEBHOOK_MAX_ATTEMPTS parsing, delivery and worker changes, COMPLETE dev plan, STATE TESTING. 30-verify: Tester test updates and COMPLETE FULL verification, STATE REVIEWING_IMPLEMENTATION. 35-review: COMPLETE implementation review with ELIGIBLE closure whose Assessed Inputs cite CONTRIBUTING.md at the pre-correction blob, STATE AWAITING_USER_SIGNOFF. 40-rework: STATE DOCUMENTING after USER_REWORK from AWAITING_USER_SIGNOFF with Frame 1 (Owner DOCUMENTING, FailureType DOCUMENTATION, ResumeAt AWAITING_USER_SIGNOFF, RerunThrough NONE) and the initial IN_PROGRESS documentation record. 50-guidance (unstaged): corrected CONTRIBUTING.md. 55-record (unstaged): documentation record updated to show DOC-001 resolved and verified, README no-change, AC dispositions, checks; still IN_PROGRESS with the gate recheck and Frame 1 routing left as next action. The record does not mention the closure dependency; the role must find it in the review report. The case prompt's statement that reassessment is required is kept grader-only.",
+  "case": "documenter-74",
+  "caseHash": "b41a7127173bf135",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T02:57:05.948Z",
+    "verdict": "pass",
+    "fixtureHash": "5ef1e294c194097a",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-30T23:54:48.498Z"
+  }
+}

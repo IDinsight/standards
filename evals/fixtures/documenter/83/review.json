@@ -1,0 +1,78 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield template)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode DOCUMENTATION, CompletionPolicy NONE",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id = guide-20261004T120000Z-1a2b3c4d",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "WorkflowState DOCUMENTING after a legal FORWARD from ARCHITECTING, no recovery, Development NONE",
+      "where": ".standards/STATE.md; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "Upstream records present (Auditor context, scope, architecture)",
+      "where": ".standards/CONTEXT.md, .standards/docs/scope/…, .standards/docs/specs/…",
+      "status": "realized"
+    },
+    {
+      "condition": "Source and docs available, and the guide is genuinely stale (roundTo, delimiter, MM/DD/YYYY missing)",
+      "where": "src/config.js, src/ledger.js vs docs/configuration.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Docs build fails because a plugin is missing",
+      "where": "docs.config.json lists @inkpress/callouts; scripts/build-docs.mjs dynamic import fails (selfCheck exit 1, 'Cannot find package')",
+      "status": "realized"
+    },
+    {
+      "condition": "Fixing the build would require package configuration changes and cannot be done by an install during the run",
+      "where": "package.json has no such dependency (selfCheck); registry and CDNs blocked (install selfCheck ECONNREFUSED)",
+      "status": "realized"
+    },
+    {
+      "condition": "The build result is needed for a current documentation AC",
+      "where": "scope AC-003 and design TAC AC-003 require npm run docs:build exit 0 with callouts rendered",
+      "status": "realized"
+    },
+    {
+      "condition": "No alternate sufficient evidence is established",
+      "where": "AC-003 names the established build specifically; no prebuilt site/ or other renderer exists",
+      "status": "realized"
+    },
+    {
+      "condition": "No documentation record exists yet",
+      "where": "no .standards/docs/documentation/ file",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 2,
+      "detail": "`contains` requires the literal '@inkpress/callouts' in the record. This identifier appears verbatim in the actual build error and in the design, so a record of the actual failure will almost certainly include it. A record saying only 'the callouts plugin' would fail. The risk is small, and the spec format allows requiring identifiers.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally loosen to 'inkpress|callouts'."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized: a valid DOCUMENTATION cycle at DOCUMENTING, a stale guide, and a deterministic docs-build failure on an undeclared plugin that the blocked registry cannot supply, with AC-003 requiring that build. No file leaks the answer, and check.mjs is ok. The checks are necessary conditions for each assertion: unchanged package, config, tooling, and test files; no route to Developer or Tester; BlockedOn set while the request and the empty recovery stack are preserved; and a non-COMPLETE record naming the command and plugin. The invariants fit the case.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T02:58:33.119Z",
+  "costUsd": 0.2307794,
+  "ms": 38673,
+  "fixtureHash": "cf1d0f8315326ebb"
+}

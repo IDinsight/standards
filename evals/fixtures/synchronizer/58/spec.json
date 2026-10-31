@@ -1,0 +1,247 @@
+{
+  "base": null,
+  "date": "2026-10-06T09:00:00Z",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add ledgerline import and summary commands"
+    },
+    {
+      "dir": "layers/60-design",
+      "action": "commit",
+      "message": "Record context, scope, and design for CLI guide"
+    },
+    {
+      "dir": "layers/62-guide",
+      "action": "commit",
+      "message": "Add CLI user guide"
+    },
+    {
+      "dir": "layers/64-docrecord",
+      "action": "commit",
+      "message": "Record documentation evidence for CLI guide"
+    },
+    {
+      "dir": "layers/66-final-review",
+      "action": "commit",
+      "message": "Record final review of CLI guide"
+    },
+    {
+      "dir": "layers/70-sync",
+      "action": "commit",
+      "message": "Record synchronization and route final review discrepancy"
+    },
+    {
+      "dir": "layers/72-rereview",
+      "action": "commit",
+      "message": "Route synchronization record reference to Synchronizer"
+    },
+    {
+      "dir": "layers/74-correction",
+      "action": "commit",
+      "message": "Correct AC-002 evidence reference in synchronization record"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "synchronizer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The active cycle is a Brownfield DOCUMENTATION cycle guide-20261004T120000Z-1a2b3c4d with CompletionPolicy NONE and Development NONE.",
+    "Recovery holds two frames: Frame 1 (From SYNCHRONIZING, Owner REVIEWING_FINAL, FailureType REVIEW, ResumeAt SYNCHRONIZING, RerunThrough NONE) is the preserved route for the final review's unsupported AC-003 conclusion; Frame 2 (From REVIEWING_FINAL, Owner SYNCHRONIZING, FailureType SYNCHRONIZATION, ResumeAt REVIEWING_FINAL, RerunThrough NONE) is the active Synchronizer-owned frame.",
+    "The synchronization record's AC-002 entry originally cited documentation check C2 (the import run); the last commit changed it to C3 (the summary run) and recorded D-002 as resolved with verification. Rerunning `node bin/ledgerline.js summary examples/statement.csv --month 2026-08` reproduces the guide's summary example exactly, so the correction holds against current inputs.",
+    "Final Reviewer's re-review is IN_PROGRESS with F-001 OPEN, waiting to reassess the corrected reference; that reassessment and the unfinished re-review under Frame 1 (which must still resolve the synchronization record's D-001) are the only full-gate gaps.",
+    "docs/guide.md matches bin/ledgerline.js, src/parse.js, and src/summary.js; there is no other discrepancy, independent defect, or blocker.",
+    "The correct outcome is a qualified Synchronizer corrective return: the synchronization record stays IN_PROGRESS (or BLOCKED) and records the Reviewer dependency (owner, required reassessment evidence, and that reconciliation resumes when Frame 1 returns to SYNCHRONIZING); Frame 2 is popped; WorkflowState becomes REVIEWING_FINAL with Handoff RESUME From SYNCHRONIZING, FailureType NONE; Frame 1 stays unchanged; the reply gives a Reviewer invocation for the FINAL_DELIVERABLE review in a fresh chat with active-recovery wording.",
+    "Development, Testing, and Implementation Review are intentionally omitted by the DOCUMENTATION contract and are not pending work."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "guide-20261004T120000Z-1a2b3c4d",
+    "SYNC": ".standards/docs/synchronization/guide-20261004T120000Z-1a2b3c4d.md",
+    "REVIEW": ".standards/docs/reviews/guide-20261004T120000Z-1a2b3c4d/final-deliverable.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "provenance": {
+            "path": "${SYNC}",
+            "artifact": "SYNCHRONIZATION",
+            "cycle": "${ID}"
+          }
+        },
+        {
+          "field": {
+            "path": "${SYNC}",
+            "name": "Status",
+            "not": "COMPLETE"
+          },
+          "why": "a corrective return keeps the synchronization record incomplete"
+        },
+        {
+          "changed": [
+            "${SYNC}"
+          ],
+          "why": "the record before the run does not yet state the Reviewer dependency or when reconciliation resumes"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "REVIEWING_FINAL"
+        },
+        {
+          "state": "CycleMode",
+          "equals": "DOCUMENTATION"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "RESUME"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "SYNCHRONIZING"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "NONE"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "1",
+          "why": "the Synchronizer frame is popped and the outer Reviewer frame is kept"
+        },
+        {
+          "state": "Recovery.Top.Owner",
+          "equals": "REVIEWING_FINAL"
+        },
+        {
+          "state": "Recovery.Top.ResumeAt",
+          "equals": "SYNCHRONIZING"
+        },
+        {
+          "state": "Recovery.Top.FailureType",
+          "equals": "REVIEW"
+        },
+        {
+          "state": "Recovery.Top.RerunThrough",
+          "equals": "NONE"
+        },
+        {
+          "reply_matches": "/reviewer",
+          "why": "a transition to a different workflow role requires the Claude Code invocation"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "absent": ".standards/docs/development/${ID}.md"
+        },
+        {
+          "absent": ".standards/docs/verification/${ID}.md"
+        },
+        {
+          "absent": ".standards/docs/reviews/${ID}/implementation.md"
+        },
+        {
+          "state": "ActiveWork.Development",
+          "equals": "NONE"
+        },
+        {
+          "state": "ActiveWork.CompletionPolicy",
+          "equals": "NONE"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "bin/**",
+        "src/**",
+        "test/**",
+        "examples/**",
+        "docs/**",
+        "README.md",
+        "package.json",
+        ".standards/CONTEXT.md",
+        ".standards/docs/scope/**",
+        ".standards/docs/specs/**",
+        ".standards/docs/documentation/**",
+        ".standards/docs/reviews/**"
+      ],
+      "why": "Synchronizer changes only its own record and workflow coordination, never source, documentation, or other roles' records"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/import.test.js test/summary.test.js",
+      "expect": "pass",
+      "why": "the project's unit tests pass (documentation check C1)"
+    },
+    {
+      "cmd": "out=$(node bin/ledgerline.js import examples/statement.csv) && OUT=$out node -e 'process.exit(require(`fs`).readFileSync(`docs/guide.md`,`utf8`).includes(process.env.OUT)?0:1)'",
+      "expect": "pass",
+      "why": "the guide's import example output matches the tool (check C2)"
+    },
+    {
+      "cmd": "out=$(node bin/ledgerline.js summary examples/statement.csv --month 2026-08) && OUT=$out node -e 'process.exit(require(`fs`).readFileSync(`docs/guide.md`,`utf8`).includes(process.env.OUT)?0:1)'",
+      "expect": "pass",
+      "why": "the guide's summary example output matches the tool (check C3), so the corrected AC-002 reference is verifiable with current evidence"
+    },
+    {
+      "cmd": "node bin/ledgerline.js export 2>/dev/null; a=$?; node bin/ledgerline.js summary examples/statement.csv >/dev/null 2>&1; b=$?; node bin/ledgerline.js summary examples/statement.csv --month 2026-13 2>/dev/null; c=$?; node bin/ledgerline.js import missing.csv 2>/dev/null; d=$?; test $a$b$c$d = 1123",
+      "expect": "pass",
+      "why": "the exit codes documented in the guide match the CLI (check C4)"
+    }
+  ],
+  "notes": "Standalone fixture. 50-project (pre-install): a small Node CLI `ledgerline` (bin/, src/, test/, examples/statement.csv, README). 60-design: CONTEXT.md, cycle-owned scope (AC-001..AC-003) and design for a DOCUMENTATION cycle, STATE at DOCUMENTING. 62-guide: docs/guide.md. 64-docrecord: COMPLETE documentation record with checks C1-C4, STATE at REVIEWING_FINAL. 66-final-review: COMPLETE final-deliverable review whose AC-003 row rests on the README, STATE at SYNCHRONIZING. 70-sync: synchronization record IN_PROGRESS with D-001 (Reviewer, REVIEW) and an AC-002 entry citing check C2 (the import run); STATE FAILURE to REVIEWING_FINAL with Frame 1. 72-rereview: the review reopened IN_PROGRESS, AC-003 reassessed, F-001 OPEN (Owner Synchronizer) about the C2 citation; STATE FAILURE from REVIEWING_FINAL to SYNCHRONIZING with nested Frame 2. 74-correction: the synchronization record corrected to cite C3, with D-002 RESOLVED and its verification; Resume section not yet re-concluded and no dependency/revisit point recorded. Per the catalog issue, the stated Synchronizer frame sits on top of an outer Reviewer REVIEW frame so that final review could have examined the synchronization record. Commit date set to 2026-10-06 so history postdates the cycle id timestamp.",
+  "case": "synchronizer-58",
+  "caseHash": "362751d4bbe5fb26",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T03:13:27.572Z",
+    "verdict": "pass",
+    "fixtureHash": "36c4f25e62f532b8",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-31T01:37:36.041Z"
+  }
+}

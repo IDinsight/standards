@@ -1,0 +1,64 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is BROWNFIELD",
+      "where": ".standards/MODE.md (brownfield install, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState AUDITING, first cycle with Handoff INITIAL/NONE and CompletionPolicy FULL_DELIVERABLE",
+      "where": ".standards/STATE.md (layer 60)",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery inactive, no outstanding obligations, BaselineReconciliation NONE",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": ".standards/CONTEXT.md does not exist",
+      "where": "built tree (no CONTEXT.md)",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Request is to add a beneficiaries CSV export",
+      "where": ".standards/STATE.md Request `Add a beneficiaries CSV export.`",
+      "status": "realized"
+    },
+    {
+      "condition": "Existing households CSV export in app/households/export.py",
+      "where": "app/households/export.py (COLUMNS, household_rows, export_households), wired in app/cli.py",
+      "status": "realized"
+    },
+    {
+      "condition": "Households export tests in tests/households/test_export.py, passing",
+      "where": "tests/households/test_export.py; selfChecks 1-2 pass",
+      "status": "realized"
+    },
+    {
+      "condition": "A beneficiaries model exists to compare against, with no export yet",
+      "where": "app/beneficiaries/models.py, repository.py; selfCheck 4 confirms no export module",
+      "status": "realized"
+    },
+    {
+      "condition": "Some commands needed downstream cannot be established (no lint/typecheck/CI config)",
+      "where": "pyproject.toml has only pytest config; no CI or lint files",
+      "status": "realized"
+    },
+    {
+      "condition": "No planned design exists in the repository",
+      "where": "Scope/Architecture NONE; no design docs",
+      "status": "realized"
+    }
+  ],
+  "issues": [],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition: a brownfield STANDARD cycle in AUDITING with no CONTEXT.md, a realistic households CSV export with passing tests, and a beneficiaries model whose differences give the judge something to compare. Nothing leaks. The checks are necessary conditions for a correct audit: the Nearest Analogues regex follows the template heading, and the unchanged globs cover only project files. The invariants are standard and fit an Auditor that hands off to SCOPING.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T02:51:30.855Z",
+  "costUsd": 0.147586,
+  "ms": 27634,
+  "fixtureHash": "b6ead6c2109463ed"
+}

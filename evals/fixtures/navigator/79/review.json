@@ -1,0 +1,79 @@
+{
+  "conditions": [
+    {
+      "condition": "User invokes Navigator for a security review of the Next.js admin routes in web/app/admin",
+      "where": "prompt.utterance; web/app/admin/{layout,page}.tsx, users/, events/, settings/ pages",
+      "status": "realized"
+    },
+    {
+      "condition": "An active STANDARD cycle is in DEVELOPING for unrelated work",
+      "where": ".standards/STATE.md (DEVELOPING, STANDARD, FULL_DELIVERABLE, FORWARD from ARCHITECTING, Development NONE) with matching scope, design, and CONTEXT.md for remaining event spots; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "Admin Server Actions in web/lib/actions/admin.ts check session?.user but not the admin role",
+      "where": "web/lib/actions/admin.ts requireUser() lines 10-16; all four exported actions call only requireUser",
+      "status": "realized"
+    },
+    {
+      "condition": "web/proxy.ts redirects non-admins away from /admin pages",
+      "where": "web/proxy.ts matcher /admin/:path*, redirect when role !== 'admin' on GET",
+      "status": "realized"
+    },
+    {
+      "condition": "Server Actions are reachable by direct POST, so the proxy redirect does not protect them",
+      "where": "web/proxy.ts returns NextResponse.next() for non-GET; Server Actions are action-ID POSTs that the page redirect does not gate",
+      "status": "realized"
+    },
+    {
+      "condition": "A concrete abuse path and impact exist (self-promotion, deactivation, deletion, settings change)",
+      "where": "setUserRole/deactivateUser/deleteEvent/updateSiteSettings in admin.ts; role copied into the cookie at sign-in in web/lib/actions/auth.ts",
+      "status": "realized"
+    },
+    {
+      "condition": "NEXT_PUBLIC_ANALYTICS_KEY is set in web/.env.example",
+      "where": "web/.env.example line 4; used client-side in web/app/layout.tsx",
+      "status": "realized"
+    },
+    {
+      "condition": "Evidence exists to give each OWASP Top 10:2025 category a status",
+      "where": "parameterized SQL, HMAC cookie and scrypt in session.ts/auth.ts, no security headers in next.config.ts, no lockfile, admin_log table, no tests",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 1,
+      "detail": "reply_matches \"actions/admin\" requires the reply to include the directory segment of the path. The skill requires exact file paths, so a correct run almost always cites web/lib/actions/admin.ts. A run that writes only `admin.ts:14` after naming the folder would still fail this necessary check.",
+      "recommendation": "fix_file",
+      "fix": "In navigator-79/spec.json, checks[1].all[1]: change reply_matches from \"actions/admin\" to \"admin\\\\.ts\" (or drop the check and leave path citation to the judge)."
+    },
+    {
+      "severity": "note",
+      "kind": "hint-leak",
+      "assertion": 1,
+      "detail": "web/proxy.ts carries a comment that POSTs 'go straight through', and .standards/CONTEXT.md says the proxy redirects non-admins 'from `/admin` page loads'. Both are realistic developer and Auditor text, but they make the bypass easier to find. They could also lead the role to attribute the gap only to the GET check rather than to Server Actions being reachable independently of the page guard. The judge should accept either explanation as long as it gives the direct-POST bypass.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 0,
+      "detail": "The OWASP reply checks are loose necessary conditions: generic words such as 'authentication', 'integrity', or 'logging' could match without real per-category coverage. That is acceptable because complete is false and the judge decides coverage. None of them would fail a correct run.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition. The admin Server Actions only check session?.user, proxy.ts guards /admin page loads for non-admins and passes POSTs through, NEXT_PUBLIC_ANALYTICS_KEY is in .env.example, and a valid unrelated STANDARD cycle sits in DEVELOPING. Navigator invariants are correct and the checks are safe preconditions; the only notes are a slightly narrow path regex for assertion 1 and a mildly suggestive proxy comment.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T03:01:54.787Z",
+  "costUsd": 0.2478044,
+  "ms": 57918,
+  "fixtureHash": "5a83a8548a2c3f41"
+}

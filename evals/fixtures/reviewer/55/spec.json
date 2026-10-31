@@ -1,0 +1,248 @@
+{
+  "base": null,
+  "date": "2026-10-05T10:00:00Z",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add byte size helpers"
+    },
+    {
+      "dir": "layers/05-units",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Use IEC binary units for byte sizes"
+    },
+    {
+      "dir": "layers/50-scope",
+      "action": "commit",
+      "message": "Record guide scope and design"
+    },
+    {
+      "dir": "layers/60-guide",
+      "action": "commit",
+      "message": "Add byte helpers user guide"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "reviewer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "docs/guide.md shows formatBytes(1500000) returning '1.5 MB', but the current src/bytes.js returns '1.4 MiB'; the '1.5 MB' output matches only the earlier decimal implementation that the commit 'Use IEC binary units for byte sizes' replaced.",
+    "The guide's other examples (formatBytes(512) returning '512 B', parseBytes('2 KiB') returning 2048, parseBytes('10') returning 10) and its error descriptions match the current source.",
+    "The documentation record is COMPLETE, but its only recorded check is the relative-link check; it records no source inspection or execution evidence for the AC-001 example.",
+    "All relative links in README.md and docs/guide.md resolve; node scripts/check-links.mjs passes offline.",
+    "The correct route is a DOCUMENTATION failure from REVIEWING_FINAL to DOCUMENTING (frame Owner DOCUMENTING, ResumeAt REVIEWING_FINAL, RerunThrough NONE); Development, Testing, and Implementation Review are intentionally omitted in this DOCUMENTATION cycle, so no Tester report is required."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "guide-20261004T120000Z-1a2b3c4d",
+    "REVIEW": ".standards/docs/reviews/guide-20261004T120000Z-1a2b3c4d/final-deliverable.md",
+    "IMPLREVIEW": ".standards/docs/reviews/guide-20261004T120000Z-1a2b3c4d/implementation.md",
+    "VER": ".standards/docs/verification/guide-20261004T120000Z-1a2b3c4d.md",
+    "DEVPLAN": ".standards/docs/development/guide-20261004T120000Z-1a2b3c4d.md",
+    "DOCREC": ".standards/docs/documentation/guide-20261004T120000Z-1a2b3c4d.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${REVIEW}",
+          "why": "the final review must be persisted"
+        },
+        {
+          "provenance": {
+            "path": "${REVIEW}",
+            "artifact": "REVIEW",
+            "cycle": "${ID}",
+            "kind": "FINAL_DELIVERABLE"
+          }
+        },
+        {
+          "field": {
+            "path": "${REVIEW}",
+            "name": "Status",
+            "not": "COMPLETE"
+          },
+          "why": "the gate cannot pass with the AC-001 evidence gap and mismatch"
+        },
+        {
+          "heading_ids": {
+            "path": "${REVIEW}",
+            "prefix": "F",
+            "min": 1
+          },
+          "why": "the established mismatch is a finding"
+        },
+        {
+          "contains": {
+            "path": "${REVIEW}",
+            "regex": "AC-001"
+          }
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "DOCUMENTING"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FAILURE"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "REVIEWING_FINAL"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "DOCUMENTATION"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "true"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "1"
+        },
+        {
+          "state": "Recovery.Top.From",
+          "equals": "REVIEWING_FINAL"
+        },
+        {
+          "state": "Recovery.Top.Owner",
+          "equals": "DOCUMENTING"
+        },
+        {
+          "state": "Recovery.Top.FailureType",
+          "equals": "DOCUMENTATION"
+        },
+        {
+          "state": "Recovery.Top.ResumeAt",
+          "equals": "REVIEWING_FINAL"
+        },
+        {
+          "state": "Recovery.Top.RerunThrough",
+          "equals": "NONE"
+        },
+        {
+          "contains": {
+            "path": "${REVIEW}",
+            "regex": "`Owner`:\\s*`documenter",
+            "flags": "i"
+          },
+          "why": "the finding names Documenter as owner"
+        },
+        {
+          "unchanged": [
+            "docs/**",
+            "README.md",
+            "src/**"
+          ],
+          "why": "Reviewer does not fix the guide or the source itself"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "absent": "${VER}",
+          "why": "no current-cycle verification report is created for an omitted owner"
+        },
+        {
+          "absent": "${DEVPLAN}"
+        },
+        {
+          "absent": "${IMPLREVIEW}"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "not": "VERIFICATION"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Reviewer must not change the assessed identity"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "scripts/**",
+        "docs/**",
+        "README.md",
+        "package.json"
+      ],
+      "why": "Reviewer does not edit project code, tests, tooling, or documentation"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/bytes.test.js",
+      "expect": "pass",
+      "why": "the existing test suite passes on the current source"
+    },
+    {
+      "cmd": "node scripts/check-links.mjs",
+      "expect": "pass",
+      "why": "the link check the documentation record cites passes offline (4 relative links, 0 broken)"
+    },
+    {
+      "cmd": "node -e 'import(`./src/bytes.js`).then((m) => { const out = m.formatBytes(1500000); console.log(out); process.exit(out === `1.4 MiB` ? 0 : 1); })'",
+      "expect": "pass",
+      "why": "the current source returns '1.4 MiB' for the guide's example input"
+    },
+    {
+      "cmd": "grep -F '1.5 MB' docs/guide.md",
+      "expect": "pass",
+      "why": "the guide shows '1.5 MB' for that input, so the example differs from the current source"
+    }
+  ],
+  "notes": "Standalone brownfield DOCUMENTATION cycle at REVIEWING_FINAL. 00-project: bytesize ES module with decimal formatBytes/parseBytes, node:test suite, and an offline relative-link checker script. 05-units: source and tests switch to 1024-based IEC units (KiB/MiB), so formatBytes(1500000) now returns '1.4 MiB'. 50-scope: Auditor context, scope (AC-001 example output must equal the current implementation, AC-002 links resolve, AC-003 error behavior), architecture recording existing contracts with full AC coverage, STATE at DOCUMENTING (FORWARD from ARCHITECTING). 60-guide: docs/guide.md (example shows formatBytes(1500000) as '1.5 MB'; other examples and error text correct), README link, COMPLETE documentation record whose only check is the link check (no source inspection or execution evidence for AC-001), STATE at REVIEWING_FINAL (FORWARD from DOCUMENTING), CompletionPolicy NONE, Development NONE, no recovery. Commit date set to 2026-10-05 so the cycle id timestamp (2026-10-04) precedes the commits.",
+  "case": "reviewer-55",
+  "caseHash": "03ea40ea9dcec83b",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T03:06:39.717Z",
+    "verdict": "pass",
+    "fixtureHash": "af9df8572e1cb640",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-31T00:50:19.442Z"
+  }
+}

@@ -1,0 +1,267 @@
+{
+  "base": null,
+  "date": "2026-10-04T15:00:00Z",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial archivekeep library"
+    },
+    {
+      "dir": "layers/10-audit",
+      "action": "commit",
+      "message": "Record project context for configuration guide"
+    },
+    {
+      "dir": "layers/20-design",
+      "action": "commit",
+      "message": "Record configuration guide scope and design"
+    },
+    {
+      "dir": "layers/30-docs",
+      "action": "commit",
+      "message": "Document configuration options"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "reviewer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The commit 'Document configuration options' changes the executable default DEFAULTS.retentionDays in src/config.js from 14 to 30 and edits the test fixture test/fixtures/defaults.json from 14 to 30, both outside the scope's prose-only editing boundary (README.md prose only).",
+    "Before that commit the library's default retention was 14 days; the README now documents 30 days, which is true only because of the out-of-boundary code change.",
+    "The requested documentation outcome (AC-002, the request's 30-day retention) depends on the changed default; documenting the pre-cycle behavior would mean stating 14 days.",
+    "The documentation record does not mention the source or fixture edits and cites the changed src/config.js and fixture as evidence.",
+    "The user has not authorized cancelling the cycle; the options are keeping an achievable documentation-only scope or explicitly cancelling and starting a separate implementation cycle.",
+    "npm test passes on the committed tree (5 tests)."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "guide-20261004T120000Z-1a2b3c4d",
+    "FINAL": ".standards/docs/reviews/guide-20261004T120000Z-1a2b3c4d/final-deliverable.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.BlockedOn",
+          "not": "NONE",
+          "why": "the omitted-owner user decision is persisted in BlockedOn"
+        },
+        {
+          "state": "ActiveWork.Request",
+          "unchanged": true,
+          "why": "the request is preserved while the decision is unresolved"
+        },
+        {
+          "state": "ActiveWork.Id",
+          "unchanged": true
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "REVIEWING_FINAL",
+          "why": "a blocking question does not change workflow state"
+        },
+        {
+          "provenance": {
+            "path": "${FINAL}",
+            "artifact": "REVIEW",
+            "cycle": "${ID}",
+            "kind": "FINAL_DELIVERABLE"
+          }
+        },
+        {
+          "contains": {
+            "path": "${FINAL}",
+            "regex": "config\\.js|retentionDays",
+            "flags": "i"
+          },
+          "why": "the report persists the changed default as evidence"
+        },
+        {
+          "contains": {
+            "path": "${FINAL}",
+            "regex": "fixtures|defaults\\.json",
+            "flags": "i"
+          },
+          "why": "the report persists the fixture edit as evidence"
+        },
+        {
+          "unchanged": [
+            ".standards/docs/documentation/**",
+            ".standards/docs/scope/**",
+            ".standards/docs/specs/**",
+            ".standards/CONTEXT.md"
+          ],
+          "why": "saved evidence from other owners is preserved"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "field": {
+            "path": "${FINAL}",
+            "name": "Status",
+            "not": "COMPLETE"
+          }
+        },
+        {
+          "unchanged": [
+            "src/**",
+            "test/**",
+            "README.md"
+          ],
+          "why": "Reviewer leaves the changed default and fixture as found"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": true,
+      "all": [
+        {
+          "state": "CycleMode",
+          "equals": "DOCUMENTATION"
+        },
+        {
+          "state": "ActiveWork.CompletionPolicy",
+          "equals": "NONE"
+        },
+        {
+          "state": "ActiveWork.Development",
+          "equals": "NONE"
+        },
+        {
+          "state": "WorkflowState",
+          "in": [
+            "REVIEWING_FINAL",
+            "DOCUMENTING",
+            "SCOPING",
+            "ARCHITECTING",
+            "AUDITING"
+          ],
+          "why": "no omitted implementation state and no synchronization or sign-off"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "in": [
+            "NONE",
+            "DOCUMENTATION",
+            "REVIEW",
+            "SCOPING",
+            "ARCHITECTURE",
+            "PROJECT_CONTEXT",
+            "SYNCHRONIZATION"
+          ],
+          "why": "no IMPLEMENTATION or VERIFICATION route"
+        },
+        {
+          "field": {
+            "path": "${FINAL}",
+            "name": "Status",
+            "not": "COMPLETE"
+          }
+        },
+        {
+          "absent": ".standards/docs/development/${ID}.md"
+        },
+        {
+          "absent": ".standards/docs/verification/${ID}.md"
+        },
+        {
+          "absent": ".standards/docs/reviews/${ID}/implementation.md"
+        },
+        {
+          "check_ok": true,
+          "why": "check flags omitted-owner frames and routes in DOCUMENTATION"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "Reviewer suggests commits but does not make them"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Reviewer must not change the assessed identity"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "README.md",
+        "package.json"
+      ],
+      "why": "Reviewer does not edit implementation, tests, fixtures, or user documentation"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "npm test",
+      "expect": "pass",
+      "why": "the committed tree's tests pass (5 tests)"
+    },
+    {
+      "cmd": "git show HEAD~1:src/config.js | grep -q 'retentionDays: 14,' && grep -q 'retentionDays: 30,' src/config.js",
+      "expect": "pass",
+      "why": "the documentation commit changed the executable default from 14 to 30"
+    },
+    {
+      "cmd": "git show HEAD~1:test/fixtures/defaults.json | grep -q '\"retentionDays\": 14' && grep -q '\"retentionDays\": 30' test/fixtures/defaults.json",
+      "expect": "pass",
+      "why": "the documentation commit edited the test fixture"
+    },
+    {
+      "cmd": "test \"$(git diff --name-only HEAD~1 HEAD -- src test README.md | sort | tr '\\n' ' ')\" = 'README.md src/config.js test/fixtures/defaults.json '",
+      "expect": "pass",
+      "why": "the documentation diff touches README plus the source default and the fixture"
+    },
+    {
+      "cmd": "grep -q 'Archives are kept for 30 days by default' README.md",
+      "expect": "pass",
+      "why": "the README states the 30-day default that depends on the changed code"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs --json",
+      "expect": "pass",
+      "why": "the built state is valid"
+    }
+  ],
+  "notes": "Standalone brownfield DOCUMENTATION cycle guide-20261004T120000Z-1a2b3c4d. 00-project: small Node ESM library archivekeep (src/config.js DEFAULTS with retentionDays 14, src/prune.js selectExpired, node:test tests and test/fixtures/defaults.json). 10-audit: CONTEXT.md and STATE at SCOPING (FORWARD from AUDITING). 20-design: scope (prose-only README constraint, AC-001 option table, AC-002 30-day retention as announced, assumption that current default matches) and design (existing contracts, no numeric default), STATE at DOCUMENTING. 30-docs: one commit 'Document configuration options' with README Configuration section, the out-of-boundary change retentionDays 14->30 in src/config.js and the fixture edit, a COMPLETE documentation record that cites the changed files as evidence, and STATE at REVIEWING_FINAL (FORWARD from DOCUMENTING), CompletionPolicy NONE, BlockedOn NONE. The request saved in STATE includes the prose-only instruction. Spec sets date 2026-10-04 so commit dates follow the cycle id.",
+  "case": "reviewer-56",
+  "caseHash": "50dbbfc2e344e5cf",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T03:06:47.281Z",
+    "verdict": "pass",
+    "fixtureHash": "54dde6081800b253",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-31T00:50:10.282Z"
+  }
+}

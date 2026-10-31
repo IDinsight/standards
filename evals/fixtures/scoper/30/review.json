@@ -1,0 +1,79 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is GREENFIELD",
+      "where": ".standards/MODE.md (installer greenfield template)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode is STANDARD with a started first cycle (valid generated Id, CompletionPolicy FULL_DELIVERABLE, Handoff INITIAL)",
+      "where": ".standards/STATE.md (layer 50-cycle)",
+      "status": "realized"
+    },
+    {
+      "condition": "WorkflowState is SCOPING",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Scope is NONE and no scope record exists",
+      "where": ".standards/STATE.md; no .standards/docs (selfCheck 2)",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Request is the throwaway clickable mockup of the household registration flow for a client demo",
+      "where": ".standards/STATE.md Active Work.Request",
+      "status": "realized"
+    },
+    {
+      "condition": "No maturity level is named in the request, so Level 1 must be inferred",
+      "where": ".standards/STATE.md Request text",
+      "status": "realized"
+    },
+    {
+      "condition": "Greenfield before first audit: no CONTEXT.md and no project implementation",
+      "where": "repo tree; selfCheck 2",
+      "status": "realized"
+    },
+    {
+      "condition": "All of it committed, clean tree, no recovery or obligations",
+      "where": "git status clean; STATE.md Recovery/Obligations Active false",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 0,
+      "detail": "Assertion 0's checks (WorkflowState ARCHITECTING, BlockedOn NONE, Scope path set) require the run to finish scoping this turn. A Scoper could instead treat the unspecified contents of the 'household registration flow' (screens, fields) as a blocking question, which would fail these checks even if it inferred Level 1 correctly. The expected output and the catalog note both describe a completed scope handed to Architect, and for a disposable demo mockup recording the flow steps as assumptions is the natural reading, so the checks fit the case.",
+      "recommendation": "run_as_is",
+      "fix": "None needed; the case expects completion in one turn."
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 0,
+      "detail": "The contains checks require a literal 'Level 1' and a '## Assumptions' heading. The maturity reference says to record an inferred level as an assumption and to write the constraint as 'Target maturity: Level N ...'. The template provides an Assumptions section. A correct run should reproduce both, so the risk of a false failure is low.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The local git config has user.name=Fixture and user.email=fixture@example.invalid. Running `git config` or `git log --format` would show a test-like identity. This is set by the harness for every fixture and has no bearing on scoping.",
+      "recommendation": "run_as_is",
+      "fix": "None for this fixture."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes a valid first STANDARD greenfield cycle in SCOPING, with Scope NONE, the exact throwaway-mockup request, and no context or records; check.mjs passes, and nothing leaks the expected Level 1 answer. The checks are minimal: the fixed artifact-init scope path, provenance, AC-001, a Level 1 mention, Assumptions and Non-goals headings, and a forward handoff to ARCHITECTING. Content judgments are left to the judge. Invariants are standard, so the fixture is fit to run.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T03:09:45.443Z",
+  "costUsd": 0.127125,
+  "ms": 37926,
+  "fixtureHash": "7a373d90e13e0ce4"
+}

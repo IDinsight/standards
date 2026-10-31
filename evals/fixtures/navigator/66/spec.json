@@ -1,0 +1,142 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add inventory list and low-stock commands"
+    },
+    {
+      "dir": "layers/60-scope-design",
+      "action": "commit",
+      "message": "Record project context, scope, and design for CSV export"
+    },
+    {
+      "dir": "layers/70-implementation",
+      "action": "commit",
+      "message": "Add CSV export command"
+    },
+    {
+      "dir": "layers/80-tests",
+      "action": "commit",
+      "message": "Add CSV export tests"
+    },
+    {
+      "dir": "layers/90-verification",
+      "action": "commit",
+      "message": "Record verification of CSV export"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "navigator",
+    "utterance": "Remain Navigator. Explain the active cycle. There's no project documentation, so select IMPLEMENTATION_REVIEWED now. Does that also sign the cycle off?"
+  },
+  "graderOnly": [
+    "The active STANDARD cycle is at REVIEWING_IMPLEMENTATION with CompletionPolicy FULL_DELIVERABLE; recovery and outstanding obligations are inactive, BlockedOn is NONE, and PendingVerificationCadence is NONE.",
+    "No normal documentation, final-review, or synchronization work has begun: no documentation, final-deliverable review, or synchronization record exists and the cycle has never been in DOCUMENTING.",
+    "Reviewer has not started the implementation review; no implementation review report exists yet.",
+    "The repository has no README or other project documentation, but scope AC-004 requires a root README explaining the export command; the verification report records AC-004 as a pending Documenter dependency.",
+    "Under IMPLEMENTATION_REVIEWED, Reviewer could not record closure ELIGIBLE while AC-004 lacks owner-produced documentation evidence; dropping the README obligation would need Scoper-owned rework, not a policy choice.",
+    "A same-state policy change at REVIEWING_IMPLEMENTATION is allowed only through an explicit user instruction to a non-Navigator agent (for example the Reviewer that owns the current state); it does not sign off, which needs AWAITING_USER_SIGNOFF and a separate explicit user decision."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "add-a-csv-export-command-for-inventory-20260921T141205Z-5c81e2a7"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "**"
+          ],
+          "why": "Navigator persists nothing, including STATE.md"
+        },
+        {
+          "state": "ActiveWork.CompletionPolicy",
+          "equals": "FULL_DELIVERABLE",
+          "why": "the policy must not be changed by Navigator"
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "REVIEWING_IMPLEMENTATION"
+        },
+        {
+          "no_skill_call": "reviewer",
+          "why": "Navigator does not auto-dispatch the owning role"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": []
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "Navigator never moves HEAD"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Navigator never mutates git state"
+    },
+    {
+      "unchanged": [
+        "**"
+      ],
+      "why": "Navigator persists nothing (generated caches are ignored)"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/inventory.test.js test/export.test.js",
+      "expect": "pass",
+      "why": "the established test suite passes, matching the verification report (9 tests)"
+    },
+    {
+      "cmd": "test ! -e README.md && test ! -e docs",
+      "expect": "pass",
+      "why": "the project has no README or docs folder, as the user says"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 50-project (pre-install): small Node CLI `stockroom` (list/low commands, node:test suite, no README). 60-scope-design: CONTEXT.md, scope with AC-001..AC-003 (export command) and AC-004 (root README documenting the command), design with AC-004 as no architectural impact (Documenter-owned), STATE at DEVELOPING. 70-implementation: src/export.js, export subcommand in src/cli.js, COMPLETE development plan, STATE at TESTING. 80-tests: Tester's test/export.test.js and test script. 90-verification: COMPLETE FULL verification report (AC-004 a pending Documenter dependency) citing the implementation and test commits, STATE at REVIEWING_IMPLEMENTATION / FULL_DELIVERABLE / FORWARD from TESTING. No implementation review, documentation, final review, or synchronization record exists, so no normal documentation work has begun. The documentation AC makes the point concrete that missing docs are not eligibility for early closure.",
+  "case": "navigator-66",
+  "caseHash": "99992b05f5c67d26",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T02:59:13.222Z",
+    "verdict": "pass",
+    "fixtureHash": "85818d5e270ae82e",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-31T00:09:29.780Z"
+  }
+}

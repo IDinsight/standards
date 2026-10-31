@@ -1,0 +1,74 @@
+{
+  "family": "beneficiary-registry",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "1024",
+  "memory": "2048",
+  "executionRoleArn": "arn:aws:iam::418272790611:role/beneficiary-registry-execution",
+  "taskRoleArn": "arn:aws:iam::418272790611:role/beneficiary-registry-task",
+  "containerDefinitions": [
+    {
+      "name": "web",
+      "image": "418272790611.dkr.ecr.af-south-1.amazonaws.com/beneficiary-registry:latest",
+      "essential": true,
+      "command": [
+        "sh",
+        "-c",
+        "python manage.py migrate --noinput && exec gunicorn registry.wsgi:application --bind 0.0.0.0:8000 --workers 3 --timeout 60"
+      ],
+      "portMappings": [{ "containerPort": 8000, "protocol": "tcp" }],
+      "environment": [
+        { "name": "DB_HOST", "value": "registry-prod.c7ql2kx0vb1d.af-south-1.rds.amazonaws.com" },
+        { "name": "DB_NAME", "value": "registry" },
+        { "name": "DB_USER", "value": "registry_app" },
+        { "name": "DJANGO_ALLOWED_HOSTS", "value": "registry.example.org" },
+        { "name": "CELERY_BROKER_URL", "value": "redis://registry-prod.x1y2z3.0001.afs1.cache.amazonaws.com:6379/0" }
+      ],
+      "secrets": [
+        { "name": "DJANGO_SECRET_KEY", "valueFrom": "arn:aws:secretsmanager:af-south-1:418272790611:secret:registry/django-secret-key" },
+        { "name": "DB_PASSWORD", "valueFrom": "arn:aws:secretsmanager:af-south-1:418272790611:secret:registry/db-password" }
+      ],
+      "healthCheck": {
+        "command": ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/', timeout=3)"],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 60
+      },
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/beneficiary-registry",
+          "awslogs-region": "af-south-1",
+          "awslogs-stream-prefix": "web"
+        }
+      }
+    },
+    {
+      "name": "worker",
+      "image": "418272790611.dkr.ecr.af-south-1.amazonaws.com/beneficiary-registry:latest",
+      "essential": true,
+      "command": ["celery", "-A", "registry", "worker", "--loglevel", "info", "--concurrency", "2"],
+      "environment": [
+        { "name": "DB_HOST", "value": "registry-prod.c7ql2kx0vb1d.af-south-1.rds.amazonaws.com" },
+        { "name": "DB_NAME", "value": "registry" },
+        { "name": "DB_USER", "value": "registry_app" },
+        { "name": "CELERY_BROKER_URL", "value": "redis://registry-prod.x1y2z3.0001.afs1.cache.amazonaws.com:6379/0" },
+        { "name": "SMS_GATEWAY_URL", "value": "https://sms.example.org/v1/messages" }
+      ],
+      "secrets": [
+        { "name": "DJANGO_SECRET_KEY", "valueFrom": "arn:aws:secretsmanager:af-south-1:418272790611:secret:registry/django-secret-key" },
+        { "name": "DB_PASSWORD", "valueFrom": "arn:aws:secretsmanager:af-south-1:418272790611:secret:registry/db-password" },
+        { "name": "SMS_GATEWAY_TOKEN", "valueFrom": "arn:aws:secretsmanager:af-south-1:418272790611:secret:registry/sms-gateway-token" }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/beneficiary-registry",
+          "awslogs-region": "af-south-1",
+          "awslogs-stream-prefix": "worker"
+        }
+      }
+    }
+  ]
+}

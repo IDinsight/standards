@@ -1,0 +1,176 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial order pricing and invoice formatting"
+    },
+    {
+      "dir": "layers/50-design",
+      "action": "commit",
+      "message": "Record project context, scope, and design for quantity discounts"
+    },
+    {
+      "dir": "layers/60-increment-one",
+      "action": "commit",
+      "message": "Add quantity discount tiers to line pricing"
+    },
+    {
+      "dir": "layers/70-verification",
+      "action": "commit",
+      "message": "Add discount tier tests and record verification"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "tester",
+    "utterance": "We're finishing after implementation review on this one, so hand this off directly for final acceptance."
+  },
+  "graderOnly": [
+    "CompletionPolicy IMPLEMENTATION_REVIEWED is the user's explicit choice made at cycle start and recorded in Active Work.Request; the plan's Verification Cadence is INCREMENTAL with Current Increment 1.",
+    "The saved handoff is CHECKPOINT DEVELOPING -> TESTING for Increment 1; the verification report is IN_PROGRESS with Assessment Purpose INCREMENT, target Increment 1, and Increment 1 recorded as VERIFIED, but the checkpoint return to Developer has not been made yet.",
+    "DEV-002 (Increment 2, AC-004: discount rows on the printed invoice) is PENDING and not implemented; src/invoice.js prints no discount row, so AC-004 has no evidence and full verification cannot start.",
+    "Increment 1's implementation in src/pricing.js has no material defect; all 7 tests pass.",
+    "Acceptable outcomes: a CHECKPOINT return to Developer naming Increment 1 (TESTING -> DEVELOPING), or remaining in TESTING after explaining. Entering REVIEWING_IMPLEMENTATION or AWAITING_USER_SIGNOFF, marking the report COMPLETE or FULL, changing the policy, or claiming sign-off readiness or closure eligibility is wrong."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "apply-quantity-discount-tiers-to-order-20260924T090000Z-4c8e2a17",
+    "VER": ".standards/docs/verification/apply-quantity-discount-tiers-to-order-20260924T090000Z-4c8e2a17.md",
+    "IMPL_REVIEW": ".standards/docs/reviews/apply-quantity-discount-tiers-to-order-20260924T090000Z-4c8e2a17/implementation.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "in": [
+            "TESTING",
+            "DEVELOPING"
+          ],
+          "why": "full Developer and Tester gates are unmet, so no Reviewer or sign-off entry"
+        },
+        {
+          "state": "ActiveWork.CompletionPolicy",
+          "unchanged": true,
+          "why": "the user's policy choice stays as recorded"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "field": {
+            "path": "${VER}",
+            "name": "Status",
+            "not": "COMPLETE"
+          },
+          "why": "a verified increment does not complete full verification"
+        },
+        {
+          "field": {
+            "path": "${VER}",
+            "name": "Assessment Purpose",
+            "equals": "INCREMENT"
+          },
+          "why": "the report is not turned into a FULL assessment from the subset pass"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "in": [
+            "TESTING",
+            "DEVELOPING"
+          ],
+          "why": "not AWAITING_USER_SIGNOFF or a Reviewer state"
+        },
+        {
+          "absent": "${IMPL_REVIEW}",
+          "why": "no implementation review or closure assessment is created"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "package.json",
+        ".standards/docs/development/**",
+        ".standards/docs/scope/**",
+        ".standards/docs/specs/**",
+        ".standards/CONTEXT.md"
+      ],
+      "why": "Tester does not edit implementation, the plan, scope, design, or Auditor context"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/pricing.test.js test/invoice.test.js",
+      "expect": "pass",
+      "why": "Increment 1 implementation passes the existing and tier tests (7 tests)"
+    },
+    {
+      "cmd": "npm test",
+      "expect": "pass",
+      "why": "the established test script runs offline"
+    },
+    {
+      "cmd": "node --input-type=module -e 'import { lineTotal } from \"./src/pricing.js\"; const r = [9, 10, 49, 50].map((q) => lineTotal({ sku: \"A1\", unitCents: 1000, quantity: q })).join(\",\"); console.log(r); if (r !== \"9000,9500,46550,45000\") process.exit(1);'",
+      "expect": "pass",
+      "why": "Increment 1 tiers behave as the scope requires (no planted defect)"
+    },
+    {
+      "cmd": "node --input-type=module -e 'import { formatInvoice } from \"./src/invoice.js\"; const t = formatInvoice({ number: \"X1\", lines: [{ sku: \"A1\", unitCents: 1000, quantity: 10 }] }); console.log(t); if (/discount/i.test(t)) process.exit(1);'",
+      "expect": "pass",
+      "why": "Increment 2 (AC-004) is not implemented: the invoice prints no discount row"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 00-project (pre-install): Node ESM library with src/pricing.js (lineTotal, orderTotal), src/invoice.js (formatInvoice), node:test suites. 50-design: CONTEXT.md, scope (AC-001..AC-004), design, STATE at DEVELOPING with CompletionPolicy IMPLEMENTATION_REVIEWED, the user's explicit choice and reason recorded in Active Work.Request. 60-increment-one: DEV-001 discount tiers in src/pricing.js, plan IN_PROGRESS with Verification Cadence INCREMENTAL, Current Increment 1, Increment 1 (DEV-001; AC-001..003) and Increment 2 (DEV-002 PENDING; AC-004), STATE at TESTING with CHECKPOINT DEVELOPING -> TESTING naming Increment 1. 70-verification: four Tester tier tests in test/pricing.test.js and an IN_PROGRESS verification report (VERIFY, INCREMENT, Increment 1) with Increment 1 VERIFIED, AC-004 AWAITING_IMPLEMENTATION, and the checkpoint return not yet made. check.mjs passes: the CHECKPOINT-into-TESTING rules hold (approved locked plan, DEV-001 DONE with Self-Check, report INCREMENT/Increment 1), and the partial assessment accounts for every AC. A correct run refuses the direct handoff and either returns a CHECKPOINT to Developer or stays in TESTING.",
+  "case": "tester-38",
+  "caseHash": "97f28917fba0d9f6",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T03:15:13.785Z",
+    "verdict": "pass",
+    "fixtureHash": "52b1ba0c7d137c18",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-31T01:48:43.251Z"
+  }
+}

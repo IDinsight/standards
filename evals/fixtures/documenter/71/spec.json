@@ -1,0 +1,218 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add weekly hours summary CLI"
+    },
+    {
+      "dir": "layers/55-plan",
+      "action": "commit",
+      "message": "Record context, scope, and design for summary --since"
+    },
+    {
+      "dir": "layers/60-implementation",
+      "action": "commit",
+      "message": "Add --since filter to hours summary"
+    },
+    {
+      "dir": "layers/65-tests",
+      "action": "commit",
+      "message": "Add tests for summary since filter"
+    },
+    {
+      "dir": "layers/70-verification",
+      "action": "commit",
+      "message": "Record verification of summary since filter"
+    },
+    {
+      "dir": "layers/75-review",
+      "action": "commit",
+      "message": "Record implementation review of summary since filter"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "documenter",
+    "utterance": "Let's finish this cycle after implementation review."
+  },
+  "graderOnly": [
+    "Documenter has not begun any normal documentation work in this cycle: no documentation record exists and no project documentation was edited during the cycle.",
+    "The implementation review report is COMPLETE, has no material findings, has no Implementation-Reviewed Closure section, and is current for the committed implementation; the FULL verification report is COMPLETE and current.",
+    "No current acceptance condition requires documentation (AC-001 and AC-002 are behavior conditions, both verified and supported by review).",
+    "The user did not give a reason for choosing to finish after implementation review.",
+    "The correct outcome is CompletionPolicy IMPLEMENTATION_REVIEWED, WorkflowState REVIEWING_IMPLEMENTATION, Handoff COMPLETION_CHANGE from DOCUMENTING with FailureType NONE, the choice recorded in Active Work.Request alongside the unchanged implementation request, and a Reviewer invocation (IMPLEMENTATION kind, fresh independent session) without running review."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "add-since-filter-to-hours-summary-20260922T141500Z-3f9a6c21",
+    "SCOPE": ".standards/docs/scope/add-since-filter-to-hours-summary-20260922T141500Z-3f9a6c21.md",
+    "SPEC": ".standards/docs/specs/add-since-filter-to-hours-summary-20260922T141500Z-3f9a6c21.md",
+    "REVIEW": ".standards/docs/reviews/add-since-filter-to-hours-summary-20260922T141500Z-3f9a6c21/implementation.md",
+    "DOCREC": ".standards/docs/documentation/add-since-filter-to-hours-summary-20260922T141500Z-3f9a6c21.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.CompletionPolicy",
+          "equals": "IMPLEMENTATION_REVIEWED",
+          "why": "the explicit choice selects the shorter policy"
+        },
+        {
+          "state": "ActiveWork.Request",
+          "changed": true,
+          "why": "Change completion policy step 4 retains the explicit choice in Active Work.Request"
+        },
+        {
+          "contains": {
+            "path": ".standards/STATE.md",
+            "regex": "Add\\s+a\\s+--since\\s+option\\s+to\\s+the\\s+hours\\s+summary"
+          },
+          "why": "the original implementation request is preserved"
+        },
+        {
+          "unchanged": [
+            "${SCOPE}",
+            "${SPEC}"
+          ],
+          "why": "the policy choice is not a scope or design change"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "state": "Recovery.Active",
+          "equals": "false"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "0"
+        },
+        {
+          "state": "WorkflowState",
+          "not": "AWAITING_USER_SIGNOFF"
+        },
+        {
+          "absent": "${DOCREC}",
+          "why": "no documentation record is created"
+        },
+        {
+          "unchanged": [
+            "*.md",
+            "src/**",
+            "bin/**",
+            "test/**",
+            "${REVIEW}",
+            ".standards/docs/verification/**",
+            ".standards/docs/development/**"
+          ],
+          "why": "no documentation edits and no closure conclusion written into the review report"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "REVIEWING_IMPLEMENTATION"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "COMPLETION_CHANGE"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "DOCUMENTING"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "NONE"
+        },
+        {
+          "unchanged": [
+            "${REVIEW}"
+          ],
+          "why": "no review was performed in this chat"
+        },
+        {
+          "no_skill_call": "reviewer",
+          "why": "the policy choice does not invoke Reviewer"
+        },
+        {
+          "reply_matches": "/reviewer",
+          "why": "a copy/paste Claude Code invocation for Reviewer is provided"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "bin/**",
+        "test/**",
+        "package.json"
+      ],
+      "why": "Documenter never changes behavior or tests"
+    }
+  ],
+  "runtime": null,
+  "selfChecks": [
+    {
+      "cmd": "node --test test/summary.test.js test/cli.test.js",
+      "expect": "pass",
+      "why": "the committed implementation and its tests pass, matching the COMPLETE verification and review records"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs --json",
+      "expect": "pass",
+      "why": "the starting workflow state is valid"
+    }
+  ],
+  "notes": "Standalone brownfield fixture for a small Node CLI (`hours`). 50-project (pre-install): summarize/run/bin, two test files, README. 55-plan: CONTEXT.md, scope (AC-001, AC-002, no documentation AC), design, STATE at DEVELOPING. 60-implementation: --since in src/summary.js and src/cli.js, development plan COMPLETE (AFTER_IMPLEMENTATION, Current Increment NONE), STATE at TESTING. 65-tests: Tester's six new scenarios. 70-verification: verification report COMPLETE, FULL/NONE, citing commits and blobs, STATE at REVIEWING_IMPLEMENTATION. 75-review: implementation review COMPLETE with no findings and no closure section, STATE at DOCUMENTING with FORWARD from REVIEWING_IMPLEMENTATION, CompletionPolicy FULL_DELIVERABLE, recovery/obligations inactive, BlockedOn NONE. No documentation record exists. The role is asked only to finish after implementation review; the expected route is the DOCUMENTING -> REVIEWING_IMPLEMENTATION COMPLETION_CHANGE row of Change completion policy.",
+  "case": "documenter-71",
+  "caseHash": "8852715fdb5168a4",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T02:55:52.807Z",
+    "verdict": "pass",
+    "fixtureHash": "04b80c4fd4074b16",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-30T23:46:05.782Z"
+  }
+}

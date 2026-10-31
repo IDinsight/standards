@@ -1,0 +1,187 @@
+{
+  "base": null,
+  "date": "2026-10-04T13:00:00Z",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add CSV export command"
+    },
+    {
+      "dir": "layers/05-guide",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add analyst guide for exporting records"
+    },
+    {
+      "dir": "layers/50-pending-request",
+      "action": "commit",
+      "message": "Record blocked documentation request"
+    },
+    {
+      "dir": "layers/51-start-cycle",
+      "action": "commit",
+      "message": "Start documentation cycle for export guide"
+    },
+    {
+      "dir": "layers/52-context",
+      "action": "commit",
+      "message": "Record project context for export guide"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "scoper",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "docs/guide/exporting.md already documents every option, default, output form, quoting rule, empty-input behavior, and error message (with exit status) that src/cli.js and src/csv.js implement; no statement in it is inaccurate, so no documentation edit is needed to satisfy the request.",
+    "Active Work.Request holds the explicit standalone Documenter assignment (target FILE docs/guide/exporting.md, AUTONOMOUS, user style NONE) that the previous commit had saved in PendingCycleRequest while a pending STANDARD preference blocked cycle creation.",
+    "A correct scope states accuracy and coverage outcomes for the guide that an assessed no-change result can satisfy, keeps behavior changes out of scope, and hands off to Architect; the documentation route still requires Architect, Documenter, final Reviewer, and Synchronizer."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "guide-20261004T120000Z-1a2b3c4d",
+    "SCOPE": ".standards/docs/scope/guide-20261004T120000Z-1a2b3c4d.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.Scope",
+          "equals": "${SCOPE}",
+          "why": "a correct run persists the first scope for the cycle at the artifact init path"
+        },
+        {
+          "provenance": {
+            "path": "${SCOPE}",
+            "artifact": "SCOPE",
+            "cycle": "${ID}"
+          }
+        },
+        {
+          "check_ok": true
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "ARCHITECTING",
+          "why": "Scoper's normal success in a documentation cycle hands off to Architect"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FORWARD"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "SCOPING"
+        },
+        {
+          "state": "CycleMode",
+          "equals": "DOCUMENTATION"
+        },
+        {
+          "state": "ActiveWork.CompletionPolicy",
+          "equals": "NONE"
+        },
+        {
+          "reply_matches": "/architect",
+          "why": "the Claude Code next-role invocation for Architect"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "src/**",
+            "bin/**",
+            "test/**",
+            "data/**",
+            "docs/**",
+            "README.md",
+            "package.json"
+          ],
+          "why": "Scoper edits no project source, tests, or documentation"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/csv.test.js test/cli.test.js",
+      "expect": "pass",
+      "why": "the established test command passes on the committed tree"
+    },
+    {
+      "cmd": "node bin/export.js --input data/sample-records.json --fields id,name",
+      "expect": "pass",
+      "why": "the guide's column-selection example runs"
+    },
+    {
+      "cmd": "node bin/export.js",
+      "expect": "fail",
+      "expectOutput": "error: --input is required",
+      "why": "the documented missing-input error"
+    },
+    {
+      "cmd": "node bin/export.js --input data/sample-records.json --fields id,region",
+      "expect": "fail",
+      "expectOutput": "error: unknown field region",
+      "why": "the documented unknown-field error"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the starting workflow state is valid"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 00-project (pre-install): a dependency-free Node ESM CLI, bin/export.js plus src/cli.js and src/csv.js, sample data, and node:test tests. 05-guide (pre-install): docs/guide/exporting.md, an accurate analyst guide covering options, defaults, examples with real output, quoting, empty input, and every error message and exit status; README links it. 50-pending-request: STATE.md with Active Work UNSET and a blocked standalone Documenter request in PendingCycleRequest (pending STANDARD preference conflict) so the formerly-pending fact is true in history. 51-start-cycle: STATE.md starts the DOCUMENTATION cycle guide-20261004T120000Z-1a2b3c4d at AUDITING (INITIAL, policy NONE) with the request moved to Active Work.Request and pending fields cleared. 52-context: Auditor-owned .standards/CONTEXT.md recording the command behavior and that the guide matches it, and STATE.md at SCOPING with FORWARD from AUDITING, Scope/Architecture/Development NONE. The spec sets date so the cycle ID timestamp is not after the commit dates. Layer code avoids template literals so no dollar-brace text appears in layer files.",
+  "case": "scoper-25",
+  "caseHash": "8a18fb8a7066b424",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T03:08:52.053Z",
+    "verdict": "pass",
+    "fixtureHash": "dfa591ded9e42fcd",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-31T01:01:47.367Z"
+  }
+}

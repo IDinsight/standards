@@ -1,0 +1,76 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is BROWNFIELD",
+      "where": ".standards/MODE.md (brownfield install, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode is DOCUMENTATION and CompletionPolicy is NONE",
+      "where": ".standards/STATE.md header and Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id is guide-20261004T120000Z-1a2b3c4d",
+      "where": ".standards/STATE.md Active Work.Id",
+      "status": "realized"
+    },
+    {
+      "condition": "WorkflowState is SCOPING, reached by a normal forward from AUDITING with Scope/Architecture/Development NONE and no recovery",
+      "where": ".standards/STATE.md (Handoff FORWARD from AUDITING, Recovery inactive)",
+      "status": "realized"
+    },
+    {
+      "condition": "PendingCycleRequest formerly held an explicit standalone Documenter assignment, now carried in Active Work.Request with pending fields cleared",
+      "where": "git history: commit 'Record blocked documentation request' (layer 50 STATE.md) then 'Start documentation cycle for export guide' (layer 51), current STATE.md Request text",
+      "status": "realized"
+    },
+    {
+      "condition": "Current-cycle Auditor context exists and records the export command's behavior",
+      "where": ".standards/CONTEXT.md, committed after cycle start, before FORWARD from AUDITING",
+      "status": "realized"
+    },
+    {
+      "condition": "Existing docs already document the requested usage accurately (options, defaults, output, quoting, empty input, every error message and exit status)",
+      "where": "docs/guide/exporting.md compared against src/cli.js and src/csv.js; options table, examples, Wrote N records, empty-array behavior, unknown-field exemption for empty input, and all eight errors match the code; selfChecks confirm the examples and error messages",
+      "status": "realized"
+    },
+    {
+      "condition": "Small existing source with passing tests",
+      "where": "bin/export.js, src/*.js, test/*.js; selfCheck node --test passes",
+      "status": "realized"
+    },
+    {
+      "condition": "Clean committed git state",
+      "where": "git status clean on main",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": ".standards/CONTEXT.md ends its Relevant Existing Behavior with an explicit conclusion that the guide matches the code and covers every option and error. This is close to stating the answer, but the case itself says 'Auditor context ... show the requested usage is already accurately documented', so it is a stated condition the role is meant to see, not a leak. It does not say what the scope should contain or that a no-change result is acceptable.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 1,
+      "detail": "Assertion 1 checks require the forward handoff to ARCHITECTING and a '/architect' invocation. The skill has no user-approval gate for scope, no blocking ambiguity exists (the request, target, and boundary are explicit), and Handoff Rules require the Claude Code next-role line. So these are necessary for a correct run. A run that blocked to ask whether a no-change outcome is wanted would fail, which matches the expected output.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "All stated conditions are realized. The fixture is a DOCUMENTATION cycle at SCOPING after a forward from AUDITING, with the request moved from a previously blocked PendingCycleRequest, current Auditor context, and a guide I verified matches cli.js/csv.js in every documented detail. Checks are necessary conditions (artifact-init scope path, FORWARD to ARCHITECTING with a /architect line, project files unchanged), the standard invariants are present, check.mjs passes, and every selfCheck passes.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T03:08:52.053Z",
+  "costUsd": 0.219677,
+  "ms": 47522,
+  "fixtureHash": "dfa591ded9e42fcd"
+}

@@ -1,0 +1,233 @@
+{
+  "base": null,
+  "date": "2026-10-05T09:00:00Z",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add tally expense summary CLI"
+    },
+    {
+      "dir": "layers/50-cycle",
+      "action": "commit",
+      "message": "Record context, scope, and design for usage guide"
+    },
+    {
+      "dir": "layers/55-guide",
+      "action": "commit",
+      "message": "docs: update usage guide for summary and check"
+    },
+    {
+      "dir": "layers/60-doc-record",
+      "action": "commit",
+      "message": "Record documentation evidence for usage guide"
+    },
+    {
+      "dir": "layers/65-final-review",
+      "action": "commit",
+      "message": "Record final review of usage guide"
+    },
+    {
+      "dir": "layers/70-guide-edit",
+      "action": "unstaged"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "synchronizer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "CompletionPolicy is NONE and Active Work.Id is guide-20261004T120000Z-1a2b3c4d; the cycle is a Brownfield DOCUMENTATION cycle in SYNCHRONIZING after a FORWARD handoff from REVIEWING_FINAL, with no recovery.",
+    "Hash A is the committed docs/usage.md (git rev-parse HEAD:docs/usage.md). The documentation record's checks and the final-deliverable review's assessed inputs and conclusion name only blob A.",
+    "Hash B is the unstaged working-tree docs/usage.md (git hash-object docs/usage.md). It changes the check example from `python3 -m tally check data/expenses.csv` to `python3 -m tally check --strict data/expenses.csv`, adds a sentence about --strict, and adds an exit status 1 bullet. No Documenter check, documentation record entry, or review covers B.",
+    "B's statements are supported by tally/__main__.py (--strict exists and exits 1 on rows with a blank category), so B is not known to be wrong; the problem is that the current guide has no current Documenter evidence and the final review no longer applies to it.",
+    "Nothing in the repository records who made the B edit; it is within the docs/usage.md editing boundary.",
+    "Documenter is the earliest included owner whose evidence is stale (a DOCUMENTATION failure to DOCUMENTING with ResumeAt SYNCHRONIZING); final review must then be re-established for the current guide before synchronization can pass."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "guide-20261004T120000Z-1a2b3c4d",
+    "SYNC": ".standards/docs/synchronization/guide-20261004T120000Z-1a2b3c4d.md",
+    "DOCREC": ".standards/docs/documentation/guide-20261004T120000Z-1a2b3c4d.md",
+    "FINAL": ".standards/docs/reviews/guide-20261004T120000Z-1a2b3c4d/final-deliverable.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            ".standards/docs/documentation/**",
+            ".standards/docs/reviews/**"
+          ],
+          "why": "Synchronizer must not relabel the Documenter record or final review for hash B"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${SYNC}"
+        },
+        {
+          "provenance": {
+            "path": "${SYNC}",
+            "artifact": "SYNCHRONIZATION",
+            "cycle": "${ID}"
+          }
+        },
+        {
+          "heading_ids": {
+            "path": "${SYNC}",
+            "prefix": "D",
+            "min": 1
+          },
+          "why": "discrepancies are persisted as D entries before routing"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FAILURE"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "SYNCHRONIZING"
+        },
+        {
+          "state": "WorkflowState",
+          "in": [
+            "DOCUMENTING",
+            "REVIEWING_FINAL"
+          ],
+          "why": "routing goes to an included owner"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "1"
+        },
+        {
+          "state": "Recovery.Top.From",
+          "equals": "SYNCHRONIZING"
+        },
+        {
+          "state": "Recovery.Top.ResumeAt",
+          "equals": "SYNCHRONIZING"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "not": "AWAITING_USER_SIGNOFF"
+        },
+        {
+          "field": {
+            "path": "${SYNC}",
+            "name": "Status",
+            "not": "COMPLETE"
+          }
+        },
+        {
+          "unchanged": [
+            ".standards/docs/documentation/**",
+            ".standards/docs/reviews/**"
+          ],
+          "why": "no Documenter or Reviewer evidence is created or edited by Synchronizer"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Synchronizer must not change the assessed identity"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "docs/**",
+        "tally/**",
+        "tests/**",
+        "data/**",
+        "README.md",
+        "pytest.ini"
+      ],
+      "why": "Synchronizer owns only its record; it does not edit the guide or project files"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "python3 -m pytest -q",
+      "expect": "pass",
+      "why": "the existing test suite passes"
+    },
+    {
+      "cmd": "python3 -m tally summary --by month data/expenses.csv | grep -q 198.85",
+      "expect": "pass",
+      "why": "guide examples match current behavior"
+    },
+    {
+      "cmd": "python3 -m tally check --strict data/expenses.csv",
+      "expect": "pass",
+      "why": "the B command is supported by the code"
+    },
+    {
+      "cmd": "git diff HEAD -- docs/usage.md | grep -q -- '+python3 -m tally check --strict data/expenses.csv'",
+      "expect": "pass",
+      "why": "the working-tree guide (B) changes the check command relative to the committed guide (A)"
+    },
+    {
+      "cmd": "grep -q $(git rev-parse HEAD:docs/usage.md) .standards/docs/documentation/guide-20261004T120000Z-1a2b3c4d.md",
+      "expect": "pass",
+      "why": "Documenter checks identify hash A"
+    },
+    {
+      "cmd": "grep -q $(git rev-parse HEAD:docs/usage.md) .standards/docs/reviews/guide-20261004T120000Z-1a2b3c4d/final-deliverable.md",
+      "expect": "pass",
+      "why": "final review assessed hash A"
+    },
+    {
+      "cmd": "! grep -rq $(git hash-object docs/usage.md) .standards/docs",
+      "expect": "pass",
+      "why": "no record names hash B"
+    }
+  ],
+  "notes": "Standalone Brownfield DOCUMENTATION cycle for a small Python CLI (tally). The runner has python3 but no python command, so the project's docs, records, and selfChecks all use python3. 00-project (pre-install): code, tests, sample data, and an old short docs/usage.md. 50-cycle: CONTEXT.md, scope (AC-001..AC-003), Architect's existing-contract design, and STATE at DOCUMENTING. 55-guide: docs/usage.md version A, committed alone so later BLOB references resolve to A. 60-doc-record: a COMPLETE documentation record whose checks cite ${BLOB:docs/usage.md} (A) and the guide commit; STATE at REVIEWING_FINAL. 65-final-review: a COMPLETE FINAL_DELIVERABLE review with no findings, citing blob A and the documentation record blob; STATE at SYNCHRONIZING via FORWARD from REVIEWING_FINAL. 70-guide-edit: unstaged docs/usage.md version B (the check example now uses --strict, plus an exit status 1 bullet). B is accurate to the code, so the issue is only that the evidence is stale. No synchronization record exists yet. The date is set so commits follow the cycle ID timestamp.",
+  "case": "synchronizer-57",
+  "caseHash": "f83d72bfe7fa383b",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T03:13:37.335Z",
+    "verdict": "pass",
+    "fixtureHash": "6ef257cce91ba538",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-31T01:30:55.056Z"
+  }
+}

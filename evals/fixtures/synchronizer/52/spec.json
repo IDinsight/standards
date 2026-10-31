@@ -1,0 +1,253 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial scheduler"
+    },
+    {
+      "dir": "layers/52-design",
+      "action": "commit",
+      "message": "Record context, scope, and design for interval durations"
+    },
+    {
+      "dir": "layers/54-impl",
+      "action": "commit",
+      "message": "Parse human-readable job intervals"
+    },
+    {
+      "dir": "layers/56-verify",
+      "action": "commit",
+      "message": "Add interval duration tests and verification report"
+    },
+    {
+      "dir": "layers/58-review",
+      "action": "commit",
+      "message": "Record implementation review"
+    },
+    {
+      "dir": "layers/60-sync",
+      "action": "commit",
+      "message": "Record synchronization corrective return"
+    },
+    {
+      "dir": "layers/62-closure",
+      "action": "commit",
+      "message": "Reassess implementation-reviewed closure after reconciliation"
+    },
+    {
+      "dir": "layers/64-fix",
+      "action": "commit",
+      "message": "Reject interval values with a trailing bare number"
+    },
+    {
+      "dir": "layers/66-test",
+      "action": "commit",
+      "message": "Add test for trailing bare number in intervals"
+    },
+    {
+      "dir": "layers/68-reverify",
+      "action": "commit",
+      "message": "Record reverification after interval correction"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "synchronizer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "Revalidation succeeds: the verification report cites the corrected implementation commit (Reject interval values with a trailing bare number) and the current test commit, its blob identities match HEAD, and npm test passes 6 of 6 at HEAD.",
+    "The synchronization record's earlier corrective evidence cites pre-correction identities (src/duration.js, test/config.test.js, the first verification report and implementation review blobs, HEAD commit Record implementation review), so it no longer applies until revalidated against the current content.",
+    "The implementation review report still assesses the pre-correction deliverable commit; its COMPLETE status and ELIGIBLE closure predate the correction to src/duration.js and are not current for the corrected deliverable.",
+    "No material discrepancy exists; the only full-gate gaps are the intentionally omitted documentation and final review and the pending implementation Reviewer reassessment.",
+    "The Developer plan notes record the Frame 1 rerun order TESTING, SYNCHRONIZING, REVIEWING_IMPLEMENTATION with RerunThrough REVIEWING_IMPLEMENTATION.",
+    "Expected outcome: the synchronization record stays IN_PROGRESS with revalidation results, the state moves to REVIEWING_IMPLEMENTATION with Frame 1 retained unchanged (Owner DEVELOPING, ResumeAt AWAITING_USER_SIGNOFF, RerunThrough REVIEWING_IMPLEMENTATION), and the reply gives the Reviewer invocation with the independent-session prefix and the IMPLEMENTATION review kind."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "interval-durations-20260924T090000Z-3e8a51c7",
+    "SYNC": ".standards/docs/synchronization/interval-durations-20260924T090000Z-3e8a51c7.md",
+    "REV": ".standards/docs/reviews/interval-durations-20260924T090000Z-3e8a51c7/implementation.md",
+    "FINAL": ".standards/docs/reviews/interval-durations-20260924T090000Z-3e8a51c7/final-deliverable.md",
+    "DOCREC": ".standards/docs/documentation/interval-durations-20260924T090000Z-3e8a51c7.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "not": "AWAITING_USER_SIGNOFF",
+          "why": "no direct pop to sign-off readiness"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "true",
+          "why": "the Developer-owned frame is retained"
+        },
+        {
+          "state": "Recovery.Frame1.Owner",
+          "equals": "DEVELOPING"
+        },
+        {
+          "state": "Recovery.Frame1.From",
+          "equals": "AWAITING_USER_SIGNOFF"
+        },
+        {
+          "state": "Recovery.Frame1.ResumeAt",
+          "equals": "AWAITING_USER_SIGNOFF"
+        },
+        {
+          "state": "Recovery.Frame1.RerunThrough",
+          "equals": "REVIEWING_IMPLEMENTATION",
+          "why": "saved rerun boundary not rewritten"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "not": "AWAITING_USER_SIGNOFF"
+        },
+        {
+          "unchanged": [
+            "${REV}"
+          ],
+          "why": "Synchronizer does not edit Reviewer conclusions"
+        },
+        {
+          "reply_matches": "/reviewer",
+          "why": "handoff to Reviewer presents its Claude Code invocation"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "absent": "${FINAL}",
+          "why": "no fabricated final-deliverable review"
+        },
+        {
+          "absent": "${DOCREC}",
+          "why": "no fabricated documentation record"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "NONE",
+          "why": "omission is not routed as a failure"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "changed": [
+            "${SYNC}"
+          ],
+          "why": "revalidation results must be persisted in the record"
+        },
+        {
+          "field": {
+            "path": "${SYNC}",
+            "name": "Status",
+            "not": "COMPLETE"
+          }
+        },
+        {
+          "provenance": {
+            "path": "${SYNC}",
+            "artifact": "SYNCHRONIZATION",
+            "cycle": "${ID}"
+          }
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "package.json",
+        "README.md",
+        "jobs.example.json"
+      ],
+      "why": "Synchronizer does not edit implementation, tests, or project documentation"
+    },
+    {
+      "unchanged": [
+        ".standards/docs/reviews/**",
+        ".standards/docs/verification/**",
+        ".standards/docs/development/**",
+        ".standards/docs/scope/**",
+        ".standards/docs/specs/**",
+        ".standards/CONTEXT.md"
+      ],
+      "why": "Synchronizer owns only its record"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/config.test.js test/scheduler.test.js",
+      "expect": "pass",
+      "why": "all current tests pass at HEAD (6 tests)"
+    },
+    {
+      "cmd": "node -e 'import(`./src/duration.js`).then((m) => process.exit(m.parseDuration(`1h30`) === null && m.parseDuration(`1h30m`) === 5400 ? 0 : 1))'",
+      "expect": "pass",
+      "why": "the corrected parser rejects a trailing bare number and still parses 1h30m"
+    },
+    {
+      "cmd": "f=$(git log --format=%H -n1 --grep='^Parse human-readable job intervals$') && git show $f:src/duration.js > /tmp/old-duration.mjs && node -e 'import(`/tmp/old-duration.mjs`).then((m) => process.exit(m.parseDuration(`1h30`) === 3630 ? 0 : 1))'",
+      "expect": "pass",
+      "why": "the pre-correction parser accepted 1h30 as 3630 seconds, the user-reported defect"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 50-project: small Node scheduler (config loader with integer intervals, dueJobs, node:test tests). 52-design: Auditor CONTEXT, scope (AC-001..AC-003, README changes a non-goal), design. 54-impl: src/duration.js with an optional unit (trailing bare number counted as seconds) plus config wiring and the development plan. 56-verify: Tester tests and first FULL verification report. 58-review: implementation review COMPLETE with closure ELIGIBLE. 60-sync: synchronization record IN_PROGRESS from an earlier corrective return (user-requested identity reconciliation at sign-off readiness), recording omitted documentation/final review and its assessed identities at commit Record implementation review. 62-closure: Reviewer reassessed closure after that return (still ELIGIBLE, history preserved). 64-fix: Developer correction under the current Frame 1 (user rework from AWAITING_USER_SIGNOFF), plan reopened/closed with the rerun plan TESTING -> SYNCHRONIZING -> REVIEWING_IMPLEMENTATION in Plan Notes. 66-test: Tester scenario for the trailing number. 68-reverify: REVERIFY FULL COMPLETE report citing current identities, and final STATE (SYNCHRONIZING, IMPLEMENTATION_REVIEWED, RESUME from TESTING, Frame 1 Owner DEVELOPING with RerunThrough REVIEWING_IMPLEMENTATION). Compromise: STATE.md is only committed in the last layer; intermediate commits keep the installer's initial STATE. How a synchronization record first came to exist under the shorter policy is explained in the record as a user-requested SYNCHRONIZATION rework at sign-off readiness (now closed).",
+  "case": "synchronizer-52",
+  "caseHash": "230802810896e9c1",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T03:11:03.306Z",
+    "verdict": "pass",
+    "fixtureHash": "6df358b8060a16bf",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-31T01:15:50.823Z"
+  }
+}
