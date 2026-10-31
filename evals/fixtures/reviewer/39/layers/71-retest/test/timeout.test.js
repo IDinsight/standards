@@ -13,9 +13,10 @@ const records = [
 ];
 
 // A destination that takes the first write and never acknowledges it, like a
-// stalled network share.
+// stalled network share: its teardown never finishes either, because the
+// pending write never returns.
 function stalledDestination() {
-  return new Writable({ write() {} });
+  return new Writable({ write() {}, destroy() {} });
 }
 
 function collector() {

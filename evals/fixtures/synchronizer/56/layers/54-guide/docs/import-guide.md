@@ -75,11 +75,11 @@ Each transaction has these fields:
 
 ## Exit codes and errors
 
-| Exit code | Meaning                                                                            |
-| --------- | ---------------------------------------------------------------------------------- |
-| `0`       | The import succeeded, including a dry run.                                         |
-| `1`       | The file could not be read or a row is invalid. No transactions are output.        |
-| `2`       | The command was used incorrectly: no file, an extra argument, or another command.  |
+| Exit code | Meaning                                                                                                             |
+| --------- | ------------------------------------------------------------------------------------------------------------------- |
+| `0`       | The import succeeded, including a dry run.                                                                          |
+| `1`       | The file could not be read, a row is invalid, or the `--out` file could not be written. No transactions are output. |
+| `2`       | The command was used incorrectly: no file, an extra argument, or another command.                                   |
 
 A failed import prints one line to standard error starting with
 `import failed:`, for example:

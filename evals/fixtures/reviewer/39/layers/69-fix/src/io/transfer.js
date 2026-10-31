@@ -18,11 +18,20 @@ export class TransferTimeoutError extends Error {
 export async function transfer(source, destination, { timeoutMs = 0 } = {}) {
   if (!(timeoutMs > 0)) return pipeline(source, destination);
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(new TransferTimeoutError(timeoutMs)), timeoutMs);
+  let timer;
+  // Aborting destroys both streams. The timeout is reported at once: a stalled
+  // stream may never finish closing, so the caller does not wait for that.
+  const timedOut = new Promise((_resolve, reject) => {
+    timer = setTimeout(() => {
+      controller.abort(new TransferTimeoutError(timeoutMs));
+      reject(controller.signal.reason);
+    }, timeoutMs);
+  });
   try {
-    return await pipeline(source, destination, { signal: controller.signal });
+    const finished = pipeline(source, destination, { signal: controller.signal });
+    return await Promise.race([finished, timedOut]);
   } catch (error) {
-    // Aborting destroys both streams; report the timeout rather than the abort.
+    // Report the timeout rather than the abort error the pipeline raises.
     throw controller.signal.aborted ? controller.signal.reason : error;
   } finally {
     clearTimeout(timer);

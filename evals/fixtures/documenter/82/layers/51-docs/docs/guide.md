@@ -29,8 +29,8 @@ date,name,hours
 - Every row needs a name and a numeric `hours` value. Decimals use a dot
   (`7.5`).
 - Spaces around values are ignored, and blank lines are skipped.
-- Values are split at every comma. Quoted values that contain commas are not
-  supported.
+- Values are split at every comma, and quotation marks are kept as part of the
+  value: quoted fields are not supported.
 - Names are matched exactly, including case: `Ana` and `ana` are counted as
   two people.
 - Windows (CRLF) line endings are accepted.

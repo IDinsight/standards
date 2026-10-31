@@ -45,8 +45,9 @@
   parsing into cents, the category default, blank lines, a missing column, an
   invalid amount with its line number, `--dry-run`, `--out`, and the usage error
   for a missing file argument.
-- Invalid dates, unreadable files, and extra arguments are not covered by tests;
-  their behavior is established by reading the source.
+- Invalid dates, unreadable files, an unwritable `--out` file, and extra
+  arguments are not covered by tests; their behavior is established by reading
+  the source.
 
 ## Relevant Existing Behavior
 
@@ -58,8 +59,9 @@
   `Number()`, so an empty amount becomes 0; values are rounded to whole cents.
 - Success prints `<n> transactions, net <total>` first, then the JSON array to
   standard output or the `--out` file; `--dry-run` prints only the summary.
-- Exit codes: 0 success, 1 read or parse failure (`import failed: <message>`),
-  2 usage problems (usage line, or `unexpected argument: <arg>`).
+- Exit codes: 0 success, 1 read, parse, or `--out` write failure
+  (`import failed: <message>`), 2 usage problems (usage line, or
+  `unexpected argument: <arg>`).
 
 ## Evidence
 

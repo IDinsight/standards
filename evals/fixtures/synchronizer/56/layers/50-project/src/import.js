@@ -31,7 +31,15 @@ export async function runImport(argv, { stdout, stderr }) {
   stdout.write(transactions.length + ' transactions, net ' + (total / 100).toFixed(2) + '\n');
   if (options.dryRun) return 0;
   const json = JSON.stringify(transactions, null, 2) + '\n';
-  if (options.out) await writeFile(options.out, json);
-  else stdout.write(json);
+  if (!options.out) {
+    stdout.write(json);
+    return 0;
+  }
+  try {
+    await writeFile(options.out, json);
+  } catch (error) {
+    stderr.write('import failed: ' + error.message + '\n');
+    return 1;
+  }
   return 0;
 }

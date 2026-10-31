@@ -66,6 +66,9 @@ All from the project root at
   line.
 - `node bin/ledger.js import missing.csv` — exit 1, `import failed: ENOENT ...`
   as quoted in the guide.
+- `node bin/ledger.js import test/fixtures/sample.csv --out /no-dir/out.json` —
+  exit 1, summary line, then `import failed: ENOENT ...`, as the guide's
+  exit-code table says.
 - Documenter's blank-line reproduction was rerun with a new temporary file;
   same result, `line 2: invalid amount "abc"`.
 

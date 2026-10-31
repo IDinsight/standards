@@ -41,7 +41,7 @@ Cycle: add-a-free-shipping-threshold-to-the-20260924T090000Z-3e8a51c7
 
 | AC / technical criterion | Tests or checks | Disposition and evidence |
 | ------------------------ | --------------- | ------------------------ |
-| AC-001 / inclusive threshold in `shippingCost` | `test/shipping.test.js`: "ships free when the subtotal equals the threshold", "ships free when the subtotal is above the threshold" | Verified: both pass, cost 0 at subtotal 50 and 80 with threshold 50 |
+| AC-001 / inclusive threshold in `shippingCost` | `test/shipping.test.js`: "ships free when the subtotal equals the threshold", "ships free when the subtotal is above the threshold" | Verified: both pass, cost 0 at a cent-rounded subtotal of 0.45 (5 x 0.09) with threshold 0.45, and at subtotal 80 with threshold 50 |
 | AC-002 / unchanged weight-based path | `test/shipping.test.js`: "keeps the weight-based rate below the threshold", "keeps the weight-based rate when no threshold is configured", plus the four existing rate and subtotal tests; `test/quote.test.js` | Verified: below-threshold and unset cases give 6.9, existing expectations unchanged and passing |
 | AC-003 / `parseSettings` validation | `test/settings.test.js`: "leaves the free-shipping threshold unset by default", "rejects a negative free-shipping threshold", "rejects a non-numeric free-shipping threshold" | Verified: null default; RangeError naming freeShippingThreshold for -5 and the string 50 |
 

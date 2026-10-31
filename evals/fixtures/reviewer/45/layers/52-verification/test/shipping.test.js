@@ -25,8 +25,9 @@ test('sums line items into the subtotal', () => {
 });
 
 test('ships free when the subtotal equals the threshold', () => {
-  const withThreshold = parseSettings({ freeShippingThreshold: 50 });
-  assert.equal(shippingCost(order({ unitPrice: 25, quantity: 2, weightKg: 1.5 }), withThreshold), 0);
+  // 5 x 0.09 adds up to 0.44999999999999996, so only the cent-rounded subtotal reaches the threshold.
+  const withThreshold = parseSettings({ freeShippingThreshold: 0.45 });
+  assert.equal(shippingCost(order({ unitPrice: 0.09, quantity: 5, weightKg: 0.3 }), withThreshold), 0);
 });
 
 test('ships free when the subtotal is above the threshold', () => {

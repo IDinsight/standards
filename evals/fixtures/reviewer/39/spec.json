@@ -91,7 +91,7 @@
     "utterance": "Continue."
   },
   "graderOnly": [
-    "Developer's cleanup fix in src/io/transfer.js is correct: on timeout it aborts the pipeline through an AbortSignal, which destroys both the source and the destination stream, rejects with TransferTimeoutError, and clears the timer in finally; the no-timeout path is still a plain pipeline(source, destination).",
+    "Developer's cleanup fix in src/io/transfer.js is correct: on timeout it aborts the pipeline through an AbortSignal, which destroys both the source and the destination stream, and rejects with TransferTimeoutError at once, without waiting for a stalled stream to finish closing (the stalledDestination helper in test/timeout.test.js never finishes its teardown, and both timeout tests pass); it clears the timer in finally; the no-timeout path is still a plain pipeline(source, destination).",
     "Re-running F-002's original failure case (non-ending source, stalled destination, timeoutMs 20) against the current src/io/transfer.js now prints source.destroyed true and destination.destroyed true; against the transfer.js of commit 'Add timeout to export transfers' it prints false for both.",
     "Tester reverified the original timeout and the shared import/export boundaries: npm test passes 15 tests at HEAD, including the new stream-teardown test and a slow-source import test; the verification record is a COMPLETE FULL REVERIFY assessment citing the fix commit.",
     "src/import.js, src/csv.js, and src/store.js are unchanged since the pre-cycle commit; src/export.js is unchanged since 'Add timeout to export transfers'.",
@@ -283,7 +283,7 @@
     "effort": "high",
     "at": "2026-10-02T23:31:46.198Z",
     "verdict": "pass",
-    "fixtureHash": "f69505f8f9cb9aed",
+    "fixtureHash": "d4bec7586d18b804",
     "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
     "carriedOver": {
       "fromFixtureHash": "5c9f1be60b136b4a",
@@ -291,7 +291,8 @@
       "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
       "at": "2026-10-30T19:27:43.894Z",
       "selfChecks": "passed"
-    }
+    },
+    "fixedBy": "owner decision"
   },
   "generatedBy": {
     "model": "claude-opus-5-5",
@@ -318,5 +319,11 @@
       "selfChecks": "passed",
       "result": "carried-over"
     }
-  ]
+  ],
+  "decision": {
+    "action": "fixed",
+    "note": "timeout rejects on time even if a stalled stream never closes",
+    "at": "2026-10-31T19:46:06.830Z",
+    "fixtureHash": "d4bec7586d18b804"
+  }
 }

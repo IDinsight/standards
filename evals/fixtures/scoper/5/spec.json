@@ -33,7 +33,7 @@
   },
   "prompt": {
     "skill": "scoper",
-    "utterance": "Replace the browser-close sign-out requirement: sessions must now survive browser restarts for up to 8 hours."
+    "utterance": "Replace the browser-close sign-out requirement: sessions must now survive browser restarts for up to 8 hours after sign-in. Keep AC-001's 30-minute idle expiry as it is; it applies while the browser is closed too, and 8 hours is the longest a session can last."
   },
   "graderOnly": [
     "docs/scope/session-policy.md is an unmarked project-owned scope document (no provenance block) that this cycle's Scoper reused. It defines AC-001 (sessions expire after 30 minutes of inactivity) and AC-002 (users are signed out when the browser closes) and has no Retired Acceptance Identifiers or Previous Cycles section, so the next unused identifier is AC-003.",
@@ -225,7 +225,8 @@
       "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
       "at": "2026-10-30T19:32:16.724Z",
       "selfChecks": "passed"
-    }
+    },
+    "fixedBy": "owner decision"
   },
   "generatedBy": {
     "model": "claude-opus-5-5",
@@ -245,5 +246,11 @@
       "selfChecks": "passed",
       "result": "carried-over"
     }
-  ]
+  ],
+  "decision": {
+    "action": "fixed",
+    "note": "request says idle expiry still applies and 8 hours is the longest session",
+    "at": "2026-10-31T19:45:19.742Z",
+    "fixtureHash": "de53fe329d953548"
+  }
 }
