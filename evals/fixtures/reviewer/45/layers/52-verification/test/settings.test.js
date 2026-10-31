@@ -31,3 +31,8 @@ test('rejects a negative free-shipping threshold', () => {
 test('rejects a non-numeric free-shipping threshold', () => {
   assert.throws(() => parseSettings({ freeShippingThreshold: '50' }), { name: 'RangeError', message: /freeShippingThreshold/ });
 });
+
+test('rejects a non-finite free-shipping threshold', () => {
+  assert.throws(() => parseSettings({ freeShippingThreshold: NaN }), { name: 'RangeError', message: /freeShippingThreshold/ });
+  assert.throws(() => parseSettings({ freeShippingThreshold: Infinity }), { name: 'RangeError', message: /freeShippingThreshold/ });
+});

@@ -43,7 +43,7 @@ Cycle: add-a-free-shipping-threshold-to-the-20260924T090000Z-3e8a51c7
 | ------------------------ | --------------- | ------------------------ |
 | AC-001 / inclusive threshold in `shippingCost` | `test/shipping.test.js`: "ships free when the subtotal equals the threshold", "ships free when the subtotal is above the threshold" | Verified: both pass, cost 0 at a cent-rounded subtotal of 0.45 (5 x 0.09) with threshold 0.45, and at subtotal 80 with threshold 50 |
 | AC-002 / unchanged weight-based path | `test/shipping.test.js`: "keeps the weight-based rate below the threshold", "keeps the weight-based rate when no threshold is configured", plus the four existing rate and subtotal tests; `test/quote.test.js` | Verified: below-threshold and unset cases give 6.9, existing expectations unchanged and passing |
-| AC-003 / `parseSettings` validation | `test/settings.test.js`: "leaves the free-shipping threshold unset by default", "rejects a negative free-shipping threshold", "rejects a non-numeric free-shipping threshold" | Verified: null default; RangeError naming freeShippingThreshold for -5 and the string 50 |
+| AC-003 / `parseSettings` validation | `test/settings.test.js`: "leaves the free-shipping threshold unset by default", "rejects a negative free-shipping threshold", "rejects a non-numeric free-shipping threshold", "rejects a non-finite free-shipping threshold" | Verified: null default; RangeError naming freeShippingThreshold for -5, the string 50, NaN, and Infinity |
 
 No pending later-role work for any current acceptance condition.
 
@@ -52,7 +52,7 @@ No pending later-role work for any current acceptance condition.
 | Source file | Reused coverage | Active-change allocations | User additions |
 | ----------- | --------------- | ------------------------- | -------------- |
 | `src/shipping.js` | 4 existing rate and subtotal scenarios | 4: at threshold, above, below, unset | NONE |
-| `src/settings.js` | 3 existing settings scenarios | 3: null default, negative, non-numeric | NONE |
+| `src/settings.js` | 3 existing settings scenarios | 5: null default, negative, non-numeric, NaN, Infinity | NONE |
 | `src/quote.js` | 1 existing quote scenario | 0 | NONE |
 
 ## Execution Evidence
@@ -60,9 +60,9 @@ No pending later-role work for any current acceptance condition.
 - `node --test test/shipping.test.js test/settings.test.js test/quote.test.js`
   in the project root, on commit
   ${COMMIT:Add free-shipping threshold to shipping rates} plus the test files at
-  the blobs listed above; Node 22. Result: exit 0, 15 tests, 15 pass, 0 fail,
+  the blobs listed above; Node 22. Result: exit 0, 16 tests, 16 pass, 0 fail,
   0 skipped.
-- `npm test` in the project root on the same content: exit 0, same 15 passes.
+- `npm test` in the project root on the same content: exit 0, same 16 passes.
 - The Developer self-checks in the plan were not used as formal evidence.
 
 ## Resume or Handoff
