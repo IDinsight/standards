@@ -3167,7 +3167,7 @@
       "needs_history": false,
       "history_note": "",
       "client_specific": "none",
-      "external_dependency": "Python with pytest and the project's FastAPI test dependencies installed offline; no provider key or network.",
+      "external_dependency": "Python with pytest and the project's FastAPI test dependencies installed offline; no LLM_API_KEY (the test setup sets a placeholder). api.anthropic.com stays reachable because the agent needs it, and runs carry the agent's ANTHROPIC_API_KEY, so the project client must read a different variable.",
       "issues": [],
       "assertions": [
         {
@@ -3226,7 +3226,7 @@
           "note": "file: no real key in tests or config; trace: test runs reach no provider host; judge: default runs make no provider call"
         }
       ],
-      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0)."
+      "catalog_note": "Written 2026-10-30 for a case added after the original catalog review (cases at v0.15.0). Revised 2026-10-31: the first fixture blocked api.anthropic.com, which stopped every run before its first turn."
     }
   ],
   "summary": {

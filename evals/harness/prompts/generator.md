@@ -261,6 +261,10 @@ Only when the case needs it:
 - `projectPath`: where the project is mounted, `/work` by default (for example
   `/work/bootstrap-demo`).
 - `blockHosts`: hostnames that must be unreachable (GitHub is always blocked).
+  Never `api.anthropic.com`: the agent needs it to reach the model, and every
+  run carries the agent's real key in `ANTHROPIC_API_KEY` (selfChecks run
+  without it). A project that calls api.anthropic.com must read its key from
+  another variable and set a placeholder for it in its test setup.
 - `standardsCli`: `{"mode": "shim"}` puts a `standards` command on PATH that
   runs the pinned framework's CLI;
   `{"mode": "stub", "script": "runtime/standards"}` uses a script you write

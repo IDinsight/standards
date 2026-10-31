@@ -842,6 +842,8 @@ const r = await sendAll(items, { mode: 'sync', concurrency: 4 }); console.log(JS
   check('runtime.image: "browser" selects the browser image; another value is a gate-1 problem; absent keeps the default',
     imageFor({ image: 'browser' }) === BROWSER_IMAGE && imageFor({}) === IMAGE && BROWSER_IMAGE !== IMAGE
       && runtimeProblems({ image: 'gpu' }).some((p) => /runtime.image/.test(p)) && runtimeProblems({ image: 'browser' }).length === 0);
+  check('runtime.blockHosts: blocking api.anthropic.com, which the agent needs, is a gate-1 problem; other provider hosts are not',
+    runtimeProblems({ blockHosts: ['api.openai.com', 'API.Anthropic.com.'] }).some((p) => /api\.anthropic\.com/.test(p)) && runtimeProblems({ blockHosts: ['api.openai.com', 'generativelanguage.googleapis.com'] }).length === 0);
 }
 
 // SelfCheck commands get the spec's ${VAR}s, like checks (tester-25 once failed

@@ -3,7 +3,7 @@
 //
 //   runtime: {
 //     projectPath: "/work/bootstrap-demo",     // where the project is mounted (default /work)
-//     blockHosts: ["api.prod.example.com"],    // unreachable hosts, on top of the GitHub hosts
+//     blockHosts: ["api.prod.example.com"],    // unreachable hosts, on top of the GitHub hosts (never api.anthropic.com)
 //     standardsCli: { mode: "shim" }           // `standards` on PATH, running the pinned framework export
 //                 | { mode: "stub", script: "runtime/standards" },  // a spec-provided stub instead
 //     hideCommands: ["standards", "npx"],      // removed from PATH (command -v fails)
@@ -48,6 +48,8 @@ export function runtimeProblems(runtime = {}, specDir = null) {
   const p = [];
   for (const k of Object.keys(runtime)) if (!RUNTIME_KEYS.has(k)) p.push(`runtime: unknown key ${k}`);
   if (runtime.projectPath && !/^\/work(\/[\w.-]+)*$/.test(runtime.projectPath)) p.push('runtime.projectPath must be /work or a path under it');
+  // Claude Code reaches the model through api.anthropic.com; blocking it stops every run before its first turn.
+  if ((runtime.blockHosts ?? []).some((h) => String(h).toLowerCase().replace(/\.$/, '') === 'api.anthropic.com')) p.push('runtime.blockHosts must not include api.anthropic.com: the agent needs it to reach the model');
   const cli = runtime.standardsCli;
   if (cli && !['shim', 'stub'].includes(cli.mode)) p.push('runtime.standardsCli.mode must be shim or stub');
   if (cli?.mode === 'stub' && !/^runtime\/[\w.-]+$/.test(cli.script ?? '')) p.push(`runtime.standardsCli.script must be runtime/<name>: ${cli?.script}`);
