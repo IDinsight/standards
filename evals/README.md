@@ -36,10 +36,9 @@ otherwise. To test Opus 5.5, set `EVAL_JUDGE_MODEL` to another model first.
    the framework's own parser reads it, files, git, and the reply. An assertion
    the checks fully decide never reaches the judge.
 4. **Judge.** Opus 5.5 grades each remaining assertion from the run's evidence
-   (the full timeline, state before and after, changed files, the reply, and
-   the files Claude Code loaded at startup: `CLAUDE.md` and its `@` imports)
-   plus ground-truth facts about the fixture that the model under test never
-   saw.
+   (the full timeline, state before and after, changed files, the reply, and the
+   files Claude Code loaded at startup: `CLAUDE.md` and its `@` imports) plus
+   ground-truth facts about the fixture that the model under test never saw.
 5. **Judge checks.** Each batch also tests the judge: known wrong answers must
    FAIL, re-judging a sample must give the same verdicts (at most 5% change),
    and a second judge must agree on at least 90% of a sample.

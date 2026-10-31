@@ -10,8 +10,8 @@ You receive, inside `<evidence>`:
 - the exact message the agent received;
 - the files Claude Code loaded into the agent's context before its first turn:
   the project's `CLAUDE.md` and every file it imports with `@` (for example
-  `AGENTS.md`). The agent saw these without a tool call, so their content
-  counts as read;
+  `AGENTS.md`). The agent saw these without a tool call, so their content counts
+  as read;
 - the workflow state file (`.standards/STATE.md`) before and after the run;
 - the full text of every file the agent added or changed;
 - a timeline of the run: everything the agent wrote, every tool call with its
