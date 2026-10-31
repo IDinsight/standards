@@ -18,7 +18,7 @@ const sources = [
     "The exact rules the STANDARDS CLI follows when it installs, upgrades, and uninstalls.",
   ],
   [
-    "SKILL_EVAL_REPORT.md",
+    "evals/SKILL_EVAL_REPORT_20261031.md",
     "skill-eval-report",
     "Skill Eval Report",
     "How the role skills were evaluated against their eval cases and how they performed.",

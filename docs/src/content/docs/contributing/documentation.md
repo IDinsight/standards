@@ -60,10 +60,11 @@ the glossary for every paragraph.
 
 The Protocol page, the Installer Contract page, the Skill Eval Report page, and
 eight template pages are generated from `PROTOCOL.md` and its chapters in
-`protocol/`, `INSTALLER.md`, `SKILL_EVAL_REPORT.md`, and
-`skills/<role>/template.md`. Their content comes from those files; the
-introductory text comes from `docs/scripts/sync-reference.mjs`. Make changes in
-the relevant source, then run:
+`protocol/`, `INSTALLER.md`, the newest eval report in `evals/` (now
+`evals/SKILL_EVAL_REPORT_20261031.md`), and `skills/<role>/template.md`. Their
+content comes from those files; the introductory text comes from
+`docs/scripts/sync-reference.mjs`. Make changes in the relevant source, then
+run:
 
 ```sh
 pnpm run docs:sync-reference

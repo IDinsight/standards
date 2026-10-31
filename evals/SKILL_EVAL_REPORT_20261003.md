@@ -1,5 +1,10 @@
 # STANDARDS skills eval suite results
 
+> **Note, 31 October 2026:** This report covers release 0.8.0. For release
+> 0.15.0, see [SKILL_EVAL_REPORT_20261031.md](SKILL_EVAL_REPORT_20261031.md).
+> That report also corrects the navigator-38 example below: the failure came
+> from the old harness, not from the model.
+
 This report explains how the STANDARDS role skills were evaluated and what the
 evaluation found. It covers the 363 cases included in that evaluation.
 
