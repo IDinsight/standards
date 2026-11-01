@@ -177,7 +177,7 @@ Each batch of runs also tests the judge:
 - **Second judge.** Claude Fable 5.1 grades a sample from the same evidence. It
   must agree with the main judge on at least 90% of the sample.
 
-No person labeled grades.
+No human labeled grades, these were all LLM judges.
 
 ### How results are counted
 
@@ -216,7 +216,7 @@ No person labeled grades.
 
 ### The 25 consistent failures
 
-They fall into five groups. The appendix lists every failing case.
+They fall into five groups. See the appendix for every failing case.
 
 1. **The role accepts weak or missing evidence (4).**
    - synchronizer-14 completes the synchronization, although test evidence was
@@ -418,12 +418,6 @@ The run records stay on the machine that ran them. Each run ID has the form
 `2026-10-31T<time>-184b5b4-claude-sonnet-5-5`. The ID of a role run also ends
 with `-<role>`, for example
 `2026-10-31T1134Z-184b5b4-claude-sonnet-5-5-navigator`.
-
-| Runs                       | Times in the IDs                                                                                                                                   |
-| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| One run for each role      | 1134Z Navigator, 1153Z Auditor, 1225Z Architect, 1240Z Scoper, 1323Z Developer, 1520Z Tester, 1702Z Reviewer, 1732Z Synchronizer, 1801Z Documenter |
-| Runs after fixture changes | 1946Z (8 cases), 2115Z (2 cases), 2222Z (synchronizer-2, three runs)                                                                               |
-| Repeat runs                | 2130Z (43 cases, two runs each)                                                                                                                    |
 
 ## Appendix: cases that failed
 
