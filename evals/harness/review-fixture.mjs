@@ -26,8 +26,8 @@ import { fileURLToPath } from 'node:url';
 import { BASES_DIR, frameworkAt, resolveSpec, staleBases } from './build-fixture.mjs';
 import { NO_CATALOG_ENTRY, targetDir } from './generate-fixture.mjs';
 import { createMessage, parseStructured } from './lib/anthropic.mjs';
-import { DEFAULT_COMMIT, EVALS_ROOT, findCase } from './lib/cases.mjs';
-import { FIXTURE_EFFORT, REVIEW_MODEL } from './lib/config.mjs';
+import { DEFAULT_COMMIT, findCase } from './lib/cases.mjs';
+import { CATALOG_DIR, FIXTURE_EFFORT, REVIEW_MODEL } from './lib/config.mjs';
 import { builtTreeText, roleText, sharedFrameworkText, specDirText } from './lib/context.mjs';
 import { dockerAvailable } from './lib/selfcheck.mjs';
 import { validate } from './validate-fixture.mjs';
@@ -82,7 +82,7 @@ export function reviewRequest(target, { sha, built, gates }) {
     }
   } else {
     const kase = findCase(target);
-    const cat = readJson(path.join(EVALS_ROOT, 'catalog', `${kase.role}.json`)).cases.find((c) => c.id === kase.id);
+    const cat = readJson(path.join(CATALOG_DIR, `${kase.role}.json`)).cases.find((c) => c.id === kase.id);
     parts.push(`<case key="${kase.key}" role="${kase.role}">\n<prompt>\n${kase.prompt}\n</prompt>\n<expected_output>\n${kase.expected}\n</expected_output>\n<assertions>\n${kase.assertions.map((a, i) => `${i}. ${a}`).join('\n')}\n</assertions>\n</case>`);
     parts.push(`<catalog_entry>\n${cat ? JSON.stringify(cat, null, 2) : NO_CATALOG_ENTRY}\n</catalog_entry>`);
   }

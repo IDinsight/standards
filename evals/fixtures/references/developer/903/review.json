@@ -1,0 +1,121 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState DEVELOPING, CompletionPolicy FULL_DELIVERABLE",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id is api-ci-20260924T090000Z-2f9c6e1a",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery inactive, obligations inactive, BlockedOn NONE",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work points to this cycle's scope, design, and plan",
+      "where": ".standards/STATE.md Scope/Architecture/Development; provenance blocks in .standards/docs/{scope,specs,development}/api-ci-20260924T090000Z-2f9c6e1a.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Valid Auditor context exists",
+      "where": ".standards/CONTEXT.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Monorepo with no GitHub Actions workflows",
+      "where": "tree has apps/api, apps/worker, packages/shared and no .github (selfCheck test ! -e .github)",
+      "status": "realized"
+    },
+    {
+      "condition": "apps/api is a uv FastAPI service with requires-python >=3.11 and dev group pytest, pytest-cov, ruff, mypy",
+      "where": "apps/api/pyproject.toml, apps/api/app/main.py (selfCheck)",
+      "status": "realized"
+    },
+    {
+      "condition": "apps/api has .python-version 3.12 and uv.lock",
+      "where": "apps/api/.python-version, apps/api/uv.lock",
+      "status": "realized"
+    },
+    {
+      "condition": "apps/api depends on packages/shared through a path source",
+      "where": "apps/api/pyproject.toml [tool.uv.sources]",
+      "status": "realized"
+    },
+    {
+      "condition": "apps/worker is another uv service using packages/shared",
+      "where": "apps/worker/pyproject.toml, uv.lock, .python-version",
+      "status": "realized"
+    },
+    {
+      "condition": "No coverage threshold anywhere",
+      "where": "no [tool.coverage], .coveragerc, or fail-under in any file",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope defines AC-001 and AC-002 as worded",
+      "where": ".standards/docs/scope/...md Done when list",
+      "status": "realized"
+    },
+    {
+      "condition": "Design: CI only, .github/workflows/api-ci.yml, the five commands run in apps/api, actions by major tag",
+      "where": ".standards/docs/specs/...md Decision, Components, Interfaces and Contracts",
+      "status": "realized"
+    },
+    {
+      "condition": "Design is silent on per-run Python selection, report retention, triggers, caching, timeouts, permissions",
+      "where": ".standards/docs/specs/...md",
+      "status": "realized"
+    },
+    {
+      "condition": "Plan APPROVED, AUTONOMOUS, User Style NONE locked, AFTER_IMPLEMENTATION, Current Increment NONE, single DEV-001 PENDING for AC-001, AC-002",
+      "where": ".standards/docs/development/...md",
+      "status": "realized"
+    },
+    {
+      "condition": "Previous handoff is FORWARD from ARCHITECTING",
+      "where": ".standards/STATE.md Handoff",
+      "status": "realized"
+    },
+    {
+      "condition": "uv not installed and package registries blocked",
+      "where": "runner image (selfCheck uv --version fails), runtime.blockHosts (pypi, pythonhosted, astral.sh, npm, debian; selfChecks)",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "apps/api/uv.lock and apps/worker/uv.lock are hand-written. They have placeholder hashes, non-standard wheel URL paths (e.g. packages/py3/f/fastapi/...), and omit transitive dependencies such as anyio, h11, click, and pydantic-core. Nothing runs against them in this environment, and a Developer is unlikely to inspect them closely, so the test is unaffected.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally make the locks more complete in a future regeneration; not required."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "No `unchanged` invariant protects apps/**. The generator left it out on purpose because a self-check could write untracked artifacts there. This is a reasonable choice: the case does not grade implementation scope.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition about state, records, monorepo layout, uv configuration, design gaps, and the unavailable toolchain is realized, and check.mjs and the selfChecks pass as expected. Both assertions' deterministic checks are necessary conditions of any correct completion: plan fields and DEV-001 DONE, then a TESTING/FORWARD/DEVELOPING handoff with the literal /tester invocation. Invariants fit the Developer role, and no leak strings or framework file names appear in the project.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-11-03T00:28:34.835Z",
+  "costUsd": 0.2701556,
+  "ms": 49720,
+  "fixtureHash": "58aff11bb8066a79"
+}

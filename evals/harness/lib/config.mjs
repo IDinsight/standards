@@ -94,6 +94,13 @@ export const BROWSER_IMAGE = setting('EVAL_BROWSER_IMAGE', `standards-eval:claud
 // Where data lives. All of it is gitignored (evals/.gitignore).
 // Relative paths in settings are relative to the repository root.
 export const FIXTURES_ROOT = path.resolve(REPO_ROOT, setting('EVAL_FIXTURES_DIR', path.join(EVALS_ROOT, 'fixtures')));
+// Cases come from skills/<role>/evals/evals.json, or, when EVAL_CASES_DIR is
+// set, from <dir>/<role>.json in the same format (the reference evals' cases).
+const casesDir = setting('EVAL_CASES_DIR', null);
+export const CASES_DIR = casesDir === null ? null : path.resolve(REPO_ROOT, casesDir);
+// Notes on each case for the fixture writer and reviewer (catalog/README.md):
+// <dir>/<role>.json. The reference evals keep their own.
+export const CATALOG_DIR = path.resolve(REPO_ROOT, setting('EVAL_CATALOG_DIR', path.join(EVALS_ROOT, 'catalog')));
 export const RUNS_ROOT = path.join(EVALS_ROOT, 'runs');
 
 // Where the key comes from, without revealing it: "environment", ".env", or null.

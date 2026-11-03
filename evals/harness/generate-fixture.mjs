@@ -25,8 +25,8 @@ import { fileURLToPath } from 'node:url';
 
 import { BASES_DIR, frameworkAt, resolveSpec, staleBases } from './build-fixture.mjs';
 import { createMessage, parseStructured } from './lib/anthropic.mjs';
-import { DEFAULT_COMMIT, EVALS_ROOT, FIXTURES_ROOT, REPO_ROOT, findCase, loadRole } from './lib/cases.mjs';
-import { FIXTURE_EFFORT, GEN_MODEL, userGitEnv } from './lib/config.mjs';
+import { DEFAULT_COMMIT, FIXTURES_ROOT, REPO_ROOT, findCase, loadRole } from './lib/cases.mjs';
+import { CATALOG_DIR, FIXTURE_EFFORT, GEN_MODEL, userGitEnv } from './lib/config.mjs';
 import { roleText, samplesText, sharedFrameworkText, specDirText } from './lib/context.mjs';
 import { uncommittableFixtureFiles } from './lib/readiness.mjs';
 import { dockerAvailable } from './lib/selfcheck.mjs';
@@ -62,7 +62,7 @@ export const GEN_SCHEMA = {
 };
 
 const readJson = (f) => JSON.parse(readFileSync(f, 'utf8'));
-const catalogEntry = (role, id) => readJson(path.join(EVALS_ROOT, 'catalog', `${role}.json`)).cases.find((c) => c.id === id);
+const catalogEntry = (role, id) => readJson(path.join(CATALOG_DIR, `${role}.json`)).cases.find((c) => c.id === id);
 // Cases added after the catalog was written have no entry.
 export const NO_CATALOG_ENTRY = 'none: this case was added after the catalog review; work out the utterance, the grader-only facts, the fixture needs, and which assertions need the judge from the case itself';
 

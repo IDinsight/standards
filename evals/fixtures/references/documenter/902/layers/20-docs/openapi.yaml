@@ -1,0 +1,100 @@
+openapi: 3.1.0
+info:
+  title: imports-api
+  version: 0.3.0
+  description: Accepts CSV inventory files and records each import.
+paths:
+  /imports:
+    post:
+      operationId: createImport
+      summary: Upload a CSV file and record the import
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: >-
+                    UTF-8 CSV file whose header includes sku, name, and
+                    quantity. Other columns are ignored.
+      responses:
+        "201":
+          description: The file was parsed and the import recorded.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Import"
+        "422":
+          description: >-
+            The file could not be decoded or parsed, or the request is
+            malformed (for example, no file field).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /imports/{import_id}:
+    get:
+      operationId: getImport
+      summary: Get a recorded import
+      parameters:
+        - name: import_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The import record.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Import"
+        "404":
+          description: No import has this ID.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+components:
+  schemas:
+    Import:
+      type: object
+      required:
+        - id
+        - filename
+        - status
+        - row_count
+        - created_at
+      properties:
+        id:
+          type: string
+          description: Import identifier, 32 hexadecimal characters.
+        filename:
+          type: string
+          description: Name of the uploaded file.
+        status:
+          type: string
+          enum:
+            - completed
+        row_count:
+          type: integer
+          minimum: 0
+          description: Number of data rows imported.
+        created_at:
+          type: string
+          format: date-time
+    Error:
+      type: object
+      required:
+        - detail
+      properties:
+        detail:
+          description: >-
+            Error message. For a malformed request, FastAPI returns a list of
+            validation errors instead.

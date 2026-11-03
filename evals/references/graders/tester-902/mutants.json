@@ -1,0 +1,44 @@
+[
+  {
+    "id": "piece-parsed-alone",
+    "why": "only the last input_json_delta piece is parsed, as if the tool input arrived whole",
+    "file": "app/extract/stream.py",
+    "find": "                record = json.loads(\"\".join(pieces))\n",
+    "replace": "                record = json.loads(pieces[-1] if pieces else \"\")\n"
+  },
+  {
+    "id": "partial-on-error",
+    "why": "an error event returns the tool input received so far as a record",
+    "file": "app/extract/stream.py",
+    "find": "        if event_type == \"error\":\n            return ExtractResult(\"retryable\", None)\n",
+    "replace": "        if event_type == \"error\":\n            return ExtractResult(\"retryable\", {\"partial_json\": \"\".join(pieces)})\n"
+  },
+  {
+    "id": "no-stop-as-complete",
+    "why": "a stream that ends without message_stop is handled as if it had finished",
+    "file": "app/extract/stream.py",
+    "find": "            return ExtractResult(\"stored\", record)\n    return ExtractResult(\"retryable\", None)\n",
+    "replace": "            return ExtractResult(\"stored\", record)\n    try:\n        record = json.loads(\"\".join(pieces))\n    except json.JSONDecodeError:\n        return ExtractResult(\"invalid\", None)\n    store.save_invoice(document_id, record)\n    return ExtractResult(\"stored\", record)\n"
+  },
+  {
+    "id": "stored-before-stop",
+    "why": "the record is saved when the stop reason arrives, before message_stop and before the stop reason is checked",
+    "file": "app/extract/stream.py",
+    "find": "            stop_reason = event.get(\"delta\", {}).get(\"stop_reason\")\n",
+    "replace": "            stop_reason = event.get(\"delta\", {}).get(\"stop_reason\")\n            try:\n                store.save_invoice(document_id, json.loads(\"\".join(pieces)))\n            except json.JSONDecodeError:\n                pass\n"
+  },
+  {
+    "id": "max-tokens-accepted",
+    "why": "tool input cut off at max_tokens is stored when it happens to parse",
+    "file": "app/extract/stream.py",
+    "find": "            if stop_reason == \"max_tokens\":\n                return ExtractResult(\"invalid\", None)\n",
+    "replace": ""
+  },
+  {
+    "id": "first-piece-dropped",
+    "why": "the first input_json_delta piece is left out of the tool input",
+    "file": "app/extract/stream.py",
+    "find": "                record = json.loads(\"\".join(pieces))\n",
+    "replace": "                record = json.loads(\"\".join(pieces[1:]))\n"
+  }
+]

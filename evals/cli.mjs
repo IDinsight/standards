@@ -48,6 +48,14 @@ const USAGE = `STANDARDS skills evals (evals/README.md)
   pnpm evals spend [<run> ...]          measured API spend
   pnpm evals selftest                   the harness's own tests (no model, no Docker)
 
+  pnpm evals references build-b [--check]   build version B of the reference evals as the local tag eval/noref-0.15.0
+  pnpm evals references [--smoke] [--run-id <id>] [--version-budget-usd 90] [--execute]
+                                        the reference evals: versions A and B, graders, blinded judge, summary
+  pnpm evals references check-graders [--cases developer-901,...] [--execute]
+                                        each grader against its starting project and known solutions (Docker)
+  pnpm evals references fixtures <status|generate|review|flags|decide|validate> ...
+                                        the fixtures commands for the reference evals' cases
+
 <run> is a run id under evals/runs/ or a path.`;
 
 const argv = process.argv.slice(2);
@@ -56,9 +64,9 @@ const rest = (from) => argv.slice(from).filter((a) => a !== '--execute');
 const readJson = (f) => JSON.parse(readFileSync(f, 'utf8'));
 
 // Run one harness script, inheriting the terminal. --execute alone switches
-// model calls on. Returns the exit code.
-function script(name, args, { allowModel = false } = {}) {
-  const env = { ...process.env };
+// model calls on. `env` adds settings for that script. Returns the exit code.
+function script(name, args, { allowModel = false, env: extra = {} } = {}) {
+  const env = { ...process.env, ...extra };
   if (allowModel) env.EVAL_ALLOW_MODEL = '1';
   else delete env.EVAL_ALLOW_MODEL;
   return spawnSync(process.execPath, [path.join(HARNESS, name), ...args], { stdio: 'inherit', env }).status ?? 1;
@@ -324,6 +332,24 @@ async function main() {
     }
     case 'spend': return script('spend.mjs', argv.slice(1).map((a, i, all) => (a.startsWith('--') || all[i - 1] === '--since' ? a : runDir(a))));
     case 'selftest': return script('selftest.mjs', []);
+    case 'references': {
+      if (sub === 'build-b') return script('references/build-b.mjs', rest(2));
+      // The reference evals' own cases and fixtures (documenter-38's part gets the suite's).
+      const { REFERENCES_ENV } = await import('./harness/references/plan.mjs');
+      // The fixtures commands, with the reference evals' cases, catalog, and fixtures.
+      if (sub === 'fixtures') {
+        return spawnSync(process.execPath, [fileURLToPath(import.meta.url), 'fixtures', ...argv.slice(2)], { stdio: 'inherit', env: { ...process.env, ...REFERENCES_ENV } }).status ?? 1;
+      }
+      if (sub === 'check-graders') {
+        if (execute) requireKey();
+        return script('references/check-graders.mjs', [...rest(2), ...(execute ? ['--execute'] : [])], { allowModel: execute, env: REFERENCES_ENV });
+      }
+      if (sub === undefined || sub.startsWith('--')) {
+        if (execute) requireKey();
+        return script('references/pipeline.mjs', [...rest(1), ...(execute ? ['--execute'] : [])], { allowModel: execute, env: REFERENCES_ENV });
+      }
+      break;
+    }
     default: break;
   }
   console.log(USAGE);

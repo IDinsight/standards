@@ -1,0 +1,111 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield template)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState TESTING, CompletionPolicy FULL_DELIVERABLE",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id is csv-export-20260924T090000Z-62d0b9c4",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery inactive, no outstanding obligations, BlockedOn NONE",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Developer handed off to Testing (FORWARD from DEVELOPING)",
+      "where": ".standards/STATE.md Handoff",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work points to this cycle's completed scope, technical design, and development plan",
+      "where": ".standards/docs/scope/…, .standards/docs/specs/…, .standards/docs/development/… with matching provenance",
+      "status": "realized"
+    },
+    {
+      "condition": "Valid Auditor context exists",
+      "where": ".standards/CONTEXT.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Development plan COMPLETE with DEV-001 DONE and self-checks recorded",
+      "where": ".standards/docs/development/csv-export-20260924T090000Z-62d0b9c4.md",
+      "status": "realized"
+    },
+    {
+      "condition": "No verification report exists",
+      "where": ".standards/docs/verification/ absent",
+      "status": "realized"
+    },
+    {
+      "condition": "Python service using only the standard library",
+      "where": "pyproject.toml (dependencies = []), app/**",
+      "status": "realized"
+    },
+    {
+      "condition": "app/llm/client.py calls an LLM provider for summaries in app/summaries/, unchanged by this cycle",
+      "where": "app/llm/client.py, app/summaries/service.py, committed pre-install in 'Add LLM-backed ticket summaries'",
+      "status": "realized"
+    },
+    {
+      "condition": "Change under test app/exports/csv_export.py writes tickets to CSV and never calls the LLM client",
+      "where": "app/exports/csv_export.py (imports only csv), commit 'Add CSV ticket export'",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope AC-001 and AC-002 worded as stated",
+      "where": "scope record Done when list items",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation meets AC-001 and AC-002 (grader-only)",
+      "where": "csv_export.py uses csv.writer default dialect, header then rows; selfCheck 2 round-trips comma/quote/newline",
+      "status": "realized"
+    },
+    {
+      "condition": "Existing tests cover summaries, not export, and pass with python3 -m pytest",
+      "where": "tests/test_summaries.py; selfCheck 1 (3 passed)",
+      "status": "realized"
+    },
+    {
+      "condition": "Package registries blocked",
+      "where": "runtime.blockHosts; selfCheck 3 (pypi connection refused)",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-wrong",
+      "assertion": 1,
+      "detail": "reply_matches \"IMPLEMENTATION|[Ii]mplementation [Rr]eview\" is also satisfied by the state name REVIEWING_IMPLEMENTATION, which a run reporting the new state will usually print, so the check is weak as evidence that the review kind was named. It cannot fail a correct run, though, and the catalog accepted it.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally tighten to something like `(?<!REVIEWING_)IMPLEMENTATION|[Ii]mplementation [Rr]eview`; not required."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The development plan's Self-Check cites the commit 'Add CSV ticket export' that also adds the plan itself. This is slightly odd but plausible as a description of the working tree assessed before committing, and it gives no hint about the answer.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is present in the built repository. check.mjs is clean, the selfChecks confirm the passing summaries suite, a correct export, and the blocked hosts, and nothing in the files hints at the answer or names framework files. The checks for both assertions are necessary conditions of a correct full-verification run with a FORWARD handoff to the IMPLEMENTATION review, and the invariants (HEAD, git, turn-end check, app/** unchanged) fit the Tester role.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-11-02T17:31:34.826Z",
+  "costUsd": 0.2006608,
+  "ms": 37947,
+  "fixtureHash": "6c0f9314ddf56272"
+}

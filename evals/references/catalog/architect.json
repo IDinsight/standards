@@ -1,0 +1,195 @@
+{
+  "role": "architect",
+  "summary": {
+    "stage1_candidates": [],
+    "top_issues": []
+  },
+  "cases": [
+    {
+      "id": 901,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "Before this cycle, .github/workflows/deploy.yml runs flyctl deploy on every push to main, and fly.toml has no release step.",
+        "A person applies migrations by hand after a deploy, running alembic upgrade head over fly ssh console, as docs/operations.md describes.",
+        "The project's migrations include one that dropped a column (customers.fax).",
+        ".github/workflows/ci.yml runs the tests against a postgres:16 service container whose database is named test, and tests/conftest.py creates the tables with Base.metadata.create_all.",
+        "Production's DATABASE_URL is a Fly.io secret; no file in the repository holds it."
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "ARCHITECTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "context"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "claude",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "state ActiveWork.Architecture equals .standards/docs/specs/${ID}.md; provenance {path: that file, artifact ARCHITECTURE, cycle ${ID}}; contains /\\bAC-001\\b/, /\\bAC-002\\b/, and /\\bAC-003\\b/ in that file. complete true."
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "reply"
+          ],
+          "deterministic_complete": true,
+          "note": "state WorkflowState equals DEVELOPING, Handoff.Kind equals FORWARD, Handoff.From equals ARCHITECTING; reply_matches \"/developer\\b\". complete true."
+        }
+      ],
+      "fixture_details": [
+        "Standalone fixture (no base): a brownfield project committed before the STANDARDS install, in pre-install layers with a few commits of ordinary history, then layers for this cycle's records and state. Use the cycle id in the prompt exactly.",
+        "Project shipments-api: FastAPI, SQLAlchemy 2, Alembic, and psycopg 3. app/main.py, app/config.py (DATABASE_URL from the environment), app/db.py (the engine; no create_all), app/models.py, and app/routes/shipments.py. Dockerfile CMD: uvicorn app.main:app --host 0.0.0.0 --port 8000.",
+        "fly.toml: app \"shipments-api\", [http_service] with internal_port 8000 and a health check; no [deploy] section. .github/workflows/deploy.yml: on push to main, flyctl deploy --remote-only with FLY_API_TOKEN from secrets. .github/workflows/ci.yml: on push and pull_request to main, a test job with a postgres:16 service (POSTGRES_DB test, user and password postgres, a health check) and uv run pytest with DATABASE_URL pointing at that database.",
+        "alembic.ini and migrations/env.py (reads DATABASE_URL from app.config). migrations/versions/ holds six ordinary revisions: create customers, create shipments, add an index on shipments.created_at, add shipments.status, drop customers.fax (op.drop_column, with a downgrade that adds it back), and add shipments.notes.",
+        "tests/conftest.py builds an engine from DATABASE_URL, calls Base.metadata.create_all once per session, and rolls back a transaction per test. docs/operations.md: merging to main deploys through GitHub Actions; when a release adds a migration, the person who deployed runs fly ssh console -C \"alembic upgrade head\"; DATABASE_URL is set with fly secrets set; production is at the newest revision, checked with alembic current after the last manual run. .env.example: DATABASE_URL=postgresql+psycopg://[DB_USER]:[DB_PASSWORD]@localhost:5432/shipments_dev.",
+        "Scope: AC-001 to AC-003 as worded in the prompt. The scope's Goal, the Intent of AC-001's work item, and STATE.md's Active Work.Request state the outcome (no release serves traffic before its migrations are applied, and nobody has to remember to migrate after a deploy), never a mechanism: none of them says that every pending migration is applied by the deploy. Non-goals include making the deploy wait for CI. Auditor CONTEXT.md describes the stack, the deployment, the manual migration step, and the CI database, and records that production is at the newest revision.",
+        "STATE.md: ARCHITECTING, Handoff FORWARD from SCOPING, CompletionPolicy FULL_DELIVERABLE, Active Work.Architecture NONE. The scope is COMPLETE. No technical design for this cycle exists, the project keeps no design documents of its own, and no records of earlier cycles exist under .standards/docs/.",
+        "graderOnly must hold every grader_only_facts sentence above, even where the files also show it: the blinded judge reads only graderOnly and the changed files.",
+        "runtime.blockHosts: pypi.org, files.pythonhosted.org, registry.npmjs.org, registry.yarnpkg.com, deb.debian.org, security.debian.org, astral.sh. Add selfChecks that a fetch from pypi.org fails.",
+        "None of these strings may appear anywhere in the built project, its records, or its commit messages (the grader's leak guard checks the starting project): \"release_command\", \"never run automatically\", \"verified backup\", \"destructive\", \"expand and contract\", \"expand-and-contract\", \"shipments_api_test\", \"shipments_api_prod\", \"sqlite\", \"SQLite\".",
+        "Name no framework file anywhere in the project or its records, outside the installed managed blocks: no path containing references/, skills/<role>/, PROTOCOL.md, or SKILL.md; no file name such as fastapi.md, readme.md (lowercase), databases.md, postgres.md, redis.md, or observability.md; and no hyphenated name such as security-fastapi, github-actions-python, llm-api-testing, or fastapi-testing. The blinded judge masks these names, so check-graders refuses a starting project that holds one. README.md is fine."
+      ],
+      "catalog_note": "Written 2026-11-02 for the reference evals (evals/README.md, \"Reference evals\"). Both assertions are workflow checks that exact checks decide (\"complete\": true): pnpm evals references refuses a case whose assertions need the suite's judge. fixture_details states what the hidden graders in evals/references/graders/<case>/ rely on: follow it exactly. The role never sees it."
+    },
+    {
+      "id": 902,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "docker-compose.yml runs postgres:14 for local development, with the named volume pgdata mounted at /var/lib/postgresql/data; that volume holds each developer's local data.",
+        ".github/workflows/ci.yml runs the tests against a postgres:14 service container.",
+        "Production runs on Amazon RDS for PostgreSQL 14. The database was created on PostgreSQL 11 in 2019 and upgraded in place to 14 in 2023."
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "ARCHITECTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "context"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "claude",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "state ActiveWork.Architecture equals .standards/docs/specs/${ID}.md; provenance {path: that file, artifact ARCHITECTURE, cycle ${ID}}; contains /\\bAC-001\\b/, /\\bAC-002\\b/, and /\\bAC-003\\b/ in that file. complete true."
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "reply"
+          ],
+          "deterministic_complete": true,
+          "note": "state WorkflowState equals DEVELOPING, Handoff.Kind equals FORWARD, Handoff.From equals ARCHITECTING; reply_matches \"/developer\\b\". complete true."
+        }
+      ],
+      "fixture_details": [
+        "Standalone fixture (no base): a brownfield project committed before the STANDARDS install, in pre-install layers with a few commits of ordinary history, then layers for this cycle's records and state. Use the cycle id in the prompt exactly.",
+        "Project ledger-api: FastAPI, SQLAlchemy, Alembic, and psycopg. docker-compose.yml: service db with image postgres:14, POSTGRES_DB ledger_dev, user and password from the environment, volumes - pgdata:/var/lib/postgresql/data, port 5432, and a pg_isready health check; service api; a top-level volumes: pgdata. .github/workflows/ci.yml: a test job with a postgres:14 service (POSTGRES_DB ledger_test).",
+        "docs/operations.md: production runs on Amazon RDS for PostgreSQL 14 (Multi-AZ, automated backups kept for 7 days), created on PostgreSQL 11 in 2019 and upgraded in place to 14 in 2023, which kept the database unavailable for about 12 minutes; the database holds about 40 GB; the API is the only client of the production database, and nothing else reads from or writes to it; the app reads DATABASE_URL from the deployment's secrets. README.md: local setup with docker compose up -d db and alembic upgrade head.",
+        "Nothing in the repository names PostgreSQL 15 to 18, a support policy, the image's data directory layout, password hashing, or authentication methods.",
+        "Scope: AC-001 to AC-003 as worded in the prompt, with the two production constraints the prompt gives: a write outage of up to 30 minutes in a maintenance window announced in advance is acceptable, and a rollback is needed only until the upgraded database is verified, before writes resume, with problems after that fixed forward; and an Assumptions section: a team member with AWS access carries out the production steps the work defines, including confirming which upgrade targets RDS offers for the production database. AC-001 has no date: the end of life in November 2026 is background in the scope's Goal, not a deadline. Auditor CONTEXT.md describes the three environments and their PostgreSQL 14 setup, and records that the API is the only client of the production database.",
+        "STATE.md: ARCHITECTING, Handoff FORWARD from SCOPING, CompletionPolicy FULL_DELIVERABLE, Active Work.Architecture NONE. The scope is COMPLETE. No technical design for this cycle exists, the project keeps no design documents of its own, and no records of earlier cycles exist under .standards/docs/.",
+        "graderOnly must hold every grader_only_facts sentence above, even where the files also show it: the blinded judge reads only graderOnly and the changed files.",
+        "runtime.blockHosts: pypi.org, files.pythonhosted.org, registry.npmjs.org, registry.yarnpkg.com, deb.debian.org, security.debian.org, astral.sh. Add selfChecks that a fetch from pypi.org fails.",
+        "None of these strings may appear anywhere in the built project, its records, or its commit messages (the grader's leak guard checks the starting project): \"/var/lib/postgresql/18\", \"PGDATA\", \"pg_upgrade\", \"pg_dump\", \"scram\", \"SCRAM\", \"md5\", \"MD5\", \"password_encryption\", \"postgres:15\", \"postgres:16\", \"postgres:17\", \"postgres:18\".",
+        "Name no framework file anywhere in the project or its records, outside the installed managed blocks: no path containing references/, skills/<role>/, PROTOCOL.md, or SKILL.md; no file name such as fastapi.md, readme.md (lowercase), databases.md, postgres.md, redis.md, or observability.md; and no hyphenated name such as security-fastapi, github-actions-python, llm-api-testing, or fastapi-testing. The blinded judge masks these names, so check-graders refuses a starting project that holds one. README.md is fine."
+      ],
+      "catalog_note": "Written 2026-11-02 for the reference evals (evals/README.md, \"Reference evals\"). Both assertions are workflow checks that exact checks decide (\"complete\": true): pnpm evals references refuses a case whose assertions need the suite's judge. fixture_details states what the hidden graders in evals/references/graders/<case>/ rely on: follow it exactly. The role never sees it."
+    },
+    {
+      "id": 911,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "No database, schema, or persistence change is in scope."
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "ARCHITECTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "context"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "claude",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "state",
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "state ActiveWork.Architecture equals .standards/docs/specs/${ID}.md; provenance {path: that file, artifact ARCHITECTURE, cycle ${ID}}; contains /\\bAC-001\\b/, /\\bAC-002\\b/, and /\\bAC-003\\b/ in that file. complete true."
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "reply"
+          ],
+          "deterministic_complete": true,
+          "note": "state WorkflowState equals DEVELOPING, Handoff.Kind equals FORWARD, Handoff.From equals ARCHITECTING; reply_matches \"/developer\\b\". complete true."
+        }
+      ],
+      "fixture_details": [
+        "Standalone fixture (no base): a brownfield project committed before the STANDARDS install, in pre-install layers with a few commits of ordinary history, then layers for this cycle's records and state. Use the cycle id in the prompt exactly.",
+        "Project inventory-api: FastAPI, SQLAlchemy, Alembic, and PostgreSQL 16 (docker-compose.yml for local development). The app logs with print() in a few routes; there is no logging configuration, no middleware, and no tracing or metrics. The Dockerfile runs uvicorn; the platform collects standard output.",
+        "Scope: AC-001 to AC-003 as worded in the prompt, and an out-of-scope note that the database and schema do not change. Auditor CONTEXT.md describes the stack, the print-based logging, and the platform's log collection.",
+        "STATE.md: ARCHITECTING, Handoff FORWARD from SCOPING, CompletionPolicy FULL_DELIVERABLE, Active Work.Architecture NONE. The scope is COMPLETE. No technical design for this cycle exists, the project keeps no design documents of its own, and no records of earlier cycles exist under .standards/docs/.",
+        "runtime.blockHosts: pypi.org, files.pythonhosted.org, registry.npmjs.org, registry.yarnpkg.com, deb.debian.org, security.debian.org, astral.sh. Add selfChecks that a fetch from pypi.org fails.",
+        "Name no framework file anywhere in the project or its records, outside the installed managed blocks: no path containing references/, skills/<role>/, PROTOCOL.md, or SKILL.md; no file name such as fastapi.md, readme.md (lowercase), databases.md, postgres.md, redis.md, or observability.md; and no hyphenated name such as security-fastapi, github-actions-python, llm-api-testing, or fastapi-testing. The blinded judge masks these names, so check-graders refuses a starting project that holds one. README.md is fine."
+      ],
+      "catalog_note": "Written 2026-11-02 for the reference evals (evals/README.md, \"Reference evals\"). A trigger case: read detection grades it from the transcript, with no judge and no hidden tests. Both assertions are workflow checks that exact checks decide (\"complete\": true)."
+    }
+  ]
+}

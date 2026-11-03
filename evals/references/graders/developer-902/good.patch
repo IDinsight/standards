@@ -1,0 +1,59 @@
+diff --git a/Dockerfile b/Dockerfile
+index 0277db7..5610aae 100644
+--- a/Dockerfile
++++ b/Dockerfile
+@@ -11,4 +11,4 @@ RUN useradd --system --no-create-home notes
+ USER notes
+ 
+ EXPOSE 8000
+-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
++CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--no-server-header"]
+diff --git a/app/main.py b/app/main.py
+index 1208c74..4f3bbdf 100644
+--- a/app/main.py
++++ b/app/main.py
+@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
+ 
+ from app.config import settings
+ from app.routers import notes
++from app.utils.security_headers import SecurityHeadersMiddleware
+ 
+ app = FastAPI(title="notes-api")
+ 
+@@ -13,6 +14,8 @@ app.add_middleware(
+     allow_methods=["*"],
+     allow_headers=["*"],
+ )
++# Added after CORS, so it is the outer layer and its headers reach preflight responses too.
++app.add_middleware(SecurityHeadersMiddleware)
+ 
+ app.include_router(notes.router)
+ 
+diff --git a/app/utils/security_headers.py b/app/utils/security_headers.py
+new file mode 100644
+index 0000000..d83c3ec
+--- /dev/null
++++ b/app/utils/security_headers.py
+@@ -0,0 +1,22 @@
++"""Baseline security headers on every response."""
++
++from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
++from starlette.requests import Request
++from starlette.responses import Response
++
++from app.config import settings
++
++
++class SecurityHeadersMiddleware(BaseHTTPMiddleware):
++    async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
++        response = await call_next(request)
++        headers = response.headers
++        headers["X-Content-Type-Options"] = "nosniff"
++        headers["X-Frame-Options"] = "DENY"
++        headers["X-XSS-Protection"] = "0"
++        headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
++        headers["Permissions-Policy"] = "geolocation=(), camera=(), microphone=()"
++        headers["Cache-Control"] = "no-store"
++        if settings.environment == "production":
++            headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
++        return response

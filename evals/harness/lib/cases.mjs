@@ -1,11 +1,11 @@
-// Load eval cases from skills/<role>/evals/evals.json and give each a stable key
-// and content hash. The hash lets a frozen fixture detect that its case's prompt
+// Load eval cases from skills/<role>/evals/evals.json (or EVAL_CASES_DIR) and
+// give each a stable key and content hash. The hash lets a frozen fixture detect that its case's prompt
 // or assertions changed after the fixture was reviewed.
 import { createHash } from 'node:crypto';
-import { readFileSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 
-import { DEFAULT_COMMIT, EVALS_ROOT, FIXTURES_ROOT, HARNESS_DIR, REPO_ROOT } from './config.mjs';
+import { CASES_DIR, DEFAULT_COMMIT, EVALS_ROOT, FIXTURES_ROOT, HARNESS_DIR, REPO_ROOT } from './config.mjs';
 
 // Paths and the framework commit are settings (lib/config.mjs); re-exported
 // here because most of the harness imports them from this module.
@@ -23,7 +23,10 @@ export const ROLES = readdirSync(path.join(REPO_ROOT, 'skills'))
 export const hashOf = (value) => createHash('sha256').update(JSON.stringify(value)).digest('hex').slice(0, 16);
 
 export function loadRole(role) {
-  const file = path.join(REPO_ROOT, 'skills', role, 'evals', 'evals.json');
+  // EVAL_CASES_DIR (lib/config.mjs) holds one <role>.json per role it covers; a
+  // role without a file there has no cases.
+  const file = CASES_DIR ? path.join(CASES_DIR, `${role}.json`) : path.join(REPO_ROOT, 'skills', role, 'evals', 'evals.json');
+  if (CASES_DIR && !existsSync(file)) return [];
   const data = JSON.parse(readFileSync(file, 'utf8'));
   return data.evals.map((c) => ({
     key: `${role}-${c.id}`,

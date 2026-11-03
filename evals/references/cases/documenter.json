@@ -1,0 +1,25 @@
+{
+  "skill_name": "documenter",
+  "evals": [
+    {
+      "id": 901,
+      "prompt": "Continue as Documenter. ProjectMode is BROWNFIELD, CycleMode is STANDARD, WorkflowState is DOCUMENTING, Active Work.Id is import-jobs-20260924T090000Z-7e15c9a4, recovery is inactive, and Active Work.BlockedOn is NONE. CompletionPolicy is FULL_DELIVERABLE. Scope, architecture, Auditor context, development, Tester verification, and implementation review have matching provenance and current evidence, and no documentation record exists yet. The repository has apps/api, a FastAPI service managed with uv, and apps/web, a web app managed with pnpm. The cycle changed POST /imports and the import page. The scope has AC-001: POST /imports requires bearer authentication; AC-002: POST /imports accepts an optional Idempotency-Key header and returns 409 when the same key was already used with a different file; AC-003: POST /imports returns 202 with an ImportJob body, whose status is pending, running, failed, or done; and AC-004: the web import page shows pending and failed imports. The API also reads a new required setting, IMPORT_MAX_BYTES. The test commands changed: apps/api runs uv run pytest tests/unit and uv run pytest tests/integration, and apps/web adds pnpm test:e2e. The repository's documents still describe the state before the cycle: apps/api/openapi.yaml, the hand-maintained API contract, which already defines the ImportJob schema and a bearerAuth security scheme that GET /imports/{import_id} uses; apps/api/README.md; apps/api/.env.example; apps/web/README.md; and the root README.md.",
+      "expected_output": "Documenter finds the documents the cycle's changes affect and updates them, records its work and checks in a COMPLETE documentation record, and hands off to an independent FINAL_DELIVERABLE review.",
+      "files": [],
+      "assertions": [
+        "The documentation record at .standards/docs/documentation/import-jobs-20260924T090000Z-7e15c9a4.md has DOCUMENTATION provenance for that cycle and Status COMPLETE.",
+        "Completion persists DOCUMENTING -> REVIEWING_FINAL as a FORWARD handoff and gives the /reviewer invocation, naming the FINAL_DELIVERABLE review kind."
+      ]
+    },
+    {
+      "id": 902,
+      "prompt": "Continue as Documenter. ProjectMode is BROWNFIELD, CycleMode is STANDARD, WorkflowState is DOCUMENTING, Active Work.Id is parser-rename-20260924T090000Z-d29a84f1, recovery is inactive, and Active Work.BlockedOn is NONE. CompletionPolicy is FULL_DELIVERABLE. Scope, architecture, Auditor context, development, Tester verification, and implementation review have matching provenance and current evidence, and no documentation record exists yet. The project is a FastAPI import service managed with uv. The cycle renamed the private helper _parse_rows in app/imports/parser.py to _read_rows and moved its tests from tests/test_parser.py to tests/imports/test_parser.py; behavior, the HTTP API, the settings, and the commands are unchanged. The repository's documents are README.md, openapi.yaml (the API contract), .env.example, and docs/architecture.md; none of them names the helper or the test files. The scope has AC-001: the parser's row helper is named _read_rows, and the parser behaves as before; and AC-002: the parser tests live under tests/imports/.",
+      "expected_output": "Documenter assesses the project's documents against the change, records an evidenced outcome for each in a COMPLETE documentation record, and hands off to an independent FINAL_DELIVERABLE review.",
+      "files": [],
+      "assertions": [
+        "The documentation record at .standards/docs/documentation/parser-rename-20260924T090000Z-d29a84f1.md has DOCUMENTATION provenance for that cycle and Status COMPLETE.",
+        "Completion persists DOCUMENTING -> REVIEWING_FINAL as a FORWARD handoff and gives the /reviewer invocation, naming the FINAL_DELIVERABLE review kind."
+      ]
+    }
+  ]
+}

@@ -10,12 +10,14 @@
 // the judge merge (unparseable verdict -> ERROR -> INCOMPLETE), N/A handling in
 // the summary, the scripted good/bad runs (simulate.mjs), migration edits, git
 // on the host (hermetic builds, no repository helpers), Finder files, the
-// judge's guards, and committed fixtures.
+// judge's guards, committed fixtures, and the reference evals' parts
+// (version B's build, EVAL_CASES_DIR, deeper fixture logs, paired builds, the
+// graders' runner, and read detection).
 import { execFileSync, spawnSync } from 'node:child_process';
-import { chmodSync, cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { chmodSync, cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import { buildFixture } from './build-fixture.mjs';
 import { EVALS_ROOT, REPO_ROOT, SAMPLES_ROOT, loadRole } from './lib/cases.mjs';
@@ -150,13 +152,16 @@ check('subagent text excluded from agent text; subagent commit still detected; t
     { type: 'assistant', message: { content: [{ type: 'tool_use', id: 'x1', name: 'Bash', input: { command: 'cd /tmp/m/skills/navigator/evals && cat *.json' } }] } },
     { type: 'assistant', message: { content: [{ type: 'tool_use', id: 'x2', name: 'Bash', input: { command: 'cat /tmp/dump.txt' } }] } },
     { type: 'user', message: { content: [{ type: 'tool_result', tool_use_id: 'x2', content: '{"id": 3, "expected_output": "..."}' }] } },
+    // The reference evals' hidden graders are flagged; a shipped reference the role reads is not.
+    { type: 'assistant', message: { content: [{ type: 'tool_use', id: 'x3', name: 'Read', input: { file_path: '/tmp/m/evals/references/graders/developer-901/test_lockout.py' } }] } },
+    { type: 'assistant', message: { content: [{ type: 'tool_use', id: 'x4', name: 'Read', input: { file_path: '/work/.claude/skills/developer/references/security-fastapi.md' } }] } },
     { type: 'result', subtype: 'success', result: 'ok', total_cost_usd: 0 },
   ];
   writeFileSync(path.join(ak, 'transcript.jsonl'), events.map((x) => JSON.stringify(x)).join('\n'));
   const res = await grade(ak, fixture('navigator', 3));
   const simRuns = ['developer-1-good', 'navigator-3-good', 'reviewer-2-good'].map((n) => JSON.parse(readFileSync(path.join(os.tmpdir(), 'standards-eval-sim', n, 'run/verdicts.json'), 'utf8')));
-  check('answer-key scan flags a cd into an evals folder and an answer-key field in output; ordinary runs are not flagged',
-    res.answerKeyAccess.length === 2 && simRuns.every((r) => r.answerKeyAccess.length === 0), JSON.stringify(res.answerKeyAccess));
+  check('answer-key scan flags a cd into an evals folder, a reference-eval grader, and an answer-key field in output; a shipped reference and ordinary runs are not flagged',
+    res.answerKeyAccess.length === 3 && res.answerKeyAccess[2].startsWith('event 2:') && simRuns.every((r) => r.answerKeyAccess.length === 0), JSON.stringify(res.answerKeyAccess));
 }
 
 // 7. Pristine runtime: a role's edit to the project's .standards/bin (check.mjs
@@ -968,6 +973,680 @@ const r = await sendAll(items, { mode: 'sync', concurrency: 4 }); console.log(JS
   const { userGitEnv } = await import('./lib/config.mjs');
   const missing = uncommittableFixtureFiles(userGitEnv());
   check('committed fixtures: git tracks every fixture file (add any it ignores with `git add -f`)', missing.length === 0, missing.slice(0, 10).join(', '));
+}
+
+// Version B of the reference evals: v0.15.0 and the committed patch must build
+// the pinned commit. --check mode saves no objects and no tag.
+{
+  const { buildVersionB, EXPECTED_SHA } = await import('./references/build-b.mjs');
+  let built = null;
+  let error = '';
+  try { built = buildVersionB({ check: true }); } catch (e) { error = e.message; }
+  check('reference evals: version B builds the pinned commit from v0.15.0 and the patch', built === EXPECTED_SHA, error);
+}
+
+// EVAL_CASES_DIR: cases come from <dir>/<role>.json (the reference evals'
+// cases), and a role without a file there has none. Settings are read when
+// lib/config.mjs loads, so this runs in a fresh process.
+{
+  const dir = path.join(TMP, 'cases-dir');
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(path.join(dir, 'developer.json'), JSON.stringify({ skill_name: 'developer', evals: [{ id: 901, prompt: 'p', expected_output: 'e', assertions: ['a'] }] }));
+  const code = "const { findCase, loadRole } = await import('./lib/cases.mjs');"
+    + " console.log(JSON.stringify({ dev: loadRole('developer').map((c) => c.key), tester: loadRole('tester').length, found: findCase('developer-901').prompt }));";
+  const r = spawnSync(process.execPath, ['--input-type=module', '-e', code], { cwd: HERE, encoding: 'utf8', env: { ...process.env, EVAL_CASES_DIR: dir } });
+  let got = null;
+  try { got = JSON.parse(r.stdout); } catch { /* reported below */ }
+  const ok = got?.dev?.join() === 'developer-901' && got.tester === 0 && got.found === 'p';
+  check('EVAL_CASES_DIR: cases come from <dir>/<role>.json; a role without a file there has none', ok, ok ? '' : (r.stderr.trim() || r.stdout.trim()));
+}
+
+// The reference evals' fixtures sit one folder deeper (fixtures/references/):
+// their generation and decision logs stay local, like the suite's, both for
+// git and for the committed-fixtures check.
+{
+  const { LOCAL } = await import('./lib/readiness.mjs');
+  const ignored = (rel) => spawnSync('git', ['check-ignore', '-q', '--no-index', `evals/fixtures/${rel}`], { cwd: REPO_ROOT }).status === 0;
+  const local = ['references/developer/901/gen/request.json', 'references/decisions.jsonl', 'references/regenerate-notes.json', 'developer/1/gen/x.json', 'decisions.jsonl'];
+  const kept = ['references/developer/901/spec.json', 'references/developer/901/layers/10-app/app.py', 'developer/1/spec.json'];
+  const wrong = [...local.filter((f) => !LOCAL.test(f) || !ignored(f)), ...kept.filter((f) => LOCAL.test(f) || ignored(f))];
+  check('fixture logs one folder deeper (fixtures/references/) stay local; their specs and layers do not', wrong.length === 0, wrong.join(', '));
+}
+
+// Paired builds (run.mjs --reviewed-at): two builds of one project at
+// different framework commits may differ in the framework's files and in the
+// hashes that follow from them: a plan citing a commit, and a record citing
+// that plan's blob, still match. A changed project file, a record citing a
+// different commit, or an extra untracked file is a difference.
+{
+  const { buildDifferences } = await import('./build-fixture.mjs');
+  const env = { ...process.env, GIT_AUTHOR_NAME: 'F', GIT_AUTHOR_EMAIL: 'f@example.invalid', GIT_COMMITTER_NAME: 'F', GIT_COMMITTER_EMAIL: 'f@example.invalid',
+    GIT_AUTHOR_DATE: '2026-09-24T09:00:00Z', GIT_COMMITTER_DATE: '2026-09-24T09:00:00Z' };
+  const g = (dir, ...a) => execFileSync('git', a, { cwd: dir, env, encoding: 'utf8' }).trim();
+  const make = (name, { skill, extra = '', cite = 'HEAD', untracked = false }) => {
+    const d = path.join(TMP, 'paired', name);
+    mkdirSync(path.join(d, '.claude/skills/developer'), { recursive: true });
+    g(d, 'init', '-q', '--template=', '-b', 'main');
+    g(d, 'commit', '-q', '--allow-empty', '-m', 'Initial commit');
+    writeFileSync(path.join(d, '.claude/skills/developer/SKILL.md'), skill);
+    writeFileSync(path.join(d, 'app.py'), 'print(1)\n');
+    g(d, 'add', '-A');
+    g(d, 'commit', '-q', '-m', 'Install STANDARDS');
+    writeFileSync(path.join(d, 'plan.md'), `Base: ${g(d, 'rev-parse', 'HEAD')}\n`);
+    g(d, 'add', '-A');
+    g(d, 'commit', '-q', '-m', 'Plan');
+    writeFileSync(path.join(d, 'record.md'), `Plan: blob ${g(d, 'hash-object', 'plan.md')}, at ${g(d, 'rev-parse', cite)}\n${extra}`);
+    g(d, 'add', '-A');
+    g(d, 'commit', '-q', '-m', 'Record');
+    if (untracked) writeFileSync(path.join(d, 'notes.txt'), 'x\n');
+    return d;
+  };
+  const a = make('a', { skill: 'version A\n' });
+  const b = make('b', { skill: 'version B\n' });
+  const c = make('c', { skill: 'version B\n', extra: 'one more line\n' });
+  const d = make('d', { skill: 'version A\n', untracked: true });
+  const e = make('e', { skill: 'version B\n', cite: 'HEAD~1' });
+  const [ab, ac, ad, ae] = [buildDifferences(a, b), buildDifferences(a, c), buildDifferences(a, d), buildDifferences(a, e)];
+  check('paired builds: framework files and the hashes they change may differ; a changed file, a different cited commit, or an untracked extra may not',
+    g(a, 'rev-parse', 'HEAD') !== g(b, 'rev-parse', 'HEAD') && ab.length === 0
+      && ac.includes('record.md differs') && ac.includes('record.md is staged differently')
+      && ad.includes('notes.txt is in only one build') && ad.includes('git status differs')
+      && ae.includes('record.md differs'), JSON.stringify({ ab, ac, ad, ae }));
+}
+
+// The same on real builds: a sample fixture built at v0.15.0 and at version B
+// (the local tag from `pnpm evals references build-b`) differs only in the
+// framework's files. Skipped in a clone that has not built version B.
+{
+  const { BASE_COMMIT, TAG } = await import('./references/build-b.mjs');
+  if (spawnSync('git', ['rev-parse', '-q', '--verify', `refs/tags/${TAG}^{commit}`], { cwd: REPO_ROOT }).status !== 0) {
+    console.log(`skip reference evals: paired build at v0.15.0 and version B (no local tag ${TAG}; run pnpm evals references build-b)`);
+  } else {
+    const { buildDifferences } = await import('./build-fixture.mjs');
+    const a = buildFixture({ specDir: fixture('developer', 1), out: path.join(TMP, 'paired-a'), commit: BASE_COMMIT });
+    const b = buildFixture({ specDir: fixture('developer', 1), out: path.join(TMP, 'paired-b'), commit: TAG });
+    const diff = buildDifferences(a.out, b.out);
+    check('reference evals: a sample built at v0.15.0 and at version B differs only in the framework files',
+      !a.problems.length && !b.problems.length && a.fixtureHash !== b.fixtureHash && diff.length === 0, JSON.stringify({ a: a.problems, b: b.problems, diff }));
+  }
+}
+
+// The reference evals' graders' runner, with a stand-in for docker: the last
+// GRADER_RESULT line counts, every listed check gets exactly one PASS or FAIL
+// (else ERROR), the container has no network and a read-only grader folder,
+// and a harness exit fails the container's checks but not the host's.
+{
+  const { gradeRun, loadGrader, runGraders } = await import('./references/graders.mjs');
+  const gdir = path.join(TMP, 'grader', 'developer-901');
+  mkdirSync(gdir, { recursive: true });
+  writeFileSync(path.join(gdir, 'grader.json'), JSON.stringify({ reference: 'skills/developer/references/security-fastapi.md', solutions: [{ patch: 'good.patch', kind: 'good' }, { patch: 'bad.patch', kind: 'bad', fails: ['lock'] }], checks: [
+    { id: 'lock', tier: 'outcome', text: 'locks' }, { id: 'header', tier: 'reference', text: 'Retry-After' },
+    { id: 'style', tier: 'control', text: 'style' }, { id: 'ci', tier: 'outcome', text: 'ci.yml exists' }] }));
+  writeFileSync(path.join(gdir, 'grade.sh'), 'echo never runs here\n');
+  for (const f of ['good.patch', 'bad.patch']) writeFileSync(path.join(gdir, f), '');
+  writeFileSync(path.join(gdir, 'host.mjs'), "import { existsSync } from 'node:fs';\nimport path from 'node:path';\n"
+    + "export async function grade({ projectDir }) { return { checks: [{ id: 'ci', verdict: existsSync(path.join(projectDir, 'ci.yml')) ? 'PASS' : 'FAIL' }] }; }\n");
+  const project = path.join(TMP, 'grader', 'project');
+  mkdirSync(project, { recursive: true });
+  writeFileSync(path.join(project, 'ci.yml'), 'on: push\n');
+  let seen = null;
+  const fake = (out, status = 1) => (args) => {
+    const mount = args[args.indexOf('-v') + 1].split(':')[0];
+    seen = { args, copied: existsSync(path.join(mount, 'ci.yml')) };
+    return { status, stdout: out, stderr: '' };
+  };
+  const ok = await runGraders({ graderDir: gdir, projectDir: project, docker: fake('GRADER_RESULT {"checks":[{"id":"lock","verdict":"FAIL"}]}\npytest output\n'
+    + 'GRADER_RESULT {"checks":[{"id":"lock","verdict":"PASS"},{"id":"header","verdict":"FAIL"},{"id":"style","verdict":"maybe"}]}\n') });
+  const v = Object.fromEntries(ok.checks.map((c) => [c.id, c.verdict]));
+  const harness = await runGraders({ graderDir: gdir, projectDir: project, docker: fake('', 125) });
+  const unknown = await runGraders({ graderDir: gdir, projectDir: project, docker: fake('GRADER_RESULT {"checks":[{"id":"bogus","verdict":"PASS"}]}\n') });
+  check('graders: the last GRADER_RESULT counts; a verdict other than PASS or FAIL, a missing one, or a harness exit is ERROR; host and container parts merge',
+    JSON.stringify(v) === '{"lock":"PASS","header":"FAIL","style":"ERROR","ci":"PASS"}'
+      && seen.copied && seen.args.join(' ').includes('--network none') && seen.args.includes(`${gdir}:/opt/grader:ro`) && !ok.problems.length
+      && harness.checks.filter((c) => c.verdict === 'ERROR').length === 3 && harness.checks.find((c) => c.id === 'ci').verdict === 'PASS'
+      && /could not run \(exit 125\)/.test(harness.problems.join())
+      && unknown.problems.some((p) => /bogus/.test(p)) && unknown.checks.find((c) => c.id === 'lock').verdict === 'ERROR',
+    JSON.stringify({ v, harness: harness.problems, unknown: unknown.problems }));
+  // gradeRun: the finished project comes from the run's after.tar.gz.
+  const hostOnly = path.join(TMP, 'grader', 'host-only');
+  mkdirSync(hostOnly, { recursive: true });
+  writeFileSync(path.join(hostOnly, 'grader.json'), JSON.stringify({ reference: 'skills/developer/references/security-fastapi.md', checks: [{ id: 'ci', tier: 'outcome', text: 'ci.yml exists' }] }));
+  cpSync(path.join(gdir, 'host.mjs'), path.join(hostOnly, 'host.mjs'));
+  const runDir = path.join(TMP, 'grader', 'run');
+  mkdirSync(runDir, { recursive: true });
+  writeFileSync(path.join(runDir, 'run.json'), JSON.stringify({ case: 'developer-901', projectRoot: '/work', runtime: {} }));
+  execFileSync('tar', ['-czf', path.join(runDir, 'after.tar.gz'), '-C', project, '.']);
+  const graded = await gradeRun(runDir, { graderDir: hostOnly });
+  const saved = JSON.parse(readFileSync(path.join(runDir, 'post-checks.json'), 'utf8'));
+  const bad = path.join(TMP, 'grader', 'bad');
+  mkdirSync(bad, { recursive: true });
+  writeFileSync(path.join(bad, 'grader.json'), JSON.stringify({ reference: 'skills/developer/references/security-fastapi.md', checks: [{ id: 'a', tier: 'outcome', text: 'x' }, { id: 'a', tier: 'style', text: 'y' }] }));
+  check('graders: gradeRun grades the run\'s after.tar.gz into post-checks.json with the grader\'s hash; grader.json is checked (ids, tiers, a part to run)',
+    graded.checks[0].verdict === 'PASS' && saved.project === 'after.tar.gz' && saved.checks[0].verdict === 'PASS' && /^[0-9a-f]{16}$/.test(saved.graderHash)
+      && loadGrader(bad).problems.length === 4,
+    JSON.stringify({ graded: graded.checks, bad: loadGrader(bad).problems }));
+}
+
+// The graders' manifest, more: a share check counts with its value and PASSes
+// only at 1; a trigger case and a judge-only task run nothing; grader.json is
+// checked (the reference, kinds, ids, the judge's task, solutions, rules); a
+// changed grader folder gets a new hash, so its runs are graded again.
+{
+  const { graderHash, loadGrader, runGraders } = await import('./references/graders.mjs');
+  const root = path.join(TMP, 'grader-more');
+  const mk = (name, manifest, files = {}) => {
+    const d = path.join(root, name);
+    mkdirSync(d, { recursive: true });
+    writeFileSync(path.join(d, 'grader.json'), JSON.stringify(manifest));
+    for (const [f, t] of Object.entries(files)) writeFileSync(path.join(d, f), t);
+    return d;
+  };
+  const REF = 'skills/developer/references/security-fastapi.md';
+  const share = mk('share', { reference: REF, checks: [{ id: 'mutants', tier: 'outcome', text: 'mutants caught', kind: 'share' }] },
+    { 'host.mjs': "export async function grade() { return { checks: [{ id: 'mutants', value: Number(process.env.SHARE_VALUE) }] }; }\n" });
+  const values = {};
+  for (const x of ['0.5', '1', '2', 'NaN']) {
+    process.env.SHARE_VALUE = x;
+    values[x] = (await runGraders({ graderDir: share, projectDir: root })).checks[0];
+  }
+  delete process.env.SHARE_VALUE;
+  check('graders: a share check counts with its value and PASSes only at 1; a value outside 0 to 1 is ERROR',
+    values['0.5'].verdict === 'FAIL' && values['0.5'].value === 0.5 && values['1'].verdict === 'PASS' && values['2'].verdict === 'ERROR' && values.NaN.verdict === 'ERROR',
+    JSON.stringify(values));
+  const trigger = mk('trigger', { trigger: { avoid: [REF], read: ['skills/architect/references/observability.md'] } });
+  const badTrigger = mk('bad-trigger', { trigger: { avoid: ['skills/developer/references/nope.md'] } });
+  const emptyTrigger = mk('empty-trigger', { trigger: {} });
+  // A stray grade.sh in a folder with no checks never runs.
+  const judgeOnly = mk('judge-only', { reference: 'skills/architect/references/databases.md', judge: { task: 'Design it.', items: [{ id: 'plan', tier: 'outcome', text: 'PASS when ...' }] },
+    solutions: [{ patch: 'good.patch', kind: 'good' }, { patch: 'bad.patch', kind: 'bad', fails: ['plan'] }] },
+  { 'grade.sh': 'echo GRADER_RESULT {"checks":[]}\n', 'good.patch': '', 'bad.patch': '' });
+  const noSolutions = mk('no-solutions', { reference: 'skills/architect/references/databases.md', judge: { task: 'Design it.', items: [{ id: 'plan', tier: 'control', text: 'PASS when ...' }] } });
+  const broken = mk('broken', { reference: 'skills/developer/styles/fastapi.md', checks: [{ id: 'a', tier: 'outcome', text: 'x', kind: 'count' }],
+    judge: { items: [{ id: 'a', tier: 'outcome', text: 'y' }] }, solutions: [{ patch: 'missing.patch', kind: 'good' }, { patch: 'grader.json', kind: 'bad' }],
+    rules: [{ check: 'zzz', file: 'skills/developer/SKILL.md', text: 'x' }] });
+  let ran = false;
+  const none = await runGraders({ graderDir: judgeOnly, projectDir: root, docker: () => { ran = true; return { status: 0, stdout: '', stderr: '' }; } });
+  const p = loadGrader(broken).problems.join(' | ');
+  check('graders: trigger cases and judge-only tasks run nothing; grader.json is checked (reference, kinds, ids, judge task, solutions, rules, an outcome check, known solutions)',
+    loadGrader(trigger).kind === 'trigger' && !loadGrader(trigger).problems.length && loadGrader(badTrigger).problems.length === 1 && loadGrader(emptyTrigger).problems.length === 1
+      && !loadGrader(judgeOnly).problems.length && !ran && none.checks.length === 0
+      && /known good and one known bad solution/.test(loadGrader(noSolutions).problems.join()) && /at least one outcome check/.test(loadGrader(noSolutions).problems.join())
+      && /reference "skills\/developer\/styles\/fastapi\.md"/.test(p) && /kind can only be "share"/.test(p) && /id a is listed twice/.test(p) && /give the judge a task statement/.test(p)
+      && /missing\.patch": no such patch/.test(p) && /a bad solution lists/.test(p) && /rule "zzz"/.test(p) && /neither grade\.sh nor host\.mjs/.test(p), p.slice(0, 600));
+  const h1 = graderHash(share);
+  writeFileSync(path.join(share, 'host.mjs'), `${readFileSync(path.join(share, 'host.mjs'), 'utf8')}// changed\n`);
+  check('graders: a changed grader folder gets a new hash', graderHash(share) !== h1 && graderHash(share) === graderHash(share));
+  // atStart: "pass" marks a check the task passes by changing nothing (Doc2's
+  // "no document changes"): the starting project must pass it.
+  const { expected } = await import('./references/check-graders.mjs');
+  const atStartBad = mk('at-start-bad', { reference: REF, checks: [{ id: 'same', tier: 'outcome', text: 'x', atStart: 'fail' }] }, { 'host.mjs': '' });
+  const start = { kind: 'start' };
+  check('graders: atStart "pass" makes the starting project pass that check; any other atStart is a problem',
+    /check same: atStart can only be "pass"/.test(loadGrader(atStartBad).problems.join())
+      && expected({ id: 'a', tier: 'outcome', atStart: 'pass' }, start) === 'PASS' && expected({ id: 'b', tier: 'outcome' }, start) === 'FAIL'
+      && expected({ id: 'c', tier: 'control' }, start) === null && expected({ id: 'd', tier: 'outcome', atStart: 'pass' }, { kind: 'bad', fails: ['d'] }) === 'FAIL',
+    loadGrader(atStartBad).problems.join(' | '));
+}
+
+// The reference evals' plan: the parts in order, --smoke, each version's
+// run.mjs arguments, and the cost estimate (the README's figures for 10
+// tasks and 5 trigger cases).
+{
+  const { BUDGET_USD, estimate, kindOf, makePlan, runArgs } = await import('./references/plan.mjs');
+  const { BASE_COMMIT, TAG } = await import('./references/build-b.mjs');
+  const c = (key) => { const [, role, id] = key.match(/^(.*)-(\d+)$/); return { key, role, id: Number(id), assertions: [], kind: kindOf(Number(id)) }; };
+  const ten = ['developer-901', 'developer-902', 'developer-903', 'developer-904', 'tester-901', 'tester-902', 'architect-901', 'architect-902', 'documenter-901', 'documenter-902'];
+  const five = ['developer-911', 'developer-912', 'developer-913', 'tester-911', 'architect-911'];
+  const plan = makePlan({ cases: [...ten, ...five, 'scoper-5'].map(c) });
+  const smoke = makePlan({ smoke: true, cases: [...ten, ...five].map(c) });
+  const e = estimate(plan);
+  const s = estimate(smoke);
+  const round = ([lo, hi]) => `${Math.round(lo)}-${Math.round(hi)}`;
+  const shape = (pl) => pl.parts.map((x) => `${x.name}:${x.cases.length}x${x.reps}`).join();
+  const a = runArgs(plan.parts[0], { runId: 'x', model: 'm', effort: 'high', budgetUsd: BUDGET_USD, execute: true }).join(' ');
+  const b = runArgs(plan.parts[1], { runId: 'x', model: 'm', effort: 'high' }).join(' ');
+  check('reference plan: tasks in A and B, documenter-38 in both, triggers in A, 3 runs each; --smoke is one A run per task; each version\'s commits; the README\'s estimate',
+    shape(plan) === 'A:10x3,B:10x3,A-documenter-38:1x3,B-documenter-38:1x3,A-triggers:5x3' && shape(smoke) === 'A:10x1'
+      && plan.problems.length === 1 && /scoper-5/.test(plan.problems[0])
+      && a.includes(`--run-id x/A --commit ${BASE_COMMIT} --reviewed-at ${BASE_COMMIT}`) && BUDGET_USD === 90 && a.endsWith('--suite-budget-usd 90 --execute')
+      && b.includes(`--run-id x/B --commit ${TAG} --reviewed-at ${BASE_COMMIT}`) && !b.includes('--execute') && !b.includes('--suite-budget-usd')
+      && e.count === 81 && round(e.total) === '90-180' && round(e.runs) === '75-149' && round(s.total) === '12-24',
+    JSON.stringify({ plan: shape(plan), e, s, a, b }));
+  // The settings each part and `references fixtures` get, and that the
+  // harness's config honors the catalog setting (an empty one is the default).
+  const { REFERENCES_ENV, SUITE_ENV } = await import('./references/plan.mjs');
+  const catalogDir = (value) => spawnSync('node', ['--input-type=module', '-e', "const { CATALOG_DIR } = await import(process.argv[1]); console.log(CATALOG_DIR);", pathToFileURL(path.join(HERE, 'lib/config.mjs')).href],
+    { encoding: 'utf8', env: { ...process.env, EVAL_CATALOG_DIR: value } }).stdout.trim();
+  check('reference plan: its parts and fixtures commands get the reference evals\' cases, catalog, and fixtures at release 0.15.0; documenter-38 gets the suite\'s',
+    REFERENCES_ENV.EVAL_CASES_DIR === path.join(EVALS_ROOT, 'references/cases') && REFERENCES_ENV.EVAL_CATALOG_DIR === path.join(EVALS_ROOT, 'references/catalog')
+      && REFERENCES_ENV.EVAL_FIXTURES_DIR === path.join(EVALS_ROOT, 'fixtures/references') && REFERENCES_ENV.EVAL_COMMIT === BASE_COMMIT
+      && Object.keys(SUITE_ENV).sort().join() === Object.keys(REFERENCES_ENV).sort().join() && SUITE_ENV.EVAL_CATALOG_DIR === '' && SUITE_ENV.EVAL_COMMIT === BASE_COMMIT
+      && catalogDir(REFERENCES_ENV.EVAL_CATALOG_DIR) === path.join(EVALS_ROOT, 'references/catalog') && catalogDir('') === path.join(EVALS_ROOT, 'catalog'),
+    JSON.stringify({ REFERENCES_ENV, SUITE_ENV, set: catalogDir(REFERENCES_ENV.EVAL_CATALOG_DIR), empty: catalogDir('') }));
+}
+
+// The reference evals' own cases (evals/references/): 10 tasks and 5 trigger
+// cases. Each has a catalog entry whose assertions code decides (the command
+// refuses any other), and a complete grader folder of its kind. The fixture
+// writer is told every string the leak guard rejects, each rule's text is in
+// its framework file at release 0.15.0 exactly once, so read detection finds
+// it, and each Tester mutant changes its fixture file in exactly one place.
+{
+  const { CATALOG_DIR: REF_CATALOG, FIXTURES_DIR: REF_FIXTURES, makePlan, referenceCases } = await import('./references/plan.mjs');
+  const { GRADERS_ROOT, loadGrader } = await import('./references/graders.mjs');
+  const { BASE_COMMIT } = await import('./references/build-b.mjs');
+  const cases = referenceCases();
+  const entries = Object.fromEntries([...new Set(cases.map((c) => c.role))].map((r) => [r, JSON.parse(readFileSync(path.join(REF_CATALOG, `${r}.json`), 'utf8')).cases]));
+  const shown = new Map();
+  const at = (file) => shown.get(file) ?? shown.set(file, spawnSync('git', ['show', `${BASE_COMMIT}:${file}`], { cwd: REPO_ROOT, encoding: 'utf8' }).stdout ?? '').get(file);
+  const bad = [];
+  for (const c of cases) {
+    const e = entries[c.role].find((x) => x.id === c.id);
+    const g = loadGrader(path.join(GRADERS_ROOT, c.key));
+    if (!e || e.assertions.length !== c.assertions.length || e.assertions.some((a, i) => a.i !== i || !a.deterministic_complete || a.graders.some((x) => x === 'trace' || x === 'judge'))) bad.push(`${c.key}: catalog`);
+    if (!g.manifest || g.kind !== (c.kind === 'task' ? 'task' : 'trigger')) bad.push(`${c.key}: grader kind`);
+    for (const x of g.problems) bad.push(`${c.key}: grader: ${x}`);
+    const mutants = path.join(GRADERS_ROOT, c.key, 'mutants.json');
+    const layers = path.join(REF_FIXTURES, c.role, String(c.id), 'layers');
+    for (const m of existsSync(mutants) ? JSON.parse(readFileSync(mutants, 'utf8')) : []) {
+      // The fixture's file as its last layer that writes it leaves it.
+      const file = existsSync(layers) ? readdirSync(layers).sort().map((l) => path.join(layers, l, m.file)).filter((f) => existsSync(f)).pop() : null;
+      if (!file || readFileSync(file, 'utf8').split(m.find).length !== 2) bad.push(`${c.key}: mutant ${m.id} does not change ${m.file} in exactly one place`);
+    }
+    const told = JSON.stringify(e?.fixture_details ?? []);
+    for (const s of g.manifest?.leakGuard ?? []) if (!told.includes(JSON.stringify(JSON.stringify(s)).slice(1, -1))) bad.push(`${c.key}: the writer is not told "${s}"`);
+    for (const r of g.manifest?.rules ?? []) if (at(r.file).split(r.text).length !== 2) bad.push(`${c.key}: rule ${r.check} is not in ${r.file} exactly once`);
+  }
+  const plan = makePlan({ cases });
+  check('reference cases: 10 tasks and 5 trigger cases, each with a catalog entry code can grade, a complete grader of its kind, every leak-guard string told to the writer, every rule found once, and every mutant applying once',
+    plan.tasks.length === 10 && plan.triggers.length === 5 && !plan.problems.length && !bad.length, JSON.stringify(bad.slice(0, 5)));
+}
+
+// The blinded judge's masking and evidence (references/judge.mjs): names and
+// paths of framework files become "[framework file]", project names stay; a
+// request that still names a reference is caught, even after a line break;
+// the evidence leaves out .claude/, .agents/, and .standards/, except a
+// record the grader includes, and never shows a framework file.
+{
+  const { auditRequest, blindEvidence, blindRequest, changedFilesText, mask } = await import('./references/judge.mjs');
+  const cases = {
+    'see .claude/skills/developer/references/security-fastapi.md now': 'see [framework file] now',
+    'read skills/developer/references/security-fastapi.md.': 'read [framework file].',
+    '/opt/standards/skills/tester/SKILL.md': '[framework file]',
+    '.standards/PROTOCOL.md and .standards/protocol/roles.md': '[framework file] and [framework file]',
+    'cat references/readme.md': 'cat [framework file]',
+    'security-fastapi rules': '[framework file] rules',
+    'postgres.md, docs/readme.md': '[framework file], [framework file]',
+    'postgres 14, README.md, .standards/project-references/api.md, .standards/STATE.md, app/skills/routes.py, readme.mdx': null,
+  };
+  const wrong = Object.entries(cases).filter(([i, o]) => mask(i) !== (o ?? i)).map(([i]) => `${i} -> ${mask(i)}`);
+  const t0 = Date.now();
+  mask(`${'a'.repeat(2_000_000)} ${'b/'.repeat(100_000)}`);
+  const ms = Date.now() - t0;
+  check('reference judge: framework names and paths are masked, project names are not; masking long text stays fast',
+    !wrong.length && ms < 2000, `${wrong.join('; ')} (${ms} ms)`);
+  const { withoutWrittenHeredocs: w } = await import('./references/reads.mjs');
+  check('reads: the text a heredoc only writes out (cat, tee) is not part of the command; one fed to a shell or interpreter, or written and then run, is',
+    w("cat > r.md <<'EOF'\nreferences/x.md\nEOF") === 'cat > r.md <<EOF' && w('mkdir d && tee d/a <<-END\n\tSKILL.md\n\tEND\necho ok') === 'mkdir d && tee d/a <<END\necho ok'
+      && w("cat > f <<'EOF'\nEOF\nls skills/developer/references/") === 'cat > f <<EOF\nls skills/developer/references/'
+      && w('cat <<EOF > x.md\nSKILL.md\nEOF\necho done') === 'cat <<EOF > x.md\necho done'
+      && ["bash <<'EOF'\ncat references/x.md\nEOF", "cat <<'EOF' | sh\ncat references/x.md\nEOF", "cat a.txt | bash <<'EOF'\ncat references/x.md\nEOF",
+        "python3 - <<'EOS'\nopen('references/x.md')\nEOS", "cat > /tmp/s.sh <<'EOF'\ncat references/x.md\nEOF\nsh /tmp/s.sh",
+        // An earlier cat on the line, a second heredoc on it, a run on the heredoc's own line, a
+        // tee or second redirect, and a substitution: each body runs, so each stays.
+        "cd /w && cat a.md && bash <<'EOF'\ncat references/x.md\nEOF", "python3 - <<'A' && cat > o.txt <<'B'\nopen('references/x.md')\nA\nhi\nB",
+        "cat > /tmp/s.sh <<'EOF' && bash /tmp/s.sh\ncat references/x.md\nEOF", "tee /tmp/s.sh > /dev/null <<'EOF'\ncat references/x.md\nEOF\nbash /tmp/s.sh",
+        "cat 2>/dev/null > /tmp/s.sh <<'EOF'\ncat references/x.md\nEOF\nsh /tmp/s.sh", 'bash -c "$(cat <<EOF\ncat references/x.md\nEOF\n)"',
+        "bash <(cat <<'EOF'\ncat references/x.md\nEOF\n)", "cat <<'EOF' \\\n| bash\ncat references/x.md\nEOF", "(cat <<'EOF'\ncat references/x.md\nEOF\n) | bash",
+        'bash -c "$(\ncat <<EOF\ncat references/x.md\nEOF\n)"', "cat 1> /tmp/s.sh <<'EOF'\ncat references/x.md\nEOF\nsh /tmp/s.sh"].every((c) => w(c) === c));
+  const req = (text) => blindRequest(blindEvidence({ task: 'Do it.', facts: [], files: '(no files changed)' }), { text });
+  check('reference judge: a request that names a reference is caught, in any block, after a line break too',
+    auditRequest(req('Follows\nsecurity-fastapi.md')).join() === 'security-fastapi.md' && !auditRequest(req('Locks after 5 tries.')).length
+      && auditRequest({ system: 'x', messages: [{ role: 'user', content: 'see references/x.md' }] }).length === 1);
+  const files = changedFilesText({ before: { 'app/main.py': '1', '.standards/STATE.md': '1', '.claude/skills/x/SKILL.md': '1', 'docs/old.md': '1' },
+    after: { 'app/main.py': '2', '.standards/STATE.md': '2', '.claude/skills/x/SKILL.md': '2', '.standards/docs/design.md': '1', '.standards/protocol/x.md': '1', '.agents/notes.md': '1' },
+    read: (f) => `text of ${f}`, include: ['.standards/docs/**', '.standards/protocol/**'] });
+  check('reference judge: the changed files are the project\'s, plus included records; never .claude/, .agents/, or .standards/ otherwise, nor a framework file',
+    files === '--- .standards/docs/design.md (added)\ntext of .standards/docs/design.md\n\n--- app/main.py (changed)\ntext of app/main.py\n\n--- docs/old.md (deleted)', JSON.stringify(files));
+}
+
+// The side-by-side summary (references/summary.mjs): scores from code checks
+// and judge items (a share check counts with its value, a timed-out run on
+// what it left), the gap with a seeded 90% range, pass counts per check,
+// reads, trigger and documenter-38 results, cost per version, problems, and
+// the rules fixed before the first run.
+{
+  const { bootstrapGap, nextSteps, summarizeReferences } = await import('./references/summary.mjs');
+  const b1 = bootstrapGap([[[1, 1, 1], [0, 0, 0]]], { seed: 7 });
+  const b2 = bootstrapGap([[[1, 0, 1], [0, 0, 1]], [[1, 1], [1, 0]]], { seed: 7 });
+  // Spread-out scores, so that two unseeded resamplings would differ.
+  const spread = [[[0.1, 0.25, 0.33, 0.5, 0.61, 0.72, 0.8, 0.95], [0.05, 0.2, 0.3, 0.42, 0.55, 0.6, 0.7, 0.9]]];
+  const [s1, s2, s3] = [7, 7, 8].map((seed) => bootstrapGap(spread, { seed }));
+  check('summary: the gap is the mean of the task gaps, its 90% range brackets it, and the seed repeats it',
+    b1.gap === 1 && b1.low === 1 && b1.high === 1 && Math.abs(b2.gap - (1 / 3 + 1 / 2) / 2) < 1e-9 && b2.low < b2.gap && b2.high > b2.gap
+      && s1.low === s2.low && s1.high === s2.high && s1.low !== s3.low && bootstrapGap([[[1], []]]).gap === null, JSON.stringify({ b1, b2, s1, s3 }));
+  // Each rule on its own: reads on 10 tasks (version A's 3 runs each), and the gaps.
+  const tasksRead = (low) => Array.from({ length: 10 }, (_, k) => ({ key: `t${k}`, label: `T${k}`, checks: [],
+    rows: [1, 2, 3].map((n) => ({ version: 'A', scored: true, read: k < low && n > 1 ? 'seen' : 'full' })) }));
+  const g = (gap, low, high) => ({ gap, low, high });
+  const rules = (o, r, t) => nextSteps({ outcome: o, reference: r, tasks: t }).map((x) => (x.applies ? 1 : 0)).join('');
+  const got = [rules(g(0.3, 0.1, 0.5), g(0, 0, 0), tasksRead(0)), rules(g(0.3, 0.1, 0.5), g(0, 0, 0), tasksRead(3)), rules(g(0.3, 0.1, 0.5), g(0, 0, 0), tasksRead(2)),
+    rules(g(0, -0.08, 0.09), g(0, 0, 0), tasksRead(0)), rules(g(0, -0.08, 0.09), g(0, 0, 0), tasksRead(3)), rules(g(0.05, -0.05, 0.2), g(0.5, 0.2, 0.8), tasksRead(0))];
+  check('summary: each rule fixed before the first run applies only on its own conditions, reads included',
+    got.join() === '10000,01000,10000,00100,01000,00001', got.join());
+  const root = path.join(TMP, 'ref-summary');
+  const gradersRoot = path.join(TMP, 'ref-summary-graders');
+  const put = (f, v) => { mkdirSync(path.dirname(f), { recursive: true }); writeFileSync(f, JSON.stringify(v)); };
+  const REF = 'skills/developer/references/security-fastapi.md';
+  const README_REF = 'skills/documenter/references/readme.md';
+  put(path.join(gradersRoot, 'developer-901', 'grader.json'), { label: 'D1', reference: REF,
+    checks: [{ id: 'lock', tier: 'outcome', text: 'locks' }, { id: 'mut', tier: 'outcome', text: 'mutants', kind: 'share' }, { id: 'hdr', tier: 'reference', text: 'Retry-After' }],
+    judge: { task: 't', items: [{ id: 'safe', tier: 'outcome', text: 'fails closed' }] } });
+  put(path.join(gradersRoot, 'developer-911', 'grader.json'), { trigger: { avoid: [REF] } });
+  const parts = [
+    { name: 'A', version: 'A', kind: 'tasks', cases: ['developer-901'], reps: 3 },
+    { name: 'B', version: 'B', kind: 'tasks', cases: ['developer-901'], reps: 3 },
+    { name: 'A-documenter-38', version: 'A', kind: 'probe', cases: ['documenter-38'], reps: 1 },
+    { name: 'B-documenter-38', version: 'B', kind: 'probe', cases: ['documenter-38'], reps: 1 },
+    { name: 'A-triggers', version: 'A', kind: 'triggers', cases: ['developer-911'], reps: 2 }];
+  put(path.join(root, 'references.json'), { runId: 'sum-1', smoke: false, model: 'm', effort: 'high', versions: { A: { commit: 'a'.repeat(40) }, B: { commit: 'b'.repeat(40) } }, parts });
+  const rep = (part, key, n) => path.join(root, part, 'cases', key, `r${n}`);
+  put(path.join(root, 'A', 'results.json'), [1, 2, 3].map((n) => ({ key: 'developer-901', rep: n, status: n === 3 ? 'TIMEOUT' : 'GRADED' })));
+  put(path.join(root, 'B', 'results.json'), [1, 2, 3].map((n) => ({ key: 'developer-901', rep: n, status: n === 3 ? 'ERROR' : 'GRADED', ...(n === 3 ? { error: 'exit 1' } : {}) })));
+  for (const v of ['A', 'B']) {
+    for (const n of [1, 2]) {
+      const d = rep(v, 'developer-901', n);
+      const A = v === 'A';
+      put(path.join(d, 'post-checks.json'), { checks: [{ id: 'lock', tier: 'outcome', verdict: A ? 'PASS' : 'FAIL' }, { id: 'mut', tier: 'outcome', kind: 'share', verdict: A && n === 1 ? 'PASS' : 'FAIL', value: A ? (n === 1 ? 1 : 0.5) : 0 }, { id: 'hdr', tier: 'reference', verdict: A ? 'PASS' : 'FAIL' }], problems: [] });
+      put(path.join(d, 'blind-verdicts.json'), { items: { safe: { tier: 'outcome', text: 'fails closed', verdict: A ? 'FAIL' : 'PASS', costUsd: 0.1 } } });
+      put(path.join(d, 'reads.json'), { references: { [REF]: { status: A ? ['full', 'partial'][n - 1] : 'not-seen' } }, rules: [{ exposed: A }, { exposed: false }], searches: !A && n === 1 ? [{ event: 3 }] : [] });
+      put(path.join(d, 'usage.json'), { costUsd: A ? 1.5 : 1, wallMs: 120000, turns: 20 });
+      put(path.join(d, 'verdicts.json'), { assertions: [{ grader: 'deterministic', verdict: 'PASS' }], invariants: [{ pass: true }] });
+    }
+  }
+  const t3 = rep('A', 'developer-901', 3);
+  put(path.join(t3, 'post-checks.json'), { checks: [{ id: 'lock', tier: 'outcome', verdict: 'PASS' }, { id: 'mut', tier: 'outcome', kind: 'share', verdict: 'PASS', value: 1 }, { id: 'hdr', tier: 'reference', verdict: 'PASS' }], problems: [] });
+  put(path.join(t3, 'blind-verdicts.json'), { items: { safe: { tier: 'outcome', text: 'fails closed', verdict: 'FAIL', costUsd: 0.1 } } });
+  put(path.join(t3, 'reads.json'), { references: { [REF]: { status: 'seen' } }, rules: [], searches: [] });
+  put(path.join(t3, 'usage.json'), { costUsd: 1.5, wallMs: 120000, turns: 20 });
+  put(path.join(`${rep('B', 'developer-901', 3)}-attempt1`, 'usage.json'), { costUsd: 0.5 });
+  for (const v of ['A', 'B']) {
+    put(path.join(root, `${v}-documenter-38`, 'results.json'), [{ key: 'documenter-38', rep: 1, status: 'GRADED' }]);
+    const d = rep(`${v}-documenter-38`, 'documenter-38', 1);
+    put(path.join(d, 'verdicts.json'), { assertions: [{ grader: 'judge', verdict: v === 'A' ? 'FAIL' : 'PASS', judgeCostUsd: 0.2 }, { grader: 'deterministic', verdict: 'PASS' }] });
+    put(path.join(d, 'reads.json'), { references: { [README_REF]: { status: v === 'A' ? 'full' : 'not-seen' } }, rules: [], searches: [] });
+    put(path.join(d, 'usage.json'), { costUsd: 1, wallMs: 60000, turns: 10 });
+  }
+  put(path.join(root, 'A-triggers', 'results.json'), [1, 2].map((n) => ({ key: 'developer-911', rep: n, status: 'GRADED' })));
+  for (const n of [1, 2]) {
+    const d = rep('A-triggers', 'developer-911', n);
+    put(path.join(d, 'reads.json'), { references: { [REF]: { status: n === 1 ? 'seen' : 'partial' } }, rules: [], searches: [] });
+    put(path.join(d, 'usage.json'), { costUsd: 0.7, wallMs: 60000, turns: 10 });
+  }
+  // Version B's third run was stopped before it reported anything (Ctrl+C): no score, unknown cost.
+  const b3 = rep('B', 'developer-901', 3);
+  mkdirSync(b3, { recursive: true });
+  writeFileSync(path.join(b3, 'transcript.jsonl'), '');
+  const early = summarizeReferences(root, { gradersRoot });
+  const earlyMd = readFileSync(path.join(root, 'references-summary.md'), 'utf8');
+  const near = (x, y) => Math.abs(x - y) < 1e-9;
+  const te = early.tasks[0];
+  const costOf = (sm) => Object.fromEntries(sm.cost.map((c) => [c.version, c]));
+  check('summary: run scores (share value, judge item, timed-out run scored, unfinished run not), the gap so far; rules not applied until every run has a score',
+    te.scores.A.outcome.length === 3 && near(te.scores.A.outcome[0], 2 / 3) && near(te.scores.A.outcome[1], 0.5) && near(te.scores.A.outcome[2], 2 / 3)
+      && te.scores.B.outcome.length === 2 && near(te.scores.B.outcome[0], 1 / 3) && near(early.pooled.outcome.gap, 11 / 18 - 1 / 3)
+      && early.final === false && early.unscored === 1 && early.nextSteps.length === 0 && earlyMd.includes('Not final: 1 of 6 task runs have no score yet')
+      && !earlyMd.includes('**Applies**') && costOf(early).B.unknown === 1
+      && early.problems.some((x) => /^B developer-901 r3: ERROR \(exit 1\)/.test(x)) && early.problems.some((x) => /B developer-901 r1: 1 calls looked for a references\/ path/.test(x)),
+    JSON.stringify({ scores: te.scores, final: early.final, unscored: early.unscored, cost: early.cost, problems: early.problems }));
+  // The rerun finishes it.
+  for (const f of ['post-checks.json', 'blind-verdicts.json', 'reads.json', 'usage.json', 'verdicts.json']) cpSync(path.join(rep('B', 'developer-901', 2), f), path.join(b3, f));
+  put(path.join(b3, 'blind-verdicts.json'), { items: { safe: { tier: 'outcome', text: 'fails closed', verdict: 'FAIL', costUsd: 0.1 } } });
+  put(path.join(root, 'B', 'results.json'), [1, 2, 3].map((n) => ({ key: 'developer-901', rep: n, status: 'GRADED' })));
+  const sum = summarizeReferences(root, { gradersRoot });
+  const md = readFileSync(path.join(root, 'references-summary.md'), 'utf8');
+  const t = sum.tasks[0];
+  const applies = sum.nextSteps.map((x) => x.applies);
+  const cost = costOf(sum);
+  check('summary: once complete, the gap and its range, pass counts per check (a share by its values), and the judge items',
+    sum.final === true && t.scores.B.outcome.length === 3 && near(t.scores.B.outcome[2], 0) && near(sum.pooled.outcome.gap, 11 / 18 - 2 / 9) && sum.pooled.outcome.low > 0
+      && near(sum.pooled.reference.gap, 1) && sum.pooled.control.gap === null
+      && t.checks.find((c) => c.id === 'lock').A.pass === 3 && t.checks.find((c) => c.id === 'lock').B.n === 3 && near(t.checks.find((c) => c.id === 'mut').A.sum, 2.5)
+      && t.checks.find((c) => c.id === 'safe').kind === 'judge',
+    JSON.stringify({ scores: t.scores, pooled: sum.pooled.outcome }));
+  check('summary: the rules (a large gap with reads, and version A worse on one check by 2 runs, apply), triggers, documenter-38, reads, and cost per version',
+    JSON.stringify(applies) === '[true,false,false,true,false]' && /D1 safe \(A 0 of 3, B 2 of 3\)/.test(sum.nextSteps[3].why)
+      && sum.triggers[0].rows.filter((x) => x.pass).length === 1 && sum.references[0].applied === '2 of 3' && sum.references[0].notApplied === '1 of 2'
+      && sum.probe.find((x) => x.version === 'A').pass === false && sum.probe.find((x) => x.version === 'B').pass === true && sum.probe.find((x) => x.version === 'A').read === 'full'
+      && near(cost.A.runUsd, 6.9) && near(cost.B.runUsd, 4.5) && cost.B.runs === 4 && cost.B.unknown === 0 && near(cost.A.judgeUsd, 0.5) && near(cost.B.judgeUsd, 0.5),
+    JSON.stringify({ applies, steps: sum.nextSteps.map((x) => x.why), cost: sum.cost }));
+  const reported = md.includes('| outcome | +0.39 |') && md.includes('**Applies**: Run a larger study') && md.includes('### D1: developer-901 (`security-fastapi.md`)')
+    && md.includes('Version A: 0 of 1 complete runs pass.') && md.includes('| mut: mutants | outcome | code | mean 0.83 (3 runs) | mean 0.00 (3 runs) |');
+  check('summary: the report has the result, the rules, and each task',
+    reported, reported ? '' : JSON.stringify({ problems: sum.problems, md: md.slice(0, 1500) }));
+}
+
+// The references command's own checks (references/pipeline.mjs): each case
+// needs a grader of its kind and assertions the suite's judge never grades;
+// a version's spend counts every attempt, and a run of unknown cost as $50.
+{
+  const { caseProblems, spentBy, uncheckedGraders } = await import('./references/pipeline.mjs');
+  const root = path.join(TMP, 'ref-pipeline');
+  const put = (f, v) => { mkdirSync(path.dirname(f), { recursive: true }); writeFileSync(f, JSON.stringify(v)); };
+  const gradersRoot = path.join(root, 'graders');
+  const fixturesDir = path.join(root, 'fixtures');
+  put(path.join(gradersRoot, 'developer-901', 'grader.json'), { reference: 'skills/developer/references/security-fastapi.md', checks: [{ id: 'a', tier: 'outcome', text: 'x' }] });
+  writeFileSync(path.join(gradersRoot, 'developer-901', 'host.mjs'), 'export async function grade() { return { checks: [] }; }\n');
+  put(path.join(gradersRoot, 'developer-911', 'grader.json'), { reference: 'skills/developer/references/security-fastapi.md', judge: { task: 't', items: [{ id: 'b', tier: 'outcome', text: 'y' }] } });
+  put(path.join(fixturesDir, 'developer', '901', 'spec.json'), { checks: [{ assertion: 0, complete: true, all: [] }, { assertion: 1, complete: false, all: [] }, { assertion: 2, na: true }] });
+  const cases = [{ key: 'developer-901', role: 'developer', id: 901, kind: 'task', assertions: ['a', 'b', 'c'] },
+    { key: 'developer-911', role: 'developer', id: 911, kind: 'trigger', assertions: [] },
+    { key: 'developer-902', role: 'developer', id: 902, kind: 'task', assertions: [] }];
+  const problems = caseProblems(cases, { gradersRoot, fixturesDir }).join(' | ');
+  for (const [part, dir, usage] of [['A', 'r1', { costUsd: 1.25 }], ['A', 'r1-attempt1', { costUsd: null, costUnknown: true }], ['A-triggers', 'r1', { costUsd: 0.5 }], ['B', 'r1', { costUsd: 9 }]]) {
+    put(path.join(root, 'run', part, 'cases', 'x', dir, 'usage.json'), usage);
+  }
+  // Started, then stopped by Ctrl+C before its usage was written; and one that never started.
+  put(path.join(root, 'run', 'A', 'cases', 'x', 'r2', 'stderr.log'), '');
+  writeFileSync(path.join(root, 'run', 'A', 'cases', 'x', 'r2', 'transcript.jsonl'), '');
+  mkdirSync(path.join(root, 'run', 'A', 'cases', 'x', 'r3'), { recursive: true });
+  const parts = [{ name: 'A', version: 'A' }, { name: 'A-triggers', version: 'A' }, { name: 'B', version: 'B' }];
+  const spentA = spentBy(path.join(root, 'run'), 'A', parts);
+  check('references command: a case needs a grader of its kind and only code-decided assertions; spend counts attempts, and a run that never reported its cost as $50',
+    /developer-901: assertion 1 would need the suite's judge/.test(problems) && /developer-911: its grader.json is for a task/.test(problems) && /developer-902: grader: .*has no grader\.json/.test(problems)
+      && spentA.usd === 101.75 && spentA.unknown === 2 && spentBy(path.join(root, 'run'), 'B', parts).usd === 9, `${problems} ${JSON.stringify(spentA)}`);
+  // The real runs need a judged check-graders pass of the grader and fixture as they are now.
+  const { graderHash } = await import('./references/graders.mjs');
+  const { checkInputsHash } = await import('./references/check-graders.mjs');
+  const passedFile = path.join(root, 'passed.json');
+  for (const id of [902, 903, 904, 905, 906]) {
+    put(path.join(gradersRoot, `developer-${id}`, 'grader.json'), { reference: 'skills/developer/references/security-fastapi.md' });
+    put(path.join(fixturesDir, 'developer', String(id), 'spec.json'), { reviewedBy: { fixtureHash: `f${id}` } });
+  }
+  put(path.join(fixturesDir, 'developer', '901', 'spec.json'), { checks: [], reviewedBy: { fixtureHash: 'f901' } });
+  const h = (id) => graderHash(path.join(gradersRoot, `developer-${id}`));
+  const ih = (id) => checkInputsHash(path.join(fixturesDir, 'developer', String(id)));
+  const entry = (id, more = {}) => ({ graderHash: h(id), fixtureHash: `f${id}`, inputsHash: ih(id), judged: true, ...more });
+  put(passedFile, { 'developer-901': entry(901), 'developer-902': entry(902, { judged: false }), 'developer-903': entry(903, { graderHash: 'stale' }),
+    'developer-905': entry(905, { fixtureHash: 'before-review' }), 'developer-906': entry(906, { inputsHash: 'facts-or-judge-changed' }) });
+  const unchecked = uncheckedGraders(['developer-901', 'developer-902', 'developer-903', 'developer-904', 'developer-905', 'developer-906'], { passedFile, gradersRoot, fixturesDir });
+  // A change to the facts the judge gets changes the inputs hash.
+  const factsBefore = ih(901);
+  put(path.join(fixturesDir, 'developer', '901', 'spec.json'), { checks: [], reviewedBy: { fixtureHash: 'f901' }, graderOnly: ['a new fact'] });
+  check('references command: the real runs need each grader to have passed check-graders with the judge, as the grader, fixture, facts, runtime, and judge are now',
+    unchecked.join() === 'developer-902,developer-903,developer-904,developer-905,developer-906' && /^[0-9a-f]{16}$/.test(factsBefore) && ih(901) !== factsBefore
+      && uncheckedGraders(['developer-901'], { passedFile, gradersRoot, fixturesDir }).length === 1, unchecked.join());
+}
+
+// The reference evals' judge parts end to end with a fake Claude API:
+// selftest/references.mjs in a child process with a scratch spend log.
+{
+  const scratch = path.join(TMP, 'references');
+  mkdirSync(scratch, { recursive: true });
+  const r = spawnSync('node', [path.join(HERE, 'selftest/references.mjs')], {
+    encoding: 'utf8', maxBuffer: 1 << 26,
+    env: { ...process.env, EVAL_FAKE_TRANSPORT: path.join(HERE, 'selftest/references-fake.mjs'), EVAL_FAKE_DIR: scratch, EVAL_SPEND_LOG: path.join(scratch, 'spend.jsonl'), EVAL_ALLOW_MODEL: '' },
+  });
+  let out = null;
+  try { out = JSON.parse(r.stdout.trim().split('\n').at(-1)); } catch { /* reported below */ }
+  if (!out) check('reference evals judge self-test ran', false, `${r.stderr.slice(-800)}`);
+  for (const c of out?.checks ?? []) check(c.name, c.ok, c.ok ? '' : c.detail);
+}
+
+// Read detection on a made-up transcript: a Read of a style file shows its
+// pointer (the reference is seen); sed of the reference is a partial read even
+// when the compound command failed; a whole-project grep line is a hit, not a
+// read; a project file that shares a line is not a read; a subagent's full
+// Read counts; a failed Read of a missing reference is a search; a reference
+// named only in git ls-files is not seen, but in an ls of its folder it is.
+{
+  const { detectReads } = await import('./references/reads.mjs');
+  const ref = 'skills/developer/references/security-fastapi.md';
+  const llm = 'skills/tester/references/llm-api-testing.md';
+  const style = 'skills/developer/styles/fastapi.md';
+  const lines = Array.from({ length: 30 }, (_, k) => `Rule ${k + 1}: lock the account after attempt ${k + 1}.`);
+  const files = {
+    [ref]: `${lines.join('\n')}\n`,
+    [llm]: 'Test a truncated reply.\nTest a refusal reply.\n',
+    [style]: '- Keep routes thin and typed.\n\nFor security detail, read `../references/security-fastapi.md` when needed.\n',
+  };
+  const numbered = (text) => text.split('\n').slice(0, -1).map((l, k) => `${k + 1}\t${l}`).join('\n');
+  const ev = (i, tool, input, output, extra = {}) => ({ i, tool, input, output, isError: false, subagent: false, ...(tool === 'Bash' ? { command: input.command } : {}), ...extra });
+  const trace = { events: [
+    ev(0, 'Read', { file_path: `/work/.claude/${style}` }, numbered(files[style])),
+    ev(1, 'Bash', { command: `cat pyproject.toml; sed -n 5,9p .claude/${ref}; which ruff`, description: 'check references' }, `Exit code 1\n${lines.slice(4, 9).join('\n')}`, { isError: true }),
+    ev(2, 'Bash', { command: 'grep -rn attempt .' }, `./.claude/${ref}:20:${lines[19]}\napp/main.py:3:attempts = 0`),
+    ev(3, 'Bash', { command: 'cat app/main.py' }, `${lines[11]}\nprint(1)`),
+    ev(4, 'Read', { file_path: `/work/.claude/${llm}` }, numbered(files[llm]), { subagent: true }),
+    ev(5, 'Read', { file_path: '/work/.claude/skills/developer/references/github-actions-python.md' }, 'File does not exist.', { isError: true }),
+    ev(6, 'Bash', { command: 'git ls-files' }, '.claude/skills/architect/references/databases.md\napp/main.py'),
+    ev(7, 'Bash', { command: 'ls .claude/skills/architect/references' }, 'databases.md\n'),
+    // A grep inside the skill folder reads; a whole-project grep next to a cat of a style is still a hit; cat -n of one line reads it.
+    ev(8, 'Bash', { command: 'cd .claude/skills/developer && grep -rn "attempt 12" .' }, `./references/security-fastapi.md:12:${lines[11]}`),
+    ev(9, 'Bash', { command: `cd /work && cat .claude/${style}; grep -rn "attempt 14" .` }, `./.claude/${ref}:14:${lines[13]}`),
+    ev(10, 'Bash', { command: `cat -n .claude/${ref} | sed -n 27p` }, `    27\t${lines[26]}`),
+    // A | inside quotes does not split the grep from the folder it searches.
+    ev(11, 'Bash', { command: 'grep -rn -E "attempt 15|attempt 16" .claude/skills/developer/references/' }, `.claude/${ref}:15:${lines[14]}\n.claude/${ref}:16:${lines[15]}`),
+  ] };
+  const references = [ref, llm, 'skills/developer/references/github-actions-python.md', 'skills/architect/references/databases.md'];
+  const rules = [{ check: 'r1', file: ref, text: `${lines[5]}\n${lines[6]}` }, { check: 'r2', file: ref, text: lines[19] },
+    { check: 'r3', file: ref, text: lines[24] }, { check: 'r4', file: ref, text: 'not in this version' }];
+  const r = detectReads(trace, files, { references, rules });
+  const s = (k) => r.references[k]?.status ?? r.files[k]?.status;
+  check('read detection: partial, full, seen, and not-seen as documented; grep reads and hits by segment; cat -n lines; rule exposure by text; searches',
+    s(ref) === 'partial' && JSON.stringify(r.references[ref].ranges) === '[[5,9],[12,12],[15,16],[27,27]]' && JSON.stringify(r.references[ref].hits) === '[[14,14],[20,20]]'
+      && s(style) === 'full' && s(llm) === 'full' && r.references[llm].subagent
+      && s('skills/developer/references/github-actions-python.md') === 'not-seen' && r.searches.some((x) => x.event === 5 && x.error)
+      && s('skills/architect/references/databases.md') === 'seen' && JSON.stringify(r.references['skills/architect/references/databases.md'].events) === '[7]'
+      && !r.searches.some((x) => x.event === 1 && /check references/.test(x.target))
+      && JSON.stringify(r.rules.map((x) => [x.lines, x.exposed])) === '[[[6,7],true],[[20,20],true],[[25,25],false],[null,false]]',
+    JSON.stringify({ refs: Object.fromEntries(Object.entries(r.references).map(([k, x]) => [path.basename(k), x])), searches: r.searches, rules: r.rules }));
+
+  // Each mechanism on its own made-up event, so removing any one fails here:
+  // SKILL.md read at the start (its pointer to an unread reference is seen);
+  // a reference's bare sibling name is seen; two references cat'ed together
+  // keep a line they share, by neighbors; head's headings break a tie the
+  // neighbors leave, and a cat after them still counts; output too large for
+  // the transcript counts when read back, plain or as grep lines; a whole-
+  // project listing next to an ls of one role's references sees only that
+  // role's files; ls -R of a skill folder lists its references; a stray shared
+  // line is a hit; a listing line before a cat is not a heading; a cd into a
+  // references folder resolves relative names, and a gap of blank lines still
+  // joins one range; globs and braces read what they match.
+  const R = (n) => `skills/architect/references/${n}.md`;
+  const skill = 'skills/architect/SKILL.md';
+  const [aos, db, pg, rail, redis, vec, mongo, obs, gcp, after, ds, listed, listed2, cache, b1, b2, gfile, q, q2, q3, z] = ['android-offline-sync', 'databases', 'postgres',
+    'deploy-railway', 'redis', 'pgvector', 'mongodb', 'observability', 'deploy-gcp', 'after', 'default-stack', 'listed', 'listed2', 'cache', 'b1', 'b2', 'g',
+    'q', 'q2', 'q3', 'z'].map(R);
+  const [p1, p2, p4, p5, p6, p7, p8, p9] = [1, 2, 4, 5, 6, 7, 8, 9].map((j) => R(`p${j}`));
+  const m1 = 'skills/architect/modes/m1.md';
+  const [dup, listed3, gl] = ['dup', 'listed3', 'gl'].map(R);
+  const dupStyle = 'skills/architect/styles/dup.md';
+  const linesOf = (k, n) => Array.from({ length: n }, (_, j) => `${path.basename(k)} guidance line ${j + 1}.`);
+  const files2 = Object.fromEntries([aos, rail, redis, vec, mongo, after, ds, listed, listed2, b1, b2, gfile, q, q2, q3, z, p1, p2, m1, p4, p5, p7, p8, p9,
+    dup, listed3, dupStyle].map((k) => [k, `${linesOf(k, k === redis ? 20 : 6).join('\n')}\n`]));
+  files2[gl] = 'gl first guidance line.\nSKILL.md: the main file of a role.\ngl third guidance line.\n';
+  files2[p6] = 'p6 first guidance line.\np6 second guidance line.\nExample steps:\np6 fourth guidance line.\n';
+  files2[skill] = 'Architect skill.\nFor offline sync, read `references/android-offline-sync.md`.\n';
+  files2[db] = 'DB first line here.\nShared rule: use migrations.\nDB third line here.\nSee [`deploy-railway.md`](deploy-railway.md) for hosting.\n';
+  files2[pg] = 'PG first line here.\nShared rule: use migrations.\nPG third line here.\n';
+  files2[obs] = `Shared opening line for both files.\n${linesOf(obs, 5).join('\n')}\n`;
+  files2[gcp] = `Shared opening line for both files.\n${linesOf(gcp, 5).join('\n')}\n`;
+  files2[cache] = 'Cache line one here.\n\nCache line three here.\n';
+  const head = (k, n) => files2[k].split('\n').slice(0, n);
+  const saved = '/home/runner/.claude/projects/-work/s1/tool-results/abc.txt';
+  const savedGrep = '/home/runner/.claude/projects/-work/s1/tool-results/def.txt';
+  const persisted = (p, preview) => `<persisted-output>\nOutput too large (30KB). Full output saved to: ${p}\n\nPreview (first 2KB):\n${preview.join('\n')}\n</persisted-output>`;
+  const grepLines = head(gfile, 6).map((l, j) => `.claude/${gfile}:${j + 1}:${l}`);
+  const trace2 = { events: [
+    ev(0, 'Bash', { command: `cat .claude/${db} .claude/${pg}` }, `${files2[db]}${files2[pg]}`),
+    ev(1, 'Bash', { command: `cat .claude/${redis}` }, persisted(saved, head(redis, 2))),
+    ev(2, 'Read', { file_path: saved, offset: 3 }, head(redis, 20).slice(2).map((l, j) => `${j + 103}\t${l}`).join('\n')),
+    ev(3, 'Bash', { command: 'git ls-files | head -3; ls .claude/skills/architect/references' }, `.claude/skills/developer/references/security-fastapi.md\nlisted.md`),
+    ev(4, 'Bash', { command: `head -2 .claude/${vec}; cat notes.md` }, `${head(vec, 2).join('\n')}\nan unrelated note line\n${head(vec, 6)[5]}`),
+    ev(5, 'Bash', { command: `git ls-files .claude/skills/architect | head -2; cat .claude/${mongo}` }, `.claude/${gcp}\n.claude/${skill}\n${files2[mongo]}`),
+    ev(6, 'Bash', { command: `head -n 1 .claude/${obs} .claude/${gcp}; cat .claude/${after}` }, `==> .claude/${obs} <==\n${head(obs, 1)}\n\n==> .claude/${gcp} <==\n${head(gcp, 1)}\n${files2[after]}`),
+    ev(7, 'Bash', { command: 'cat .claude/skills/architect/references/default-*.md' }, files2[ds]),
+    ev(8, 'Bash', { command: 'cd .claude/skills/architect && ls -R .' }, '.:\nSKILL.md\nreferences\n\n./references:\nlisted2.md\n'),
+    ev(9, 'Bash', { command: 'cd .claude/skills/architect/references && cat cache.md' }, 'Cache line one here.\n\nCache line three here.'),
+    ev(10, 'Bash', { command: 'cat .claude/skills/architect/references/{b1,b2}.md' }, `${files2[b1]}${files2[b2]}`),
+    ev(11, 'Bash', { command: 'grep -rn "guidance" .claude/skills/architect' }, persisted(savedGrep, grepLines.slice(0, 2))),
+    ev(12, 'Read', { file_path: savedGrep }, grepLines.slice(2).map((l, j) => `${j + 3}\t${l}`).join('\n')),
+    // A listing path is no heading for a stray line after it; lines alone under a heading are read; a found path is seen past a "Files:" heading.
+    ev(13, 'Bash', { command: `git ls-files .claude/skills/architect/references | head -1; cat .claude/${mongo}` }, `.claude/${q}\n${head(q, 3)[2]}`),
+    ev(14, 'Bash', { command: `head -n 1 .claude/${q2} .claude/${q3}` }, `==> .claude/${q2} <==\n${head(q2, 1)}\n\n==> .claude/${q3} <==\n${head(q3, 1)}`),
+    ev(15, 'Bash', { command: 'ls -R .claude/skills/architect/modes; find .claude/skills/architect/references -name "z*"' }, `.claude/skills/architect/modes:\nfeature.md\n.claude/${z}`),
+    // The shell keeps its folder between calls, unless a cd failed; a cd to the skills folder counts.
+    ev(16, 'Bash', { command: 'cd .claude/skills/architect/references' }, ''),
+    ev(17, 'Bash', { command: 'cat p1.md' }, files2[p1]),
+    ev(18, 'Bash', { command: 'cd /nonexistent' }, 'bash: cd: /nonexistent: No such file or directory', { isError: true }),
+    ev(19, 'Bash', { command: 'cat p2.md' }, files2[p2]),
+    ev(20, 'Bash', { command: 'cd /work/.claude/skills && cat architect/modes/m1.md' }, files2[m1]),
+    // wc only names a file: project lines that match it are not a read. A heading ends at a line its file lacks.
+    ev(21, 'Bash', { command: `cd /work && wc -l .claude/${p4}; cat notes.md` }, `6 .claude/${p4}\n${head(p4, 4).slice(1).join('\n')}`),
+    ev(22, 'Bash', { command: `echo "=== .claude/${p5}"; cat notes2.md` }, `=== .claude/${p5}\nan unrelated first line\n${head(p5, 3).slice(1).join('\n')}`),
+    // One ls folder prints no headings, so a "...:" line that sed prints hides nothing; a for loop's files print through "$f".
+    ev(23, 'Bash', { command: `ls .claude/skills/architect/references 2>&1; sed -n 1,3p .claude/${p6}` }, `p7.md\n${head(p6, 3).join('\n')}`),
+    ev(24, 'Bash', { command: `for f in .claude/${p8} .claude/${p9}; do cat "$f"; done` }, `${files2[p8]}${files2[p9]}`),
+    // ls of a skill folder's * prints folder headings: a style named like a reference is not that reference.
+    ev(25, 'Bash', { command: 'ls .claude/skills/architect/*' }, 'SKILL.md\n\n.claude/skills/architect/styles:\ndup.md\n\n.claude/skills/architect/references:\nlisted3.md\n'),
+    // A reference line that starts like a grep line ("SKILL.md: ...") is still the reference's own line.
+    ev(26, 'Bash', { command: 'cd /work/.claude/skills/architect && cat references/gl.md' }, files2[gl]),
+  ] };
+  const r2 = detectReads(trace2, files2, { references: [ref], role: 'architect', rules: [{ check: 's1', file: skill, text: 'For offline sync, read `references/android-offline-sync.md`.' }] });
+  const s2 = (k) => r2.references[k]?.status ?? r2.files[k]?.status;
+  const rg = (k) => JSON.stringify(r2.files[k]?.ranges);
+  const wrong = Object.entries({
+    'SKILL.md at the start': s2(skill) === 'full' && r2.files[skill].atStart,
+    'its pointer is seen': s2(aos) === 'seen' && r2.files[aos].atStart,
+    'a sibling name is seen': s2(rail) === 'seen',
+    'shared lines by neighbors': s2(db) === 'full' && s2(pg) === 'full',
+    'headings break ties': rg(obs) === '[[1,1]]' && rg(gcp) === '[[1,1]]',
+    'a cat after headings counts': s2(after) === 'full',
+    'saved output read back': s2(redis) === 'full',
+    'saved grep output read back': s2(gfile) === 'full',
+    'listing scoped to its role': s2(ref) === 'not-seen' && s2(listed) === 'seen',
+    'ls -R of a skill folder': s2(listed2) === 'seen',
+    'a stray shared line is a hit': rg(vec) === '[[1,2]]' && JSON.stringify(r2.files[vec].hits) === '[[6,6]]',
+    'a listing line is not a heading': s2(mongo) === 'full',
+    'cd and a blank line in one range': s2(cache) === 'full' && rg(cache) === '[[1,3]]',
+    'globs and braces': s2(ds) === 'full' && s2(b1) === 'full' && s2(b2) === 'full',
+    'a listing path is no heading': s2(q) === 'seen',
+    'lines alone under a heading are read': rg(q2) === '[[1,1]]' && rg(q3) === '[[1,1]]',
+    'a found path is seen past other headings': s2(z) === 'seen',
+    'the folder carries over between calls': s2(p1) === 'full',
+    'a failed cd changes nothing': s2(p2) === 'full',
+    'a cd to the skills folder counts': s2(m1) === 'full',
+    'a named but unprinted file is no candidate': s2(p4) === 'seen',
+    'a heading ends at a line its file lacks': s2(p5) === 'seen',
+    'one ls folder has no headings': s2(p7) === 'seen' && rg(p6) === '[[1,3]]',
+    'a for loop prints its files': s2(p8) === 'full' && s2(p9) === 'full',
+    'ls headings from a glob': s2(listed3) === 'seen' && s2(dup) === 'not-seen',
+    'a grep-like line of a printed file': s2(gl) === 'full',
+    'rule in SKILL.md exposed': r2.rules[0].exposed,
+  }).filter(([, ok]) => !ok).map(([name]) => name);
+  check('read detection: SKILL.md, siblings, shared lines, headings, saved outputs, listings by role and ls -R, stray lines, cd, ranges, globs, braces',
+    wrong.length === 0, wrong.length ? `${wrong.join('; ')} — ${JSON.stringify(r2.files)}` : '');
 }
 
 console.log(failures ? `\nselftest: ${failures} failure(s)` : '\nselftest: all checks passed');

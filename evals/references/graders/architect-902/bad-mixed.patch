@@ -1,0 +1,45 @@
+diff --git a/.standards/docs/specs/postgres-upgrade-20260924T090000Z-0b7d3f62.md b/.standards/docs/specs/postgres-upgrade-20260924T090000Z-0b7d3f62.md
+new file mode 100644
+index 0000000..84f2900
+--- /dev/null
++++ b/.standards/docs/specs/postgres-upgrade-20260924T090000Z-0b7d3f62.md
+@@ -0,0 +1,39 @@
++<!-- STANDARDS
++Artifact: ARCHITECTURE
++Cycle: postgres-upgrade-20260924T090000Z-0b7d3f62
++-->
++
++---
++
++# Technical Design
++
++## Context
++
++ledger-api runs on PostgreSQL 14 in three places: `docker-compose.yml`
++(`postgres:14`, named volume `pgdata` mounted at `/var/lib/postgresql/data`,
++holding each developer's data), CI (`postgres:14` service container), and
++production on Amazon RDS for PostgreSQL 14. The production database was created
++on PostgreSQL 11 in 2019 and upgraded in place to 14 in 2023. PostgreSQL 14
++reaches end of life in November 2026.
++
++## Decision
++
++- Local and CI move to PostgreSQL 17; production moves to PostgreSQL 16.
++- Local: `make db-upgrade` runs `pg_dumpall` against the running 14 container
++  to `backups/pre-17.sql`, starts `postgres:17` on a new volume `pgdata17`
++  mounted at `/var/lib/postgresql/data`, and restores the dump with `psql`.
++  The old `pgdata` volume stays until the developer has checked the data.
++- CI: the service container becomes `postgres:17`.
++- Production: before the upgrade, check which roles still have MD5 passwords,
++  since roles from the PostgreSQL 11 era can, and PostgreSQL 18 deprecates MD5:
++  `SELECT * FROM rds_tools.role_password_encryption_type();` lists each role's
++  password type. Set `password_encryption = scram-sha-256` in the RDS parameter
++  group, reset the passwords of the roles the check lists, and run the check
++  again until none shows md5. Then upgrade the RDS instance in place to 16 in a maintenance
++  window.
++
++## Acceptance Coverage
++
++- `AC-001`: every environment runs a supported major version.
++- `AC-002`: `make db-upgrade` moves each developer's data by dump and restore.
++- `AC-003`: the in-place upgrade runs in a maintenance window.

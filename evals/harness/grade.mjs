@@ -298,10 +298,11 @@ export async function grade(runDir, specDir, { judge = 'off' } = {}) {
   // file. Fixtures never contain one, so a hit means the role reached outside
   // (a mirror of the public repo, say); the run is flagged for review.
   // Matches a path into any skills/<role>/evals folder (with or without a
-  // trailing slash or file name), evals.json, or the answer key's own field
-  // name appearing in a tool's output.
+  // trailing slash or file name), evals.json, the reference evals' cases and
+  // hidden graders (evals/references/), or the answer key's own field name
+  // appearing in a tool's output.
   const answerKeyAccess = c.trace.events
-    .filter((e) => /skills\/[\w-]+\/evals\b|evals\.json/.test(JSON.stringify(e.input)) || /skills\/[\w-]+\/evals\b|evals\.json|"expected_output"/.test(e.output ?? ''))
+    .filter((e) => /skills\/[\w-]+\/evals\b|evals\.json|evals\/references\b/.test(JSON.stringify(e.input)) || /skills\/[\w-]+\/evals\b|evals\.json|evals\/references\b|"expected_output"/.test(e.output ?? ''))
     .map((e) => `event ${e.i}: ${e.tool}`);
   const out = {
     case: spec.case, caseHash: kase.hash, status: 'GRADED', assertions, invariants, answerKeyAccess,

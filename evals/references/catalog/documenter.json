@@ -1,0 +1,137 @@
+{
+  "role": "documenter",
+  "summary": {
+    "stage1_candidates": [],
+    "top_issues": []
+  },
+  "cases": [
+    {
+      "id": 901,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "The implementation of AC-001 to AC-004 is committed and verified; the documents listed in the prompt still describe the state before the cycle."
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "DOCUMENTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "claude",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "provenance {path: .standards/docs/documentation/${ID}.md, artifact DOCUMENTATION, cycle ${ID}}; field Status equals COMPLETE on that path. complete true."
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "reply"
+          ],
+          "deterministic_complete": true,
+          "note": "state WorkflowState equals REVIEWING_FINAL, Handoff.Kind equals FORWARD, Handoff.From equals DOCUMENTING; reply_matches \"/reviewer\\b\"; reply_matches \"FINAL_DELIVERABLE|final[- ]deliverable\" with flags i. Require no fresh-chat wording. complete true."
+        }
+      ],
+      "fixture_details": [
+        "Standalone fixture (no base): a brownfield project committed before the STANDARDS install, in pre-install layers with a few commits of ordinary history, then layers for this cycle's records and state. Use the cycle id in the prompt exactly.",
+        "Monorepo datahub. The cycle's code is committed in earlier layers: apps/api/app/routes/imports.py (POST /imports with a bearer-token dependency and an optional Idempotency-Key header, answering 202 with an ImportJob, or 409 when the key was used with a different file), apps/api/app/schemas.py (ImportJob with id, status, created_at, and error), apps/api/app/config.py (IMPORT_MAX_BYTES, required), apps/api/tests/unit/ and apps/api/tests/integration/, .github/workflows/api.yml (uv run pytest tests/unit and uv run pytest tests/integration), apps/web/ (an imports page that shows pending and failed imports), apps/web/package.json (scripts dev, build, test \"vitest run\", and test:e2e \"playwright test\"), and .github/workflows/web.yml (pnpm test and pnpm test:e2e).",
+        "apps/api/openapi.yaml as before the cycle, the hand-maintained contract (a comment at its top says the web client's types are generated from it): openapi 3.1.0; components.securitySchemes.bearerAuth (type http, scheme bearer); components.schemas ImportJob (id, status with the enum running and done only, created_at), Error, and UploadForm; paths /imports post with operationId createImport, a multipart body that refers to UploadForm, responses 201 referring to ImportJob and 400 and 413 referring to Error, and no security and no parameters; and /imports/{import_id} get with operationId getImport, security bearerAuth, and 200 referring to ImportJob. No response anywhere is 202 or 409, and no parameter is Idempotency-Key.",
+        "apps/api/README.md: Setup (uv sync), Run (uv run uvicorn app.main:app --reload), Test (uv run pytest), a Configuration table with DATABASE_URL and STORAGE_DIR, and an API section saying the contract is openapi.yaml in this folder. apps/api/.env.example: DATABASE_URL and STORAGE_DIR with placeholder values. apps/web/README.md: Setup (pnpm install), Run (pnpm dev), Test (pnpm test), and a Pages section where the imports page uploads a file and lists finished imports. Root README.md: an overview with links to both READMEs. None of these documents names IMPORT_MAX_BYTES, tests/unit, tests/integration, test:e2e, Idempotency-Key, 202, or 409.",
+        "No OpenAPI linter or other documentation tooling is installed, and no lowercase readme.md exists anywhere.",
+        "Scope: AC-001 to AC-004 as worded in the prompt; the scope defers retrying a failed import from the web page. The upstream records describe the implemented change, the new setting, and the new commands.",
+        "STATE.md: DOCUMENTING, Handoff FORWARD from REVIEWING_IMPLEMENTATION, CompletionPolicy FULL_DELIVERABLE. The development plan is COMPLETE, the verification report is COMPLETE with every acceptance criterion verified, and the implementation review passed with no open findings. No documentation record exists, and no records of earlier cycles exist under .standards/docs/.",
+        "runtime.blockHosts: pypi.org, files.pythonhosted.org, registry.npmjs.org, registry.yarnpkg.com, deb.debian.org, security.debian.org, astral.sh. Add selfChecks that a fetch from pypi.org fails.",
+        "None of these strings may appear anywhere in the built project, its records, or its commit messages (the grader's leak guard checks the starting project): \"Documentation Impact\", \"nearest relevant document\", \"intentionally left unchanged\", \"stable operation IDs\", \"component reuse\".",
+        "Name no framework file anywhere in the project or its records, outside the installed managed blocks: no path containing references/, skills/<role>/, PROTOCOL.md, or SKILL.md; no file name such as fastapi.md, readme.md (lowercase), databases.md, postgres.md, redis.md, or observability.md; and no hyphenated name such as security-fastapi, github-actions-python, llm-api-testing, or fastapi-testing. The blinded judge masks these names, so check-graders refuses a starting project that holds one. README.md is fine."
+      ],
+      "catalog_note": "Written 2026-11-02 for the reference evals (evals/README.md, \"Reference evals\"). Both assertions are workflow checks that exact checks decide (\"complete\": true): pnpm evals references refuses a case whose assertions need the suite's judge. fixture_details states what the hidden graders in evals/references/graders/<case>/ rely on: follow it exactly. The role never sees it."
+    },
+    {
+      "id": 902,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "The cycle only renamed the private helper _parse_rows in app/imports/parser.py to _read_rows and moved its tests from tests/test_parser.py to tests/imports/test_parser.py; behavior, the HTTP API, the settings, and the commands are unchanged.",
+        "The project's documents are README.md, openapi.yaml (the API contract), .env.example, and docs/architecture.md. None names the helper or the test files, so none needs a change."
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "DOCUMENTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development",
+          "verification",
+          "review-implementation"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "claude",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "provenance {path: .standards/docs/documentation/${ID}.md, artifact DOCUMENTATION, cycle ${ID}}; field Status equals COMPLETE on that path. complete true."
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "reply"
+          ],
+          "deterministic_complete": true,
+          "note": "state WorkflowState equals REVIEWING_FINAL, Handoff.Kind equals FORWARD, Handoff.From equals DOCUMENTING; reply_matches \"/reviewer\\b\"; reply_matches \"FINAL_DELIVERABLE|final[- ]deliverable\" with flags i. Require no fresh-chat wording. complete true."
+        }
+      ],
+      "fixture_details": [
+        "Standalone fixture (no base): a brownfield project committed before the STANDARDS install, in pre-install layers with a few commits of ordinary history, then layers for this cycle's records and state. Use the cycle id in the prompt exactly.",
+        "Project imports-api: app/imports/parser.py with parse_csv(stream) calling the private _read_rows(reader); the cycle's commits renamed _parse_rows to _read_rows and moved tests/test_parser.py to tests/imports/test_parser.py (with tests/imports/__init__.py if the layout needs it). python3 -m pytest passes.",
+        "Documents: README.md (setup with uv, running with uvicorn, testing with uv run pytest, and a short architecture overview that names modules such as app/imports/parser.py by purpose only); openapi.yaml (the API contract for POST /imports and GET /imports/{import_id}); .env.example (DATABASE_URL and UPLOAD_DIR with placeholder values); and docs/architecture.md (a module overview). No document names _parse_rows, _read_rows, or a test file path. No CHANGELOG exists.",
+        "Scope: AC-001 and AC-002 as worded in the prompt. Technical design: an internal refactor with no change to behavior, the API, settings, or commands. The verification report runs python3 -m pytest; the implementation review passed with no findings.",
+        "STATE.md: DOCUMENTING, Handoff FORWARD from REVIEWING_IMPLEMENTATION, CompletionPolicy FULL_DELIVERABLE. The development plan is COMPLETE, the verification report is COMPLETE with every acceptance criterion verified, and the implementation review passed with no open findings. No documentation record exists, and no records of earlier cycles exist under .standards/docs/.",
+        "graderOnly must hold every grader_only_facts sentence above, even where the files also show it: the blinded judge reads only graderOnly and the changed files.",
+        "runtime.blockHosts: pypi.org, files.pythonhosted.org, registry.npmjs.org, registry.yarnpkg.com, deb.debian.org, security.debian.org, astral.sh. Add selfChecks that a fetch from pypi.org fails.",
+        "None of these strings may appear anywhere in the built project, its records, or its commit messages (the grader's leak guard checks the starting project): \"intentionally left unchanged\", \"Documentation Impact\", \"no documentation change\", \"no documentation impact\", \"Internal API refactor\".",
+        "Name no framework file anywhere in the project or its records, outside the installed managed blocks: no path containing references/, skills/<role>/, PROTOCOL.md, or SKILL.md; no file name such as fastapi.md, readme.md (lowercase), databases.md, postgres.md, redis.md, or observability.md; and no hyphenated name such as security-fastapi, github-actions-python, llm-api-testing, or fastapi-testing. The blinded judge masks these names, so check-graders refuses a starting project that holds one. README.md is fine."
+      ],
+      "catalog_note": "Written 2026-11-02 for the reference evals (evals/README.md, \"Reference evals\"). Both assertions are workflow checks that exact checks decide (\"complete\": true): pnpm evals references refuses a case whose assertions need the suite's judge. fixture_details states what the hidden graders in evals/references/graders/<case>/ rely on: follow it exactly. The role never sees it."
+    }
+  ]
+}

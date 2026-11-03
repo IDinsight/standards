@@ -89,7 +89,9 @@ export function caseState(kase, sha) {
 // config), so a clone would build those fixtures differently than reviewed.
 // Each spec dir's generation log, the decision logs, and .DS_Store are local
 // by design. Run with the user's own git environment (config.userGitEnv).
-const LOCAL = /^[^/]+\/[^/]+\/gen\/|^(decisions\.jsonl|regenerate-notes\.json)$|(^|\/)\.DS_Store$/;
+// The reference evals' fixtures and logs sit one folder deeper, under
+// references/ (fixtures/.gitignore lists the same paths).
+export const LOCAL = /^(references\/)?[^/]+\/[^/]+\/gen\/|^(references\/)?(decisions\.jsonl|regenerate-notes\.json)$|(^|\/)\.DS_Store$/;
 export function uncommittableFixtureFiles(env = process.env) {
   const rel = path.relative(REPO_ROOT, FIXTURES_ROOT);
   if (!existsSync(FIXTURES_ROOT) || rel.startsWith('..')) return [];

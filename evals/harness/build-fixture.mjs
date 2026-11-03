@@ -21,7 +21,7 @@
 // spec.json, grader-only facts, and deterministic checks stay outside the
 // project directory so the agent under test cannot read them.
 import { execFileSync } from 'node:child_process';
-import { cpSync, existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, readlinkSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
@@ -290,6 +290,52 @@ export function buildFixture({ specDir, out, client = 'claude', commit = DEFAULT
     commits[s.join('\t')] ??= h;
   }
   return { case: spec.case ?? null, base: spec.base ?? null, bases: resolved.bases, caseHash: kase?.hash ?? null, fixtureHash, framework: framework.sha, client, out, check, problems, revisions: { commits }, ms: Date.now() - started };
+}
+
+// Framework files: what a release of STANDARDS installs into a project. Two
+// builds of one spec at different framework commits may differ only here
+// (run.mjs --reviewed-at).
+export const FRAMEWORK_PATH = /^(\.claude\/skills\/|\.agents\/skills\/|\.standards\/PROTOCOL\.md$|\.standards\/protocol\/)/;
+
+// Differences between two builds of one spec at different framework commits,
+// outside the framework's files: every file, the index, the status, the refs,
+// and the commits (subjects, order, and parents). The install commit differs,
+// so every later commit hash differs too, and so does the blob hash of any
+// file that cites one. Before contents are compared, each build's commit
+// hashes become their place in its own history (so ${COMMIT:<subject>} must
+// still name the same commit), and any other full hash, such as a blob a
+// record cites with ${BLOB:<path>}, becomes <hash>. Returns [] when they agree.
+export function buildDifferences(a, b) {
+  const history = (dir) => git(dir, ['log', '--all', '--format=%H%x09%P%x09%s']).split('\n').filter(Boolean)
+    .map((l) => { const [c, parents, ...s] = l.split('\t'); return [c, parents, s.join('\t')]; });
+  const [ha, hb] = [history(a), history(b)];
+  const shape = (h) => { const at = new Map(h.map(([c], i) => [c, i])); return h.map(([, p, s]) => `${p.split(' ').filter(Boolean).map((x) => at.get(x)).join(',')}\t${s}`); };
+  const out = [];
+  if (JSON.stringify(shape(ha)) !== JSON.stringify(shape(hb))) out.push('the commits differ (subjects, order, or parents)');
+  const refs = (dir) => `${git(dir, ['rev-parse', '--abbrev-ref', 'HEAD'])}\n${git(dir, ['for-each-ref', '--format=%(refname)'])}`;
+  if (refs(a) !== refs(b)) out.push('the branches or tags differ');
+  const norm = (buf, h) => h.reduce((text, [c], i) => text.split(c).join(`<commit ${i}>`), buf.toString('latin1')).replace(/\b[0-9a-f]{40}\b/g, '<hash>');
+  const same = (x, y) => norm(x, ha) === norm(y, hb);
+  const raw = (dir, rel) => { const f = path.join(dir, rel); return lstatSync(f).isSymbolicLink() ? Buffer.from(`symlink -> ${readlinkSync(f)}`) : readFileSync(f); };
+  const [ma, mb] = [manifest(a), manifest(b)];
+  for (const rel of new Set([...Object.keys(ma), ...Object.keys(mb)])) {
+    if (FRAMEWORK_PATH.test(rel) || ma[rel] === mb[rel]) continue;
+    if (!(rel in ma) || !(rel in mb)) out.push(`${rel} is in only one build`);
+    else if (!same(raw(a, rel), raw(b, rel))) out.push(`${rel} differs`);
+  }
+  // Index entries: mode, blob, stage, path.
+  const index = (dir) => new Map(git(dir, ['ls-files', '-s']).split('\n').filter(Boolean)
+    .map((l) => { const [meta, rel] = l.split('\t'); return [rel, meta.split(' ')]; }).filter(([rel]) => !FRAMEWORK_PATH.test(rel)));
+  const blob = (dir, sha) => execFileSync('git', ['cat-file', 'blob', sha], { cwd: dir, maxBuffer: 1 << 28 });
+  const [ia, ib] = [index(a), index(b)];
+  for (const rel of new Set([...ia.keys(), ...ib.keys()])) {
+    const [x, y] = [ia.get(rel), ib.get(rel)];
+    if (!x || !y) out.push(`${rel} is in only one build's index`);
+    else if (x[0] !== y[0] || x[2] !== y[2] || (x[1] !== y[1] && !same(blob(a, x[1]), blob(b, y[1])))) out.push(`${rel} is staged differently`);
+  }
+  const status = (dir) => git(dir, ['status', '--porcelain=v1', '-uall']).split('\n').filter((l) => l && !FRAMEWORK_PATH.test(l.slice(3)));
+  if (JSON.stringify(status(a)) !== JSON.stringify(status(b))) out.push('git status differs');
+  return out;
 }
 
 // Files a layer directory contributes, relative to the project root.

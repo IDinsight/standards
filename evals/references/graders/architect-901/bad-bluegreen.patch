@@ -1,0 +1,62 @@
+diff --git a/.standards/docs/specs/deploy-migrations-20260924T090000Z-e6c4129b.md b/.standards/docs/specs/deploy-migrations-20260924T090000Z-e6c4129b.md
+new file mode 100644
+index 0000000..066641a
+--- /dev/null
++++ b/.standards/docs/specs/deploy-migrations-20260924T090000Z-e6c4129b.md
+@@ -0,0 +1,56 @@
++<!-- STANDARDS
++Artifact: ARCHITECTURE
++Cycle: deploy-migrations-20260924T090000Z-e6c4129b
++-->
++
++---
++
++# Technical Design
++
++## Context
++
++shipments-api is a FastAPI service on PostgreSQL 16 with SQLAlchemy and
++Alembic. Pushes to main deploy it to Fly.io with `flyctl deploy`; a person
++applies migrations afterwards with `fly ssh console -C "alembic upgrade head"`.
++Production's `DATABASE_URL` is a Fly.io secret. CI runs the tests against a
++postgres:16 service container; `tests/conftest.py` creates the tables with
++`Base.metadata.create_all`. The history includes a migration that dropped
++`customers.fax`.
++
++## Decision
++
++Each app machine applies pending migrations when it starts, in the FastAPI
++lifespan handler, before the app accepts requests. The handler lists the
++pending revisions with Alembic's script API. If one drops a table, column, or
++index (`op.drop_table`, `op.drop_column`, `op.drop_index`), the machine exits
++without migrating; otherwise the handler runs `alembic upgrade head`.
++To keep two machines from migrating at once, they take a lock in a new Redis
++instance on Fly.io before migrating. fly.toml sets
++`[deploy] strategy = "bluegreen"`: each deploy boots new machines next to the
++running ones, and traffic moves to them only after every new machine passes
++the existing `/health` check. If a migration fails, the new machine exits
++before it passes that check, the deploy fails without moving traffic, and the
++machines already running keep serving the previous version. Migrations that
++drop a table, column, or index are therefore never applied at startup: a
++person runs them by hand with `fly ssh console -C "alembic upgrade head"`
++after taking a backup and checking that it restores.
++
++## Acceptance Coverage
++
++- `AC-001`: a new machine migrates before it accepts requests.
++- `AC-002`: a failed migration keeps the new machines from passing their
++  health check, so the blue-green deploy fails before traffic moves; the old
++  machines keep serving.
++- `AC-003`: CI keeps creating the schema with `Base.metadata.create_all` on
++  its `test` database, which matches the models the migrations produce.
++
++## Components
++
++- `app/main.py` (lifespan), `fly.toml` (deploy strategy), a new Redis app on
++  Fly.io for the migration lock, `docs/operations.md`.
++
++## Build Plan
++
++1. Add the lifespan migration and the Redis lock.
++2. Set the blue-green deploy strategy in `fly.toml`.
++3. Update `docs/operations.md`.

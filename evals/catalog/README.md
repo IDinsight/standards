@@ -24,6 +24,11 @@ says:
 
 Every case at v0.15.0 has an entry.
 
+The reference evals keep their own catalog, in the same format, in
+`evals/references/catalog/`. Their entries add `fixture_details`: what the
+hidden graders need the fixture to hold, and the strings it must not hold.
+`pnpm evals references fixtures` reads that catalog instead of this one.
+
 ## Who uses it
 
 | Reader                                 | Use                                                                                                                                               |

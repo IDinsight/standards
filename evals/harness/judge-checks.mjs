@@ -71,8 +71,8 @@ const DO_NOTHING = new RegExp([
 export const isPositiveAssertion = (text) => !DO_NOTHING.test(text);
 
 // Deterministic order from a label: sha256(label + id).
-const seeded = (label, list, key) => [...list].sort((a, b) => createHash('sha256').update(label + key(a)).digest('hex').localeCompare(createHash('sha256').update(label + key(b)).digest('hex')));
-const shortHash = (s) => createHash('sha256').update(path.resolve(s)).digest('hex').slice(0, 6);
+export const seeded = (label, list, key) => [...list].sort((a, b) => createHash('sha256').update(label + key(a)).digest('hex').localeCompare(createHash('sha256').update(label + key(b)).digest('hex')));
+export const shortHash = (s) => createHash('sha256').update(path.resolve(s)).digest('hex').slice(0, 6);
 
 // Every judge-graded assertion of the runs, with its request and the run's
 // evidence. Ids carry a short hash of the run directory, so the same case in

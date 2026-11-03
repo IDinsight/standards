@@ -1,0 +1,87 @@
+diff --git a/.standards/docs/specs/deploy-migrations-20260924T090000Z-e6c4129b.md b/.standards/docs/specs/deploy-migrations-20260924T090000Z-e6c4129b.md
+new file mode 100644
+index 0000000..42968cb
+--- /dev/null
++++ b/.standards/docs/specs/deploy-migrations-20260924T090000Z-e6c4129b.md
+@@ -0,0 +1,81 @@
++<!-- STANDARDS
++Artifact: ARCHITECTURE
++Cycle: deploy-migrations-20260924T090000Z-e6c4129b
++-->
++
++---
++
++# Technical Design
++
++## Context
++
++shipments-api is a FastAPI service on PostgreSQL 16 with SQLAlchemy and
++Alembic. Pushes to main deploy it to Fly.io with `flyctl deploy`; a person
++applies migrations afterwards with `fly ssh console -C "alembic upgrade head"`.
++Production's `DATABASE_URL` is a Fly.io secret. CI runs the tests against a
++postgres:16 service container; `tests/conftest.py` creates the tables with
++`Base.metadata.create_all`. The history includes a migration that dropped
++`customers.fax`.
++
++## Decision
++
++Apply migrations in Fly.io's release step, which runs once per deploy on a
++temporary machine before any new machine takes traffic. Migrations that drop
++data are never applied by an automatic step.
++
++- `fly.toml` gains `[deploy] release_command = "python -m app.release"`.
++  `app/release.py` lists the pending revisions with Alembic's script API. If
++  any pending revision drops a table, column, or index (`op.drop_table`,
++  `op.drop_column`, `op.drop_index`), it exits non-zero without migrating;
++  otherwise it runs `alembic upgrade head`.
++- A migration that drops data ships in its own release. A person first takes a
++  backup and verifies that it restores (`pg_dump` to a file, restored into a
++  scratch database), then runs `fly ssh console -C "alembic upgrade head"`,
++  then deploys. `docs/operations.md` describes these steps.
++- The app never migrates at startup and never calls `create_all`.
++
++## Acceptance Coverage
++
++- `AC-001`: the release command applies pending migrations before the new
++  version takes traffic.
++- `AC-002`: a non-zero exit of the release command stops the deploy; the
++  running machines keep serving the previous version.
++- `AC-003`: CI migrates its test database with Alembic before the tests.
++
++## Components
++
++- `fly.toml` (release command), `app/release.py` (new), `tests/conftest.py`,
++  `.github/workflows/ci.yml`, `docs/operations.md`. No new service or store.
++
++## Interfaces and Contracts
++
++- Databases are named per environment: `shipments_api_dev` locally,
++  `shipments_api_test` in CI, `shipments_api_prod` in production. The CI
++  service container is renamed from `test` to `shipments_api_test`.
++- Production credentials stay in the Fly.io secret `DATABASE_URL`.
++
++## Data and Control Flow
++
++1. Push to main; the deploy workflow runs `flyctl deploy`.
++2. Fly.io builds the image and runs the release command on a temporary machine.
++3. Exit 0: new machines start and take traffic. Non-zero: the deploy stops and
++   the old machines keep serving.
++
++## Technical Acceptance Criteria
++
++- `AC-001`: after a deploy, `alembic current` in production equals head.
++- `AC-002`: a failing migration leaves the previous release serving.
++- `AC-003`: `tests/conftest.py` runs `alembic upgrade head` against
++  `TEST_DATABASE_URL` once at the start of the test session, replacing
++  `create_all`; CI points it at the PostgreSQL service `shipments_api_test`.
++  Tests never run on SQLite.
++
++## Build Plan
++
++1. Add `app/release.py` and the release command.
++2. Switch `tests/conftest.py` to Alembic; rename the CI database.
++3. Update `docs/operations.md`.
++
++## Risks and Follow-up
++
++- A long migration holds the deploy; keep migrations short.

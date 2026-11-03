@@ -7,7 +7,7 @@
 //   node run.mjs --role tester [...]      (every case of one role; see below)
 //   node run.mjs --all [...]              (every case of every role)
 //                [--model claude-sonnet-5-5] [--effort <level>] [--client claude]
-//                [--run-id <id>] [--execute]
+//                [--commit <ref> [--reviewed-at <ref>]] [--run-id <id>] [--execute]
 //
 // Layout written under evals/runs/<run-id>/:
 //   run.json                        config, framework commit, versions, prices
@@ -26,7 +26,7 @@ import { cpSync, createWriteStream, existsSync, mkdirSync, readFileSync, renameS
 import os from 'node:os';
 import path from 'node:path';
 
-import { BASES_DIR, buildFixture, frameworkAt, resolveSpec } from './build-fixture.mjs';
+import { BASES_DIR, buildDifferences, buildFixture, frameworkAt, resolveSpec } from './build-fixture.mjs';
 import { DOCKER_KEY_ARGS, NO_HELPERS, apiKeyProblems, dockerKeyEnv, gitHolds, redactKey } from './lib/credentials.mjs';
 import { checkFacts } from './validate-fixture.mjs';
 import { DEFAULT_COMMIT, FIXTURES_ROOT, REPO_ROOT, ROLES, findCase, loadRole } from './lib/cases.mjs';
@@ -48,7 +48,7 @@ const args = Object.fromEntries(process.argv.slice(2).join(' ').split(/\s+--/).f
 const notRun = [];
 function roleCases(role) {
   return loadRole(role).filter((c) => {
-    const { state, why } = caseState(c, commit);
+    const { state, why } = caseState(c, reviewedAt);
     if (state === 'ready' || (args['allow-draft'] === true && !['deferred', 'missing'].includes(state))) return true;
     notRun.push({ key: c.key, status: 'NOT_RUN', error: `${state}: ${why}` });
     return false;
@@ -56,6 +56,12 @@ function roleCases(role) {
 }
 // Framework commit to install into fixtures; recorded in run.json.
 const commit = git(REPO_ROOT, ['rev-parse', args.commit ?? DEFAULT_COMMIT]);
+// --reviewed-at: the commit the fixtures were reviewed at, when the run
+// installs a different one (the reference evals' version B); --commit by
+// default. Readiness and the reviewed build are checked at this commit, and
+// each run builds its fixture at both: the builds must agree outside the
+// framework's files (build-fixture.mjs buildDifferences).
+const reviewedAt = git(REPO_ROOT, ['rev-parse', args['reviewed-at'] ?? args.commit ?? DEFAULT_COMMIT]);
 const cfg = {
   cases: args.all ? ROLES.flatMap(roleCases) : args.role ? roleCases(args.role) : String(args.cases ?? '').split(',').filter(Boolean),
   role: args.role ?? null,
@@ -74,6 +80,7 @@ const cfg = {
   image: args.image ?? IMAGE,
   // Framework commit to install into fixtures; recorded in run.json.
   commitArg: args.commit ?? DEFAULT_COMMIT,
+  reviewedAtArg: args['reviewed-at'] ?? args.commit ?? DEFAULT_COMMIT,
   // Hosts made unreachable inside the container, so a role cannot fetch the
   // public repository (which contains skills/*/evals/) or other answer sources.
   blockHosts: args['block-hosts'] ? String(args['block-hosts']).split(',').filter(Boolean) : DEFAULT_BLOCK_HOSTS,
@@ -111,9 +118,9 @@ async function runOne(key, rep) {
   const kase = findCase(key);
   const specDir = path.join(FIXTURES_ROOT, kase.role, String(kase.id));
   const spec = JSON.parse((await import('node:fs')).readFileSync(path.join(specDir, 'spec.json'), 'utf8'));
-  // The fixture must be ready to run at this commit (lib/readiness.mjs).
+  // The fixture must be ready to run at the commit it was reviewed at (lib/readiness.mjs).
   if (!cfg.allowDraft) {
-    const { state, why } = caseState(kase, commit);
+    const { state, why } = caseState(kase, reviewedAt);
     if (state !== 'ready') return { key, rep, status: 'ERROR', error: `fixture not ready (${state}): ${why}` };
   }
   // Spec status must be "reviewed" (see allowDraft above).
@@ -130,14 +137,27 @@ async function runOne(key, rep) {
   // keep tarballs with .git and a .git-free copy for graders and reviewers.
   const work = path.join(os.tmpdir(), 'standards-eval-work', runId, key, `r${rep}`);
   mkdirSync(dir, { recursive: true });
+  // --reviewed-at: the fixture is also built at the reviewed commit, and the
+  // run's build must match that build outside the framework's files.
+  const reviewed = reviewedAt === commit ? null : buildFixture({ specDir, out: `${work}-reviewed`, client: cfg.client, commit: reviewedAt });
   const build = buildFixture({ specDir, out: work, client: cfg.client, commit });
-  writeFileSync(path.join(dir, 'fixture.json'), JSON.stringify(build, null, 2));
+  const differences = reviewed && !reviewed.problems.length && !build.problems.length ? buildDifferences(reviewed.out, work) : [];
+  if (reviewed) rmSync(reviewed.out, { recursive: true, force: true });
+  writeFileSync(path.join(dir, 'fixture.json'), JSON.stringify(reviewed
+    ? { ...build, reviewedBuild: { commit: reviewedAt, fixtureHash: reviewed.fixtureHash, problems: reviewed.problems }, differences }
+    : build, null, 2));
+  if (reviewed?.problems.length) return { key, rep, status: 'ERROR', error: `fixture at ${reviewedAt.slice(0, 7)}: ${reviewed.problems.join('; ')}` };
   if (build.problems.length) return { key, rep, status: 'ERROR', error: `fixture: ${build.problems.join('; ')}` };
-  // Only the exact build that passed review (or the owner's fix) runs.
-  if (!cfg.allowDraft && spec.reviewedBy?.fixtureHash && build.fixtureHash !== spec.reviewedBy.fixtureHash) {
-    return { key, rep, status: 'ERROR', error: `fixture build ${build.fixtureHash} differs from the reviewed build ${spec.reviewedBy.fixtureHash}; re-review` };
+  // Only the exact build that passed review (or the owner's fix) runs: with
+  // --reviewed-at, the build at that commit.
+  const reviewedHash = (reviewed ?? build).fixtureHash;
+  if (!cfg.allowDraft && spec.reviewedBy?.fixtureHash && reviewedHash !== spec.reviewedBy.fixtureHash) {
+    return { key, rep, status: 'ERROR', error: `fixture build ${reviewedHash} differs from the reviewed build ${spec.reviewedBy.fixtureHash}; re-review` };
   }
   if (!cfg.allowDraft && !spec.reviewedBy?.fixtureHash) return { key, rep, status: 'ERROR', error: 'the spec records no reviewed build; re-review' };
+  if (differences.length) {
+    return { key, rep, status: 'ERROR', error: `the builds at ${reviewedAt.slice(0, 7)} and ${commit.slice(0, 7)} differ outside the framework's files: ${differences.slice(0, 5).join('; ')}` };
+  }
   const before = await snapshot(work, { commit });
   // Gate 2 on the exact fixture this run uses: stated prompt facts must match.
   const facts = checkFacts(kase, work, before, spec.factExemptions);
@@ -351,7 +371,7 @@ const done = (key, rep) => {
 };
 const kept = earlier.filter((r) => r.rep && done(r.key, r.rep));
 if (existsSync(path.join(runRoot, 'run.json')) && kept.length) console.log(`resuming ${runId}: ${kept.length} runs already done`);
-else writeFileSync(path.join(runRoot, 'run.json'), JSON.stringify({ runId, commit, ...cfg, versions, startedAt: new Date().toISOString() }, null, 2));
+else writeFileSync(path.join(runRoot, 'run.json'), JSON.stringify({ runId, commit, reviewedAt, ...cfg, versions, startedAt: new Date().toISOString() }, null, 2));
 const jobs = cfg.cases.flatMap((key) => Array.from({ length: cfg.reps }, (_, r) => ({ key, rep: r + 1, run: () => runWithRetry(key, r + 1) })))
   .filter((j) => !done(j.key, j.rep));
 // results.json is rewritten after every run, so an interruption loses nothing finished.

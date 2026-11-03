@@ -7,7 +7,8 @@ import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 
 import { predicateOf } from '../grade.mjs';
-import { EVALS_ROOT, FIXTURES_ROOT } from './cases.mjs';
+import { FIXTURES_ROOT } from './cases.mjs';
+import { CATALOG_DIR } from './config.mjs';
 import { runtimeProblems } from './runtime.mjs';
 
 // Assertions that describe counterfactual, future, or optional behavior, which
@@ -46,7 +47,7 @@ export const LISTED_NA = 'listed N/A:';
 // `complete: true` would let code alone decide them.
 export function judgeRoutedAssertions(kase) {
   try {
-    const cat = JSON.parse(readFileSync(path.join(EVALS_ROOT, 'catalog', `${kase.role}.json`), 'utf8')).cases.find((c) => c.id === kase.id);
+    const cat = JSON.parse(readFileSync(path.join(CATALOG_DIR, `${kase.role}.json`), 'utf8')).cases.find((c) => c.id === kase.id);
     return new Set((cat?.assertions ?? []).filter((a) => !a.deterministic_complete || (a.graders ?? []).some((g) => g === 'trace' || g === 'judge')).map((a) => a.i));
   } catch { return new Set(); }
 }

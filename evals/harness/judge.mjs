@@ -85,7 +85,7 @@ function clip(text) {
 // One chronological record of the run: the agent's text, each tool call with
 // its input and output, and stop-hook events, in the order they happened.
 // Subagent entries are labeled: the user never saw a subagent's text.
-function timeline(c) {
+export function timeline(c) {
   const entries = [
     ...c.trace.texts.map((t) => ({ seq: t.seq, text: `[${t.subagent ? 'subagent text (not shown to the user)' : 'agent text'}]\n${t.text}` })),
     ...c.trace.hooks.map((h) => ({ seq: h.seq, text: `[hook event]\n${clip(JSON.stringify(h))}` })),
