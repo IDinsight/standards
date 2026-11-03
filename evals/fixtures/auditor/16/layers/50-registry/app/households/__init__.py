@@ -1,1 +1,0 @@
-"""Household records."""
