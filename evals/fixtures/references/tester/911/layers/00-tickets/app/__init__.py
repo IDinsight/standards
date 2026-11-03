@@ -1,1 +1,0 @@
-"""helpdesk-api application package."""

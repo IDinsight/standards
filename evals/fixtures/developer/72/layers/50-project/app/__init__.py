@@ -1,1 +1,0 @@
-"""visits-api application package."""

@@ -1,10 +1,14 @@
 # STANDARDS skills evals
 
-This directory holds the harness that runs the eval cases in
+The harness in this directory runs the eval cases in
 `skills/<role>/evals/evals.json` against a STANDARDS release and grades the
 results. You run it from your own terminal; nothing here needs a Claude Code
 session to drive it. The [reference evals](#reference-evals) use the same
 harness to test whether the role references make the roles' work better.
+
+The harness and its data are not in git. They come in an archive that you unpack
+into this directory: see [Get the harness](#get-the-harness). Git holds this
+README, `package.json`, and the eval reports.
 
 | Setting                     | Default                             | Change it with                              |
 | --------------------------- | ----------------------------------- | ------------------------------------------- |
@@ -51,13 +55,49 @@ otherwise. To test Opus 5.5, set `EVAL_JUDGE_MODEL` to another model first.
   container gets 2 CPUs and 4 GB of memory, and 6 run at once by default; use
   `--concurrency 2` or `3` on a smaller machine.
 - Node 22.12 or newer and pnpm (`corepack enable`).
-- This checkout with its release tags (`git fetch --tags`).
+- A clone of this repository with its release tags (`git fetch --tags`), and the
+  harness unpacked in it ([Get the harness](#get-the-harness)).
 - An Anthropic API key with access to every model your settings name: by default
   Claude Sonnet 5.5, Claude Opus 5.5, and Claude Fable 5.1 (the second judge).
   Fable 5.1 is unavailable to organizations with zero data retention; if
   `pnpm evals preflight` reports `ZDR_BLOCKED` for a model, choose another one
   for that setting (`EVAL_SECOND_JUDGE_MODEL=none` skips the second judge).
 - About 2 GB of disk for fixtures and a full set of runs.
+
+## Get the harness
+
+The harness, the fixtures, the case notes for the fixture writer, and the
+reference evals' cases and graders are in one archive:
+
+- [standards-evals-20261103.tar.gz](https://drive.google.com/file/d/1NandhDKflUZcbueu0EBgqWj0H3nN6oRx/view?usp=sharing)
+  (4.8 MB)
+- SHA-256: `041bfcf9c9e3bdb55f239e499500b68353bfc0e526aba37779fd8dd1064d985c`
+
+Download it, check it, and unpack it at the repository root. Its paths start
+with `evals/`, so it fills this directory with `cli.mjs`, `catalog/`,
+`fixtures/`, `harness/`, and `references/`. `evals/.gitignore` keeps them out of
+git.
+
+```bash
+curl -L -o ~/Downloads/standards-evals-20261103.tar.gz "https://drive.usercontent.google.com/download?id=1NandhDKflUZcbueu0EBgqWj0H3nN6oRx&export=download&confirm=t"
+```
+
+```bash
+shasum -a 256 ~/Downloads/standards-evals-20261103.tar.gz
+```
+
+The output must match the SHA-256 above. If it does not, you probably saved a
+Google Drive warning page instead of the archive: download it again from the
+link above in a browser. Then unpack it from the repository root:
+
+```bash
+tar -xzf ~/Downloads/standards-evals-20261103.tar.gz
+```
+
+Use `tar`, not a tool that drops file permissions or symlinks. A fixture runs
+only if it builds byte for byte as reviewed, and some fixtures hold executable
+files and symlinks. If a case changed after the archive was made,
+`pnpm evals fixtures status` shows its fixture as `stale`.
 
 ## Set up once
 
@@ -86,27 +126,24 @@ pnpm evals check
 `image build` pulls `node:22-bookworm-slim`, pins it by digest, and builds two
 images: `standards-eval:claude-2.1.283` and a `-browser` variant with Playwright
 and Chromium for cases that need a real browser. `check` tests every
-prerequisite, counts the fixtures that are ready, lists any fixture file git
-would leave out, and says how to fix what is missing.
+prerequisite, counts the fixtures that are ready, and says how to fix what is
+missing.
 
 ## Fixtures
 
 Every case needs a fixture spec in `evals/fixtures/<role>/<id>/`: a `spec.json`,
 the `layers/` of files the builder applies, and the gate-3 review
-(`review.json`). Shared bases live in `evals/fixtures/_bases/`. Fixtures are
-committed, so a fresh clone can run the evals as they are. Each fixture's
-generation log (`gen/`) stays local and is not committed.
+(`review.json`). Shared bases live in `evals/fixtures/_bases/`. Fixtures come in
+the [archive](#get-the-harness). Each fixture's generation log (`gen/`) stays
+local and is left out of the archive.
 
 A fixture runs only if its build matches the build that was reviewed, byte for
 byte. So:
 
-- `evals/fixtures/` is kept out of the lint hooks (`.pre-commit-config.yaml`),
-  prettier (`.prettierignore`), and line-ending conversion (`.gitattributes`).
-- `evals/fixtures/.gitignore` takes back every file the repository's other
-  ignore rules would skip (`.env` files, `results/`, and so on). A layer's own
-  `.gitignore` can still hide files, for example `node_modules/` in a fixture
-  that ships a package: `pnpm evals check` and `pnpm evals selftest` list them;
-  add each with `git add -f`.
+- `evals/fixtures/` is kept out of prettier (`.prettierignore`) and ESLint
+  (`eslint.config.mjs`). Prettier skips the archive's other folders too.
+- The archive is packed and unpacked with `tar`, which keeps file permissions
+  and symlinks.
 - The harness runs git with its own settings, not your global or system git
   config, so a fixture builds to the same hash on every machine.
 - Finder's `.DS_Store` files are never part of a build.
@@ -584,11 +621,12 @@ These rules are fixed before the first real run:
 | `evals/harness/references/`              | The code: version B's build, the graders' runner, read detection, the blinded judge, and the summary                                |
 | `evals/REFERENCE_EVAL_REPORT_<date>.md`  | The written report, committed like the suite's reports                                                                              |
 
-As in the suite, runs, judge checks, and spend logs stay out of git. To write or
-review these fixtures, run the [`fixtures` commands](#fixtures) through
-`references`. It points them at the cases, catalog, and fixtures above, at
-release 0.15.0 (it sets `EVAL_CASES_DIR`, `EVAL_CATALOG_DIR`,
-`EVAL_FIXTURES_DIR`, and `EVAL_COMMIT`):
+Everything in this table except the report comes in the
+[archive](#get-the-harness). As in the suite, runs, judge checks, and spend logs
+stay local. To write or review these fixtures, run the
+[`fixtures` commands](#fixtures) through `references`. It points them at the
+cases, catalog, and fixtures above, at release 0.15.0 (it sets `EVAL_CASES_DIR`,
+`EVAL_CATALOG_DIR`, `EVAL_FIXTURES_DIR`, and `EVAL_COMMIT`):
 
 ```bash
 pnpm evals references fixtures status
@@ -618,40 +656,66 @@ pnpm evals references fixtures review --needed --execute
   its fsmonitor. A run that leaves git config that would run commands on your
   machine anyway (filters, includes) is stopped as an ERROR, and its project is
   kept for you to look at.
-- Runs, judge checks, and spend logs stay out of git (`evals/.gitignore`).
-  Fixtures are committed, including the grader-only facts in each `spec.json`.
-  The cases' expected behavior is already public in `evals.json`, and runs block
-  GitHub, so a model under test cannot read either.
+- Runs, judge checks, and spend logs stay out of git (`evals/.gitignore`). The
+  archive is public, including the grader-only facts in each `spec.json` and the
+  reference evals' graders. The cases' expected behavior is public in
+  `evals.json`. Runs block GitHub, so a model under test cannot read the cases
+  or find the archive's link, which is only in this repository.
 
 ## Harness layout
 
-| Path                                                 | Purpose                                                                 |
-| ---------------------------------------------------- | ----------------------------------------------------------------------- |
-| `cli.mjs`                                            | the `pnpm evals` commands                                               |
-| `harness/lib/config.mjs`                             | every setting and its default, `.env` loading                           |
-| `harness/run.mjs`                                    | builds fixtures, runs containers, grades with exact checks              |
-| `harness/grade.mjs`                                  | exact checks and judge requests                                         |
-| `harness/judge*.mjs`                                 | the judge, its runner, its checks, and the preflight                    |
-| `harness/generate-fixture.mjs`, `review-fixture.mjs` | fixture writing and gate-3 review                                       |
-| `harness/migrate-fixtures.mjs`, `lib/migrate.mjs`    | carrying fixtures to a newer release                                    |
-| `harness/lib/readiness.mjs`                          | whether each fixture can run, and why not                               |
-| `harness/build-fixture.mjs`, `validate-fixture.mjs`  | gates 1 and 2                                                           |
-| `harness/container/`, `Dockerfile*`, `image.mjs`     | the runner images and what runs inside them                             |
-| `harness/summarize.mjs`, `spend.mjs`                 | reports and spend                                                       |
-| `harness/references/`                                | the reference evals (see [Reference evals](#reference-evals))           |
-| `catalog/`                                           | notes on each case for the fixture writer ([README](catalog/README.md)) |
+| Path                                                 | Purpose                                                             |
+| ---------------------------------------------------- | ------------------------------------------------------------------- |
+| `cli.mjs`                                            | the `pnpm evals` commands                                           |
+| `harness/lib/config.mjs`                             | every setting and its default, `.env` loading                       |
+| `harness/run.mjs`                                    | builds fixtures, runs containers, grades with exact checks          |
+| `harness/grade.mjs`                                  | exact checks and judge requests                                     |
+| `harness/judge*.mjs`                                 | the judge, its runner, its checks, and the preflight                |
+| `harness/generate-fixture.mjs`, `review-fixture.mjs` | fixture writing and gate-3 review                                   |
+| `harness/migrate-fixtures.mjs`, `lib/migrate.mjs`    | carrying fixtures to a newer release                                |
+| `harness/lib/readiness.mjs`                          | whether each fixture can run, and why not                           |
+| `harness/build-fixture.mjs`, `validate-fixture.mjs`  | gates 1 and 2                                                       |
+| `harness/container/`, `Dockerfile*`, `image.mjs`     | the runner images and what runs inside them                         |
+| `harness/summarize.mjs`, `spend.mjs`                 | reports and spend                                                   |
+| `harness/references/`                                | the reference evals (see [Reference evals](#reference-evals))       |
+| `catalog/`                                           | notes on each case for the fixture writer (see `catalog/README.md`) |
 
-`pnpm evals selftest` runs the harness's own tests (175 checks, no model and no
+`pnpm evals selftest` runs the harness's own tests (173 checks, no model and no
 Docker): fixture builds, gates, git-command classification, grading of scripted
 good and bad runs, the judge merge and checks against a fake API, key handling,
 the fixture migration, and the reference evals' parts.
+
+## Publish a new archive
+
+After you change the harness, a fixture, a catalog entry, or the reference
+evals' cases or graders, run `pnpm evals selftest` and publish a new archive.
+Build it at the repository root. The command leaves out what stays local: each
+fixture's `gen/` log, the decision logs, `regenerate-notes.json`, `.DS_Store`
+files, and `harness/image.json`:
+
+```bash
+find evals/cli.mjs evals/catalog evals/fixtures evals/harness \
+  evals/references \( -type f -o -type l \) |
+  grep -Ev -e '^evals/fixtures/(references/)?[^/]+/[^/]+/gen/' \
+    -e '^evals/fixtures/(references/)?decisions\.jsonl$' \
+    -e '^evals/fixtures/(references/)?regenerate-notes\.json$' \
+    -e '(^|/)\.DS_Store$' -e '^evals/harness/image\.json$' |
+  tar --no-mac-metadata --no-xattrs -czf \
+    ~/Downloads/standards-evals-<date>.tar.gz -T -
+```
+
+Upload it to Google Drive as a new file and share it the same way ("Anyone with
+the link"). Keep the older archives: a clone of an older commit needs the
+archive that its README names. Then update [Get the harness](#get-the-harness)
+(the link, file name, size, SHA-256, and commands) and the link in the root
+`README.md`.
 
 ## Known gaps
 
 - Catalog entries are written by hand or by an agent, and nothing warns when one
   is out of date. A case added or changed later needs its entry added or updated
-  before its fixture is written (see [`catalog/README.md`](catalog/README.md)).
-  Without one, the fixture writer and reviewer work from the case text alone.
+  before its fixture is written (see `catalog/README.md`). Without one, the
+  fixture writer and reviewer work from the case text alone.
 - Carried-over fixtures keep their earlier review. Gates 1 and 2 confirm they
   build, pass `check.mjs`, and match their prompts at the current release, but
   only a new review would catch a fixture that newer protocol rules make

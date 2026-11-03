@@ -1,1 +1,0 @@
-"""accounts-api application package."""

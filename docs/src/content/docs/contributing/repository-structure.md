@@ -14,7 +14,7 @@ with the file responsible for the part you want to change.
 | `PROTOCOL.md`            | Shared rules for roles, states, handoffs, recovery, and the runtime. |
 | `protocol/`              | Protocol chapters, installed into `.standards/protocol/`.            |
 | `INSTALLER.md`           | Rules for the CLI's install, upgrade, and uninstall; not installed.  |
-| `evals/`                 | The eval harness, its fixtures, and dated eval reports.              |
+| `evals/`                 | Dated eval reports, and how to get and run the eval harness.         |
 | `README.md`              | A high-level introduction and development entry points.              |
 | `skills/`                | The nine role packages.                                              |
 | `runtime/`               | Tools installed into `.standards/bin/`, including `check.mjs`.       |

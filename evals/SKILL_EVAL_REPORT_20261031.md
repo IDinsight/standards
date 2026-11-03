@@ -388,8 +388,9 @@ alarm.
 - **These situations only.** The cases were written together with the framework.
   Passing them shows that the skills handle these situations, not every
   situation.
-- **What is published.** The eval cases, the fixtures and the harness are in
-  this repository. The run records are not.
+- **What is published.** The eval cases are in this repository. The fixtures and
+  the harness are in a public archive that `evals/README.md` links to. The run
+  records are not published.
 
 ## Cost
 

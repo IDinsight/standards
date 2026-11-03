@@ -69,8 +69,10 @@ the latest results,
 [the release 0.8.0 skill eval report](evals/SKILL_EVAL_REPORT_20261003.md) for
 an earlier evaluation,
 [the release 0.15.0 reference eval report](evals/REFERENCE_EVAL_REPORT_20261103.md)
-for whether the role references make the roles' work better, and
-[`evals/README.md`](evals/README.md) to run the cases yourself.
+for whether the role references make the roles' work better. To run the cases
+yourself, get
+[the eval harness archive](https://drive.google.com/file/d/1NandhDKflUZcbueu0EBgqWj0H3nN6oRx/view?usp=sharing)
+and follow [`evals/README.md`](evals/README.md).
 
 ## Choose when a standard cycle finishes
 
