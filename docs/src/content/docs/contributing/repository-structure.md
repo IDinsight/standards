@@ -52,7 +52,9 @@ a project under `.standards/user-styles/<role>/` and
 Evaluation scenarios describe intended role behavior. Checking their JSON,
 linting Markdown, or building the site does not run those evaluations or show
 that the roles passed them. For results from running them, see the
-[Skill Eval Report](../../reference/skill-eval-report/).
+[Skill Eval Report](../../reference/skill-eval-report/). The
+[Reference Eval Report](../../reference/reference-eval-report/) tests whether
+the role references make the roles' work better.
 
 See [Roles](../../roles/overview/) for behavior and
 [Artifact Templates](../../reference/artifact-templates/) for output formats.
@@ -82,9 +84,10 @@ explicitly in `docs/astro.config.mjs`; adding a file alone does not add a
 navigation entry.
 
 `docs/scripts/sync-reference.mjs` generates the Protocol, Installer Contract,
-and Skill Eval Report pages and eight role template pages from their repository
-originals. It also copies downloadable originals into `docs/public/reference/`.
-Edit the source files rather than these generated copies.
+Skill Eval Report, and Reference Eval Report pages and eight role template pages
+from their repository originals. It also copies downloadable originals into
+`docs/public/reference/`. Edit the source files rather than these generated
+copies.
 
 The built website goes to `docs/dist/`. `docs/scripts/check-links.mjs` checks
 local links and anchors in that output.

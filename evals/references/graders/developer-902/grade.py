@@ -195,17 +195,27 @@ def registration_order(files):
 
 def prod_registration(files, ours):
     """Whether app/main.py registers or builds a security middleware with an
-    argument that mentions production (hsts=settings.environment == "production")."""
+    argument that mentions production (hsts=settings.environment == "production"),
+    or with a name that every assignment in app/main.py sets from production
+    (hsts = settings.environment == "production", then hsts=hsts)."""
+    prod = lambda s: bool(re.search(r"prod", s, re.I))
     for rel, src, tree in files:
         if rel != "app/main.py":
             continue
+        assigned = {}
+        for node in ast.walk(tree):
+            if isinstance(node, (ast.Assign, ast.AnnAssign)) and node.value is not None:
+                for t in node.targets if isinstance(node, ast.Assign) else [node.target]:
+                    if isinstance(t, ast.Name):
+                        assigned.setdefault(t.id, []).append(ast.get_source_segment(src, node.value) or "")
+        from_prod = lambda n: isinstance(n, ast.Name) and bool(assigned.get(n.id)) and all(prod(s) for s in assigned[n.id])
         for call in ast.walk(tree):
             if not isinstance(call, ast.Call):
                 continue
             name = getattr(call.func, "id", getattr(call.func, "attr", ""))
             target = (ast.get_source_segment(src, call.args[0]) or "") if name in ("add_middleware", "Middleware") and call.args else ""
             if name in ours or target.split(".")[-1] in ours:
-                if any(re.search(r"prod", ast.get_source_segment(src, a) or "", re.I) for a in [*call.args, *(k.value for k in call.keywords)]):
+                if any(prod(ast.get_source_segment(src, a) or "") or any(from_prod(n) for n in ast.walk(a)) for a in [*call.args, *(k.value for k in call.keywords)]):
                     return True
     return False
 

@@ -25,7 +25,9 @@ cancellation.
 
 Each role has eval cases describing expected behavior. The
 [skill eval report](../../reference/skill-eval-report/) shows how the role
-skills scored on all 457 cases at release 0.15.0.
+skills scored on all 457 cases at release 0.15.0. The
+[reference eval report](../../reference/reference-eval-report/) tests whether
+the role references make the roles' work better, on 10 tasks.
 
 ## Run a role
 

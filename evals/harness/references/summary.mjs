@@ -157,7 +157,7 @@ export function nextSteps({ outcome, reference, tasks }) {
       `reads as in the first rule: ${readOk ? 'yes' : 'no'}; 90% range ${range(outcome)}`),
     r(worse.length > 0, 'Look for a misleading example in that reference before any more runs', worse.length ? `version A worse by 2 or more runs: ${worse.join('; ')}` : 'no outcome check where version A is worse by 2 or more runs'),
     r(has(reference) && reference.low > 0 && has(outcome) && outcome.low <= 0, 'The references change the work but not its quality here. A larger study needs harder tasks',
-      `reference checks: gap ${fmt(reference.gap)}, 90% range ${range(reference)} (more: range above 0); outcome 90% range ${range(outcome)} (no better: it reaches 0 or below)`),
+      `reference checks: gap ${fmt(reference.gap)}, 90% range ${range(reference)} (above 0: ${has(reference) && reference.low > 0 ? 'yes' : 'no'}); outcome 90% range ${range(outcome)} (reaches 0 or below: ${has(outcome) && outcome.low <= 0 ? 'yes' : 'no'})`),
   ];
 }
 
