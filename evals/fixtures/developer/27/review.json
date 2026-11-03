@@ -1,0 +1,81 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is BROWNFIELD",
+      "where": ".standards/MODE.md (installer, --mode brownfield, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode is EXPEDITED",
+      "where": ".standards/STATE.md `CycleMode`: `EXPEDITED`",
+      "status": "realized"
+    },
+    {
+      "condition": "WorkflowState is DEVELOPING",
+      "where": ".standards/STATE.md `WorkflowState`: `DEVELOPING`",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Development is NONE and no development plan exists",
+      "where": ".standards/STATE.md `Development`: `NONE`; no .standards/docs/ directory",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id is the hand-typed 'admin-note-fix', not in generated form",
+      "where": ".standards/STATE.md `Id`: `admin-note-fix`, committed in 'Start blank admin note fix'",
+      "status": "realized"
+    },
+    {
+      "condition": "check.mjs reports the Id is not in the form cycle.mjs generates (and nothing else)",
+      "where": "gate checkMjs: exactly one problem on .standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "cycle.mjs new refuses while the cycle is active",
+      "where": "selfCheck 3: 'Cycle admin-note-fix is still active (DEVELOPING)'",
+      "status": "realized"
+    },
+    {
+      "condition": "A plausible bounded brownfield request exists for an expedited cycle",
+      "where": "Active Work.Request 'Reject blank admin notes instead of saving them.'; src/notes.js accepts blank notes",
+      "status": "realized"
+    },
+    {
+      "condition": "State is otherwise a coherent first expedited cycle (INITIAL handoff with expedited-entry reason, recovery and obligations inactive)",
+      "where": ".standards/STATE.md Handoff and Recovery sections",
+      "status": "realized"
+    },
+    {
+      "condition": "Work is committed; clean tree",
+      "where": "git status clean on main",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "Local git config identity is `Fixture <fixture@example.invalid>`, which is visible in `git log`. This is the harness-wide builder identity, not specific to this case, and it does not hint at the answer.",
+      "recommendation": "run_as_is",
+      "fix": "None needed for this case."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 2,
+      "detail": "Whether the run calls `cycle.mjs new` is a non-git command, so the predicates cannot detect it. The check only pins Active Work.Id unchanged, and complete:false correctly leaves the trace to the judge.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition. These are a brownfield, expedited, DEVELOPING state with Development NONE and the hand-typed Id `admin-note-fix`. check.mjs reports exactly the malformed-Id problem, and cycle.mjs refuses as expected. Checks are necessary conditions a correct stop-and-report run satisfies (it may still set BlockedOn), the invariants fit, and nothing leaks the answer.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T02:19:23.582Z",
+  "costUsd": 0.1016706,
+  "ms": 26837,
+  "fixtureHash": "4292f6dc264432a5"
+}

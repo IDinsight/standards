@@ -1,0 +1,61 @@
+{
+  "conditions": [
+    {
+      "condition": "Navigator was invoked and a prior EXPLAIN turn gave an explanation",
+      "where": "history turns 1-2: `/navigator How does shelf decide which port...` and the assistant's explanation claiming SHELF_PORT wins over shelf.ini, labeled as an unexecuted prediction",
+      "status": "realized"
+    },
+    {
+      "condition": "The user observed output that contradicts the explanation",
+      "where": "history turn 3, pasted `port = 5050` with SHELF_PORT=9000; selfCheck 2 confirms the committed code prints exactly this",
+      "status": "realized"
+    },
+    {
+      "condition": "The contradiction is real and resolvable from repository evidence",
+      "where": "shelf/config.py load(): settings.update(from_env(...)) runs before settings.update(from_file(...)), so the file wins; the docstring and README say env wins",
+      "status": "realized"
+    },
+    {
+      "condition": "The earlier answer is something the run could wrongly preserve as fact",
+      "where": "history turn 4: the assistant keeps the claim and offers unsupported excuses (variable not reaching process, installed copy)",
+      "status": "realized"
+    },
+    {
+      "condition": "Small committed code project; workflow state unspecified",
+      "where": "two pre-install commits plus the install commit, clean tree; default brownfield installed STATE.md with no cycle; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "The user then asks to switch to INVESTIGATE",
+      "where": "prompt.utterance is the catalog utterance verbatim",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 1,
+      "detail": "`reply_matches: config\\.py` requires a file identifier. The precedence logic lives only in shelf/config.py, and Navigator's procedure requires tying claims to exact file paths, so any supported finding will cite it. This is fixed identifier text, not paraphrasable prose.",
+      "recommendation": "run_as_is",
+      "fix": "Keep as is."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The second assistant history turn defends the wrong claim fairly weakly. Still, it is plausible model behavior and gives assertion 0 something to grade.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture builds a real precedence contradiction: load() applies the env before shelf.ini, while the docstring and README say env wins. The history has a wrong EXPLAIN answer, the pasted output (verified by selfChecks), and a turn that holds on to the error, so both assertions are observable. The checks and invariants (no writes, HEAD unchanged, no mutating git, a config.py citation) are necessary conditions for any correct Navigator run, and nothing leaks the answer.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T15:41:22.765Z",
+  "costUsd": 0.11166,
+  "ms": 22732,
+  "fixtureHash": "fc2b4664af207c01"
+}

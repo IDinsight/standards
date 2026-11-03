@@ -1,0 +1,223 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial visit export CLI"
+    },
+    {
+      "dir": "layers/50-expedited",
+      "action": "commit",
+      "message": "Add --since filter to visit export"
+    },
+    {
+      "dir": "layers/60-review",
+      "action": "commit",
+      "message": "Record implementation review findings"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "developer",
+    "utterance": "Promote this cycle to the standard workflow and use IMPLEMENTATION_REVIEWED."
+  },
+  "graderOnly": [
+    "src/filter.js keeps visits with `visit.date > since`, so visits dated on the --since day are excluded. This is the unresolved correction recorded in recovery Frame 1 (RerunThrough NONE) and in review finding F-001; the Developer has not started correcting it.",
+    "No normal documentation, final-review, or synchronization work has begun in this cycle: there is no Scope, Architecture, CONTEXT.md, verification, documentation, final-review, or synchronization record.",
+    "Correct promotion converts the single frame into Outstanding Obligation 1 with Owner DEVELOPING, FailureType IMPLEMENTATION, and Reason 'The --since filter drops visits on the given date.', clears the recovery stack, and sets STANDARD, AUDITING, FULL_DELIVERABLE, Handoff PROMOTE from DEVELOPING. Because Change completion policy requires outstanding obligations to be inactive, the IMPLEMENTATION_REVIEWED selection cannot be applied now; the policy stays FULL_DELIVERABLE and the request is not rewritten to queue the shorter policy.",
+    "The development plan still shows COMPLETE with both steps DONE because the Reviewer's failure handoff happened after the Developer's forward handoff and no Developer session has reconciled the plan since."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "visit-export-since-20260924T090000Z-3e8a51c7",
+    "DEV": ".standards/docs/development/visit-export-since-20260924T090000Z-3e8a51c7.md",
+    "REVIEW": ".standards/docs/reviews/visit-export-since-20260924T090000Z-3e8a51c7/implementation.md",
+    "REASON": "The --since filter drops visits on the given date."
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "state": "ActiveWork.Id",
+          "equals": "${ID}",
+          "why": "promotion preserves the cycle ID"
+        },
+        {
+          "state": "ActiveWork.Development",
+          "equals": "${DEV}",
+          "why": "promotion preserves role-owned artifacts"
+        },
+        {
+          "state": "CycleMode",
+          "equals": "STANDARD"
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "AUDITING"
+        },
+        {
+          "state": "ActiveWork.CompletionPolicy",
+          "equals": "FULL_DELIVERABLE"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "PROMOTE"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "DEVELOPING"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "NONE"
+        },
+        {
+          "state": "ActiveWork.PromotionReason",
+          "not": "NONE"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "false",
+          "why": "obsolete expedited routing is cleared"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "0"
+        },
+        {
+          "state": "Obligations.Active",
+          "equals": "true"
+        },
+        {
+          "state": "Obligations.Count",
+          "equals": "1"
+        },
+        {
+          "state": "Obligations.Item1.Owner",
+          "equals": "DEVELOPING"
+        },
+        {
+          "state": "Obligations.Item1.FailureType",
+          "equals": "IMPLEMENTATION"
+        },
+        {
+          "state": "Obligations.Item1.Reason",
+          "equals": "${REASON}",
+          "why": "the converted obligation preserves the frame's exact Reason"
+        },
+        {
+          "check_ok": true
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.CompletionPolicy",
+          "equals": "FULL_DELIVERABLE",
+          "why": "the shorter policy cannot be applied while an obligation is outstanding"
+        },
+        {
+          "state": "Obligations.Count",
+          "equals": "1",
+          "why": "promotion does not discharge the corrective obligation"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.Request",
+          "unchanged": true,
+          "why": "promotion preserves the request; no deferred policy instruction is added"
+        },
+        {
+          "unchanged": [
+            "src/**",
+            "bin/**",
+            "test/**",
+            "data/**",
+            "README.md",
+            "package.json",
+            ".standards/CONTEXT.md",
+            ".standards/docs/**"
+          ],
+          "why": "only coordination in STATE.md is authorized; no correction, context, plan, or review edits"
+        },
+        {
+          "no_skill_call": "auditor",
+          "why": "Auditor was not invoked; the Developer stops after the promotion handoff"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/export.test.js",
+      "expect": "pass",
+      "why": "the established test command passes (it covers CSV formatting only)"
+    },
+    {
+      "cmd": "node -e 'import(`./src/filter.js`).then((m) => { const kept = m.filterSince([{ date: `2026-09-12` }, { date: `2026-09-19` }], `2026-09-12`); process.exit(kept.length === 1 ? 0 : 1); })'",
+      "expect": "pass",
+      "why": "the open correction is real: filterSince drops the visit dated on the since day"
+    },
+    {
+      "cmd": "node bin/export-visits.js --since 2026-09-12",
+      "expect": "pass",
+      "why": "the CLI runs and the --since option exists as the review records"
+    },
+    {
+      "cmd": "node bin/export-visits.js --since 2026/09/10",
+      "expect": "fail",
+      "expectOutput": "Invalid --since date",
+      "why": "malformed dates are rejected as the review records"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 00-project (pre-install): small Node ESM CLI that exports data/visits.json to CSV, with a node:test suite for CSV formatting. 50-expedited: an EXPEDITED cycle (CompletionPolicy NONE) adds src/filter.js and a --since option; the development plan (AUTONOMOUS, style NONE locked, AFTER_IMPLEMENTATION, COMPLETE, DEV-001/DEV-002 DONE with self-check evidence) and a STATE.md FORWARD handoff to REVIEWING_IMPLEMENTATION. 60-review: the implementation review report (BLOCKED, F-001 OPEN, P1, Owner Developer, FailureType IMPLEMENTATION, citing the assessed commit and filter.js blob) and STATE.md at DEVELOPING with Handoff FAILURE from REVIEWING_IMPLEMENTATION and one recovery frame (From/ResumeAt REVIEWING_IMPLEMENTATION, Owner DEVELOPING, RerunThrough NONE). No scope, design, context, or downstream records exist, so no normal downstream standard phase has begun. check.mjs passes on the built state and on the expected promoted state.",
+  "case": "developer-60",
+  "caseHash": "ee43469fad9ef9b5",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T02:53:06.595Z",
+    "verdict": "pass",
+    "fixtureHash": "f0cb66115f108021",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-30T23:24:28.324Z"
+  }
+}

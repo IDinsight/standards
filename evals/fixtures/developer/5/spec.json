@@ -1,0 +1,230 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add reports service with owner-only access"
+    },
+    {
+      "dir": "layers/10-cycle",
+      "action": "commit",
+      "message": "Record share-link scope and design"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "developer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The architecture record says to persist a share-link token but never defines whether the token is globally unique or scoped per report, whether it can be revoked, or how callers resolve it (no shared-view route or URL shape is given).",
+    "Those choices affect the persistence contract of ReportStore and the public API of the service, so they are consequential technical design owned by Architect, not a local Developer detail.",
+    "No development plan exists before the run; Active Work.Development is NONE."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "share-report-link-20260924T090000Z-5e8a1c3f",
+    "SPEC": ".standards/docs/specs/share-report-link-20260924T090000Z-5e8a1c3f.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "state": "Handoff.Kind",
+          "equals": "FAILURE",
+          "why": "the gap is routed as a defect, not resolved locally"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "ARCHITECTURE",
+          "why": "classified as Architect-owned technical design"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "src/**",
+            "test/**",
+            "package.json",
+            "${SPEC}",
+            ".standards/docs/scope/**",
+            ".standards/CONTEXT.md"
+          ],
+          "why": "no implementation or upstream record may encode chosen token semantics"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "src/**",
+            "test/**"
+          ],
+          "why": "no implementation proceeds on an unresolved design"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "ARCHITECTING"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FAILURE"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "DEVELOPING"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "ARCHITECTURE"
+        },
+        {
+          "check_ok": true
+        }
+      ]
+    },
+    {
+      "assertion": 4,
+      "complete": true,
+      "all": [
+        {
+          "state": "Recovery.Active",
+          "equals": "true"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "1"
+        },
+        {
+          "state": "Recovery.Frame1.From",
+          "equals": "DEVELOPING"
+        },
+        {
+          "state": "Recovery.Frame1.Owner",
+          "equals": "ARCHITECTING"
+        },
+        {
+          "state": "Recovery.Frame1.FailureType",
+          "equals": "ARCHITECTURE"
+        },
+        {
+          "state": "Recovery.Frame1.ResumeAt",
+          "equals": "DEVELOPING"
+        },
+        {
+          "state": "Recovery.Frame1.RerunThrough",
+          "equals": "NONE"
+        },
+        {
+          "check_ok": true
+        }
+      ]
+    },
+    {
+      "assertion": 5,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "ARCHITECTING",
+          "why": "transition persisted"
+        },
+        {
+          "reply_matches": "/architect\\b",
+          "why": "Claude Code invocation of the Architect skill"
+        },
+        {
+          "reply_matches": "active recovery",
+          "flags": "i",
+          "why": "protocol requires the active-recovery wording while recovery is active"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/store.test.js test/api.test.js",
+      "expect": "pass",
+      "why": "the existing project tests pass before the run"
+    },
+    {
+      "cmd": "npm test",
+      "expect": "pass",
+      "why": "the established test script works offline"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. layers/00-project (pre-install): a small plain-JS reports service (ReportStore JSON-file persistence, owner-only handlers, router) with node:test tests. layers/10-cycle: CONTEXT.md (Auditor context), MODE.md BROWNFIELD, STATE.md at DEVELOPING / STANDARD with a FORWARD handoff from ARCHITECTING and Development NONE, the scope (AC-001..AC-004) and the technical design. The design says to persist a share-link token in ReportStore and return a URL containing it, but never defines token uniqueness/scope (per report vs global, one vs many), revocation, the stored shape, or the route/URL by which a viewer resolves a link; it reads as an ordinary under-specified design with no open-questions section. check.mjs passes: every current AC is covered by the design and no plan is required yet.",
+  "case": "developer-5",
+  "caseHash": "1051a8359366f5d5",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T02:14:29.384Z",
+    "verdict": "pass",
+    "fixtureHash": "330b03e4737a726c",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "02797d25ce49bd68",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:06:41.516Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T01:01:48.837Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/10-cycle/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:06:41.516Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

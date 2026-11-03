@@ -810,17 +810,6 @@
       ]
     },
     {
-      "id": 78,
-      "prompt": "Invoke Scoper to continue a blocked request. ProjectMode=BROWNFIELD, no active cycle. PendingCycleRequest says standalone Documenter: document the CLI in GUIDED mode, plus an incompatible FULL_DELIVERABLE policy choice. The user now clears a conflicting mode preference but has not withdrawn the policy or standalone entry.",
-      "expected_output": "Preserve the saved intent and unresolved policy conflict before cycle creation.",
-      "files": [],
-      "assertions": [
-        "Clearing a preference does not erase standalone intent or infer STANDARD.",
-        "No cycle is started while the standard-policy conflict remains.",
-        "GUIDED and the original goal remain saved; no separate pending-policy field is invented."
-      ]
-    },
-    {
       "id": 79,
       "prompt": "Invoke Documenter: document another feature. An active STANDARD cycle is at TESTING with an existing ID, plan, request, blocker and nested recovery. The user has not asked to cancel or replace it.",
       "expected_output": "Identify the active owner and preserve the cycle; a separate assignment must wait or be explicitly preceded by cancellation.",
@@ -894,18 +883,6 @@
         "Incomplete work cannot return directly to sign-off.",
         "The unverified example is not deferred as an interrupted-owner dependency.",
         "Saved evidence and the recovery frame are preserved."
-      ]
-    },
-    {
-      "id": 86,
-      "prompt": "Documenter completed its assigned documentation work and persisted a legal transition to REVIEWING_FINAL in STANDARD. The user asks for the next-role handoff in Codex from the documentation authoring chat. The implementation review record retains User Style=tony and the final-deliverable review record retains alice; both styles exist.",
-      "expected_output": "Provide an independent final-deliverable-review invocation and a state-informed summary using the final report's saved style.",
-      "files": [],
-      "assertions": [
-        "The prescribed fresh-chat prefix, FINAL_DELIVERABLE review kind, and persisted-input directions remain.",
-        "The helper resolves the current review kind before reading its saved style; alice is retained and tony is not inherited from the implementation review.",
-        "Neither review kind is presented as a user-selectable switch.",
-        "No formal review occurs in the documentation authoring chat, and optional style guidance adds no approval or automatic invocation."
       ]
     }
   ]

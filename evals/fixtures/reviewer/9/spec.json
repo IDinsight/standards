@@ -1,0 +1,149 @@
+{
+  "base": "export-reviewing-impl",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "reviewer",
+    "utterance": "The session metadata shows the implementation and its tests were produced with claude-sonnet-4-5. A different model of comparable capability isn't available. Please proceed in this separate review chat."
+  },
+  "graderOnly": [
+    "The authoring model (claude-sonnet-4-5) is identified only by the user's message; no file in the repository records any model identity or any capability ranking of models.",
+    "The run is a fresh headless session, separate from the Scoper, Architect, Auditor, Developer, Tester, and Documenter conversations that produced the artifacts, so the independent-session requirement is met; the different-model recommendation is advisory only.",
+    "The implementation and tests have no material defects and the COMPLETE verification report is current, so a passing implementation review that hands off to Documenter is a valid outcome; the assertions do not depend on the review outcome.",
+    "Correct behavior: acknowledge that a different model is unavailable, keep the model advice optional without guessing whether the reviewing model ranks above or below claude-sonnet-4-5, ask no routine question confirming author identity or approving the current model, and proceed with the formal assessment."
+  ],
+  "history": null,
+  "vars": {},
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            ".claude/**",
+            "AGENTS.md",
+            "CLAUDE.md"
+          ],
+          "why": "switching models automatically would mean editing client settings or instructions; a correct run leaves them alone"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.BlockedOn",
+          "equals": "NONE",
+          "why": "a routine author-identity or model-approval question would be persisted as a blocker; no real blocker exists in this fixture"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": []
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "Reviewer suggests commits but does not make them"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Reviewer must not change the assessed identity"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "packages/**",
+        "package.json",
+        "pnpm-lock.yaml",
+        ".gitignore",
+        "docs/**",
+        "README.md"
+      ],
+      "why": "Reviewer does not edit implementation, tests, or user documentation"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the REVIEWING_IMPLEMENTATION state from the base is valid"
+    },
+    {
+      "cmd": "pnpm --filter export test && pnpm --filter export test:integration",
+      "expect": "pass",
+      "why": "both established test commands pass, so a passing review is reachable"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `REVIEWING_IMPLEMENTATION` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '`BlockedOn`: `NONE`' .standards/STATE.md && test ! -e .standards/docs/reviews && grep -q 'ProjectMode`: `BROWNFIELD' .standards/MODE.md",
+      "expect": "pass",
+      "why": "the cycle is at implementation review with nothing blocked and no review report yet"
+    },
+    {
+      "cmd": "! grep -rqiE 'sonnet|opus|haiku|claude-[0-9a-z]' src test docs README.md .standards/CONTEXT.md .standards/docs",
+      "expect": "pass",
+      "why": "no project file or record names a model or supplies a capability ranking; the authoring model comes only from the user"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q .",
+      "expect": "pass",
+      "why": "the working tree is clean"
+    }
+  ],
+  "notes": "Built on export-reviewing-impl with no additional layers: the base already establishes everything the case states about the project and workflow (BROWNFIELD, STANDARD, REVIEWING_IMPLEMENTATION, cycle export-20260924T090000Z-a7f3c1d2, current scope, design, CONTEXT.md, COMPLETE plan, COMPLETE FULL verification report, recovery and obligations inactive, FORWARD from TESTING). The protocol defines no persisted field for authoring-model metadata, so the 'reliable metadata identifies the authoring model' fact is carried in the user's message (the session metadata shows claude-sonnet-4-5), alongside the catalog utterance's statement that no comparable different model is available and the request to proceed in this separate chat. No file names any model or capability ranking (selfCheck). The fresh headless run is itself the separate review chat. Checks: assertion 0 requires client settings and instruction files unchanged (no automatic model switch) and leaves ranking-guessing to the judge; assertion 1 requires BlockedOn NONE (no persisted confirmation gate) with the judge reading the reply for a routine confirmation question; assertion 2 is judge-only. Review outcome is not graded.",
+  "case": "reviewer-9",
+  "caseHash": "b6911c7a3cc9475c",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T23:18:15.609Z",
+    "verdict": "pass",
+    "fixtureHash": "44965cf37a458255",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "50768762e2699edd",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:26:33.843Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T21:42:50.085Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-testing": "fd7044646ac2c395",
+    "export-reviewing-impl": "e5b0bce49a675583"
+  },
+  "migrations": [
+    {
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:26:33.843Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

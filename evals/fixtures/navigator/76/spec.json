@@ -1,0 +1,147 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add fetch client with retry and backoff"
+    },
+    {
+      "dir": "layers/60-styles",
+      "action": "commit",
+      "message": "Add navigator user styles"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "navigator",
+    "utterance": "Switch to INVESTIGATE, clear my user style, and show Navigator options."
+  },
+  "graderOnly": [
+    "Earlier in this conversation Navigator was running GRILL_ME on the project's retry behavior with user style tony explicitly selected; one question was answered and graded, and a second question (a 404 on the first call) is still pending.",
+    "The Navigator discovery helper (.standards/bin/invocation.mjs) is installed and works; its catalog includes the INVESTIGATE mode, and the user-style inventory lists brief and tony.",
+    "The pending quiz question's answer is: transport is called once, because isRetryable (src/client.js:10-13) returns false for a 404, so withRetry rethrows immediately (src/retry.js:16). A correct run does not grade or quiz on this after the switch.",
+    "No user style other than tony was ever selected; brief.md exists but was never chosen.",
+    "No workflow cycle is active; .standards/STATE.md is the fresh brownfield installation state."
+  ],
+  "history": {
+    "turns": [
+      {
+        "role": "user",
+        "text": "/navigator Grill me on how retries work in this repo. Use user style tony."
+      },
+      {
+        "role": "assistant",
+        "text": "GRILL_ME on retry behavior, user style `tony`.\n\nI read:\n- `src/retry.js` (`withRetry`, `backoffDelay`)\n- `src/client.js` (`fetchJson`, `isRetryable`)\n- `test/retry.test.js`\n\nFirst question, big picture:\n\nA server answers 503 to every request. You call `fetchJson(transport, '/items')` with default options. How many times is `transport` called, and what does the caller get in the end?"
+      },
+      {
+        "role": "user",
+        "text": "Four times I think, then it throws."
+      },
+      {
+        "role": "assistant",
+        "text": "Correct on both.\n\n- Default `retries` is 3 (`src/retry.js:1`). The first call plus 3 retries makes 4 calls.\n- After the fourth failure, `attempt >= retries` is true, so the error is rethrown (`src/retry.js:16`).\n- The caller gets the last `HttpError`, with `status` 503 (`src/client.js:18`).\n- One detail you skipped: the waits between calls are 100, 200, then 400 ms (`backoffDelay`, `src/retry.js:4`).\n\nNext question:\n\nThe server answers 404 on the very first call. How many times is `transport` called, and why?"
+      }
+    ]
+  },
+  "vars": {
+    "STYLE": ".standards/user-styles/navigator/tony.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "reply_matches": "investigate",
+          "flags": "i",
+          "why": "the reply must acknowledge or list the requested INVESTIGATE mode"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "**"
+          ],
+          "why": "clearing a conversation-only style writes nothing"
+        },
+        {
+          "state": "WorkflowState",
+          "unchanged": true,
+          "why": "no cycle change"
+        },
+        {
+          "exists": "${STYLE}",
+          "why": "clearing the selection must not delete the style file"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": []
+    }
+  ],
+  "invariants": [
+    {
+      "unchanged": [
+        "**"
+      ],
+      "why": "Navigator persists nothing (generated caches are ignored)"
+    },
+    {
+      "head_unchanged": true,
+      "why": "Navigator never moves HEAD"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Navigator never mutates git state"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/retry.test.js",
+      "expect": "pass",
+      "why": "the retry behavior described in the history (4 calls on persistent 503, no retry on 404, 100/200/400 ms backoff) matches the code and its tests"
+    },
+    {
+      "cmd": "node .standards/bin/invocation.mjs navigator --client claude --json | grep -q INVESTIGATE",
+      "expect": "pass",
+      "why": "the discovery helper is available and its catalog includes INVESTIGATE"
+    },
+    {
+      "cmd": "node .standards/bin/invocation.mjs navigator --client claude --json | grep -q tony",
+      "expect": "pass",
+      "why": "the helper reports the tony user style that the earlier turns selected"
+    }
+  ],
+  "notes": "Standalone brownfield fixture with the fresh installed STATE.md (no cycle). Layer 50-project (pre-install) commits a small Node ESM fetch client: src/retry.js (withRetry with exponential backoff, default 3 retries), src/client.js (fetchJson retrying 429/5xx and connection resets via isRetryable), and node:test tests. Layer 60-styles commits two navigator user styles, tony.md (selected in history) and brief.md (never selected, so inferring it would be wrong). History holds the GRILL_ME conversation: style tony chosen, one answered question with feedback citing real line numbers, and a pending 404 question. The run's utterance combines explicit mode switch, style clear, and an options request.",
+  "case": "navigator-76",
+  "caseHash": "7f05ddaba314f385",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T03:00:48.482Z",
+    "verdict": "pass",
+    "fixtureHash": "2b8eccb785db5b77",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-31T00:14:03.409Z"
+  }
+}

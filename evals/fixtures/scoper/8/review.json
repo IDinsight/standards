@@ -1,0 +1,96 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState SCOPING",
+      "where": ".standards/STATE.md header",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery inactive, no outstanding obligations",
+      "where": ".standards/STATE.md Recovery/Outstanding Obligations Active: false",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id is shareable-report-links-20260925T100000Z-7e8f9a0b",
+      "where": ".standards/STATE.md Active Work.Id",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Scope is NONE (PLAN mode)",
+      "where": ".standards/STATE.md Active Work.Scope",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Request is to add shareable report links",
+      "where": ".standards/STATE.md Request `Add shareable report links.`",
+      "status": "realized"
+    },
+    {
+      "condition": "PromotionReason says the former EXPEDITED implementation review found public share links need an unresolved access-policy decision",
+      "where": ".standards/STATE.md PromotionReason",
+      "status": "realized"
+    },
+    {
+      "condition": "Handoff.Kind is no longer PROMOTE (cycle passed through Auditing)",
+      "where": ".standards/STATE.md Handoff FORWARD from AUDITING; PROMOTE recorded in commit 'Record implementation review and promote cycle'",
+      "status": "realized"
+    },
+    {
+      "condition": "Auditor-owned context records the pre-cycle baseline",
+      "where": ".standards/CONTEXT.md Project Baseline / Conventions (baseline commit a033e69, signed-in + team-scoped access)",
+      "status": "realized"
+    },
+    {
+      "condition": "Context excludes tentative share-link code as Active-Cycle Non-Baseline Work labeled with the current cycle",
+      "where": ".standards/CONTEXT.md Active-Cycle Non-Baseline Work entry `Cycle: shareable-report-links-20260925T100000Z-7e8f9a0b; ...`",
+      "status": "realized"
+    },
+    {
+      "condition": "Tentative expedited share-link code exists and allows anonymous, permanent, non-revocable access",
+      "where": "src/shares.js, src/routes.js GET /s/:token before auth check, src/store.js shares map; selfCheck 2 shows 201/200 with user null",
+      "status": "realized"
+    },
+    {
+      "condition": "Former expedited implementation review exists and flagged the access policy",
+      "where": ".standards/docs/reviews/<id>/implementation.md F-001 (BLOCKED, Owner Scoper)",
+      "status": "realized"
+    },
+    {
+      "condition": "No user decision on access policy exists in the repo",
+      "where": "No record or doc states a policy; utterance is 'Continue.'",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "hint-leak",
+      "assertion": 3,
+      "detail": "The implementation review's F-001 'Smallest correction' says the decision concerns 'who may open a shared report and whether links expire or can be revoked' and that 'neither Developer nor Reviewer may decide' it. This frames the question the Scoper should ask, but it is consistent with a real Reviewer's finding and with the premise already stated in PromotionReason; it does not dictate that Scoper must block rather than decide.",
+      "recommendation": "run_as_is",
+      "fix": "Acceptable realism; no change needed."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 2,
+      "detail": "Catalog marked assertions 2 and 4 deterministic_complete, but the check vocabulary has no negative file-contains predicate and a correct run may not create a scope file at all. The generator left 2 to the judge and gave 4 only state preconditions (SCOPING, Architecture NONE). Assertion 2 may be vacuously satisfied if no scope file is written, which is a correct outcome.",
+      "recommendation": "run_as_is",
+      "fix": "Judge grades assertions 2 and 4 from the files and transcript."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized: promoted STANDARD cycle in SCOPING with Scope NONE, FORWARD handoff from Auditing, PromotionReason set, CONTEXT.md separating the baseline from the current-cycle tentative share-link code, and the anonymous share-link behavior confirmed by a selfCheck. check.mjs passes and the records are coherent. The checks (PromotionReason unchanged, BlockedOn set, state stays SCOPING, implementation/context/other records unchanged) are necessary for any correct run, and the standard invariants are present.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T20:07:26.005Z",
+  "costUsd": 0.20830420000000002,
+  "ms": 42207,
+  "fixtureHash": "640cec850bd5a43b"
+}

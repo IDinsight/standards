@@ -1,0 +1,71 @@
+{
+  "conditions": [
+    {
+      "condition": "STANDARD cycle with CompletionPolicy FULL_DELIVERABLE in DOCUMENTING",
+      "where": ".standards/STATE.md (layer 75): WorkflowState DOCUMENTING, CycleMode STANDARD, CompletionPolicy FULL_DELIVERABLE",
+      "status": "realized"
+    },
+    {
+      "condition": "Handoff is FORWARD from REVIEWING_IMPLEMENTATION",
+      "where": ".standards/STATE.md Handoff: Kind FORWARD, From REVIEWING_IMPLEMENTATION, FailureType NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Documenter has not begun normal documentation work",
+      "where": "No .standards/docs/documentation/ record; README.md unchanged since the pre-install commit",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation review is COMPLETE and current",
+      "where": ".standards/docs/reviews/<id>/implementation.md: Status COMPLETE, no findings, no closure section, cites the commits that hold the current code and tests; working tree clean",
+      "status": "realized"
+    },
+    {
+      "condition": "FULL verification report is COMPLETE and current",
+      "where": ".standards/docs/verification/<id>.md: COMPLETE, Assessment Purpose FULL, Target NONE, blobs match committed src/test; selfCheck shows 10/10 tests pass",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery, outstanding obligations, and BlockedOn are empty",
+      "where": ".standards/STATE.md: Recovery Active false, Obligations Active false, BlockedOn NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Brownfield project with upstream records (context, scope, design, plan) consistent with the cycle",
+      "where": ".standards/MODE.md BROWNFIELD; CONTEXT.md, scope (AC-001, AC-002), spec, development plan COMPLETE; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "Reviewer not invoked in this chat (utterance only asks to finish after implementation review)",
+      "where": "prompt.utterance; history null",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 0,
+      "detail": "The `contains` regex on STATE.md requires the original request words 'Add a --since option to the hours summary'. A run that rewords the implementation request while appending the policy instruction would fail. The protocol says to preserve the implementation request (Change completion policy step 4), so a correct run should keep the text verbatim. The regex tolerates rewrapping.",
+      "recommendation": "run_as_is",
+      "fix": "Acceptable. Loosen only if observed false failures appear."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "Every commit is dated 2026-09-24 while the cycle ID timestamp is 2026-09-22. This is harmless and gives no hint.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes the exact precondition for the DOCUMENTING -> REVIEWING_IMPLEMENTATION COMPLETION_CHANGE route: STANDARD/FULL_DELIVERABLE, a FORWARD from implementation review, no documentation record, current COMPLETE review and FULL verification, and empty recovery and BlockedOn. check.mjs passes and the checker's policyReturn branch would accept the correct end state. The checks are necessary conditions for a correct run, the judge-dependent parts (fresh-session wording, review kind) are left with complete:false, and nothing leaks the answer.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T02:55:52.807Z",
+  "costUsd": 0.2826714,
+  "ms": 32350,
+  "fixtureHash": "04b80c4fd4074b16"
+}

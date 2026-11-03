@@ -1,0 +1,74 @@
+diff --git a/Dockerfile b/Dockerfile
+index 0277db7..5610aae 100644
+--- a/Dockerfile
++++ b/Dockerfile
+@@ -11,4 +11,4 @@ RUN useradd --system --no-create-home notes
+ USER notes
+ 
+ EXPOSE 8000
+-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
++CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--no-server-header"]
+diff --git a/app/main.py b/app/main.py
+index 1208c74..5e3760a 100644
+--- a/app/main.py
++++ b/app/main.py
+@@ -1,10 +1,22 @@
+ from fastapi import FastAPI
+ from fastapi.middleware.cors import CORSMiddleware
+ 
++from starlette.types import ASGIApp
++
+ from app.config import settings
+ from app.routers import notes
++from app.utils.security_headers import SecurityHeadersMiddleware
++
++class NotesAPI(FastAPI):
++    # Wrapping the finished stack puts the headers outside ServerErrorMiddleware too.
++    def build_middleware_stack(self) -> ASGIApp:
++        return SecurityHeadersMiddleware(
++            super().build_middleware_stack(),
++            hsts=settings.environment == "production",
++        )
++
+ 
+-app = FastAPI(title="notes-api")
++app = NotesAPI(title="notes-api")
+ 
+ app.add_middleware(
+     CORSMiddleware,
+diff --git a/app/utils/security_headers.py b/app/utils/security_headers.py
+new file mode 100644
+index 0000000..735d336
+--- /dev/null
++++ b/app/utils/security_headers.py
+@@ -0,0 +1,30 @@
++"""Baseline browser security headers on every response."""
++
++from starlette.types import ASGIApp, Message, Receive, Scope, Send
++
++_BASELINE_HEADERS: list[tuple[bytes, bytes]] = [
++    (b"x-content-type-options", b"nosniff"),
++    (b"x-frame-options", b"DENY"),
++    (b"referrer-policy", b"strict-origin-when-cross-origin"),
++    (b"permissions-policy", b"geolocation=(), camera=(), microphone=()"),
++    (b"cache-control", b"no-store"),
++]
++_HSTS_HEADER = (b"strict-transport-security", b"max-age=31536000")
++
++
++class SecurityHeadersMiddleware:
++    def __init__(self, app: ASGIApp, *, hsts: bool) -> None:
++        self.app = app
++        self.headers = [*_BASELINE_HEADERS, _HSTS_HEADER] if hsts else _BASELINE_HEADERS
++
++    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
++        if scope["type"] != "http":
++            await self.app(scope, receive, send)
++            return
++
++        async def send_with_headers(message: Message) -> None:
++            if message["type"] == "http.response.start":
++                message = {**message, "headers": [*message.get("headers", []), *self.headers]}
++            await send(message)
++
++        await self.app(scope, receive, send_with_headers)

@@ -1,0 +1,51 @@
+{
+  "conditions": [
+    {
+      "condition": "A tracked handler exists in HEAD and is deleted in the working tree",
+      "where": "src/handlers/orders.js is committed in 3bd5971; git status shows ' D src/handlers/orders.js' (an unstaged deletion); selfChecks 1–2 confirm it",
+      "status": "realized"
+    },
+    {
+      "condition": "Its replacement is untracked at a new path",
+      "where": "src/routes/orders/handler.js is '??' in git status, with the same createOrder/getOrder/listOrders exports and behavior (selfCheck 5)",
+      "status": "realized"
+    },
+    {
+      "condition": "Unchanged callers still import the old path, so the linkage is currently broken",
+      "where": "src/server.js ('./handlers/orders.js'), src/jobs/reconcile.js ('../handlers/orders.js') and test/orders.test.js are unchanged from HEAD (selfChecks 3–4); importing server.js and running the tests both fail with ERR_MODULE_NOT_FOUND (selfChecks 6–7)",
+      "status": "realized"
+    },
+    {
+      "condition": "Navigator can run in any workflow state; the case leaves the state unspecified",
+      "where": "The installed brownfield initial STATE.md is left as written (no active cycle); check.mjs reports ok",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 0,
+      "detail": "The reply_matches patterns 'routes/orders/handler' and 'handlers/orders' assume the reply cites both paths in slash form. A correct explanation almost certainly does, but one that wrote, say, 'handler.js in the routes/orders folder' would fail the first pattern.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally loosen the first pattern to 'routes/orders' (and the second to 'handlers/orders|handlers/'); acceptable as is."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "README.md still documents src/handlers/orders.js. This is ordinary stale documentation, consistent with a mid-refactor working tree, and gives no hint of the answer.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized in git and the code: an unstaged deletion of the tracked handler, an untracked replacement with the same exports, and three unchanged callers whose imports now fail with ERR_MODULE_NOT_FOUND. Nothing in the repository leaks the answer, the Navigator invariants (unchanged **, HEAD unchanged, no mutating git) are present, and the checks are necessary conditions for a correct reply. The only note is that the first assertion's path regexes are slightly narrow.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T01:38:02.067Z",
+  "costUsd": 0.10593219999999999,
+  "ms": 17317,
+  "fixtureHash": "c21bb40b6f422ecf"
+}

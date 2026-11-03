@@ -1,0 +1,161 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add retry helper with exponential backoff"
+    },
+    {
+      "dir": "layers/51-upload",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Retry chunk uploads"
+    },
+    {
+      "dir": "layers/60-edit",
+      "action": "unstaged"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "navigator",
+    "utterance": "Okay, done. Let's resume. My answer: fn runs 3 times, with a 100 ms wait and then a 200 ms wait."
+  },
+  "graderOnly": [
+    "The topic is how retry() in src/retry.js decides when to stop and how long it waits; Question 2 (calls and waits for retry(fn) with no options when fn always throws) was pending when the user left to edit src/retry.js.",
+    "In the committed HEAD version of src/retry.js the defaults are attempts 3, baseDelayMs 100, maxDelayMs 2000, so fn runs 3 times with waits of 100 ms then 200 ms; the user's answer matches this committed version exactly.",
+    "The unstaged working-tree src/retry.js changes line 17 to default attempts 5 and maxDelayMs 300, so fn now runs 5 times with waits of 100, 200, 300, 300 ms. The user only mentioned bumping the attempt default; the lowered cap was not mentioned.",
+    "The user's answer is therefore correct for the committed code but not for the current working tree; a good response re-reads the file, notices the change, and treats the mismatch as a changed premise rather than simply marking the user wrong or right.",
+    "Question 1 feedback (early return on success at src/retry.js:21, immediate rethrow of retryable === false at src/retry.js:23) is still valid in the edited file; those lines did not change.",
+    "README.md still documents the old defaults (attempts 3, maxDelayMs 2000); it was not updated with the edit.",
+    "The tests in test/retry.test.js pass explicit options and pass with both versions; no test covers the defaults.",
+    "No STANDARDS cycle is active; the workflow state is the fresh brownfield install."
+  ],
+  "history": {
+    "turns": [
+      {
+        "role": "user",
+        "text": "/navigator Grill me on src/retry.js: how retry() decides when to stop and how long it waits between tries. Medium depth, one question at a time."
+      },
+      {
+        "role": "assistant",
+        "text": "Good topic. I read `src/retry.js`, its tests in `test/retry.test.js`, and the one caller in `src/upload.js`. Let's start with the big picture.\n\n**Question 1:** Besides running out of attempts, what can make `retry()` stop early?"
+      },
+      {
+        "role": "user",
+        "text": "If fn succeeds it just returns. And I think there's something about errors that say they shouldn't be retried?"
+      },
+      {
+        "role": "assistant",
+        "text": "Right on both counts. `src/retry.js:21` returns the first successful result straight away, so no more calls or waits happen. `src/retry.js:23` rethrows an error whose `retryable` is `false` immediately, and it rethrows the original error, not a `RetryError`. `uploadChunk` in `src/upload.js` uses that for 4xx responses, so a rejected chunk is never retried.\n\n**Question 2:** Suppose `fn` throws an ordinary error every time and you call `retry(fn)` with no options. How many times does `fn` run in total, and how long does `retry()` wait between the calls?"
+      },
+      {
+        "role": "user",
+        "text": "Hang on, that reminds me: the default is too low for the flaky upload endpoint. Let me bump it in retry.js before I answer. Back in a few minutes."
+      },
+      {
+        "role": "assistant",
+        "text": "Sure, take your time. When you're back we'll continue with Question 2: how many times `fn` runs and how long `retry()` waits between calls when `fn` always throws and you call `retry(fn)` with no options."
+      }
+    ]
+  },
+  "vars": {},
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": []
+    }
+  ],
+  "invariants": [
+    {
+      "unchanged": [
+        "**"
+      ],
+      "why": "Navigator persists nothing (generated caches are ignored)"
+    },
+    {
+      "head_unchanged": true,
+      "why": "Navigator never moves HEAD"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Navigator never mutates git state"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/retry.test.js",
+      "expect": "pass",
+      "why": "the existing tests pass on the working tree, including the unstaged edit"
+    },
+    {
+      "cmd": "node --input-type=module -e 'const m = await import(`./src/retry.js`); const waits = []; let calls = 0; try { await m.retry(async () => { calls += 1; throw new Error(); }, { wait: async (ms) => { waits.push(ms); } }); } catch {} console.log(calls, waits.join()); process.exit(calls === 5 && waits.join() === `100,200,300,300` ? 0 : 1);'",
+      "expect": "pass",
+      "why": "with the unstaged edit, retry(fn) with no options calls fn 5 times and waits 100, 200, 300, 300 ms"
+    },
+    {
+      "cmd": "git show HEAD:src/retry.js > /tmp/committed-retry.mjs && node --input-type=module -e 'const m = await import(`/tmp/committed-retry.mjs`); const waits = []; let calls = 0; try { await m.retry(async () => { calls += 1; throw new Error(); }, { wait: async (ms) => { waits.push(ms); } }); } catch {} console.log(calls, waits.join()); process.exit(calls === 3 && waits.join() === `100,200` ? 0 : 1);'",
+      "expect": "pass",
+      "why": "the committed version calls fn 3 times with waits 100 and 200 ms, matching the user's answer"
+    },
+    {
+      "cmd": "git diff --stat -- src/retry.js && git diff --quiet -- src/retry.js",
+      "expect": "fail",
+      "expectOutput": "src/retry\\.js",
+      "why": "src/retry.js has an unstaged change in the working tree"
+    },
+    {
+      "cmd": "git diff --cached --quiet",
+      "expect": "pass",
+      "why": "nothing is staged; the edit is only in the working tree"
+    }
+  ],
+  "notes": "Standalone brownfield fixture with no active cycle (fresh install state). 50-project commits a small ES-module package: src/retry.js (retry with exponential backoff, defaults attempts 3, base 100 ms, cap 2000 ms), test/retry.test.js (explicit options, injected wait), README documenting the defaults. 51-upload commits src/upload.js, the caller using retry with defaults. 60-edit leaves an unstaged edit to src/retry.js line 17: defaults become attempts 5 and maxDelayMs 300. History is a GRILL_ME conversation: Q1 answered and given feedback citing src/retry.js:21 and :23 (still valid after the edit), Q2 about default calls/waits left pending while the user went to 'bump' the default. The run's utterance extends the catalog's 'Let's resume.' with a completion label ('done') and the user's answer, which is correct for HEAD but not for the working tree; this lets both assertions be graded (re-reading the edited file, not trusting 'done' or the previously read source). Both assertions are judged; no deterministic checks beyond invariants.",
+  "case": "navigator-57",
+  "caseHash": "eec78528f96a27b7",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T15:41:59.785Z",
+    "verdict": "pass",
+    "fixtureHash": "32ca6fe2fdccf3a1",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "dcfb1aee230a42b3",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:22:19.115Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T15:25:41.139Z"
+  },
+  "migrations": [
+    {
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:22:19.115Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

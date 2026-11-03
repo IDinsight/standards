@@ -1,0 +1,81 @@
+{
+  "conditions": [
+    {
+      "condition": "BROWNFIELD project, STANDARD cycle, WorkflowState DOCUMENTING, Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/MODE.md (installed BROWNFIELD); .standards/STATE.md header and Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Current-cycle documentation record with valid DOCUMENTATION provenance and matching visible Cycle",
+      "where": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md provenance block and header",
+      "status": "realized"
+    },
+    {
+      "condition": "Collaboration AUTONOMOUS, target ACTIVE_CHANGE, user style NONE",
+      "where": "documentation record header",
+      "status": "realized"
+    },
+    {
+      "condition": "No outstanding obligations, blocking questions, or independent defects",
+      "where": "STATE.md Outstanding Obligations Active false, BlockedOn NONE; code and tests pass (selfCheck npm test)",
+      "status": "realized"
+    },
+    {
+      "condition": "Oldest frame: Owner ARCHITECTING, ResumeAt DEVELOPING, RerunThrough NONE, for an unresolved export contract",
+      "where": "STATE.md Frame 1 (From DEVELOPING, ARCHITECTURE, reason: to-date inclusivity and time zone undefined); spec lacks range rules; plan Suspended Assignment 1 matches the reason",
+      "status": "realized"
+    },
+    {
+      "condition": "Active nested frame: Owner DOCUMENTING, ResumeAt ARCHITECTING, RerunThrough NONE, for incorrect existing project guidance needed by Architect",
+      "where": "STATE.md Frame 2; Handoff FAILURE from ARCHITECTING (DOCUMENTATION); design says to represent responses as docs/conventions.md prescribes; the pre-correction conventions.md at 75145b0 said Unix seconds and decimal strings",
+      "status": "realized"
+    },
+    {
+      "condition": "Documentation correction is verified",
+      "where": "commit f0c2807 corrects docs/conventions.md; record DOC-001 RESOLVED with inspection and command evidence; selfCheck confirms the example matches the handler output",
+      "status": "realized"
+    },
+    {
+      "condition": "Required new API guide cannot be completed before Architect decides the contract and Developer implements it",
+      "where": "AC-004 requires docs/api/export.md (absent); range rules undefined in the spec (Frame 1); DEV-002 PENDING in the plan",
+      "status": "realized"
+    },
+    {
+      "condition": "Nothing completed downstream is invalidated by the correction",
+      "where": "no verification, review, or synchronization records; the only DONE step is DEV-001 (the serializer), which does not depend on the conventions doc",
+      "status": "realized"
+    },
+    {
+      "condition": "check.mjs reports a valid state",
+      "where": "gate checkMjs ok:true",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 1,
+      "detail": "The unchanged check covers `src/**`. Documenter's skill permits documentation-only edits to source comments and docstrings, so a correct run could in principle add a JSDoc to src/serialize.js. That is very unlikely here: the source has no comments, and the remaining work is a new guide that depends on unfinished work.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally narrow the glob to non-comment changes. Leaving it as is carries negligible risk."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "Layer 52 jumps the state directly to DEVELOPING (FORWARD from ARCHITECTING) in one commit, compressing the brownfield AUDITING→SCOPING→ARCHITECTING path. The records exist and are consistent, so this does not affect the test.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "All stated conditions are realized: the two nested frames match the case exactly, the conventions correction is committed and evidenced, and the AC-004 guide verifiably depends on Frame 1's undecided range rules and on the PENDING DEV-002, with no downstream records to invalidate. The checks match the expected corrective return (pop only Frame 2, RESUME to ARCHITECTING, record not COMPLETE, no obligation), the turn-end check passes for that outcome, and nothing leaks the routing. Only minor notes remain: the src/** glob is strict given the skill permits comment edits, and the cycle history is compressed.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-01T18:35:25.428Z",
+  "costUsd": 0.2922938,
+  "ms": 52199,
+  "fixtureHash": "2450b52ddcd68087"
+}

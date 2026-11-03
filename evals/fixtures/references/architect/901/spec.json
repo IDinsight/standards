@@ -1,0 +1,220 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial shipments API"
+    },
+    {
+      "dir": "layers/51-deploy",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Deploy to Fly.io from GitHub Actions"
+    },
+    {
+      "dir": "layers/52-status",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add shipment status and created_at index"
+    },
+    {
+      "dir": "layers/53-drop-fax",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Drop unused customers.fax column"
+    },
+    {
+      "dir": "layers/54-notes",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add shipment notes and status filter"
+    },
+    {
+      "dir": "layers/60-audit",
+      "action": "commit",
+      "message": "docs(context): record deploy and migration context"
+    },
+    {
+      "dir": "layers/61-scope",
+      "action": "commit",
+      "message": "docs(scope): define migrations-with-deploys scope"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "architect",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "Before this cycle, .github/workflows/deploy.yml runs flyctl deploy on every push to main, and fly.toml has no release step.",
+    "A person applies migrations by hand after a deploy, running alembic upgrade head over fly ssh console, as docs/operations.md describes.",
+    "The project's migrations include one that dropped a column (customers.fax).",
+    ".github/workflows/ci.yml runs the tests against a postgres:16 service container whose database is named test, and tests/conftest.py creates the tables with Base.metadata.create_all.",
+    "Production's DATABASE_URL is a Fly.io secret; no file in the repository holds it."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "deploy-migrations-20260924T090000Z-e6c4129b",
+    "SPEC": ".standards/docs/specs/deploy-migrations-20260924T090000Z-e6c4129b.md",
+    "SCOPE": ".standards/docs/scope/deploy-migrations-20260924T090000Z-e6c4129b.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "state": "ActiveWork.Architecture",
+          "equals": "${SPEC}",
+          "why": "Architect records the new design path in Active Work"
+        },
+        {
+          "provenance": {
+            "path": "${SPEC}",
+            "artifact": "ARCHITECTURE",
+            "cycle": "${ID}"
+          },
+          "why": "the design is created with artifact init for this cycle"
+        },
+        {
+          "contains": {
+            "path": "${SPEC}",
+            "regex": "AC-001"
+          }
+        },
+        {
+          "contains": {
+            "path": "${SPEC}",
+            "regex": "AC-002"
+          }
+        },
+        {
+          "contains": {
+            "path": "${SPEC}",
+            "regex": "AC-003"
+          }
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "DEVELOPING"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FORWARD"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "ARCHITECTING"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "NONE"
+        },
+        {
+          "reply_matches": "/developer(?![a-z-])",
+          "why": "next-role invocation for Claude Code"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "app/**",
+        "migrations/**",
+        "tests/**",
+        ".github/**",
+        "docs/**",
+        "fly.toml",
+        "Dockerfile",
+        "alembic.ini",
+        "pyproject.toml",
+        "README.md"
+      ],
+      "why": "Architect writes no production code, tests, CI or deploy configuration, or user documentation"
+    }
+  ],
+  "runtime": {
+    "blockHosts": [
+      "pypi.org",
+      "files.pythonhosted.org",
+      "registry.npmjs.org",
+      "registry.yarnpkg.com",
+      "deb.debian.org",
+      "security.debian.org",
+      "astral.sh"
+    ]
+  },
+  "selfChecks": [
+    {
+      "cmd": "python3 -c \"import urllib.request; urllib.request.urlopen('https://pypi.org/simple/fastapi/', timeout=15)\"",
+      "expect": "fail",
+      "expectOutput": "URLError|Connection refused|timed out|Errno|getaddrinfo|unreachable|Name or service|Temporary failure",
+      "why": "the Python package index is unreachable, so the role cannot install the project's dependencies or tooling"
+    },
+    {
+      "cmd": "for f in app/*.py app/routes/*.py migrations/env.py migrations/versions/*.py tests/*.py; do python3 -m py_compile $f || exit 1; done",
+      "expect": "pass",
+      "why": "every Python file in the project is syntactically valid"
+    },
+    {
+      "cmd": "test $(ls migrations/versions/*.py | wc -l) -eq 6 && test $(grep -l '^down_revision = None' migrations/versions/*.py | wc -l) -eq 1 && grep -q 'op.drop_column(.customers., .fax.)' migrations/versions/0005_drop_customers_fax.py",
+      "expect": "pass",
+      "why": "six migrations with one root revision, one of which drops customers.fax"
+    },
+    {
+      "cmd": "grep -q 'flyctl deploy --remote-only' .github/workflows/deploy.yml && grep -q 'image: postgres:16' .github/workflows/ci.yml && grep -q 'POSTGRES_DB: test' .github/workflows/ci.yml && grep -q 'Base.metadata.create_all' tests/conftest.py && ! grep -q '^.deploy]' fly.toml",
+      "expect": "pass",
+      "why": "deploy workflow runs flyctl deploy, CI uses a postgres:16 service with database test, conftest uses create_all, and fly.toml has no deploy section"
+    },
+    {
+      "cmd": "grep -q 'alembic upgrade head' docs/operations.md && grep -q 'fly ssh console' docs/operations.md && grep -q 'fly secrets set' docs/operations.md",
+      "expect": "pass",
+      "why": "the runbook describes the manual migration step and the DATABASE_URL secret"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. Pre-install layers 50-54 build shipments-api (FastAPI, SQLAlchemy 2, Alembic, psycopg 3) over five commits: initial app with migrations 0001-0002 (customers with fax, shipments); Fly.io deploy (fly.toml without a deploy section, deploy.yml running flyctl deploy --remote-only on push to main, ci.yml with a postgres:16 service, database test) and docs/operations.md describing the manual fly ssh console alembic upgrade head step and the DATABASE_URL Fly secret; 0003 index + 0004 status; 0005 drop customers.fax; 0006 notes plus route/tests and an operations note that production is at head. tests/conftest.py builds the schema with Base.metadata.create_all. Layer 60 commits Auditor CONTEXT.md with STATE at SCOPING (FORWARD from AUDITING); layer 61 commits the scope record (AC-001..AC-003 verbatim from the case, outcome-only goal/intent, non-goal: deploy waiting for CI) and STATE at ARCHITECTING, FORWARD from SCOPING, FULL_DELIVERABLE, Architecture NONE, recovery inactive, BlockedOn NONE. No design documents or earlier cycle records exist. Tests cannot run here (no dependencies, no PostgreSQL); the case does not claim they run.",
+  "case": "architect-901",
+  "caseHash": "d4bc639eb5286e82",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-11-03T00:27:46.950Z",
+    "verdict": "pass",
+    "fixtureHash": "50003e9fd1684af3",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-11-03T00:13:55.338Z"
+  }
+}

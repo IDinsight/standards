@@ -1,0 +1,334 @@
+{
+  "base": "export-project",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-context",
+      "action": "commit",
+      "message": "Record project context for CSV export"
+    },
+    {
+      "dir": "layers/52-scope",
+      "action": "commit",
+      "message": "Define CSV export scope"
+    },
+    {
+      "dir": "layers/54-design",
+      "action": "commit",
+      "message": "Design CSV export"
+    },
+    {
+      "dir": "layers/56-plan",
+      "action": "commit",
+      "message": "Plan CSV export implementation"
+    },
+    {
+      "dir": "layers/58-export",
+      "action": "commit",
+      "message": "Add CSV export of filtered records"
+    },
+    {
+      "dir": "layers/60-complete",
+      "action": "commit",
+      "message": "Mark CSV export plan complete"
+    },
+    {
+      "dir": "layers/62-access-test",
+      "action": "commit",
+      "message": "Add integration test for denied exports"
+    },
+    {
+      "dir": "layers/64-verification",
+      "action": "commit",
+      "message": "Record CSV export verification"
+    },
+    {
+      "dir": "layers/66-impl-review",
+      "action": "commit",
+      "message": "Record CSV export implementation review"
+    },
+    {
+      "dir": "layers/68-guide",
+      "action": "commit",
+      "message": "Document CSV export in the usage guide"
+    },
+    {
+      "dir": "layers/70-doc-record",
+      "action": "commit",
+      "message": "Record CSV export documentation"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "reviewer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "docs/usage.md (Roles line, Exporting records section, CSV format subsection) and README.md accurately describe the implemented POST /records/export route, its filters and validation, the 201 response and headers, the file name and default folder, the CSV format, and administrator-only access (401/403, no file).",
+    "Every current acceptance condition (AC-001, AC-002, AC-003) and every technical criterion has sufficient current evidence. AC-003, recorded as pending Documenter in the verification report and the implementation review, is now satisfied by the saved guide recorded in the COMPLETE documentation record.",
+    "Implementation and tests are byte-identical to the commit the implementation review assessed (Record CSV export verification); after it only docs/usage.md, README.md, the documentation record, and STATE.md changed.",
+    "No material findings, discrepancies, or evidence gaps exist; the final-deliverable review can pass and hand off to Synchronizer."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "export-20260924T090000Z-a7f3c1d2",
+    "SCOPE": ".standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md",
+    "ARCH": ".standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md",
+    "DEV": ".standards/docs/development/export-20260924T090000Z-a7f3c1d2.md",
+    "VERIFICATION": ".standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md",
+    "REVIEW_IMPL": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md",
+    "REVIEW_FINAL": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md",
+    "DOCUMENTATION": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md",
+    "SYNC": ".standards/docs/synchronization/export-20260924T090000Z-a7f3c1d2.md",
+    "CONTEXT": ".standards/CONTEXT.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "provenance": {
+            "path": "${REVIEW_FINAL}",
+            "artifact": "REVIEW",
+            "cycle": "${ID}",
+            "kind": "FINAL_DELIVERABLE"
+          },
+          "why": "final report at the fixed path with matching provenance"
+        },
+        {
+          "field": {
+            "path": "${REVIEW_FINAL}",
+            "name": "ReviewKind",
+            "equals": "FINAL_DELIVERABLE"
+          },
+          "why": "visible ReviewKind matches the block"
+        },
+        {
+          "field": {
+            "path": "${REVIEW_FINAL}",
+            "name": "Cycle",
+            "equals": "${ID}"
+          },
+          "why": "visible Cycle matches the block"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "contains": {
+            "path": "${REVIEW_FINAL}",
+            "regex": "AC-003"
+          },
+          "why": "the guide condition must be accounted for under its own ID in the final report"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": true,
+      "all": [
+        {
+          "unchanged": [
+            "${REVIEW_IMPL}"
+          ],
+          "why": "the implementation report is preserved byte-identical"
+        },
+        {
+          "absent": "${SYNC}",
+          "why": "Reviewer does not create a synchronization record"
+        }
+      ]
+    },
+    {
+      "assertion": 4,
+      "complete": false,
+      "all": [
+        {
+          "field": {
+            "path": "${REVIEW_FINAL}",
+            "name": "Status",
+            "equals": "COMPLETE"
+          },
+          "why": "the final review passes"
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "SYNCHRONIZING",
+          "why": "normal success hands off to Synchronizer"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FORWARD"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "REVIEWING_FINAL"
+        },
+        {
+          "reply_matches": "/synchronizer",
+          "why": "the next-role invocation for Claude Code"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "Reviewer must not change the assessed identity"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Reviewer must not change git state"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "packages/**",
+        "package.json",
+        "pnpm-lock.yaml",
+        ".gitignore",
+        "docs/**",
+        "README.md"
+      ],
+      "why": "Reviewer does not edit implementation, tests, or documentation"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the unit suite passes offline"
+    },
+    {
+      "cmd": "pnpm --filter export test 2>&1 | grep -qE 'pass 21$'",
+      "expect": "pass",
+      "why": "the unit suite runs 21 tests as the records state"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration 2>&1 | grep -qE 'pass 3$' && pnpm --filter export test:integration",
+      "expect": "pass",
+      "why": "the integration script passes with three tests, including the denied-export test"
+    },
+    {
+      "cmd": "node -e 'import(`./src/app.ts`).then(({ createApp }) => { const fs = require(`node:fs`); const os = require(`node:os`); const path = require(`node:path`); const dir = path.join(fs.mkdtempSync(path.join(os.tmpdir(), `deny-`)), `out`); const app = createApp({ exportDir: dir }); const send = (user, query = {}) => app.handle({ method: `POST`, path: `/records/export`, query, user }); const admin = { id: 1, name: `Ada`, role: `admin` }; const bad = send(admin, { status: `deleted` }); const codes = [send(null).status, send({ id: 3, name: `Vik`, role: `viewer` }).status, send({ id: 2, name: `Eli`, role: `editor` }).status, bad.status]; if (codes.join() !== `401,403,403,400` || bad.body !== JSON.stringify({ error: `unknown status: deleted` }) || fs.existsSync(dir)) { console.error(codes); process.exit(1); } if (send(admin).status !== 201 || fs.readdirSync(dir).length !== 1) process.exit(2); console.log(`denied before write`); }, (error) => { console.error(error); process.exit(3); })'",
+      "expect": "pass",
+      "why": "AC-002 and the invalid-status contract hold: 401/403/403/400 with no export folder, while an admin export writes one file (implementation review R3)"
+    },
+    {
+      "cmd": "node -e 'import(`./src/app.ts`).then(({ createApp }) => { const fs = require(`node:fs`); const os = require(`node:os`); const path = require(`node:path`); const dir = fs.mkdtempSync(path.join(os.tmpdir(), `cmp-`)); const user = { id: 1, name: `Ada`, role: `admin` }; const crlf = String.fromCharCode(13, 10); for (const query of [{ status: `active` }, { status: `archived` }, { q: `review` }, { owner: `marco`, status: `active` }]) { const app = createApp({ exportDir: dir }); const listed = JSON.parse(app.handle({ method: `GET`, path: `/records`, query, user }).body).records.map((record) => String(record.id)); const exported = app.handle({ method: `POST`, path: `/records/export`, query, user }).body.split(crlf).filter(Boolean).slice(1).map((row) => row.split(`,`)[0]); if (listed.join() !== exported.join() || listed.length === 0) { console.error(query, listed, exported); process.exit(1); } } console.log(`rows match`); }, (error) => { console.error(error); process.exit(3); })'",
+      "expect": "pass",
+      "why": "the verification report's E3 comparison is true: exported rows equal GET /records for the same queries"
+    },
+    {
+      "cmd": "grep -q 'POST /records/export' docs/usage.md && grep -q 'Only `admin` can export records' docs/usage.md && grep -q 'id,title,owner,status,createdAt' docs/usage.md && grep -q 'text/csv; charset=utf-8' docs/usage.md && grep -q 'records-20260924T090000Z.csv' docs/usage.md && grep -q 'src/export.ts' README.md && grep -q 'test:integration' README.md",
+      "expect": "pass",
+      "why": "the guide documents the export route, permissions, format, and headers; README links and lists it"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the REVIEWING_FINAL state and records are valid"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && git diff --quiet HEAD && test ! -e exports",
+      "expect": "pass",
+      "why": "all work is committed and no export files exist"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `REVIEWING_FINAL` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Id`: `export-20260924T090000Z-a7f3c1d2`$' .standards/STATE.md && grep -q '^`Kind`: `FORWARD` `From`: `DOCUMENTING` `FailureType`: `NONE`' .standards/STATE.md && grep -q '^`PromotionReason`: `NONE` `AuditTarget`: `NONE` `BlockedOn`: `NONE`$' .standards/STATE.md && grep -q '^`PendingVerificationCadence`: `NONE`$' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md && grep -q 'ProjectMode`: `BROWNFIELD' .standards/MODE.md",
+      "expect": "pass",
+      "why": "REVIEWING_FINAL after a FORWARD from DOCUMENTING, nothing blocked, recovery and obligations inactive"
+    },
+    {
+      "cmd": "f=.standards/docs; id=export-20260924T090000Z-a7f3c1d2; grep -q '`Status`: `COMPLETE`' $f/reviews/$id/implementation.md && head -5 $f/reviews/$id/implementation.md | grep -qx 'ReviewKind: IMPLEMENTATION' && grep -q '`Status`: `COMPLETE`' $f/documentation/$id.md && head -3 $f/documentation/$id.md | grep -qx 'Artifact: DOCUMENTATION' && grep -q '`Mode`: `VERIFY` `Status`: `COMPLETE`' $f/verification/$id.md && grep -q 'AC-003' $f/verification/$id.md && grep -q '^- `AC-003`:' $f/scope/$id.md && test -f .standards/CONTEXT.md && test ! -e $f/reviews/$id/final-deliverable.md && test ! -e $f/synchronization",
+      "expect": "pass",
+      "why": "scope with AC-003, COMPLETE verification, implementation review, and documentation records exist; no final review or synchronization record yet"
+    },
+    {
+      "cmd": "! grep -rqE 'COMMIT:|BLOB:' .standards/docs .standards/CONTEXT.md",
+      "expect": "pass",
+      "why": "every revision placeholder was resolved"
+    },
+    {
+      "cmd": "c=$(git log --format=%H -1 --fixed-strings --grep='Record CSV export verification') && test -n $c && git diff --quiet $c HEAD -- src test packages package.json .gitignore pnpm-lock.yaml && [ $(git diff --name-only $c HEAD -- docs README.md | paste -s -d, -) = README.md,docs/usage.md ]",
+      "expect": "pass",
+      "why": "after the implementation review's assessed commit only the guide and README changed"
+    },
+    {
+      "cmd": "git log -11 --format=%s | paste -s -d '|' - | grep -qx 'Record CSV export documentation|Document CSV export in the usage guide|Record CSV export implementation review|Record CSV export verification|Add integration test for denied exports|Mark CSV export plan complete|Add CSV export of filtered records|Plan CSV export implementation|Design CSV export|Define CSV export scope|Record project context for CSV export'",
+      "expect": "pass",
+      "why": "history follows the standard brownfield order"
+    },
+    {
+      "cmd": "! grep -rqE 'AC-[0-9]' src test packages docs README.md",
+      "expect": "pass",
+      "why": "code, tests, and docs cite no acceptance identifiers"
+    }
+  ],
+  "notes": "Built on export-project (the code base) rather than the suggested export-reviewing-impl, because this case needs a third, guide acceptance condition (AC-003) that was pending Documenter, and export-reviewing-impl's committed scope, verification report, and handoff have only AC-001/AC-002 with no later-role dependency. Eleven post-install commits replay the export cycle with AC-003 included from the start. 50-context: CONTEXT.md (export-testing's, plus a docs/usage.md line), STATE SCOPING. 52-scope: AC-001 (filtered CSV with RFC 4180 quoting), AC-002 (non-admin/anonymous denied before any file), AC-003 (user guide explains the export, filters, CSV, admin-only access). 54-design: same design as export-testing plus AC-003 No architectural impact (Documenter). 56-plan: APPROVED plan (DEV-001..003 for AC-001/AC-002). 58-export: implementation and tests identical to export-testing's 40-export. 60-complete: plan COMPLETE, STATE TESTING. 62-access-test: the denied-export integration test from export-reviewing-impl. 64-verification: COMPLETE FULL verification with AC-003 as a later-role dependency on Documenter (Open Findings and Dependencies), plus an E3 filter comparison; STATE REVIEWING_IMPLEMENTATION. 66-impl-review: COMPLETE implementation review, no material findings, AC-003 permitted dependency, diagnostic R3 (invalid status 400, no folder); STATE DOCUMENTING. 68-guide: docs/usage.md gains a Roles line, Exporting records and CSV format sections; README links export, lists src/export.ts and test:integration. 70-doc-record: COMPLETE documentation record (AUTONOMOUS, ACTIVE_CHANGE, NONE style, no discrepancies) citing blobs and commits; STATE REVIEWING_FINAL with FORWARD from DOCUMENTING. No final review or synchronization record. Tree clean.",
+  "case": "reviewer-5",
+  "caseHash": "5551fb53e32f6c82",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T23:17:08.764Z",
+    "verdict": "pass",
+    "fixtureHash": "373f925185d18815",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "1b051c449ad466d8",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:25:10.052Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T21:37:27.142Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-context/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/52-scope/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/54-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/56-plan/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/60-complete/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/64-verification/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/66-impl-review/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/70-doc-record/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:25:10.052Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

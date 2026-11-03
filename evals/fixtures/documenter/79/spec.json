@@ -1,0 +1,179 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add stockroom CLI with export and import commands"
+    },
+    {
+      "dir": "layers/50-design",
+      "action": "commit",
+      "message": "Record scope and design for export --since"
+    },
+    {
+      "dir": "layers/60-implementation",
+      "action": "commit",
+      "message": "Add --since filter to export and record verification"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "documenter",
+    "utterance": "Document the import command; it's a separate feature from the current work."
+  },
+  "graderOnly": [
+    "The active cycle's request is the export --since filter; it does not cover the import command, whose only documentation is a one-line entry in README.md.",
+    "WorkflowState TESTING is owned by Tester; the persisted Active Work.BlockedOn is Tester's scenario-budget question for its Frame 2 test correction.",
+    "Recovery is nested: Frame 1 (TESTING -> DEVELOPING, IMPLEMENTATION) and Frame 2 (DEVELOPING -> TESTING, VERIFICATION), both with RerunThrough NONE.",
+    "The user has not asked to cancel, replace, or rework the active cycle; the working tree is clean."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "add-a-since-date-filter-to-the-export-20260922T141500Z-5c1e9a3b",
+    "DOCREC": ".standards/docs/documentation/add-a-since-date-filter-to-the-export-20260922T141500Z-5c1e9a3b.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "state": "ActiveWork.Id",
+          "equals": "${ID}",
+          "why": "no new cycle ID"
+        },
+        {
+          "state": "CycleMode",
+          "equals": "STANDARD",
+          "why": "no mode conversion"
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "TESTING",
+          "why": "the active cycle stays with its owner"
+        },
+        {
+          "state": "ActiveWork.Request",
+          "unchanged": true,
+          "why": "no replacement request"
+        },
+        {
+          "state": "ActiveWork.BlockedOn",
+          "unchanged": true,
+          "why": "Tester's blocker is preserved"
+        },
+        {
+          "state": "ActiveWork.Development",
+          "unchanged": true,
+          "why": "plan reference preserved"
+        },
+        {
+          "state": "PendingCycleRequest",
+          "equals": "UNSET",
+          "why": "pending fields are not overwritten to queue the separate request"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "true"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "2",
+          "why": "no dropped recovery frame"
+        },
+        {
+          "state": "Recovery.Frame1.Owner",
+          "unchanged": true
+        },
+        {
+          "state": "Recovery.Frame1.Reason",
+          "unchanged": true
+        },
+        {
+          "state": "Recovery.Frame2.Owner",
+          "unchanged": true
+        },
+        {
+          "state": "Recovery.Frame2.Reason",
+          "unchanged": true
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "unchanged": [
+            "README.md",
+            "docs/**",
+            "src/**",
+            "bin/**"
+          ],
+          "why": "no project documentation, comment, or docstring edits"
+        },
+        {
+          "unchanged": [
+            ".standards/docs/**"
+          ],
+          "why": "no documentation record or other cycle record written"
+        },
+        {
+          "absent": "${DOCREC}"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": []
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/export.test.js test/import.test.js",
+      "expect": "pass",
+      "why": "the verification report records the established test command passing (7 tests) on the committed sources in a UTC runner"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 00-project (pre-install): small Node ESM CLI 'stockroom' with export and import commands, README.md (import has a one-line mention only), docs/export.md, node:test suites. 50-design: Auditor CONTEXT.md, cycle scope (AC-001..AC-004, non-goal: import command) and technical design, STATE at DEVELOPING. 60-implementation: --since implementation in src/export.js and src/cli.js, Tester's since scenarios in test/export.test.js, development plan (DEV-001 reopened IN_PROGRESS, DEV-002 DONE, Developer Suspended Assignment for Frame 2), verification report (BLOCKED, Assessment Purpose CORRECTION, Tester Suspended Assignment FULL for Frame 1), and final STATE: TESTING, STANDARD, FULL_DELIVERABLE, Handoff FAILURE DEVELOPING->TESTING VERIFICATION, two recovery frames (Frame 1 TESTING->DEVELOPING IMPLEMENTATION; Frame 2 DEVELOPING->TESTING VERIFICATION; both RerunThrough NONE), Active Work.BlockedOn holding Tester's scenario-budget question. The verification report's CORRECTION purpose is required by check.mjs for a scoped Tester correction frame and was set by Tester, not the role under test. Assertion 0 is graded field-by-field on STATE.md; assertion 1 by unchanged globs over documentation and cycle records; assertion 2 by the judge.",
+  "case": "documenter-79",
+  "caseHash": "330aaf3fa021532f",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T02:57:47.042Z",
+    "verdict": "pass",
+    "fixtureHash": "91d3c22f8b7f3e45",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-30T23:57:12.143Z"
+  }
+}

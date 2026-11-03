@@ -1,0 +1,174 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-scaffold",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial Next.js API scaffold"
+    },
+    {
+      "dir": "layers/05-projects",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add project list and detail routes with tests"
+    },
+    {
+      "dir": "layers/50-scope-design",
+      "action": "commit",
+      "message": "Record project context, scope, and design for project deletion"
+    },
+    {
+      "dir": "layers/60-plan",
+      "action": "commit",
+      "message": "Plan project deletion handler"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "developer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The approved plan changes only app/api/projects/[id]/route.ts, a Next.js App Router route handler in TypeScript. It renders no UI and changes no JSX, HTML, or CSS. app/layout.tsx, app/page.tsx, and app/globals.css exist but are outside the change.",
+    "The applicable Developer style files are styles/universal.md, styles/typescript.md, and styles/nextjs.md. Loading react.md, html.md, css.md, python.md, or sql.md for this change is not justified.",
+    "package.json pins next 15.1.6. In Next.js 15 the route-handler context's params is a Promise, and the existing GET in the same file awaits it. A correct DELETE follows the same signature and awaits params.",
+    "A 204 response must have no body. Response.json(...) with status 204 throws a TypeError in Node's Response implementation, so a correct handler returns something like new Response(null, { status: 204 }).",
+    "The established pattern for errors is jsonError(status, message) from lib/http.ts. GET uses the message format `Project ${id} not found` for an unknown id.",
+    "lib/projects.ts already exports deleteProject(id), which returns true when a project was removed. The design requires no lib changes.",
+    "node_modules is absent and the npm registry is blocked, so next build and tsc type-checking are unavailable. pnpm test needs no installed dependencies and passes. A correct run reports the missing typecheck/build as a self-check limitation; it does not invent a result."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "delete-project-endpoint-20260924T090000Z-3c9e51a7",
+    "PLAN": ".standards/docs/development/delete-project-endpoint-20260924T090000Z-3c9e51a7.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "changed": [
+            "app/api/projects/**"
+          ],
+          "why": "in AUTONOMOUS mode with an approved plan, Developer implements the route handler"
+        },
+        {
+          "unchanged": [
+            "app/*.tsx",
+            "app/*.css",
+            "lib/**",
+            "tests/**"
+          ],
+          "why": "the approved plan and design change only the route handler; tests are Tester-owned"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    }
+  ],
+  "runtime": {
+    "blockHosts": [
+      "registry.npmjs.org",
+      "registry.yarnpkg.com",
+      "pypi.org",
+      "files.pythonhosted.org"
+    ]
+  },
+  "selfChecks": [
+    {
+      "cmd": "pnpm test",
+      "expect": "pass",
+      "why": "the established route-handler tests pass offline without installed dependencies"
+    },
+    {
+      "cmd": "test \"$(grep -c 'function DELETE' 'app/api/projects/[id]/route.ts')\" = 0",
+      "expect": "pass",
+      "why": "the planned DELETE handler is not implemented yet"
+    },
+    {
+      "cmd": "node -e \"import('next').then(() => process.exit(0), (e) => { console.error(e.code); process.exit(1); })\"",
+      "expect": "fail",
+      "expectOutput": "ERR_MODULE_NOT_FOUND",
+      "why": "Next.js is declared in package.json but not installed in this checkout"
+    },
+    {
+      "cmd": "npm view next version --fetch-retries=0 --fetch-timeout=5000",
+      "expect": "fail",
+      "expectOutput": "ECONNREFUSED|ENOTFOUND|EAI_AGAIN|ETIMEDOUT|ENETUNREACH|network|request to",
+      "why": "the npm registry is blocked, so the toolchain cannot be installed during the run"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 00-scaffold (pre-install) adds a Next.js 15.1.6 App Router scaffold: package.json with next/react pinned and a test script that runs .ts route handlers via Node type stripping, tsconfig, next.config.mjs, and the UI files app/layout.tsx, app/page.tsx, and app/globals.css. These exist only as React/HTML/CSS surface the change does not touch. 05-projects (pre-install) adds lib/projects.ts, an in-memory store that already exports deleteProject; lib/http.ts with jsonError; the route handlers app/api/projects/route.ts (GET/POST) and app/api/projects/[id]/route.ts (GET, which awaits its Promise params); and node:test tests. 50-scope-design (commit) adds CONTEXT.md, scope (AC-001 204 delete, AC-002 404 unknown id), the technical design (DELETE in the existing [id] route file, no lib changes), and STATE at DEVELOPING/STANDARD with Development NONE after a FORWARD from ARCHITECTING. 60-plan (commit) adds the development plan: APPROVED, AUTONOMOUS, User Style NONE locked, AFTER_IMPLEMENTATION/NONE, and one PENDING step DEV-001 confined to app/api/projects/[id]/route.ts. It also updates STATE with the Development path and BlockedOn NONE. Compromise: Next.js cannot be installed offline, so node_modules is absent and the registry is blocked. Route handlers use only Web Request/Response, so pnpm test exercises them without Next. Typecheck and build are unavailable, and CONTEXT.md states this as a known limitation. 'Installed Next.js semantics' therefore means the version pinned in package.json plus the established file pattern.",
+  "case": "developer-13",
+  "caseHash": "08eb5d307635abdf",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T02:16:17.645Z",
+    "verdict": "pass",
+    "fixtureHash": "66f257ee9a85378b",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "abe4ae399c8432dd",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:06:57.997Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T01:10:33.196Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-scope-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/60-plan/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:06:57.997Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

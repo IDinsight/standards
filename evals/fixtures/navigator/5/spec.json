@@ -1,0 +1,158 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add records client and batch sync"
+    },
+    {
+      "dir": "layers/05-release-140",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Release 1.4.0"
+    },
+    {
+      "dir": "layers/10-retry-backoff",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Use exponential backoff and abortable waits in retry"
+    },
+    {
+      "dir": "layers/20-sync-rejected",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Report rejected batches separately in sync"
+    },
+    {
+      "dir": "layers/30-release-150",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Release 1.5.0"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "navigator",
+    "utterance": "Compare the old and new retry sequence between the 1.4.0 and 1.5.0 releases, including when waits and cancellation occur."
+  },
+  "graderOnly": [
+    "The repository has no git tags; the two releases are the commits titled 'Release 1.4.0' and 'Release 1.5.0'. The working tree matches 1.5.0 project code (HEAD is the STANDARDS install commit on top of it).",
+    "In 1.4.0, retry() defaults to 3 attempts and sleeps a fixed delayMs (default 500 ms) after every failed attempt, including the last one, before throwing RetryExhaustedError; every error is retried, including HTTP 4xx.",
+    "In 1.4.0, cancellation is checked only at the start of each attempt: an abort during a wait is not noticed until the wait ends, an abort during the final wait produces RetryExhaustedError instead of CancelledError, and the signal is not passed to the transport, so an in-flight request is not aborted.",
+    "In 1.5.0, retry() defaults to 4 attempts and waits min(maxDelayMs, baseDelayMs * 2^(attempt-1)) only between attempts (defaults 200, 400, 800 ms, capped at 2000 ms), with no wait after the last attempt; non-retryable errors (HttpError other than 5xx, 408, 429) are rethrown immediately and unwrapped.",
+    "In 1.5.0, an abort during a wait rejects immediately with CancelledError (timer cleared), an abort is also checked after a failed attempt, and the signal is passed through client.js to the transport and fetch, so an in-flight request can be aborted.",
+    "Callers: src/client.js forwards the signal to the transport in 1.5.0; src/sync.js treats RetryExhaustedError as a failed batch, rethrows CancelledError, and in 1.5.0 adds a rejected list for HttpError 4xx; src/cli.js is unchanged between the releases.",
+    "src/cli.js still passes retry option delayMs: 1000, which 1.5.0 ignores (waits use the 200 ms base default with 5 attempts), and it reports only failed batches, so a run where batches are only rejected (4xx) exits 0 in 1.5.0 whereas in 1.4.0 those batches were retried and counted as failed (exit 1).",
+    "No timing measurements, benchmarks, or logs exist in the repository; any durations come from reading the constants in source."
+  ],
+  "history": null,
+  "vars": {},
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "reply_matches": "sync",
+          "flags": "i",
+          "why": "the batch sync caller (src/sync.js / syncRecords) is the main affected consumer; an answer covering callers names it"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": []
+    }
+  ],
+  "invariants": [
+    {
+      "unchanged": [
+        "**"
+      ],
+      "why": "Navigator persists nothing (generated caches are ignored)"
+    },
+    {
+      "head_unchanged": true,
+      "why": "Navigator never moves HEAD"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Navigator never mutates git state"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/retry.test.js test/sync.test.js",
+      "expect": "pass",
+      "why": "the 1.5.0 tests in the working tree pass"
+    },
+    {
+      "cmd": "git log --format=%s | grep -qx 'Release 1.4.0' && git log --format=%s | grep -qx 'Release 1.5.0'",
+      "expect": "pass",
+      "why": "both requested release revisions exist in history"
+    },
+    {
+      "cmd": "d=$(mktemp -d) && git archive $(git log --format=%H --grep='^Release 1.4.0$') | tar -x -C $d && cd $d && node --test test/retry.test.js test/sync.test.js",
+      "expect": "pass",
+      "why": "the 1.4.0 revision is a working project whose own tests pass"
+    },
+    {
+      "cmd": "! git diff --quiet $(git log --format=%H --grep='^Release 1.4.0$') $(git log --format=%H --grep='^Release 1.5.0$') -- src/retry.js",
+      "expect": "pass",
+      "why": "the retry implementation differs between the releases"
+    },
+    {
+      "cmd": "git diff --quiet $(git log --format=%H --grep='^Release 1.4.0$') $(git log --format=%H --grep='^Release 1.5.0$') -- src/cli.js",
+      "expect": "pass",
+      "why": "the CLI caller is unchanged between the releases (it still passes delayMs)"
+    },
+    {
+      "cmd": "d=$(mktemp -d) && git show $(git log --format=%H --grep='^Release 1.4.0$'):src/retry.js > $d/retry.mjs && node -e 'import(process.argv[1]).then(async (m) => { const c = new AbortController(); setTimeout(() => c.abort(), 20); try { await m.retry(async () => { throw new Error(`down`); }, { attempts: 1, delayMs: 100, signal: c.signal }); } catch (e) { process.exit(e.name === `RetryExhaustedError` ? 0 : 1); } process.exit(1); })' $d/retry.mjs",
+      "expect": "pass",
+      "why": "grader fact: in 1.4.0 an abort during the final wait yields RetryExhaustedError, not CancelledError"
+    }
+  ],
+  "notes": "Standalone brownfield fixture; all project history is pre-install and the default installed workflow state is untouched (no cycle), so check is ok. Layer 00 adds a small Node ESM records-sync client (src/retry.js fixed-delay retry, src/transport.js fetch transport with HttpError, src/client.js, src/sync.js batch sync, src/cli.js with SIGINT AbortController) plus node:test tests. Layer 05 is the 'Release 1.4.0' commit (version bump, changelog). Layer 10 reworks retry (exponential backoff, retryable classification, abortable wait, signal passed to transport) and updates client/transport/tests/README. Layer 20 adds rejected-batch reporting in sync. Layer 30 is the 'Release 1.5.0' commit. src/cli.js is never changed, so it still passes delayMs and ignores rejected batches. Compromise: the builder cannot create tags, so releases are identified by commit subjects and package.json/CHANGELOG versions; the utterance says 'the 1.4.0 and 1.5.0 releases' instead of 'v1.4.0 and v1.5.0'.",
+  "case": "navigator-5",
+  "caseHash": "7497f01c7889f3b0",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T01:35:06.949Z",
+    "verdict": "pass",
+    "fixtureHash": "58db2624f172053e",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "b241d2e82388b5f8",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:18:43.267Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T00:54:20.706Z"
+  },
+  "migrations": [
+    {
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:18:43.267Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

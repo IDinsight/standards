@@ -1,0 +1,76 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is BROWNFIELD",
+      "where": ".standards/MODE.md (brownfield install)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode DOCUMENTATION, CompletionPolicy NONE, Active Work.Id guide-20261004T120000Z-1a2b3c4d, WorkflowState ARCHITECTING",
+      "where": ".standards/STATE.md (layer 52-scope)",
+      "status": "realized"
+    },
+    {
+      "condition": "Upstream Auditor and Scoper work is complete (FORWARD from SCOPING, context exists, recovery inactive, BlockedOn NONE, Architecture/Development NONE)",
+      "where": ".standards/STATE.md, .standards/CONTEXT.md, git log commits 51/52",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope requires documenting a guaranteed cache lifetime, stated plainly",
+      "where": ".standards/docs/scope/guide-20261004T120000Z-1a2b3c4d.md AC-002",
+      "status": "realized"
+    },
+    {
+      "condition": "Current source does not enforce the lifetime",
+      "where": "src/cache.js get() ignores storedAt; prune() applies ttl only when set() exceeds maxEntries; selfCheck 2 shows a rate served one hour later",
+      "status": "realized"
+    },
+    {
+      "condition": "Guaranteeing the lifetime needs Developer work that the documentation cycle omits",
+      "where": "src/cache.js (an expiry check on read is required); scope Non-goals exclude behavior changes",
+      "status": "realized"
+    },
+    {
+      "condition": "The user has not revised the request",
+      "where": "Active Work.Request still asks for the guarantee; no history",
+      "status": "realized"
+    },
+    {
+      "condition": "Context is accurate and makes no enforcement claim, so a PROJECT_CONTEXT route is not warranted",
+      "where": ".standards/CONTEXT.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Git is clean and committed",
+      "where": "git status clean on main",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "case-defect",
+      "assertion": 1,
+      "detail": "AC-002 requires the guide to state behavior the source does not have, while the scope's Non-goals exclude behavior changes. Some readers could treat that as a Scoper-owned defect and route a SCOPING failure, which would push a frame and fail assertion 1's Recovery checks. The case and the Architect skill both direct this situation to an Active Work.BlockedOn user decision instead. The scope faithfully restates the user's explicit request, so the fixture's choice is consistent with the case.",
+      "recommendation": "run_as_is",
+      "fix": "None needed; the judge and the Recovery checks reflect the case's expected route."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "All commits share the timestamp 2026-10-04T13:00:00Z, via the spec's top-level date. The cycle ID timestamp of 12:00 precedes it, so this is plausible and harmless.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized: src/cache.js never expires entries on read, a selfCheck proves it, AC-002 states the guarantee plainly, and CONTEXT.md is accurate without claiming enforcement. Records and STATE.md are coherent and check.mjs passes. Nothing hints at the answer. The checks (source, test, and README unchanged; state preserved with no frames; BlockedOn not NONE) are necessary conditions a correct run satisfies, and the standard invariants are present.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-30T22:48:01.464Z",
+  "costUsd": 1.144827,
+  "ms": 34892,
+  "fixtureHash": "62ece9cb01e812da"
+}

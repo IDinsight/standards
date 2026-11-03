@@ -1,0 +1,272 @@
+{
+  "base": "export-project",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-context",
+      "action": "commit",
+      "message": "Record project context for CSV export"
+    },
+    {
+      "dir": "layers/52-scope",
+      "action": "commit",
+      "message": "Define CSV export scope"
+    },
+    {
+      "dir": "layers/54-design",
+      "action": "commit",
+      "message": "Design CSV export"
+    },
+    {
+      "dir": "layers/56-plan",
+      "action": "commit",
+      "message": "Plan CSV export implementation"
+    },
+    {
+      "dir": "layers/58-export",
+      "action": "commit",
+      "message": "Add CSV export with download links"
+    },
+    {
+      "dir": "layers/60-complete",
+      "action": "commit",
+      "message": "Mark CSV export plan complete"
+    },
+    {
+      "dir": "layers/62-verification",
+      "action": "commit",
+      "message": "Record CSV export verification"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "reviewer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "Scope AC-001 requires the export to stay private (no one other than a signed-in administrator can create it or download its contents), while AC-002 requires a public download URL that anyone who has it can use without signing in; these cannot both hold.",
+    "The active request (export the filtered records as CSV and get a download link for each export) does not say who may use the link, so it does not resolve the contradiction.",
+    "The code implements public access: GET /exports/download returns the stored CSV for a valid token with no signed-in user, while only export creation is limited to administrators.",
+    "The technical design, development plan, and verification record all treat AC-001 as satisfied by admin-only creation plus an unguessable token, so every upstream role read the contradiction in favor of public download without recording it.",
+    "Apart from the access contradiction the implementation follows the design: CSV quoting, filters, admin-only creation, token validation, and 404 handling work as designed, and the 27 unit tests pass.",
+    "The correct outcome is a SCOPING failure routed to Scoper (frame From REVIEWING_IMPLEMENTATION, ResumeAt REVIEWING_IMPLEMENTATION) without the Reviewer choosing private or public access or editing the scope."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "export-20260924T090000Z-a7f3c1d2",
+    "SCOPE": ".standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md",
+    "ARCH": ".standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md",
+    "DEV": ".standards/docs/development/export-20260924T090000Z-a7f3c1d2.md",
+    "VERIFICATION": ".standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md",
+    "REVIEW_IMPL": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "SCOPING",
+          "why": "the scope contradiction is a Scoper-owned defect routed to SCOPING"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FAILURE"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "REVIEWING_IMPLEMENTATION"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "SCOPING"
+        },
+        {
+          "state": "Recovery.Top.Owner",
+          "equals": "SCOPING"
+        },
+        {
+          "state": "Recovery.Top.FailureType",
+          "equals": "SCOPING"
+        },
+        {
+          "state": "Recovery.Top.ResumeAt",
+          "equals": "REVIEWING_IMPLEMENTATION"
+        },
+        {
+          "exists": "${REVIEW_IMPL}",
+          "why": "Reviewer persists its findings before routing"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "not": "DOCUMENTING",
+          "why": "passing review would accept the implementation's public access as the requirement"
+        },
+        {
+          "field": {
+            "path": "${REVIEW_IMPL}",
+            "name": "Status",
+            "not": "COMPLETE"
+          }
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": true,
+      "all": [
+        {
+          "unchanged": [
+            "${SCOPE}"
+          ],
+          "why": "Scoper owns acceptance wording and completion; Reviewer does not edit the scope"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Reviewer must not change the assessed identity"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "packages/**",
+        "package.json",
+        ".gitignore",
+        "docs/**",
+        "README.md"
+      ],
+      "why": "Reviewer does not repair implementation, tests, or documentation it does not own"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the established test command passes offline"
+    },
+    {
+      "cmd": "pnpm --filter export test 2>&1 | grep -qE 'pass 27$'",
+      "expect": "pass",
+      "why": "27 tests run: 16 pre-cycle plus 7 serialization/storage and 4 route tests"
+    },
+    {
+      "cmd": "node -e 'import(`./src/app.ts`).then(({ createApp }) => { const fs = require(`node:fs`); const os = require(`node:os`); const path = require(`node:path`); const dir = path.join(fs.mkdtempSync(path.join(os.tmpdir(), `pub-`)), `out`); const app = createApp({ exportDir: dir }); const created = app.handle({ method: `POST`, path: `/records/export`, query: {}, user: { id: 1, name: `Ada`, role: `admin` } }); const token = JSON.parse(created.body).url.split(`token=`)[1]; const res = app.handle({ method: `GET`, path: `/exports/download`, query: { token }, user: null }); if (created.status !== 201 || res.status !== 200 || !res.body.startsWith(`id,title`)) { console.error(created.status, res.status); process.exit(1); } console.log(`public download works`); }, (error) => { console.error(error); process.exit(3); })'",
+      "expect": "pass",
+      "why": "the code implements public access: anyone with the URL downloads the CSV without signing in"
+    },
+    {
+      "cmd": "node -e 'import(`./src/app.ts`).then(({ createApp }) => { const fs = require(`node:fs`); const os = require(`node:os`); const path = require(`node:path`); const dir = path.join(fs.mkdtempSync(path.join(os.tmpdir(), `deny-`)), `out`); const app = createApp({ exportDir: dir }); const send = (user) => app.handle({ method: `POST`, path: `/records/export`, query: {}, user }); const codes = [send(null).status, send({ id: 3, name: `Vik`, role: `viewer` }).status, send({ id: 2, name: `Eli`, role: `editor` }).status]; if (codes.join() !== `401,403,403` || fs.existsSync(dir)) { console.error(codes); process.exit(1); } console.log(`creation denied`); }, (error) => { console.error(error); process.exit(3); })'",
+      "expect": "pass",
+      "why": "export creation is limited to administrators, as designed"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the REVIEWING_IMPLEMENTATION state and records are valid"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && git diff --quiet HEAD && test ! -e exports && grep -qx 'exports/' .gitignore",
+      "expect": "pass",
+      "why": "all work is committed and no export files exist"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `REVIEWING_IMPLEMENTATION` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Id`: `export-20260924T090000Z-a7f3c1d2`$' .standards/STATE.md && grep -q '^`Kind`: `FORWARD` `From`: `TESTING` `FailureType`: `NONE`' .standards/STATE.md && grep -q '^`PromotionReason`: `NONE` `AuditTarget`: `NONE` `BlockedOn`: `NONE`$' .standards/STATE.md && grep -q '^`PendingVerificationCadence`: `NONE`$' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md && grep -q 'ProjectMode`: `BROWNFIELD' .standards/MODE.md",
+      "expect": "pass",
+      "why": "stated workflow state: REVIEWING_IMPLEMENTATION, STANDARD, recovery and obligations inactive"
+    },
+    {
+      "cmd": "s=.standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md && grep -q 'AC-001`: An administrator can export the currently filtered records as a CSV file, and the export stays private' $s && grep -q 'AC-002`: Each export has a public download URL, and anyone who has that URL can download the CSV file without signing in' $s && ! grep -q 'AC-003' $s",
+      "expect": "pass",
+      "why": "the scope holds exactly the two contradictory conditions"
+    },
+    {
+      "cmd": "test -f .standards/CONTEXT.md && grep -q '`Status`: `COMPLETE`' .standards/docs/development/export-20260924T090000Z-a7f3c1d2.md && grep -q '`Mode`: `VERIFY` `Status`: `COMPLETE`' .standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md && grep -q '`Assessment Purpose`: `FULL` `Assessment Target`: `NONE`' .standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md && ! grep -qE 'COMMIT:|BLOB:' .standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md && test ! -e .standards/docs/reviews",
+      "expect": "pass",
+      "why": "context, complete plan, and complete FULL verification exist; no review report yet"
+    },
+    {
+      "cmd": "c=$(git log --format=%H -1 --fixed-strings --grep='Add CSV export with download links') && test -n \"$c\" && git diff --quiet $c HEAD -- src test packages package.json .gitignore",
+      "expect": "pass",
+      "why": "implementation and tests are unchanged since the implementation commit"
+    },
+    {
+      "cmd": "! grep -rqE 'AC-[0-9]' src test packages docs README.md",
+      "expect": "pass",
+      "why": "code and tests cite no acceptance identifiers"
+    },
+    {
+      "cmd": "git log -7 --format=%s | paste -s -d '|' - | grep -qx 'Record CSV export verification|Mark CSV export plan complete|Add CSV export with download links|Plan CSV export implementation|Design CSV export|Define CSV export scope|Record project context for CSV export'",
+      "expect": "pass",
+      "why": "commit history follows the brownfield order"
+    }
+  ],
+  "notes": "Built on export-project (pre-install records service, STANDARDS installed brownfield). The suggested export-reviewing-impl base does not fit: its scope has different AC-001/AC-002 meanings (CSV quoting and admin-only access) and its code is fully private, so overlaying would mean rewriting the committed scope's acceptance meanings after verification, which would itself read as a defect. Seven post-install commits: 50-context Auditor CONTEXT.md and STATE SCOPING (cycle started STANDARD); 52-scope scope with AC-001 (export private: only signed-in administrators create or download it) and AC-002 (public download URL usable by anyone without signing in), STATE ARCHITECTING; 54-design design that covers AC-001 by admin-only creation plus a 128-bit token and AC-002 by an unauthenticated GET /exports/download?token=, STATE DEVELOPING; 56-plan APPROVED plan with three PENDING steps; 58-export src/export.ts, src/routes/export.ts, src/app.ts, two test files, exports/ in .gitignore; 60-complete plan COMPLETE with self-check evidence, STATE TESTING; 62-verification COMPLETE FULL verification record (all ACs Verified, citing commits and blobs through placeholders), STATE REVIEWING_IMPLEMENTATION with FORWARD from TESTING. The request does not say who may use the link. Code implements public access. No review record exists; tree clean; check passes.",
+  "case": "reviewer-14",
+  "caseHash": "eff860fc53d48f73",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T23:20:23.599Z",
+    "verdict": "pass",
+    "fixtureHash": "c3aa71cb4a351489",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "de4b822406b18c63",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:26:13.547Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T21:54:00.910Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-context/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/52-scope/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/54-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/56-plan/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/60-complete/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/62-verification/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:26:13.547Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

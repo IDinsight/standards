@@ -1,0 +1,76 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed with --mode brownfield, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState TESTING",
+      "where": ".standards/STATE.md (layer 50-handoff)",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery inactive, no outstanding obligations",
+      "where": ".standards/STATE.md Recovery/Outstanding Obligations Active false",
+      "status": "realized"
+    },
+    {
+      "condition": "Current scope and architecture for the active cycle",
+      "where": ".standards/docs/scope/add-search-20260927T101500Z-1a2b3c4d.md (AC-001..AC-003); .standards/docs/specs/add-search-20260927T101500Z-1a2b3c4d.md covering all three",
+      "status": "realized"
+    },
+    {
+      "condition": "Development plan is COMPLETE with all steps DONE",
+      "where": ".standards/docs/development/add-search-20260927T101500Z-1a2b3c4d.md header Status COMPLETE; DEV-001..DEV-003 DONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Preflight check reports exactly the DEV-003 -> DEV-008 dangling dependency",
+      "where": "plan DEV-003 `Depends On`: `DEV-002, DEV-008`; gate checkMjs shows that single problem",
+      "status": "realized"
+    },
+    {
+      "condition": "Handoff into TESTING from Developer (fresh Tester session context)",
+      "where": "STATE.md Handoff FORWARD From DEVELOPING",
+      "status": "realized"
+    },
+    {
+      "condition": "Small committed code; clean tree; no active-cycle verification report or search tests yet",
+      "where": "src/search.js, src/directory.js committed; git status clean; no .standards/docs/verification/add-search-*.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Auditor context present",
+      "where": ".standards/CONTEXT.md refreshed in layer 20",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": -1,
+      "detail": "If Tester creates a verification report (e.g. to hold a Suspended Assignment, as the skill suggests when routing) and names DEV-008 in it or in a Recovery Reason that must match the frame Reason, check.mjs's checkReferences reports a new problem ('mentions DEV-008, which is not a step in the development plan'), which the check_ok invariant would count. The stop hook sends the agent back once with that message, so a correct run can reword; the risk is small and the check is the installed runtime's behavior, not the fixture's.",
+      "recommendation": "run_as_is",
+      "fix": "Be aware when reading a check_ok failure: confirm whether it is only a bare DEV-008 mention in the new verification report."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "All commits carry 2026-09-24 while the prior cycle ID is stamped 2026-09-15 and the active cycle ID 2026-09-27 (after its own commits). Harmless for this case.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition: brownfield STANDARD cycle in TESTING with a COMPLETE plan whose DEV-003 dangles on DEV-008, which check.mjs reports as its only problem, and the prior signed-off cycle plausibly explains the stray step number without hinting at the answer. Checks are necessary conditions for a correct IMPLEMENTATION failure route with a TESTING-resume frame, and invariants fit; the only caveat is the runtime flagging a bare DEV-008 mention in a newly created report, which the stop hook lets the agent correct.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-01T22:36:05.050Z",
+  "costUsd": 0.2708792,
+  "ms": 47336,
+  "fixtureHash": "7f8e91ccd2553d5d"
+}

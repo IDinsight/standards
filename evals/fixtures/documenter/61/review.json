@@ -1,0 +1,74 @@
+{
+  "conditions": [
+    {
+      "condition": "BROWNFIELD project, STANDARD cycle at DOCUMENTING with Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/MODE.md (installed BROWNFIELD); .standards/STATE.md WorkflowState/CycleMode/Id",
+      "status": "realized"
+    },
+    {
+      "condition": "Current-cycle documentation record with valid DOCUMENTATION provenance and matching visible Cycle",
+      "where": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md header",
+      "status": "realized"
+    },
+    {
+      "condition": "Collaboration GUIDED, target ACTIVE_CHANGE, user style NONE",
+      "where": "documentation record header fields",
+      "status": "realized"
+    },
+    {
+      "condition": "No outstanding obligations, independent defects, or other blocking questions",
+      "where": "STATE.md Outstanding Obligations Active false; README and docs/usage.md otherwise accurate against src/",
+      "status": "realized"
+    },
+    {
+      "condition": "Single active frame Owner DOCUMENTING, ResumeAt DEVELOPING, RerunThrough NONE (FAILURE from DEVELOPING, DOCUMENTATION)",
+      "where": "STATE.md Handoff and Recovery Frame 1",
+      "status": "realized"
+    },
+    {
+      "condition": "GUIDED previously offered a setup correction (one pending step with paste content, pre-edit identity, expected result, next inspection)",
+      "where": "documentation record 'Resume and Conclusion' and DOC-001 OPEN",
+      "status": "realized"
+    },
+    {
+      "condition": "The user applied the edit and it is saved",
+      "where": "unstaged README.md matching guided step 1 exactly; git status ' M README.md'",
+      "status": "realized"
+    },
+    {
+      "condition": "Inspection and appropriate checks verify the saved result",
+      "where": "selfChecks: pnpm install --offline --frozen-lockfile && pnpm --filter export test pass (21); npm install fails EUNSUPPORTEDPROTOCOL",
+      "status": "realized"
+    },
+    {
+      "condition": "Matching guided blocker exists and is resolved by the user's reply (role clears it)",
+      "where": "STATE.md Active Work.BlockedOn 'Apply guided step 1 ...'; utterance reports application",
+      "status": "realized"
+    },
+    {
+      "condition": "Only remaining documentation (AC-002 usage guide) depends on the unfinished export API assigned to Developer",
+      "where": "plan DEV-002/DEV-003 PENDING with Suspended Assignment 1; src/export.ts has only csvCell/toCsv; record's remaining-work entry",
+      "status": "realized"
+    },
+    {
+      "condition": "No completed downstream work invalidated",
+      "where": "no verification, review, or synchronization records exist",
+      "status": "realized"
+    },
+    {
+      "condition": "Git: committed history plus an unstaged change",
+      "where": "git log; README.md unstaged",
+      "status": "realized"
+    }
+  ],
+  "issues": [],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized: a DOCUMENTING recovery frame resuming DEVELOPING, a GUIDED record with an offered README step, the user's matching unstaged edit verified by working pnpm commands, and only API-dependent AC-002 work remaining with no downstream records. Checks (RESUME to DEVELOPING from DOCUMENTING, recovery cleared, BlockedOn NONE, GUIDED retained, record not COMPLETE and changed, README/docs untouched) are necessary for any correct run, and the post-run state passes check.mjs. No leaks or record incoherence found.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T16:41:10.563Z",
+  "costUsd": 0.31227259999999996,
+  "ms": 64451,
+  "fixtureHash": "2a501a73e0bfed28"
+}

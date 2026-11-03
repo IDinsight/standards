@@ -1,0 +1,151 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial envfile parser"
+    },
+    {
+      "dir": "layers/10-design",
+      "action": "commit",
+      "message": "docs: record context, scope, and design for quoted values"
+    },
+    {
+      "dir": "layers/20-implement",
+      "action": "commit",
+      "message": "feat(parser): support double-quoted values with escapes"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "navigator",
+    "utterance": "EXPLAIN the parser."
+  },
+  "graderOnly": [
+    "WorkflowState is TESTING and CycleMode is STANDARD; the Developer handed off forward and no verification report exists yet, so nothing has been formally verified.",
+    "All parser source (src/parser.js and src/index.js) is committed and readable; the working tree is clean.",
+    "The explanation needs no workflow change: Navigator may run in TESTING, and there is no NAVIGATING state."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "quoted-env-values-20260924T090000Z-3e9a51c7"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "reply_not_matches": "\\bNAVIGATING\\b",
+          "why": "no invented NAVIGATING state"
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "TESTING",
+          "why": "no move to DEVELOPING or any other state"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "TESTING"
+        },
+        {
+          "no_skill_call": "tester",
+          "why": "Navigator does not invoke Tester"
+        },
+        {
+          "reply_not_matches": "Next role:",
+          "why": "Navigator emits no next-role invocation"
+        },
+        {
+          "absent": ".standards/docs/verification/${ID}.md",
+          "why": "no verification report is created"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "unchanged": [
+        "**"
+      ],
+      "why": "Navigator persists nothing (generated caches are ignored)"
+    },
+    {
+      "head_unchanged": true,
+      "why": "Navigator never moves HEAD"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Navigator never mutates git state"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/parser.test.js",
+      "expect": "pass",
+      "why": "the existing parser tests pass on the committed implementation"
+    },
+    {
+      "cmd": "test -r src/parser.js && test -r src/index.js",
+      "expect": "pass",
+      "why": "all parser source is readable"
+    },
+    {
+      "cmd": "node --input-type=module -e \"import { parse } from './src/parser.js'; const r = parse('A=\\\"x # y\\\"'); if (r.A !== 'x # y') process.exit(1);\"",
+      "expect": "pass",
+      "why": "the committed parser handles a quoted value containing a hash, as the cycle implemented"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 00-project (pre-install): a small dependency-free Node ES-module dotenv-style parser (src/parser.js, src/index.js), README, and existing node:test tests. 10-design: Auditor CONTEXT.md, scope (AC-001..AC-004), technical design, and STATE at DEVELOPING after FORWARD from ARCHITECTING. 20-implement: parser.js gains double-quoted value support, a COMPLETE AFTER_IMPLEMENTATION development plan (DEV-001, DEV-002 DONE with self-check evidence), and STATE at TESTING / STANDARD with Handoff FORWARD from DEVELOPING, recovery and obligations inactive, no verification report yet. check.mjs passes on this state. Navigator only needs to explain the parser; checks guard against state changes, a NAVIGATING state, a tester Skill call, and a Next role line.",
+  "case": "navigator-9",
+  "caseHash": "bec057a60c6682b0",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T01:35:40.903Z",
+    "verdict": "pass",
+    "fixtureHash": "884a1bc43d6e6e21",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "b08bc40010b537d2",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:19:04.443Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T00:55:59.243Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/10-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/20-implement/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:19:04.443Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

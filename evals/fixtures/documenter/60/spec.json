@@ -1,0 +1,270 @@
+{
+  "base": "export-project",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-readme",
+      "action": "commit",
+      "message": "Expand README development notes"
+    },
+    {
+      "dir": "layers/52-context",
+      "action": "commit",
+      "message": "Record project context for CSV export"
+    },
+    {
+      "dir": "layers/54-scope",
+      "action": "commit",
+      "message": "Define CSV export scope"
+    },
+    {
+      "dir": "layers/56-design",
+      "action": "commit",
+      "message": "Design CSV export"
+    },
+    {
+      "dir": "layers/58-plan",
+      "action": "commit",
+      "message": "Plan CSV export implementation"
+    },
+    {
+      "dir": "layers/60-serialize",
+      "action": "commit",
+      "message": "Add CSV serialization for record export"
+    },
+    {
+      "dir": "layers/62-route-docs",
+      "action": "commit",
+      "message": "Record serialization self-check and route README correction"
+    },
+    {
+      "dir": "layers/64-doc-progress",
+      "action": "commit",
+      "message": "Record documentation progress for README correction"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "documenter",
+    "utterance": "Done."
+  },
+  "graderOnly": [
+    "README.md is byte-identical to the pre-edit identity recorded for guided step 1 in the documentation record: the Development section still says pnpm --filter records-admin test. The user did not apply the step.",
+    "The corrective return conditions do not hold, because the README correction has not been made or verified in saved content.",
+    "There are no other documentation defects, independent defects, outstanding obligations, or user questions besides the pending guided step.",
+    "The remaining cycle documentation (the export section of docs/usage.md for AC-002) depends on DEV-002 and DEV-003, which are PENDING."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "export-20260924T090000Z-a7f3c1d2",
+    "DOC": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md",
+    "DEV": ".standards/docs/development/export-20260924T090000Z-a7f3c1d2.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "DOCUMENTING",
+          "why": "no corrective return to DEVELOPING on the user's word"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "1",
+          "why": "the frame is not popped"
+        },
+        {
+          "field": {
+            "path": "${DOC}",
+            "name": "Status",
+            "not": "COMPLETE"
+          }
+        },
+        {
+          "contains": {
+            "path": "${DOC}",
+            "regex": "### DOC-001[^`]*`Status`: `OPEN`"
+          },
+          "why": "the README discrepancy is not resolved without a saved, inspected fix"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "DOCUMENTING"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "1"
+        },
+        {
+          "state": "Recovery.Top.Owner",
+          "equals": "DOCUMENTING"
+        },
+        {
+          "state": "Recovery.Top.ResumeAt",
+          "equals": "DEVELOPING"
+        },
+        {
+          "state": "Recovery.Top.RerunThrough",
+          "equals": "NONE"
+        },
+        {
+          "state": "ActiveWork.BlockedOn",
+          "not": "NONE",
+          "why": "the guided blocker stays persisted"
+        },
+        {
+          "exists": "${DOC}"
+        },
+        {
+          "field": {
+            "path": "${DOC}",
+            "name": "Status",
+            "not": "COMPLETE"
+          }
+        },
+        {
+          "field": {
+            "path": "${DOC}",
+            "name": "Collaboration",
+            "equals": "GUIDED"
+          }
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "README.md",
+        "docs/**",
+        "src/**",
+        "test/**",
+        "packages/**",
+        "package.json"
+      ],
+      "why": "in GUIDED mode the user applies documentation edits, and Documenter never changes implementation or tests"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the correct test command runs the root package's tests offline and they pass"
+    },
+    {
+      "cmd": "pnpm --filter export test 2>&1 | grep -qE 'pass 21$'",
+      "expect": "pass",
+      "why": "21 tests run, as the plan and documentation record state"
+    },
+    {
+      "cmd": "pnpm --filter records-admin test 2>&1 | grep -qi 'no projects matched'",
+      "expect": "pass",
+      "why": "the README's documented command matches no workspace package and runs no tests"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the recovery state and records are valid"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q .",
+      "expect": "pass",
+      "why": "everything is committed"
+    },
+    {
+      "cmd": "grep -q 'pnpm --filter records-admin test' README.md && grep -q $(git hash-object README.md) .standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md",
+      "expect": "pass",
+      "why": "README is unchanged from the pre-edit identity recorded for the guided step"
+    },
+    {
+      "cmd": "test ! -e src/routes/export.ts && test ! -e test/integration && ! grep -q writeExport src/export.ts",
+      "expect": "pass",
+      "why": "only DEV-001 is implemented; the route and file writing are unfinished"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `DOCUMENTING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^### Frame 1$' .standards/STATE.md && grep -q '^`From`: `DEVELOPING` `Owner`: `DOCUMENTING` `FailureType`: `DOCUMENTATION`$' .standards/STATE.md && grep -q '^`ResumeAt`: `DEVELOPING` `RerunThrough`: `NONE`$' .standards/STATE.md && ! grep -q '`BlockedOn`: `NONE`' .standards/STATE.md && grep -q '^`PendingVerificationCadence`: `NONE`$' .standards/STATE.md",
+      "expect": "pass",
+      "why": "one recovery frame owned by DOCUMENTING resuming DEVELOPING, with a persisted blocker"
+    },
+    {
+      "cmd": "d=.standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md && head -3 $d | grep -qx 'Artifact: DOCUMENTATION' && grep -q '`Status`: `BLOCKED`' $d && grep -q '`Collaboration`: `GUIDED` `Target`: `ACTIVE_CHANGE`' $d && grep -q '^### DOC-001' $d",
+      "expect": "pass",
+      "why": "the documentation record is BLOCKED, GUIDED, ACTIVE_CHANGE with one open discrepancy"
+    },
+    {
+      "cmd": "! grep -rqE 'COMMIT:|BLOB:' .standards/docs .standards/CONTEXT.md",
+      "expect": "pass",
+      "why": "all revision placeholders were resolved"
+    }
+  ],
+  "notes": "Built on export-project (not export-documenting, whose implementation is complete; this case needs unfinished Developer work and a frame resuming at DEVELOPING). 50-readme: a pre-cycle commit that expands the README Development section but gives the test command as pnpm --filter records-admin test (repo name instead of package name export), which matches no workspace package. 52 to 58: context, scope (AC-001 export, AC-002 usage guide), design, and APPROVED plan, same contract as export-documenting. 60-serialize: src/export.ts with csvCell and toCsv only, plus test/export.test.ts (21 tests total). 62-route-docs: plan IN_PROGRESS with DEV-001 DONE and self-check evidence, DEV-002 and DEV-003 PENDING, Suspended Assignment 1 (DEVELOPMENT) tied to frame 1; STATE DOCUMENTING with FAILURE DEVELOPING to DOCUMENTING, FailureType DOCUMENTATION, frame 1 Owner DOCUMENTING ResumeAt DEVELOPING RerunThrough NONE. 64-doc-progress: documentation record (BLOCKED, GUIDED, ACTIVE_CHANGE, User Style NONE) with DOC-001 OPEN, guided step 1 offered with README pre-edit blob and expected saved result, and the usage-guide export section (AC-002) recorded as remaining work depending on DEV-002 and DEV-003; STATE BlockedOn holds the guided request. README.md is left unchanged, so the user's Done is not borne out by the saved file.",
+  "case": "documenter-60",
+  "caseHash": "61af7a8d15780101",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T16:40:42.640Z",
+    "verdict": "pass",
+    "fixtureHash": "091d6ba88f2a55bb",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "2d1a0009aa2b4848",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:17:58.158Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T15:46:29.202Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/52-context/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/54-scope/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/56-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/58-plan/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/62-route-docs/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/64-doc-progress/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:17:58.158Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

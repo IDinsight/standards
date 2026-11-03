@@ -180,6 +180,9 @@ export default defineConfig({
               slug: "reference/skill-eval-report",
             },
             {
+              slug: "reference/reference-eval-report",
+            },
+            {
               slug: "reference/glossary",
             },
           ],

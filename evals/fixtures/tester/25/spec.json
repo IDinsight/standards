@@ -1,0 +1,260 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-web",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add records page with status filter",
+      "pnpmInstall": true
+    },
+    {
+      "dir": "layers/05-cli",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add export CLI for records dumps"
+    },
+    {
+      "dir": "layers/50-context",
+      "action": "commit",
+      "message": "Record project context for export changes"
+    },
+    {
+      "dir": "layers/55-scope",
+      "action": "commit",
+      "message": "Define export CLI output and download control scope"
+    },
+    {
+      "dir": "layers/60-design",
+      "action": "commit",
+      "message": "Design export CLI streams and download control"
+    },
+    {
+      "dir": "layers/65-plan",
+      "action": "commit",
+      "message": "Plan export CLI and download control changes"
+    },
+    {
+      "dir": "layers/70-implementation",
+      "action": "commit",
+      "message": "Write CLI output to standard streams and add CSV download control"
+    },
+    {
+      "dir": "layers/75-complete",
+      "action": "commit",
+      "message": "Mark export plan complete"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "tester",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The committed implementation satisfies AC-001 and AC-002: by default the CLI writes only the CSV to standard output, writes the summary line to standard error with --output, reports dump and output problems as one export-cli: error line with exit status 1 and no output file, and exits 2 on usage errors; in Chromium the Download CSV control is a native button activated by Enter or Space, and after a failed export the alert is shown and focused and the button is no longer aria-disabled.",
+    "No existing test covers the CLI stream and exit-status contract, exportRecords, or the export control. The command-line and Chromium checks in the development plan are Developer self-checks, not Tester evidence.",
+    "packages/web/test/support/dom.js is a simulated DOM: no layout or styling, a simplified focus model, and key events for Enter or Space do not click a button, so keyboard activation and real focus behavior can only be established in a real browser.",
+    "Playwright 1.63.0 with headless Chromium is available in the run environment (import('playwright') resolves) although the project does not depend on it; the page can be loaded through a local static server or request routing, with /api responses stubbed.",
+    "The CLI fixture run_cli in packages/export-cli/tests/conftest.py already runs the command in tmp_path with a minimal environment; an inherited RECORDS_FILE would otherwise change which dump the CLI reads."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "export-20260924T090000Z-a7f3c1d2",
+    "DEV": ".standards/docs/development/export-20260924T090000Z-a7f3c1d2.md",
+    "VERIFICATION": ".standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "field": {
+            "path": "${VERIFICATION}",
+            "name": "Mode",
+            "equals": "VERIFY"
+          },
+          "why": "no report existed, so the only valid mode is VERIFY; CLI and component techniques are combined inside it"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "pnpm-lock.yaml",
+            "pnpm-workspace.yaml",
+            "packages/export-cli/pyproject.toml",
+            ".standards/user-styles/**"
+          ],
+          "why": "no dependency, workspace, or pytest configuration change and no preferences file is needed to test with the established tooling"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "changed": [
+            "packages/export-cli/tests/**"
+          ],
+          "why": "no existing CLI test covers the stream and exit-status contract"
+        },
+        {
+          "changed": [
+            "packages/web/test/**"
+          ],
+          "why": "no existing web test covers the export control"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "contains": {
+            "path": "${VERIFICATION}",
+            "regex": "browser|chromium|playwright",
+            "flags": "i"
+          },
+          "why": "a report that distinguishes simulated component evidence from real browser evidence names the browser evidence"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "Tester suggests commits but does not make them"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Tester must not change git state"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "packages/export-cli/src/**",
+        "packages/web/src/**",
+        "packages/web/index.html",
+        "README.md",
+        "packages/*/README.md"
+      ],
+      "why": "Tester does not edit implementation or project documentation"
+    }
+  ],
+  "runtime": {
+    "image": "browser"
+  },
+  "selfChecks": [
+    {
+      "cmd": "! git status --porcelain | grep -q . && ! grep -qi playwright package.json packages/web/package.json pnpm-lock.yaml",
+      "expect": "pass",
+      "why": "the tree is clean and the project does not depend on Playwright"
+    },
+    {
+      "cmd": "pnpm --filter @records/web test > /tmp/web.log 2>&1 && grep -q 'pass 4' /tmp/web.log",
+      "expect": "pass",
+      "why": "the established web component suite passes with its four pre-cycle tests"
+    },
+    {
+      "cmd": "cd packages/export-cli && python3 -m pytest > /tmp/cli.log 2>&1 && grep -q '4 passed' /tmp/cli.log",
+      "expect": "pass",
+      "why": "the established CLI pytest suite passes with its four pre-cycle tests"
+    },
+    {
+      "cmd": "cd packages/export-cli && python3 -c \"import json, os, pathlib, subprocess, sys, tempfile; Q = chr(34); NL = chr(10); work = pathlib.Path(tempfile.mkdtemp()); (work / 'records.json').write_text(json.dumps([{'id': 2, 'title': 'Lease agreement, Building B', 'owner': 'dana', 'status': 'active', 'createdAt': '2026-03-02T10:15:00Z'}, {'id': 1, 'title': 'Data retention policy', 'owner': 'li', 'status': 'archived', 'createdAt': '2026-05-06T11:00:00Z'}]), encoding='utf-8'); env = {'PATH': os.environ['PATH'], 'PYTHONPATH': os.path.abspath('src'), 'PYTHONDONTWRITEBYTECODE': '1'}; run = lambda *args: subprocess.run([sys.executable, '-m', 'export_cli', *args], cwd=work, env=env, capture_output=True, text=True, timeout=30); r = run(); assert r.returncode == 0 and r.stderr == '' and r.stdout.startswith('id,title,owner,status,createdAt' + NL + '1,') and Q + 'Lease agreement, Building B' + Q in r.stdout, r; r = run('--output', 'out.csv'); assert r.returncode == 0 and r.stdout == '' and r.stderr == 'wrote 2 records to out.csv' + NL and (work / 'out.csv').is_file(), r; r = run('--input', 'missing.json', '--output', 'bad.csv'); assert r.returncode == 1 and r.stdout == '' and r.stderr.startswith('export-cli: error: ') and r.stderr.count(NL) == 1 and not (work / 'bad.csv').exists(), r; (work / 'broken.json').write_text('[{', encoding='utf-8'); r = run('--input', 'broken.json'); assert r.returncode == 1 and r.stdout == '' and 'Traceback' not in r.stderr, r; r = run('--status', 'deleted'); assert r.returncode == 2 and r.stdout == '', r; print('cli contract holds')\"",
+      "expect": "pass",
+      "why": "the implementation satisfies AC-001"
+    },
+    {
+      "cmd": "node --input-type=module -e 'const { pathToFileURL } = await import(`node:url`); const load = (file) => import(pathToFileURL(file).href); const { createDocument, flush, getByRole } = await load(`packages/web/test/support/dom.js`); const { createExportControl } = await load(`packages/web/src/export-control.js`); const document = createDocument(); let calls = 0; const control = createExportControl(document, { getFilter: () => ({ status: `active` }), exportRecords: async () => { calls += 1; throw new Error(`storage unavailable`); }, saveFile: () => {} }); document.body.append(control.element); getByRole(document.body, `button`, { name: `Download CSV` }).click(); await flush(); const alert = getByRole(document.body, `alert`); if (calls !== 1 || document.activeElement !== alert || control.button.hasAttribute(`aria-disabled`) || !alert.textContent.includes(`storage unavailable`)) { console.error(`unexpected component state`); process.exit(1); } console.log(`component mounts in the test DOM`);'",
+      "expect": "pass",
+      "why": "the export control can be exercised with the established in-memory DOM"
+    },
+    {
+      "cmd": "node --input-type=module -e 'const { existsSync } = await import(`node:fs`); const path = (await import(`node:path`)).default; const { chromium } = await import(`playwright`); const web = path.resolve(`packages/web`); const browser = await chromium.launch(); try { const page = await browser.newPage(); await page.route((url) => url.hostname === `records.test`, (route) => { const url = new URL(route.request().url()); if (url.pathname === `/api/records`) return route.fulfill({ json: { count: 0, records: [] } }); if (url.pathname === `/api/records/export`) return route.fulfill({ status: 503, json: { error: `export storage unavailable` } }); const file = path.join(web, url.pathname === `/` ? `index.html` : url.pathname.slice(1)); return existsSync(file) ? route.fulfill({ path: file }) : route.fulfill({ status: 404, body: `not found` }); }); await page.goto(`http://records.test/`); const button = page.getByRole(`button`, { name: `Download CSV` }); await button.focus(); await page.keyboard.press(`Enter`); await page.getByRole(`alert`).filter({ hasText: `export storage unavailable` }).waitFor(); const state = await page.evaluate(() => ({ focused: document.activeElement?.className, busy: document.querySelector(`.export-control button`).getAttribute(`aria-disabled`) })); if (state.focused !== `export-error` || state.busy !== null) { console.error(JSON.stringify(state)); process.exitCode = 1; } else { console.log(`focus moved to the export error in Chromium`); } } finally { await browser.close(); }'",
+      "expect": "pass",
+      "why": "in real Chromium Enter activates the button and after a failed export focus is on the alert and the button is usable again"
+    },
+    {
+      "cmd": "! grep -rqE 'createExportControl|exportRecords|Download CSV|aria-disabled' packages/web/test && ! grep -rqE 'stdout|stderr|returncode == [12]' packages/export-cli/tests",
+      "expect": "pass",
+      "why": "no existing test covers the new behavior"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the TESTING state and records are valid"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `TESTING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Id`: `export-20260924T090000Z-a7f3c1d2`$' .standards/STATE.md && grep -q '^`Kind`: `FORWARD` `From`: `DEVELOPING` `FailureType`: `NONE`' .standards/STATE.md && grep -q '^`PendingVerificationCadence`: `NONE`$' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md && grep -q 'ProjectMode`: `BROWNFIELD' .standards/MODE.md",
+      "expect": "pass",
+      "why": "STATE.md holds the stated TESTING state"
+    },
+    {
+      "cmd": "test -f .standards/CONTEXT.md && grep -q '`Status`: `COMPLETE`$' ${DEV} && grep -q '^`Verification Cadence`: `AFTER_IMPLEMENTATION` `Current Increment`: `NONE`$' ${DEV} && test $(grep -c '^`Status`: `DONE`' ${DEV}) -eq 3 && test ! -e .standards/docs/verification && test ! -e .standards/docs/reviews",
+      "expect": "pass",
+      "why": "the plan is COMPLETE with three DONE steps and default cadence; no verification or review record exists"
+    }
+  ],
+  "notes": "Standalone fixture: the export-testing base (TypeScript records service, CSV quoting and admin-only ACs) does not match this case. Pre-install 00-web: pnpm workspace root records-tools listing packages/web; @records/web is a plain ESM records page (index.html, src/api.js, src/records-table.js, src/main.js) with node:test component tests on the in-repo DOM shim test/support/dom.js; pnpm install runs. Pre-install 05-cli: packages/export-cli (Python stdlib) with pytest config in pyproject.toml and subprocess fixtures run_cli (tmp_path cwd, minimal env) and records_file; root README. 50-context: CONTEXT.md, cycle started STANDARD at SCOPING. 55-scope: AC-001 (CLI stdout/stderr and exit codes), AC-002 (accessible Download CSV button, alert and focus after errors). 60-design: CLI and web contracts. 65-plan: APPROVED plan. 70-implementation: CLI streams/exit statuses, exportRecords, export control, page wiring; no tests added. 75-complete: plan COMPLETE with self-checks (including a manual Chromium check), STATE TESTING FORWARD from DEVELOPING. No verification report. runtime.image browser for the real-browser focus contract. The implementation is correct.",
+  "case": "tester-25",
+  "caseHash": "bd499ecdb732bdf0",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T16:08:11.196Z",
+    "verdict": "issues",
+    "fixtureHash": "6d04c92fb137f2ad",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "d3cec24fdd8d8e4b",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:48:50.845Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T16:06:47.520Z"
+  },
+  "decision": {
+    "action": "run",
+    "note": "Owner-approved (2026-10-03): flagged only by the selfCheck ${VAR} substitution gap, now fixed in the harness; all 10 selfChecks pass; no other issue.",
+    "at": "2026-10-03T16:14:42.505Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-context/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/55-scope/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/60-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/65-plan/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/75-complete/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:48:50.845Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

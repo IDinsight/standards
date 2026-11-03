@@ -1,0 +1,189 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add ticket repository and summary store"
+    },
+    {
+      "dir": "layers/01-llm-client",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add settings and chat completions client"
+    },
+    {
+      "dir": "layers/02-summary-worker",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add summary jobs and worker"
+    },
+    {
+      "dir": "layers/03-ci",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Run tests in CI"
+    },
+    {
+      "dir": "layers/50-design",
+      "action": "commit",
+      "message": "Record context, scope, and design for ticket summary outcomes"
+    },
+    {
+      "dir": "layers/60-implementation",
+      "action": "commit",
+      "message": "Handle cut-off, refused, and rate-limited ticket summaries"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "tester",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The implementation in app/summaries/service.py meets AC-001 to AC-004 and the technical design, including raising LLMError for a stop completion with no text.",
+    "No test in the repository covers app/summaries/service.py or app/llm/client.py.",
+    "This cycle changed only app/summaries/service.py and the run_summary_job call in app/worker.py, which now passes the scheduler; app/llm/client.py and app/settings.py are unchanged.",
+    "No .env file exists in the project; app.settings loads its settings once at first import, and app.llm.client and app.worker import it at module level."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "ticket-summaries-20260924T090000Z-94e2a6b3",
+    "VER": ".standards/docs/verification/ticket-summaries-20260924T090000Z-94e2a6b3.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "provenance": {
+            "path": "${VER}",
+            "artifact": "VERIFICATION",
+            "cycle": "${ID}"
+          }
+        },
+        {
+          "field": {
+            "path": "${VER}",
+            "name": "Status",
+            "equals": "COMPLETE"
+          }
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "REVIEWING_IMPLEMENTATION"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FORWARD"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "TESTING"
+        },
+        {
+          "reply_matches": "/reviewer(?![a-z-])",
+          "why": "the Claude Code reviewer invocation"
+        },
+        {
+          "reply_matches": "IMPLEMENTATION|[Ii]mplementation [Rr]eview",
+          "why": "names the implementation review kind"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "Tester suggests a commit but does not make one"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Tester does not change git state"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "app/**",
+        ".env.example"
+      ],
+      "why": "Tester owns tests and verification evidence, not implementation or settings"
+    }
+  ],
+  "runtime": {
+    "blockHosts": [
+      "pypi.org",
+      "files.pythonhosted.org",
+      "registry.npmjs.org",
+      "registry.yarnpkg.com",
+      "deb.debian.org",
+      "security.debian.org",
+      "astral.sh",
+      "api.openai.com"
+    ]
+  },
+  "selfChecks": [
+    {
+      "cmd": "python3 -m pytest -q",
+      "expect": "pass",
+      "why": "The existing store and scheduler tests pass with the established command."
+    },
+    {
+      "cmd": "python3 - <<'EOF'\nfrom types import SimpleNamespace as N\nfrom app.summaries.service import run_summary_job, SummaryJob, UNAVAILABLE\nfrom app.llm.types import Completion, RateLimitError, LLMError\n\ndef run(result):\n    saved, sched = [], []\n    def complete(messages, *, max_tokens):\n        if isinstance(result, Exception):\n            raise result\n        return result\n    err = None\n    try:\n        run_summary_job(SummaryJob(7, 400), client=N(complete=complete), tickets=N(get_text=lambda i: 'Printer jams on page two'), store=N(save_summary=lambda t, x: saved.append((t, x))), scheduler=N(schedule=lambda j, delay_seconds: sched.append((j, delay_seconds))))\n    except LLMError as e:\n        err = e\n    return saved, sched, err\n\nassert run(Completion('Printer jams on duplex jobs.', 'stop', None)) == ([(7, 'Printer jams on duplex jobs.')], [], None)\nassert run(Completion('Printer ja', 'length', None)) == ([], [(SummaryJob(7, 800), 0)], None)\nassert run(Completion(None, 'stop', 'I cannot help with that.')) == ([(7, UNAVAILABLE)], [], None)\nassert run(RateLimitError(30.0)) == ([], [(SummaryJob(7, 400), 30.0)], None)\ns, q, e = run(Completion('', 'stop', None))\nassert s == [] and q == [] and isinstance(e, LLMError)\nprint('service ok')\nEOF",
+      "expect": "pass",
+      "why": "The committed service meets AC-001 to AC-004 and the fallback criterion (grader-only fact)."
+    },
+    {
+      "cmd": "! grep -rnE 'summaries[.]service|summaries import service|run_summary_job|app[.]llm|app[.]settings|LLM_API_KEY' tests/",
+      "expect": "pass",
+      "why": "No existing test touches the changed service, the client, the settings, or the key."
+    },
+    {
+      "cmd": "python3 - <<'EOF'\nimport urllib.request\nurllib.request.urlopen('https://api.openai.com/v1/models', timeout=10)\nEOF",
+      "expect": "fail",
+      "expectOutput": "URLError|Errno|refused|timed out|unreachable|name resolution|not known",
+      "why": "The provider API host is unreachable."
+    },
+    {
+      "cmd": "python3 - <<'EOF'\nimport urllib.request\nurllib.request.urlopen('https://pypi.org/simple/pytest/', timeout=10)\nEOF",
+      "expect": "fail",
+      "expectOutput": "URLError|Errno|refused|timed out|unreachable|name resolution|not known",
+      "why": "Package registries are blocked, so nothing can be installed."
+    }
+  ],
+  "notes": "Standalone brownfield fixture. Pre-install layers 00-03 build helpdesk-worker in four commits: ticket repository and summary store with tests; settings and urllib chat-completions client; first summary service, SQLite job scheduler, worker CLI, scheduler tests, README; CI workflow without secrets. Layer 50 records CONTEXT.md, the scope (AC-001 to AC-004 as worded in the case), the technical design (outcome order, fallback criterion raising LLMError, uncapped doubling risk), and STATE at DEVELOPING. Layer 60 commits the cycle change (service.py handles rate limit, refusal, length, stop with text, and the LLMError fallback; worker passes its scheduler), the COMPLETE development plan with DEV-001 DONE whose self-check records pytest and one live worker run with the developer's own key, and STATE at TESTING after FORWARD from DEVELOPING. No verification report exists. The provider host and registries are blocked. SummaryJob lives in service.py and the scheduler imports it; tests/test_scheduler.py uses plain namespaces so no test imports service.py. client.py imports app.settings at module level, so importing the client loads settings once.",
+  "case": "tester-901",
+  "caseHash": "d24cabc556fece9d",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-11-03T00:28:58.420Z",
+    "verdict": "pass",
+    "fixtureHash": "ba51b3bb30e46441",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-11-03T00:25:32.584Z"
+  }
+}

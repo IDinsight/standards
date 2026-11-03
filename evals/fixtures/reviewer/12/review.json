@@ -1,0 +1,81 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD, CycleMode STANDARD, WorkflowState REVIEWING_IMPLEMENTATION, Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/MODE.md (installed BROWNFIELD); .standards/STATE.md header and Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Current scope, architecture, context, development plan and Tester report exist with valid ownership",
+      "where": ".standards/docs/scope|specs|development|verification/export-20260924T090000Z-a7f3c1d2.md (provenance matches cycle); .standards/CONTEXT.md; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and outstanding obligations inactive; arrival by FORWARD from TESTING",
+      "where": ".standards/STATE.md Handoff/Recovery/Outstanding Obligations",
+      "status": "realized"
+    },
+    {
+      "condition": "src/export.ts:72 writes the protected CSV before authorization at line 80",
+      "where": "src/export.ts registerExportRoutes: line 72 writeExport(...), line 80 requireAdmin(request.user); selfCheck sed confirms",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-002 explicitly prohibits unauthorized writes",
+      "where": "scope AC-002: denied by server-side authorization before any export file is created; design AC-002 TAC: no export folder or file is created",
+      "status": "realized"
+    },
+    {
+      "condition": "A non-admin request produces the file then returns 403",
+      "where": "selfCheck node reproducer: anon 401, viewer 403, file exists",
+      "status": "realized"
+    },
+    {
+      "condition": "Tester checked only the status code",
+      "where": "test/integration/export-flow.test.ts 'export requests without an administrator are denied' asserts only 401/403/403; verification report marks AC-002 Verified on those codes",
+      "status": "realized"
+    },
+    {
+      "condition": "Tests and report commands exit zero despite the defect",
+      "where": "selfChecks: pnpm --filter export test (21 pass), test:integration (3 pass), check.mjs passes",
+      "status": "realized"
+    },
+    {
+      "condition": "No review report exists yet for this cycle",
+      "where": "selfCheck: test ! -e .standards/docs/reviews",
+      "status": "realized"
+    },
+    {
+      "condition": "Clean committed git state",
+      "where": "git status clean on main",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 3,
+      "detail": "Assertion 3 is marked complete with only 'report Status not COMPLETE' and 'WorkflowState not DOCUMENTING'. A run that stops early or misses the defect but leaves the report IN_PROGRESS would pass vacuously, since nothing ties the non-completion to recorded unresolved defects.",
+      "recommendation": "fix_file",
+      "fix": "In reviewer-12/spec.json, checks entry for assertion 3, add {\"heading_ids\": {\"path\": \"${REVIEW}\", \"prefix\": \"F\", \"min\": 1}, \"why\": \"the blocking defects are recorded as findings\"} to its `all` list (or set complete:false so the judge confirms the block is due to the unresolved findings)."
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 0,
+      "detail": "The check 'Owner[^A-Za-z0-9]{1,8}Developer' (flag i) accepts Developer/DEVELOPER, which matches the template's `<role>` field. It would miss a run that writes the owning state (`DEVELOPING`) as the Owner instead. That is unlikely given the template and the SKILL's ownership table, which names roles.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized and confirmed by selfChecks. The handler writes the CSV at line 72 and calls requireAdmin at line 80, a non-admin request writes the file and still gets 401/403, Tester's test asserts only status codes, and the records are coherent with check.mjs passing. Nothing leaks, the invariants fit (I traced check.mjs on a FAILURE route to DEVELOPING), and the only notes concern assertion 3's completeness and a narrow Owner regex.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T23:20:49.137Z",
+  "costUsd": 0.3257248,
+  "ms": 97523,
+  "fixtureHash": "f0589e75b4db9709"
+}

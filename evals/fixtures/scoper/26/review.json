@@ -1,0 +1,104 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode DOCUMENTATION, CompletionPolicy NONE, Active Work.Id guide-20261004T120000Z-1a2b3c4d",
+      "where": ".standards/STATE.md header and Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "WorkflowState SCOPING",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Current AC-001 covers CSV usage",
+      "where": ".standards/docs/scope/guide-20261004T120000Z-1a2b3c4d.md Work item 1",
+      "status": "realized"
+    },
+    {
+      "condition": "Current AC-002 covers the audience and does not depend on output format",
+      "where": "scope Work item 2",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-003 is retired",
+      "where": "scope ## Retired Acceptance Identifiers",
+      "status": "realized"
+    },
+    {
+      "condition": "The user explicitly replaced CSV instructions with JSON instructions during recovery, already persisted",
+      "where": "STATE.md Active Work.Request revision text; Handoff USER_REWORK From REVIEWING_FINAL FailureType SCOPING; Frame 2 (Owner SCOPING, ResumeAt REVIEWING_FINAL)",
+      "status": "realized"
+    },
+    {
+      "condition": "JSON output already exists, so no implementation or omitted-owner work is needed",
+      "where": "acctreport/report.py to_json; acctreport/cli.py --format json; tests/test_report.py; selfCheck 2",
+      "status": "realized"
+    },
+    {
+      "condition": "An older recovery frame is saved beneath the rework frame",
+      "where": "STATE.md Frame 1 (REVIEW, From SYNCHRONIZING, Owner REVIEWING_FINAL, ResumeAt SYNCHRONIZING)",
+      "status": "realized"
+    },
+    {
+      "condition": "Downstream included-role work exists that the change affects (design, guide and documentation record, final review, synchronization)",
+      "where": ".standards/docs/specs/..., docs/reporting-guide.md, .standards/docs/documentation/..., reviews/.../final-deliverable.md (IN_PROGRESS), synchronization/... (IN_PROGRESS, D-001)",
+      "status": "realized"
+    },
+    {
+      "condition": "Brownfield project context for the active cycle exists and covers JSON",
+      "where": ".standards/CONTEXT.md",
+      "status": "realized"
+    },
+    {
+      "condition": "No Development/Testing/Implementation Review records (omitted owners)",
+      "where": "no files under development/, verification/, reviews/<id>/implementation.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Starting state is valid for check.mjs",
+      "where": "gate checkMjs ok:true; selfCheck 4",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The last commit 'Record synchronization finding and guide format rework' bundles Synchronizer's record, Reviewer's reopened report, and the user's rework state in one commit. In a real project these would usually be separate commits. This does not affect what the run tests.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": ".standards/CONTEXT.md says 'no user guide exists yet', but the guide now exists. That gap comes from planned active-cycle work, which the protocol says does not make context stale. It also states the JSON output shape, so a correct Scoper has no PROJECT_CONTEXT grounds.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 0,
+      "detail": "The contains regexes match '## Retired Acceptance Identifiers' case-sensitively. REPLAN preserves the existing heading, and the template fixes this exact text, so a correct run keeps it. The JSON-proximity regex (AC-00[4-9] within 400 chars of 'json') relies on a fixed identifier that any correct JSON condition will name.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes a coherent nested DOCUMENTATION recovery. The older REVIEW frame (Frame 1) sits under the user's persisted USER_REWORK frame to SCOPING (Frame 2), with current AC-001/AC-002, retired AC-003, and an existing JSON output that needs no implementation. I traced the checks through id.mjs and check.mjs: AC-004, RerunThrough DOCUMENTING, the next state ARCHITECTING, the unchanged Frame 1, and turn-end check_ok after a FORWARD or RESUME from SCOPING are each the unique outcome for a correct run, and the invariants fit Scoper. Only minor realism notes remain.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T03:09:52.457Z",
+  "costUsd": 0.323321,
+  "ms": 93121,
+  "fixtureHash": "3b73a418a2fede5c"
+}

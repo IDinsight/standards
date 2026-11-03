@@ -1,0 +1,94 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState DOCUMENTING, entered by a FORWARD handoff from REVIEWING_IMPLEMENTATION",
+      "where": ".standards/STATE.md header and Handoff",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id is export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, architecture, context, development plan, verification and implementation review exist with matching provenance and current evidence",
+      "where": ".standards/docs/{scope,specs,development,verification,reviews/<id>/implementation.md}, .standards/CONTEXT.md; cited blobs and commits resolve; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-001 covers CSV export behavior; AC-002 requires an accurate usage guide",
+      "where": "scope file, Work items 1 and 2",
+      "status": "realized"
+    },
+    {
+      "condition": "The export implementation satisfies AC-001 and the usage guide still lacks an export section, so AC-002 work is pending",
+      "where": "src/export.ts, src/routes/export.ts, tests passing (selfChecks); docs/usage.md has no export section",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and obligations are inactive, and no user question is blocked",
+      "where": "STATE.md: Recovery Active false, Obligations Active false, BlockedOn NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Editing is unrestricted",
+      "where": "no documentation record or target restriction exists; nothing in the request limits edits",
+      "status": "realized"
+    },
+    {
+      "condition": "The active request and the development plan disagree about whether an old migration belongs to this cycle",
+      "where": "STATE.md Request says 'The closed-status migration in scripts/ is part of this change.'; plan Plan Notes say scripts/migrate-closed-status.mjs 'is not part of this cycle'",
+      "status": "realized"
+    },
+    {
+      "condition": "Repository evidence cannot establish the boundary",
+      "where": "the migration was committed before the cycle (b00d601); scope, design and verification are silent; CONTEXT and the review treat it neutrally as baseline or out of range but do not address the request's claim; git cannot settle a conflict between the user's request and the plan",
+      "status": "realized"
+    },
+    {
+      "condition": "Git state: all work committed, clean tree",
+      "where": "git status clean; selfCheck confirms",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "blocking",
+      "kind": "check-too-strict",
+      "assertion": 1,
+      "detail": "The assertion 1 precondition {\"field\": {\"path\": \"${DOC}\", \"name\": \"Status\", \"not\": \"COMPLETE\"}} assumes the documentation record exists after the run. Like the state `not` predicate, a field check most likely fails when the field (or file) is absent. The skill's procedure step 1 says to 'Persist a material boundary gap and resolve it through its owner or a blocking question' before step 2 creates the record. A correct run could therefore set Active Work.BlockedOn and ask the user without ever creating .standards/docs/documentation/<id>.md. That run is correct, but it would fail assertion 1 deterministically, and no judge would look at it.",
+      "recommendation": "fix_file",
+      "fix": "In documenter-28/spec.json, checks[1].all: remove the {\"field\": {\"path\": \"${DOC}\", \"name\": \"Status\", \"not\": \"COMPLETE\"}} entry. Keep only {\"state\": \"WorkflowState\", \"not\": \"REVIEWING_FINAL\"}, with complete:false, and let the judge confirm that no COMPLETE record or completion claim was made."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "CONTEXT.md, the implementation review's 'Excluded' line, and the commit order all lean toward treating the migration as pre-existing baseline. A Documenter could argue that this settles the question. However, the user's Request explicitly includes the migration and the Developer's plan explicitly excludes it. That is a material conflict between authorities, which Instruction Layering forbids resolving by precedence, so the gap is still genuine.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "Every commit, including the pre-install history, has the same timestamp, 2026-09-24T09:00:00Z, which matches the cycle ID's time. This is harmless.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "issues",
+  "summary": "The fixture realizes every stated condition: a valid DOCUMENTING state with complete upstream records, a pending AC-002 guide, and a genuine conflict between the Request and the plan over scripts/migrate-closed-status.mjs that repository evidence cannot settle. Nothing leaks the answer. One precondition for assertion 1 requires the documentation record to exist, and a correct run that only persists BlockedOn and asks the user would fail it, so that check should be dropped.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T16:29:38.321Z",
+  "costUsd": 0.34773659999999995,
+  "ms": 61061,
+  "fixtureHash": "3af0ad8c9f38751b"
+}

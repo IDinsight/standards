@@ -1,0 +1,89 @@
+{
+  "conditions": [
+    {
+      "condition": "Brownfield project in a STANDARD cycle with WorkflowState DEVELOPING, no recovery, no blocker",
+      "where": ".standards/MODE.md (BROWNFIELD); .standards/STATE.md (DEVELOPING, STANDARD, FORWARD from ARCHITECTING, Recovery.Active false, BlockedOn NONE)",
+      "status": "realized"
+    },
+    {
+      "condition": "An approved development plan exists and Developer may continue implementing",
+      "where": ".standards/docs/development/filter-orders-...-5b8d2f61.md: Status APPROVED, User Style Locked true, Mode AUTONOMOUS, AFTER_IMPLEMENTATION/NONE; Active Work.Development points to it",
+      "status": "realized"
+    },
+    {
+      "condition": "The plan modifies a Next.js App Router page written in TypeScript/React",
+      "where": "DEV-002 targets app/orders/page.tsx, a server component; package.json pins next 15.1.6 and react 19",
+      "status": "realized"
+    },
+    {
+      "condition": "The plan modifies a SQL query",
+      "where": "DEV-001 targets lib/sql/recent-orders.sql (left join to customers, optional $2 status filter)",
+      "status": "realized"
+    },
+    {
+      "condition": "Rendered markup changes, so html.md applies",
+      "where": "DEV-002 Affected Area and the design's markup contract: a new nav/ul of links and a Customer column",
+      "status": "realized"
+    },
+    {
+      "condition": "Styling is not materially changed, so css.md does not apply",
+      "where": "DEV-002 and the design's Styling bullet: reuse .pill-nav/.data-table/.muted with no stylesheet changes; app/globals.css already has those rules",
+      "status": "realized"
+    },
+    {
+      "condition": "The repository has its own formatter and lint commands",
+      "where": "scripts/format.mjs and scripts/lint.mjs, package.json format/format:check/lint, README; selfChecks show they pass offline and enforce the no-semicolon and lowercase-SQL rules",
+      "status": "realized"
+    },
+    {
+      "condition": "No Python files are involved",
+      "where": "The built tree has no .py files",
+      "status": "realized"
+    },
+    {
+      "condition": "Upstream scope, design, and Auditor context exist and are consistent",
+      "where": ".standards/docs/scope (AC-001..AC-005), .standards/docs/specs (covers all ACs), .standards/CONTEXT.md; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "Unrelated code exists that a style-normalizing refactor could touch",
+      "where": "app/customers/page.tsx (index keys, short names), lib/customers.ts, lib/money.ts, app/layout.tsx",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "hint-leak",
+      "assertion": 1,
+      "detail": "The plan's Affected Area annotates paths with languages ('lib/sql/recent-orders.sql (SQL)', 'lib/orders.ts (TypeScript)', 'Next.js App Router server component, TypeScript/React') and states 'The rendered markup changes' and 'No stylesheet changes'. This slightly steers style selection. The catalog required the markup statement, file extensions already reveal the languages, and a real Developer plan could plausibly say all of this.",
+      "recommendation": "run_as_is",
+      "fix": "Acceptable as is. Optionally drop the parenthetical language labels from DEV-001 and DEV-002 Affected Area."
+    },
+    {
+      "severity": "note",
+      "kind": "ungradeable-assertion",
+      "assertion": 0,
+      "detail": "Assertions 0 to 2 concern which style files were read. The check vocabulary has no read-trace predicate, so they have empty checks with complete:false and the judge decides from the tool calls. That is correct, even though the catalog tags them as deterministic.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "typecheck and build cannot run, and the approved plan and CONTEXT.md record that. A correct run may either complete and hand off to TESTING or treat the gap as a limitation or blocker. No check or invariant depends on which path it takes: check_ok holds in both, and the existing tests still pass after the planned change because params[0] stays the limit and customerName is not asserted. So test/** unchanged cannot force a correct run to edit tests.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes the case faithfully: an approved AUTONOMOUS plan changes a Next.js 15 App Router TSX page (with stated markup changes and no stylesheet changes) and a SQL query, the repository's own formatter and lint run offline, and there are no Python files. The unchanged-file preconditions and invariants cannot fail a correct run, check.mjs is clean, and all selfChecks pass. Only minor notes remain: mild language labels in the plan, and judge-only grading of the style-loading assertions.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T02:15:33.948Z",
+  "costUsd": 0.2792866,
+  "ms": 55910,
+  "fixtureHash": "9c66ebafaab0206a"
+}

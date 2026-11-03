@@ -19,3 +19,8 @@ updates:
     groups:
       npm-minor-patch:
         update-types: ["minor", "patch"]
+    # The eval harness's judge calls go through the Anthropic SDK, so it is
+    # updated by hand between eval suites, after `pnpm evals selftest` and
+    # `pnpm evals preflight --execute`.
+    ignore:
+      - dependency-name: "@anthropic-ai/sdk"

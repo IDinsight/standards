@@ -1,0 +1,96 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield template)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState DOCUMENTING",
+      "where": ".standards/STATE.md header",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id = export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md Active Work; every record's provenance block",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, architecture, context, development, verification and implementation review have matching provenance and current evidence",
+      "where": "scope/specs/development/verification/reviews records carry cycle provenance; verification (REVERIFY, COMPLETE, FULL) and implementation review (COMPLETE) were rerun after the scope revision and cite the current scope and design blobs; CONTEXT.md is pre-cycle baseline",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-001 covers CSV export behavior",
+      "where": "scope `- `AC-001`:` under Work item 1; design Acceptance Coverage; verification and review rows",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-002 required an accurate usage guide (now retired)",
+      "where": "scope `## Retired Acceptance Identifiers` lists `AC-002`; doc record names AC-002 as the guide need",
+      "status": "realized"
+    },
+    {
+      "condition": "Scoper added AC-009 requiring migration instructions",
+      "where": "scope Work item 2 `- `AC-009`:`, which requires migration instructions for admin-tool code built on GET /records",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and obligations inactive; no blocked user question",
+      "where": "STATE.md Recovery `Active`: `false`, no frames, Obligations inactive, BlockedOn NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Editing unrestricted",
+      "where": "doc record Target ACTIVE_CHANGE, editing boundary unrestricted; no restriction in the utterance",
+      "status": "realized"
+    },
+    {
+      "condition": "A COMPLETE documentation record supports AC-002 and does not cover AC-009",
+      "where": ".standards/docs/documentation/export-...md Status COMPLETE; it cites the pre-revision scope blob and AC-002, with no AC-009",
+      "status": "realized"
+    },
+    {
+      "condition": "Source behavior unchanged",
+      "where": "git log shows no src/test/package changes after 2a0fea8; selfCheck git diff passes",
+      "status": "realized"
+    },
+    {
+      "condition": "The guide documents the export accurately but has no migration instructions",
+      "where": "docs/usage.md export section matches src/routes/export.ts and src/export.ts; selfCheck confirms the guide contains no 'migrat'",
+      "status": "realized"
+    },
+    {
+      "condition": "Full check reports exactly the stale doc record missing AC-009",
+      "where": "gate check.mjs output (1 problem)",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 1,
+      "detail": "The check `contains docs/usage.md /migrat/i` assumes the new instructions use the word 'migrate' or 'migration'. AC-009's wording ('gives migration instructions') makes such a heading very likely. A correct run could still title the section something like 'Switching from client-built CSV' and fail this check.",
+      "recommendation": "run_as_is",
+      "fix": "Optional: in spec.json assertion 1, widen the regex to `migrat|switch(ing)? from|moving from|replac` (flags i)."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The new condition is numbered AC-009, although id.mjs would have produced AC-003. The case requires this number, and no AC-003 to AC-008 exist anywhere, so the gap is harmless. The record was COMPLETE while STATE stayed at DOCUMENTING before the rework; the case also requires this combination.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized: DOCUMENTING after a popped SCOPING rework frame, AC-002 retired in favor of AC-009, upstream records rerun and covering AC-009, a stale COMPLETE doc record, unchanged source, and an accurate guide without migration text. check.mjs reports exactly the one intended problem, nothing leaks, and the checks and invariants are necessary conditions for a correct Documenter run. The only notes are a slightly narrow 'migrat' regex and the case-mandated AC-009 numbering.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T16:35:35.249Z",
+  "costUsd": 0.3479806,
+  "ms": 69387,
+  "fixtureHash": "198b121635aa1735"
+}

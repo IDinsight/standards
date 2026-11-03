@@ -1,0 +1,86 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed with --mode brownfield)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState SYNCHRONIZING, Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md (layer 71); Handoff FORWARD from REVIEWING_FINAL",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, architecture, context, development plan, verification, and both review reports have valid ownership and content identities",
+      "where": ".standards/docs/{scope,specs,development,verification,reviews/<id>/*}, .standards/CONTEXT.md; check.mjs ok; selfCheck confirms cited blobs match HEAD",
+      "status": "realized"
+    },
+    {
+      "condition": "Documentation evidence is available",
+      "where": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md (COMPLETE, G1–G3 evidence)",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and outstanding obligations inactive; no blocked user question",
+      "where": ".standards/STATE.md Recovery/Obligations Active false, BlockedOn NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "README instructs use of the deleted CLI option",
+      "where": "README.md Quick start: `node bin/export-records.js --owner dana --json --out dana.json`; the CLI rejects --json with exit 2 (selfCheck)",
+      "status": "realized"
+    },
+    {
+      "condition": "User-authored project guidance outside the managed AGENTS block instructs use of the deleted option",
+      "where": "AGENTS.md 'Sample data' section above <!-- standards:start -->: `--json --out /tmp/records.json`",
+      "status": "realized"
+    },
+    {
+      "condition": "The managed AGENTS/CLAUDE blocks are present so their preservation can be observed",
+      "where": "AGENTS.md standards:start/end block; CLAUDE.md installed managed block",
+      "status": "realized"
+    },
+    {
+      "condition": "Current implementation correctly follows scope and design",
+      "where": "src/cli.js: --format with default csv, FORMATS validation before output, json removed from parseArgs table; 11 tests pass",
+      "status": "realized"
+    },
+    {
+      "condition": "Upstream records plausibly missed the stale references (so Synchronizer must detect them)",
+      "where": "Documentation record says README needs no change and excludes only managed blocks in AGENTS.md; final review C4 checks only the README link",
+      "status": "realized"
+    },
+    {
+      "condition": "Clean committed git state with no synchronization record yet",
+      "where": "git status clean; .standards/docs/synchronization absent (selfCheck)",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "Commits are authored by `Fixture <fixture@example.invalid>` (local git config). A role reading `git log` sees this author. It is harness-wide and does not hint at the stale references or the expected route.",
+      "recommendation": "run_as_is",
+      "fix": "No change needed for this case."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 2,
+      "detail": "The checks `WorkflowState == DOCUMENTING` and `Handoff.FailureType == DOCUMENTATION` follow the case's expected output. Under the protocol, Documenter owns project documentation and user-authored agent guidance outside managed blocks, so a correct run routes there first. A run might also record a REVIEW discrepancy against the final review. That is still consistent as long as it routes DOCUMENTATION first, which the skill's ownership table implies.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized: README.md and the user-authored 'Sample data' notes outside the managed block in AGENTS.md both instruct the removed `--json` flag, the implementation is correct, and the records are coherent and pass check.mjs at SYNCHRONIZING. The upstream records plausibly missed the stale references without hinting at them. Checks require only fixed paths, state values, and record structure that a correct DOCUMENTATION route must produce, and the invariants fit a Synchronizer that edits only its record and STATE.md.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T14:35:54.507Z",
+  "costUsd": 0.3511688,
+  "ms": 54475,
+  "fixtureHash": "1fe17796073e7a76"
+}

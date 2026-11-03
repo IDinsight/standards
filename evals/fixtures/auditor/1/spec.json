@@ -1,0 +1,209 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial expense API with API key roles"
+    },
+    {
+      "dir": "layers/10-reports",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add monthly report endpoint"
+    },
+    {
+      "dir": "layers/50-cycle",
+      "action": "commit",
+      "message": "Start STANDARDS cycle for CSV export"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "auditor",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "At the start of the run .standards/CONTEXT.md does not exist, so no usable project-level context baseline exists; this is the initial brownfield audit of the first cycle.",
+    "Active Work.Request is to add CSV export of expenses to the existing expense tracker; Scope, Architecture, and Development are NONE.",
+    "The repository contains no CSV or export code; the relevant existing areas are the expense list route (filters, owner scoping), the monthly report route, src/auth.js role rules, src/format.js money formatting, and the integer-cents convention.",
+    "Established commands are `npm start` and `npm test` (package.json scripts, README.md, AGENTS.md); `npm test` runs `node --test` over four explicit test files and passes. Configuration uses the environment variable names PORT, API_KEYS, and DATA_FILE.",
+    "AGENTS.md holds pre-existing project instructions (no third-party dependencies, integer cents, ISO dates, auth on every route, run npm test) outside the STANDARDS managed block.",
+    "`npm start` starts a long-running HTTP server; running it is not needed to establish the baseline."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "add-csv-export-of-expenses-to-the-20260924T090000Z-3e9a6b10",
+    "CONTEXT": ".standards/CONTEXT.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${CONTEXT}",
+          "why": "the audit must produce the context artifact"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${CONTEXT}",
+          "why": "the baseline must be written"
+        },
+        {
+          "unchanged": [
+            "src/**",
+            "test/**",
+            "data/**",
+            "package.json",
+            "README.md"
+          ],
+          "why": "Auditor does not implement or change project files"
+        },
+        {
+          "absent": ".standards/docs/specs",
+          "why": "Auditor does not create a technical design"
+        }
+      ]
+    },
+    {
+      "assertion": 4,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${CONTEXT}",
+          "why": "commands are judged from the written context"
+        }
+      ]
+    },
+    {
+      "assertion": 5,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "SCOPING"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FORWARD"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "AUDITING"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "NONE"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "false"
+        },
+        {
+          "state": "ActiveWork.Id",
+          "equals": "${ID}"
+        },
+        {
+          "reply_matches": "/scoper\\b",
+          "why": "Claude Code next-role invocation for Scoper"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Auditor inspects version control without changing it"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "npm test",
+      "expect": "pass",
+      "why": "the documented test command passes"
+    },
+    {
+      "cmd": "node --test test/store.test.js test/expenses.test.js test/format.test.js test/reports.test.js",
+      "expect": "pass",
+      "why": "the node:test files named by the test script pass"
+    },
+    {
+      "cmd": "test ! -e .standards/CONTEXT.md",
+      "expect": "pass",
+      "why": "no project context exists before the audit"
+    },
+    {
+      "cmd": "sh -c '! grep -rqi csv src test data README.md package.json'",
+      "expect": "pass",
+      "why": "the existing product has no CSV code or docs yet"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. layers/00-project (pre-install commit): a dependency-free Node 22 ESM expense-tracker API (src/server.js, router.js, http.js, auth.js, store.js, validate.js, format.js, routes/expenses.js), sample data, node:test tests, README, .gitignore, and a pre-existing AGENTS.md with project instructions the installer merges with. layers/10-reports (pre-install commit): adds the monthly report route and its test, updating router, README, and the test script. layers/50-cycle: STATE.md for the first cycle: AUDITING, STANDARD, Id add-csv-export-of-expenses-to-the-20260924T090000Z-3e9a6b10 (slug as cycle.mjs would derive it from the request), Request 'Add CSV export of expenses to the expense tracker.', all paths NONE, Handoff INITIAL (first cycle keeps INITIAL), recovery and obligations inactive. MODE.md stays the installer's BROWNFIELD. No CONTEXT.md and no records. Utterance is just 'Continue.' per the catalog, dropping the prompt's leaked instructions.",
+  "case": "auditor-1",
+  "caseHash": "7ac2cdef3c664c18",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-01T18:33:28.901Z",
+    "verdict": "pass",
+    "fixtureHash": "8b2b0134c88b027c",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "49a2208720f8c14f",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:05:44.607Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-01T17:43:20.932Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-cycle/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:05:44.607Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

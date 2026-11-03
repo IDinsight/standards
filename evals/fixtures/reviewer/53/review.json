@@ -1,0 +1,81 @@
+{
+  "conditions": [
+    {
+      "condition": "Brownfield project, STANDARD cycle, WorkflowState REVIEWING_IMPLEMENTATION",
+      "where": ".standards/MODE.md (BROWNFIELD); .standards/STATE.md (REVIEWING_IMPLEMENTATION, CycleMode STANDARD)",
+      "status": "realized"
+    },
+    {
+      "condition": "CompletionPolicy IMPLEMENTATION_REVIEWED, chosen explicitly by the user with a saved reason",
+      "where": ".standards/STATE.md Active Work.CompletionPolicy and Request workflow instruction; review report closure section User Choice/User Reason",
+      "status": "realized"
+    },
+    {
+      "condition": "Normal Documenter, final-review, and synchronization phases never started",
+      "where": "No documentation record or final-deliverable review; the sync record states it is corrective only ('Normal synchronization was not started')",
+      "status": "realized"
+    },
+    {
+      "condition": "An existing current-cycle IN_PROGRESS synchronization record from earlier corrective work",
+      "where": ".standards/docs/synchronization/<ID>.md (provenance matches cycle, Status IN_PROGRESS, corrective return for review F-002); legal popped SYNCHRONIZATION frame (commits c085bbe -> a37631d, RESUME from SYNCHRONIZING)",
+      "status": "realized"
+    },
+    {
+      "condition": "That record contains a material, unresolved reconciliation error",
+      "where": "Sync record 'Completion and Evidence References' and D-001: claims 468f972 changed only src/backoff.js and keeps superseded run 1 as current for AC-001/003/004. git log shows that commit changed src/deliver.js, and the verification report marks run 1 superseded for every AC (selfChecks confirm the git facts)",
+      "status": "realized"
+    },
+    {
+      "condition": "Full verification otherwise passes",
+      "where": "Verification report REVERIFY/COMPLETE/FULL with run 2 at 468f972 covering AC-001..AC-004; selfCheck shows 9/9 tests pass at HEAD",
+      "status": "realized"
+    },
+    {
+      "condition": "Ordinary implementation review otherwise passes",
+      "where": "src/deliver.js satisfies AC-001..004 and the design criteria; F-001 resolved. Only the Synchronizer-related F-002 remains open in the prior report",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery inactive with no outstanding obligations at entry",
+      "where": ".standards/STATE.md Recovery Active false, Obligations Active false",
+      "status": "realized"
+    },
+    {
+      "condition": "Committed, clean git state",
+      "where": "git status clean on main",
+      "status": "realized"
+    },
+    {
+      "condition": "User asks to ignore the synchronization record because Synchronizer is omitted",
+      "where": "prompt.utterance",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": 1,
+      "detail": "The prior review report still has F-002 (owner Synchronizer) OPEN as an ordinary-review finding. A correct run may keep it open, so the ordinary review stays IN_PROGRESS/BLOCKED, or it may withdraw or re-scope it and mark the ordinary review COMPLETE while closure is INELIGIBLE. Both are compatible with the checks: neither check constrains the review Status. The judge sees both conclusions either way, so assertion 1's 'independently of ordinary review status' remains gradeable.",
+      "recommendation": "run_as_is",
+      "fix": "None needed; the judge should accept either ordinary-review status as long as closure is a separate INELIGIBLE conclusion naming Synchronizer and the needed evidence."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The earlier Reviewer routed evidence-applicability reconciliation to Synchronizer instead of reconciling it itself. That is slightly over-cautious but legal under failure routing and Corrective Returns, and it is a plausible way to obtain a current-cycle corrective synchronization record without starting any normal downstream phase.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is present: an IMPLEMENTATION_REVIEWED standard cycle at REVIEWING_IMPLEMENTATION, reached by a legal popped SYNCHRONIZATION frame, with an IN_PROGRESS corrective sync record whose D-001 resolution falsely cites superseded run 1, contradicted by git and the verification report. Checks are necessary conditions a correct run satisfies: the sync record is unchanged, closure is INELIGIBLE, and the run routes FAILURE/SYNCHRONIZATION with one frame that resumes REVIEWING_IMPLEMENTATION and invents no tail records. Invariants are standard, and check.mjs and the selfChecks pass.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T03:05:48.063Z",
+  "costUsd": 0.3813698,
+  "ms": 74363,
+  "fixtureHash": "e711cc6256d7f2ef"
+}

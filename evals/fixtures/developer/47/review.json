@@ -1,0 +1,71 @@
+{
+  "conditions": [
+    {
+      "condition": "Initialized BROWNFIELD project",
+      "where": ".standards/MODE.md (installed brownfield, ProjectMode BROWNFIELD); pre-install commit holds existing inventory-page code",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode UNSET, PendingCycleMode UNSET",
+      "where": ".standards/STATE.md head line",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id and Request UNSET (no active cycle)",
+      "where": ".standards/STATE.md Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Handoff section of STATE.md was edited by hand, leaving it invalid (Kind missing)",
+      "where": ".standards/STATE.md ## Handoff has From/FailureType/Reason but no Kind; commit 'Reword handoff note in workflow state'",
+      "status": "realized"
+    },
+    {
+      "condition": "`node .standards/bin/cycle.mjs new --request \"Add an export button\"` fails with 'Invalid or missing Handoff.Kind in .standards/STATE.md'",
+      "where": "selfCheck 1 output: 'Unexpected error: Invalid or missing Handoff.Kind in .standards/STATE.md'",
+      "status": "realized"
+    },
+    {
+      "condition": "The request is a new bounded change (export button) not already implemented",
+      "where": "src/render.js has only an 'Add item' button; no export feature",
+      "status": "realized"
+    },
+    {
+      "condition": "Everything else in STATE.md valid so the only failure is the missing Kind",
+      "where": "check.mjs reports exactly one problem: 'Invalid or missing Handoff.Kind'",
+      "status": "realized"
+    },
+    {
+      "condition": "Clean committed git state",
+      "where": "git status clean on main",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "git config shows user.name=Fixture / fixture@example.invalid, so the commit author the role may see in `git log` says 'Fixture'. This comes from the harness's fixed author, not this spec, and does not point to the planted problem or the expected answer.",
+      "recommendation": "run_as_is",
+      "fix": "Harness-wide; consider a neutral author name in the builder."
+    },
+    {
+      "severity": "note",
+      "kind": "check-wrong",
+      "assertion": 0,
+      "detail": "reply_matches 'STATE\\.md' requires the reply to name the file. Both tool messages name it, and reporting the invalid workflow state file realistically names it, so a correct run is very unlikely to fail this. The judge decides the rest (complete:false), which matches the catalog's note accepting a check.mjs-only report.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes the case. It is a committed brownfield install whose STATE.md lacks only Handoff.Kind, and both check.mjs and cycle.mjs fail with the stated message, as the selfChecks confirm. Checks depend on .standards/** staying byte-identical and on the reply naming STATE.md, which a correct run satisfies; invariants are standard plus an apt no-implementation guard. Nothing leaks the answer.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T02:23:12.661Z",
+  "costUsd": 0.1121666,
+  "ms": 23902,
+  "fixtureHash": "91bddc1be9e6ab83"
+}

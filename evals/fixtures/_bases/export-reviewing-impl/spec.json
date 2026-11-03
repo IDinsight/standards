@@ -1,0 +1,147 @@
+{
+  "base": "export-testing",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/46-access-test",
+      "action": "commit",
+      "message": "Add integration test for denied exports"
+    },
+    {
+      "dir": "layers/48-verification",
+      "action": "commit",
+      "message": "Record CSV export verification"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "vars": {
+    "ASSESSED_COMMIT": "${COMMIT:Add integration test for denied exports}",
+    "IMPL_COMMIT": "${COMMIT:Add CSV export of filtered records}"
+  },
+  "notes": "Shared base for the export cycle at REVIEWING_IMPLEMENTATION, built on export-testing (which ends at TESTING with a COMPLETE plan and the committed implementation). Two commits. 46-access-test: Tester's change to test/integration/export-flow.test.ts only. It adds editor and viewer users, gives exportRequest an optional user parameter (default admin), and adds a third test that sends POST /records/export as no user (401), viewer (403), and editor (403), asserting status, the JSON error body, and that the export folder was not created. The test:integration script is unchanged and now runs 3 tests; the unit suite still runs 21. 48-verification: Tester's COMPLETE verification record at vars VERIFICATION (Mode VERIFY, User Style NONE, Assessment Purpose FULL, Assessment Target NONE) and STATE moved to REVIEWING_IMPLEMENTATION with FORWARD from TESTING. The record cites the assessed commit (subject 'Add integration test for denied exports') through a COMMIT placeholder and the content identities of the scope, design, context, plan, implementation files, and integration test through BLOB placeholders. Its Execution Evidence holds Tester's runs of pnpm --filter export test (21 passed) and pnpm --filter export test:integration (3 passed, the admin export and the anonymous, viewer, and editor denials all observed) plus an inspection of the handler order. Acceptance Evidence accounts for AC-001 (three technical criteria) and AC-002, all Verified, with no AWAITING_IMPLEMENTATION, no pending later-role dependency, and no open findings. Implementation files are byte-identical to the commit 'Add CSV export of filtered records' and have no material defects. No review, documentation, or synchronization record exists. The tree is clean. Layer numbers 46 and 48 stay inside the 00 to 49 range reserved for bases. Parent selfChecks that pinned the integration test count to 2 or forbade viewer/editor in the integration file are intentionally superseded by this base.",
+  "baseFacts": [
+    "Everything export-project states about the project code outside the export feature remains true: src/records (store, parseFilter), src/auth (roles, authorize, requireAdmin), src/http (HttpError, messages, Router), GET /records for every signed-in role, createApp, the six seed records (record 1 title contains a comma, record 3 title contains double quotes), README.md, and docs/usage.md (which still has no export section and does not contain the word export).",
+    "Cycle export-20260924T090000Z-a7f3c1d2 is active: ProjectMode BROWNFIELD, CycleMode STANDARD, WorkflowState REVIEWING_IMPLEMENTATION, PendingCycleMode UNSET, PendingCycleRequest UNSET, PendingCycleBlockedOn NONE. Active Work is unchanged from export-testing: Request `Let administrators export the filtered records list as CSV; non-admins must not be able to export.`; Scope, Architecture, and Development point to the records at vars SCOPE, ARCH, DEV; PromotionReason, AuditTarget, BlockedOn, PendingVerificationCadence, and BaselineReconciliation are NONE. Handoff: Kind FORWARD, From TESTING, FailureType NONE, Reason `Full verification complete; AC-001 and AC-002 verified with current evidence.` Recovery and Outstanding Obligations are inactive (Active false, no frames, no obligations).",
+    ".standards/CONTEXT.md, the scope record, and the technical design are unchanged from export-testing. The scope defines exactly two current conditions and no retired ones: AC-001 administrators can export the currently filtered records as CSV with RFC 4180 quoting of fields containing a comma, double quote, or newline (embedded quotes doubled); AC-002 an export request from a non-administrator or no signed-in user is denied by server-side authorization before any export file is created. The design specifies POST /records/export, requireAdmin first (401 authentication required, 403 forbidden), 400 for invalid status with no file, 201 text/csv with content-disposition and body equal to the file, header id,title,owner,status,createdAt, CRLF rows in id order, file <exportDir>/records-<YYYYMMDDTHHMMSSZ>.csv, and names the same-second overwrite as an accepted risk.",
+    "The development plan (vars DEV) is unchanged from export-testing: Mode AUTONOMOUS, User Style NONE, User Style Locked true, Status COMPLETE, Verification Cadence AFTER_IMPLEMENTATION, Current Increment NONE, no Verification Increments section; DEV-001, DEV-002, DEV-003 all DONE with self-checks citing the commit 'Add CSV export of filtered records' (the DEV-003 authorization self-check is an inspection only).",
+    "Implementation files (src/, packages/, package.json, .gitignore, pnpm-lock.yaml) are byte-identical to the commit 'Add CSV export of filtered records' (vars IMPL_COMMIT). src/export.ts provides csvCell, toCsv, exportFileName, writeExport; src/routes/export.ts registers POST /records/export calling requireAdmin(request.user) first, then store.list(parseFilter(request.query)), writeExport, and a 201 text/csv response; createApp accepts records, exportDir (default exports), and now. The implementation satisfies AC-001 and AC-002 and has no material defects.",
+    "The commit 'Add integration test for denied exports' (vars ASSESSED_COMMIT) changed only test/integration/export-flow.test.ts: it adds editor (id 2, Eli) and viewer (id 3, Vik) users, an optional user parameter on exportRequest defaulting to the admin, and a third test, 'export requests without an administrator are denied and write no file', which sends POST /records/export with owner=dana as no user (expects 401 and error authentication required), as the viewer, and as the editor (expects 403 and error forbidden), asserting after each that the export folder does not exist. The two admin export tests are unchanged.",
+    "package.json scripts are unchanged: test = node --test test/*.test.ts and test:integration = node --test test/integration/export-flow.test.ts. `pnpm --filter export test` passes 21 tests (16 pre-cycle plus five in test/export.test.ts). `pnpm --filter export test:integration` passes 3 tests: the owner=dana admin export, the unfiltered admin export, and the denied-export test.",
+    "The verification record at vars VERIFICATION has VERIFICATION provenance for this cycle and header Cycle export-20260924T090000Z-a7f3c1d2, Mode VERIFY, Status COMPLETE, User Style NONE, Assessment Purpose FULL, Assessment Target NONE. Sections: Assessed Inputs (the full hash of the commit 'Add integration test for denied exports' with a clean tree; blob hashes of the scope, design, CONTEXT.md, plan, src/export.ts, src/routes/export.ts, src/app.ts, and the integration test; environment; reason for a first VERIFY assessment; a session-freshness limitation note), Acceptance Evidence (three AC-001 rows: quoting rules, rows equal GET /records for the same query in id order, response headers and body equal to the file; one AC-002 row: anonymous and non-admin denied with no folder or file; all Verified with E1/E2/inspection pointers), Scenario Budget (5 reused serialization scenarios and 2 reused admin integration scenarios; 1 Tester allocation for src/routes/export.ts; no user additions), Execution Evidence (E1 pnpm --filter export test exit 0 with 21 passed; E2 pnpm --filter export test:integration exit 0 with 3 passed, the admin exports and the three denials observed; an inspection of the handler statement order and the shared filter path; limitations: same-second overwrite not exercised as an accepted design risk, status and q filters on export established by inspection of the shared parseFilter and store.list path), and Resume or Handoff (full verification passed, no open findings, no later-role dependencies, next step an IMPLEMENTATION review in an independent Reviewer session). It has no Open Findings and Dependencies section and no Increment Assessments section, and it does not mention AWAITING_IMPLEMENTATION.",
+    "There is no implementation review, final-deliverable review, documentation record, or synchronization record; .standards/docs/reviews does not exist.",
+    "No file under src/, test/, packages/, docs/, or README.md contains an AC identifier. No exports directory exists.",
+    "Commit subjects after the installer commit, oldest first: 'Record project context for CSV export', 'Define CSV export scope', 'Design CSV export', 'Plan CSV export implementation', 'Add CSV export of filtered records', 'Mark CSV export plan complete', 'Add integration test for denied exports', 'Record CSV export verification'.",
+    "The working tree is clean (git diff empty, nothing untracked), and node .standards/bin/check.mjs passes."
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the unit suite passes offline"
+    },
+    {
+      "cmd": "pnpm --filter export test 2>&1 | grep -qE 'pass 21$'",
+      "expect": "pass",
+      "why": "the unit suite still runs 21 tests"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration",
+      "expect": "pass",
+      "why": "the integration script passes, including the denied-export test"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration 2>&1 | grep -qE 'pass 3$' && pnpm --filter export test:integration 2>&1 | grep -q 'without an administrator are denied and write no file'",
+      "expect": "pass",
+      "why": "test:integration now runs three tests, one of which is Tester's authorization test"
+    },
+    {
+      "cmd": "grep -q 'viewer' test/integration/export-flow.test.ts && grep -q 'editor' test/integration/export-flow.test.ts && grep -q 'existsSync(exportDir), false' test/integration/export-flow.test.ts && grep -q 'authentication required' test/integration/export-flow.test.ts",
+      "expect": "pass",
+      "why": "the authorization test sends anonymous, viewer, and editor requests and checks that no export folder is created"
+    },
+    {
+      "cmd": "c=$(git log --format=%H -1 --fixed-strings --grep='Add CSV export of filtered records') && test -n $c && git diff --quiet $c HEAD -- src packages package.json .gitignore pnpm-lock.yaml && test $(git diff --name-only $c HEAD -- test) = test/integration/export-flow.test.ts",
+      "expect": "pass",
+      "why": "implementation is unchanged since the implementation commit; the only test change is the integration test file"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the REVIEWING_IMPLEMENTATION state and records are valid"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && git diff --quiet HEAD && test ! -e exports",
+      "expect": "pass",
+      "why": "all work is committed and no export files exist"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `REVIEWING_IMPLEMENTATION` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Id`: `export-20260924T090000Z-a7f3c1d2`$' .standards/STATE.md && grep -q '^`Kind`: `FORWARD` `From`: `TESTING` `FailureType`: `NONE`' .standards/STATE.md && grep -q '^`PromotionReason`: `NONE` `AuditTarget`: `NONE` `BlockedOn`: `NONE`$' .standards/STATE.md && grep -q '^`PendingVerificationCadence`: `NONE`$' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md",
+      "expect": "pass",
+      "why": "STATE.md holds REVIEWING_IMPLEMENTATION with FORWARD from TESTING, nothing blocked, recovery and obligations inactive"
+    },
+    {
+      "cmd": "f=.standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md && head -3 $f | grep -qx 'Artifact: VERIFICATION' && grep -q '`Mode`: `VERIFY` `Status`: `COMPLETE`' $f && grep -q '`Assessment Purpose`: `FULL` `Assessment Target`: `NONE`' $f && grep -q $(git log --format=%H -1 --fixed-strings --grep='Add integration test for denied exports') $f && ! grep -qE 'COMMIT:|BLOB:|AWAITING_IMPLEMENTATION' $f && grep -q 'pnpm --filter export test:integration' $f && grep -q 'AC-002' $f",
+      "expect": "pass",
+      "why": "the COMPLETE FULL verification record exists, cites the assessed commit hash, and records the integration run"
+    },
+    {
+      "cmd": "test ! -e .standards/docs/reviews && test ! -e .standards/docs/documentation && test ! -e .standards/docs/synchronization && grep -q '^`Verification Cadence`: `AFTER_IMPLEMENTATION` `Current Increment`: `NONE`$' .standards/docs/development/export-20260924T090000Z-a7f3c1d2.md",
+      "expect": "pass",
+      "why": "no review or later record exists yet; the plan keeps the default cadence"
+    },
+    {
+      "cmd": "! grep -rqE 'AC-[0-9]' src test packages docs README.md",
+      "expect": "pass",
+      "why": "code and tests cite no acceptance identifiers"
+    },
+    {
+      "cmd": "git log -2 --format=%s | paste -s -d '|' - | grep -qx 'Record CSV export verification|Add integration test for denied exports'",
+      "expect": "pass",
+      "why": "the two new commit subjects exist in order for COMMIT references"
+    }
+  ],
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-01T17:38:42.605Z",
+    "verdict": "pass",
+    "fixtureHash": "44965cf37a458255",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "50768762e2699edd",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:04:29.700Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-01T17:19:24.873Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-testing": "fd7044646ac2c395"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/48-verification/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:04:29.700Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

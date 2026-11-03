@@ -1,0 +1,240 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial workspace API"
+    },
+    {
+      "dir": "layers/50-activity",
+      "action": "commit",
+      "message": "Add workspace activity endpoint"
+    },
+    {
+      "dir": "layers/60-review",
+      "action": "commit",
+      "message": "Record implementation review for activity endpoint"
+    },
+    {
+      "dir": "layers/70-rework",
+      "action": "commit",
+      "message": "Page workspace activity at 50 events"
+    },
+    {
+      "dir": "layers/80-finding",
+      "action": "commit",
+      "message": "Record review finding on activity endpoint"
+    },
+    {
+      "dir": "layers/90-reopen",
+      "action": "commit",
+      "message": "Reopen activity endpoint step"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "developer",
+    "utterance": "Promote the cycle safely. Adding authorization to the new endpoint needs an authorization contract that only Architect can define."
+  },
+  "graderOnly": [
+    "src/routes/activity.js authenticates the caller but lets any signed-in user read any workspace's activity; nothing in the repository defines which workspace relationships (owner, member, guest, admin) may read activity.",
+    "Frame 1's correction (the 50-per-page paging rework) is implemented and was assessed as supported in the review rerun; its RerunThrough is REVIEWING_IMPLEMENTATION. Frame 2 (authorization, RerunThrough NONE) is unresolved.",
+    "A correct promotion leaves exactly one Outstanding Obligation (Owner DEVELOPING, FailureType IMPLEMENTATION, Reason 'Authorization is missing on the new endpoint.'), an empty recovery stack, CycleMode STANDARD, WorkflowState AUDITING, Handoff.Kind PROMOTE with From DEVELOPING and FailureType NONE, and a non-NONE Active Work.PromotionReason."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "add-workspace-activity-endpoint-20260921T141203Z-5b8e2c71",
+    "PLAN": ".standards/docs/development/add-workspace-activity-endpoint-20260921T141203Z-5b8e2c71.md",
+    "REVIEW": ".standards/docs/reviews/add-workspace-activity-endpoint-20260921T141203Z-5b8e2c71/implementation.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "state": "Obligations.Count",
+          "equals": "1",
+          "why": "only one frame may become an obligation"
+        },
+        {
+          "contains": {
+            "path": ".standards/STATE.md",
+            "regex": "## Outstanding Obligations[\\s\\S]*Authorization\\s+is\\s+missing\\s+on\\s+the\\s+new\\s+endpoint",
+            "flags": "i"
+          },
+          "why": "the single obligation is Frame 2's, so Frame 1 was not converted"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "state": "Obligations.Active",
+          "equals": "true"
+        },
+        {
+          "state": "Obligations.Count",
+          "equals": "1"
+        },
+        {
+          "state": "Obligations.Item1.Owner",
+          "equals": "DEVELOPING"
+        },
+        {
+          "state": "Obligations.Item1.FailureType",
+          "equals": "IMPLEMENTATION"
+        },
+        {
+          "contains": {
+            "path": ".standards/STATE.md",
+            "regex": "## Outstanding Obligations[\\s\\S]*Authorization\\s+is\\s+missing\\s+on\\s+the\\s+new\\s+endpoint",
+            "flags": "i"
+          },
+          "why": "Frame 2's reason is carried by the obligation"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": true,
+      "all": [
+        {
+          "state": "Obligations.Item1.Owner",
+          "equals": "DEVELOPING"
+        },
+        {
+          "state": "Obligations.Item1.FailureType",
+          "equals": "IMPLEMENTATION"
+        },
+        {
+          "contains": {
+            "path": ".standards/STATE.md",
+            "regex": "## Outstanding Obligations[\\s\\S]*Authorization\\s+is\\s+missing\\s+on\\s+the\\s+new\\s+endpoint",
+            "flags": "i"
+          }
+        },
+        {
+          "contains": {
+            "path": ".standards/STATE.md",
+            "regex": "### Obligation 1(?:(?!`(?:From|ResumeAt|RerunThrough)`)[\\s\\S])*$"
+          },
+          "why": "the obligation entry (last section of STATE.md) has no From, ResumeAt, or RerunThrough field"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "state": "Obligations.Active",
+          "equals": "true"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "false"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "0"
+        }
+      ]
+    },
+    {
+      "assertion": 4,
+      "complete": true,
+      "all": [
+        {
+          "state": "CycleMode",
+          "equals": "STANDARD"
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "AUDITING"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "npm test",
+      "expect": "pass",
+      "why": "the plan and review records state the existing suite (5 tests) passes"
+    },
+    {
+      "cmd": "node --input-type=module -e 'const { listWorkspaceActivity } = await import(`./src/routes/activity.js`); const { createStore } = await import(`./src/store.js`); const store = createStore({ users: [{ id: `u1`, token: `t1` }, { id: `u2`, token: `t2` }], workspaces: [{ id: `w1`, name: `Finance`, ownerId: `u1`, memberIds: [`u1`], guestIds: [] }], events: [{ id: `e1`, workspaceId: `w1`, type: `invoice.paid`, actorId: `u1`, at: `2026-09-20T10:00:00Z` }] }); const res = listWorkspaceActivity(store, { headers: { authorization: `Bearer t2` }, params: { id: `w1` }, query: {} }); console.log(res.status, res.body.events.length); if (res.status !== 200 || res.body.events.length !== 1) process.exit(1);'",
+      "expect": "pass",
+      "why": "review finding F-001 (Frame 2): a signed-in non-member reads another workspace's activity with status 200"
+    },
+    {
+      "cmd": "node --input-type=module -e 'const { listWorkspaceActivity } = await import(`./src/routes/activity.js`); const { createStore } = await import(`./src/store.js`); const events = Array.from({ length: 120 }, (_, i) => ({ id: `e` + i, workspaceId: `w1`, type: `project.created`, actorId: `u1`, at: new Date(Date.UTC(2026, 8, 1, 0, i)).toISOString() })); const store = createStore({ users: [{ id: `u1`, token: `t1` }], workspaces: [{ id: `w1`, name: `Design`, ownerId: `u1`, memberIds: [`u1`], guestIds: [] }], events }); const req = (query) => ({ headers: { authorization: `Bearer t1` }, params: { id: `w1` }, query }); const first = listWorkspaceActivity(store, req({})); const second = listWorkspaceActivity(store, req({ before: first.body.next })); const third = listWorkspaceActivity(store, req({ before: second.body.next })); console.log(first.body.events.length, second.body.events.length, third.body.events.length, third.body.next); if (first.body.events.length !== 50 || second.body.events.length !== 50 || third.body.events.length !== 20 || third.body.next !== null || first.body.events[0].id !== `e119`) process.exit(1);'",
+      "expect": "pass",
+      "why": "the bounded paging rework (Frame 1) is implemented: pages of 50, 50, 20 newest first with a null final cursor"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 00-project: small Node ESM in-process API (auth, store, workspace-list routes, 5 node:test tests); no activity tests. 50-activity: EXPEDITED cycle add-workspace-activity-endpoint-20260921T141203Z-5b8e2c71, new src/routes/activity.js (authenticates but has no workspace authorization), plan COMPLETE with DEV-001, STATE at REVIEWING_IMPLEMENTATION. 60-review: implementation review COMPLETE with no findings; STATE AWAITING_USER_SIGNOFF. 70-rework: user's bounded paging rework at sign-off (Frame 1, From/ResumeAt AWAITING_USER_SIGNOFF), activity.js paged at 50 with a before cursor, plan gains DEV-002 (DONE), STATE back at REVIEWING_IMPLEMENTATION with Frame 1 RerunThrough REVIEWING_IMPLEMENTATION. 80-finding: review rerun BLOCKED with F-001 (authorization missing, P1, Developer/IMPLEMENTATION); STATE DEVELOPING, Handoff FAILURE from REVIEWING_IMPLEMENTATION, Frame 1 (RerunThrough REVIEWING_IMPLEMENTATION) and Frame 2 (From/ResumeAt REVIEWING_IMPLEMENTATION, RerunThrough NONE). 90-reopen: Developer reopened DEV-001 (IN_PROGRESS) and set the plan IN_PROGRESS for the Frame 2 correction. Frame 1's From is AWAITING_USER_SIGNOFF as the catalog issue requires. Frames' From are not DEVELOPING/TESTING, so no Suspended Assignment is required by check.mjs. The architecture-owned authorization discovery is supplied by the user utterance, as the case intends; the code supports it (owner/member/guest relationships, billing and membership events, no rule on who may read activity).",
+  "case": "developer-17",
+  "caseHash": "52ad8be8afcfbd45",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T02:17:22.938Z",
+    "verdict": "pass",
+    "fixtureHash": "0c9d7aa5e9e367ad",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "9c2e7ee2ee81201b",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:07:12.579Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T01:23:01.908Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-activity/.standards/STATE.md: NONE",
+        "layers/60-review/.standards/STATE.md: NONE",
+        "layers/70-rework/.standards/STATE.md: NONE",
+        "layers/80-finding/.standards/STATE.md: NONE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:07:12.579Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

@@ -1,0 +1,81 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState DOCUMENTING, Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope with AC-001 (CSV export behavior) and AC-002 (accurate usage guide), matching provenance",
+      "where": ".standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Architecture, context, development plan, verification and implementation review present with matching provenance and current evidence",
+      "where": ".standards/docs/specs/…, .standards/CONTEXT.md, .standards/docs/development/…, .standards/docs/verification/…, .standards/docs/reviews/export-…/implementation.md (all COMPLETE where applicable)",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and obligations inactive, BlockedOn NONE",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Editing unrestricted (no target or boundary set)",
+      "where": "utterance 'Continue.' and no existing record selects a target",
+      "status": "realized"
+    },
+    {
+      "condition": "Unmarked project essay at the active cycle's fixed documentation-record path",
+      "where": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md (no provenance block; check.mjs reports collision)",
+      "status": "realized"
+    },
+    {
+      "condition": "A moved record elsewhere with DOCUMENTATION provenance for a different cycle",
+      "where": "docs/archive/list-filters-guide-documentation.md (Cycle list-filters-guide-20260910T141500Z-3c9e0b71), git R100 rename from its fixed path in commit ab8ce6f",
+      "status": "realized"
+    },
+    {
+      "condition": "No documentation record for the active cycle exists anywhere",
+      "where": "repository tree; check.mjs reports only the fixed-path collision",
+      "status": "realized"
+    },
+    {
+      "condition": "Committed, clean working tree",
+      "where": "git status clean",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "An ordinary project essay living at .standards/docs/documentation/<active cycle id>.md is implausible for a real project, and the other cycle's record is 'brought over' citing scope/design paths absent from this repo. Both are forced by the case's stated conditions and do not hint at the answer.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 0,
+      "detail": "Assertion 0 checks cover .standards/docs/** and docs/archive/** only; a silent alternate record created elsewhere (e.g. docs/documentation-record.md) is left to the judge, which is appropriate given complete:false.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized: DOCUMENTING standard brownfield cycle with complete upstream records, an unmarked essay at the fixed documentation path (reported by check.mjs as the sole problem), and a git-renamed DOCUMENTATION record for another cycle under docs/archive. Checks are necessary conditions a correct collision-reporting run satisfies (BlockedOn edits fall outside the unchanged globs), and invariants fit. Only minor realism notes remain.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T16:35:08.823Z",
+  "costUsd": 0.2166086,
+  "ms": 32117,
+  "fixtureHash": "a990235b6ca78d4a"
+}

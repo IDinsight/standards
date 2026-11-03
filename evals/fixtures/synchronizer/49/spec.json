@@ -1,0 +1,225 @@
+{
+  "base": "export-synchronizing",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-guide-edit",
+      "action": "commit",
+      "message": "Clarify export file naming in usage guide"
+    },
+    {
+      "dir": "layers/52-sync-discrepancy",
+      "action": "commit",
+      "message": "Record synchronization discrepancy for CSV export"
+    },
+    {
+      "dir": "layers/54-final-rereview",
+      "action": "commit",
+      "message": "Record final re-review finding for CSV export guide"
+    },
+    {
+      "dir": "layers/56-guide-fix",
+      "action": "commit",
+      "message": "Correct export file naming in usage guide"
+    },
+    {
+      "dir": "layers/58-doc-correction",
+      "action": "commit",
+      "message": "Record CSV export guide correction"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "synchronizer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "Recovery has two frames. Frame 1: From SYNCHRONIZING, Owner REVIEWING_FINAL, FailureType REVIEW, ResumeAt SYNCHRONIZING, RerunThrough NONE (Reviewer has not finished its reassessment). Frame 2, the active frame: From REVIEWING_FINAL, Owner DOCUMENTING, FailureType DOCUMENTATION, ResumeAt REVIEWING_FINAL, RerunThrough SYNCHRONIZING. Synchronizer is a downstream rerun at frame 2's boundary, not its owner.",
+    "The final-deliverable review is IN_PROGRESS with F-001 OPEN and has no conclusion applicable to the current docs/usage.md, which Documenter corrected after the re-review.",
+    "The synchronization record's D-001 (Owner Reviewer, FailureType REVIEW) is still unresolved because no current final review exists, so the full synchronization gate cannot pass.",
+    "No Synchronizer-owned corrective frame exists. The cycle is FULL_DELIVERABLE, so Synchronizer Corrective Reruns (IMPLEMENTATION_REVIEWED only) does not apply, and Synchronizer Corrective Return requires owning the active frame. Popping frame 2 and resuming REVIEWING_FINAL on an incomplete gate is the incorrect shortcut, as is marking the record COMPLETE, rewriting frame 2's Owner or RerunThrough, or moving toward AWAITING_USER_SIGNOFF.",
+    "The corrected Limits section of docs/usage.md now accurately says same-second exports share a file name and the later replaces the earlier. Implementation and tests are unchanged since the implementation review and still satisfy AC-001 and AC-002.",
+    "The case does not prescribe the exact route. Acceptable outcomes keep the record incomplete with the Reviewer dependency persisted, and then either push a nested REVIEW failure to REVIEWING_FINAL (keeping frames 1 and 2) or stop and report the route problem to the user without changing the frames."
+  ],
+  "history": null,
+  "vars": {
+    "GUIDE_EDIT_COMMIT": "${COMMIT:Clarify export file naming in usage guide}",
+    "GUIDE_FIX_COMMIT": "${COMMIT:Correct export file naming in usage guide}"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "state": "Recovery.Active",
+          "equals": "true",
+          "why": "the rerun boundary frame is not popped on an incomplete gate"
+        },
+        {
+          "state": "Recovery.Frame2.Owner",
+          "equals": "DOCUMENTING"
+        },
+        {
+          "state": "Recovery.Frame2.RerunThrough",
+          "equals": "SYNCHRONIZING"
+        },
+        {
+          "state": "Recovery.Frame2.ResumeAt",
+          "equals": "REVIEWING_FINAL"
+        },
+        {
+          "field": {
+            "path": "${SYNC}",
+            "name": "Status",
+            "not": "COMPLETE"
+          },
+          "why": "the full synchronization gate cannot pass without a current final review"
+        },
+        {
+          "state": "WorkflowState",
+          "not": "AWAITING_USER_SIGNOFF"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "state": "Recovery.Frame2.Owner",
+          "equals": "DOCUMENTING",
+          "why": "active-frame ownership stays with Documenter"
+        },
+        {
+          "state": "Recovery.Frame2.RerunThrough",
+          "equals": "SYNCHRONIZING",
+          "why": "Synchronizer does not rewrite the owner's rerun plan"
+        },
+        {
+          "state": "Recovery.Frame2.ResumeAt",
+          "equals": "REVIEWING_FINAL"
+        },
+        {
+          "state": "Recovery.Frame1.Owner",
+          "equals": "REVIEWING_FINAL",
+          "why": "older frames are preserved"
+        },
+        {
+          "state": "Recovery.Frame1.RerunThrough",
+          "equals": "NONE"
+        },
+        {
+          "state": "WorkflowState",
+          "not": "AWAITING_USER_SIGNOFF",
+          "why": "no sign-off shortcut"
+        },
+        {
+          "state": "WorkflowState",
+          "not": "SIGNED_OFF"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "packages/**",
+        "docs/**",
+        "README.md",
+        "package.json",
+        ".standards/CONTEXT.md",
+        ".standards/docs/scope/**",
+        ".standards/docs/specs/**",
+        ".standards/docs/development/**",
+        ".standards/docs/verification/**",
+        ".standards/docs/reviews/**",
+        ".standards/docs/documentation/**"
+      ],
+      "why": "Synchronizer owns only its record; it does not edit implementation, documentation, or other roles' records"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the unit suite still passes"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration",
+      "expect": "pass",
+      "why": "the integration suite still passes"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the recovery state at SYNCHRONIZING is valid"
+    },
+    {
+      "cmd": "node -e 'import(`./src/app.ts`).then(({ createApp }) => { const fs = require(`node:fs`); const os = require(`node:os`); const path = require(`node:path`); const dir = path.join(fs.mkdtempSync(path.join(os.tmpdir(), `same-`)), `out`); const app = createApp({ exportDir: dir, now: () => new Date(`2026-09-24T09:00:00Z`) }); const admin = { id: 1, name: `Ada`, role: `admin` }; const send = (owner) => app.handle({ method: `POST`, path: `/records/export`, query: { owner }, user: admin }); send(`dana`); const second = send(`marco`); const files = fs.readdirSync(dir); if (files.join() !== `records-20260924T090000Z.csv` || second.status !== 201 || fs.readFileSync(path.join(dir, files[0]), `utf8`) !== second.body || !second.body.includes(`marco`) || second.body.includes(`dana`)) { console.error(files); process.exit(1); } console.log(`same-second export replaces the earlier file`); }, (error) => { console.error(error); process.exit(2); })'",
+      "expect": "pass",
+      "why": "the service overwrites a same-second export, so the edited guide was wrong and the corrected guide is accurate"
+    },
+    {
+      "cmd": "grep -q 'the later one' docs/usage.md && grep -q 'replaces the earlier file' docs/usage.md && ! grep -q 'numeric suffix' docs/usage.md && git show $(git log --format=%H -1 --fixed-strings --grep='Clarify export file naming in usage guide'):docs/usage.md | grep -q 'numeric suffix'",
+      "expect": "pass",
+      "why": "the third-party edit introduced the suffix claim and the current guide is corrected"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `SYNCHRONIZING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`CompletionPolicy`: `FULL_DELIVERABLE`$' .standards/STATE.md && grep -q '^`Kind`: `RESUME` `From`: `DOCUMENTING` `FailureType`: `NONE`' .standards/STATE.md && test $(grep -c '^### Frame ' .standards/STATE.md) -eq 2 && grep -q 'ResumeAt`: `REVIEWING_FINAL` `RerunThrough`: `SYNCHRONIZING`' .standards/STATE.md && grep -q 'ResumeAt`: `SYNCHRONIZING` `RerunThrough`: `NONE`' .standards/STATE.md && grep -A2 '^## Outstanding Obligations' .standards/STATE.md | grep -q 'Active`: `false`' && grep -q '^`PromotionReason`: `NONE` `AuditTarget`: `NONE` `BlockedOn`: `NONE`$' .standards/STATE.md && grep -q '^`PendingVerificationCadence`: `NONE`$' .standards/STATE.md",
+      "expect": "pass",
+      "why": "STATE.md holds the two-frame recovery with Documenter's active frame rerunning through SYNCHRONIZING, nothing blocked, obligations inactive"
+    },
+    {
+      "cmd": "f=.standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md && s=.standards/docs/synchronization/export-20260924T090000Z-a7f3c1d2.md && d=.standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md && grep -q '^`Status`: `IN_PROGRESS` `User Style`: `NONE`$' $f && grep -q '^### F-001 ' $f && grep -q '`Status`: `OPEN` `Owner`: `Documenter`' $f && head -3 $s | grep -qx 'Artifact: SYNCHRONIZATION' && grep -q 'export-20260924T090000Z-a7f3c1d2` `Status`: `IN_PROGRESS`$' $s && grep -q '^### D-001 ' $s && grep -q '`Status`: `OPEN` `Owner`: `Reviewer` `FailureType`: `REVIEW`' $s && grep -q '`Status`: `COMPLETE`$' $d && grep -q '^### DOC-001 ' $d && grep -q '`Status`: `RESOLVED` `Owner`: `Documenter`' $d",
+      "expect": "pass",
+      "why": "final review incomplete with F-001 open, synchronization record incomplete with D-001 open, documentation record complete with its correction resolved"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && ! grep -rqE 'COMMIT:|BLOB:' .standards/docs && test ! -e exports && grep -q $(git rev-parse HEAD:docs/usage.md) .standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md && ! grep -q $(git rev-parse HEAD:docs/usage.md) .standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md",
+      "expect": "pass",
+      "why": "clean tree, placeholders resolved, the documentation record cites the current guide and the final review does not"
+    }
+  ],
+  "notes": "Built on export-synchronizing (base ends at SYNCHRONIZING with COMPLETE final review and no sync record). 50-guide-edit: a non-workflow commit rewrites the Limits section of docs/usage.md to claim same-second exports get a numeric suffix (false; the code overwrites). 52-sync-discrepancy: Synchronizer's first run creates the sync record (IN_PROGRESS, D-001 OPEN, Reviewer/REVIEW: final review assessed older guide content) and routes REVIEW failure to REVIEWING_FINAL with frame 1. 54-final-rereview: Reviewer reopens final-deliverable.md (IN_PROGRESS), withdraws its earlier conclusion, records F-001 OPEN (Documenter/DOCUMENTATION) and pushes frame 2 to DOCUMENTING. 56-guide-fix: Documenter corrects the Limits section. 58-doc-correction: documentation record COMPLETE with DOC-001 RESOLVED; Documenter as frame-2 owner sets RerunThrough SYNCHRONIZING (sync record reconciled the replaced guide) and hands RESUME to SYNCHRONIZING. Result: Synchronizer is a downstream rerun at frame 2's boundary; the final review it depends on is incomplete, so the full gate fails and no scoped exception applies under FULL_DELIVERABLE. Checks verify frame 2 is preserved unchanged, frame 1 intact, record not COMPLETE, and no move to sign-off.",
+  "case": "synchronizer-49",
+  "caseHash": "bf3e76b56f302d7f",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-30T20:51:02.284Z",
+    "verdict": "pass",
+    "fixtureHash": "1642e3bf2db94b52",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-30T20:44:47.304Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-synchronizing": "33937a9926a74652"
+  }
+}

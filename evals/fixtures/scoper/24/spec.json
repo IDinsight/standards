@@ -1,0 +1,234 @@
+{
+  "base": null,
+  "date": "2026-10-04T13:00:00Z",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add ledger export CLI"
+    },
+    {
+      "dir": "layers/52-docs",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add docs site build and contributor guide"
+    },
+    {
+      "dir": "layers/60-style",
+      "action": "commit",
+      "message": "Add concise documenter style"
+    },
+    {
+      "dir": "layers/65-cycle",
+      "action": "commit",
+      "message": "Start usage guide documentation cycle"
+    },
+    {
+      "dir": "layers/70-context",
+      "action": "commit",
+      "message": "Record project context for usage guide"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "scoper",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "docs/usage.md does not exist in the built fixture; docs/ holds only index.md and development.md.",
+    "scripts/build-docs.mjs discovers every Markdown file in docs/ and generates the navigation itself, and docs:check only requires a '# Title' first line and resolvable page links, so creating docs/usage.md needs no other project edit.",
+    ".standards/user-styles/documenter/concise.md exists and is distinctive: question-phrased section headings, sentences under 15 words, numbered steps with one command each, and a closing 'Stuck?' line. It is Documenter's style; Scoper should not load or apply it, and a scope with question headings or a 'Stuck?' line shows the style was misapplied to Scoper's artifact.",
+    "CLI behavior (src/cli.js and src/export.js, also recorded in CONTEXT.md): --input required, --from/--to inclusive YYYY-MM-DD bounds compared as text, --account exact match, --format csv (default) or json, --out writes a file instead of stdout, output sorted by date; missing --input exits 2; unknown format, unknown option, or bad input exits 1.",
+    "No blocking scope ambiguity is planted: the saved request is enough to complete the scope and hand off to ARCHITECTING with a FORWARD handoff."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "guide-20261004T120000Z-1a2b3c4d",
+    "SCOPE": ".standards/docs/scope/guide-20261004T120000Z-1a2b3c4d.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.Scope",
+          "equals": "${SCOPE}",
+          "why": "no project scope document exists, so the scope is created at the cycle path and recorded"
+        },
+        {
+          "provenance": {
+            "path": "${SCOPE}",
+            "artifact": "SCOPE",
+            "cycle": "${ID}"
+          }
+        },
+        {
+          "contains": {
+            "path": "${SCOPE}",
+            "regex": "analyst",
+            "flags": "i"
+          },
+          "why": "the scope names the audience"
+        },
+        {
+          "contains": {
+            "path": "${SCOPE}",
+            "regex": "docs/usage[.]md"
+          },
+          "why": "the scope names the target file"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "state": "CycleMode",
+          "equals": "DOCUMENTATION"
+        },
+        {
+          "state": "ActiveWork.Development",
+          "equals": "NONE"
+        },
+        {
+          "absent": ".standards/docs/development/${ID}.md"
+        },
+        {
+          "absent": ".standards/docs/verification/${ID}.md"
+        },
+        {
+          "absent": ".standards/docs/reviews/${ID}/implementation.md"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.Request",
+          "unchanged": true,
+          "why": "the saved Documenter choices stay in the request"
+        },
+        {
+          "contains": {
+            "path": "${SCOPE}",
+            "regex": "guided",
+            "flags": "i"
+          }
+        },
+        {
+          "contains": {
+            "path": "${SCOPE}",
+            "regex": "concise",
+            "flags": "i"
+          }
+        },
+        {
+          "unchanged": [
+            ".standards/user-styles/**"
+          ]
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "docs/**",
+        "scripts/**",
+        "examples/**",
+        "package.json",
+        "README.md",
+        ".gitignore"
+      ],
+      "why": "Scoper edits no project code or documentation; Documenter owns docs/usage.md"
+    },
+    {
+      "unchanged": [
+        ".standards/CONTEXT.md",
+        ".standards/docs/documentation/**"
+      ],
+      "why": "Scoper does not rewrite Auditor context or create a premature documentation record"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/export.test.js",
+      "expect": "pass",
+      "why": "the established test command passes"
+    },
+    {
+      "cmd": "node scripts/check-docs.mjs",
+      "expect": "pass",
+      "why": "existing docs pages satisfy the docs check"
+    },
+    {
+      "cmd": "node scripts/build-docs.mjs && grep -q development.html site/index.html",
+      "expect": "pass",
+      "why": "the docs build discovers pages and generates navigation on its own"
+    },
+    {
+      "cmd": "node src/cli.js --input examples/transactions.json --from 2026-09-01 --to 2026-09-30",
+      "expect": "pass",
+      "why": "the existing export CLI runs on the sample input"
+    },
+    {
+      "cmd": "node src/cli.js --input examples/transactions.json --format xml",
+      "expect": "fail",
+      "expectOutput": "Unknown format",
+      "why": "an unknown format is rejected as CONTEXT.md describes"
+    },
+    {
+      "cmd": "test ! -e docs/usage.md && test -f .standards/user-styles/documenter/concise.md",
+      "expect": "pass",
+      "why": "the usage guide is missing and the concise Documenter style exists"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the starting state is valid"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 50-project and 52-docs (pre-install) commit a dependency-free Node CLI (ledger-export) with node:test tests, and a docs convention: docs/*.md pages rendered by scripts/build-docs.mjs, which discovers every page and builds the navigation, plus scripts/check-docs.mjs (title line and page links). 60-style commits the Documenter user style concise (distinctive question headings and a 'Stuck?' closing line). 65-cycle commits STATE.md at AUDITING with the DOCUMENTATION cycle guide-20261004T120000Z-1a2b3c4d (INITIAL handoff) and the saved standalone-Documenter request: FILE docs/usage.md, GUIDED, user style concise, no other project edits. 70-context commits CONTEXT.md (export CLI behavior, docs convention, commands) and STATE.md at SCOPING with FORWARD from AUDITING, CompletionPolicy NONE, Scope/Architecture/Development NONE. Commit date set to 2026-10-04T13:00:00Z so history follows the cycle ID timestamp.",
+  "case": "scoper-24",
+  "caseHash": "cbd6bd3326d36acb",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T03:08:11.882Z",
+    "verdict": "pass",
+    "fixtureHash": "367e998ccf4e1f49",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-31T01:00:43.590Z"
+  }
+}

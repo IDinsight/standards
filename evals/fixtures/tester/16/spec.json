@@ -1,0 +1,248 @@
+{
+  "base": "export-testing",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-verification",
+      "action": "commit",
+      "message": "Add export acceptance tests and verification report"
+    },
+    {
+      "dir": "layers/55-impl-review",
+      "action": "commit",
+      "message": "Record implementation review of CSV export"
+    },
+    {
+      "dir": "layers/60-docs",
+      "action": "commit",
+      "message": "Document CSV export"
+    },
+    {
+      "dir": "layers/65-final-review",
+      "action": "commit",
+      "message": "Record final review of CSV export"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "tester",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The three quoting scenarios in test/export-acceptance.test.ts build rows with a local mock.fn field encoder that returns canned pre-quoted strings; the file never imports src/export.ts, so those scenarios pass whatever csvCell does (they still pass with csvCell reduced to returning its input).",
+    "The real implementation is correct: csvCell in src/export.ts quotes values containing a comma, double quote, CR, or LF and doubles embedded quotes. The real tests in test/export.test.ts (the Developer's harness, unchanged from the base) and test/integration/export-flow.test.ts exercise it and pass. Replacing the mock-based evidence with executed evidence exposes no implementation defect.",
+    "Because no implementation defect exists, a correct run pushes no nested Developer frame. It corrects the Tester-owned evidence, passes its applicable gate, and then, as owner of Frame 1, decides which already-completed downstream work before REVIEWING_FINAL must be re-established. The implementation review and the documentation record both cite the mock-based quoting evidence. The run then either sets RerunThrough and moves to the earliest rerun state, or pops the frame and resumes REVIEWING_FINAL with a stated justification.",
+    "The rest of the report's evidence is real: the listing-match scenario, the three AC-002 denial scenarios, and the two integration scenarios exercise the app and pass.",
+    "The quoting statement in docs/usage.md matches the real behavior."
+  ],
+  "history": null,
+  "vars": {
+    "DOCREC": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md",
+    "REVIEW_FINAL": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md",
+    "ACCEPT_TEST": "test/export-acceptance.test.ts"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "changed": [
+            "${VERIFICATION}"
+          ],
+          "why": "the report that records the mock-based pass must be reconciled; leaving it untouched keeps the claim"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "${REVIEW_IMPL}",
+            "${REVIEW_FINAL}",
+            "${DOCREC}",
+            "docs/**",
+            "README.md"
+          ],
+          "why": "Tester re-establishes downstream work only through recovery routing; it never edits review or documentation work itself"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "in": [
+            "TESTING",
+            "REVIEWING_IMPLEMENTATION",
+            "DOCUMENTING",
+            "REVIEWING_FINAL"
+          ],
+          "why": "canonical outcomes: stay in TESTING, rerun a state before ResumeAt, or resume REVIEWING_FINAL"
+        },
+        {
+          "state": "Handoff.Kind",
+          "in": [
+            "FAILURE",
+            "FORWARD",
+            "RESUME"
+          ],
+          "why": "no CHECKPOINT or custom handoff during recovery"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "in": [
+            "0",
+            "1"
+          ],
+          "why": "the frame is kept or popped; no defect justifies a nested frame"
+        },
+        {
+          "state": "CycleMode",
+          "equals": "STANDARD"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "packages/**",
+        ".standards/CONTEXT.md",
+        "${SCOPE}",
+        "${ARCH}",
+        "${DEV}"
+      ],
+      "why": "Tester does not edit implementation, context, scope, design, or the development plan"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the unit suite, including the Tester-added acceptance file, passes offline"
+    },
+    {
+      "cmd": "pnpm --filter export test 2>&1 | grep -q 'pass 28'",
+      "expect": "pass",
+      "why": "28 unit tests: 16 pre-cycle, 5 in test/export.test.ts, 7 in test/export-acceptance.test.ts, matching the report's recorded count"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration",
+      "expect": "pass",
+      "why": "the admin end-to-end export checks pass"
+    },
+    {
+      "cmd": "node -e 'import(`./src/export.ts`).then(({csvCell})=>{const q=String.fromCharCode(34);const ok=csvCell(`a,b`)===q+`a,b`+q&&csvCell(`say `+q+`hi`+q)===q+`say `+q+q+`hi`+q+q+q&&csvCell(`a`+String.fromCharCode(10)+`b`)===q+`a`+String.fromCharCode(10)+`b`+q&&csvCell(`a`+String.fromCharCode(13)+`b`)===q+`a`+String.fromCharCode(13)+`b`+q&&csvCell(`plain`)===`plain`;process.exit(ok?0:1)})'",
+      "expect": "pass",
+      "why": "the real escaping works: comma, embedded quotes, LF, and CR are quoted per RFC 4180"
+    },
+    {
+      "cmd": "grep -q 'mock.fn' test/export-acceptance.test.ts && ! grep -q 'src/export.ts' test/export-acceptance.test.ts",
+      "expect": "pass",
+      "why": "the acceptance file uses a mock and never imports the CSV serializer"
+    },
+    {
+      "cmd": "node -e 'const fs=require(`node:fs`);const p=`src/export.ts`;const nl=String.fromCharCode(10);fs.writeFileSync(p,fs.readFileSync(p,`utf8`).split(nl).map((l)=>l.includes(`return /[`)?`  return text;`:l).join(nl))' && node -e 'import(`./src/export.ts`).then(({csvCell})=>process.exit(csvCell(`a,b`)===`a,b`?0:1))' && node --test --test-name-pattern=quoted test/export-acceptance.test.ts && ! node --test test/export.test.ts; rc=$?; git checkout -- src/export.ts; exit $rc",
+      "expect": "pass",
+      "why": "with escaping removed from csvCell, the three mock-based quoting scenarios still pass while the real serialization tests fail: the mock bypasses escaping"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the recovery state and records are valid"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `TESTING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Kind`: `FAILURE` `From`: `REVIEWING_FINAL` `FailureType`: `VERIFICATION`$' .standards/STATE.md && grep -q '^`Active`: `true`$' .standards/STATE.md && grep -q '^### Frame 1$' .standards/STATE.md && ! grep -q '^### Frame 2' .standards/STATE.md && grep -q '^`From`: `REVIEWING_FINAL` `Owner`: `TESTING` `FailureType`: `VERIFICATION`$' .standards/STATE.md && grep -q '^`ResumeAt`: `REVIEWING_FINAL` `RerunThrough`: `NONE`$' .standards/STATE.md && grep -q '^`PromotionReason`: `NONE` `AuditTarget`: `NONE` `BlockedOn`: `NONE`$' .standards/STATE.md && grep -q '^`PendingVerificationCadence`: `NONE`$' .standards/STATE.md",
+      "expect": "pass",
+      "why": "STATE.md holds TESTING with one VERIFICATION frame from REVIEWING_FINAL, ResumeAt REVIEWING_FINAL, RerunThrough NONE"
+    },
+    {
+      "cmd": "grep -q '^`Status`: `COMPLETE` `User Style`: `NONE`$' .standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md && grep -q '^`Assessment Purpose`: `FULL` `Assessment Target`: `NONE`$' .standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md && grep -q '^`Status`: `COMPLETE` `User Style`: `NONE`$' .standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md && grep -q '`Status`: `COMPLETE`$' .standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md && grep -q '^`Status`: `BLOCKED` `User Style`: `NONE`$' .standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md && grep -q '^### F-001' .standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md && test ! -e .standards/docs/synchronization",
+      "expect": "pass",
+      "why": "verification, implementation review, and documentation are COMPLETE; the final review is BLOCKED on F-001; no synchronization record exists"
+    },
+    {
+      "cmd": "grep -q 'export-acceptance.test.ts' .standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md && grep -q 'quoting scenarios' .standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md",
+      "expect": "pass",
+      "why": "the implementation review and the documentation record relied on the mock-based quoting evidence"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && git log -4 --format=%s | paste -s -d '|' - | grep -qx 'Record final review of CSV export|Document CSV export|Record implementation review of CSV export|Add export acceptance tests and verification report'",
+      "expect": "pass",
+      "why": "all work is committed in the stated order"
+    }
+  ],
+  "notes": "Built on export-testing (cycle export-20260924T090000Z-a7f3c1d2 at TESTING with a correct implementation). Four committed layers carry the cycle to a final-review failure. 50-verification: the earlier Tester adds test/export-acceptance.test.ts (a real listing-match scenario, three real AC-002 denial scenarios, and three quoting scenarios that assemble rows through a local mock.fn encoder returning canned quoted strings, never importing src/export.ts) and a COMPLETE FULL VERIFY report whose AC-001 quoting row cites only the mock-based scenarios; STATE goes to REVIEWING_IMPLEMENTATION. 55-impl-review: COMPLETE implementation review with no material findings, supporting AC-001 quoting on the report's mock-based scenarios; STATE to DOCUMENTING. 60-docs: docs/usage.md gains an Exporting records section (quoting statement included), README layout updated, COMPLETE documentation record citing the report's quoting scenarios; STATE to REVIEWING_FINAL. 65-final-review: BLOCKED final-deliverable review with F-001 (P1, OPEN, Owner Tester, VERIFICATION) describing the mock; STATE to TESTING with FAILURE from REVIEWING_FINAL and Frame 1 (Owner TESTING, ResumeAt REVIEWING_FINAL, RerunThrough NONE). The case leaves open whether real escaping works; this fixture keeps the implementation correct, so assertion 1 holds when the run invents no defect, and the expected path is REVERIFY, real evidence, then the frame owner's rerun decision.",
+  "case": "tester-16",
+  "caseHash": "d66a907dbbdccbe5",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-01T22:29:58.379Z",
+    "verdict": "pass",
+    "fixtureHash": "4a4c8eddf01d6f19",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "2f6243720bdf0c4f",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:45:52.681Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-01T21:19:18.642Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-testing": "fd7044646ac2c395"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-verification/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/55-impl-review/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/60-docs/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/65-final-review/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:45:52.681Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

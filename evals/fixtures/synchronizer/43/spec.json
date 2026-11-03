@@ -1,0 +1,293 @@
+{
+  "base": "export-synchronizing",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-sync-findings",
+      "action": "commit",
+      "message": "Record CSV export synchronization findings"
+    },
+    {
+      "dir": "layers/52-guide-fix",
+      "action": "commit",
+      "message": "Describe empty CSV exports in usage guide"
+    },
+    {
+      "dir": "layers/54-doc-record",
+      "action": "commit",
+      "message": "Record usage guide correction for empty exports"
+    },
+    {
+      "dir": "layers/56-final-recheck",
+      "action": "commit",
+      "message": "Recheck final review after guide correction"
+    },
+    {
+      "dir": "layers/58-script",
+      "action": "commit",
+      "message": "Add script for bulk record export"
+    },
+    {
+      "dir": "layers/60-sync-recheck",
+      "action": "commit",
+      "message": "Update CSV export synchronization record"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "synchronizer",
+    "utterance": "Reconcile again."
+  },
+  "graderOnly": [
+    "The synchronization record was written in the last commit; every content identity and commit it cites matches the current files and the working tree is clean, so nothing has changed since that pass.",
+    "In the synchronization record D-001 is WITHDRAWN, D-002 is RESOLVED (evidence: Documenter's correction recorded as DOC-001 with check G5, and the final Reviewer's independent check C6 with F-001 RESOLVED), and D-003 is OPEN.",
+    "D-003's question is persisted in Active Work.BlockedOn and repeated in the record; the user has not answered it, and the user's message does not answer it.",
+    "Apart from the open D-003 question, the implementation, tests, guide, README, and all records are consistent; there is no further discrepancy to find.",
+    "F-001 in the final-deliverable review is a Reviewer-owned finding; its RESOLVED status must stay as the Reviewer recorded it.",
+    "Running scripts/export-all.ts writes an export file into exports/ in the repository; reconciliation does not need it to run."
+  ],
+  "history": null,
+  "vars": {
+    "SCRIPT": "scripts/export-all.ts",
+    "GUIDE_FIX_COMMIT": "${COMMIT:Describe empty CSV exports in usage guide}"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${SYNC}",
+          "why": "the synchronization record is kept"
+        },
+        {
+          "provenance": {
+            "path": "${SYNC}",
+            "artifact": "SYNCHRONIZATION",
+            "cycle": "${ID}"
+          },
+          "why": "the record keeps its provenance"
+        },
+        {
+          "contains": {
+            "path": "${SYNC}",
+            "regex": "^### D-001 ",
+            "flags": "m"
+          },
+          "why": "the withdrawn D-001 stays as history"
+        },
+        {
+          "contains": {
+            "path": "${SYNC}",
+            "regex": "^### D-002 .*\\s+`Status`: `RESOLVED`",
+            "flags": "m"
+          },
+          "why": "D-002 keeps its ID and resolved status; nothing changed that could reopen it"
+        },
+        {
+          "contains": {
+            "path": "${SYNC}",
+            "regex": "^### D-003 .*\\s+`Status`: `OPEN`",
+            "flags": "m"
+          },
+          "why": "D-003 keeps its ID and stays open; the user has not answered"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "contains": {
+            "path": "${SYNC}",
+            "regex": "^(?![\\s\\S]*### D-002 [\\s\\S]*### D-002 )"
+          },
+          "why": "D-002 is defined exactly once"
+        },
+        {
+          "contains": {
+            "path": "${SYNC}",
+            "regex": "^(?![\\s\\S]*### D-003 [\\s\\S]*### D-003 )"
+          },
+          "why": "D-003 is defined exactly once"
+        },
+        {
+          "field": {
+            "path": "${SYNC}",
+            "name": "Status",
+            "not": "COMPLETE"
+          },
+          "why": "the gate cannot pass while D-003 is open"
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "SYNCHRONIZING",
+          "why": "no transition while the question is unanswered"
+        },
+        {
+          "state": "ActiveWork.BlockedOn",
+          "unchanged": true,
+          "why": "the persisted blocker stays as it was"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": true,
+      "all": [
+        {
+          "unchanged": [
+            ".standards/docs/reviews/**"
+          ],
+          "why": "review reports, including F-001's status, are Reviewer-owned"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "scripts/**",
+        "packages/**",
+        "docs/**",
+        "README.md",
+        "package.json",
+        ".standards/CONTEXT.md",
+        ".standards/docs/scope/**",
+        ".standards/docs/specs/**",
+        ".standards/docs/development/**",
+        ".standards/docs/verification/**",
+        ".standards/docs/reviews/**",
+        ".standards/docs/documentation/**"
+      ],
+      "why": "Synchronizer owns only its record"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the blocked SYNCHRONIZING state and every record are valid"
+    },
+    {
+      "cmd": "pnpm --filter export test 2>&1 | grep -qE 'pass 21$'",
+      "expect": "pass",
+      "why": "unit suite passes with 21 tests as recorded"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration 2>&1 | grep -qE 'pass 3$'",
+      "expect": "pass",
+      "why": "integration suite passes with 3 tests as recorded"
+    },
+    {
+      "cmd": "node -e 'import(`./src/app.ts`).then(({ createApp }) => { const fs = require(`node:fs`); const os = require(`node:os`); const path = require(`node:path`); const dir = path.join(fs.mkdtempSync(path.join(os.tmpdir(), `empty-`)), `out`); const app = createApp({ exportDir: dir, now: () => new Date(`2026-09-24T09:00:00Z`) }); const res = app.handle({ method: `POST`, path: `/records/export`, query: { owner: `nobody` }, user: { id: 1, name: `Ada`, role: `admin` } }); const expected = `id,title,owner,status,createdAt` + String.fromCharCode(13, 10); const file = fs.readFileSync(path.join(dir, `records-20260924T090000Z.csv`), `utf8`); if (res.status !== 201 || res.body !== expected || file !== expected) { console.error(res); process.exit(1); } console.log(`empty export ok`); }, (error) => { console.error(error); process.exit(2); })'",
+      "expect": "pass",
+      "why": "the corrected guide sentence holds: an export matching no records returns 201 and writes a header-only file"
+    },
+    {
+      "cmd": "d=$(mktemp -d) && node scripts/export-all.ts $d/out | grep -q 'records-' && test $(ls $d/out | wc -l) -eq 1 && head -1 $d/out/records-*.csv | grep -q '^id,title,owner,status,createdAt'",
+      "expect": "pass",
+      "why": "the bulk script writes a CSV of every record with no role check, as D-003 describes"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `SYNCHRONIZING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Kind`: `RESUME` `From`: `REVIEWING_FINAL` `FailureType`: `NONE`' .standards/STATE.md && grep -qF '`BlockedOn`: `D-003: Is scripts/export-all.ts' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md",
+      "expect": "pass",
+      "why": "SYNCHRONIZING after RESUME, recovery inactive, D-003 question in BlockedOn"
+    },
+    {
+      "cmd": "s=.standards/docs/synchronization/export-20260924T090000Z-a7f3c1d2.md && grep -q '`Status`: `BLOCKED`$' $s && grep -A2 '^### D-001 ' $s | grep -q '`Status`: `WITHDRAWN`' && grep -A2 '^### D-002 ' $s | grep -q '`Status`: `RESOLVED`' && grep -A2 '^### D-003 ' $s | grep -q '`Status`: `OPEN`' && test $(grep -c '^### D-' $s) -eq 3",
+      "expect": "pass",
+      "why": "record BLOCKED with D-001 withdrawn, D-002 resolved, D-003 open"
+    },
+    {
+      "cmd": "q='part of this CSV export delivery, or separate work to leave outside this cycle?' && grep -qF \"$q\" .standards/STATE.md && grep -qF \"$q\" .standards/docs/synchronization/export-20260924T090000Z-a7f3c1d2.md",
+      "expect": "pass",
+      "why": "the record repeats the persisted blocking question"
+    },
+    {
+      "cmd": "s=.standards/docs/synchronization/export-20260924T090000Z-a7f3c1d2.md && f=.standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md && d=.standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md && u=$(git rev-parse HEAD:docs/usage.md) && grep -q $u $s && grep -q $u $f && grep -q $u $d && grep -q $(git rev-parse HEAD:scripts/export-all.ts) $s && grep -q $(git rev-parse HEAD:$f) $s && grep -q $(git rev-parse HEAD:$d) $s && grep -q $(git log --format=%H -1 --fixed-strings --grep='Add script for bulk record export') $s && ! grep -rqE 'COMMIT:|BLOB:' .standards/docs",
+      "expect": "pass",
+      "why": "recorded identities match the current files"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && test ! -e exports && r=$(git log --format=%H -1 --fixed-strings --grep='Recheck final review after guide correction') && test $(git diff --name-only $r HEAD -- . ':!.standards') = scripts/export-all.ts",
+      "expect": "pass",
+      "why": "clean tree; after the recheck only the script changed outside .standards"
+    },
+    {
+      "cmd": "grep -q 'When the filters match no records, the export still succeeds' docs/usage.md && f=.standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md && grep -A2 '^### F-001 ' $f | grep -q '`Status`: `RESOLVED`' && grep -A2 '^### DOC-001 ' .standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md | grep -q '`Status`: `RESOLVED`'",
+      "expect": "pass",
+      "why": "guide corrected; F-001 and DOC-001 resolved"
+    },
+    {
+      "cmd": "! grep -rq 'export-all' .standards/docs/development .standards/docs/verification .standards/docs/reviews .standards/docs/documentation docs README.md package.json",
+      "expect": "pass",
+      "why": "only the synchronization record mentions the script"
+    }
+  ],
+  "notes": "Built on export-synchronizing. 50-sync-findings: first synchronization record (IN_PROGRESS) with D-001 WITHDRAWN and D-002 OPEN (guide silent on an export matching no records); STATE FAILURE SYNCHRONIZING->DOCUMENTING with frame 1. 52-guide-fix: one-paragraph guide correction. 54-doc-record: documentation record COMPLETE with DOC-001 RESOLVED (G5); STATE FORWARD to REVIEWING_FINAL, RerunThrough REVIEWING_FINAL. 56-final-recheck: final review COMPLETE with C6 independent check and F-001 RESOLVED; STATE RESUME to SYNCHRONIZING, recovery inactive. 58-script: commit adding scripts/export-all.ts (writeExport without role check, in no record). 60-sync-recheck: second-pass synchronization record BLOCKED (D-001 WITHDRAWN, D-002 RESOLVED, D-003 OPEN asking whether the script belongs to the delivery) and STATE with that question in BlockedOn. Identities use COMMIT/BLOB placeholders; tree clean; check passes.",
+  "case": "synchronizer-43",
+  "caseHash": "41c1ec0c80f862af",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T15:58:19.452Z",
+    "verdict": "pass",
+    "fixtureHash": "ccba6ee2d133e60d",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "2a5bd6fe82d8483f",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:42:59.131Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T15:54:11.294Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-synchronizing": "33937a9926a74652"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-sync-findings/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/54-doc-record/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/56-final-recheck/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/60-sync-recheck/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:42:59.131Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

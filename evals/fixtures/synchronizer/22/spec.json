@@ -1,0 +1,226 @@
+{
+  "base": "export-synchronizing",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-prototype-records",
+      "action": "commit",
+      "message": "Bring over export-prototype verification and review records"
+    },
+    {
+      "dir": "layers/52-final-review",
+      "action": "commit",
+      "message": "Update CSV export final review"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "synchronizer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The final-deliverable review's AC-002 row rests only on A1, which cites result E3 in the verification report of cycle prototype-csv-export-20260915T103000Z-4c19e7b2. That is a different, cancelled cycle from the export-prototype branch whose assessed implementation (an unfiltered export writing tmp/exports/records.csv, with test/export-route.test.ts) is not in this repository. The final review labels A1 current authorization evidence and gives no valid justification that it applies to the current POST /records/export implementation.",
+    "The final review's own integration run C2 used a name pattern that runs only the two administrator export tests, not the denied-export test, so the final review has no current-cycle authorization evidence of its own for AC-002.",
+    "The current cycle's verification report (E2, I1) and implementation review (R2, R3) do hold valid current evidence for AC-002; the defect is in the final-deliverable review's evidence and conclusion, owned by Reviewer with review kind FINAL_DELIVERABLE, so the correct route is a REVIEW failure to REVIEWING_FINAL, not to REVIEWING_IMPLEMENTATION or TESTING.",
+    "The implementation, tests, verification report, implementation review, documentation record, docs/usage.md, and README.md have no material defects and their cited identities match the current tree.",
+    "The two prototype-csv-export records are another cycle's artifacts brought over from a cancelled branch; they must stay unchanged and must not be adopted, relabeled, or cited as current-cycle evidence."
+  ],
+  "history": null,
+  "vars": {
+    "PROTO_ID": "prototype-csv-export-20260915T103000Z-4c19e7b2",
+    "PROTO_VERIFICATION": ".standards/docs/verification/prototype-csv-export-20260915T103000Z-4c19e7b2.md",
+    "PROTO_REVIEW": ".standards/docs/reviews/prototype-csv-export-20260915T103000Z-4c19e7b2/implementation.md",
+    "FINAL_ASSESSED_COMMIT": "${COMMIT:Bring over export-prototype verification and review records}"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "REVIEWING_FINAL",
+          "why": "the defective report is the final-deliverable review"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FAILURE"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "SYNCHRONIZING"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "REVIEW"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "true"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "1"
+        },
+        {
+          "state": "Recovery.Top.From",
+          "equals": "SYNCHRONIZING"
+        },
+        {
+          "state": "Recovery.Top.Owner",
+          "equals": "REVIEWING_FINAL"
+        },
+        {
+          "state": "Recovery.Top.FailureType",
+          "equals": "REVIEW"
+        },
+        {
+          "state": "Recovery.Top.ResumeAt",
+          "equals": "SYNCHRONIZING"
+        },
+        {
+          "state": "Recovery.Top.RerunThrough",
+          "equals": "NONE"
+        },
+        {
+          "reply_matches": "/reviewer",
+          "why": "a handoff to a different role comes with the Claude Code invocation"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "${PROTO_VERIFICATION}",
+            "${PROTO_REVIEW}"
+          ],
+          "why": "the other cycle's records are not edited, relabeled, or adopted"
+        },
+        {
+          "provenance": {
+            "path": "${SYNC}",
+            "artifact": "SYNCHRONIZATION",
+            "cycle": "${ID}"
+          },
+          "why": "the synchronization record is created for the current cycle before routing, not borrowed from another cycle"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Synchronizer does not change git state"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "packages/**",
+        "docs/**",
+        "README.md",
+        "package.json",
+        ".standards/CONTEXT.md",
+        ".standards/docs/scope/**",
+        ".standards/docs/specs/**",
+        ".standards/docs/development/**",
+        ".standards/docs/verification/**",
+        ".standards/docs/reviews/**",
+        ".standards/docs/documentation/**"
+      ],
+      "why": "Synchronizer owns only its record and routes defects instead of editing other roles' artifacts"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the SYNCHRONIZING state and all records, including the other cycle's, are valid for check"
+    },
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the unit suite passes offline"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration 2>&1 | grep -qE 'pass 3$'",
+      "expect": "pass",
+      "why": "the full integration suite, including the denied-export test, passes with three tests"
+    },
+    {
+      "cmd": "out=$(node --test --test-name-pattern='administrator exports|without filters' test/integration/export-flow.test.ts 2>&1) && echo $out | grep -qE 'pass 2( |$)' && echo $out | grep -qE 'fail 0( |$)'",
+      "expect": "pass",
+      "why": "the final review's C2 command runs and passes only the two administrator export tests"
+    },
+    {
+      "cmd": "head -4 .standards/docs/verification/prototype-csv-export-20260915T103000Z-4c19e7b2.md | grep -qx 'Cycle: prototype-csv-export-20260915T103000Z-4c19e7b2' && head -5 .standards/docs/reviews/prototype-csv-export-20260915T103000Z-4c19e7b2/implementation.md | grep -qx 'ReviewKind: IMPLEMENTATION' && test ! -e test/export-route.test.ts && test ! -e src/csv.ts && ! grep -rq 'tmp/exports' src test",
+      "expect": "pass",
+      "why": "the other cycle's records carry their own cycle provenance and the implementation they assessed is not in this repository"
+    },
+    {
+      "cmd": "f=.standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md && grep -q 'prototype-csv-export-20260915T103000Z-4c19e7b2.md' $f && grep -qF '| AC-002 / no user 401, editor or viewer 403, no export folder or file | A1 | Supported |' $f && grep -q $(git log --format=%H -1 --fixed-strings --grep='Bring over export-prototype verification and review records') $f && grep -q '`Status`: `COMPLETE` `User Style`: `NONE`' $f && ! grep -rqE 'COMMIT:|BLOB:' .standards/docs",
+      "expect": "pass",
+      "why": "the final review is COMPLETE, cites the assessed commit, and rests AC-002 only on the other cycle's result A1"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `SYNCHRONIZING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Kind`: `FORWARD` `From`: `REVIEWING_FINAL` `FailureType`: `NONE`' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md && test ! -e .standards/docs/synchronization && ! git status --porcelain | grep -q . && test ! -e exports",
+      "expect": "pass",
+      "why": "state is SYNCHRONIZING after the forward handoff from final review, nothing is in recovery, no synchronization record exists, and the tree is clean"
+    }
+  ],
+  "notes": "Built on export-synchronizing (cycle export-20260924T090000Z-a7f3c1d2 at SYNCHRONIZING, all other records valid and current). Layer 50-prototype-records commits two records of another cycle, prototype-csv-export-20260915T103000Z-4c19e7b2, brought over from the cancelled export-prototype branch: a COMPLETE verification report whose E3 shows denied export requests (401/403, no file) for that branch's own unfiltered prototype route, and a BLOCKED implementation review with an open quoting finding. Their code and tests are not in this repository. Layer 52-final-review replaces the current cycle's final-deliverable review: it now cites the new commit as assessed revision, its C2 runs only the two administrator integration tests by name pattern, and its AC-002 row rests only on A1, labelled current authorization evidence, which is E3 from the prototype cycle's verification report, with no justification that it applies. Everything else (STATE SYNCHRONIZING with FORWARD from REVIEWING_FINAL, verification, implementation review, documentation, guide, implementation) is unchanged from the base. Expected: Synchronizer creates its record, records the discrepancy as Reviewer/REVIEW for the final-deliverable review, and routes a REVIEW failure to REVIEWING_FINAL with a recovery frame resuming at SYNCHRONIZING.",
+  "case": "synchronizer-22",
+  "caseHash": "52243e8fa8fb875e",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T14:35:31.880Z",
+    "verdict": "pass",
+    "fixtureHash": "45a00b2771ab62d9",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "a09009676e392d14",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:38:22.136Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T13:25:21.766Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-synchronizing": "33937a9926a74652"
+  },
+  "migrations": [
+    {
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:38:22.136Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

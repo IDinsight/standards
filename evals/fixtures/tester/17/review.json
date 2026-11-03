@@ -1,0 +1,99 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (brownfield install, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState TESTING",
+      "where": ".standards/STATE.md header",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id = export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, Architecture, and Development reference current-cycle artifacts",
+      "where": ".standards/docs/scope|specs|development/export-20260924T090000Z-a7f3c1d2.md, with matching provenance",
+      "status": "realized"
+    },
+    {
+      "condition": "Valid Auditor context exists",
+      "where": ".standards/CONTEXT.md (pre-cycle baseline, commit 0481bcd)",
+      "status": "realized"
+    },
+    {
+      "condition": "One recovery frame: Owner DEVELOPING, ResumeAt REVIEWING_IMPLEMENTATION, RerunThrough TESTING",
+      "where": ".standards/STATE.md Recovery Frame 1 (From REVIEWING_IMPLEMENTATION, FailureType IMPLEMENTATION)",
+      "status": "realized"
+    },
+    {
+      "condition": "Tester is a downstream rerun after Developer's correction",
+      "where": "STATE Handoff FORWARD From DEVELOPING; the plan is COMPLETE, with DEV-001 reopened and done again for F-001",
+      "status": "realized"
+    },
+    {
+      "condition": "An implementation correction exists and is correct",
+      "where": "src/export.ts QUOTED_CHARACTERS includes '\\r' (commit 82b1880); the selfCheck confirms CR-only fields are quoted",
+      "status": "realized"
+    },
+    {
+      "condition": "Earlier implementation review routed the defect and is BLOCKED with F-001 open",
+      "where": ".standards/docs/reviews/<id>/implementation.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Existing verification evidence is stale and needs reconciliation (REVERIFY)",
+      "where": ".standards/docs/verification/<id>.md is COMPLETE at pre-fix commit c42411c",
+      "status": "realized"
+    },
+    {
+      "condition": "Reverification can satisfy all Tester obligations (tests pass; budget allows a CR-only scenario; no other defects)",
+      "where": "selfChecks: 21 unit and 6 integration tests pass; src/export.ts uses 0/5 allocations; AC-002 denial selfCheck",
+      "status": "realized"
+    },
+    {
+      "condition": "All work committed; clean tree",
+      "where": "git status clean; selfCheck",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "history",
+      "assertion": -1,
+      "detail": "Layer 50 ('Extract CSV quoting check') is a Developer source commit made after the plan was marked COMPLETE, while STATE said TESTING. The first verification report and the Plan Notes both acknowledge it, so the records stay coherent. It is a mild realism irregularity and does not affect what this run tests.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 3,
+      "detail": "reply_matches '(fresh|new|separate) (chat|session|conversation)' could miss a paraphrase such as 'a fresh Claude Code session'. The protocol mandates the prefix 'Open a fresh chat separate from…', so a correct run will normally match it.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 1,
+      "detail": "check_ok at turn end would flag a bare 'F-001' mention in the rewritten verification report. The skill requires running check before the handoff and fixing owned problems, so a correct run qualifies the reference. Traced the post-run state (REVIEWING_IMPLEMENTATION, RESUME, empty stack, COMPLETE FULL report covering AC-001/AC-002, BLOCKED review not held): check passes.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes the stated recovery rerun at TESTING: a DEVELOPING-owned frame with RerunThrough TESTING, a real CR-quoting defect corrected in committed code, a stale COMPLETE verification report to reconcile, and passing suites with budget room for a CR-only scenario. Checks and invariants are necessary conditions that a correct REVERIFY-then-RESUME run satisfies, and nothing leaks the answer. Only minor notes remain: one history irregularity and a slightly narrow reply regex.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-01T22:29:46.752Z",
+  "costUsd": 0.31887920000000003,
+  "ms": 53248,
+  "fixtureHash": "75b8d6754ee81774"
+}

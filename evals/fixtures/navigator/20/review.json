@@ -1,0 +1,48 @@
+{
+  "conditions": [
+    {
+      "condition": "No cycle is active (Active Work.Id UNSET, CycleMode UNSET)",
+      "where": ".standards/STATE.md (fresh brownfield install template, untouched)",
+      "status": "realized"
+    },
+    {
+      "condition": "No next-cycle preference or pending request exists yet (PendingCycleMode UNSET, PendingCycleRequest UNSET, PendingCycleBlockedOn NONE, Active Work.BlockedOn NONE)",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "There is a concrete question and explanation topic for 'this question' / 'this explanation' to refer to",
+      "where": "utterance prefix 'How does the sync client retry a failed pull?' backed by syncer/client.py and syncer/retry.py",
+      "status": "realized"
+    },
+    {
+      "condition": "Repository is committed and clean",
+      "where": "git status '## main', two commits",
+      "status": "realized"
+    },
+    {
+      "condition": "STANDARDS installed with the navigator skill and protocol available",
+      "where": ".claude/skills/navigator/, .standards/PROTOCOL.md (pristine install)",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "The utterance prepends a concrete question to the catalog's verbatim words. This resolves the catalog's flagged ambiguity and reveals no state or answer. It is a reasonable choice for this fixture.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fresh brownfield install gives 'no cycle active' with every pending and blocker field clear, and the retry code gives the explanation a real subject. Checks for assertion 0 (unchanged ** plus explicit state fields) decide it fully, and a correct non-mutating Navigator run satisfies them. Assertion 1's no_skill_call checks and the invariants fit a correct run, and nothing in the repository leaks the answer.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T01:37:32.541Z",
+  "costUsd": 0.0809762,
+  "ms": 26055,
+  "fixtureHash": "7721adaf666c33f0"
+}

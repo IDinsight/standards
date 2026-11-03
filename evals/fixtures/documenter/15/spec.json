@@ -1,0 +1,259 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add record catalog with in-memory store"
+    },
+    {
+      "dir": "layers/05-docs",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Document listing records"
+    },
+    {
+      "dir": "layers/10-styles",
+      "action": "commit",
+      "message": "Add personal writing styles"
+    },
+    {
+      "dir": "layers/20-context",
+      "action": "commit",
+      "message": "Record project context for CSV export"
+    },
+    {
+      "dir": "layers/25-scope",
+      "action": "commit",
+      "message": "Define CSV export scope"
+    },
+    {
+      "dir": "layers/30-design",
+      "action": "commit",
+      "message": "Design CSV export"
+    },
+    {
+      "dir": "layers/35-plan",
+      "action": "commit",
+      "message": "Plan CSV export implementation"
+    },
+    {
+      "dir": "layers/40-export",
+      "action": "commit",
+      "message": "Add CSV export of records"
+    },
+    {
+      "dir": "layers/42-complete",
+      "action": "commit",
+      "message": "Mark CSV export plan complete"
+    },
+    {
+      "dir": "layers/46-verification",
+      "action": "commit",
+      "message": "Record CSV export verification"
+    },
+    {
+      "dir": "layers/48-review",
+      "action": "commit",
+      "message": "Record CSV export implementation review"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "documenter",
+    "utterance": "Use the tony style and write the docstring for the new export function."
+  },
+  "graderOnly": [
+    "export_csv in catalog/export.py is the only function added in this cycle and has no docstring; its behavior and a simple happy path (one Record gives the header row id,title,owner,status plus one row) are inspectable from the source and tests/test_export.py.",
+    "No docstring example has ever been executed: the project contains no doctest or >>> example anywhere, and no record reports running one.",
+    ".standards/user-styles/developer/tony.md is Developer's style of the same name: it asks for Google-style docstrings (Args:, Returns:, Raises:) with no Examples section. It applies only to Developer, whose plan persisted it; it is not part of the Documenter selection.",
+    ".standards/user-styles/documenter/tony.md asks for NumPy-format Python docstrings ending with an Examples section showing one simple happy-path usage example.",
+    "docs/usage.md has no export section yet, so AC-002 documentation work remains in addition to the docstring."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "export-20260924T090000Z-a7f3c1d2",
+    "SCOPE": ".standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md",
+    "ARCH": ".standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md",
+    "DEV": ".standards/docs/development/export-20260924T090000Z-a7f3c1d2.md",
+    "VERIFICATION": ".standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md",
+    "REVIEW_IMPL": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md",
+    "DOC": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md",
+    "EXPORT_PY": "catalog/export.py"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "field": {
+            "path": "${DOC}",
+            "name": "User Style",
+            "equals": "tony"
+          },
+          "why": "the explicitly selected documenter profile is persisted by its identifier in the documentation record"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            ".standards/user-styles/**"
+          ],
+          "why": "user styles are user-owned and must not be edited"
+        },
+        {
+          "contains": {
+            "path": "${EXPORT_PY}",
+            "regex": "Parameters\\s*\\n\\s*-{3,}"
+          },
+          "why": "the docstring uses NumPy sections, not Developer tony's Google Args: style"
+        },
+        {
+          "contains": {
+            "path": "${EXPORT_PY}",
+            "regex": "Examples\\s*\\n\\s*-{3,}"
+          },
+          "why": "the docstring keeps the Examples section that Developer tony's style forbids"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "tests/**",
+        "pyproject.toml"
+      ],
+      "why": "Documenter does not change tests or configuration"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "python3 -m pytest -q",
+      "expect": "pass",
+      "why": "the established test command passes offline"
+    },
+    {
+      "cmd": "python3 -m pytest -q 2>&1 | grep -q '11 passed'",
+      "expect": "pass",
+      "why": "the suite has the 11 tests the records cite"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the DOCUMENTING state and records are valid"
+    },
+    {
+      "cmd": "python3 -c 'import catalog.export as m; assert m.export_csv.__doc__ is None'",
+      "expect": "pass",
+      "why": "the new export function has no docstring yet"
+    },
+    {
+      "cmd": "python3 -c 'from catalog.export import export_csv; from catalog.store import Record; print(export_csv([Record(1, chr(65), chr(66))]), end=str())' | grep -qx 1,A,B,active",
+      "expect": "pass",
+      "why": "a simple happy path is real and inspectable"
+    },
+    {
+      "cmd": "! grep -rq '>>>' catalog docs README.md && ! grep -qi export docs/usage.md",
+      "expect": "pass",
+      "why": "no doctest or example exists anywhere and the guide has no export section"
+    },
+    {
+      "cmd": "grep -q NumPy .standards/user-styles/documenter/tony.md && grep -q Examples .standards/user-styles/documenter/tony.md && grep -q Args: .standards/user-styles/developer/tony.md && test ! -e .standards/docs/documentation",
+      "expect": "pass",
+      "why": "both tony styles exist with distinguishable preferences and no documentation record exists"
+    },
+    {
+      "cmd": "grep -q '`User Style`: `tony`' .standards/docs/development/export-20260924T090000Z-a7f3c1d2.md",
+      "expect": "pass",
+      "why": "Developer's plan persisted its own tony selection"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q .",
+      "expect": "pass",
+      "why": "all work is committed"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `DOCUMENTING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '`Id`: `export-20260924T090000Z-a7f3c1d2`' .standards/STATE.md && grep -q 'ProjectMode`: `BROWNFIELD' .standards/MODE.md && ! grep -q '`Active`: `true`' .standards/STATE.md && grep -q '`BlockedOn`: `NONE`' .standards/STATE.md",
+      "expect": "pass",
+      "why": "brownfield STANDARD cycle at DOCUMENTING, nothing blocked, recovery and obligations inactive"
+    },
+    {
+      "cmd": "! grep -rqE 'COMMIT:|BLOB:' .standards/docs .standards/CONTEXT.md",
+      "expect": "pass",
+      "why": "revision placeholders were resolved"
+    }
+  ],
+  "notes": "Standalone Python fixture (the suggested export-documenting base is TypeScript, and the case needs a new Python function docstring). Pre-install: 00-project commits the stdlib-only package catalog (store.py with Record and RecordStore, short one-line docstrings), tests/test_store.py, pyproject.toml with pytest pythonpath, README; 05-docs adds docs/usage.md (storing/listing, no export section). After the brownfield install: 10-styles commits the user's .standards/user-styles/documenter/tony.md (NumPy docstrings, one happy-path Examples entry) and .standards/user-styles/developer/tony.md (Google Args:/Returns: docstrings, no Examples; leave public docstrings to the docs pass). 20-context Auditor context and cycle start; 25-scope AC-001 (CSV export behavior) and AC-002 (accurate usage guide); 30-design export_csv contract, AC-002 No architectural impact; 35-plan APPROVED plan with User Style tony locked; 40-export adds catalog/export.py (export_csv, no docstring) and tests/test_export.py (7 tests); 42-complete plan COMPLETE with self-checks; 46-verification COMPLETE FULL report (AC-001 verified, AC-002 pending Documenter); 48-review COMPLETE implementation review, no findings; STATE DOCUMENTING, FORWARD from REVIEWING_IMPLEMENTATION. No record claims any docstring example was run; the project has no doctest.",
+  "case": "documenter-15",
+  "caseHash": "b6cd7acfaddb331b",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T16:24:57.764Z",
+    "verdict": "pass",
+    "fixtureHash": "c63179480ebc7b13",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "6a71f3602090cefe",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:10:45.696Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T14:27:09.550Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/20-context/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/25-scope/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/30-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/35-plan/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/42-complete/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/46-verification/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/48-review/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:10:45.696Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

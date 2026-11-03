@@ -1,0 +1,101 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield template, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState TESTING, recovery and outstanding obligations inactive",
+      "where": ".standards/STATE.md (Handoff FORWARD from DEVELOPING)",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id = export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, Architecture and Development reference current-cycle artifacts",
+      "where": ".standards/docs/scope|specs|development/export-20260924T090000Z-a7f3c1d2.md with matching provenance; plan COMPLETE, three DONE steps",
+      "status": "realized"
+    },
+    {
+      "condition": "Valid Auditor context exists",
+      "where": ".standards/CONTEXT.md",
+      "status": "realized"
+    },
+    {
+      "condition": "No verification report yet (fresh VERIFY)",
+      "where": "no .standards/docs/verification/",
+      "status": "realized"
+    },
+    {
+      "condition": "packages/export-cli uses Python pytest with subprocess fixtures",
+      "where": "packages/export-cli/pyproject.toml, tests/conftest.py (run_cli in tmp_path, minimal env; records_file)",
+      "status": "realized"
+    },
+    {
+      "condition": "packages/web has an established component runner",
+      "where": "packages/web/package.json test script (node --test), test/support/dom.js, existing component tests",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-001 covers CLI stdout/stderr and exit codes; implementation present",
+      "where": "scope AC-001; cli.py/records.py; selfCheck 'cli contract holds' passes",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-002 covers an accessible download control and focus after errors; implementation present",
+      "where": "scope AC-002; src/export-control.js, main.js; Chromium selfCheck passes",
+      "status": "realized"
+    },
+    {
+      "condition": "Commands and fixtures established per package",
+      "where": "CONTEXT.md Commands; package READMEs; both suites pass (4 each)",
+      "status": "realized"
+    },
+    {
+      "condition": "A real browser is available for focus/keyboard evidence",
+      "where": "runtime.image browser; Playwright selfCheck passes",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "blocking",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "The last selfCheck fails the gate only because `${DEV}` is not substituted in selfCheck commands: the shell expands it to empty, so `grep -q ... ${DEV}` reads empty stdin and exits 1. Reading the built plan by hand, every condition it tests holds (header ends `Status`: `COMPLETE`, cadence line matches, three `Status`: `DONE` lines, no verification or reviews folder). The fixture is correct but cannot pass gate 1/2 as written.",
+      "recommendation": "fix_file",
+      "fix": "In tester-25/spec.json, last selfCheck `cmd`: replace each `${DEV}` with the literal path `.standards/docs/development/export-20260924T090000Z-a7f3c1d2.md`."
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 1,
+      "detail": "`unchanged: pnpm-lock.yaml` could fail a Tester who adds Playwright as a packages/web devDependency so its browser test runs reproducibly. The npm registry is open in this run, so that install would succeed. The skill assigns consequential new tooling to Architect and says to reuse established tooling, and the image resolves Playwright without installing it, so the check is defensible.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally drop pnpm-lock.yaml from the assertion 1 check and leave dependency additions to the judge."
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 2,
+      "detail": "`changed: packages/web/test/**` assumes web tests go in the established test folder. A Tester could put only a browser script in another folder (for example packages/web/e2e/). That is unlikely, because the established runner only picks up test/*.test.js and component coverage of the control is the natural complement.",
+      "recommendation": "run_as_is",
+      "fix": "None needed; optionally widen to packages/web/**test**."
+    }
+  ],
+  "verdict": "issues",
+  "summary": "Every stated condition is realized: a valid STANDARD TESTING state, a correct CLI and export control, pytest subprocess fixtures, the in-memory DOM component runner, and a working real-browser image, with no leaks and a passing check.mjs. The one blocking problem is a selfCheck that uses an unsubstituted `${DEV}` and so fails the gate even though the plan satisfies it. Replace the variable with the literal path and the fixture is fit to run.</br>",
+  "gateProblems": [
+    "selfCheck `test -f .standards/CONTEXT.md && grep -q '`Status`: `COMPLETE`$' ${DEV} && grep -q '^`Verification Cadence`: `AFTER_IMPLEMENTATION` `Current Increment`: `NONE`$' ${DEV} && test $(grep -c '^`Status`: `DONE`' ${DEV}) -eq 3 && test ! -e .standards/docs/verification && test ! -e .standards/docs/reviews`: exited 1, expected pass: "
+  ],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T16:08:11.196Z",
+  "costUsd": 0.918684,
+  "ms": 54532,
+  "fixtureHash": "d3cec24fdd8d8e4b"
+}

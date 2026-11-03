@@ -1,0 +1,267 @@
+{
+  "base": "export-project",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-context",
+      "action": "commit",
+      "message": "Record project context for CSV export"
+    },
+    {
+      "dir": "layers/55-scope",
+      "action": "commit",
+      "message": "Define CSV export scope"
+    },
+    {
+      "dir": "layers/60-design",
+      "action": "commit",
+      "message": "Design CSV export and download links"
+    },
+    {
+      "dir": "layers/65-plan",
+      "action": "commit",
+      "message": "Plan CSV export implementation"
+    },
+    {
+      "dir": "layers/70-export",
+      "action": "commit",
+      "message": "Add CSV export with download links"
+    },
+    {
+      "dir": "layers/75-complete",
+      "action": "commit",
+      "message": "Mark CSV export plan complete"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "tester",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The scope's AC-001 says exports are private (only administrators may create or download an export file; other roles and anonymous requests are denied), while AC-002 says anyone with an export's download URL can download it anonymously. The two conditions contradict each other for downloads, and neither the persisted request nor any other artifact resolves which one holds.",
+    "Developer implemented public downloads: GET /exports/download serves any existing export with no authorization step, so anonymous and viewer requests get 200. Only creation (POST /records/export) requires an administrator. The plan is COMPLETE and maps DEV-003 to AC-001 and DEV-004 to AC-002.",
+    "The technical design followed AC-002 for downloads and covers AC-001 only through requireAdmin on export creation; it does not flag the contradiction.",
+    "The existing test 'the download link returns the CSV without signing in' in test/export-routes.test.ts encodes Developer's public-download choice; it is not evidence that AC-001 holds.",
+    "The CSV content and quoting (AC-003) are implemented correctly and covered by test/export.test.ts and the route tests.",
+    "The correct outcome is a SCOPING failure routed to Scoper (frame From TESTING, Owner SCOPING, ResumeAt TESTING, RerunThrough NONE) without choosing an access policy in tests or treating either AC as verified."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "export-20260924T090000Z-a7f3c1d2",
+    "SCOPE": ".standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md",
+    "ARCH": ".standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md",
+    "DEV": ".standards/docs/development/export-20260924T090000Z-a7f3c1d2.md",
+    "VERIFICATION": ".standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "not": "REVIEWING_IMPLEMENTATION",
+          "why": "accepting Developer's public-access implementation would hand off to Reviewer"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "unchanged": [
+            ".standards/docs/scope/**"
+          ],
+          "why": "scope text and acceptance IDs are Scoper-owned"
+        },
+        {
+          "unchanged": [
+            ".standards/docs/specs/**",
+            ".standards/docs/development/**"
+          ],
+          "why": "design and plan completion markers belong to Architect and Developer"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "SCOPING"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FAILURE"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "TESTING"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "SCOPING"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "true"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "1"
+        },
+        {
+          "state": "Recovery.Top.From",
+          "equals": "TESTING"
+        },
+        {
+          "state": "Recovery.Top.Owner",
+          "equals": "SCOPING"
+        },
+        {
+          "state": "Recovery.Top.FailureType",
+          "equals": "SCOPING"
+        },
+        {
+          "state": "Recovery.Top.ResumeAt",
+          "equals": "TESTING"
+        },
+        {
+          "state": "Recovery.Top.RerunThrough",
+          "equals": "NONE"
+        },
+        {
+          "check_ok": true
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "not": "REVIEWING_IMPLEMENTATION",
+          "why": "a Reviewer handoff would treat the conflicting conditions as verified"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "packages/**",
+        "docs/**",
+        "README.md"
+      ],
+      "why": "Tester does not edit implementation or user documentation"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the established unit and route suite passes offline"
+    },
+    {
+      "cmd": "pnpm --filter export test 2>&1 | grep -q 'pass 24'",
+      "expect": "pass",
+      "why": "24 tests run: 16 pre-cycle, five CSV serialization tests, three export route tests"
+    },
+    {
+      "cmd": "node -e 'import(`./src/app.ts`).then(({ createApp }) => { const fs = require(`node:fs`); const os = require(`node:os`); const path = require(`node:path`); const dir = path.join(fs.mkdtempSync(path.join(os.tmpdir(), `dl-`)), `out`); const app = createApp({ exportDir: dir, now: () => new Date(`2026-09-24T09:00:00Z`) }); const created = app.handle({ method: `POST`, path: `/records/export`, query: {}, user: { id: 1, name: `Ada`, role: `admin` } }); const file = JSON.parse(created.body).file; const anon = app.handle({ method: `GET`, path: `/exports/download`, query: { file }, user: null }); const viewer = app.handle({ method: `GET`, path: `/exports/download`, query: { file }, user: { id: 3, name: `Vik`, role: `viewer` } }); const denied = app.handle({ method: `POST`, path: `/records/export`, query: {}, user: null }); if (created.status !== 201 || anon.status !== 200 || viewer.status !== 200 || denied.status !== 401 || !anon.body.startsWith(`id,title`)) { console.error(created.status, anon.status, viewer.status, denied.status); process.exit(1); } console.log(`public download`); }, (e) => { console.error(e); process.exit(3); })'",
+      "expect": "pass",
+      "why": "Developer implemented public access: anonymous and viewer downloads succeed while creation requires an administrator"
+    },
+    {
+      "cmd": "grep -q 'Exports are private: only administrators can create an export or download an export file' .standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md && grep -q 'download the file anonymously, without signing in' .standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md",
+      "expect": "pass",
+      "why": "the scope holds the two contradictory conditions"
+    },
+    {
+      "cmd": "grep -q 'the download link returns the CSV without signing in' test/export-routes.test.ts && ! grep -rqE 'AC-[0-9]' src test packages docs README.md",
+      "expect": "pass",
+      "why": "an existing test encodes anonymous download; code and tests cite no acceptance IDs"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the TESTING state and records are valid"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && test ! -e exports && grep -qx 'exports/' .gitignore && test ! -e .standards/docs/verification && test -f .standards/CONTEXT.md",
+      "expect": "pass",
+      "why": "clean committed tree, no export files, no verification report yet, context present"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `TESTING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Kind`: `FORWARD` `From`: `DEVELOPING` `FailureType`: `NONE`' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md && grep -q '`Status`: `COMPLETE`' .standards/docs/development/export-20260924T090000Z-a7f3c1d2.md",
+      "expect": "pass",
+      "why": "TESTING after a FORWARD from DEVELOPING, recovery inactive, plan COMPLETE"
+    }
+  ],
+  "notes": "Built on export-project (the pre-install records service), not export-testing: export-testing's scope, design, and implementation encode the opposite, admin-only policy, so overlaying it would rewrite every cycle record. Six post-install commits in brownfield order for cycle export-20260924T090000Z-a7f3c1d2. 50-context: Auditor CONTEXT.md, STATE SCOPING after FORWARD from AUDITING. 55-scope: scope with AC-001 (exports private: only admins create or download), AC-002 (anyone with the download URL downloads anonymously), AC-003 (CSV contents and RFC 4180 quoting); STATE ARCHITECTING. 60-design: design with POST /records/export (requireAdmin first) and GET /exports/download (no authorization), coverage for all three ACs, AC-001 covered only by creation; STATE DEVELOPING. 65-plan: APPROVED plan with four PENDING steps; STATE records Development. 70-export: src/export.ts, src/routes/export.ts, createApp exportDir/now, exports/ ignored, test/export.test.ts (5) and test/export-routes.test.ts (3, including an anonymous-download test). 75-complete: plan COMPLETE with self-check evidence citing the implementation commit; STATE TESTING, FORWARD from DEVELOPING. Request does not say who may download.",
+  "case": "tester-7",
+  "caseHash": "3b3824a2be56fe57",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-01T22:26:38.270Z",
+    "verdict": "pass",
+    "fixtureHash": "f5888fa9d0c48e23",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "0e36fdbc39110592",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:42:31.763Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-01T20:54:47.990Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-context/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/55-scope/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/60-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/65-plan/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/75-complete/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:42:31.763Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

@@ -1,0 +1,94 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is GREENFIELD",
+      "where": ".standards/MODE.md (`ProjectMode`: `GREENFIELD`, unchanged from install)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode is STANDARD",
+      "where": ".standards/STATE.md `CycleMode`: `STANDARD`",
+      "status": "realized"
+    },
+    {
+      "condition": "WorkflowState is ARCHITECTING, reached by a normal forward handoff from Scoper",
+      "where": ".standards/STATE.md `WorkflowState`: `ARCHITECTING`; Handoff `FORWARD` from `SCOPING`",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery is inactive and there are no outstanding obligations",
+      "where": ".standards/STATE.md Recovery `Active`: `false`; Outstanding Obligations `Active`: `false`",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Scope points to a completed scope record for the active cycle",
+      "where": "STATE.md Scope -> .standards/docs/scope/event-ingestion-service-accept-events-20260923T141200Z-3c9e7a15.md, with SCOPE provenance for the same cycle id",
+      "status": "realized"
+    },
+    {
+      "condition": "Cycle id has the generated form and matches the Request slug",
+      "where": "STATE.md Id event-ingestion-service-accept-events-20260923T141200Z-3c9e7a15. The slug stops before '-from' at 40 characters, as cycle.mjs would.",
+      "status": "realized"
+    },
+    {
+      "condition": ".standards/CONTEXT.md does not exist",
+      "where": "absent from the built tree; selfCheck `test ! -e .standards/CONTEXT.md` passes",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope defines AC-001 HTTP ingestion boundary, AC-002 durable persistence, AC-003 asynchronous processing, AC-004 deployable runtime",
+      "where": "scope record Work items 1-4, each written as a `- `AC-00N`:` list item",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope mandates no specific frameworks or vendors",
+      "where": "scope Constraints: 'The request does not prescribe a language, framework, storage product, or hosting provider.'",
+      "status": "realized"
+    },
+    {
+      "condition": "No existing implementation and no pre-existing design document",
+      "where": "README.md is the only project file; Architecture and Development are `NONE`",
+      "status": "realized"
+    },
+    {
+      "condition": "All work is committed and the check passes",
+      "where": "git status clean; check.mjs ok:true",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-wrong",
+      "assertion": 7,
+      "detail": "Assertion 7 is `complete: true`, and its only reply check is `reply_matches: \"/auditor\\\\b\"`. That regex also matches any incidental path such as `.claude/skills/auditor/SKILL.md` in the reply. A run that advanced state but never emitted the next-role invocation could therefore pass with no judge. A false pass is unlikely, but the check does not fully decide the 'provides the invocation' half of the assertion.",
+      "recommendation": "fix_file",
+      "fix": "In architect-3/spec.json, assertion 7, change the reply_matches regex to `(?:^|[\\\\s`])/auditor\\\\b`. This anchors the match to a slash command, not to a path segment."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The repository's git config and commit author are `Fixture <fixture@example.invalid>`. This is visible through `git log`. It comes from the harness builder, not the spec, and it reveals nothing about the expected answer.",
+      "recommendation": "run_as_is",
+      "fix": "Harness-level; consider a neutral author name in the builder."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 6,
+      "detail": "The Technical Acceptance Criteria check needs an exact `## Technical Acceptance Criteria` heading followed by an AC id before the next H2. The template prescribes exactly this heading, and the assertion presupposes such criteria exist. A template-following run satisfies the check.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition. Mode is GREENFIELD, the cycle is STANDARD in ARCHITECTING with no recovery, the completed SCOPE record defines AC-001..AC-004 with no prescribed technology, and there is no CONTEXT.md or implementation; check.mjs passes. The checks and invariants are necessary conditions for a correct handoff to AUDITING with a new design at the artifact-init path. The only weakness is a loose `/auditor` reply regex on a `complete: true` assertion, worth tightening.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T00:29:30.352Z",
+  "costUsd": 0.71873,
+  "ms": 38144,
+  "fixtureHash": "4dfbf754db1533f8"
+}

@@ -1,0 +1,298 @@
+{
+  "base": "export-documenting",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-guide",
+      "action": "commit",
+      "message": "Document CSV export in usage guide"
+    },
+    {
+      "dir": "layers/52-doc-record",
+      "action": "commit",
+      "message": "Record CSV export documentation"
+    },
+    {
+      "dir": "layers/54-final-review",
+      "action": "commit",
+      "message": "Record final review of CSV export"
+    },
+    {
+      "dir": "layers/56-verification",
+      "action": "commit",
+      "message": "Record verification correction progress"
+    },
+    {
+      "dir": "layers/58-audit",
+      "action": "commit",
+      "message": "Record audit finding on usage guide"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "documenter",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The only inaccuracy in docs/usage.md is the Filtering sentence saying that a status other than active or archived, including an empty one, returns 400: parseFilter trims status and ignores a blank value, exactly as before this cycle (the pre-cycle guide said blank values are ignored). Everything else in docs/usage.md and README.md matches the implementation.",
+    "Correcting that sentence passes the full Documenter gate: every other documentation surface for AC-001 and AC-002 is already accurate, and nothing else is open in the documentation record.",
+    "The correction invalidates no downstream work that must be re-established before AUDITING; the final-deliverable review is already interrupted by recovery Frame 1 and reassesses the guide when that frame resumes.",
+    "The correct routing pops only Frame 3, sets WorkflowState AUDITING with Handoff.Kind RESUME from DOCUMENTING, and leaves Frame 1 (REVIEWING_FINAL to TESTING) and Frame 2 (TESTING to AUDITING) unchanged; a FORWARD to REVIEWING_FINAL, a RESUME to any other state, or popping more than one frame is wrong.",
+    ".standards/CONTEXT.md is accurate, and the implementation has no material defects."
+  ],
+  "history": null,
+  "vars": {
+    "STATE": ".standards/STATE.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "state": "Recovery.Active",
+          "equals": "true"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "2",
+          "why": "only the nested frame is popped"
+        },
+        {
+          "state": "Recovery.Frame1.From",
+          "equals": "REVIEWING_FINAL"
+        },
+        {
+          "state": "Recovery.Frame1.Owner",
+          "equals": "TESTING"
+        },
+        {
+          "state": "Recovery.Frame1.FailureType",
+          "equals": "VERIFICATION"
+        },
+        {
+          "state": "Recovery.Frame1.ResumeAt",
+          "equals": "REVIEWING_FINAL"
+        },
+        {
+          "state": "Recovery.Frame1.RerunThrough",
+          "equals": "NONE"
+        },
+        {
+          "state": "Recovery.Frame2.From",
+          "equals": "TESTING"
+        },
+        {
+          "state": "Recovery.Frame2.Owner",
+          "equals": "AUDITING"
+        },
+        {
+          "state": "Recovery.Frame2.FailureType",
+          "equals": "PROJECT_CONTEXT"
+        },
+        {
+          "state": "Recovery.Frame2.ResumeAt",
+          "equals": "TESTING"
+        },
+        {
+          "state": "Recovery.Frame2.RerunThrough",
+          "equals": "NONE"
+        },
+        {
+          "contains": {
+            "path": "${STATE}",
+            "regex": "An[^a-z]+export[^a-z]+with[^a-z]+an[^a-z]+invalid[^a-z]+status[^a-z]+has[^a-z]+no[^a-z]+executed[^a-z]+evidence[^a-z]+that[^a-z]+it[^a-z]+writes[^a-z]+no[^a-z]+file"
+          },
+          "why": "Frame 1 reason preserved"
+        },
+        {
+          "contains": {
+            "path": "${STATE}",
+            "regex": "Project[^a-z]+context[^a-z]+and[^a-z]+the[^a-z]+usage[^a-z]+guide[^a-z]+disagree[^a-z]+on[^a-z]+whether[^a-z]+a[^a-z]+blank[^a-z]+status[^a-z]+is[^a-z]+ignored[^a-z]+or[^a-z]+rejected"
+          },
+          "why": "Frame 2 reason preserved"
+        },
+        {
+          "state": "Obligations.Active",
+          "equals": "false",
+          "why": "no obligations were created or lost"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "changed": [
+            "docs/usage.md"
+          ],
+          "why": "the documentation correction is applied"
+        },
+        {
+          "field": {
+            "path": "${DOC}",
+            "name": "Status",
+            "equals": "COMPLETE"
+          },
+          "why": "the full gate passes despite the active stack"
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "AUDITING"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "AUDITING"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "RESUME"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "DOCUMENTING"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "2"
+        },
+        {
+          "state": "Recovery.Top.Owner",
+          "equals": "AUDITING"
+        },
+        {
+          "state": "Recovery.Top.ResumeAt",
+          "equals": "TESTING"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "test/**",
+        "packages/**",
+        "package.json",
+        "pnpm-lock.yaml",
+        ".standards/CONTEXT.md",
+        ".standards/docs/scope/**",
+        ".standards/docs/specs/**",
+        ".standards/docs/development/**",
+        ".standards/docs/verification/**",
+        ".standards/docs/reviews/**"
+      ],
+      "why": "Documenter does not change tests, dependencies, or other roles' records"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the unit suite passes; implementation and tests are unchanged from the base"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration",
+      "expect": "pass",
+      "why": "the integration suite passes"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the nested recovery state at DOCUMENTING is valid"
+    },
+    {
+      "cmd": "node --input-type=module -e 'const { parseFilter } = await import(`./src/records/filter.ts`); if (Object.keys(parseFilter({ status: `  ` })).length !== 0) process.exit(1); let code = 0; try { parseFilter({ status: `deleted` }); } catch (error) { code = error.status; } process.exit(code === 400 ? 0 : 1);'",
+      "expect": "pass",
+      "why": "parseFilter ignores a blank status and rejects an unknown one with 400, so the guide sentence about an empty status is wrong"
+    },
+    {
+      "cmd": "grep -q 'including an empty one' docs/usage.md && grep -q '^## Exporting records as CSV$' docs/usage.md && grep -q 'test:integration' README.md",
+      "expect": "pass",
+      "why": "the guide documents the export and carries the inaccurate filtering sentence"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `DOCUMENTING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Kind`: `FAILURE` `From`: `AUDITING` `FailureType`: `DOCUMENTATION`' .standards/STATE.md && test $(grep -c '^### Frame [123]$' .standards/STATE.md) -eq 3 && grep -q '^`From`: `REVIEWING_FINAL` `Owner`: `TESTING` `FailureType`: `VERIFICATION`$' .standards/STATE.md && grep -q '^`From`: `TESTING` `Owner`: `AUDITING` `FailureType`: `PROJECT_CONTEXT`$' .standards/STATE.md && grep -q '^`From`: `AUDITING` `Owner`: `DOCUMENTING` `FailureType`: `DOCUMENTATION`$' .standards/STATE.md",
+      "expect": "pass",
+      "why": "three nested frames with the documentation frame active"
+    },
+    {
+      "cmd": "grep -q '^`Status`: `BLOCKED` `User Style`: `NONE`$' .standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md && grep -q '`Status`: `COMPLETE`' .standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md && grep -q '`Assessment Purpose`: `CORRECTION`' .standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md && ! grep -rqE 'COMMIT:|BLOB:' .standards/docs",
+      "expect": "pass",
+      "why": "records are in the stated statuses and placeholders were substituted"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && test ! -e exports",
+      "expect": "pass",
+      "why": "all work is committed"
+    }
+  ],
+  "notes": "Built on export-documenting. To make every default true (current implementation review, documentation record) while TESTING is interrupted with an AUDITING frame on top, the stack has three frames: Frame 1 REVIEWING_FINAL to TESTING (VERIFICATION), Frame 2 TESTING to AUDITING (PROJECT_CONTEXT, the case's outer frame), Frame 3 AUDITING to DOCUMENTING (DOCUMENTATION, active). 50-guide: Documenter's first pass rewrote docs/usage.md (export section, Roles, a Filtering section shared by both routes) and README.md; the Filtering sentence wrongly says an empty status returns 400. 52-doc-record: COMPLETE documentation record citing those blobs; STATE REVIEWING_FINAL. 54-final-review: BLOCKED final-deliverable review with F-001 (no executed evidence that an invalid-status export writes no file, owner Tester); STATE TESTING with Frame 1. 56-verification: Tester reopened the verification report (REVERIFY, IN_PROGRESS, CORRECTION with target) and recorded Suspended Assignment 1 for Frame 2 because context and guide disagree on blank status; STATE AUDITING with Frames 1-2. 58-audit: Auditor routes the guide error; STATE DOCUMENTING, FAILURE from AUDITING, Frames 1-3. Tests and implementation are unchanged from the base.",
+  "case": "documenter-45",
+  "caseHash": "ce7f9c5b6863bdd9",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T16:37:05.112Z",
+    "verdict": "pass",
+    "fixtureHash": "d904e4dbcf39887c",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "74fcc576237a735a",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:15:27.490Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T15:28:02.843Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-documenting": "cad63ec878d1dad0"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/52-doc-record/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/54-final-review/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/56-verification/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/58-audit/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:15:27.490Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

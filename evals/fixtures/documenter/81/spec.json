@@ -1,0 +1,233 @@
+{
+  "base": null,
+  "date": "2026-10-04T15:30:00Z",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add logtrim level filter, CLI, and usage guide"
+    },
+    {
+      "dir": "layers/51-options",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Default to info level, add --count, and match --grep case-insensitively"
+    },
+    {
+      "dir": "layers/60-style",
+      "action": "commit",
+      "message": "Add concise documenter style"
+    },
+    {
+      "dir": "layers/70-cycle",
+      "action": "commit",
+      "message": "Record context, scope, and design for the usage guide"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "documenter",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "Scope, Architect's technical coverage, and Auditor context (.standards/CONTEXT.md) are current for the documentation contract.",
+    "docs/usage.md is out of date relative to the source: it gives the --level default as warn (the code uses info), says --grep is case-sensitive (the code ignores case), omits --count, and its example output omits the three info lines the default now prints.",
+    "node src/cli.js examples/sample.log prints 5 lines; node src/cli.js --grep upload --count examples/sample.log prints 3.",
+    "No development plan, verification report, or implementation review exists for this cycle, and none is required in a DOCUMENTATION cycle; existing tests in test/ may be used as supporting evidence only.",
+    "The project has no documentation lint, link checker, or doc build; documentation checks are inspection and running the documented commands."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "guide-20261004T120000Z-1a2b3c4d",
+    "DOC": ".standards/docs/documentation/guide-20261004T120000Z-1a2b3c4d.md",
+    "PLAN": ".standards/docs/development/guide-20261004T120000Z-1a2b3c4d.md",
+    "VER": ".standards/docs/verification/guide-20261004T120000Z-1a2b3c4d.md",
+    "IMPL": ".standards/docs/reviews/guide-20261004T120000Z-1a2b3c4d/implementation.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "provenance": {
+            "path": "${DOC}",
+            "artifact": "DOCUMENTATION",
+            "cycle": "${ID}"
+          },
+          "why": "the documentation record exists at its fixed path for this cycle"
+        },
+        {
+          "field": {
+            "path": "${DOC}",
+            "name": "Target",
+            "equals": "FILE"
+          },
+          "why": "saved target, not default ACTIVE_CHANGE"
+        },
+        {
+          "field": {
+            "path": "${DOC}",
+            "name": "Target Detail",
+            "equals": "docs/usage.md"
+          },
+          "why": "saved file target"
+        },
+        {
+          "field": {
+            "path": "${DOC}",
+            "name": "Collaboration",
+            "equals": "GUIDED"
+          },
+          "why": "saved collaboration, not default AUTONOMOUS"
+        },
+        {
+          "field": {
+            "path": "${DOC}",
+            "name": "User Style",
+            "equals": "concise"
+          },
+          "why": "saved style stem, not default NONE"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${DOC}",
+          "why": "the pending step is persisted in the record"
+        },
+        {
+          "field": {
+            "path": "${DOC}",
+            "name": "Status",
+            "not": "COMPLETE"
+          },
+          "why": "a pending guided edit cannot complete the gate"
+        },
+        {
+          "state": "ActiveWork.BlockedOn",
+          "not": "NONE",
+          "why": "guided mode sets BlockedOn to the request to apply the step"
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "DOCUMENTING",
+          "why": "no handoff while the guided step is pending"
+        },
+        {
+          "unchanged": [
+            "docs/**",
+            "README.md"
+          ],
+          "why": "in GUIDED the user applies project documentation edits"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "absent": "${PLAN}",
+          "why": "no fabricated development plan"
+        },
+        {
+          "absent": "${VER}",
+          "why": "no fabricated verification report"
+        },
+        {
+          "absent": "${IMPL}",
+          "why": "no fabricated implementation review"
+        },
+        {
+          "state": "ActiveWork.Development",
+          "equals": "NONE",
+          "why": "documentation cycles keep Development NONE"
+        },
+        {
+          "state": "Handoff.Kind",
+          "not": "FAILURE",
+          "why": "missing omitted-owner reports are not a failure to route"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "examples/**",
+        "package.json"
+      ],
+      "why": "a documentation cycle never changes behavior, tests, or sample data"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/filter.test.js test/cli.test.js",
+      "expect": "pass",
+      "why": "the existing tests pass on the current source"
+    },
+    {
+      "cmd": "node src/cli.js --count examples/sample.log | grep -x 5",
+      "expect": "pass",
+      "why": "the default level is info: 5 sample lines are kept, not the 2 the guide shows"
+    },
+    {
+      "cmd": "node src/cli.js --grep upload --count examples/sample.log | grep -x 3",
+      "expect": "pass",
+      "why": "--grep ignores case"
+    },
+    {
+      "cmd": "grep -q case-sensitive docs/usage.md && ! grep -q -- --count docs/usage.md",
+      "expect": "pass",
+      "why": "the guide predates the current options"
+    },
+    {
+      "cmd": "test -f .standards/user-styles/documenter/concise.md && test ! -e .standards/docs/documentation && test ! -e .standards/docs/development && test ! -e .standards/docs/verification && test ! -e .standards/docs/reviews",
+      "expect": "pass",
+      "why": "the concise style exists; no documentation record or omitted-owner record exists"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 50-project (pre-install): logtrim CLI v0.1 (default level warn, case-sensitive --grep) with tests, examples/sample.log, README, and docs/usage.md written for that version. 51-options (pre-install): CLI v0.2 changes default to info, adds --count, makes --grep case-insensitive, updates tests; docs/usage.md untouched, so it is stale. 60-style: user style .standards/user-styles/documenter/concise.md. 70-cycle: STATE.md at DOCUMENTING, CycleMode DOCUMENTATION, CompletionPolicy NONE, Handoff FORWARD from ARCHITECTING, Development NONE; the Request records the standalone Documenter choices (FILE docs/usage.md, GUIDED, concise), and the scope's Constraints repeat them; CONTEXT.md (Auditor), scope with AC-001..AC-003, and technical design covering all three ACs. No documentation, development, verification, or review record exists.",
+  "case": "documenter-81",
+  "caseHash": "30e78c5d088ff3c9",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T02:58:21.038Z",
+    "verdict": "pass",
+    "fixtureHash": "0935a9f6b80d5fa7",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-30T23:59:28.776Z"
+  }
+}

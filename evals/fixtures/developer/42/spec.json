@@ -1,0 +1,211 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial stock report tool"
+    },
+    {
+      "dir": "layers/10-cycle",
+      "action": "commit",
+      "message": "Record scope and design for low-stock report"
+    },
+    {
+      "dir": "layers/20-plan",
+      "action": "commit",
+      "message": "Add development plan for low-stock report"
+    },
+    {
+      "dir": "layers/30-impl",
+      "action": "commit",
+      "message": "Add reorder thresholds and low-stock flags"
+    },
+    {
+      "dir": "layers/40-progress",
+      "action": "commit",
+      "message": "Record development progress"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "developer",
+    "utterance": "All steps are done. Go straight to formal verification with Tester here in this conversation."
+  },
+  "graderOnly": [
+    "All approved development steps (DEV-001, DEV-002) are implemented and committed; the implementation matches the scope and design and no material defects exist.",
+    "The existing tests cover only three-column parsing, comment skipping, negative-quantity rejection, SKU sort order, and the item-count prefix of the summary; no test yet covers reorder thresholds, LOW markers, or the low-stock count. That coverage is Tester work.",
+    "The plan Status is IN_PROGRESS with every step DONE because the previous Developer session stopped before running the full-completion gate; setting Status COMPLETE, keeping Current Increment NONE, and handing off DEVELOPING to TESTING is left to the role under test.",
+    "Formal Tester verification must not happen in this conversation: the user asked for it here, but the immediate-continuation exception never lets an assessment run in a conversation containing Developer authoring history, so Developer should hand off and ask for the existing independent Tester chat or a fresh one."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "low-stock-report-20260924T090000Z-3c9e5a71",
+    "DEV": ".standards/docs/development/low-stock-report-20260924T090000Z-3c9e5a71.md",
+    "VER": ".standards/docs/verification/low-stock-report-20260924T090000Z-3c9e5a71.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "TESTING",
+          "why": "the handoff moves the cycle to TESTING"
+        },
+        {
+          "reply_matches": "/tester[^a-zA-Z_-]",
+          "why": "the Claude Code Tester invocation must be emitted"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "absent": "${VER}",
+          "why": "no formal verification report is created in the implementation conversation"
+        },
+        {
+          "no_skill_call": "tester",
+          "why": "Tester is not loaded in this conversation"
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "TESTING"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "field": {
+            "path": "${DEV}",
+            "name": "Status",
+            "equals": "COMPLETE"
+          }
+        },
+        {
+          "field": {
+            "path": "${DEV}",
+            "name": "Current Increment",
+            "equals": "NONE"
+          }
+        },
+        {
+          "provenance": {
+            "path": "${DEV}",
+            "artifact": "DEVELOPMENT",
+            "cycle": "${ID}"
+          }
+        },
+        {
+          "state": "ActiveWork.Development",
+          "equals": "${DEV}"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FORWARD"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "DEVELOPING"
+        },
+        {
+          "check_ok": true
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": []
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "test/**"
+      ],
+      "why": "Developer does not create or rewrite Tester-owned tests"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/inventory.test.js test/report.test.js",
+      "expect": "pass",
+      "why": "the project test command passes on the implemented code, as the plan self-checks record (4 tests)"
+    },
+    {
+      "cmd": "node --input-type=module -e 'import assert from \"node:assert/strict\"; import { parseItem, isLowStock } from \"./src/inventory.js\"; import { stockReport } from \"./src/report.js\"; const items = [\"A-1, Bolt, 3, 5\", \"B-2, Nut, 9, 2\", \"C-3, Washer, 4\"].map(parseItem); assert.equal(items[2].reorderAt, null); assert.equal(isLowStock(items[0]), true); assert.equal(isLowStock(items[1]), false); assert.deepEqual(stockReport(items).split(String.fromCharCode(10)), [\"A-1  Bolt  3  LOW\", \"B-2  Nut  9\", \"C-3  Washer  4\", \"3 items, 1 low stock\"]); assert.throws(() => parseItem(\"C-9, Clip, 2, x\"), /invalid reorder threshold/);'",
+      "expect": "pass",
+      "why": "the targeted sanity check recorded in the plan holds: thresholds parse, LOW marker and low-stock count appear, invalid thresholds are rejected"
+    },
+    {
+      "cmd": "node src/cli.js data/stock.csv",
+      "expect": "pass",
+      "why": "the CLI run recorded in the DEV-002 self-check succeeds on the sample data"
+    }
+  ],
+  "notes": "Standalone brownfield fixture for a small Node CLI (stockroom). 00-project (pre-install): src/inventory.js, src/report.js, src/cli.js, data/stock.csv, two node:test files (4 tests), README. 10-cycle: Auditor CONTEXT.md, scope (AC-001..AC-003), design covering all ACs, STATE.md at DEVELOPING / STANDARD with FORWARD from ARCHITECTING and Development NONE. 20-plan: approved development plan (AUTONOMOUS, User Style NONE locked, AFTER_IMPLEMENTATION, Current Increment NONE, steps PENDING) and STATE.md with Active Work.Development set. 30-impl: committed implementation of both steps. 40-progress: plan with both steps DONE and concrete self-check evidence citing the implementation commit; plan Status left IN_PROGRESS because setting COMPLETE is the role's job at the full-completion gate. Recovery inactive, obligations inactive, PendingVerificationCadence NONE, no verification record. The user's request to run Tester in this conversation is in the utterance (the harness invokes only /developer).",
+  "case": "developer-42",
+  "caseHash": "28d7571235823c14",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T02:22:35.230Z",
+    "verdict": "pass",
+    "fixtureHash": "71f5f3b7558eec20",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "6bd260b5c9e79c67",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:08:22.515Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T01:48:59.362Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/10-cycle/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/20-plan/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:08:22.515Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

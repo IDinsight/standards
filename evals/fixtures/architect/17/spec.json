@@ -1,0 +1,145 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add Markdown notes exporter"
+    },
+    {
+      "dir": "layers/50-styles",
+      "action": "commit",
+      "message": "Add developer user styles"
+    },
+    {
+      "dir": "layers/60-cycle",
+      "action": "commit",
+      "message": "Record scope and design for export word counts"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "architect",
+    "utterance": "Give me the handoff for the next role."
+  },
+  "graderOnly": [
+    "Active Work.Request and the scope's Constraints both explicitly ask for STEPWISE collaboration during development.",
+    "No development plan exists (Active Work.Development is NONE), so invocation discovery cannot read a saved collaboration mode or a User Style Locked value; both are unknown, and only Developer can establish whether this is new work whose style may still be chosen.",
+    "Developer user styles .standards/user-styles/developer/alice.md and tony.md exist; no style has been selected for this cycle.",
+    "The workflow is already in DEVELOPING with Handoff FORWARD from ARCHITECTING; Architect has nothing left to persist, and the correct output is the Claude Code next-role message beginning '/developer Continue the active workflow from `.standards/STATE.md`.' with no state or record changes.",
+    "AUTONOMOUS is Developer's default for new work only; it must not be presented as the selected or saved collaboration mode, since the request asks for STEPWISE."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "notes-word-counts-20260924T090000Z-5c8e2a1f",
+    "DEV": ".standards/docs/development/notes-word-counts-20260924T090000Z-5c8e2a1f.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "reply_matches": "/developer Continue the active workflow",
+          "why": "the protocol's Claude Code base invocation for Developer must appear"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "absent": "${DEV}",
+          "why": "no development plan is created"
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "DEVELOPING"
+        },
+        {
+          "state": "ActiveWork.Development",
+          "equals": "NONE"
+        },
+        {
+          "state": "Handoff.Kind",
+          "unchanged": true
+        },
+        {
+          "unchanged": [
+            ".standards/**",
+            "src/**",
+            "bin/**",
+            "test/**"
+          ],
+          "why": "presenting the handoff changes no workflow files or code"
+        },
+        {
+          "no_skill_call": "developer",
+          "why": "Developer is not invoked automatically"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "npm test",
+      "expect": "pass",
+      "why": "the existing export and loader tests pass at the committed baseline, as CONTEXT.md states"
+    },
+    {
+      "cmd": "node .standards/bin/invocation.mjs developer --client claude --json > /tmp/inv.json; grep -q alice /tmp/inv.json && grep -q tony /tmp/inv.json",
+      "expect": "pass",
+      "why": "Developer discovery sees the alice and tony user styles"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 00-project (pre-install): small dependency-free Node ES-module tool (src/export.js renders notes to Markdown, src/store.js loads JSON, bin/export.js CLI, node:test tests). 50-styles: .standards/user-styles/developer/alice.md and tony.md. 60-cycle: MODE BROWNFIELD; STATE at DEVELOPING, STANDARD, FULL_DELIVERABLE, Handoff FORWARD from ARCHITECTING, Development NONE, request text explicitly says 'Use STEPWISE collaboration for development.'; CONTEXT.md; STANDARDS-marked scope (AC-001..AC-004, Constraints line asking for STEPWISE) and design covering every AC. No development plan exists, so discovery cannot report a saved mode or style lock. Architect is invoked outside its owned state and should only present the next-role message.",
+  "case": "architect-17",
+  "caseHash": "516be3ada3074a6d",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-30T22:48:44.819Z",
+    "verdict": "pass",
+    "fixtureHash": "653b588e3dd5a7fd",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-30T22:34:38.372Z"
+  }
+}

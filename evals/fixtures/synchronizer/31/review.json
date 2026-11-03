@@ -1,0 +1,76 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD, CycleMode STANDARD, WorkflowState SYNCHRONIZING, Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/MODE.md (installed BROWNFIELD); .standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, architecture, context, plan, verification and both reviews present with valid ownership and content identities",
+      "where": ".standards/docs/{scope,specs,development,verification,reviews/*/}*.md and .standards/CONTEXT.md; all COMPLETE with matching provenance; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "Documentation evidence available",
+      "where": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md (COMPLETE, checks G1–G4)",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and outstanding obligations inactive; no blocked user question",
+      "where": ".standards/STATE.md Recovery/Obligations Active false, BlockedOn NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Interrupted IN_PROGRESS synchronization record exists",
+      "where": ".standards/docs/synchronization/export-20260924T090000Z-a7f3c1d2.md, Status IN_PROGRESS, committed in 'Record CSV export synchronization progress'",
+      "status": "realized"
+    },
+    {
+      "condition": "Record identifies helper A and fixture A",
+      "where": "sync record Assessed Inputs cites blob cd8fd9dc… for src/records/filter.ts and blob 2dc27b76… for packages/seed/index.js (HEAD versions); selfCheck confirms",
+      "status": "realized"
+    },
+    {
+      "condition": "Helper and fixture both changed to B",
+      "where": "git status: unstaged ' M src/records/filter.ts' (status lowercased before validation) and ' M packages/seed/index.js' (record 4 retitled with comma); no record cites the new blobs",
+      "status": "realized"
+    },
+    {
+      "condition": "An unchanged import caller shares the helper",
+      "where": "src/routes/records.ts (unchanged, imports parseFilter); selfCheck shows GET /records?status=ACTIVE now returns 200",
+      "status": "realized"
+    },
+    {
+      "condition": "Record has partial conclusions some of which remain valid (useful unaffected evidence) and some that depend on changed inputs",
+      "where": "sync record: AC-001 CSV format and AC-002 denial reconciled with reasons unaffected by B; rows/response/AC-003/final-review applicability not yet reconciled",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The case's 'fixture A/B' is mapped to the seed data package packages/seed/index.js rather than a file under test/. It is test-relied data (integration tests and guide examples use it, and package.json describes it as 'Seed records for local development and tests'), so the mapping is reasonable and consistent.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 1,
+      "detail": "Checks require the sync record to change, its Status not to be COMPLETE, and WorkflowState not to be AWAITING_USER_SIGNOFF. A correct run must record the changed identities and the gap, whether it routes a failure or asks a blocking question about the unstaged edits. The skill forbids passing the gate with unassessed deliverable changes, so none of these checks can fail a correct run. I also traced the turn-end check_ok for the FAILURE routes to DEVELOPING, TESTING, DOCUMENTING, and REVIEWING_FINAL, and it raises no spurious problems.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes the case exactly. The committed IN_PROGRESS synchronization record cites the A blobs of the shared helper (src/records/filter.ts) and the seed data, and both now carry unstaged B edits that keep every test passing. The unchanged caller src/routes/records.ts changes behavior, docs/usage.md goes stale, and two reconciled items remain valid with stated reasons. Checks and invariants are necessary conditions that a correct run satisfies, and nothing leaks the answer.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T14:38:45.523Z",
+  "costUsd": 0.3038608,
+  "ms": 68430,
+  "fixtureHash": "b800f1e5f7b4b6dc"
+}

@@ -1,0 +1,81 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState SYNCHRONIZING",
+      "where": ".standards/STATE.md head fields",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id = export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md Active Work; provenance of every cycle record",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, architecture, context, development plan, verification, both reviews have valid ownership and content identities",
+      "where": ".standards/docs/{scope,specs,development,verification,reviews/...}/export-20260924T090000Z-a7f3c1d2*.md and .standards/CONTEXT.md; all COMPLETE with matching provenance; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "Documentation evidence is available",
+      "where": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md (COMPLETE, G1–G4) and docs/usage.md export section",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and outstanding obligations inactive; no blocked user question",
+      "where": "STATE.md Recovery.Active false, Obligations Active false, BlockedOn NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "An existing COMPLETE synchronization record is sufficient",
+      "where": ".standards/docs/synchronization/export-20260924T090000Z-a7f3c1d2.md: Status COMPLETE, AC-001..003 accounted for by reference, Discrepancies NONE, gate passed",
+      "status": "realized"
+    },
+    {
+      "condition": "All assessed inputs remain identical",
+      "where": "Record cites commit c0ee414 and blobs that equal HEAD content (selfCheck 7); last commit ec567f1 only adds the record (selfCheck 8); clean tree",
+      "status": "realized"
+    },
+    {
+      "condition": "State transition interrupted before leaving SYNCHRONIZING",
+      "where": "STATE.md still SYNCHRONIZING with FORWARD from REVIEWING_FINAL while the record's conclusion says handoff forward to AWAITING_USER_SIGNOFF",
+      "status": "realized"
+    },
+    {
+      "condition": "Code is small and committed; tests pass",
+      "where": "src/, test/; selfChecks 1–2 pass (21 and 3 tests); git status clean",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "Local git config sets user.name=Fixture and user.email=fixture@example.invalid, so `git log --format=%an` shows an author name that hints at a test. This comes from the builder's fixed author and is shared by every fixture, not something this spec added.",
+      "recommendation": "run_as_is",
+      "fix": "Harness-level: consider a neutral fixed author name in the builder."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 1,
+      "detail": "The catalog marked assertion 1 as deterministically complete, but the spec uses complete:false with a no-D-heading regex and an unchanged check over the other roles' records. Both checks are necessary for any correct run. Leaving the final decision to the judge is conservative and harmless.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture faithfully realizes an interrupted SYNCHRONIZING→AWAITING_USER_SIGNOFF transition: the COMPLETE synchronization record's cited commit and blobs equal HEAD, only the record itself was committed afterward, and STATE.md still shows the FORWARD from REVIEWING_FINAL. check.mjs passes now and would still pass after a correct transition, since every record is COMPLETE and covers AC-001..003. The checks (provenance kept, no D-NNN headings, other roles' records unchanged) and the invariants cannot fail a correct run, and nothing leaks the answer.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T14:29:11.540Z",
+  "costUsd": 0.870044,
+  "ms": 45509,
+  "fixtureHash": "2c35fad22991dd50"
+}

@@ -1,0 +1,54 @@
+diff --git a/.standards/docs/documentation/parser-rename-20260924T090000Z-d29a84f1.md b/.standards/docs/documentation/parser-rename-20260924T090000Z-d29a84f1.md
+new file mode 100644
+index 0000000..a9c37ef
+--- /dev/null
++++ b/.standards/docs/documentation/parser-rename-20260924T090000Z-d29a84f1.md
+@@ -0,0 +1,48 @@
++<!-- STANDARDS
++Artifact: DOCUMENTATION
++Cycle: parser-rename-20260924T090000Z-d29a84f1
++-->
++
++---
++
++# Documentation Record
++
++`Cycle`: `parser-rename-20260924T090000Z-d29a84f1` `Status`: `COMPLETE`
++`Collaboration`: `AUTONOMOUS` `Target`: `ACTIVE_CHANGE` `Target Detail`:
++`parser-rename-20260924T090000Z-d29a84f1` `User Style`: `NONE`
++
++## Assessed Inputs and Boundary
++
++- Scope (AC-001, AC-002), technical design, development plan, verification
++  report, and implementation review of this cycle, all current.
++- The change: `_parse_rows` in `app/imports/parser.py` is now `_read_rows`,
++  and `tests/test_parser.py` moved to `tests/imports/test_parser.py`. Behavior,
++  the HTTP API, settings, and commands are unchanged.
++- Project references loaded: NONE.
++
++## Documentation Work and Evidence
++
++| Document               | Outcome   | Reason                                                                                   |
++| ---------------------- | --------- | ---------------------------------------------------------------------------------------- |
++| `README.md`            | unchanged | Names `app/imports/parser.py` by purpose only; setup, run, and `uv run pytest` are as before. |
++| `openapi.yaml`         | unchanged | The HTTP contract did not change; the helper is private to the parser.                    |
++| `.env.example`         | unchanged | No setting was added, removed, or renamed.                                                |
++| `docs/architecture.md` | unchanged | The module overview names neither the helper nor the test files.                          |
++
++AC-001 and AC-002 need no documentation: the rename and the test move change
++nothing a reader of these documents relies on.
++
++## Checks and Applicability
++
++- Inspection: searched `README.md`, `openapi.yaml`, `.env.example`, and
++  `docs/` for `_parse_rows`, `_read_rows`, and `test_parser`; no match.
++
++## Discrepancies, Dependencies, and Remaining Work
++
++NONE.
++
++## Resume and Conclusion
++
++- The full Documenter gate is complete with no document changes. Next:
++  DOCUMENTING -> REVIEWING_FINAL for a FINAL_DELIVERABLE review.
++- Blocking question: NONE.

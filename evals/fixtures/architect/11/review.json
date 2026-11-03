@@ -1,0 +1,81 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is BROWNFIELD",
+      "where": ".standards/MODE.md (installed with --mode brownfield)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState ARCHITECTING, recovery inactive",
+      "where": ".standards/STATE.md header, Recovery `Active`: `false`, Outstanding Obligations inactive",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id is billing-copy-20260923T101500Z-4d7e9a13",
+      "where": ".standards/STATE.md Active Work.Id",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Scope points to a completed scope",
+      "where": "STATE.md Scope -> .standards/docs/scope/billing-copy-20260923T101500Z-4d7e9a13.md (SCOPE provenance, AC-001..AC-004 as list items); Handoff FORWARD from SCOPING",
+      "status": "realized"
+    },
+    {
+      "condition": "Valid active-cycle project context exists",
+      "where": ".standards/CONTEXT.md (refreshed for the cycle id, consistent with src/ and test/; selfCheck confirms tests pass)",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Architecture is NONE",
+      "where": ".standards/STATE.md `Architecture`: `NONE`",
+      "status": "realized"
+    },
+    {
+      "condition": "docs/architecture.md is an established unmarked project-owned canonical architecture document",
+      "where": "docs/architecture.md committed pre-install; AGENTS.md project instructions and CONTEXT.md Conventions name it canonical",
+      "status": "realized"
+    },
+    {
+      "condition": "The current design change belongs in that document",
+      "where": "AGENTS.md: record design changes in docs/architecture.md rather than separate design documents; doc intro says to update the affected section",
+      "status": "realized"
+    },
+    {
+      "condition": "No STANDARDS provenance block in docs/architecture.md",
+      "where": "docs/architecture.md (selfCheck confirms no 'STANDARDS' string)",
+      "status": "realized"
+    },
+    {
+      "condition": "No blocking architecture, scope, or context defect so a forward handoff is reachable",
+      "where": "Scope is bounded and consistent with code (new copy route over existing numbering, ledger, 404 mapping)",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 0,
+      "detail": "Assertion 0 ('the response recognizes ... rather than a STANDARDS cycle-owned artifact') is marked complete:true and decided by state/file outcomes only: Architecture == docs/architecture.md, no specs record, no provenance block. This can only produce a false pass, never a false fail, and the catalog explicitly endorses this inference.",
+      "recommendation": "run_as_is",
+      "fix": "None needed; optionally set complete:false so the judge also confirms the reply or behavior shows the distinction."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "Cycle start and the audit are folded into one commit ('Record project context for invoice copy'), with no intermediate AUDITING-state commit. This is plausible, does not affect what the run tests, and check.mjs is clean.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized. docs/architecture.md is an unmarked, committed project document, and AGENTS.md and CONTEXT.md make it the evident design home; the state is ARCHITECTING/STANDARD with Architecture NONE and a clean check. The checks are necessary conditions a correct run satisfies (path recorded, file changed, no provenance, no cycle spec record, forward handoff to DEVELOPING with a /developer invocation), the invariants fit, and no file leaks the answer.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T00:31:10.654Z",
+  "costUsd": 0.1968724,
+  "ms": 35643,
+  "fixtureHash": "c80628cf77509cd4"
+}

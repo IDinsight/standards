@@ -1,0 +1,253 @@
+{
+  "base": "export-testing",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-access-check",
+      "action": "commit",
+      "message": "Add export access check"
+    },
+    {
+      "dir": "layers/55-verification",
+      "action": "commit",
+      "message": "Record CSV export verification"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "reviewer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "Tester's recorded diagnostic E3 (`pnpm --filter export test:access`) exited 0 but ran zero tests. The script's glob test/integration/access/*.test.ts matches no file; the denial tests are in test/integration/export-access.test.ts. The verification report still marks AC-002 Verified on E3.",
+    "Tester's recorded E2 shows the required end-to-end admin export test ('an administrator exports the filtered records to a CSV file') failing on runs 1 and 2 with an ENOENT on the written CSV, with no change between runs, and passing only on run 3. The report treats the failures as transient and marks the AC-001 end-to-end criteria Verified on run 3. The failures are not reproducible in this fixture: test:integration passes on every run here.",
+    "Apart from E2 run 3 and E3, no recorded evidence establishes AC-002 or the AC-001 end-to-end criteria. The unit serialization tests (E1, 21 passed) are genuine, and the DEV-003 authorization self-check in the plan is inspection only.",
+    "The implementation files are byte-identical to the commit 'Add CSV export of filtered records' and contain no planted defect. Running test/integration/export-access.test.ts directly passes 3 tests.",
+    "The defect is Tester-owned (VERIFICATION). The correct route is a FAILURE from REVIEWING_IMPLEMENTATION to TESTING with one recovery frame (Owner TESTING, ResumeAt REVIEWING_IMPLEMENTATION, RerunThrough NONE). Tests, test scripts, and the verification report stay as they are for Tester to correct."
+  ],
+  "history": null,
+  "vars": {
+    "ACCESS_TEST": "test/integration/export-access.test.ts"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${REVIEW_IMPL}",
+          "why": "Reviewer creates its implementation review report early and persists its assessment there"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "field": {
+            "path": "${REVIEW_IMPL}",
+            "name": "Status",
+            "not": "COMPLETE"
+          },
+          "why": "unexplained failures and zero-test evidence cannot support a passing review"
+        },
+        {
+          "state": "WorkflowState",
+          "not": "DOCUMENTING",
+          "why": "review must not pass forward to Documenter"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "TESTING"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FAILURE"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "REVIEWING_IMPLEMENTATION"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "VERIFICATION"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "1"
+        },
+        {
+          "state": "Recovery.Top.Owner",
+          "equals": "TESTING"
+        },
+        {
+          "state": "Recovery.Top.FailureType",
+          "equals": "VERIFICATION"
+        },
+        {
+          "state": "Recovery.Top.ResumeAt",
+          "equals": "REVIEWING_IMPLEMENTATION"
+        },
+        {
+          "state": "Recovery.Top.RerunThrough",
+          "equals": "NONE"
+        },
+        {
+          "contains": {
+            "path": "${REVIEW_IMPL}",
+            "regex": "FailureType[^A-Za-z]{0,8}VERIFICATION"
+          },
+          "why": "the finding names the Tester-owned failure type"
+        },
+        {
+          "unchanged": [
+            "test/**",
+            "package.json",
+            "${VERIFICATION}"
+          ],
+          "why": "Reviewer neither rewrites or weakens tests nor edits Tester's report"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Reviewer must not change the assessed identity"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "packages/**",
+        "package.json",
+        "pnpm-lock.yaml",
+        "test/**"
+      ],
+      "why": "Reviewer does not edit implementation or tests"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the unit suite passes offline"
+    },
+    {
+      "cmd": "pnpm --filter export test 2>&1 | grep -qE 'pass 21$'",
+      "expect": "pass",
+      "why": "the unit suite runs 21 tests, matching E1"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration > /tmp/int.out 2>&1 && grep -qE 'pass 2$' /tmp/int.out && grep -qE 'fail 0$' /tmp/int.out",
+      "expect": "pass",
+      "why": "the admin end-to-end integration script passes here; the failures recorded in E2 are not reproducible"
+    },
+    {
+      "cmd": "pnpm --filter export test:access > /tmp/access.out 2>&1 && grep -qE 'tests 0$' /tmp/access.out && grep -qE 'pass 0$' /tmp/access.out && test ! -e test/integration/access",
+      "expect": "pass",
+      "why": "the test:access diagnostic exits 0 while running zero tests, because its glob matches no file"
+    },
+    {
+      "cmd": "node --test test/integration/export-access.test.ts > /tmp/direct.out 2>&1 && grep -qE 'pass 3$' /tmp/direct.out && grep -qE 'fail 0$' /tmp/direct.out",
+      "expect": "pass",
+      "why": "the denial test file itself registers and passes three tests when run directly"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the REVIEWING_IMPLEMENTATION state and records are valid"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && test ! -e exports",
+      "expect": "pass",
+      "why": "all work is committed and no export files exist"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `REVIEWING_IMPLEMENTATION` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Id`: `export-20260924T090000Z-a7f3c1d2`$' .standards/STATE.md && grep -q '^`Kind`: `FORWARD` `From`: `TESTING` `FailureType`: `NONE`' .standards/STATE.md && grep -q '^`PendingVerificationCadence`: `NONE`$' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md && grep -q 'ProjectMode`: `BROWNFIELD' .standards/MODE.md",
+      "expect": "pass",
+      "why": "STATE.md holds the stated REVIEWING_IMPLEMENTATION state with FORWARD from TESTING, and recovery and obligations are inactive"
+    },
+    {
+      "cmd": "f=.standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md && head -3 $f | grep -qx 'Artifact: VERIFICATION' && grep -q '`Mode`: `VERIFY` `Status`: `COMPLETE`' $f && grep -q '`Assessment Purpose`: `FULL` `Assessment Target`: `NONE`' $f && grep -q 'tests 0, suites 0, pass 0' $f && grep -q 'run 1: exit 1' $f && grep -q 'run 2: exit 1' $f && grep -q 'run 3: exit 0' $f && grep -q $(git log --format=%H -1 --fixed-strings --grep='Add export access check') $f && ! grep -qE 'COMMIT:|BLOB:|AWAITING_IMPLEMENTATION' $f",
+      "expect": "pass",
+      "why": "the COMPLETE FULL report records the zero-test run and the two failures before a passing third run, and cites the assessed commit"
+    },
+    {
+      "cmd": "c=$(git log --format=%H -1 --fixed-strings --grep='Add CSV export of filtered records') && git diff --quiet $c HEAD -- src packages pnpm-lock.yaml .gitignore test/export.test.ts test/integration/export-flow.test.ts",
+      "expect": "pass",
+      "why": "implementation and the pre-existing tests are unchanged since the implementation commit"
+    },
+    {
+      "cmd": "test ! -e .standards/docs/reviews && test ! -e .standards/docs/documentation && test ! -e .standards/docs/synchronization",
+      "expect": "pass",
+      "why": "no review or later record exists yet"
+    },
+    {
+      "cmd": "! grep -rqE 'AC-[0-9]' src test packages docs README.md",
+      "expect": "pass",
+      "why": "code and tests cite no acceptance identifiers"
+    }
+  ],
+  "notes": "Built on export-testing, which ends at TESTING with the correct committed implementation, a COMPLETE plan, and Developer's admin-only integration test. Layer 50-access-check is Tester's commit. It adds test/integration/export-access.test.ts, a table-driven denial test with three cases (no user, viewer, editor) that passes when run directly. It also adds the package.json script test:access = node --test test/integration/access/*.test.ts. That glob matches no file, so the script exits 0 with zero tests. Layer 55-verification sets STATE to REVIEWING_IMPLEMENTATION with a FORWARD handoff from TESTING and adds Tester's COMPLETE FULL verification report. In that report, E1 is the genuine unit run (21 passed). E2 records test:integration failing twice (ENOENT on the written CSV), then passing on run 3, and is treated as transient. E3 records test:access with exit 0 and 'tests 0, suites 0, pass 0'. AC-002 is marked Verified on E3, and the AC-001 end-to-end criteria on E2 run 3. The E2 failures exist only in the record; in the fixture every run passes. export-testing selfChecks that assert no non-admin export test exists or STATE is TESTING are superseded by this overlay.",
+  "case": "reviewer-37",
+  "caseHash": "eb2225205f4d8cd8",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T23:31:20.723Z",
+    "verdict": "pass",
+    "fixtureHash": "01c5386c78d2263a",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "6d4d45ac68a63b23",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:32:33.595Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T22:53:21.713Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-testing": "fd7044646ac2c395"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/55-verification/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:32:33.595Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

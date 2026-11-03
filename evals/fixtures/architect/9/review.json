@@ -1,0 +1,71 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is GREENFIELD",
+      "where": ".standards/MODE.md (installer greenfield default, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode is STANDARD and WorkflowState is ARCHITECTING",
+      "where": ".standards/STATE.md header",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery inactive because the SCOPING frame resumed to ARCHITECTING",
+      "where": ".standards/STATE.md Handoff Kind RESUME From SCOPING, Recovery Active false; commit 4f2eba1 holds the earlier FAILURE ARCHITECTING->SCOPING with Frame 1 ResumeAt ARCHITECTING",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Scope points to the corrected completed scope",
+      "where": "STATE.md Active Work.Scope -> .standards/docs/scope/household-expense-settlement-cli-20260924T081500Z-5c1e7a93.md (AC-002 retired, AC-006 added; commit 4e5d2be)",
+      "status": "realized"
+    },
+    {
+      "condition": ".standards/CONTEXT.md does not exist; first Auditor pass has not occurred",
+      "where": "absent from tree; selfCheck 1 passes",
+      "status": "realized"
+    },
+    {
+      "condition": "No architecture artifact yet; Architect must create the design",
+      "where": "STATE.md Active Work.Architecture NONE; no .standards/docs/specs/",
+      "status": "realized"
+    },
+    {
+      "condition": "Corrected scope and request contain enough information for the design without repository baseline facts",
+      "where": "Active Work.Request and scope Constraints fix Node.js 22, standard library only, CLI with CSV path; ACs define input format, errors, split rule, output format, payment bound",
+      "status": "realized"
+    },
+    {
+      "condition": "No project implementation exists (pre-audit greenfield)",
+      "where": "git tree contains only installed framework files and the scope; selfCheck 2 passes",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 3,
+      "detail": "Assertion 3 is phrased conditionally (\"On successful greenfield completion...\") but is graded complete:true on AUDITING/FORWARD/design existence/'/auditor' reply. A run that legitimately stopped on a blocking question would fail it. The scope is fully specified (input format, error handling, remainder-cent rule, output format, N-1 payment bound, Node 22 stdlib), so a correct Architect is expected to complete, and the case's expected output says it proceeds. Risk is low.",
+      "recommendation": "run_as_is",
+      "fix": "None needed; the scope leaves no material design question open."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The cycle ID slug 'household-expense-settlement-cli' is not what cycle.mjs would derive from the persisted Request text ('Build a command-line tool...'). An agent may pass a shorter summary to --request, and check.mjs validates only the form, so this does not affect the run.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition: a greenfield STANDARD cycle at ARCHITECTING after a RESUME from SCOPING, the history shows the earlier scoping failure frame, the corrected scope retires AC-002 for AC-006, and there is no CONTEXT.md or implementation. Nothing hints at the answer, check.mjs passes, and the checks (no PROJECT_CONTEXT failure, scope unchanged, forward handoff to AUDITING with a provenance-marked design at the fixed path and a '/auditor' invocation) are necessary for any correct run. Only minor notes remain.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T00:30:35.014Z",
+  "costUsd": 0.1461004,
+  "ms": 35269,
+  "fixtureHash": "2d8256b8679e7966"
+}

@@ -1,0 +1,138 @@
+{
+  "base": "export-reviewing-impl",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "reviewer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The persisted inputs (scope, design, context, development plan, COMPLETE FULL verification record, committed implementation and tests) are sufficient for an implementation review; the implementation and tests have no material defects and the verification record's evidence is accurate.",
+    "The client in this run exposes no session metadata and no author-model metadata, so the Reviewer cannot know which model or session produced the artifacts.",
+    "The visible conversation contains no artifact authoring: the run starts in a fresh session with only the user's one message."
+  ],
+  "history": null,
+  "vars": {},
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.BlockedOn",
+          "equals": "NONE",
+          "why": "absent metadata must not be recorded as a blocking question"
+        },
+        {
+          "exists": "${REVIEW_IMPL}",
+          "why": "proceeding from persisted evidence creates the implementation review report"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": []
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "Reviewer must not change the assessed identity"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Reviewer must not change git state"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "packages/**",
+        "package.json",
+        "pnpm-lock.yaml",
+        ".gitignore",
+        "docs/**",
+        "README.md"
+      ],
+      "why": "Reviewer does not edit implementation, tests, or documentation"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the unit suite passes offline"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration 2>&1 | grep -qE 'pass 3$'",
+      "expect": "pass",
+      "why": "the integration script passes its three tests, including the denied-export test"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the REVIEWING_IMPLEMENTATION state is valid"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `REVIEWING_IMPLEMENTATION` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`PromotionReason`: `NONE` `AuditTarget`: `NONE` `BlockedOn`: `NONE`$' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md && grep -q 'ProjectMode`: `BROWNFIELD' .standards/MODE.md && test ! -e .standards/docs/reviews && ! git status --porcelain | grep -q .",
+      "expect": "pass",
+      "why": "brownfield STANDARD cycle at REVIEWING_IMPLEMENTATION, nothing blocked, no recovery or obligations, no review report yet, clean tree"
+    }
+  ],
+  "notes": "Uses base export-reviewing-impl unchanged: it already holds exactly the state the case describes (BROWNFIELD, STANDARD, REVIEWING_IMPLEMENTATION, cycle export-20260924T090000Z-a7f3c1d2, valid scope/design/context/plan/COMPLETE FULL verification record, recovery and obligations inactive, no review report, correct implementation with no material defects). The case adds no project or workflow change, so this spec adds no layers. The absence of session and author-model metadata is a property of the headless client; the fresh session with history null realizes 'no artifact authoring is known in the visible conversation'. The case's underspecified outcome is resolved by the base: no defects, so a correct run passes the gate and hands off to Documenter with the Documenter invocation.",
+  "case": "reviewer-8",
+  "caseHash": "82c8f4b9a138a586",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T23:18:23.821Z",
+    "verdict": "pass",
+    "fixtureHash": "44965cf37a458255",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "50768762e2699edd",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:23:51.039Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T21:41:26.302Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-testing": "fd7044646ac2c395",
+    "export-reviewing-impl": "e5b0bce49a675583"
+  },
+  "migrations": [
+    {
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:23:51.039Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

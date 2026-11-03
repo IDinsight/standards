@@ -1,0 +1,206 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add token auth shared by API and worker"
+    },
+    {
+      "dir": "layers/60-pending",
+      "action": "commit",
+      "message": "Hold auth contract request pending cycle mode decision"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "developer",
+    "utterance": "use STANDARD."
+  },
+  "graderOnly": [
+    "The persisted PendingCycleRequest is exactly: Change the shared authentication token contract so tokens carry a tenant claim that the API and the background worker both validate.",
+    "No cycle has started: the repository has no scope, design, development plan, verification report, or .standards/CONTEXT.md, and src/ and test/ are the committed baseline.",
+    "Starting a first STANDARD brownfield cycle enters AUDITING, which Auditor owns; under Start a cycle the first cycle keeps Handoff.Kind INITIAL with From NONE and FailureType NONE."
+  ],
+  "history": null,
+  "vars": {
+    "REQ": "Change the shared authentication token contract so tokens carry a tenant claim that the API and the background worker both validate."
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.Request",
+          "not": "UNSET",
+          "why": "the stored request must be written to Active Work"
+        },
+        {
+          "contains": {
+            "path": ".standards/STATE.md",
+            "regex": "`Request`:\\s*`[^`]*tenant"
+          },
+          "why": "any faithful copy of the stored request names the tenant claim"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.Id",
+          "not": "UNSET"
+        },
+        {
+          "contains": {
+            "path": ".standards/STATE.md",
+            "regex": "`Id`:\\s*`[a-z0-9]+(?:-[a-z0-9]+)*-\\d{8}T\\d{6}Z-[0-9a-f]{8}`"
+          },
+          "why": "the ID has the form cycle.mjs generates"
+        },
+        {
+          "check_ok": true,
+          "why": "check reports an Active Work.Id not in generated form"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "state": "CycleMode",
+          "equals": "STANDARD"
+        },
+        {
+          "state": "ActiveWork.Id",
+          "not": "UNSET"
+        },
+        {
+          "state": "ActiveWork.Request",
+          "not": "UNSET"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": true,
+      "all": [
+        {
+          "state": "PendingCycleMode",
+          "equals": "UNSET"
+        },
+        {
+          "state": "PendingCycleRequest",
+          "equals": "UNSET"
+        },
+        {
+          "state": "PendingCycleBlockedOn",
+          "equals": "NONE"
+        }
+      ]
+    },
+    {
+      "assertion": 4,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "AUDITING"
+        },
+        {
+          "state": "ActiveWork.Development",
+          "equals": "NONE"
+        },
+        {
+          "unchanged": [
+            "src/**",
+            "test/**",
+            "package.json",
+            "README.md",
+            ".standards/docs/**",
+            ".standards/CONTEXT.md"
+          ],
+          "why": "no implementation, plan, or other role's record is created"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/token.test.js test/api.test.js test/worker.test.js",
+      "expect": "pass",
+      "why": "the existing project tests pass on the committed baseline"
+    },
+    {
+      "cmd": "node .standards/bin/cycle.mjs new --request 'Change the shared authentication token contract'",
+      "expect": "pass",
+      "why": "no cycle is active, so the ID tool can allocate an ID in this state"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the pre-cycle blocked state is valid"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. Layer 50-project (pre-install) commits a small Node ESM project: src/auth/token.js (HMAC token issue/verify) used by both src/api/handler.js and src/worker/consumer.js, with node:test tests. The installer then writes the default brownfield runtime. Layer 60-pending commits .standards/STATE.md as the earlier Developer session left it after rejecting EXPEDITED: WorkflowState AUDITING, CycleMode UNSET, PendingCycleMode EXPEDITED, PendingCycleRequest holding the shared-auth-contract request, PendingCycleBlockedOn naming the ineligibility and the STANDARD/revise/abandon choice, Active Work Id/Request UNSET, Handoff INITIAL, no recovery or obligations. MODE.md stays the installer's BROWNFIELD. No records or CONTEXT.md exist. The correct run invokes cycle.mjs new with the stored request, writes the new ID, request, CycleMode STANDARD, clears pending fields, keeps AUDITING, and stops for Auditor.",
+  "case": "developer-23",
+  "caseHash": "bb22c33477f3c869",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T02:18:31.551Z",
+    "verdict": "pass",
+    "fixtureHash": "492d1c195dcbfe50",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "8967f79bc2eaea6a",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:07:11.956Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T01:25:22.959Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/60-pending/.standards/STATE.md: NONE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:07:11.956Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

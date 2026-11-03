@@ -1,0 +1,84 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is BROWNFIELD",
+      "where": ".standards/MODE.md (brownfield install, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState DEVELOPING, no recovery or obligations",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Persisted development plan is PROPOSED in AUTONOMOUS mode, User Style NONE, User Style Locked false, AFTER_IMPLEMENTATION/NONE",
+      "where": ".standards/docs/development/add-task-priority-20260923T141200Z-5c81e2a4.md header",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.BlockedOn asks for Developer build plan approval",
+      "where": ".standards/STATE.md BlockedOn",
+      "status": "realized"
+    },
+    {
+      "condition": "DEV-001 persistence field, DEV-002 service, DEV-003 UI, all PENDING",
+      "where": "development plan Build Steps",
+      "status": "realized"
+    },
+    {
+      "condition": "Architecture fully defines the required contracts (no upstream defect)",
+      "where": ".standards/docs/specs/...md Interfaces and Contracts (column, ALTER TABLE, PRIORITIES, ValueError text, badge and select markup)",
+      "status": "realized"
+    },
+    {
+      "condition": "Valid Auditor context, completed scope with current ACs",
+      "where": ".standards/CONTEXT.md; .standards/docs/scope/...md AC-001..AC-004",
+      "status": "realized"
+    },
+    {
+      "condition": "Existing checks available as self-checks and not broken by the designed change",
+      "where": "tests/*.py (15 pass; substring and positional assertions); selfCheck pytest",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation not yet started; clean committed tree",
+      "where": "app/* has no priority (selfCheck grep); git status clean",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "blocking",
+      "kind": "check-wrong",
+      "assertion": 3,
+      "detail": "graderOnly states the relevant Developer style files are only universal.md, python.md, and html.md. DEV-001 materially changes SQL in app/store.py (SCHEMA column, ALTER TABLE, PRAGMA table_info, INSERT/SELECT column lists), and the skill says to load the technology style for implementation materially modified (SQL -> styles/sql.md). The judge, relying on this grader fact, could fail a correct run for loading sql.md (\"unrelated style\") or pass a run that skipped a relevant one.",
+      "recommendation": "fix_file",
+      "fix": "In developer-2/spec.json graderOnly, replace the fourth item with: \"The Developer style files relevant to this change are styles/universal.md, styles/python.md, styles/html.md (app/views.py renders markup), and styles/sql.md (app/store.py's schema and queries change).\""
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 2,
+      "detail": "The DONE regexes require each step's Status line directly under its DEV heading (blank lines allowed). A correct run that preserves the template layout satisfies this; a run that reorders step fields would fail. Acceptable since the plan and template fix this layout.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "Plan Notes line 'acceptance tests for this cycle belong to Tester' mildly echoes assertion 4, but it is plausible Developer-authored plan text consistent with the template's authoring rules.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "issues",
+  "summary": "The fixture realizes every stated condition: a brownfield STANDARD cycle in DEVELOPING with a PROPOSED AUTONOMOUS plan, an approval blocker, three PENDING steps, and a complete design. Existing tests still pass after the designed change, and the checks and invariants would not fail a correct run. The one blocking problem is a grader-only fact that omits sql.md from the relevant style files even though store.py's SQL changes materially, which could mislead the judge on assertion 3.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T02:13:59.421Z",
+  "costUsd": 0.809877,
+  "ms": 39557,
+  "fixtureHash": "a3229e755e72f022"
+}

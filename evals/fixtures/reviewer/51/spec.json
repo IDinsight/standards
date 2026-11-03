@@ -1,0 +1,222 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial circulation service"
+    },
+    {
+      "dir": "layers/10-design",
+      "action": "commit",
+      "message": "Record project context, scope, and design for overdue digest"
+    },
+    {
+      "dir": "layers/20-implement",
+      "action": "commit",
+      "message": "Add overdue loan digest"
+    },
+    {
+      "dir": "layers/30-verify",
+      "action": "commit",
+      "message": "Add overdue digest tests and verification report"
+    },
+    {
+      "dir": "layers/40-review",
+      "action": "commit",
+      "message": "Record implementation review"
+    },
+    {
+      "dir": "layers/50-withdraw",
+      "action": "commit",
+      "message": "Withdraw implementation-reviewed completion"
+    },
+    {
+      "dir": "layers/60-reselect",
+      "action": "commit",
+      "message": "Return to implementation-reviewed completion"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "reviewer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "src/, test/, and package.json are identical to the commits the verification report and the existing implementation review assessed; the withdrawal and reselection commits changed only .standards/STATE.md.",
+    "node --test test/loans.test.js test/holds.test.js test/digest.test.js passes with 9 tests, and test/digest.test.js observes every acceptance condition AC-001 to AC-004.",
+    "The scope lists README changes as a non-goal, so no project documentation is required; no documentation record exists and Documenter never started its phase.",
+    "The existing Implementation-Reviewed Closure section says ELIGIBLE and its User Choice and User Reason describe the original cycle-start selection (internal job, no documentation changes expected), not the current reselection, whose stated reason (the user reviewed the README and decided it does not need to mention the digest) is only in Active Work.Request.",
+    "Every closure requirement passes on reassessment, so a correct run ends with one current closure section marked ELIGIBLE for the reselection, the old assessment under Closure Assessment History, and WorkflowState AWAITING_USER_SIGNOFF via a FORWARD handoff from REVIEWING_IMPLEMENTATION."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "overdue-loan-digest-20260922T141500Z-6e2a9c41",
+    "REVIEW": ".standards/docs/reviews/overdue-loan-digest-20260922T141500Z-6e2a9c41/implementation.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "contains": {
+            "path": "${REVIEW}",
+            "regex": "^## Closure Assessment History *$",
+            "flags": "m"
+          },
+          "why": "template and skill name this heading verbatim for superseded closure conclusions"
+        },
+        {
+          "contains": {
+            "path": "${REVIEW}",
+            "regex": "^## Closure Assessment History[\\s\\S]*ELIGIBLE",
+            "flags": "m"
+          },
+          "why": "the preserved history keeps the earlier ELIGIBLE conclusion (or the current one follows it); necessary in any correct layout"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "contains": {
+            "path": "${REVIEW}",
+            "regex": "^## Implementation-Reviewed Closure *$(?![\\s\\S]*^## Implementation-Reviewed Closure *$)",
+            "flags": "m"
+          },
+          "why": "exactly one current closure heading"
+        },
+        {
+          "check_ok": true,
+          "why": "the checker reports a repeated closure section"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "AWAITING_USER_SIGNOFF",
+          "why": "all closure requirements pass on reassessment"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FORWARD"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "REVIEWING_IMPLEMENTATION"
+        },
+        {
+          "state": "ActiveWork.CompletionPolicy",
+          "equals": "IMPLEMENTATION_REVIEWED"
+        },
+        {
+          "field": {
+            "path": "${REVIEW}",
+            "name": "Status",
+            "equals": "COMPLETE"
+          }
+        },
+        {
+          "contains": {
+            "path": "${REVIEW}",
+            "regex": "^## Implementation-Reviewed Closure *$(?:(?!^## )[\\s\\S])*?`Eligibility`:\\s*`ELIGIBLE`",
+            "flags": "m"
+          },
+          "why": "the current closure section, not only the history, records ELIGIBLE"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "Reviewer must not change the assessed identity"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Reviewer must not change git state"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "package.json",
+        "README.md",
+        ".standards/CONTEXT.md",
+        ".standards/docs/scope/**",
+        ".standards/docs/specs/**",
+        ".standards/docs/development/**",
+        ".standards/docs/verification/**"
+      ],
+      "why": "Reviewer does not edit implementation, tests, or other roles' records"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/loans.test.js test/holds.test.js test/digest.test.js",
+      "expect": "pass",
+      "why": "the project's tests, including the Tester's digest tests, pass"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the built state is valid"
+    },
+    {
+      "cmd": "git diff --quiet HEAD~2 HEAD -- src test package.json",
+      "expect": "pass",
+      "why": "implementation and tests are unchanged since the implementation review commit; only STATE.md changed afterwards"
+    },
+    {
+      "cmd": "grep -c '^## Implementation-Reviewed Closure' .standards/docs/reviews/overdue-loan-digest-20260922T141500Z-6e2a9c41/implementation.md | grep -qx 1",
+      "expect": "pass",
+      "why": "the report starts with exactly one current closure section"
+    },
+    {
+      "cmd": "grep -q 'Eligibility.: .ELIGIBLE' .standards/docs/reviews/overdue-loan-digest-20260922T141500Z-6e2a9c41/implementation.md",
+      "expect": "pass",
+      "why": "the earlier closure section still says ELIGIBLE"
+    },
+    {
+      "cmd": "test ! -e .standards/docs/documentation",
+      "expect": "pass",
+      "why": "no normal Documenter work ever began"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 00-project: small dependency-free Node ES-module library (loans, dates, mailer outbox, hold notices) with 4 passing tests. 10-design: CONTEXT.md, scope (AC-001..AC-004, README changes a non-goal), design, STATE at DEVELOPING with the original IMPLEMENTATION_REVIEWED choice in Request. 20-implement: src/digest.js (correct) and COMPLETE plan, STATE TESTING. 30-verify: test/digest.test.js (5 tests), package.json test script, COMPLETE FULL verification report citing the implementation commit, STATE REVIEWING_IMPLEMENTATION. 40-review: COMPLETE implementation review with one ELIGIBLE Implementation-Reviewed Closure section recording the original choice and reason, STATE AWAITING_USER_SIGNOFF. 50-withdraw: STATE DOCUMENTING, FULL_DELIVERABLE, COMPLETION_CHANGE from AWAITING_USER_SIGNOFF. 60-reselect: STATE REVIEWING_IMPLEMENTATION, IMPLEMENTATION_REVIEWED, COMPLETION_CHANGE from DOCUMENTING, Request replaced with the reselection and its new stated reason. No documentation record exists. Assertion 0's NOT_ASSESSED intermediate step is left to the judge (trace).",
+  "case": "reviewer-51",
+  "caseHash": "7347558390f4bffb",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T03:05:23.898Z",
+    "verdict": "pass",
+    "fixtureHash": "1e007aed6eaa02aa",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-31T00:39:49.758Z"
+  }
+}

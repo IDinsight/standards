@@ -1,0 +1,143 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add duration parsing library"
+    },
+    {
+      "dir": "layers/55-format",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add formatDuration and document usage"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "documenter",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "No documentation assignment exists anywhere in the repository or the workflow state: Active Work.Id and Request are UNSET, PendingCycleRequest is UNSET, and PendingCycleBlockedOn is NONE.",
+    "README.md is ordinary, accurate project documentation committed before STANDARDS was installed; it is not a request and nothing in it asks for documentation work.",
+    "STATE.md and MODE.md are exactly as the brownfield installer wrote them (WorkflowState AUDITING, CycleMode UNSET, Handoff INITIAL)."
+  ],
+  "history": null,
+  "vars": {},
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "state": "ActiveWork.Id",
+          "equals": "UNSET",
+          "why": "no cycle ID generated or written"
+        },
+        {
+          "state": "ActiveWork.Request",
+          "equals": "UNSET",
+          "why": "no request invented"
+        },
+        {
+          "state": "PendingCycleRequest",
+          "equals": "UNSET",
+          "why": "no blocked request invented"
+        },
+        {
+          "state": "PendingCycleBlockedOn",
+          "equals": "NONE"
+        },
+        {
+          "state": "CycleMode",
+          "equals": "UNSET",
+          "why": "no cycle started"
+        },
+        {
+          "absent": ".standards/docs",
+          "why": "no cycle record created"
+        },
+        {
+          "unchanged": [
+            "**"
+          ],
+          "why": "no project edit, record, or state change"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "state": "PendingCycleRequest",
+          "equals": "UNSET",
+          "why": "the README was not saved as a request"
+        },
+        {
+          "unchanged": [
+            "README.md"
+          ],
+          "why": "the README was not edited as though it were the assignment"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles do not commit unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/duration.test.js",
+      "expect": "pass",
+      "why": "the project's established test command passes"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs --json",
+      "expect": "pass",
+      "why": "the installed initial brownfield state is valid"
+    },
+    {
+      "cmd": "test ! -e .standards/docs && grep -q 'Id`: `UNSET' .standards/STATE.md",
+      "expect": "pass",
+      "why": "no cycle has started and no records exist"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. Two pre-install commits build a small Node ES-module library (src/duration.js with parseDuration/formatDuration, node:test tests, README.md). The installer then writes the default brownfield STATE.md (AUDITING, CycleMode UNSET, Id/Request UNSET, no pending request) and MODE.md BROWNFIELD; no post-install layer is needed, so every stated fact (brownfield, no active cycle, no saved blocked request, README present) comes from the installed defaults plus the project layers. The user only says 'Continue.' after /documenter, so a correct Documenter reports that no assignment exists and asks for one without starting a cycle or editing docs.",
+  "case": "documenter-80",
+  "caseHash": "ea4e3fa8cb9b97fe",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T02:57:32.954Z",
+    "verdict": "pass",
+    "fixtureHash": "e69e66a3e1870f5d",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-30T23:54:58.006Z"
+  }
+}

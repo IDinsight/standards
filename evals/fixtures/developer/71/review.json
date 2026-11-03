@@ -1,0 +1,84 @@
+{
+  "conditions": [
+    {
+      "condition": "Invocation is `/developer help` in Claude Code",
+      "where": "spec.json prompt: skill developer, utterance \"help\"",
+      "status": "realized"
+    },
+    {
+      "condition": "WorkflowState is TESTING",
+      "where": ".standards/STATE.md `WorkflowState`: `TESTING` (FORWARD from DEVELOPING)",
+      "status": "realized"
+    },
+    {
+      "condition": "STANDARD cycle (FULL_DELIVERABLE, no recovery)",
+      "where": ".standards/STATE.md CycleMode STANDARD, CompletionPolicy FULL_DELIVERABLE, Recovery Active false",
+      "status": "realized"
+    },
+    {
+      "condition": "Approved development plan with Mode STEPWISE, User Style tony, User Style Locked true",
+      "where": ".standards/docs/development/add-invoice-discounts-20260922T141500Z-3c9e5a71.md header (Status COMPLETE, referenced by Active Work.Development)",
+      "status": "realized"
+    },
+    {
+      "condition": "Discovery helper available and reports AUTONOMOUS, CODE_WITH_ME, STEPWISE",
+      "where": "installed .standards/bin/invocation.mjs plus developer modes/*.md; selfCheck grep passed",
+      "status": "realized"
+    },
+    {
+      "condition": "Complete style inventory containing alice and tony",
+      "where": ".standards/user-styles/developer/alice.md and tony.md (only files in the folder)",
+      "status": "realized"
+    },
+    {
+      "condition": "Helper reports tony as the locked selection",
+      "where": "plan `User Style Locked`: `true` read through the developer metadata's lockedWhen record field",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, architecture, context records exist (catalog)",
+      "where": ".standards/docs/scope/..., .standards/docs/specs/..., .standards/CONTEXT.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Committed, clean git state",
+      "where": "git status clean on main; 5 commits",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 1,
+      "detail": "`reply_matches: \"tony\"` is case-sensitive. A correct run that writes the style as \"Tony\" without also using the identifier would fail. This is unlikely because the discovered identifier and the saved field are both lowercase `tony`.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally add \"flags\": \"i\" to the assertion-1 `tony` check in spec.json."
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 0,
+      "detail": "`code[ _]with[ _]me` would miss a hyphenated rendering such as \"Code-With-Me\". The discovered id and label are CODE_WITH_ME and \"Code With Me\", so a correct run almost certainly matches.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally widen the pattern to `code[ _-]with[ _-]me`."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "The helper selfCheck greps only for the mode and style names. It does not confirm that the helper reports tony as locked or the inventory as complete. The plan header and the metadata's lockedWhen rule make this very likely, but no gate proves it.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally extend the selfCheck to grep the helper JSON for the lock disposition."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition: a STANDARD cycle at TESTING, an approved STEPWISE plan with tony selected and locked, alice and tony as the only developer styles, and a working discovery helper. check.mjs passes, and the records are coherent and leak nothing. The checks and invariants are necessary conditions a correct help-only run satisfies; the notes cover only minor regex strictness and a selfCheck that does not prove the lock is reported.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T02:54:48.735Z",
+  "costUsd": 0.18921020000000002,
+  "ms": 32981,
+  "fixtureHash": "13df655e7856144b"
+}

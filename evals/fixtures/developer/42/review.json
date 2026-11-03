@@ -1,0 +1,94 @@
+{
+  "conditions": [
+    {
+      "condition": "Project is BROWNFIELD and the cycle is STANDARD",
+      "where": ".standards/MODE.md (BROWNFIELD); .standards/STATE.md `CycleMode`: `STANDARD`",
+      "status": "realized"
+    },
+    {
+      "condition": "WorkflowState is DEVELOPING",
+      "where": ".standards/STATE.md `WorkflowState`: `DEVELOPING`, Handoff FORWARD from ARCHITECTING",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery inactive, no outstanding obligations, no pending cadence",
+      "where": ".standards/STATE.md Recovery `Active`: `false`, Obligations `Active`: `false`, `PendingVerificationCadence`: `NONE`",
+      "status": "realized"
+    },
+    {
+      "condition": "Completed upstream scope, design, and context exist for the active cycle",
+      "where": ".standards/docs/scope/low-stock-report-…md (AC-001..AC-003), .standards/docs/specs/low-stock-report-…md (covers all ACs), .standards/CONTEXT.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Approved plan with all approved steps implemented (DONE)",
+      "where": ".standards/docs/development/low-stock-report-…md: DEV-001 and DEV-002 `DONE`, User Style Locked true, AFTER_IMPLEMENTATION, Current Increment NONE; Status IN_PROGRESS left for the role to set COMPLETE at the gate",
+      "status": "realized"
+    },
+    {
+      "condition": "Self-checks are satisfactory",
+      "where": "Plan Self-Check sections cite commit 48d0ba1 with exit 0 results; selfChecks confirm tests, the sanity check, and the CLI run pass",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation conforms to the design (no material defects)",
+      "where": "src/inventory.js (reorderAt parsing, isLowStock with <=), src/report.js (`  LOW` marker, `<N> items, <M> low stock`)",
+      "status": "realized"
+    },
+    {
+      "condition": "User explicitly asks for Developer and Tester together, with formal verification in this conversation",
+      "where": "Utterance: 'Go straight to formal verification with Tester here in this conversation.' (harness can invoke only /developer)",
+      "status": "realized"
+    },
+    {
+      "condition": "The conversation contains Developer authoring history",
+      "where": "Realized by the run's own Developer completion work (gate, plan update, handoff) in the same session; no prior history turns",
+      "status": "realized"
+    },
+    {
+      "condition": "No verification record exists yet",
+      "where": ".standards/docs/verification/ absent",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation committed, clean tree",
+      "where": "git log commit 'Add reorder thresholds and low-stock flags'; git status clean",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The case says implementation happened earlier in 'this implementation conversation', but the fixture has no history. The prohibited authoring history is only the run's own Developer gate and handoff work. The catalog accepted this, and the independent-session prefix is required for any handoff into TESTING. A correct run will still hand off rather than assess here, and the Tester skill is user-invocable-only anyway.",
+      "recommendation": "run_as_is",
+      "fix": "None needed; the judge should accept a fresh-chat request grounded in this session's Developer work."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The Auditor's CONTEXT.md lands in the same commit as the scope and design ('Record scope and design for low-stock report'). In brownfield order the audit is a separate earlier step. This is harmless for this case.",
+      "recommendation": "run_as_is",
+      "fix": "Optional: split CONTEXT.md into its own earlier commit such as 'Record project context'."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 0,
+      "detail": "`reply_matches` \"/tester[^a-zA-Z_-]\" requires a character after `/tester`. Every realistic invocation line ('/tester Continue …', '`/tester`') satisfies it. The exact fresh-chat prefix is correctly left to the judge (complete:false).",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes a STANDARD brownfield cycle in DEVELOPING with an approved plan whose steps are all DONE, concrete self-check evidence on the committed implementation, and no verification record. The user's request to verify here is in the utterance. The checks (TESTING state, FORWARD from DEVELOPING, COMPLETE plan, no verification record or Tester skill call, a /tester invocation) are necessary for any correct handoff, and the invariants fit; only minor realism notes remain.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T02:22:35.230Z",
+  "costUsd": 0.2070746,
+  "ms": 46988,
+  "fixtureHash": "6bd260b5c9e79c67"
+}

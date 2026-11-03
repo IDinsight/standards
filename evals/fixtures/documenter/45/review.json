@@ -1,0 +1,91 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState DOCUMENTING",
+      "where": ".standards/STATE.md head",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, architecture, context, development, verification, implementation review exist with matching provenance and current evidence",
+      "where": ".standards/docs/{scope,specs,development,verification,reviews}/…, .standards/CONTEXT.md; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-001 covers CSV export behavior; AC-002 requires an accurate usage guide",
+      "where": ".standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Outer frame owned by AUDITING with ResumeAt TESTING",
+      "where": ".standards/STATE.md Frame 2 (TESTING→AUDITING, PROJECT_CONTEXT, RerunThrough NONE)",
+      "status": "realized"
+    },
+    {
+      "condition": "Active nested frame owned by DOCUMENTING with ResumeAt AUDITING",
+      "where": ".standards/STATE.md Frame 3 (AUDITING→DOCUMENTING, DOCUMENTATION, RerunThrough NONE); Handoff FAILURE from AUDITING",
+      "status": "realized"
+    },
+    {
+      "condition": "A documentation defect exists that the correction fixes",
+      "where": "docs/usage.md Filtering: 'Any other value, including an empty one, returns 400' vs src/records/filter.ts ignoring blank status (selfCheck proves)",
+      "status": "realized"
+    },
+    {
+      "condition": "Correcting it passes the full Documenter gate (rest of guide/README accurate, nothing else open in the record)",
+      "where": "docs/usage.md export section, README.md, documentation record Discrepancies NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Correction invalidates no downstream work needing rerun before AUDITING",
+      "where": "final-deliverable.md already BLOCKED under Frame 1, which resumes REVIEWING_FINAL later; Tester's Suspended Assignment resumes via Frame 2",
+      "status": "realized"
+    },
+    {
+      "condition": "Obligations inactive, no blocked user question, editing unrestricted",
+      "where": ".standards/STATE.md Outstanding Obligations Active false, BlockedOn NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Work committed, clean tree",
+      "where": "git status clean",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 1,
+      "detail": "The precondition `field Status equals COMPLETE` on the documentation record rejects a run that keeps the record IN_PROGRESS under Documenter Corrective Return, for example because it treats the guide's 'no file is written' claim as waiting on Tester's F-001 evidence. The case states that the correction passes the full gate. The skill says an interrupted Reviewer/Tester conclusion is not required for this gate, and inspection supports the claim (parseFilter runs before writeExport). So COMPLETE is the intended correct outcome, and the precondition is defensible.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The fixture adds a third, older frame (Frame 1, REVIEWING_FINAL→TESTING) to reconcile the catalog's issue that a current implementation review is incompatible with interrupting TESTING. This is a reasonable and consistent choice. 'An outer frame' does not exclude an older one, and the extra frame strengthens assertion 0.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes the nested recovery: Frame 2 is AUDITING-owned with ResumeAt TESTING, and the active Frame 3 is DOCUMENTING-owned with ResumeAt AUDITING. It plants a single, verifiable documentation inaccuracy whose correction passes the full gate without requiring reruns, and check.mjs passes. The checks match canonical routing (pop only Frame 3, RESUME to AUDITING, Frames 1–2 preserved), the turn-end check stays clean for that end state, and the invariants fit a Documenter run.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T16:37:05.112Z",
+  "costUsd": 0.3610926,
+  "ms": 89868,
+  "fixtureHash": "74fcc576237a735a"
+}

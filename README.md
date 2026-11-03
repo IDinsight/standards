@@ -64,8 +64,13 @@ your user styles, without changing anything. See
 [Ask a role for help](docs/src/content/docs/roles/overview.md#ask-a-role-for-help).
 
 Each role has eval cases in `skills/<role>/evals/evals.json`. See
-[`SKILL_EVAL_REPORT.md`](SKILL_EVAL_REPORT.md) for an earlier evaluation and its
-results.
+[the release 0.15.0 skill eval report](evals/SKILL_EVAL_REPORT_20261031.md) for
+the latest results,
+[the release 0.8.0 skill eval report](evals/SKILL_EVAL_REPORT_20261003.md) for
+an earlier evaluation,
+[the release 0.15.0 reference eval report](evals/REFERENCE_EVAL_REPORT_20261103.md)
+for whether the role references make the roles' work better, and
+[`evals/README.md`](evals/README.md) to run the cases yourself.
 
 ## Choose when a standard cycle finishes
 

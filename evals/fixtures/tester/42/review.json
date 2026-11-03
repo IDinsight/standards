@@ -1,0 +1,89 @@
+{
+  "conditions": [
+    {
+      "condition": "Fresh Tester session; ProjectMode BROWNFIELD, CycleMode STANDARD, WorkflowState TESTING after a FORWARD from DEVELOPING, no recovery",
+      "where": ".standards/MODE.md; .standards/STATE.md (Handoff FORWARD from DEVELOPING, Recovery inactive); prompt has no history",
+      "status": "realized"
+    },
+    {
+      "condition": "The change adds POST /cases/{id}/summary to a FastAPI service backed by PostgreSQL",
+      "where": "app/cases/router.py create_summary; app/utils/database.py; docker-compose.yml postgres:16",
+      "status": "realized"
+    },
+    {
+      "condition": "The route gets a thin LLM client from get_llm_client, forces a record_summary tool call, and stores the parsed summary",
+      "where": "app/cases/router.py (Depends(get_llm_client), SUMMARY_TOOL, _parse_summary, Summary insert); app/llm/client.py",
+      "status": "realized"
+    },
+    {
+      "condition": "The client has a real result shape (Completion/ToolCall with JSON-string arguments) and a rate-limit error carrying retry_after",
+      "where": "app/llm/client.py",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-001 (201 with stored summary), AC-002 (503 + Retry-After, nothing stored), AC-003 (invalid JSON tool args -> 502, nothing stored)",
+      "where": ".standards/docs/scope/case-summary-20260922T141500Z-5b8e2d71.md; design accounts for all three; router implements them",
+      "status": "realized"
+    },
+    {
+      "condition": "The existing suite uses app.dependency_overrides and a PostgreSQL test database",
+      "where": "tests/conftest.py (overrides get_session, Alembic migrations, postgresql URL, savepoint rollback)",
+      "status": "realized"
+    },
+    {
+      "condition": "CI has no provider key",
+      "where": ".github/workflows/ci.yml env (SECRET_KEY and DB URLs only); selfCheck confirms",
+      "status": "realized"
+    },
+    {
+      "condition": "Developer's notes record one successful self-check against the live API",
+      "where": ".standards/docs/development/...md DEV-001 Self-Check",
+      "status": "realized"
+    },
+    {
+      "condition": "Only app/cases/router.py carries the change",
+      "where": "git commit 'Add case summary endpoint' touches only app/cases/router.py among source files; the client, model, and migration are in a pre-install commit",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, architecture, context, and development records exist and are coherent; no verification report yet",
+      "where": ".standards/CONTEXT.md, scope, specs, development plan COMPLETE; check.mjs ok",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "runtime",
+      "assertion": -1,
+      "detail": "The case's external dependency (FastAPI, SQLModel, Alembic, openai installed offline, plus a PostgreSQL test DB) cannot be provided by the runner. The suite cannot execute, and the role can only write tests and record an unavailable execution. The assertions mostly grade test design and the report, so they stay observable, and graderOnly tells the judge not to penalize unavailable execution.",
+      "recommendation": "run_as_is",
+      "fix": "Accept; the judge grades the tests and the report as graderOnly instructs."
+    },
+    {
+      "severity": "note",
+      "kind": "ungradeable-assertion",
+      "assertion": 5,
+      "detail": "The catalog's 'trace: test runs reach no provider host' part is vacuous here, because no test can run. 'No real key' has to be judged from the test code: a placeholder LLM_API_KEY in tests/conftest.py, and overrides that keep the real client from being built. conftest deliberately sets no placeholder, so the behavior is still observable.",
+      "recommendation": "run_as_is",
+      "fix": "Judge from the test code and the report contents."
+    },
+    {
+      "severity": "note",
+      "kind": "invariant",
+      "assertion": -1,
+      "detail": "The invariant 'unchanged .github/**' forbids adding a placeholder key to CI. The llm-api-testing reference puts the placeholder in test setup (conftest), so a correct run has no need to touch CI. The risk is small.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized in the repository: the single-file router change, the client shapes that match the reference, the PostgreSQL conftest with dependency_overrides, CI with no provider key, and the live-only Developer self-check. The checks are necessary-only, and the invariants fit a Tester. The only compromise is that the suite cannot execute in the runner, which graderOnly addresses and which leaves the assertions gradeable from the tests and the report.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T03:16:39.160Z",
+  "costUsd": 0.29168740000000004,
+  "ms": 40416,
+  "fixtureHash": "89e1b451cf311f47"
+}

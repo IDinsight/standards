@@ -1,0 +1,267 @@
+{
+  "base": null,
+  "date": "2026-10-04T16:00:00Z",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add summarize CLI for CSV columns"
+    },
+    {
+      "dir": "layers/50-context",
+      "action": "commit",
+      "message": "Record project context for the CLI guide"
+    },
+    {
+      "dir": "layers/55-scope",
+      "action": "commit",
+      "message": "Define CLI guide documentation scope"
+    },
+    {
+      "dir": "layers/60-design",
+      "action": "commit",
+      "message": "Record existing CLI contracts for the guide"
+    },
+    {
+      "dir": "layers/65-guide",
+      "action": "commit",
+      "message": "docs: add summarize CLI user guide"
+    },
+    {
+      "dir": "layers/70-record",
+      "action": "commit",
+      "message": "Record CLI guide documentation evidence"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "reviewer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "docs/guide.md accurately describes the behavior of bin/summarize.js, src/csv.js, and src/summarize.js: options, input limits, counting, rounding, output formats, and exit codes all match the source, and every example block matches the command's real output (proved by selfChecks).",
+    "No material findings exist; the full FINAL_DELIVERABLE gate should pass, and the correct handoff is FORWARD from REVIEWING_FINAL to SYNCHRONIZING with CompletionPolicy NONE.",
+    "README.md links to docs/guide.md, and the guide and README edits stay within the scoped editing boundary.",
+    "The documentation record's listed checks are reproducible in the run environment. No development plan, verification report, or implementation review exists, and none is required in this DOCUMENTATION cycle."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "guide-20261004T120000Z-1a2b3c4d",
+    "FINAL": ".standards/docs/reviews/guide-20261004T120000Z-1a2b3c4d/final-deliverable.md",
+    "IMPL": ".standards/docs/reviews/guide-20261004T120000Z-1a2b3c4d/implementation.md",
+    "DEVPLAN": ".standards/docs/development/guide-20261004T120000Z-1a2b3c4d.md",
+    "VERIF": ".standards/docs/verification/guide-20261004T120000Z-1a2b3c4d.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "absent": "${DEVPLAN}",
+          "why": "no development plan is manufactured for an omitted owner"
+        },
+        {
+          "absent": "${VERIF}",
+          "why": "no verification report is manufactured for an omitted owner"
+        },
+        {
+          "absent": "${IMPL}",
+          "why": "no implementation review is manufactured"
+        },
+        {
+          "state": "ActiveWork.Development",
+          "equals": "NONE",
+          "why": "documentation cycles keep Development NONE"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "in": [
+            "NONE",
+            "SCOPING",
+            "ARCHITECTURE",
+            "PROJECT_CONTEXT",
+            "DOCUMENTATION",
+            "REVIEW",
+            "SYNCHRONIZATION"
+          ],
+          "why": "no failure is routed to an omitted Developer or Tester owner"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${FINAL}",
+          "why": "the final review report is written"
+        },
+        {
+          "provenance": {
+            "path": "${FINAL}",
+            "artifact": "REVIEW",
+            "cycle": "${ID}",
+            "kind": "FINAL_DELIVERABLE"
+          }
+        },
+        {
+          "contains": {
+            "path": "${FINAL}",
+            "regex": "AC-001"
+          },
+          "why": "the report accounts for current acceptance conditions"
+        },
+        {
+          "contains": {
+            "path": "${FINAL}",
+            "regex": "AC-007"
+          },
+          "why": "the report accounts for every current acceptance condition"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": true,
+      "all": [
+        {
+          "state": "ActiveWork.CompletionPolicy",
+          "equals": "NONE"
+        },
+        {
+          "state": "CycleMode",
+          "equals": "DOCUMENTATION"
+        },
+        {
+          "absent": "${IMPL}",
+          "why": "no implementation report, so no closure assessment there"
+        },
+        {
+          "state": "WorkflowState",
+          "not": "AWAITING_USER_SIGNOFF",
+          "why": "final review never enters sign-off readiness directly in DOCUMENTATION"
+        },
+        {
+          "check_ok": true,
+          "why": "check reports an Implementation-Reviewed Closure section placed in a final-deliverable report"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "Reviewer must not change the assessed identity"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Reviewer must not change git state"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "bin/**",
+        "test/**",
+        "examples/**",
+        "package.json",
+        "docs/**",
+        "README.md",
+        ".standards/CONTEXT.md",
+        ".standards/docs/scope/**",
+        ".standards/docs/specs/**",
+        ".standards/docs/documentation/**"
+      ],
+      "why": "Reviewer does not edit implementation, documentation, or other roles' records"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/summarize.test.js test/cli.test.js",
+      "expect": "pass",
+      "why": "the established test command passes, as the documentation record states"
+    },
+    {
+      "cmd": "test $(node bin/summarize.js examples/sales.csv --column amount | tr -d ' ' | paste -sd, -) = count:3,skipped:1,sum:300,min:80,max:120.5,mean:100",
+      "expect": "pass",
+      "why": "the guide's amount example output is exact"
+    },
+    {
+      "cmd": "test $(node bin/summarize.js examples/sales.csv --column units --format json | tr -dc 'a-z0-9.,:') = count:4,skipped:0,sum:10,min:1,max:4,mean:2.5",
+      "expect": "pass",
+      "why": "the guide's JSON units example output is exact"
+    },
+    {
+      "cmd": "test $(node bin/summarize.js examples/sales.csv --column region | tr -d ' ' | paste -sd, -) = count:0,skipped:4,sum:0,min:-,max:-,mean:-",
+      "expect": "pass",
+      "why": "the guide's no-numeric-values example output is exact"
+    },
+    {
+      "cmd": "node bin/summarize.js examples/sales.csv --column price 2>/dev/null; test $? -eq 2",
+      "expect": "pass",
+      "why": "unknown column exits 2 as documented"
+    },
+    {
+      "cmd": "node bin/summarize.js examples/sales.csv --column price 2>&1",
+      "expect": "fail",
+      "expectOutput": "Column not found: price",
+      "why": "unknown column message matches the guide"
+    },
+    {
+      "cmd": "node bin/summarize.js examples/sales.csv 2>/dev/null; test $? -eq 1",
+      "expect": "pass",
+      "why": "missing --column is a usage error with exit 1"
+    },
+    {
+      "cmd": "node bin/summarize.js examples/sales.csv 2>&1",
+      "expect": "fail",
+      "expectOutput": "Usage: summarize <file.csv> --column <name>",
+      "why": "usage line matches the guide"
+    },
+    {
+      "cmd": "node bin/summarize.js examples/sales.csv --column amount --format csv 2>/dev/null; test $? -eq 1",
+      "expect": "pass",
+      "why": "unknown --format is a usage error with exit 1"
+    },
+    {
+      "cmd": "node bin/summarize.js examples/missing.csv --column amount 2>/dev/null; test $? -eq 1",
+      "expect": "pass",
+      "why": "an unreadable file exits 1 as documented"
+    },
+    {
+      "cmd": "node bin/summarize.js examples/missing.csv --column amount 2>&1",
+      "expect": "fail",
+      "expectOutput": "ENOENT: no such file or directory",
+      "why": "an unreadable file prints Node's ENOENT error as documented"
+    }
+  ],
+  "notes": "Standalone brownfield DOCUMENTATION cycle at REVIEWING_FINAL. 00-project (pre-install): a small Node ESM CLI (bin/summarize.js, src/csv.js, src/summarize.js, examples/sales.csv, node:test tests, README). 50-context: Auditor CONTEXT.md and STATE at SCOPING. 55-scope: scope record with AC-001..AC-007 and STATE at ARCHITECTING. 60-design: documentation-mode technical design covering every AC (AC-007 no architectural impact) and STATE at DOCUMENTING. 65-guide: the saved deliverable, docs/guide.md plus a README link, committed as 'docs: add summarize CLI user guide'. 70-record: COMPLETE documentation record citing commits and blobs plus the actual checks, and the final STATE (REVIEWING_FINAL, FORWARD from DOCUMENTING, CompletionPolicy NONE, Development NONE, no recovery, obligations, or blockers). No development, verification, or implementation-review records exist. The guide is accurate (selfChecks prove every example and exit code), so a correct run passes the gate and hands off FORWARD to SYNCHRONIZING. The spec sets date so commits postdate the cycle ID timestamp.",
+  "case": "reviewer-54",
+  "caseHash": "1abf161f148af8ce",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T03:06:28.467Z",
+    "verdict": "pass",
+    "fixtureHash": "2c789ac0265b7b26",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-31T00:46:08.640Z"
+  }
+}

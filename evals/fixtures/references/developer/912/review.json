@@ -1,0 +1,114 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState DEVELOPING, CompletionPolicy FULL_DELIVERABLE",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id is ci-lint-20260924T090000Z-5f3a9d20",
+      "where": ".standards/STATE.md Active Work.Id",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery inactive, Active Work.BlockedOn NONE",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work points to the completed scope, technical design, and development plan of this cycle",
+      "where": "STATE.md Scope/Architecture/Development paths; files under .standards/docs/{scope,specs,development}/ with matching provenance; Handoff FORWARD from ARCHITECTING",
+      "status": "realized"
+    },
+    {
+      "condition": "Valid Auditor context exists",
+      "where": ".standards/CONTEXT.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Node.js HTTP service managed with pnpm",
+      "where": "package.json (packageManager pnpm@10.34.5, type module), src/server.js, index.js",
+      "status": "realized"
+    },
+    {
+      "condition": "package.json scripts lint (eslint .) and test (node --test), ESLint dev dependency",
+      "where": "package.json scripts and devDependencies; eslint.config.js",
+      "status": "realized"
+    },
+    {
+      "condition": ".github/workflows/ci.yml runs only a test job on push and pull_request to main",
+      "where": ".github/workflows/ci.yml",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope AC-001: every push and PR to main runs the linter and a lint error fails CI",
+      "where": ".standards/docs/scope/ci-lint-20260924T090000Z-5f3a9d20.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Technical design adds a lint job to ci.yml running pnpm lint",
+      "where": ".standards/docs/specs/ci-lint-20260924T090000Z-5f3a9d20.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Plan APPROVED, AUTONOMOUS, User Style NONE locked, single step DEV-001 PENDING for AC-001",
+      "where": ".standards/docs/development/ci-lint-20260924T090000Z-5f3a9d20.md",
+      "status": "realized"
+    },
+    {
+      "condition": "node --test passes",
+      "where": "selfChecks: node --test test/*.test.js and pnpm test pass (6 tests)",
+      "status": "realized"
+    },
+    {
+      "condition": "Dev dependencies not installed and registries blocked, so pnpm lint cannot run locally",
+      "where": "node_modules absent and gitignored; runtime.blockHosts; selfChecks show eslint: not found and ECONNREFUSED",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope and design complete and consistent; DEV-001 needs no upstream change",
+      "where": "scope/design records; source has no recommended-rule ESLint errors given the configured globals",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "pnpm-lock.yaml contains only the importers section, with no packages/snapshots entries. A careful run that inspects it or tries `pnpm install --frozen-lockfile --offline` might call the lockfile broken, but installation fails anyway because the registries are blocked. The existing test job already depends on the same lockfile, so DEV-001 does not change this.",
+      "recommendation": "run_as_is",
+      "fix": "Acceptable compromise; no change needed."
+    },
+    {
+      "severity": "note",
+      "kind": "case-defect",
+      "assertion": 1,
+      "detail": "Developer's full-completion gate requires that self-checks completed satisfactorily or that any limitation was routed as a blocker. A run that treats the unrunnable `pnpm lint` as a blocker would not hand off. The case's expected output resolves this by requiring a recorded limitation and a handoff, and the fixture realizes that state faithfully.",
+      "recommendation": "run_as_is",
+      "fix": "Case-level interpretation; the fixture is consistent with the expected output."
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 0,
+      "detail": "The DONE regex requires `Status`: `DONE` as the first non-blank line under the `### DEV-001` heading. The existing plan uses that layout and a correct run normally edits only the value, so a false failure is very unlikely.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized in the built tree. check.mjs reports ok, and the selfChecks confirm that tests pass while `pnpm lint` cannot run with the registries blocked. The checks for both assertions are necessary conditions a correct run satisfies, the invariants fit a Developer run, and nothing leaks the expected outcome.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-11-02T17:29:51.725Z",
+  "costUsd": 0.2247516,
+  "ms": 45923,
+  "fixtureHash": "a18d5335b0672571"
+}

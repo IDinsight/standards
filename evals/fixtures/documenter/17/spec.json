@@ -1,0 +1,226 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-service",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Set up records service with seeded store and listing route"
+    },
+    {
+      "dir": "layers/51-converter",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add legacy seed converter"
+    },
+    {
+      "dir": "layers/52-guide",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add usage guide for listing records"
+    },
+    {
+      "dir": "layers/60-context",
+      "action": "commit",
+      "message": "Record project context for CSV export"
+    },
+    {
+      "dir": "layers/61-scope",
+      "action": "commit",
+      "message": "Define CSV export scope"
+    },
+    {
+      "dir": "layers/62-design",
+      "action": "commit",
+      "message": "Design CSV export"
+    },
+    {
+      "dir": "layers/63-plan",
+      "action": "commit",
+      "message": "Plan CSV export implementation"
+    },
+    {
+      "dir": "layers/64-export",
+      "action": "commit",
+      "message": "Add CSV export of filtered records"
+    },
+    {
+      "dir": "layers/65-complete",
+      "action": "commit",
+      "message": "Mark CSV export plan complete"
+    },
+    {
+      "dir": "layers/66-verification",
+      "action": "commit",
+      "message": "Record CSV export verification"
+    },
+    {
+      "dir": "layers/67-review",
+      "action": "commit",
+      "message": "Record CSV export implementation review"
+    },
+    {
+      "dir": "layers/68-style",
+      "action": "commit",
+      "message": "Add tony's documentation style"
+    },
+    {
+      "dir": "layers/69-documentation",
+      "action": "commit",
+      "message": "Start CSV export documentation record"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "documenter",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "Only the HTML usage guide docs/usage.html needs updating for the CSV export (README.md's layout list may optionally be refreshed); no Python file is part of the cycle's change and no Python docstring needs documentation work.",
+    "The persisted user style tony (.standards/user-styles/documenter/tony.md) covers only Python docstring conventions; it should be loaded because it is the explicit persisted selection, but its Args/Returns/Raises docstring structure does not apply to the HTML guide.",
+    "The documentation surfaces for this cycle are HTML (docs/usage.html) and possibly Markdown (README.md); the relevant technology style is styles/html.md, and styles/python.md is not relevant to any documentation being assessed or changed.",
+    "tools/convert_legacy.py and tools/test_convert_legacy.py are pre-existing, unrelated to the cycle, and use reST-style :param docstrings that differ from tony's preferred Google style; restyling them would be unrelated work.",
+    "The export implementation is plain JavaScript, matches the design, and has no material defects."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "export-20260924T090000Z-a7f3c1d2",
+    "DOC": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md",
+    "USAGE": "docs/usage.html",
+    "TONY": ".standards/user-styles/documenter/tony.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "unchanged": [
+            "**/*.py"
+          ],
+          "why": "every Python file in the project is unrelated to the cycle, so none may be restyled"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "npm test",
+      "expect": "pass",
+      "why": "the established test script passes offline"
+    },
+    {
+      "cmd": "node --test test/store.test.js test/routes.test.js test/export.test.js 2>&1 | grep -qE 'pass 18$'",
+      "expect": "pass",
+      "why": "the JavaScript suites run 18 tests, as the verification and review records state"
+    },
+    {
+      "cmd": "python3 -m pytest -q tools",
+      "expect": "pass",
+      "why": "the unrelated Python converter's tests pass"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the DOCUMENTING state and records are valid"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && test ! -e exports",
+      "expect": "pass",
+      "why": "all work is committed and no export files exist"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `DOCUMENTING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '`BlockedOn`: `NONE`' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md && grep -q 'ProjectMode`: `BROWNFIELD' .standards/MODE.md",
+      "expect": "pass",
+      "why": "STANDARD cycle at DOCUMENTING, nothing blocked, recovery and obligations inactive, brownfield"
+    },
+    {
+      "cmd": "test -f .standards/user-styles/documenter/tony.md && grep -q '`User Style`: `tony`' .standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md && grep -q '`Status`: `IN_PROGRESS`' .standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md",
+      "expect": "pass",
+      "why": "the explicit tony selection is persisted in the in-progress documentation record and its file exists"
+    },
+    {
+      "cmd": "test -f docs/usage.html && ! grep -qi export docs/usage.html && test ! -e docs/usage.md",
+      "expect": "pass",
+      "why": "the usage guide is HTML and does not yet describe the export"
+    },
+    {
+      "cmd": "c=$(git log --format=%H -1 --fixed-strings --grep='Add usage guide for listing records') && test -n $c && git diff --quiet $c HEAD -- tools && test $(git ls-files '*.py' | wc -l) -eq 2",
+      "expect": "pass",
+      "why": "the Python code exists and is unaffected by the cycle"
+    },
+    {
+      "cmd": "test -f .claude/skills/documenter/styles/python.md && test -f .claude/skills/documenter/styles/html.md && test -f .claude/skills/documenter/styles/universal.md",
+      "expect": "pass",
+      "why": "the installed Documenter skill ships the universal, HTML, and Python style files"
+    }
+  ],
+  "notes": "Standalone fixture (not on export-documenting): the case needs an HTML usage guide and unrelated Python code, while the base's guide and scope are Markdown (docs/usage.md) and a case on a base cannot add pre-install layers. Pre-install: 50-service (plain JavaScript ESM records service, no dependencies: store, filter, auth with requireAdmin, router, GET /records, data/seed.json with a comma in record 1's title and quotes in record 3's, node:test suites), 51-converter (tools/convert_legacy.py, a stdlib Python script with reST-style docstrings that regenerates data/seed.json, and its pytest tests), 52-guide (docs/usage.html, the HTML help page, with no export section; README). Then the brownfield install. 60-context: CONTEXT.md and STATE at SCOPING for cycle export-20260924T090000Z-a7f3c1d2. 61-scope: AC-001 (admin-only filtered CSV export, RFC 4180 quoting, server-side denial before any write) and AC-002 (docs/usage.html accurately describes the export). 62-design: POST /records/export contract; AC-002 No architectural impact. 63-plan: APPROVED AUTONOMOUS plan, three steps on AC-001, AFTER_IMPLEMENTATION/NONE. 64-export: src/csv.js, src/routes/export.js, createApp options, test/export.test.js (8 tests), exports/ ignored. 65-complete: plan COMPLETE, STATE TESTING. 66-verification: COMPLETE FULL report, AC-002 pending Documenter. 67-review: COMPLETE implementation review, no findings, STATE DOCUMENTING. 68-style: tony.md, a user style covering only Python docstrings. 69-documentation: IN_PROGRESS documentation record created by an earlier, interrupted Documenter session that persisted User Style tony (AUTONOMOUS, ACTIVE_CHANGE) and assessed nothing yet. Assertion 0 is about which style file was read, which no check predicate can express, so it is left to the judge.",
+  "case": "documenter-17",
+  "caseHash": "311e152be48c9099",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T16:25:14.459Z",
+    "verdict": "pass",
+    "fixtureHash": "f93d242b9076e276",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "2098321e601c6b3d",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:11:14.473Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T14:27:59.376Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/60-context/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/61-scope/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/62-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/63-plan/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/65-complete/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/66-verification/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/67-review/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:11:14.473Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

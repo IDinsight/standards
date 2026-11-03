@@ -1,0 +1,101 @@
+{
+  "label": "T1",
+  "reference": "skills/tester/references/llm-api-testing.md",
+  "checks": [
+    {
+      "id": "mutants-caught",
+      "tier": "outcome",
+      "kind": "share",
+      "text": "The share of 6 broken copies of app/summaries/service.py that the new tests catch: a cut-off completion stored as the summary; the summary saved before the stop reason is checked; Retry-After ignored; refusal text stored; a rate limit dropped without scheduling the job again; a refusal handled as a cut-off completion."
+    },
+    {
+      "id": "placeholder-key",
+      "tier": "outcome",
+      "text": "With a real-looking key in the environment and in .env, a client built from the settings during the test run does not send that key: the test setup replaces it before the settings load."
+    },
+    {
+      "id": "no-network",
+      "tier": "outcome",
+      "atStart": "pass",
+      "text": "The test run opens no network connection outside the machine."
+    },
+    {
+      "id": "tests-pass",
+      "tier": "control",
+      "text": "The new tests pass on the unchanged implementation."
+    },
+    {
+      "id": "scenario-budget",
+      "tier": "control",
+      "text": "At most 5 new test scenarios target app/summaries/service.py."
+    }
+  ],
+  "rules": [
+    {
+      "check": "mutants-caught",
+      "file": "skills/tester/references/llm-api-testing.md",
+      "text": "events, retry counts, and no writes or partial results after a failure."
+    },
+    {
+      "check": "mutants-caught",
+      "file": "skills/tester/references/llm-api-testing.md",
+      "text": "Stop signals: each API reports the same outcome differently, so model the"
+    },
+    {
+      "check": "mutants-caught",
+      "file": "skills/tester/references/llm-api-testing.md",
+      "text": "a `429` rate limit with `Retry-After`;"
+    },
+    {
+      "check": "placeholder-key",
+      "file": "skills/tester/references/llm-api-testing.md",
+      "text": "In default runs, test setup assigns a placeholder key before the settings"
+    },
+    {
+      "check": "placeholder-key",
+      "file": "skills/tester/references/llm-api-testing.md",
+      "text": "Set the placeholder before the application is imported:"
+    },
+    {
+      "check": "no-network",
+      "file": "skills/tester/references/llm-api-testing.md",
+      "text": "and CI use no real API keys and make no network calls to the provider."
+    }
+  ],
+  "leakGuard": [
+    "placeholder key",
+    "dummy key",
+    "before the settings load",
+    "RUN_LIVE_LLM_TESTS",
+    "token_urlsafe"
+  ],
+  "solutions": [
+    {
+      "patch": "good.patch",
+      "kind": "good"
+    },
+    {
+      "patch": "bad-shallow.patch",
+      "kind": "bad",
+      "fails": [
+        "mutants-caught",
+        "placeholder-key"
+      ]
+    },
+    {
+      "patch": "bad-late-key.patch",
+      "kind": "bad",
+      "fails": [
+        "placeholder-key"
+      ]
+    },
+    {
+      "patch": "bad-network.patch",
+      "kind": "bad",
+      "fails": [
+        "no-network"
+      ]
+    }
+  ],
+  "timeoutSec": 900
+}

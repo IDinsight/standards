@@ -1,0 +1,234 @@
+{
+  "base": "export-documenting",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-guide-start",
+      "action": "commit",
+      "message": "Start usage guide section for CSV export"
+    },
+    {
+      "dir": "layers/55-doc-record",
+      "action": "commit",
+      "message": "Record documentation progress for CSV export"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "documenter",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The only outstanding obligation is Developer-owned (Owner DEVELOPING, FailureType IMPLEMENTATION). It concerns RecordStore.list, which really does not reject a status other than active or archived. At the HTTP level, both GET /records and POST /records/export already reject an unknown status with 400 through parseFilter. The guide can therefore describe current export behavior accurately, and the obligation does not affect any documented behavior.",
+    "No Documenter-owned outstanding obligation exists, recovery is inactive, and no user question is pending.",
+    "docs/usage.md has a partial export section covering the route, the accepted filters and their validation, row selection and order, and admin-only access. It lacks the 201 response and its headers, the CSV format, the file location and naming, the export error responses (400, 401, 403, with no file written), and an update to the Roles section. All of this can be finished now from the technical design and the code.",
+    "The export implementation has no material defects and matches the technical design's Interfaces and Contracts.",
+    "Correct outcome: the guide is completed, the documentation record is COMPLETE and accounts for AC-001 and AC-002, the state moves to REVIEWING_FINAL with a FORWARD handoff from DOCUMENTING, and the obligation is left exactly as it was. Sign-off stays unavailable while the obligation remains.",
+    "PromotionReason and the obligation were added to STATE.md in a late commit because the shared base records no expedited phase. This is a fixture compromise, not a manual edit the role should act on."
+  ],
+  "history": null,
+  "vars": {},
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "changed": [
+            "docs/usage.md"
+          ],
+          "why": "the incomplete guide must be finished, not left pending"
+        },
+        {
+          "field": {
+            "path": "${DOC}",
+            "name": "Status",
+            "equals": "COMPLETE"
+          },
+          "why": "the finishable documentation work passes the Documenter gate"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "state": "Obligations.Active",
+          "equals": "true"
+        },
+        {
+          "state": "Obligations.Count",
+          "equals": "1"
+        },
+        {
+          "state": "Obligations.Item1.Owner",
+          "equals": "DEVELOPING"
+        },
+        {
+          "state": "Obligations.Item1.FailureType",
+          "equals": "IMPLEMENTATION"
+        },
+        {
+          "state": "Obligations.Item1.Reason",
+          "unchanged": true
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "REVIEWING_FINAL",
+          "why": "Documenter's own forward handoff is not blocked by a Developer obligation"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FORWARD"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "DOCUMENTING"
+        },
+        {
+          "state": "Obligations.Count",
+          "equals": "1"
+        },
+        {
+          "state": "Obligations.Item1.Reason",
+          "unchanged": true
+        },
+        {
+          "reply_matches": "/reviewer",
+          "why": "a forward handoff to Reviewer provides the Claude Code invocation"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        ".standards/CONTEXT.md",
+        ".standards/docs/scope/**",
+        ".standards/docs/specs/**",
+        ".standards/docs/development/**",
+        ".standards/docs/verification/**",
+        ".standards/docs/reviews/**"
+      ],
+      "why": "Documenter does not edit other roles' records"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the unit suite still passes"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration",
+      "expect": "pass",
+      "why": "the integration suite still passes"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the DOCUMENTING state with the obligation and the IN_PROGRESS documentation record is valid"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && test ! -e exports",
+      "expect": "pass",
+      "why": "everything is committed"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `DOCUMENTING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q 'PromotionReason`: `Usage guide documentation' .standards/STATE.md && grep -A2 '^## Recovery' .standards/STATE.md | grep -q 'Active`: `false' && grep -A2 '^## Outstanding Obligations' .standards/STATE.md | grep -q 'Active`: `true' && grep -q '^### Obligation 1$' .standards/STATE.md && grep -q 'Owner`: `DEVELOPING` `FailureType`: `IMPLEMENTATION`' .standards/STATE.md && test $(grep -c '^### Obligation' .standards/STATE.md) -eq 1 && grep -q 'BlockedOn`: `NONE' .standards/STATE.md",
+      "expect": "pass",
+      "why": "promoted STANDARD cycle in DOCUMENTING, no recovery, nothing blocked, exactly one Developer-owned IMPLEMENTATION obligation"
+    },
+    {
+      "cmd": "node --input-type=module -e \"const { RecordStore } = await import('./src/records/store.ts'); const s = new RecordStore([{ id: 1, title: 'a', owner: 'x', status: 'active', createdAt: '2026-01-01T00:00:00Z' }]); if (s.list({ status: 'deleted' }).length !== 0) process.exit(1);\"",
+      "expect": "pass",
+      "why": "the obligation's missing validation is real: RecordStore.list accepts an unknown status and returns nothing"
+    },
+    {
+      "cmd": "node --input-type=module -e \"const { createApp } = await import('./src/app.ts'); const r = createApp({ exportDir: '/tmp/records-export-check-' + process.pid }).handle({ method: 'POST', path: '/records/export', query: { status: 'deleted' }, user: { id: 1, name: 'Ada', role: 'admin' } }); if (r.status !== 400) process.exit(1);\"",
+      "expect": "pass",
+      "why": "the export route itself already rejects an unknown status with 400, so documented HTTP behavior is unaffected by the obligation"
+    },
+    {
+      "cmd": "grep -q 'POST /records/export' docs/usage.md && grep -q '^## Exporting records as CSV$' docs/usage.md && ! grep -qi 'text/csv' docs/usage.md && ! grep -qi 'content-disposition' docs/usage.md && ! grep -q '201' docs/usage.md",
+      "expect": "pass",
+      "why": "the usage guide has a partial export section without the response, format, file, or error details"
+    },
+    {
+      "cmd": "d=.standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md && head -3 $d | grep -qx 'Artifact: DOCUMENTATION' && grep -q '`Status`: `IN_PROGRESS`' $d && grep -q '`Collaboration`: `AUTONOMOUS` `Target`: `ACTIVE_CHANGE`' $d && ! grep -rqE 'COMMIT:|BLOB:' .standards/docs",
+      "expect": "pass",
+      "why": "an IN_PROGRESS documentation record exists and every placeholder was resolved"
+    },
+    {
+      "cmd": "test ! -e .standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md && test ! -e .standards/docs/synchronization",
+      "expect": "pass",
+      "why": "no final review or synchronization record exists yet"
+    }
+  ],
+  "notes": "Built on export-documenting (DOCUMENTING, all upstream records COMPLETE, guide without an export section). Layer 50-guide-start commits a partial export section in docs/usage.md (route, filters and validation, row order, admin-only) and replaces STATE.md: same DOCUMENTING / FORWARD-from-REVIEWING_IMPLEMENTATION state, but PromotionReason set (the cycle was promoted from EXPEDITED) and Outstanding Obligations active with one obligation (Owner DEVELOPING, FailureType IMPLEMENTATION, RecordStore.list does not validate the status filter). Layer 55-doc-record commits an IN_PROGRESS AUTONOMOUS/ACTIVE_CHANGE documentation record from an earlier Documenter session. It cites input blobs and the guide commit, lists the pending guide items and an unassessed README, and refers to STATE.md for obligations without judging them. No file cited by BLOB in the base's verification or review records is changed, so their evidence stays current. Compromise: the shared base has no expedited history, so the promotion reason and obligation first appear in layer 50's STATE.md diff. The case's state is formally unusual: a DEVELOPING obligation surviving past DEVELOPING. It is built as the case states. The obligation was chosen to concern store-level validation that the documented HTTP behavior does not depend on (selfChecks prove both facts), so the guide can be completed accurately.",
+  "case": "documenter-48",
+  "caseHash": "f0df0350bcd2306d",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T15:57:52.785Z",
+    "verdict": "pass",
+    "fixtureHash": "e9605196d0e847d8",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "d8f512987e97d2b3",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:16:09.454Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T15:37:52.612Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-documenting": "cad63ec878d1dad0"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-guide-start/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:16:09.454Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

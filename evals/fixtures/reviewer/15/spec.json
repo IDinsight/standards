@@ -1,0 +1,297 @@
+{
+  "base": "export-project",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-context",
+      "action": "commit",
+      "message": "Record project context for archive export"
+    },
+    {
+      "dir": "layers/52-scope",
+      "action": "commit",
+      "message": "Define archive export scope"
+    },
+    {
+      "dir": "layers/54-design",
+      "action": "commit",
+      "message": "Design archive export"
+    },
+    {
+      "dir": "layers/56-plan",
+      "action": "commit",
+      "message": "Plan archive export implementation"
+    },
+    {
+      "dir": "layers/58-impl",
+      "action": "commit",
+      "message": "Add hourly records export to the document archive"
+    },
+    {
+      "dir": "layers/60-complete",
+      "action": "commit",
+      "message": "Mark archive export plan complete"
+    },
+    {
+      "dir": "layers/62-verification",
+      "action": "commit",
+      "message": "Record archive export verification"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "reviewer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The scope (AC-002) requires bounded retrying: a run whose archive keeps failing must stop retrying, report the failure, and exit non-zero.",
+    "The technical design defines only the retry schedule (500 ms doubling, capped at 30 s per wait); it defines no maximum number of attempts, no overall run deadline, and nothing about propagating a deadline into the retries. No project convention or context entry determines them: the project had no scripts, outbound calls, or retry/timeout helpers before this cycle.",
+    "uploadWithRetry in src/archive/retry.ts retries transient failures forever (for loop with no exit except success or a permanent error). If the archive keeps answering 5xx/429 or stays unreachable, the scheduled run never exits and never reports failure; with the hourly schedule, runs pile up, each holding a process and retrying.",
+    "The infinite retries also contradict AC-002 directly, which is a separately supported implementation concern owned by Developer, in addition to the architecture omission.",
+    "Tester's AC-002 evidence covers only retry-then-succeed cases and an inspection of the script's catch block; nothing observes a run ending while the archive keeps failing.",
+    "AC-001 and AC-003 are satisfied by the implementation; the unit suite passes 31 tests.",
+    "The expected routing is a FAILURE handoff with FailureType ARCHITECTURE from REVIEWING_IMPLEMENTATION to ARCHITECTING, pushing a frame with ResumeAt REVIEWING_IMPLEMENTATION and RerunThrough NONE."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "export-20260924T090000Z-a7f3c1d2",
+    "SCOPE": ".standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md",
+    "ARCH": ".standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md",
+    "DEV": ".standards/docs/development/export-20260924T090000Z-a7f3c1d2.md",
+    "VERIFICATION": ".standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md",
+    "REVIEW_IMPL": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md",
+    "CONTEXT": ".standards/CONTEXT.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "${ARCH}",
+            "${SCOPE}"
+          ],
+          "why": "Reviewer must not edit the specification or scope; whether the report prescribes a concrete limit or deadline is for the judge"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${REVIEW_IMPL}",
+          "why": "findings are persisted in the implementation review report before routing"
+        },
+        {
+          "provenance": {
+            "path": "${REVIEW_IMPL}",
+            "artifact": "REVIEW",
+            "cycle": "${ID}",
+            "kind": "IMPLEMENTATION"
+          }
+        },
+        {
+          "heading_ids": {
+            "path": "${REVIEW_IMPL}",
+            "prefix": "F",
+            "min": 1
+          },
+          "why": "the established defect is recorded as a finding"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "ARCHITECTING"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FAILURE"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "REVIEWING_IMPLEMENTATION"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "ARCHITECTURE"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "true"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "1"
+        },
+        {
+          "state": "Recovery.Top.From",
+          "equals": "REVIEWING_IMPLEMENTATION"
+        },
+        {
+          "state": "Recovery.Top.Owner",
+          "equals": "ARCHITECTING"
+        },
+        {
+          "state": "Recovery.Top.FailureType",
+          "equals": "ARCHITECTURE"
+        },
+        {
+          "state": "Recovery.Top.ResumeAt",
+          "equals": "REVIEWING_IMPLEMENTATION"
+        },
+        {
+          "state": "Recovery.Top.RerunThrough",
+          "equals": "NONE"
+        },
+        {
+          "check_ok": true
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "unchanged": [
+        "src/**",
+        "scripts/**",
+        "test/**",
+        "packages/**",
+        "package.json",
+        "pnpm-lock.yaml"
+      ],
+      "why": "Reviewer does not repair implementation or tests it does not own"
+    },
+    {
+      "head_unchanged": true,
+      "why": "Reviewer must not change the assessed identity"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Reviewer must not change git state"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the established unit suite passes offline"
+    },
+    {
+      "cmd": "pnpm --filter export test 2>&1 | grep -qE 'pass 31$'",
+      "expect": "pass",
+      "why": "the suite runs 31 tests: 16 pre-cycle plus six CSV and nine archive tests, matching the plan and verification record"
+    },
+    {
+      "cmd": "node -e 'Promise.all([import(`./src/archive/retry.ts`), import(`./src/archive/client.ts`)]).then(async ([{ uploadWithRetry }, { ArchiveError }]) => { let waits = 0; const client = { put: async () => { throw new ArchiveError(`archive responded 503`, 503); } }; try { await uploadWithRetry(client, `records.csv`, `id`, { sleep: async () => { waits += 1; if (waits >= 1000) throw new Error(`halted by caller`); } }); process.exit(1); } catch (error) { if (error.message !== `halted by caller`) process.exit(2); console.log(`still retrying after`, waits); } }, (error) => { console.error(error); process.exit(3); })'",
+      "expect": "pass",
+      "why": "uploadWithRetry never stops on its own while the archive keeps answering 503: after 1000 waits it is still retrying (Developer chose infinite retries)"
+    },
+    {
+      "cmd": "node scripts/archive-export.ts",
+      "expect": "fail",
+      "expectOutput": "ARCHIVE_URL and ARCHIVE_TOKEN must be set",
+      "why": "the script refuses to run without the archive environment, as the plan and verification record state"
+    },
+    {
+      "cmd": "! grep -qiE 'deadline|timeout|maximum|limit|at most|give up|stop retrying|indefinite' .standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md && grep -q 'capped at 30 s per' .standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md",
+      "expect": "pass",
+      "why": "the design defines the backoff schedule but no attempt limit or deadline"
+    },
+    {
+      "cmd": "grep -qi 'not indefinitely' .standards/STATE.md && grep -q 'retrying is bounded' .standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md",
+      "expect": "pass",
+      "why": "the request and scope require bounded retry behavior"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the REVIEWING_IMPLEMENTATION state and records are valid"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && git diff --quiet HEAD",
+      "expect": "pass",
+      "why": "all work is committed"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `REVIEWING_IMPLEMENTATION` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Id`: `export-20260924T090000Z-a7f3c1d2`$' .standards/STATE.md && grep -q '^`Kind`: `FORWARD` `From`: `TESTING` `FailureType`: `NONE`' .standards/STATE.md && grep -q '^`PendingVerificationCadence`: `NONE`$' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md && grep -q 'ProjectMode`: `BROWNFIELD' .standards/MODE.md",
+      "expect": "pass",
+      "why": "STATE.md holds REVIEWING_IMPLEMENTATION with FORWARD from TESTING, recovery and obligations inactive"
+    },
+    {
+      "cmd": "f=.standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md && grep -q '`Mode`: `VERIFY` `Status`: `COMPLETE`' $f && grep -q '`Assessment Purpose`: `FULL` `Assessment Target`: `NONE`' $f && ! grep -qE 'COMMIT:|BLOB:|AWAITING_IMPLEMENTATION' $f && grep -q AC-003 $f",
+      "expect": "pass",
+      "why": "the COMPLETE FULL verification record exists with resolved revision identities"
+    },
+    {
+      "cmd": "p=.standards/docs/development/export-20260924T090000Z-a7f3c1d2.md && grep -q '`Status`: `COMPLETE`$' $p && test $(grep -c '^`Status`: `DONE`' $p) -eq 3 && test ! -e .standards/docs/reviews && test ! -e .standards/docs/documentation && test ! -e .standards/docs/synchronization",
+      "expect": "pass",
+      "why": "the plan is COMPLETE with three DONE steps and no review or later record exists"
+    },
+    {
+      "cmd": "! grep -rqE 'AC-[0-9]' src test scripts packages docs README.md",
+      "expect": "pass",
+      "why": "code and tests cite no acceptance identifiers"
+    }
+  ],
+  "notes": "Built on export-project (pre-install records service plus brownfield install). Seven post-install commits run one STANDARD cycle export-20260924T090000Z-a7f3c1d2 in brownfield order. 50-context: Auditor CONTEXT.md (no scripts, outbound calls, or retry/timeout helpers exist) and STATE at SCOPING; the request says retry failed uploads but not indefinitely. 52-scope: AC-001 (hourly CSV upload of every record), AC-002 (transient failures retried, retrying bounded, run exits non-zero instead of retrying indefinitely), AC-003 (other statuses not retried); STATE ARCHITECTING. 54-design: archive client, isTransient, uploadWithRetry with a 500 ms doubling schedule capped at 30 s per wait, CSV format, script exit codes; it defines no attempt limit, run deadline, or deadline propagation; STATE DEVELOPING. 56-plan: APPROVED plan, three PENDING steps. 58-impl: src/export/csv.ts, src/archive/{client,retry,job}.ts, scripts/archive-export.ts, archive-export package script, test/csv.test.ts (6), test/archive.test.ts (9). uploadWithRetry loops until success or a permanent error, so it retries forever. 60-complete: plan COMPLETE with self-check evidence citing the implementation commit; STATE TESTING. 62-verification: Tester COMPLETE FULL report (AC-002 verified only through retry-then-succeed tests and an inspection) and STATE REVIEWING_IMPLEMENTATION, FORWARD from TESTING. Grading expects a FAILURE ARCHITECTURE route to ARCHITECTING with a frame resuming at REVIEWING_IMPLEMENTATION.",
+  "case": "reviewer-15",
+  "caseHash": "c65acb3cfa942a7f",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T23:22:10.834Z",
+    "verdict": "pass",
+    "fixtureHash": "b3ac1697e1ddfa34",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "de19e7b5c287795e",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:22:54.424Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T21:58:06.578Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-context/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/52-scope/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/54-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/56-plan/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/60-complete/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/62-verification/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:22:54.424Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

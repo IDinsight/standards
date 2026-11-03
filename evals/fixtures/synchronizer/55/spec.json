@@ -1,0 +1,231 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial ledger CLI"
+    },
+    {
+      "dir": "layers/50-design",
+      "action": "commit",
+      "message": "Record context, scope, and design for summary month filter"
+    },
+    {
+      "dir": "layers/51-implement",
+      "action": "commit",
+      "message": "Add --month filter to summary command"
+    },
+    {
+      "dir": "layers/52-verify",
+      "action": "commit",
+      "message": "Add month filter tests and verification report"
+    },
+    {
+      "dir": "layers/53-review",
+      "action": "commit",
+      "message": "Record implementation review and closure assessment"
+    },
+    {
+      "dir": "layers/54-sync-correction",
+      "action": "commit",
+      "message": "Correct synchronization evidence reference for AC-002"
+    },
+    {
+      "dir": "layers/55-review-finding",
+      "action": "commit",
+      "message": "Record month range finding in implementation review"
+    },
+    {
+      "dir": "layers/56-range-fix",
+      "action": "commit",
+      "message": "Reject out-of-range months in summary --month"
+    },
+    {
+      "dir": "layers/57-reverify",
+      "action": "commit",
+      "message": "Re-verify month filter after range correction"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "synchronizer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "Recovery has two frames. Frame 1 (older) is the earlier Synchronizer corrective frame: From AWAITING_USER_SIGNOFF, Owner SYNCHRONIZING, FailureType SYNCHRONIZATION, ResumeAt AWAITING_USER_SIGNOFF, RerunThrough REVIEWING_IMPLEMENTATION. Frame 2 (active) is Developer-owned: From REVIEWING_IMPLEMENTATION, Owner DEVELOPING, FailureType IMPLEMENTATION, ResumeAt REVIEWING_IMPLEMENTATION, RerunThrough SYNCHRONIZING.",
+    "The Developer's plan notes record the Frame 2 rerun plan: TESTING, then SYNCHRONIZING to revalidate the synchronization record's corrective evidence, then RESUME to REVIEWING_IMPLEMENTATION with Frame 1 kept.",
+    "The synchronization record was left IN_PROGRESS by the earlier verified corrective return (D-001: AC-002 evidence re-pointed from test/cli.test.js to the rejected-value scenarios in test/month.test.js). Its assessed input identities (src/cli.js, test/month.test.js, verification report, implementation review, plan) predate the Frame 2 correction.",
+    "The D-001 correction still holds against current inputs: the re-verified report's AC-002 row cites the rejected-value scenarios in test/month.test.js (now including 2026-13 and 2026-00), the corrected src/cli.js rejects months outside 01-12, and all 13 tests pass.",
+    "The verification report is COMPLETE with purpose FULL for the corrected implementation; the plan is COMPLETE.",
+    "The only remaining full-gate gaps are the intentionally omitted documentation and final-deliverable review under IMPLEMENTATION_REVIEWED, and the pending implementation Reviewer reassessment of the open review finding F-001 and the INELIGIBLE closure assessment. No independent gap, discrepancy, or blocker exists.",
+    "Correct routing: apply Synchronizer Corrective Reruns, keep the record IN_PROGRESS (or BLOCKED), pop only Frame 2 at its SYNCHRONIZING boundary, and RESUME to REVIEWING_IMPLEMENTATION with Frame 1 preserved unchanged; no AWAITING_USER_SIGNOFF and no change to CompletionPolicy."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "summary-month-filter-20260922T131500Z-6c1e9a40",
+    "SYNC": ".standards/docs/synchronization/summary-month-filter-20260922T131500Z-6c1e9a40.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "changed": [
+            "${SYNC}"
+          ],
+          "why": "the revalidation must be persisted in the synchronization record"
+        },
+        {
+          "provenance": {
+            "path": "${SYNC}",
+            "artifact": "SYNCHRONIZATION",
+            "cycle": "${ID}"
+          }
+        },
+        {
+          "contains": {
+            "path": "${SYNC}",
+            "regex": "^### D-001 ",
+            "flags": "m"
+          },
+          "why": "the earlier verified correction stays in the record under its stable ID"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "field": {
+            "path": "${SYNC}",
+            "name": "Status",
+            "not": "COMPLETE"
+          },
+          "why": "a scoped rerun keeps the record IN_PROGRESS or BLOCKED"
+        },
+        {
+          "state": "ActiveWork.CompletionPolicy",
+          "equals": "IMPLEMENTATION_REVIEWED",
+          "why": "the selected policy is unchanged"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "not": "AWAITING_USER_SIGNOFF",
+          "why": "no direct sign-off readiness"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "true",
+          "why": "Frame 1 must remain"
+        },
+        {
+          "state": "Recovery.Frame1.From",
+          "equals": "AWAITING_USER_SIGNOFF"
+        },
+        {
+          "state": "Recovery.Frame1.Owner",
+          "equals": "SYNCHRONIZING"
+        },
+        {
+          "state": "Recovery.Frame1.ResumeAt",
+          "equals": "AWAITING_USER_SIGNOFF"
+        },
+        {
+          "state": "Recovery.Frame1.RerunThrough",
+          "equals": "REVIEWING_IMPLEMENTATION"
+        },
+        {
+          "state": "Recovery.Frame1.Reason",
+          "unchanged": true
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "data/**",
+        "package.json",
+        "README.md",
+        ".standards/CONTEXT.md",
+        ".standards/docs/scope/**",
+        ".standards/docs/specs/**",
+        ".standards/docs/development/**",
+        ".standards/docs/verification/**",
+        ".standards/docs/reviews/**"
+      ],
+      "why": "Synchronizer owns only its record; it does not edit implementation, tests, or other roles' records"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/summary.test.js test/cli.test.js test/month.test.js",
+      "expect": "pass",
+      "why": "all 13 tests pass on the corrected implementation, as the verification report records"
+    },
+    {
+      "cmd": "npm test",
+      "expect": "pass",
+      "why": "the established test script passes"
+    },
+    {
+      "cmd": "node src/cli.js summary data/sample.csv --month 2026-13",
+      "expect": "fail",
+      "expectOutput": "expected YYYY-MM",
+      "why": "the corrected implementation rejects out-of-range months with exit 2 and the expected-format message"
+    },
+    {
+      "cmd": "node src/cli.js summary data/sample.csv --month 2026-09",
+      "expect": "pass",
+      "why": "a valid month still prints that month's totals"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 00: small Node ESM ledger CLI (summary command, node:test). 50: CONTEXT, scope (AC-001 filter, AC-002 invalid month incl. out-of-range rejected), design (month 01-12), STATE DEVELOPING, policy IMPLEMENTATION_REVIEWED recorded in Request. 51: inMonth + --month parsing with a pattern-only check (accepts 2026-13), plan COMPLETE. 52: test/month.test.js (format errors only) + verification COMPLETE. 53: implementation review COMPLETE, closure ELIGIBLE, STATE AWAITING_USER_SIGNOFF. 54: synchronization record IN_PROGRESS with D-001 RESOLVED (earlier corrective return), STATE REVIEWING_IMPLEMENTATION with Frame 1 (Owner SYNCHRONIZING, ResumeAt AWAITING_USER_SIGNOFF, RerunThrough REVIEWING_IMPLEMENTATION). 55: Reviewer reassessment finds F-001 (out-of-range months), review BLOCKED, closure INELIGIBLE with history, FAILURE to DEVELOPING pushes Frame 2. 56: range fix, DEV-002 reopened/done, plan notes record the rerun plan (TESTING, SYNCHRONIZING, RerunThrough SYNCHRONIZING), STATE TESTING. 57: added out-of-range tests, verification REVERIFY COMPLETE FULL, STATE SYNCHRONIZING with RESUME from TESTING. check.mjs passes: fullBoundary holds so verification must be COMPLETE and cover both ACs, plan COMPLETE, review report not required during recovery, closure section valid as INELIGIBLE.",
+  "case": "synchronizer-55",
+  "caseHash": "48248034480eb25b",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T03:12:22.850Z",
+    "verdict": "pass",
+    "fixtureHash": "a5755038ae02e368",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-31T01:29:06.099Z"
+  }
+}

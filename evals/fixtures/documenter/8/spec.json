@@ -1,0 +1,195 @@
+{
+  "base": "export-documenting",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-guided-step",
+      "action": "commit",
+      "message": "Start guided documentation of CSV export"
+    },
+    {
+      "dir": "layers/60-user-edit",
+      "action": "unstaged"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "documenter",
+    "utterance": "I applied it."
+  },
+  "graderOnly": [
+    "The user applied only half of guided step 1. The unstaged docs/usage.md contains the new Exporting records heading and the step's first two paragraphs (who may export, and the accepted filters), verbatim and in the specified place between Filtering and Errors. The step's last two paragraphs (the 201 response with headers and CSV format, and the kept export file) and the owner=dana example are missing.",
+    "The user also rewrote the unrelated introductory paragraph at the top of docs/usage.md. The new wording is accurate, since both registered routes reject a request without a user, and it must be preserved.",
+    "The smallest remaining correction is to insert the missing response paragraph, file paragraph, and example after the filters paragraph of the new section, leaving the rest of the file, including the rewritten introduction, as it is.",
+    "Guided steps 2 (Roles bullet) and 3 (README sentence) are later independent steps and must not be offered until step 1 is verified in saved content.",
+    "The implementation has no material defects, and the step 1 text in the documentation record accurately describes it."
+  ],
+  "history": null,
+  "vars": {},
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "changed": [
+            "${DOC}"
+          ],
+          "why": "partial progress must be persisted in the documentation record"
+        },
+        {
+          "field": {
+            "path": "${DOC}",
+            "name": "Status",
+            "not": "COMPLETE"
+          },
+          "why": "the pending guided step is not complete"
+        },
+        {
+          "field": {
+            "path": "${DOC}",
+            "name": "Collaboration",
+            "equals": "GUIDED"
+          },
+          "why": "the user did not switch collaboration mode"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "docs/**",
+            "README.md"
+          ],
+          "why": "in GUIDED mode the user applies project documentation edits; Documenter does not overwrite the saved file"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "DOCUMENTING",
+          "why": "documentation is unfinished, so no handoff"
+        },
+        {
+          "state": "ActiveWork.BlockedOn",
+          "not": "NONE",
+          "why": "the guided step is still waiting on the user to apply the remaining part"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "packages/**",
+        "package.json"
+      ],
+      "why": "Documenter does not change behavior or tests"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the unit suite still passes"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the BLOCKED guided documentation state is valid"
+    },
+    {
+      "cmd": "test $(git status --porcelain | wc -l) -eq 1 && git status --porcelain | grep -qx ' M docs/usage.md'",
+      "expect": "pass",
+      "why": "the only uncommitted change is the user's unstaged edit to docs/usage.md"
+    },
+    {
+      "cmd": "grep -qx '## Exporting records' docs/usage.md && grep -q 'with the same validation' docs/usage.md && grep -q 'Only `admin` users can export' docs/usage.md && ! grep -q 'content-disposition' docs/usage.md && ! grep -q 'YYYYMMDDTHHMMSSZ' docs/usage.md && ! grep -q 'Lease agreement' docs/usage.md",
+      "expect": "pass",
+      "why": "the saved guide has the first half of step 1 and lacks the response, file, and example parts"
+    },
+    {
+      "cmd": "git diff docs/usage.md | grep -q '^-The records service backs the internal records admin tool' && git diff docs/usage.md | grep -q '^+The records service is the backend of the internal records admin tool'",
+      "expect": "pass",
+      "why": "the user also rewrote the unrelated introductory paragraph"
+    },
+    {
+      "cmd": "! git show HEAD:docs/usage.md | grep -qi export",
+      "expect": "pass",
+      "why": "the committed guide is the pre-edit version with no export section"
+    },
+    {
+      "cmd": "d=.standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md && grep -q '`Collaboration`: `GUIDED`' $d && grep -q '`Status`: `BLOCKED`' $d && grep -q 'content-disposition' $d && grep -q 'Lease agreement, Building B' $d && ! grep -qE 'BLOB:|COMMIT:' $d && grep -q '`BlockedOn`: `Guided step 1' .standards/STATE.md",
+      "expect": "pass",
+      "why": "the record holds the pending guided step with its full content and resolved identities, and BlockedOn holds the apply request"
+    }
+  ],
+  "notes": "Built on export-documenting (cycle export-20260924T090000Z-a7f3c1d2 at DOCUMENTING, clean tree). Layer 50-guided-step commits a documentation record (BLOCKED, GUIDED, ACTIVE_CHANGE, User Style NONE) whose Resume section holds pending guided step 1: insert an Exporting records section (heading, four paragraphs, an example) between Filtering and Errors in docs/usage.md, with the pre-edit blob identity, expected saved result, and next inspection; steps 2 (Roles bullet) and 3 (README sentence) are planned but not offered. STATE.md sets Active Work.BlockedOn to the step 1 apply request, as guided mode requires while waiting; Handoff stays FORWARD from REVIEWING_IMPLEMENTATION and recovery/obligations are inactive. The case's default 'no user question is blocked' is overridden by 'Resume GUIDED' with a pending step, since guided mode persists BlockedOn while waiting. Layer 60-user-edit leaves docs/usage.md unstaged: the heading and first two paragraphs of step 1 pasted verbatim in place, the last two paragraphs and example missing, and the unrelated introductory paragraph reworded (accurately). No DOC-NNN entries exist; discrepancies are NONE.",
+  "case": "documenter-8",
+  "caseHash": "554aae46dfe93940",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T16:22:45.331Z",
+    "verdict": "pass",
+    "fixtureHash": "fb6ad47416c506d0",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "02579f18074a7663",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:10:09.285Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T14:16:12.551Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-documenting": "cad63ec878d1dad0"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-guided-step/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:10:09.285Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

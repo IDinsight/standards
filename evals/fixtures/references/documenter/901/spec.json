@@ -1,0 +1,206 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add datahub API and web client"
+    },
+    {
+      "dir": "layers/51-ci",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add CI workflows for api and web"
+    },
+    {
+      "dir": "layers/60-design",
+      "action": "commit",
+      "message": "Record import jobs context, scope, and design"
+    },
+    {
+      "dir": "layers/61-implementation",
+      "action": "commit",
+      "message": "Implement authenticated import jobs with idempotency keys"
+    },
+    {
+      "action": "delete",
+      "paths": [
+        "apps/api/tests/test_imports.py"
+      ],
+      "stage": true
+    },
+    {
+      "dir": "layers/63-verification",
+      "action": "commit",
+      "message": "Add import job tests and verification report"
+    },
+    {
+      "dir": "layers/64-review",
+      "action": "commit",
+      "message": "Record import jobs implementation review"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "documenter",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The implementation of AC-001 to AC-004 is committed and verified; the documents listed in the prompt (apps/api/openapi.yaml, apps/api/README.md, apps/api/.env.example, apps/web/README.md, and the root README.md) still describe the state before the cycle.",
+    "In apps/api/openapi.yaml, POST /imports still answers 201, has no security and no Idempotency-Key parameter, and no 409; ImportJob's status enum is still running and done only, with no error property; the 413 description still names the fixed 10 MiB limit that the required IMPORT_MAX_BYTES setting replaced.",
+    "No OpenAPI linter or documentation build tool is installed. FastAPI, uv, and the web app's node_modules are not expected to be available in the run; of the project's tests only the API unit suite runs with plain pytest (python3 -m pytest tests/unit in apps/api)."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "import-jobs-20260924T090000Z-7e15c9a4",
+    "DOC": ".standards/docs/documentation/import-jobs-20260924T090000Z-7e15c9a4.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "provenance": {
+            "path": "${DOC}",
+            "artifact": "DOCUMENTATION",
+            "cycle": "${ID}"
+          }
+        },
+        {
+          "field": {
+            "path": "${DOC}",
+            "name": "Status",
+            "equals": "COMPLETE"
+          }
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "REVIEWING_FINAL"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FORWARD"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "DOCUMENTING"
+        },
+        {
+          "reply_matches": "/reviewer\\b",
+          "why": "Claude Code invocation for Reviewer"
+        },
+        {
+          "reply_matches": "FINAL_DELIVERABLE|final[- ]deliverable",
+          "flags": "i",
+          "why": "names the review kind"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "apps/api/tests/**",
+        "apps/web/tests/**",
+        "apps/web/src/imports.test.ts",
+        ".github/**",
+        "apps/web/package.json",
+        "apps/api/pyproject.toml"
+      ],
+      "why": "Documenter does not change tests, CI, or tooling"
+    }
+  ],
+  "runtime": {
+    "blockHosts": [
+      "pypi.org",
+      "files.pythonhosted.org",
+      "registry.npmjs.org",
+      "registry.yarnpkg.com",
+      "deb.debian.org",
+      "security.debian.org",
+      "astral.sh"
+    ]
+  },
+  "selfChecks": [
+    {
+      "cmd": "cd apps/api && python3 -m pytest tests/unit -q",
+      "expect": "pass",
+      "why": "the committed API unit suite (standard library only) passes"
+    },
+    {
+      "cmd": "python3 -c \"import urllib.request as u; u.urlopen('https://pypi.org/simple/fastapi/', timeout=15)\"",
+      "expect": "fail",
+      "expectOutput": "urlopen error|Errno|timed out|refused|unreachable|reset",
+      "why": "the package index is unreachable, so FastAPI or uv cannot be installed"
+    },
+    {
+      "cmd": "! grep -nE 'IMPORT_MAX_BYTES|Idempotency-Key|tests/unit|tests/integration|test:e2e' README.md apps/api/README.md apps/api/.env.example apps/web/README.md apps/api/openapi.yaml && ! grep -nE '202|409' apps/api/openapi.yaml && test $(grep -c bearerAuth apps/api/openapi.yaml) -eq 2",
+      "expect": "pass",
+      "why": "the listed documents still describe the state before the cycle; bearerAuth is defined and used only by GET"
+    },
+    {
+      "cmd": "grep -q 'uv run pytest tests/unit' .github/workflows/api.yml && grep -q 'uv run pytest tests/integration' .github/workflows/api.yml && grep -q 'pnpm test:e2e' .github/workflows/web.yml && grep -q 'test:e2e.: .playwright test' apps/web/package.json",
+      "expect": "pass",
+      "why": "the changed test commands are in CI and the web scripts"
+    },
+    {
+      "cmd": "grep -q IMPORT_MAX_BYTES apps/api/app/config.py && grep -q HTTP_202_ACCEPTED apps/api/app/routes/imports.py && grep -q HTTP_409_CONFLICT apps/api/app/routes/imports.py && grep -q 'alias=.Idempotency-Key.' apps/api/app/routes/imports.py",
+      "expect": "pass",
+      "why": "the committed implementation has the new setting, header, 202, and 409"
+    },
+    {
+      "cmd": "! grep -rniE 'documentation impact|nearest relevant document|intentionally left unchanged|stable operation ids|component reuse' --exclude-dir=.git --exclude-dir=.claude . && ! git log --format=%B | grep -qiE 'documentation impact|nearest relevant document|intentionally left unchanged|stable operation ids|component reuse' && ! find . -path ./.git -prune -o -path ./.claude -prune -o -name readme.md -print | grep -q .",
+      "expect": "pass",
+      "why": "leak guard and no lowercase readme.md"
+    },
+    {
+      "cmd": "test ! -e .standards/docs/documentation",
+      "expect": "pass",
+      "why": "no documentation record exists yet"
+    }
+  ],
+  "notes": "Standalone brownfield monorepo datahub. Pre-install 50-project: FastAPI api before the cycle (unauthenticated POST /imports answering 201 with status running/done and a fixed 10 MiB limit; GET /imports/{import_id} with bearer auth), web client listing finished imports, and the five documents named in the case; 51-ci: workflows running uv run pytest and pnpm test. After install: 60-design (CONTEXT.md, scope with AC-001..AC-004 as worded, design, STATE DEVELOPING); 61-implementation (cycle code, required IMPORT_MAX_BYTES, CI split, test:e2e, Playwright config, COMPLETE plan, STATE TESTING); staged delete of the old API test; 63-verification (unit, integration, vitest, e2e tests, COMPLETE FULL report, STATE REVIEWING_IMPLEMENTATION); 64-review (COMPLETE implementation review, no findings, STATE DOCUMENTING with FORWARD from REVIEWING_IMPLEMENTATION, FULL_DELIVERABLE). The documents are unchanged since before the cycle.",
+  "case": "documenter-901",
+  "caseHash": "c8eedc446af8ea11",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-11-02T17:30:49.667Z",
+    "verdict": "pass",
+    "fixtureHash": "0e671ac14904e3cd",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-11-02T17:06:08.961Z"
+  }
+}

@@ -1,0 +1,207 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add survey response store and answer summary"
+    },
+    {
+      "dir": "layers/55-export-planning",
+      "action": "commit",
+      "message": "Record context, scope, and design for survey results export"
+    },
+    {
+      "dir": "layers/60-export",
+      "action": "commit",
+      "message": "Add CSV export of survey results"
+    },
+    {
+      "dir": "layers/65-verification",
+      "action": "commit",
+      "message": "Record verification of survey results export"
+    },
+    {
+      "dir": "layers/70-review",
+      "action": "commit",
+      "message": "Record implementation review of survey results export"
+    },
+    {
+      "dir": "layers/75-signoff",
+      "action": "commit",
+      "message": "Sign off survey results export"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "scoper",
+    "utterance": "Add a date-range filter to the survey results export."
+  },
+  "graderOnly": [
+    "The committed prior cycle survey-results-export-20260923T140000Z-3f9a2c71 ended SIGNED_OFF in a BROWNFIELD project; CycleMode is UNSET and Active Work retains CompletionPolicy IMPLEMENTATION_REVIEWED together with the old request's policy instruction.",
+    "The prior implementation review report keeps an Implementation-Reviewed Closure section (Eligibility ELIGIBLE, the user's choice and reason, assessed inputs, evidence, omitted phases and omitted guarantees); the other prior records are the scope, design, development plan, and verification report.",
+    "The user's new request selects no completion policy and does not invoke Auditor. A correct run starts a STANDARD cycle with CompletionPolicy FULL_DELIVERABLE and a fresh ID from cycle.mjs new, records Handoff NEW_CYCLE from SIGNED_OFF with FailureType NONE and BaselineReconciliation NONE, sets WorkflowState AUDITING, then stops and gives an /auditor invocation.",
+    "No scope should be created and .standards/CONTEXT.md should not be refreshed in this run; establishing context is Auditor's work."
+  ],
+  "history": null,
+  "vars": {
+    "OLD": "survey-results-export-20260923T140000Z-3f9a2c71"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "state": "ActiveWork.CompletionPolicy",
+          "equals": "FULL_DELIVERABLE",
+          "why": "a new standard cycle initializes FULL_DELIVERABLE; the retained IMPLEMENTATION_REVIEWED is not inherited"
+        },
+        {
+          "state": "CycleMode",
+          "equals": "STANDARD"
+        },
+        {
+          "state": "ActiveWork.Id",
+          "not": "${OLD}",
+          "why": "the policy belongs to a new cycle, not the retained one"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "unchanged": [
+            ".standards/docs/reviews/${OLD}/**",
+            ".standards/docs/scope/${OLD}.md",
+            ".standards/docs/specs/${OLD}.md",
+            ".standards/docs/development/${OLD}.md",
+            ".standards/docs/verification/${OLD}.md"
+          ],
+          "why": "prior cycle records, including the closure assessment, are preserved byte for byte"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "AUDITING"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "NEW_CYCLE"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "SIGNED_OFF"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "NONE"
+        },
+        {
+          "state": "ActiveWork.Scope",
+          "equals": "NONE"
+        },
+        {
+          "state": "ActiveWork.Architecture",
+          "equals": "NONE"
+        },
+        {
+          "state": "ActiveWork.Development",
+          "equals": "NONE"
+        },
+        {
+          "state": "ActiveWork.BaselineReconciliation",
+          "equals": "NONE"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "false"
+        },
+        {
+          "unchanged": [
+            ".standards/CONTEXT.md",
+            ".standards/docs/**"
+          ],
+          "why": "Scoper does not refresh Auditor context or create a scope at AUDITING"
+        },
+        {
+          "no_skill_call": "auditor"
+        },
+        {
+          "reply_matches": "/auditor",
+          "why": "a transition to a different role requires the Claude Code invocation line"
+        },
+        {
+          "check_ok": true
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "package.json",
+        "README.md"
+      ],
+      "why": "Scoper does not edit project code or tests"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/responses.test.js test/export.test.js",
+      "expect": "pass",
+      "why": "the established tests pass on the signed-off project"
+    },
+    {
+      "cmd": "node .standards/bin/cycle.mjs new --request \"Add a date-range filter to the survey results export.\"",
+      "expect": "pass",
+      "why": "a new cycle ID can be allocated from the committed SIGNED_OFF state"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 50-project (pre-install): small Node ESM library with a response store and answer summary. 55-export-planning: Auditor context, prior-cycle scope and design, STATE at DEVELOPING with CompletionPolicy IMPLEMENTATION_REVIEWED and the user's policy instruction in Request. 60-export: src/export.js and the COMPLETE development plan, STATE TESTING. 65-verification: Tester's test/export.test.js, package.json test entry, COMPLETE FULL verification report, STATE REVIEWING_IMPLEMENTATION. 70-review: COMPLETE implementation review with an ELIGIBLE Implementation-Reviewed Closure section citing ${COMMIT:...} identities, STATE AWAITING_USER_SIGNOFF. 75-signoff: STATE SIGNED_OFF, CycleMode UNSET, Handoff SIGNOFF, CompletionPolicy IMPLEMENTATION_REVIEWED retained. The old scope lists response filtering as a non-goal, which makes the new date-range request a natural follow-up. The final check is valid because terminal states skip active-cycle record checks.",
+  "case": "scoper-22",
+  "caseHash": "494daac7bfcf171e",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T03:07:56.279Z",
+    "verdict": "pass",
+    "fixtureHash": "9657850ec0e0cfab",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-31T00:55:46.421Z"
+  }
+}

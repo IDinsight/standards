@@ -1,0 +1,268 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add invoice API with CSV export"
+    },
+    {
+      "dir": "layers/52-cycle",
+      "action": "commit",
+      "message": "Record context, scope, and design for invoice JSON export"
+    },
+    {
+      "dir": "layers/54-serializer",
+      "action": "commit",
+      "message": "Extract invoice serializer for reuse"
+    },
+    {
+      "dir": "layers/56-architecture-route",
+      "action": "commit",
+      "message": "Route export contract gap to architecture"
+    },
+    {
+      "dir": "layers/58-documentation-route",
+      "action": "commit",
+      "message": "Route API conventions discrepancy to documentation"
+    },
+    {
+      "dir": "layers/60-conventions",
+      "action": "commit",
+      "message": "Correct timestamp and amount formats in API conventions"
+    },
+    {
+      "dir": "layers/62-record",
+      "action": "commit",
+      "message": "Record documentation correction"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "documenter",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The corrected docs/conventions.md (Timestamps, Money, and Example sections) matches what src/serialize.js and GET /invoices actually return, so the DOC-001 documentation correction is verified; re-checking it against current inputs confirms this.",
+    "docs/api/export.md does not exist. AC-004 requires it, and its content depends on the date-range rules (whether to is inclusive, which time zone from/to use) that Frame 1 leaves for Architect and on DEV-002, which is still PENDING, so the guide cannot be completed now.",
+    "Nothing completed downstream is invalidated by the correction: there is no verification report, review report, or synchronization record, and the only DONE implementation step (DEV-001, the serializer) does not depend on docs/conventions.md.",
+    "There are no outstanding obligations, independent defects, or blocking user questions."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "export-20260924T090000Z-a7f3c1d2",
+    "DOC": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md",
+    "PLAN": ".standards/docs/development/export-20260924T090000Z-a7f3c1d2.md",
+    "SCOPE": ".standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md",
+    "SPEC": ".standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "1",
+          "why": "only the active documentation frame is popped"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "true",
+          "why": "the older architecture frame remains"
+        },
+        {
+          "state": "Recovery.Frame1.From",
+          "equals": "DEVELOPING"
+        },
+        {
+          "state": "Recovery.Frame1.Owner",
+          "equals": "ARCHITECTING"
+        },
+        {
+          "state": "Recovery.Frame1.FailureType",
+          "equals": "ARCHITECTURE"
+        },
+        {
+          "state": "Recovery.Frame1.ResumeAt",
+          "equals": "DEVELOPING"
+        },
+        {
+          "state": "Recovery.Frame1.RerunThrough",
+          "equals": "NONE"
+        },
+        {
+          "state": "Obligations.Active",
+          "equals": "false",
+          "why": "no frame is converted into an outstanding obligation"
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "ARCHITECTING",
+          "why": "the popped frame resumes at ARCHITECTING"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "RESUME"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "DOCUMENTING"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${DOC}"
+        },
+        {
+          "provenance": {
+            "path": "${DOC}",
+            "artifact": "DOCUMENTATION",
+            "cycle": "${ID}"
+          }
+        },
+        {
+          "field": {
+            "path": "${DOC}",
+            "name": "Status",
+            "not": "COMPLETE"
+          },
+          "why": "the full Documenter gate is unmet"
+        },
+        {
+          "changed": [
+            "${DOC}"
+          ],
+          "why": "the corrective return must persist the remaining guide work, its prerequisites, and owners"
+        },
+        {
+          "unchanged": [
+            "src/**",
+            "test/**",
+            "package.json",
+            "${SCOPE}",
+            "${SPEC}",
+            "${PLAN}",
+            ".standards/CONTEXT.md"
+          ],
+          "why": "Documenter does not make Architect, Developer, Scoper, or Auditor decisions"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "not": "REVIEWING_FINAL"
+        },
+        {
+          "state": "WorkflowState",
+          "not": "AWAITING_USER_SIGNOFF"
+        },
+        {
+          "field": {
+            "path": "${DOC}",
+            "name": "Status",
+            "not": "COMPLETE"
+          }
+        },
+        {
+          "absent": ".standards/docs/reviews/${ID}/final-deliverable.md"
+        },
+        {
+          "reply_not_matches": "Claude Code:\\s*/reviewer",
+          "why": "no final-review invocation is offered"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "npm test",
+      "expect": "pass",
+      "why": "the existing invoice and CSV tests pass, as the plan self-check and the documentation record state"
+    },
+    {
+      "cmd": "node --input-type=module -e \"import { readFileSync } from 'node:fs'; import { handle } from './src/routes.js'; const fence = String.fromCharCode(96).repeat(3); const doc = readFileSync('docs/conventions.md', 'utf8'); const block = doc.split(fence + 'json')[1].split(fence)[0]; const shown = JSON.stringify(JSON.parse(block)); const actual = JSON.stringify(JSON.parse(handle('GET', '/invoices/INV-1001').body)); if (shown !== actual) { console.error('example differs: ' + shown + ' / ' + actual); process.exit(1); } console.log('example matches');\"",
+      "expect": "pass",
+      "why": "the corrected conventions example matches the live handler output field for field, so the correction is verifiable"
+    },
+    {
+      "cmd": "git show HEAD~2:docs/conventions.md | grep -q 'Unix epoch seconds' && grep -q 'ISO 8601 strings in UTC' docs/conventions.md",
+      "expect": "pass",
+      "why": "the pre-correction guidance was wrong (Unix seconds) and the committed correction describes ISO 8601 UTC"
+    },
+    {
+      "cmd": "test ! -e docs/api/export.md",
+      "expect": "pass",
+      "why": "the new API guide required by AC-004 does not exist yet"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 50-project (pre-install): Node ES-module invoice API (src/invoices.js, src/routes.js with inline JSON mapping, src/csv.js), node:test suites, docs/api/invoices.md (accurate) and docs/conventions.md (wrong: Unix seconds and decimal-string amounts, while code emits toISOString() and integer amount_cents). 52-cycle: CONTEXT.md, scope (AC-001..AC-004; AC-004 = new guide docs/api/export.md), design (relies on docs/conventions.md, does not define to-date inclusivity/time zone), STATE at DEVELOPING. 54-serializer: DEV-001 extracts src/serialize.js (DONE, self-check recorded), plan IN_PROGRESS, DEV-002 PENDING. 56-architecture-route: STATE ARCHITECTING with Frame 1 (From DEVELOPING, Owner ARCHITECTING, ResumeAt DEVELOPING, RerunThrough NONE); plan gets Suspended Assignment 1 matching Frame 1 reason. 58-documentation-route: final STATE at DOCUMENTING, Handoff FAILURE from ARCHITECTING (DOCUMENTATION), Frame 2 (Owner DOCUMENTING, ResumeAt ARCHITECTING, RerunThrough NONE). 60-conventions: committed correction of docs/conventions.md with an example that matches handler output. 62-record: documentation record (AUTONOMOUS, ACTIVE_CHANGE, NONE, IN_PROGRESS) holding DOC-001 RESOLVED with inspection and command evidence; remaining active-change documentation marked not yet assessed; it does not state the routing. No verification, review, or synchronization records exist. check.mjs is valid: fullBoundary is false during this recovery, so the plan may be IN_PROGRESS and the design is not held to coverage.",
+  "case": "documenter-59",
+  "caseHash": "898e79595f97a406",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-01T18:35:25.428Z",
+    "verdict": "pass",
+    "fixtureHash": "cb697ed13c6d1af4",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "2450b52ddcd68087",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:16:36.982Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-01T17:58:12.879Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/52-cycle/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/54-serializer/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/56-architecture-route/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/58-documentation-route/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:16:36.982Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

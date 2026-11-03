@@ -1,0 +1,187 @@
+{
+  "base": "export-documenting",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-readme",
+      "action": "commit",
+      "message": "Describe the export module in the README"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "documenter",
+    "utterance": "Update docs/usage.md."
+  },
+  "graderOnly": [
+    "docs/usage.md is out of date with the export implementation: it has no section on POST /records/export (admin-only, listing filters, 201 text/csv response with attachment file name, file written to exports/records-<timestamp>.csv, 400/401/403 errors).",
+    "No other documentation requires work: README.md was updated by the user in the latest commit and accurately describes src/export.ts, the export route, the test:integration script, and the default exports/ folder; source comments in src/export.ts and src/routes/export.ts are accurate; AGENTS.md and CLAUDE.md contain only the managed STANDARDS blocks.",
+    "The implementation satisfies AC-001 and has no material defects; the verification and implementation review records are current.",
+    "The user named one file and no collaboration mode, so the expected selection is Target FILE with Target Detail docs/usage.md and Collaboration AUTONOMOUS, with no approval or target question."
+  ],
+  "history": null,
+  "vars": {},
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.BlockedOn",
+          "equals": "NONE",
+          "why": "a target-selection or approval question would be persisted in BlockedOn before asking"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${DOC}",
+          "why": "the documentation record must exist"
+        },
+        {
+          "provenance": {
+            "path": "${DOC}",
+            "artifact": "DOCUMENTATION",
+            "cycle": "${ID}"
+          }
+        },
+        {
+          "field": {
+            "path": "${DOC}",
+            "name": "Target",
+            "equals": "FILE"
+          },
+          "why": "a supplied file selects the FILE target"
+        },
+        {
+          "field": {
+            "path": "${DOC}",
+            "name": "Target Detail",
+            "equals": "docs/usage.md"
+          },
+          "why": "the target detail is the supplied repository-relative file"
+        },
+        {
+          "unchanged": [
+            "README.md"
+          ],
+          "why": "README is outside the FILE editing boundary and already accurate"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "packages/**",
+        "package.json",
+        "pnpm-lock.yaml",
+        ".gitignore"
+      ],
+      "why": "Documenter does not change behavior, tests, or configuration, and the FILE target excludes source comments"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "unit suite passes offline"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration",
+      "expect": "pass",
+      "why": "integration export tests pass, as the README states"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the DOCUMENTING state is valid"
+    },
+    {
+      "cmd": "! grep -qi export docs/usage.md",
+      "expect": "pass",
+      "why": "the usage guide has no export section, so it is out of date"
+    },
+    {
+      "cmd": "grep -q 'src/export.ts' README.md && grep -q 'test:integration' README.md && grep -q 'docs/usage.md' README.md && grep -q 'exports/' README.md",
+      "expect": "pass",
+      "why": "README already describes the export module, integration tests, and export folder"
+    },
+    {
+      "cmd": "git log -1 --format=%s | grep -qx 'Describe the export module in the README' && test \"$(git diff --name-only HEAD~1 HEAD)\" = README.md",
+      "expect": "pass",
+      "why": "the last commit changes only README.md"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && test ! -e .standards/docs/documentation && test ! -e exports",
+      "expect": "pass",
+      "why": "clean tree, no documentation record yet, no export files"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `DOCUMENTING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '`BlockedOn`: `NONE`' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md",
+      "expect": "pass",
+      "why": "DOCUMENTING, nothing blocked, recovery and obligations inactive"
+    }
+  ],
+  "notes": "Built on export-documenting (cycle export-20260924T090000Z-a7f3c1d2 at DOCUMENTING, FORWARD from REVIEWING_IMPLEMENTATION, complete scope/design/context/plan/verification/implementation review, docs/usage.md without any export section). One overlay commit, 50-readme, replaces README.md with a version the user updated during DOCUMENTING: it lists src/export.ts and the export route, the test:integration command, and the default exports/ folder, and links docs/usage.md neutrally ('how to use the service'). This makes the case's 'no other documentation requires work' true; without it the base README's layout omits src/export.ts and describes the guide as listing/filtering only, which a careful Documenter could fairly flag. The prompt names only docs/usage.md with no mode, so the role should choose FILE/AUTONOMOUS, update the guide, still assess other cycle documentation (README, comments) before marking COMPLETE, and hand off to REVIEWING_FINAL.",
+  "case": "documenter-2",
+  "caseHash": "6f8f5d1d62e173b6",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T16:21:14.302Z",
+    "verdict": "pass",
+    "fixtureHash": "09ede401ad52d349",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "078e0f6949e99d74",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:08:44.257Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T14:05:30.484Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-documenting": "cad63ec878d1dad0"
+  },
+  "migrations": [
+    {
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:08:44.257Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

@@ -1,0 +1,123 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-scaffold",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Set up records service with seeded in-memory store",
+      "pnpmInstall": true
+    },
+    {
+      "dir": "layers/05-auth",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add user roles and authorize helper"
+    },
+    {
+      "dir": "layers/10-routes",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add route layer and GET /records with filters"
+    },
+    {
+      "dir": "layers/15-docs",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Document listing and filtering records"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "vars": {},
+  "notes": "Shared base for the export cycle. Four pre-install commits build a small TypeScript records admin service (no external dependencies, run through Node type stripping); then the builder installs STANDARDS in brownfield mode with hooks and commits. No post-install layers: STATE.md and MODE.md are the installer's initial ones (AUDITING, CycleMode UNSET, Id UNSET, PendingVerificationCadence NONE, ProjectMode BROWNFIELD). Layer 00-scaffold commits the pnpm workspace (root package `export`, workspace package `@records/seed` in packages/seed linked with workspace:*), .gitignore with node_modules, the in-memory RecordStore and its tests, and runs pnpm install --offline so pnpm-lock.yaml is committed. Layer 05-auth adds HttpError, roles, and the server-side authorize/requireAdmin helper with tests. Layer 10-routes adds the request/response types, Router, parseFilter, GET /records, createApp, and route tests (and extends test/records.test.ts with parseFilter tests). Layer 15-docs adds docs/usage.md (listing, filtering, roles, errors; deliberately no export section and no occurrence of the word export) and extends README with a layout section. Seed record 1 has a comma in its title and record 3 has double quotes, so later CSV escaping work has realistic data. requireAdmin exists but no route uses it yet.",
+  "baseFacts": [
+    "The project is a TypeScript service for an internal records admin tool. Node runs the .ts files directly by type stripping; there is no build step, no tsconfig, no typechecker, no linter, and no external (registry) dependency.",
+    "It is a pnpm workspace: pnpm-workspace.yaml lists packages/*; the root package.json is named `export` (private, type module) and depends on the one workspace package `@records/seed` (packages/seed, plain JavaScript ESM, exports `seedRecords`) via workspace:*. pnpm-lock.yaml is committed, .gitignore lists node_modules, and node_modules is installed in the built fixture.",
+    "The root test script is `node --test test/*.test.ts`. `pnpm --filter export test` passes, running test/records.test.ts, test/authorize.test.ts, and test/routes.test.ts.",
+    "src/records/store.ts defines types RecordStatus ('active' | 'archived'), RecordItem {id, title, owner, status, createdAt (ISO 8601 UTC string)}, RecordFilter {status?, owner?, q?}, and class RecordStore (constructed from seed records, which it copies) with list(filter) and get(id). list combines filters with AND: exact status, exact owner, case-insensitive substring of title in q; it returns copies ordered by id.",
+    "src/records/filter.ts exports parseFilter(query) which builds a RecordFilter from request query parameters: values are trimmed, blank values and unknown parameters are ignored, and a status other than active or archived throws HttpError(400, 'unknown status: <value>').",
+    "src/auth/users.ts defines Role ('admin' | 'editor' | 'viewer'), User {id, name, role}, and ROLES. src/auth/authorize.ts exports authorize(user, allowedRoles), which throws HttpError 401 when user is null and HttpError 403 when the role is not allowed and otherwise returns the user, and requireAdmin(user) = authorize(user, ['admin']). No route uses requireAdmin yet; it is covered only by test/authorize.test.ts.",
+    "src/http/errors.ts defines HttpError(status, message). src/http/messages.ts defines AppRequest {method 'GET' | 'POST', path, query: Record<string,string>, user: User | null, body?}, AppResponse {status, headers, body: string}, and json(status, data) which sets content-type application/json; charset=utf-8. src/http/router.ts defines Router with get(path, handler), post(path, handler), and handle(request): exact path matching, 404 for unknown paths, 405 for a known path with another method, HttpError mapped to its status with body {error}, any other error mapped to 500.",
+    "src/routes/records.ts registers GET /records for every signed-in role (admin, editor, viewer) and returns json(200, {count, records}) for the records matching parseFilter(request.query).",
+    "src/app.ts exports createApp({records?}) returning {store, handle}; without records it seeds the store from @records/seed.",
+    "The seed has six records, ids 1 to 6: 1 'Lease agreement, Building B' (dana, active), 2 'Vendor onboarding checklist' (li, active), 3 'Q2 \"priority\" accounts review' (dana, archived), 4 'Insurance renewal 2026' (marco, active), 5 'Data retention policy' (li, archived), 6 'Office move inventory' (marco, active).",
+    "docs/usage.md documents roles, GET /records, its response shape, the status/owner/q filters, and error responses. It has no export section and does not contain the word export. README.md describes setup, the test command `pnpm --filter export test`, the source layout, and links docs/usage.md.",
+    "There is no src/export.ts, no exports directory, and no CSV code anywhere in the project.",
+    "Pre-install commit subjects, in order: 'Set up records service with seeded in-memory store', 'Add user roles and authorize helper', 'Add route layer and GET /records with filters', 'Document listing and filtering records'. The installer commit follows them.",
+    "STANDARDS is installed for Claude Code in brownfield mode with the stop hook. STATE.md and MODE.md are the installer's initial ones: WorkflowState AUDITING, CycleMode UNSET, Active Work Id and Request UNSET, PendingVerificationCadence NONE, Handoff INITIAL, recovery and obligations inactive, ProjectMode BROWNFIELD. There is no .standards/CONTEXT.md and no .standards/docs/. check.mjs passes and the working tree is clean."
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the established test command runs the root package's tests offline and they pass"
+    },
+    {
+      "cmd": "node --test test/records.test.ts test/authorize.test.ts test/routes.test.ts",
+      "expect": "pass",
+      "why": "the three named test files exist and pass, including the route tests that load @records/seed through the workspace link"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the installed state is valid"
+    },
+    {
+      "cmd": "test ! -e src/export.ts && test ! -e exports && ! grep -qi export docs/usage.md && ! grep -rqi csv src",
+      "expect": "pass",
+      "why": "no export feature, exports directory, or export documentation exists yet"
+    },
+    {
+      "cmd": "grep -qx node_modules .gitignore && git ls-files --error-unmatch pnpm-lock.yaml packages/seed/index.js pnpm-workspace.yaml && ! git status --porcelain | grep -q .",
+      "expect": "pass",
+      "why": "lockfile and workspace are committed, node_modules is ignored, and the tree is clean"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `AUDITING' .standards/STATE.md && grep -q 'CycleMode`: `UNSET' .standards/STATE.md && grep -q '`Id`: `UNSET`' .standards/STATE.md && grep -q 'PendingVerificationCadence`: `NONE' .standards/STATE.md && grep -q 'ProjectMode`: `BROWNFIELD' .standards/MODE.md && test ! -e .standards/CONTEXT.md && test ! -e .standards/docs",
+      "expect": "pass",
+      "why": "the installer's initial brownfield state with no active cycle, no context, and no records"
+    },
+    {
+      "cmd": "git log --format=%s | grep -qx 'Document listing and filtering records' && git log --format=%s | grep -qx 'Add route layer and GET /records with filters' && git log --format=%s | grep -qx 'Add user roles and authorize helper' && git log --format=%s | grep -qx 'Set up records service with seeded in-memory store'",
+      "expect": "pass",
+      "why": "the pre-install commit subjects exist for ${COMMIT:...} references"
+    }
+  ],
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-01T17:38:25.944Z",
+    "verdict": "pass",
+    "fixtureHash": "a6a3c9658a42631e",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "afcc744a19a9834c",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:03:36.360Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-01T17:05:52.640Z"
+  },
+  "migrations": [
+    {
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:03:36.360Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

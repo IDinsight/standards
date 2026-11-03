@@ -1,0 +1,359 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial inventory workspace",
+      "pnpmInstall": true
+    },
+    {
+      "dir": "layers/10-plan",
+      "action": "commit",
+      "message": "Record scope, design, and development plan for low-stock alerts"
+    },
+    {
+      "dir": "layers/20-increment-1",
+      "action": "commit",
+      "message": "Add low-stock evaluation to inventory report"
+    },
+    {
+      "dir": "layers/30-verification",
+      "action": "commit",
+      "message": "Add low-stock tests and record Increment 1 verification"
+    },
+    {
+      "dir": "layers/40-repair",
+      "action": "commit",
+      "message": "Include items at the reorder threshold in low-stock evaluation"
+    }
+  ],
+  "expectCheck": {
+    "ok": false,
+    "problemsMatch": [
+      "scoped Tester correction requires Assessment Purpose CORRECTION"
+    ]
+  },
+  "prompt": {
+    "skill": "tester",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "Frame 2 is Tester's correction of a test defect Developer found while repairing the Frame 1 implementation defect; Frame 1 holds Tester's suspended INCREMENT / Increment 1 assignment (Suspended Assignment 1 in the verification report's Resume or Handoff section). Developer's own suspended CORRECTION assignment for Frame 2 is in the plan's Plan Notes.",
+    "packages/core/src/lowStock.js already uses quantity <= reorderPoint(item) (the Frame 1 repair is applied and committed); DEV-001 is IN_PROGRESS only because Developer could not confirm it while a Tester-owned test fails.",
+    "The only failing test is 'uses the default threshold when none is set' in packages/core/test/low-stock.test.js: it expects ['B1'], but B2 has 5 units and no threshold, so by AC-001 and AC-002 (default 5, at or below) the correct expectation is ['B1', 'B2']. Correcting that expectation makes pnpm --filter @stockroom/core test pass all 7 tests; pnpm --filter @stockroom/cli test already passes.",
+    "DEV-003 (CLI --low-stock, AC-003, Increment 2) is unimplemented by design; it is future approved work, not a defect.",
+    "The pending AFTER_IMPLEMENTATION cadence request in STATE.md is applied by Developer only once recovery returns to normal development; Tester leaves it pending."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "low-stock-alerts-20260922T141500Z-3c9e5a71",
+    "REPORT": ".standards/docs/verification/low-stock-alerts-20260922T141500Z-3c9e5a71.md",
+    "PLAN": ".standards/docs/development/low-stock-alerts-20260922T141500Z-3c9e5a71.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "field": {
+            "path": "${REPORT}",
+            "name": "Assessment Purpose",
+            "equals": "CORRECTION"
+          },
+          "why": "the nested test correction is a CORRECTION assessment"
+        },
+        {
+          "field": {
+            "path": "${REPORT}",
+            "name": "Assessment Target",
+            "not": "NONE"
+          },
+          "why": "CORRECTION needs a concrete target"
+        },
+        {
+          "field": {
+            "path": "${REPORT}",
+            "name": "Assessment Target",
+            "not": "Increment 1"
+          },
+          "why": "the target names the test correction, not the suspended increment"
+        },
+        {
+          "contains": {
+            "path": "${REPORT}",
+            "regex": "AC-001"
+          }
+        },
+        {
+          "contains": {
+            "path": "${REPORT}",
+            "regex": "AC-002"
+          }
+        },
+        {
+          "contains": {
+            "path": "${REPORT}",
+            "regex": "AC-003"
+          }
+        },
+        {
+          "contains": {
+            "path": "${REPORT}",
+            "regex": "AWAITING_IMPLEMENTATION"
+          },
+          "why": "AC-003 remains future approved work"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "${PLAN}"
+          ],
+          "why": "Developer's plan, including its Frame 2 suspended assignment, is not Tester's to edit"
+        },
+        {
+          "state": "Recovery.Frame1.Reason",
+          "equals": "Items at exactly their reorder threshold are not marked low stock."
+        },
+        {
+          "state": "Recovery.Frame1.Owner",
+          "equals": "DEVELOPING"
+        },
+        {
+          "contains": {
+            "path": "${REPORT}",
+            "regex": "### Suspended Assignment 1"
+          }
+        },
+        {
+          "contains": {
+            "path": "${REPORT}",
+            "regex": "`Recovery Frame`:\\s*`1`"
+          }
+        },
+        {
+          "contains": {
+            "path": "${REPORT}",
+            "regex": "Items\\s+at\\s+exactly\\s+their\\s+reorder\\s+threshold\\s+are\\s+not\\s+marked\\s+low\\s+stock\\."
+          },
+          "why": "exact Frame 1 Reason kept on the saved assignment"
+        },
+        {
+          "contains": {
+            "path": "${REPORT}",
+            "regex": "`Purpose`:\\s*`INCREMENT`\\s*`Target`:\\s*`Increment 1`"
+          },
+          "why": "original INCREMENT / Increment 1 assignment not overwritten"
+        },
+        {
+          "contains": {
+            "path": "${REPORT}",
+            "regex": "${COMMIT:Add low-stock evaluation to inventory report}"
+          },
+          "why": "assessed input identity of the saved assignment preserved"
+        },
+        {
+          "contains": {
+            "path": "${REPORT}",
+            "regex": "`Next Action`:\\s*`On\\s+RESUME"
+          }
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "DEVELOPING"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "RESUME"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "TESTING"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "1"
+        },
+        {
+          "state": "Recovery.Frame1.Owner",
+          "equals": "DEVELOPING"
+        },
+        {
+          "state": "Recovery.Frame1.ResumeAt",
+          "equals": "TESTING"
+        },
+        {
+          "state": "Recovery.Frame1.RerunThrough",
+          "equals": "NONE"
+        },
+        {
+          "field": {
+            "path": "${REPORT}",
+            "name": "Assessment Purpose",
+            "equals": "CORRECTION"
+          },
+          "why": "Increment 1 is not restored before its own return"
+        },
+        {
+          "unchanged": [
+            "packages/core/src/**",
+            "packages/cli/src/**",
+            "packages/cli/bin/**",
+            "${PLAN}"
+          ],
+          "why": "Tester does not continue Developer's repair"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "field": {
+            "path": "${REPORT}",
+            "name": "Assessment Purpose",
+            "not": "FULL"
+          },
+          "why": "scope comes from the saved recovery assignment, not the pending cadence"
+        }
+      ]
+    },
+    {
+      "assertion": 4,
+      "complete": true,
+      "all": [
+        {
+          "state": "ActiveWork.PendingVerificationCadence",
+          "equals": "AFTER_IMPLEMENTATION"
+        },
+        {
+          "state": "Handoff.Kind",
+          "not": "CHECKPOINT"
+        },
+        {
+          "field": {
+            "path": "${PLAN}",
+            "name": "Verification Cadence",
+            "equals": "INCREMENTAL"
+          }
+        },
+        {
+          "field": {
+            "path": "${PLAN}",
+            "name": "Current Increment",
+            "equals": "1"
+          }
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "packages/core/src/**",
+        "packages/cli/src/**",
+        "packages/cli/bin/**"
+      ],
+      "why": "Tester does not edit implementation"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter @stockroom/core test",
+      "expect": "fail",
+      "expectOutput": "uses the default threshold when none is set",
+      "why": "the core suite currently fails on the default-threshold case Developer reported"
+    },
+    {
+      "cmd": "node --test --test-name-pattern=default packages/core/test/low-stock.test.js",
+      "expect": "fail",
+      "expectOutput": "B2",
+      "why": "the failing case is the test expecting B2 (5 units, default threshold) to be excluded"
+    },
+    {
+      "cmd": "node --test --test-name-pattern=reorder packages/core/test/low-stock.test.js",
+      "expect": "pass",
+      "why": "the below/at/above threshold cases pass with the committed Frame 1 repair"
+    },
+    {
+      "cmd": "node --test packages/core/test/inventory.test.js",
+      "expect": "pass",
+      "why": "existing core inventory tests pass"
+    },
+    {
+      "cmd": "pnpm --filter @stockroom/cli test",
+      "expect": "pass",
+      "why": "the CLI suite passes through the workspace link to @stockroom/core"
+    }
+  ],
+  "notes": "Standalone brownfield pnpm workspace (packages/core, packages/cli, workspace:* link, pnpmInstall on the pre-install layer). 10-plan: CONTEXT, scope (AC-001..003), design, approved INCREMENTAL plan (Increment 1 = DEV-001/DEV-002 for AC-001/AC-002; Increment 2 = DEV-003 for AC-003), STATE at DEVELOPING. 20-increment-1: lowStock.js with a < comparison, report-row flag, plan steps DONE, STATE CHECKPOINT to TESTING. 30-verification: Tester tests (the default-threshold case wrongly expects ['B1']), report with INCREMENT / Increment 1, Increment 1 BLOCKED, AC-003 AWAITING_IMPLEMENTATION, Suspended Assignment 1 for Frame 1; STATE FAILURE to DEVELOPING with Frame 1. 40-repair: lowStock.js fixed to <=, DEV-001 IN_PROGRESS with failing self-check, Plan Notes Suspended Assignment 1 (CORRECTION) for Frame 2, STATE TESTING with Frame 2 (VERIFICATION, ResumeAt DEVELOPING), FAILURE handoff from DEVELOPING, PendingVerificationCadence AFTER_IMPLEMENTATION. Full check reports exactly the scoped-correction purpose problem (deliberately invalid per catalog); the turn-end check is clean.",
+  "case": "tester-33",
+  "caseHash": "6c3ca645bb4db060",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-01T22:36:16.029Z",
+    "verdict": "pass",
+    "fixtureHash": "0ecd2d7bde611176",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "408eeeea165e40eb",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:49:13.752Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-01T21:48:32.339Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/10-plan/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/20-increment-1/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/30-verification/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/40-repair/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:49:13.752Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

@@ -1,0 +1,143 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add in-process job queue and worker loop"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "navigator",
+    "utterance": "Are you sure it's FIFO? I think the queue orders by priority."
+  },
+  "graderOnly": [
+    "Earlier in this conversation the assistant (Navigator, GRILL_ME) wrongly told the user that JobQueue is FIFO and marked the user's correct answer (the urgent password-reset email runs before the nightly report) as 'Not quite'.",
+    "src/queue.js implements a binary max-heap: dequeue() always returns the job with the highest numeric priority (missing priority counts as 0); enqueue() pushes to the end of the array and then sifts the job up by priority.",
+    "In src/jobs.js the password-reset email has priority 10 (PRIORITY.high) and the nightly report has priority 1 (PRIORITY.low), so the user's earlier answer was correct: the email runs first.",
+    "The heap compares only priority and has no insertion-sequence tie-breaker, so the source gives no FIFO guarantee among jobs of equal priority; for example, enqueuing A, B, C all at priority 1 dequeues A, C, B.",
+    "No test covers the relative order of equal-priority jobs, and no document claims FIFO or stable ordering."
+  ],
+  "history": {
+    "turns": [
+      {
+        "role": "user",
+        "text": "/navigator Grill me on how the job queue works. Start easy."
+      },
+      {
+        "role": "assistant",
+        "text": "Sure, let's start with the big picture.\n\nQuestion 1: What is the job queue for, and which parts of the code put jobs into it and take them out?"
+      },
+      {
+        "role": "user",
+        "text": "It's for background stuff like emails and reports. The job factories in src/jobs.js build jobs, something calls enqueue, and drain() in src/worker.js keeps calling dequeue and running each job until the queue is empty."
+      },
+      {
+        "role": "assistant",
+        "text": "That's right. `drain()` in `src/worker.js` loops while `queue.size > 0`, calls `dequeue()`, runs the job, and passes any thrown error to `onError` instead of stopping the loop. Good detail on the factories, too.\n\nQuestion 2: The worker is busy. A producer enqueues a nightly report job, and a moment later enqueues a password-reset email job. When `drain()` gets to them, which one runs first?"
+      },
+      {
+        "role": "user",
+        "text": "The password-reset email, I think, because it's more urgent."
+      },
+      {
+        "role": "assistant",
+        "text": "Not quite. The queue is FIFO: `enqueue()` adds each job to the end of the internal items array and `dequeue()` hands back the item at the front, so jobs come out in the order they went in. The nightly report was enqueued first, so it runs first and the email waits behind it.\n\nQuestion 3: What happens when `dequeue()` is called on an empty queue, and how does `drain()` avoid hitting that case?"
+      }
+    ]
+  },
+  "vars": {},
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "reply_matches": "priorit",
+          "flags": "i",
+          "why": "any correct response addresses priority ordering"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": []
+    }
+  ],
+  "invariants": [
+    {
+      "unchanged": [
+        "**"
+      ],
+      "why": "Navigator persists nothing (generated caches are ignored)"
+    },
+    {
+      "head_unchanged": true,
+      "why": "Navigator never moves HEAD"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Navigator never mutates git state"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/queue.test.js test/worker.test.js",
+      "expect": "pass",
+      "why": "the existing tests pass, including the one showing higher-priority jobs dequeue first"
+    },
+    {
+      "cmd": "node --input-type=module -e \"import { JobQueue } from './src/queue.js'; import { nightlyReport, passwordResetEmail } from './src/jobs.js'; const q = new JobQueue(); q.enqueue(nightlyReport(() => {})); q.enqueue(passwordResetEmail('a@example.org', () => {})); const first = q.dequeue().name; if (first === 'password-reset-email') console.log(first); else { console.error(first); process.exit(1); }\"",
+      "expect": "pass",
+      "why": "source confirms the history scenario: the email enqueued second runs before the report enqueued first (priority, not FIFO)"
+    },
+    {
+      "cmd": "node --input-type=module -e \"import { JobQueue } from './src/queue.js'; const q = new JobQueue(); for (const name of ['A', 'B', 'C']) q.enqueue({ name, priority: 1, run() {} }); const order = [q.dequeue(), q.dequeue(), q.dequeue()].map((j) => j.name).join(','); if (order === 'A,C,B') console.log(order); else { console.error(order); process.exit(1); }\"",
+      "expect": "pass",
+      "why": "equal-priority jobs have no FIFO guarantee: A, B, C at the same priority dequeue as A, C, B"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. Layer 00-project (pre-install commit) is a tiny Node ESM job runner: src/queue.js (JobQueue, a binary max-heap on job.priority with no tie-breaker), src/jobs.js (passwordResetEmail priority 10, nightlyReport priority 1), src/worker.js (drain loop), tests in test/. The installer then adds STANDARDS in its default brownfield initial state (no cycle), which check.mjs accepts. History holds an earlier GRILL_ME exchange where the assistant wrongly called the queue FIFO and marked the user's correct answer wrong; the run's message is the user's challenge. Assertion 1's trap: equal-priority ordering is not FIFO-stable, so claiming 'FIFO within a priority' is unsupported (selfCheck demonstrates A,C,B).",
+  "case": "navigator-51",
+  "caseHash": "a4c1a23664827c24",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-01T18:39:31.277Z",
+    "verdict": "pass",
+    "fixtureHash": "295641d84dbc71a1",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "7a4af9624c79546e",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:23:00.992Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-01T18:27:18.686Z"
+  },
+  "migrations": [
+    {
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:23:00.992Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

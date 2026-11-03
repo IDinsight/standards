@@ -1,0 +1,172 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial records service"
+    },
+    {
+      "dir": "layers/50-export",
+      "action": "commit",
+      "message": "feat(export): add CSV export of records"
+    },
+    {
+      "dir": "layers/51-docs",
+      "action": "commit",
+      "message": "docs: describe CSV export in README"
+    },
+    {
+      "dir": "layers/52-records",
+      "action": "commit",
+      "message": "chore(standards): carry over csv-export cycle records"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "synchronizer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "No cycle has started: .standards/STATE.md is the installer's brownfield state with WorkflowState AUDITING, CycleMode UNSET, Active Work Id and Request UNSET, and Handoff Kind INITIAL.",
+    "There is no request to start a cycle with; the user's message gives none.",
+    "The records under .standards/docs/ belong to cycle csv-export-20260918T141000Z-3c9e5a71, which STATE.md does not track. That cycle's scope, design, plan, verification, implementation review, documentation record, and final review are present (the reports COMPLETE) and it has no synchronization record. Their presence is not an active Synchronizer assignment.",
+    "Synchronizer may do role-owned work only in SYNCHRONIZING with an initialized active STANDARD cycle. The correct response declines synchronization, says no cycle is active (CycleMode, Id, and Request UNSET; state AUDITING belongs to Auditor), and explains that a cycle must be started with a request (entering at AUDITING for this brownfield project) and reach SYNCHRONIZING before Synchronizer can act."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "csv-export-20260918T141000Z-3c9e5a71",
+    "SYNC": ".standards/docs/synchronization/csv-export-20260918T141000Z-3c9e5a71.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "AUDITING",
+          "why": "no transition is authorized"
+        },
+        {
+          "state": "CycleMode",
+          "equals": "UNSET",
+          "why": "no cycle is started"
+        },
+        {
+          "state": "ActiveWork.Id",
+          "equals": "UNSET",
+          "why": "no cycle id is generated or adopted"
+        },
+        {
+          "state": "ActiveWork.Request",
+          "equals": "UNSET",
+          "why": "no request is invented"
+        },
+        {
+          "absent": "${SYNC}",
+          "why": "no synchronization record for the untracked earlier cycle"
+        },
+        {
+          "unchanged": [
+            ".standards/**"
+          ],
+          "why": "no workflow record or evidence is written"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.Id",
+          "equals": "UNSET",
+          "why": "the earlier cycle's records are not adopted as the active cycle"
+        },
+        {
+          "unchanged": [
+            ".standards/**"
+          ],
+          "why": "no record is written on the strength of existing artifacts"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "README.md",
+        "package.json"
+      ],
+      "why": "Synchronizer never edits project code, tests, or documentation"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/store.test.js test/export.test.js",
+      "expect": "pass",
+      "why": "the project's test suite passes as the earlier cycle's records claim"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the installed initial state with untracked earlier-cycle records is valid"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 00-project (pre-install) is a small in-memory record store with node:test tests. The installer then writes the default brownfield STATE.md (AUDITING, CycleMode UNSET, Id/Request UNSET, Handoff INITIAL); no layer overwrites STATE.md or MODE.md, so the case's state is exactly the installed one. 50-export adds src/export.js (RFC 4180 toCsv) and its tests; 51-docs adds a README section. 52-records commits CONTEXT.md and a full set of records for an earlier cycle csv-export-20260918T141000Z-3c9e5a71 (scope, design, COMPLETE plan, COMPLETE verification, COMPLETE implementation and final-deliverable reviews, COMPLETE documentation record) with no synchronization record: the 'other-cycle-records' that could tempt a Synchronizer to infer it has a synchronization assignment. The story is that the records came over from a branch whose STATE.md was not kept (the protocol's merge-conflict outcome). check.mjs returns early for the active cycle when Id is UNSET, so these records produce no problems; their provenance blocks are well formed.",
+  "case": "synchronizer-6",
+  "caseHash": "465ac108101f2e7c",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T14:29:37.552Z",
+    "verdict": "pass",
+    "fixtureHash": "1ee6dc437541e539",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "dd4b7a0f3e8a1c08",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:35:42.132Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T12:46:42.964Z"
+  },
+  "migrations": [
+    {
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:35:42.132Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

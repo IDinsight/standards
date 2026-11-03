@@ -1,0 +1,199 @@
+{
+  "base": "export-synchronizing",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-helper-quoting",
+      "action": "unstaged"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "synchronizer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The committed src/export.ts (hash A, the git blob of HEAD:src/export.ts) is the content that the verification report, the implementation review, the final-deliverable review, and the documentation record cite by blob hash; their test results E1/E2, R1/R2, C1/C2 and inspections were all made against A.",
+    "The working tree has one unstaged change: src/export.ts now has hash B. Its csvCell also quotes any field that begins or ends with whitespace, in addition to fields containing a comma, double quote, CR, or LF. This changes the escaping behavior.",
+    "No record mentions hash B or this change; no Tester or Reviewer assessment covers B, and the development plan does not describe it. Final review and verification therefore no longer apply to the current helper content.",
+    "B departs from the design's CSV contract and the usage guide, which both say fields without a comma, quote, or line break are written as they are.",
+    "With B, pnpm --filter export test (21) and pnpm --filter export test:integration (3) still pass, because no test value and no seed title has leading or trailing whitespace; a passing run does not assess the new behavior.",
+    "Routing to Developer (IMPLEMENTATION, unrecorded change diverging from design and plan), to Tester (VERIFICATION, stale evidence), or recording all gaps and asking the user whether the unstaged change belongs to the deliverable are all defensible; what matters is that every gap (at least stale verification and stale final review) is persisted in the synchronization record before any routing, and that the old A results are not presented as evidence for B."
+  ],
+  "history": null,
+  "vars": {
+    "HELPER": "src/export.ts"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${SYNC}",
+          "why": "the gaps must be persisted in the cycle's synchronization record"
+        },
+        {
+          "provenance": {
+            "path": "${SYNC}",
+            "artifact": "SYNCHRONIZATION",
+            "cycle": "${ID}"
+          }
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "not": "AWAITING_USER_SIGNOFF",
+          "why": "sign-off readiness would treat A-evidence as covering B"
+        },
+        {
+          "field": {
+            "path": "${SYNC}",
+            "name": "Status",
+            "not": "COMPLETE"
+          },
+          "why": "the gate cannot pass while no assessment covers B"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "${VERIFICATION}",
+            "${REVIEW_IMPL}",
+            "${REVIEW_FINAL}",
+            "test/**"
+          ],
+          "why": "Synchronizer does not write Tester or Reviewer evidence or tests"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Synchronizer must not change the assessed identity (no stash, checkout, or commit)"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "packages/**",
+        "docs/**",
+        "README.md",
+        "package.json",
+        "pnpm-lock.yaml",
+        "${SCOPE}",
+        "${ARCH}",
+        "${DEV}",
+        "${DOC}",
+        "${CONTEXT}"
+      ],
+      "why": "Synchronizer owns only its record and does not repair other roles' artifacts"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the unit suite still passes with hash B"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration",
+      "expect": "pass",
+      "why": "the integration suite still passes with hash B"
+    },
+    {
+      "cmd": "test \"$(git diff --name-only)\" = src/export.ts && git diff --cached --quiet && test -z \"$(git ls-files --others --exclude-standard)\"",
+      "expect": "pass",
+      "why": "the only working-tree change is the unstaged helper edit"
+    },
+    {
+      "cmd": "a=$(git rev-parse HEAD:src/export.ts) && b=$(git hash-object src/export.ts) && test \"$a\" != \"$b\" && grep -q $a .standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md && grep -q $a .standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md && grep -q $a .standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md && ! grep -rq $b .standards",
+      "expect": "pass",
+      "why": "verification and both reviews cite helper hash A; nothing cites the current hash B"
+    },
+    {
+      "cmd": "git show HEAD:src/export.ts > src/export-head.ts && node -e 'Promise.all([import(`./src/export-head.ts`), import(`./src/export.ts`)]).then(([a, b]) => { const q = String.fromCharCode(34); if (a.csvCell(` padded`) !== ` padded` || b.csvCell(` padded`) !== q + ` padded` + q || a.csvCell(`a,b`) !== b.csvCell(`a,b`)) process.exit(1); console.log(`escaping differs`); }, (e) => { console.error(e); process.exit(2); })'; s=$?; rm -f src/export-head.ts; exit $s",
+      "expect": "pass",
+      "why": "hash B changes escaping (whitespace-edged fields are now quoted) while comma quoting is unchanged"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the workflow state is valid"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `SYNCHRONIZING`' .standards/STATE.md && test ! -e .standards/docs/synchronization",
+      "expect": "pass",
+      "why": "SYNCHRONIZING with no synchronization record yet"
+    }
+  ],
+  "notes": "Built on export-synchronizing (cycle export-20260924T090000Z-a7f3c1d2 at SYNCHRONIZING, all records COMPLETE and citing BLOB identities of the committed src/export.ts, i.e. hash A). One overlay layer, 50-helper-quoting, leaves an unstaged edit to src/export.ts (hash B): csvCell additionally quotes fields with leading or trailing whitespace. Tests still pass; no record mentions B. Stated facts: final review COMPLETE against A (final-deliverable.md cites the HEAD blob), Tester results identify A (verification cites the HEAD blob), helper now B with changed escaping (working tree), no assessment covers B (no record cites B). Everything else (valid ownership, documentation evidence, inactive recovery, no blocker) comes from the base.",
+  "case": "synchronizer-10",
+  "caseHash": "3a9ee992db2d6c5c",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T14:31:18.409Z",
+    "verdict": "issues",
+    "fixtureHash": "e620ce210cf491e6",
+    "fixedBy": "owner decision",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "83da14d533179566",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:35:52.132Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T12:51:17.729Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-synchronizing": "33937a9926a74652"
+  },
+  "decision": {
+    "action": "fixed",
+    "note": "Owner-approved gate-3 recommendation (2026-10-03): removed the min-2 D heading check; the judge decides whether both gaps are preserved.",
+    "at": "2026-10-03T14:46:50.851Z",
+    "fixtureHash": "83da14d533179566"
+  },
+  "migrations": [
+    {
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:35:52.132Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

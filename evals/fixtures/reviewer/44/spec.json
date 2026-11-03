@@ -1,0 +1,266 @@
+{
+  "base": null,
+  "install": {
+    "mode": "greenfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-start",
+      "action": "commit",
+      "message": "Start time-log totals cycle"
+    },
+    {
+      "dir": "layers/51-scope",
+      "action": "commit",
+      "message": "docs(scope): define time-log totals CLI"
+    },
+    {
+      "dir": "layers/52-design",
+      "action": "commit",
+      "message": "docs(spec): design time-log totals CLI"
+    },
+    {
+      "dir": "layers/53-context",
+      "action": "commit",
+      "message": "docs(context): record greenfield project context"
+    },
+    {
+      "dir": "layers/54-implementation",
+      "action": "commit",
+      "message": "feat: add time-log totals CLI"
+    },
+    {
+      "dir": "layers/55-tests",
+      "action": "commit",
+      "message": "test: cover time-log parsing, totals, and CLI errors"
+    },
+    {
+      "dir": "layers/56-verification",
+      "action": "commit",
+      "message": "docs(verification): record full verification"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "reviewer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "Scope, architecture, Auditor context, implementation, full Tester evidence, and every relevant technical criterion are current and satisfied; the 17 tests in test/parse.test.js, test/report.test.js and test/cli.test.js all pass on the committed implementation.",
+    "No required project documentation, later-role dependency, or material finding exists, so the ordinary implementation review can be COMPLETE and the closure assessment ELIGIBLE.",
+    "No README or other project-facing documentation exists; the scope lists user-facing documentation as a non-goal, and the saved request gives 'no project-facing documentation is needed' as the reason for IMPLEMENTATION_REVIEWED.",
+    "The cycle began GREENFIELD (greenfield install, SCOPING -> ARCHITECTING -> AUDITING -> DEVELOPING order); .standards/MODE.md changed to BROWNFIELD in the commit 'feat: add time-log totals CLI'.",
+    "No documentation record, final-deliverable review, or synchronization record exists for this cycle."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "build-a-command-line-tool-that-totals-20260924T090000Z-3e8b1f6a",
+    "REVIEW": ".standards/docs/reviews/build-a-command-line-tool-that-totals-20260924T090000Z-3e8b1f6a/implementation.md",
+    "FINAL": ".standards/docs/reviews/build-a-command-line-tool-that-totals-20260924T090000Z-3e8b1f6a/final-deliverable.md",
+    "DOCREC": ".standards/docs/documentation/build-a-command-line-tool-that-totals-20260924T090000Z-3e8b1f6a.md",
+    "SYNC": ".standards/docs/synchronization/build-a-command-line-tool-that-totals-20260924T090000Z-3e8b1f6a.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "field": {
+            "path": "${REVIEW}",
+            "name": "Status",
+            "equals": "COMPLETE"
+          },
+          "why": "ordinary implementation review passes"
+        },
+        {
+          "provenance": {
+            "path": "${REVIEW}",
+            "artifact": "REVIEW",
+            "cycle": "${ID}",
+            "kind": "IMPLEMENTATION"
+          }
+        },
+        {
+          "contains": {
+            "path": "${REVIEW}",
+            "regex": "`Eligibility`:\\s*`ELIGIBLE`"
+          },
+          "why": "separate closure assessment is ELIGIBLE"
+        },
+        {
+          "contains": {
+            "path": "${REVIEW}",
+            "regex": "`User Choice`:\\s*`+\\s*(?!NONE\\b)[^`\\s]"
+          },
+          "why": "explicit user choice recorded"
+        },
+        {
+          "contains": {
+            "path": "${REVIEW}",
+            "regex": "`User Reason`:\\s*`+\\s*(?!NONE\\b)[^`\\s]"
+          },
+          "why": "the saved request states a reason, so it must be recorded"
+        },
+        {
+          "check_ok": true,
+          "why": "at AWAITING_USER_SIGNOFF the checker enforces one concrete closure section with ELIGIBLE, non-NONE inputs/evidence/guarantees and the three omitted phases"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "state": "ProjectMode",
+          "equals": "BROWNFIELD"
+        },
+        {
+          "unchanged": [
+            ".standards/MODE.md"
+          ]
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "AWAITING_USER_SIGNOFF"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FORWARD"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "REVIEWING_IMPLEMENTATION"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "NONE"
+        },
+        {
+          "state": "ActiveWork.CompletionPolicy",
+          "equals": "IMPLEMENTATION_REVIEWED"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "false"
+        },
+        {
+          "absent": "${DOCREC}"
+        },
+        {
+          "absent": "${FINAL}"
+        },
+        {
+          "absent": "${SYNC}"
+        },
+        {
+          "check_ok": true
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "not": "SIGNED_OFF"
+        },
+        {
+          "reply_not_matches": "Next role:",
+          "why": "no next-role invocation at AWAITING_USER_SIGNOFF"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "Reviewer must not change the assessed identity"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Reviewer must not change git state"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "bin/**",
+        "test/**",
+        "package.json",
+        ".standards/MODE.md",
+        ".standards/CONTEXT.md",
+        ".standards/docs/scope/**",
+        ".standards/docs/specs/**",
+        ".standards/docs/development/**",
+        ".standards/docs/verification/**"
+      ],
+      "why": "Reviewer does not edit implementation, tests, or other roles' artifacts"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/parse.test.js test/report.test.js test/cli.test.js",
+      "expect": "pass",
+      "why": "the established test command passes on the committed implementation"
+    },
+    {
+      "cmd": "npm test",
+      "expect": "pass",
+      "why": "the package test script recorded by Tester passes"
+    },
+    {
+      "cmd": "echo '2026-09-01 admin 1h75m' > /tmp/timesheet-bad.log && node bin/timesheet.js /tmp/timesheet-bad.log",
+      "expect": "fail",
+      "expectOutput": "line 1: cannot parse",
+      "why": "AC-004: a malformed line exits non-zero naming the line number"
+    },
+    {
+      "cmd": "echo '2026-09-01 admin 1h30m' > /tmp/timesheet-ok.log && node bin/timesheet.js /tmp/timesheet-ok.log | grep -q '1:30'",
+      "expect": "pass",
+      "why": "AC-003: totals are printed as H:MM"
+    },
+    {
+      "cmd": "grep -q 'BROWNFIELD' .standards/MODE.md && git log -p --format= -- .standards/MODE.md | grep -q 'GREENFIELD'",
+      "expect": "pass",
+      "why": "the project began GREENFIELD and is now BROWNFIELD"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the starting state is valid"
+    }
+  ],
+  "notes": "Standalone greenfield fixture. No pre-install layer (empty initial commit), greenfield install. 50-start: cycle INITIAL in SCOPING with CompletionPolicy IMPLEMENTATION_REVIEWED; the Request carries the explicit policy choice and its reason (no project-facing documentation needed). 51-scope: scope with AC-001..AC-004 (documentation is a non-goal), STATE ARCHITECTING. 52-design: technical design covering every AC with technical criteria, STATE AUDITING. 53-context: CONTEXT.md written before implementation (greenfield order), STATE DEVELOPING. 54-implementation: src/parse.js, src/report.js, bin/timesheet.js, package.json, COMPLETE development plan (AFTER_IMPLEMENTATION, Current Increment NONE, style locked), MODE.md switched to BROWNFIELD, STATE TESTING. 55-tests: Tester's three test files and the package test script. 56-verification: COMPLETE / FULL / NONE verification report citing the implementation and test commits and blobs of upstream records, STATE REVIEWING_IMPLEMENTATION with FORWARD from TESTING. No recovery, obligations, pending cadence, baseline reconciliation, or blocker. The code is correct against the scope and design; no README exists.",
+  "case": "reviewer-44",
+  "caseHash": "1345710c77a6d995",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T03:02:02.336Z",
+    "verdict": "pass",
+    "fixtureHash": "5c7f544c0f60e165",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-31T00:21:09.528Z"
+  }
+}

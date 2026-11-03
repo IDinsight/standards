@@ -1,0 +1,39 @@
+{
+  "conditions": [
+    {
+      "condition": "No earlier conversation context or topic is available to the session",
+      "where": "spec history: null; the run is a fresh headless session with only the utterance",
+      "status": "realized"
+    },
+    {
+      "condition": "No persisted quiz topic, answers, proficiency, or score exists anywhere in the repository",
+      "where": "built tree: only src/, test/, README.md, package.json, .gitignore and unchanged installed framework files; no quiz or score file",
+      "status": "realized"
+    },
+    {
+      "condition": "User explicitly selects GRILL_ME and asks to continue",
+      "where": "prompt.utterance \"GRILL_ME, continue where we left off.\" (verbatim from the catalog)",
+      "status": "realized"
+    },
+    {
+      "condition": "Repository is committed and clean (catalog git: committed)",
+      "where": "git log has two commits; git status shows a clean main",
+      "status": "realized"
+    },
+    {
+      "condition": "Workflow state and project mode are left unspecified; any valid installed state is acceptable",
+      "where": ".standards/STATE.md is the default brownfield install (AUDITING, CycleMode UNSET); check.mjs reports ok",
+      "status": "realized"
+    }
+  ],
+  "issues": [],
+  "verdict": "pass",
+  "summary": "The fixture is a minimal, realistic invoice-totals repo on a fresh brownfield install, with no history and no persisted quiz data, which matches the case's 'no earlier context'. Nothing leaks, the Navigator invariants are correct (unchanged **, HEAD unchanged, no mutating git), and both judge-only assertions can be observed from the reply and the tool trace.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T01:42:37.586Z",
+  "costUsd": 0.0749962,
+  "ms": 11970,
+  "fixtureHash": "ad2373e925edd3bc"
+}

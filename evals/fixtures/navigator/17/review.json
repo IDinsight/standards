@@ -1,0 +1,84 @@
+{
+  "conditions": [
+    {
+      "condition": "Project is BROWNFIELD with a STANDARD cycle (promoted from EXPEDITED)",
+      "where": ".standards/MODE.md (BROWNFIELD); .standards/STATE.md CycleMode STANDARD, PromotionReason set",
+      "status": "realized"
+    },
+    {
+      "condition": "WorkflowState is ARCHITECTING",
+      "where": ".standards/STATE.md line 3",
+      "status": "realized"
+    },
+    {
+      "condition": "Top (active) frame has Owner ARCHITECTING, ResumeAt TESTING, RerunThrough NONE",
+      "where": ".standards/STATE.md ### Frame 2",
+      "status": "realized"
+    },
+    {
+      "condition": "An older recovery frame exists beneath the top frame",
+      "where": ".standards/STATE.md ### Frame 1 (From DEVELOPING, Owner TESTING, ResumeAt DEVELOPING, RerunThrough NONE)",
+      "status": "realized"
+    },
+    {
+      "condition": "Outstanding Obligations holds a Developer obligation",
+      "where": ".standards/STATE.md ## Outstanding Obligations, Active true, ### Obligation 1 Owner DEVELOPING, IMPLEMENTATION",
+      "status": "realized"
+    },
+    {
+      "condition": "The architecture correction has not been made, so no return has happened yet",
+      "where": "spec design has no Idempotency-Key value source; Handoff is FAILURE from TESTING; verification report BLOCKED with Suspended Assignment 1 for Frame 2",
+      "status": "realized"
+    },
+    {
+      "condition": "Records exist: context, scope, architecture, development, verification",
+      "where": ".standards/CONTEXT.md, docs/scope, docs/specs, docs/development, docs/verification for the cycle id",
+      "status": "realized"
+    },
+    {
+      "condition": "Everything committed, clean tree",
+      "where": "git status clean on main; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "Persisted state is valid",
+      "where": "check.mjs --json ok:true; selfCheck passes",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "blocking",
+      "kind": "check-too-strict",
+      "assertion": 1,
+      "detail": "`reply_not_matches: \"Next role:\"` can fail a correct Navigator run. A Navigator explaining what is left in recovery may naturally write a summary line such as \"Next role: Architect\" or \"**Next role:** Architect\" to name the current owner without offering a copy/paste handoff. The assertion forbids dispatching or offering a handoff, not naming who acts next.",
+      "recommendation": "fix_file",
+      "fix": "In navigator-17/spec.json checks[1].all, replace {\"reply_not_matches\": \"Next role:\"} with {\"reply_not_matches\": \"Continue the active (workflow|recovery) from\", \"why\": \"no canonical next-role invocation\"}. This is the fixed text of the protocol's invocation line. Leave the judge to decide whether any other wording amounts to a handoff offer."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The expedited review report line \"Existing `test/deliver.test.js` and `.standards/CONTEXT.md` absent (no audit in an expedited cycle)\" reads as if the test file were absent, but the test exists. This is minor and does not touch the recovery question.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally reword to \"`test/deliver.test.js` inspected; `.standards/CONTEXT.md` absent (no audit in an expedited cycle).\""
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "All commits share one timestamp, and the git author is user.name=Fixture / fixture@example.invalid. These come from the harness builder, not the spec, and do not bear on the answer.",
+      "recommendation": "run_as_is",
+      "fix": "None needed for this fixture."
+    }
+  ],
+  "verdict": "issues",
+  "summary": "The fixture realizes the stated state faithfully. STATE.md is at ARCHITECTING with a coherent two-frame nested recovery: top frame Owner ARCHITECTING, ResumeAt TESTING, RerunThrough NONE, an older Tester frame, and a Developer obligation from promotion. The records and suspended assignments agree, and check.mjs passes. The one blocking problem is the assertion-1 check `reply_not_matches \"Next role:\"`, which a correct explanatory reply could trip; narrow it to the canonical invocation text.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T01:37:37.783Z",
+  "costUsd": 0.21937620000000002,
+  "ms": 61565,
+  "fixtureHash": "c1965b0c962e072c"
+}

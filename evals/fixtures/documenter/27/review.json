@@ -1,0 +1,94 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD, CycleMode STANDARD, WorkflowState DOCUMENTING, Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/MODE.md (installed brownfield), .standards/STATE.md (unstaged)",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, architecture, context, development, verification and implementation review have matching provenance and current evidence",
+      "where": ".standards/docs/{scope,specs,development,verification,reviews/.../implementation.md}, .standards/CONTEXT.md; the selfCheck confirms the verification and review cite the current working-tree blobs and HEAD",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-001 covers CSV export behavior; AC-002 requires an accurate usage guide",
+      "where": ".standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and obligations inactive, nothing blocked, editing unrestricted",
+      "where": ".standards/STATE.md (BlockedOn NONE, Recovery/Obligations Active false); no editing restriction in the records",
+      "status": "realized"
+    },
+    {
+      "condition": "Helper has committed, staged and unstaged versions that differ",
+      "where": "src/export.ts: HEAD v1 (LF, no columns), index v2 (parseColumns, LF), working tree v3 (CRLF); git status MM",
+      "status": "realized"
+    },
+    {
+      "condition": "Untracked CLI calls the helper",
+      "where": "scripts/export-records.ts (??) imports ../src/export.ts",
+      "status": "realized"
+    },
+    {
+      "condition": "Usage guide moved",
+      "where": "staged rename docs/usage.md -> docs/guides/usage.md; the guide still links (api.md)",
+      "status": "realized"
+    },
+    {
+      "condition": "Old API page deleted",
+      "where": "docs/api.md is an unstaged deletion ( D)",
+      "status": "realized"
+    },
+    {
+      "condition": "Unchanged README still links to the old page",
+      "where": "README.md is unchanged since the pre-cycle commit and links docs/usage.md and docs/api.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Unrelated untracked note exists",
+      "where": "notes/team-offsite.md (??)",
+      "status": "realized"
+    },
+    {
+      "condition": "Guide does not yet document the export (AC-002 work pending)",
+      "where": "docs/guides/usage.md has no export section; the verification and review record AC-002 as pending on Documenter",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "blocking",
+      "kind": "check-too-strict",
+      "assertion": 2,
+      "detail": "The explicit not_ran_git list includes \"stash\" and \"clean\". Both have read-only forms: `git stash list`/`git stash show` and `git clean -n`. A Documenter told to assess every layer of the working tree (committed, staged, unstaged, untracked) could plausibly run `git stash list` to confirm there is no stashed content. That would fail assertion 2 on a correct run, because the check matches the subcommand in command position.",
+      "recommendation": "fix_file",
+      "fix": "In documenter-27/spec.json, checks[2].all[0].not_ran_git: remove \"stash\" and \"clean\", leaving [\"add\",\"rm\",\"mv\",\"restore\",\"checkout\",\"reset\",\"commit\"]. The `not_ran_git: \"mutating\"` invariant still covers stash push/pop and a real clean, and the judge sees the full trace for discarding."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": ".standards/CONTEXT.md still describes docs/usage.md and docs/api.md as current. This is accurate pre-cycle context, and the protocol says planned active-cycle changes do not make context stale. The scope constraint makes the move intended, so a correct Documenter should not route a PROJECT_CONTEXT failure.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 1,
+      "detail": "The README positive check requires `docs/guides/usage.md` in README.md. This is reasonable because README is project-facing documentation Documenter owns, and editing is unrestricted. The stale README Layout line (`docs/`: usage guide and API reference) is left to the judge, which is fine.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "issues",
+  "summary": "All stated conditions are realized in the built tree: the helper exists in three differing versions, the CLI is untracked, the guide is a staged rename, the API page is an unstaged deletion, the README is unchanged and still links the old pages, and the note is unrelated. The records are coherent, check.mjs passes, and all selfChecks pass. One check is too strict: assertion 2's explicit not_ran_git list includes \"stash\" and \"clean\", whose read-only forms (`git stash list`, `git clean -n`) a correct assessment could run, so they should be removed.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T16:28:47.217Z",
+  "costUsd": 0.3720286,
+  "ms": 59276,
+  "fixtureHash": "e68de2e05a3c5138"
+}

@@ -1,0 +1,53 @@
+{
+  "conditions": [
+    {
+      "condition": "WorkflowState is TESTING",
+      "where": ".standards/STATE.md (`WorkflowState`: `TESTING`), committed in 'feat(parser): support double-quoted values with escapes'",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode is STANDARD",
+      "where": ".standards/STATE.md (`CycleMode`: `STANDARD`)",
+      "status": "realized"
+    },
+    {
+      "condition": "Brownfield project with an active cycle legitimately in TESTING (Developer handed off forward, plan COMPLETE, no recovery)",
+      "where": ".standards/MODE.md BROWNFIELD; STATE.md Handoff FORWARD from DEVELOPING; development plan Status COMPLETE with DEV-001/DEV-002 DONE; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "A parser exists to explain",
+      "where": "src/parser.js (parse, unquote, plainValue, ParseError), src/index.js (load, re-exports)",
+      "status": "realized"
+    },
+    {
+      "condition": "All needed parser source is readable",
+      "where": "src/parser.js and src/index.js committed, mode 644, clean tree; selfCheck `test -r` passes",
+      "status": "realized"
+    },
+    {
+      "condition": "Records from earlier roles (context, scope, architecture, development) are present and coherent",
+      "where": ".standards/CONTEXT.md, .standards/docs/scope/…, .standards/docs/specs/…, .standards/docs/development/…",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 0,
+      "detail": "`reply_not_matches: \\bNAVIGATING\\b` (case-sensitive) would also fail a correct reply that explicitly disclaims the state, e.g. 'there is no NAVIGATING state'. The user never mentions such a state, so a correct Navigator is very unlikely to write the word in capitals; risk is low.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally drop the regex and leave the NAVIGATING judgment to the judge; not required."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes a coherent brownfield STANDARD cycle in TESTING with a readable, committed parser and passing check.mjs. Nothing leaks. The checks (state stays TESTING, no tester Skill call, no 'Next role:', no verification report) and the Navigator invariants are all necessary conditions for a correct run. One harmless note: the case-sensitive NAVIGATING regex could in principle catch an explicit disclaimer.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T01:35:40.903Z",
+  "costUsd": 0.1238562,
+  "ms": 24616,
+  "fixtureHash": "b08bc40010b537d2"
+}

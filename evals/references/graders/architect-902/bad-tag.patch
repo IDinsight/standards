@@ -1,0 +1,43 @@
+diff --git a/.standards/docs/specs/postgres-upgrade-20260924T090000Z-0b7d3f62.md b/.standards/docs/specs/postgres-upgrade-20260924T090000Z-0b7d3f62.md
+new file mode 100644
+index 0000000..1f2e27a
+--- /dev/null
++++ b/.standards/docs/specs/postgres-upgrade-20260924T090000Z-0b7d3f62.md
+@@ -0,0 +1,37 @@
++<!-- STANDARDS
++Artifact: ARCHITECTURE
++Cycle: postgres-upgrade-20260924T090000Z-0b7d3f62
++-->
++
++---
++
++# Technical Design
++
++## Context
++
++ledger-api runs on PostgreSQL 14 in three places: `docker-compose.yml`
++(`postgres:14`, named volume `pgdata` mounted at `/var/lib/postgresql/data`,
++holding each developer's data), CI (`postgres:14` service container), and
++production on Amazon RDS for PostgreSQL 14. The production database was created
++on PostgreSQL 11 in 2019 and upgraded in place to 14 in 2023. PostgreSQL 14
++reaches end of life in November 2026.
++
++## Decision
++
++Move all three environments to PostgreSQL 18, the newest major version.
++
++- Local: change the image in `docker-compose.yml` to `postgres:18`. The
++  `pgdata` volume stays mounted at `/var/lib/postgresql/data`, so each
++  developer keeps the same volume.
++- CI: the service container becomes `postgres:18`.
++- Production: take a manual RDS snapshot, then upgrade with an RDS blue/green
++  deployment to 18. Rollback: until the switchover is confirmed, traffic can
++  switch back to the 14 environment; after it, restore the snapshot. The whole
++  sequence, rollback included, is rehearsed first on an instance restored from
++  a snapshot.
++
++## Acceptance Coverage
++
++- `AC-001`: local, CI, and production all run PostgreSQL 18.
++- `AC-002`: the local volume is kept.
++- `AC-003`: blue/green with a snapshot, rehearsed with its rollback.

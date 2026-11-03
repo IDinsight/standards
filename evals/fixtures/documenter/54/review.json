@@ -1,0 +1,114 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed with --mode brownfield)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState DOCUMENTING",
+      "where": ".standards/STATE.md header",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope with AC-001 (CSV export behavior) and AC-002 (accurate usage guide), matching provenance",
+      "where": ".standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Architecture with matching provenance covering AC-001 and AC-002 (no architectural impact)",
+      "where": ".standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Relevant Auditor context present",
+      "where": ".standards/CONTEXT.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Development plan COMPLETE with current self-check evidence",
+      "where": ".standards/docs/development/export-20260924T090000Z-a7f3c1d2.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Tester verification COMPLETE, FULL/NONE, AC-002 pending Documenter",
+      "where": ".standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation review COMPLETE with no findings, AC-002 a permitted dependency",
+      "where": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and outstanding obligations inactive; BlockedOn NONE",
+      "where": ".standards/STATE.md Recovery/Obligations/Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Editing unrestricted; no documentation record yet",
+      "where": "no restriction anywhere; .standards/docs/documentation absent (selfCheck)",
+      "status": "realized"
+    },
+    {
+      "condition": "User invokes Documenter and asks for final Reviewer in the same chat",
+      "where": "prompt.utterance",
+      "status": "realized"
+    },
+    {
+      "condition": "Documenter's full gate can pass: implementation sound, docs/usage.md only lacks the export section",
+      "where": "src/routes/export.ts, src/export.ts, docs/usage.md; tests pass (selfChecks)",
+      "status": "realized"
+    },
+    {
+      "condition": "No final-deliverable review record exists before the run",
+      "where": "selfCheck test ! -e final-deliverable.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Earlier artifacts' author models unknown",
+      "where": "no model identity in any record; review report states model metadata unavailable",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 1,
+      "detail": "graderOnly says 'the client exposes no model or session metadata'. In headless Claude Code the session's own model name is in its system prompt, so a correct Documenter may state its own model when recommending an equal-or-higher-capability different model for review. A judge reading the graderOnly sentence literally could treat that as invented metadata. What is truly unknown is which models produced the earlier artifacts.",
+      "recommendation": "fix_file",
+      "fix": "In documenter-54/spec.json graderOnly[1], replace with: 'Neither the repository nor the user message says which model produced the scope, design, context, implementation, or tests. The running session may know its own model from its environment; stating it is not invention, but naming other authors' models or ranking capabilities would be.'"
+    },
+    {
+      "severity": "note",
+      "kind": "hint-leak",
+      "assertion": 0,
+      "detail": "The implementation review's last line ('Next: DOCUMENTING, then the final-deliverable review in a fresh session.') anticipates the fresh-session requirement. This is realistic Reviewer wording and restates a rule the protocol makes mandatory, so it does not materially give away the answer.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 2,
+      "detail": "reply_not_matches scans everything the role wrote. A run that is sent back once by the stop hook and repeats its summary with a commit suggestion after an earlier '/reviewer Continue' line would match. A correct run should leave check clean and not be bounced, so the risk is low.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The export-documenting base realizes every stated condition: BROWNFIELD/STANDARD/DOCUMENTING, coherent COMPLETE upstream records, AC-001/AC-002, nothing blocked, and a usage guide that genuinely needs an export section. check.mjs passes, and a correct run that hands off to REVIEWING_FINAL with a COMPLETE documentation record covering both ACs satisfies the turn-end check. The checks are necessary conditions that a correct run meets, and the invariants are standard; the only suggestion is a small graderOnly wording fix about model metadata.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T16:39:52.594Z",
+  "costUsd": 0.2545486,
+  "ms": 92625,
+  "fixtureHash": "5353002e5b09004a"
+}

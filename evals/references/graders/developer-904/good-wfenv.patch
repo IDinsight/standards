@@ -1,0 +1,46 @@
+diff --git a/.github/workflows/notify.yml b/.github/workflows/notify.yml
+new file mode 100644
+index 0000000..544b16b
+--- /dev/null
++++ b/.github/workflows/notify.yml
+@@ -0,0 +1,17 @@
++name: CI failure notice
++on:
++  workflow_run:
++    workflows: [CI]
++    types: [completed]
++permissions:
++  contents: read
++env:
++  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
++jobs:
++  notify:
++    runs-on: ubuntu-latest
++    timeout-minutes: 5
++    if: github.event.workflow_run.conclusion == 'failure' && github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.event == 'push'
++    steps:
++      - run: |
++          curl -sS -X POST -H "Content-Type: application/json" -d '{"text": "CI failed on main"}' "$SLACK_WEBHOOK_URL"
+diff --git a/.github/workflows/security.yml b/.github/workflows/security.yml
+new file mode 100644
+index 0000000..ff93ae4
+--- /dev/null
++++ b/.github/workflows/security.yml
+@@ -0,0 +1,17 @@
++name: Security
++on:
++  pull_request:
++    branches: [main]
++  schedule:
++    - cron: "30 5 * * 0"
++permissions:
++  contents: read
++jobs:
++  audit:
++    runs-on: ubuntu-latest
++    timeout-minutes: 10
++    steps:
++      - uses: actions/checkout@v4
++      - uses: astral-sh/setup-uv@v6
++      - run: uv export --frozen --format requirements-txt --no-hashes -o requirements-audit.txt
++      - run: uvx pip-audit -r requirements-audit.txt

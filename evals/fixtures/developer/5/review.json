@@ -1,0 +1,76 @@
+{
+  "conditions": [
+    {
+      "condition": "Project is BROWNFIELD",
+      "where": ".standards/MODE.md `ProjectMode`: `BROWNFIELD`",
+      "status": "realized"
+    },
+    {
+      "condition": "STANDARD cycle in DEVELOPING, no recovery, no outstanding obligations",
+      "where": ".standards/STATE.md (WorkflowState DEVELOPING, CycleMode STANDARD, Recovery/Obligations Active false, FORWARD from ARCHITECTING)",
+      "status": "realized"
+    },
+    {
+      "condition": "No development plan exists yet (before proposing the plan)",
+      "where": "STATE.md `Development`: `NONE`; no .standards/docs/development/ file",
+      "status": "realized"
+    },
+    {
+      "condition": "Completed scope with acceptance conditions",
+      "where": ".standards/docs/scope/share-report-link-20260924T090000Z-5e8a1c3f.md (AC-001..AC-004)",
+      "status": "realized"
+    },
+    {
+      "condition": "Architect design says to persist a share-link token",
+      "where": ".standards/docs/specs/share-report-link-...md Decision and Components (`ReportStore` persists the share-link token)",
+      "status": "realized"
+    },
+    {
+      "condition": "Design never defines token uniqueness or per-report scope, revocation, stored shape, or how callers resolve it",
+      "where": "Same spec: Interfaces gives `Shared view — 200 { title, body }` with no route or URL shape, and there is no word on revocation, one-vs-many tokens, or lookup",
+      "status": "realized"
+    },
+    {
+      "condition": "These choices affect the persistence contract and public API",
+      "where": "src/store.js (JSON-file persistence shape) and src/router.js (public routes); the spec leaves both the store shape and the shared-view route open",
+      "status": "realized"
+    },
+    {
+      "condition": "Valid Auditor-owned project context exists",
+      "where": ".standards/CONTEXT.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Small existing brownfield code, committed, with passing tests",
+      "where": "src/*.js, test/*.js; selfChecks `npm test` passes 9 tests; git status clean",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 5,
+      "detail": "`reply_matches: \"active recovery\"` under complete:true relies on the role using the protocol's invocation template with the mandated substitution (\"replace 'active workflow' with 'active recovery'\"). This is a protocol phrase quoted verbatim, so a correct run reproduces it. A run that writes a fully custom invocation would fail, but that run would also deviate from the Handoff Rules template.",
+      "recommendation": "run_as_is",
+      "fix": "Acceptable as is. If false failures appear, set assertion 5 to complete:false and keep only `/architect\\b` plus the state check."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "CONTEXT.md, scope, and design arrive in a single commit, 'Record share-link scope and design', although they come from three roles (Auditor, Scoper, Architect) in sequence. This is harmless and does not change what the run tests.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally split into separate commits for the audit, the scope, and the design."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes the case: a STANDARD brownfield cycle in DEVELOPING with no plan, and a plausible design that persists a share-link token but leaves its uniqueness and scope, revocation, stored shape, and resolution route undefined, with no hints in names or records. The checks match the expected FAILURE route to ARCHITECTING with a recovery frame, and I traced that end state, with or without a PROPOSED plan, through check.mjs: it passes the turn-end check. Only minor notes remain: the verbatim 'active recovery' phrase check and the single-commit record history.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T02:14:29.384Z",
+  "costUsd": 0.1733986,
+  "ms": 45400,
+  "fixtureHash": "02797d25ce49bd68"
+}

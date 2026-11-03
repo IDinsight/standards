@@ -1,0 +1,215 @@
+{
+  "base": "export-synchronizing",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-synchronization",
+      "action": "commit",
+      "message": "Record CSV export synchronization"
+    },
+    {
+      "dir": "layers/52-seed-upgrade",
+      "action": "commit",
+      "message": "Upgrade @records/seed to 0.2.0"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "synchronizer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The synchronization record was committed with Status COMPLETE in 'Record CSV export synchronization', but the state was never moved to AWAITING_USER_SIGNOFF, so WorkflowState is still SYNCHRONIZING.",
+    "The COMPLETE synchronization record cites the assessed revision 'Record CSV export final review' and the blob identities of the contract records, the supporting records, the src files, the test files, docs/usage.md, and README.md. It omits pnpm-lock.yaml, package.json, and packages/seed, and states that the export code imports only Node built-ins and project modules. Every blob it cites still matches HEAD.",
+    "After the synchronization record, the commit 'Upgrade @records/seed to 0.2.0' did the following: it bumped the workspace dependency @records/seed from 0.1.0 to 0.2.0, changed the root dependency specifier from workspace:* to workspace:^0.2.0, updated pnpm-lock.yaml, and added packages/seed/CHANGELOG.md. No file under src/, test/, or docs/ changed, nor did README.md or any cycle record.",
+    "createApp seeds the store from @records/seed by default. The upgrade therefore changes the data used by every recorded integration run, by the guide checks, and by the synchronization record's own runs. In seed 0.2.0, record 6's title is 'Office move inventory' followed by a CRLF and 'Floor 3 and storage'.",
+    "The implementation still quotes that title correctly per RFC 4180, but the unfiltered CSV export now contains a record that spans two physical lines. The integration test 'an export without filters contains every record in id order' splits the body on CRLF, assuming one line per record. That assumption no longer holds, so the test now fails: test:integration reports 2 passed and 1 failed. The unit suite still passes 21 tests.",
+    "All earlier formal evidence was obtained against seed 0.1.0 and the earlier lockfile. This covers verification E2, implementation review R2, final review C2, documentation G2 and G3, and the synchronization record's own S2 and S3 runs. Unchanged source hashes do not make that evidence current.",
+    "The guide's owner=dana CSV example and the dana integration test are unaffected, because records 1 and 3 did not change.",
+    "The owner of the resulting gap is ambiguous. It could be Tester, because the test's parsing assumption broke and the verification evidence is no longer current. It could be Developer, because the deliverable now includes an unplanned dependency change. Either routing is reasonable if justified. Synchronizer must not fix the test, revert the upgrade, or edit other roles' records."
+  ],
+  "history": null,
+  "vars": {
+    "SYNC_COMMIT": "${COMMIT:Record CSV export synchronization}",
+    "UPGRADE_COMMIT": "${COMMIT:Upgrade @records/seed to 0.2.0}"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "field": {
+            "path": "${SYNC}",
+            "name": "Status",
+            "not": "COMPLETE"
+          },
+          "why": "the unsupported COMPLETE conclusion must be reopened"
+        },
+        {
+          "state": "WorkflowState",
+          "not": "AWAITING_USER_SIGNOFF",
+          "why": "stale dependency evidence cannot support sign-off readiness"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "contains": {
+            "path": "${SYNC}",
+            "regex": "pnpm-lock|@records/seed|packages/seed"
+          },
+          "why": "the record must name the new execution assumption (the upgraded dependency or its lockfile); before the run it mentioned none of these"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Synchronizer does not change git state"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "packages/**",
+        "docs/**",
+        "README.md",
+        "package.json",
+        "pnpm-lock.yaml",
+        ".standards/CONTEXT.md",
+        ".standards/docs/scope/**",
+        ".standards/docs/specs/**",
+        ".standards/docs/development/**",
+        ".standards/docs/verification/**",
+        ".standards/docs/reviews/**",
+        ".standards/docs/documentation/**"
+      ],
+      "why": "Synchronizer owns only its record and routes defects; it does not repair code, tests, dependencies, docs, or other roles' records"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the unit suite still passes after the upgrade"
+    },
+    {
+      "cmd": "pnpm --filter export test 2>&1 | grep -qE 'pass 21$'",
+      "expect": "pass",
+      "why": "the unit suite runs 21 tests"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration",
+      "expect": "fail",
+      "expectOutput": "fail 1",
+      "why": "the unfiltered export test splits rows on CRLF and breaks on the upgraded seed's multi-line title"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration > /tmp/it.log 2>&1; grep -qE 'pass 2$' /tmp/it.log && grep -qE 'fail 1$' /tmp/it.log",
+      "expect": "pass",
+      "why": "exactly one of the three integration tests fails"
+    },
+    {
+      "cmd": "node -e 'import(`./src/app.ts`).then(({ createApp }) => { const fs = require(`node:fs`); const os = require(`node:os`); const path = require(`node:path`); const dir = fs.mkdtempSync(path.join(os.tmpdir(), `sync-`)); const r = createApp({ exportDir: dir, now: () => new Date(`2026-09-24T09:00:00Z`) }).handle({ method: `POST`, path: `/records/export`, query: {}, user: { id: 1, name: `Ada`, role: `admin` } }); const q = String.fromCharCode(34); const crlf = String.fromCharCode(13, 10); if (r.status !== 201 || !r.body.includes(`6,` + q + `Office move inventory` + crlf + `Floor 3 and storage` + q + `,marco,active,2026-06-12T09:30:00Z` + crlf)) { console.error(JSON.stringify(r)); process.exit(1); } console.log(`quoted`); }, (error) => { console.error(error); process.exit(3); })'",
+      "expect": "pass",
+      "why": "the unchanged implementation still quotes the multi-line title per RFC 4180; only the data and the test's parsing assumption changed"
+    },
+    {
+      "cmd": "grep -qF 'workspace:^0.2.0' pnpm-lock.yaml && grep -qF 'workspace:^0.2.0' package.json && grep -qF '0.2.0' packages/seed/package.json && ! git diff --quiet HEAD~1 HEAD -- pnpm-lock.yaml",
+      "expect": "pass",
+      "why": "the upgrade changed the lockfile and the dependency specifier"
+    },
+    {
+      "cmd": "test $(git diff --name-only HEAD~1 HEAD | paste -s -d, -) = package.json,packages/seed/CHANGELOG.md,packages/seed/index.js,packages/seed/package.json,pnpm-lock.yaml",
+      "expect": "pass",
+      "why": "the upgrade commit touches only dependency files"
+    },
+    {
+      "cmd": "c=$(git log --format=%H -1 --fixed-strings --grep='Record CSV export final review') && git diff --quiet $c HEAD -- src test docs README.md AGENTS.md CLAUDE.md .standards/CONTEXT.md .standards/STATE.md .standards/docs/scope .standards/docs/specs .standards/docs/development .standards/docs/verification .standards/docs/reviews .standards/docs/documentation",
+      "expect": "pass",
+      "why": "source, tests, docs, state, and other records are unchanged since the revision the synchronization record assessed"
+    },
+    {
+      "cmd": "s=.standards/docs/synchronization/export-20260924T090000Z-a7f3c1d2.md && grep -q '`Status`: `COMPLETE`' $s && ! grep -qE 'pnpm-lock|@records/seed|packages/seed|package.json' $s && grep -q $(git log --format=%H -1 --fixed-strings --grep='Record CSV export final review') $s && grep -q $(git rev-parse HEAD:src/export.ts) $s && grep -q $(git rev-parse HEAD:test/integration/export-flow.test.ts) $s && grep -q $(git rev-parse HEAD:docs/usage.md) $s && ! grep -qE 'COMMIT:|BLOB:' $s",
+      "expect": "pass",
+      "why": "the COMPLETE record cites current code identities but no lockfile or dependency identity"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the state and records are valid"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && test ! -e exports",
+      "expect": "pass",
+      "why": "all work is committed and no export files exist"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `SYNCHRONIZING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Kind`: `FORWARD` `From`: `REVIEWING_FINAL`' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md",
+      "expect": "pass",
+      "why": "the state is still SYNCHRONIZING with recovery and obligations inactive"
+    },
+    {
+      "cmd": "git log -2 --format=%s | paste -s -d '|' - | grep -qx 'Upgrade @records/seed to 0.2.0|Record CSV export synchronization'",
+      "expect": "pass",
+      "why": "the upgrade follows the synchronization record"
+    }
+  ],
+  "notes": "Built on export-synchronizing (SYNCHRONIZING, every earlier record COMPLETE, clean tree). Layer 50-synchronization commits a COMPLETE synchronization record, written as an earlier Synchronizer session would have left it. The record cites the assessed revision 'Record CSV export final review' and the blob identities of every contract and supporting record, src, tests, docs/usage.md, and README.md. It also records reconciliation runs S2 (21 passed), S3 (3 passed), and S4 (check). It states that the export code imports only Node built-ins and project modules. It never mentions pnpm-lock.yaml, package.json, or packages/seed. STATE.md stays at SYNCHRONIZING; the transition was never recorded. Layer 52-seed-upgrade commits an upgrade of the workspace dependency @records/seed to 0.2.0. Record 6's title now contains a CRLF, the root specifier becomes workspace:^0.2.0, a CHANGELOG is added, and pnpm-lock.yaml is updated. The layer writes the lockfile directly (pnpm lockfile v9 shape for a link-only workspace) rather than running pnpm install. The existing node_modules symlink already points at packages/seed, so the new data takes effect. Source, tests, and docs are byte-identical to what every record cites. The implementation still quotes correctly, but the integration test's CRLF row-splitting assumption breaks, so test:integration reports 2 passed and 1 failed. All recorded evidence predates the dependency change. check.mjs passes: in SYNCHRONIZING, a COMPLETE sync record that accounts for AC-001 to AC-003 is valid.",
+  "case": "synchronizer-32",
+  "caseHash": "7ef9c72e257a66a6",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T14:38:56.549Z",
+    "verdict": "pass",
+    "fixtureHash": "0635b375c607f9ff",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "3ca01586cb7ad9fb",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:36:00.509Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T13:40:25.334Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-synchronizing": "33937a9926a74652"
+  },
+  "migrations": [
+    {
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:36:00.509Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

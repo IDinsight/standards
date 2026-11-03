@@ -1,0 +1,76 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD, CycleMode STANDARD, WorkflowState DOCUMENTING, Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/MODE.md; .standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, architecture, context, development plan, verification report, and implementation review exist with matching provenance and evidence",
+      "where": ".standards/docs/{scope,specs,development,verification,reviews}/…; .standards/CONTEXT.md",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-001 covers CSV export behavior; AC-002 requires an accurate usage guide",
+      "where": ".standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and outstanding obligations inactive; nothing blocked; editing unrestricted",
+      "where": ".standards/STATE.md (Recovery/Obligations Active false, BlockedOn NONE); doc record 'Editing boundary: unrestricted'",
+      "status": "realized"
+    },
+    {
+      "condition": "IN_PROGRESS documentation record with valid, passing results for the guide",
+      "where": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md (Status IN_PROGRESS, checks C1–C4 passed at commit 09b7392)",
+      "status": "realized"
+    },
+    {
+      "condition": "API signatures changed after the record captured identities",
+      "where": "commit 'Group export settings into a single createApp option' (src/app.ts exports:{dir,now}, writeExport(records,target), ExportOptions {dir,now}); record's src blobs now stale",
+      "status": "realized"
+    },
+    {
+      "condition": "A dependency version changed after the record captured identities",
+      "where": "commit 'Update @records/seed to 0.2.0' (packages/seed/package.json 0.1.0→0.2.0, record 3 retitled Q3)",
+      "status": "realized"
+    },
+    {
+      "condition": "Guide text unchanged so doc-text identity still matches while its example and evidence are stale",
+      "where": "docs/usage.md and README.md blobs match record (selfCheck 4); guide still shows createApp({exportDir, now}) and the Q2 title; selfCheck 6 shows the example is silently ignored",
+      "status": "realized"
+    },
+    {
+      "condition": "All changes committed; workflow state untouched by the interrupting commits",
+      "where": "git status clean; selfCheck 7",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "The later commit makes src/app.ts diverge from the technical design (specs Components: 'createApp options exportDir … and now') and the development plan (writeExport(dir, records, now)), and leaves the verification and implementation review assessing superseded code. A correct Documenter may reasonably record a DOC discrepancy and route IMPLEMENTATION/VERIFICATION, or ask the user, rather than just updating the guide. The checks and invariants allow all of these (STATE.md is not frozen; check_ok tolerates a legal FAILURE frame), so this is consistent; the judge should accept any of these paths as long as freshness is reconciled.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 1,
+      "detail": "HEAD moved (record cites 09b7392, HEAD is two commits later), so the 'same HEAD' half of assertion 1 is not separately exercised; the 'unchanged documentation text' half is, since docs/usage.md and README.md blobs still match the record. That is sufficient to grade the assertion.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is present: an IN_PROGRESS documentation record with passing guide evidence, followed by committed API-signature and seed-version changes that leave the guide text byte-identical but its createApp example and owner=dana output stale. No hints leak, and check.mjs passes. The single deterministic check (the record changes) and the invariants hold for every correct path, including routing a discrepancy.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T16:34:41.229Z",
+  "costUsd": 0.2851006,
+  "ms": 43844,
+  "fixtureHash": "8f52fb18d43692c2"
+}

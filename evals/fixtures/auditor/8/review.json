@@ -1,0 +1,94 @@
+{
+  "conditions": [
+    {
+      "condition": "Brownfield project",
+      "where": ".standards/MODE.md (BROWNFIELD from install)",
+      "status": "realized"
+    },
+    {
+      "condition": "Previous retained brownfield cycle invoice-cache-hotfix-20260922T160000Z-5a6b7c8d ended CANCELLED after implementation work",
+      "where": "layer 53 commit 'chore(workflow): cancel invoice cache hotfix' (CANCEL from DEVELOPING); plan shows DEV-001 DONE, DEV-002 IN_PROGRESS",
+      "status": "realized"
+    },
+    {
+      "condition": "NEW_CYCLE started a STANDARD cycle in AUDITING because the user did not confirm no changes remained",
+      "where": "commit 'chore(workflow): start overdue invoices cycle' (layer 54 STATE.md, NEW_CYCLE from CANCELLED with that reason)",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.BaselineReconciliation lists exactly one entry: SourceCycle invoice-cache-hotfix-20260922T160000Z-5a6b7c8d, Request change invoice-cache invalidation behavior",
+      "where": ".standards/STATE.md BaselineReconciliation list",
+      "status": "realized"
+    },
+    {
+      "condition": "Latest Handoff is USER_REWORK from AUDITING and its Reason no longer mentions the cancelled cycle",
+      "where": ".standards/STATE.md Handoff (USER_REWORK, From AUDITING, PROJECT_CONTEXT, Reason about clarified request)",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery inactive (a same-state rework creates no frame)",
+      "where": ".standards/STATE.md Recovery Active false",
+      "status": "realized"
+    },
+    {
+      "condition": "New Active Work.Request is for an unrelated change",
+      "where": ".standards/STATE.md Request (overdue invoices list)",
+      "status": "realized"
+    },
+    {
+      "condition": "Working tree has material project changes whose provenance relative to the cancelled cycle is not fully clear",
+      "where": "committed DEV-001 change at HEAD (3650faf); unstaged src/lineItems.js matching DEV-002; unstaged TTL change in src/cache.js and untracked src/cacheMetrics.js and its test, which no record mentions",
+      "status": "realized"
+    },
+    {
+      "condition": "No record or commit settles whether the user adopted or reverted the residue",
+      "where": "no record or commit captures a user decision; the cancelled plan only records progress",
+      "status": "realized"
+    },
+    {
+      "condition": "A prior CONTEXT.md exists as evidence, with no Active-Cycle Non-Baseline Work section",
+      "where": ".standards/CONTEXT.md (from the cancelled cycle's audit, describing the pre-change cache)",
+      "status": "realized"
+    },
+    {
+      "condition": "check.mjs reports a valid state",
+      "where": "gate result checkMjs ok:true",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "blocking",
+      "kind": "check-too-strict",
+      "assertion": 3,
+      "detail": "The assertion 3 check requires that CONTEXT.md contain no '## *Active-Cycle Non-Baseline Work' heading, and `complete: true` lets that check decide the assertion with no judge. A correct run could include the heading with an explicit 'None' line, such as 'None — the residue from invoice-cache-hotfix-... is not this cycle's work, see Known Unknowns'. That run satisfies the assertion but fails this check. The regex would also match a '### Active-Cycle...' heading. The real violation is an entry labelled with the current cycle ID, which the template requires as `Cycle: <Active Work.Id>; ...`. The heading alone does not show that violation, and a relabel can also appear in prose elsewhere, so the check does not fully decide the assertion.",
+      "recommendation": "fix_file",
+      "fix": "In auditor-8/spec.json, change the assertion 3 check to {\"contains\": {\"path\": \".standards/CONTEXT.md\", \"regex\": \"^(?![\\\\s\\\\S]*Cycle: ?`?${ID})\"}, \"why\": \"no residue entry labelled as current-cycle non-baseline work\"} and set \"complete\": false so the judge decides the rest."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": 5,
+      "detail": "graderOnly argues the residue is material because getInvoice serves balances through the cache. However, InvoiceService.listInvoices reads the store directly without the cache, so a run could argue the cache residue does not affect an overdue-invoices list. The protocol still requires every listed source to be reconciled before BaselineReconciliation is cleared, and CONTEXT.md must describe the baseline of cache.js (TTL, invalidate) either way. Blocking therefore remains the correct behavior, and the BlockedOn and BaselineReconciliation checks stay sound.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The workflow commits (52–55) were made with git add -A, yet the src edits are left dirty afterwards. In the story the user committed only workflow files, which is plausible, and the generator acknowledges it.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "issues",
+  "summary": "The fixture realizes every stated condition: the retained CANCELLED cycle, NEW_CYCLE then a same-state USER_REWORK, the durable one-entry BaselineReconciliation, and residue of mixed provenance across committed, unstaged and untracked files with no record of a user decision. State, git and the remaining checks and invariants are sound. One fix is needed: assertion 3's `complete: true` heading-absence check can fail a correct run that writes an explicit empty section, so it should target a current-cycle-ID entry and defer to the judge.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T21:07:51.159Z",
+  "costUsd": 0.27209279999999997,
+  "ms": 66810,
+  "fixtureHash": "46081fcf302d417a"
+}

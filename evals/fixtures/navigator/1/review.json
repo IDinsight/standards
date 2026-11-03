@@ -1,0 +1,66 @@
+{
+  "conditions": [
+    {
+      "condition": "README describes batch imports",
+      "where": "README.md lines 3-6 ('batch imports of transaction CSV files into a SQLite ledger')",
+      "status": "realized"
+    },
+    {
+      "condition": "src/cli.py calls parse_args then import_batch from src/importer.py",
+      "where": "src/cli.py line 5 import; main() calls parse_args(argv) then import_batch(...)",
+      "status": "realized"
+    },
+    {
+      "condition": "import_batch is defined in src/importer.py",
+      "where": "src/importer.py def import_batch",
+      "status": "realized"
+    },
+    {
+      "condition": "No mode selected by the user",
+      "where": "prompt.utterance 'Explain this CLI to a new contributor.'",
+      "status": "realized"
+    },
+    {
+      "condition": "Relevant files are readable",
+      "where": "all project files committed, mode 644; no runtime.unreadable",
+      "status": "realized"
+    },
+    {
+      "condition": "Small committed CLI project with clean git state",
+      "where": "three pre-install commits plus install commit; git status clean",
+      "status": "realized"
+    },
+    {
+      "condition": "No context artifact exists before the run (so creation would be observable)",
+      "where": ".standards/CONTEXT.md absent; fresh brownfield STATE.md with no active cycle",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 0,
+      "detail": "Deterministic checks only require the reply to name cli.py and importer.py; line-number citations, purpose, components, and reading order are left to the judge (complete: false). A correct orientation necessarily names both files, so the checks cannot fail a correct run.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 1,
+      "detail": "The 'unchanged: **' check is correct for Navigator; pytest and the --dry-run CLI write nothing to the repo (tmp_path, PYTHONDONTWRITEBYTECODE, caches ignored), so a Navigator running safe diagnostics would not trip it. Running the CLI without --dry-run would create ledger.db, which is a real mutation and correctly fails.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition: a small Python CLI whose README describes batch imports and whose src/cli.py calls parse_args then import_batch from src/importer.py. There is no active cycle and no CONTEXT.md, and nothing leaks. Checks and invariants are necessary conditions that a correct read-only Navigator orientation satisfies, and the rest is left to the judge.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-01T18:34:52.894Z",
+  "costUsd": 0.1256398,
+  "ms": 13778,
+  "fixtureHash": "78be88c00e49c3dc"
+}

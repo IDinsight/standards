@@ -1,0 +1,112 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield template)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode EXPEDITED, WorkflowState REVIEWING_IMPLEMENTATION",
+      "where": ".standards/STATE.md header",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id = note-20260924T113000Z-c8d2e5f0",
+      "where": ".standards/STATE.md Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Request asks for a bounded internal optional note field using established behavior",
+      "where": ".standards/STATE.md Active Work.Request",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope and Architecture are NONE",
+      "where": ".standards/STATE.md Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Development plan current and COMPLETE with satisfactory self-checks",
+      "where": ".standards/docs/development/note-20260924T113000Z-c8d2e5f0.md (Status COMPLETE, DEV-001..003 DONE, self-checks exit 0 / 13 passed; selfCheck confirms 13 passes)",
+      "status": "realized"
+    },
+    {
+      "condition": "Safe completion requires a new access policy",
+      "where": "docs/access.md (partner is an external vendor in STAFF; changing or adding a tier is an access-policy change) + src/visibility.js internalNote: STAFF",
+      "status": "realized"
+    },
+    {
+      "condition": "Safe completion requires formal (Tester) verification",
+      "where": "no Tester report (expedited); no test exercises a partner reader/editor of internalNote (test/*.test.js)",
+      "status": "realized"
+    },
+    {
+      "condition": "Frame 1: Owner DEVELOPING, ResumeAt AWAITING_USER_SIGNOFF, RerunThrough REVIEWING_IMPLEMENTATION (already corrected)",
+      "where": ".standards/STATE.md Recovery Frame 1; DEV-003 DONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Frame 2: Owner REVIEWING_IMPLEMENTATION, FailureType REVIEW, Reason reassess disputed authorization finding, ResumeAt DEVELOPING, RerunThrough NONE",
+      "where": ".standards/STATE.md Recovery Frame 2",
+      "status": "realized"
+    },
+    {
+      "condition": "Review correction unresolved (open disputed finding)",
+      "where": ".standards/docs/reviews/.../implementation.md F-001 Status OPEN, report IN_PROGRESS; plan Plan Notes dispute",
+      "status": "realized"
+    },
+    {
+      "condition": "Separate chat (independent Reviewer session)",
+      "where": "history null; fresh headless session",
+      "status": "realized"
+    },
+    {
+      "condition": "Committed git state, clean tree",
+      "where": "git status clean on main",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "case-defect",
+      "assertion": -1,
+      "detail": "The recovery stack is unreachable under Recovery Mechanics: after the rerun review raised F-001 the Reviewer would have pushed an IMPLEMENTATION frame into DEVELOPING, which is absent, and Frame 2 records an interruption at DEVELOPING while Frame 1 had already advanced to its rerun. check.mjs accepts it and the fixture builds it as stated.",
+      "recommendation": "run_as_is",
+      "fix": "None; case-stated state."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 1,
+      "detail": "generator_notes_for_reviewer quote Frame 2's Reason as 'Correct unsupported authorization finding.', but STATE.md and the checks consistently use 'Reassess disputed authorization finding.'. The notes are stale; the fixture and checks agree.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "All commits are dated 09:00Z, earlier than the 11:30Z timestamp in the case-dictated cycle ID, so the cycle records predate their own ID. This is a minor realism gap that does not affect grading.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally set later per-layer dates."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "SelfCheck 2 (pipe to grep -q) prints an EPIPE stack trace from node after grep exits. The pipeline exit status is grep's (0), so it passed correctly but noisily.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally write TAP to a temp file before grepping."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition. STATE.md holds the exact nested stack, and docs/access.md plus src/visibility.js make the need for a new access policy and Tester verification discoverable without naming promotion. Checks match the promotion contract (PROMOTE/STANDARD/AUDITING from REVIEWING_IMPLEMENTATION, one obligation copied verbatim from Frame 2, recovery cleared, identity and artifacts preserved, F-001 still OPEN), and none would fail a correct run. Only minor notes remain: the case's unreachable stack, stale generator notes, and commit-date realism.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T20:37:12.003Z",
+  "costUsd": 0.852696,
+  "ms": 47409,
+  "fixtureHash": "b1f6bf817fee346e"
+}

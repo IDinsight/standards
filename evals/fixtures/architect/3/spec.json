@@ -1,0 +1,245 @@
+{
+  "base": null,
+  "install": {
+    "mode": "greenfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial commit"
+    },
+    {
+      "dir": "layers/60-scope",
+      "action": "commit",
+      "message": "Define event ingestion scope"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "architect",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "No architecture or specification document exists anywhere in the repository. The only project file outside .standards/ is a short README, so a new design must be created with artifact init at .standards/docs/specs/<cycle>.md.",
+    "The completed scope names no language, framework, storage product, queue, or hosting provider. Those foundational choices are the Architect's to make.",
+    ".standards/CONTEXT.md is absent because this is the first greenfield cycle and Auditor runs after Architecture. Its absence is not a defect.",
+    "A correct successful run ends with WorkflowState AUDITING, a Handoff FORWARD from ARCHITECTING, Active Work.Architecture set to the new design, and MODE.md still GREENFIELD."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "event-ingestion-service-accept-events-20260923T141200Z-3c9e7a15",
+    "SCOPE": ".standards/docs/scope/event-ingestion-service-accept-events-20260923T141200Z-3c9e7a15.md",
+    "SPEC": ".standards/docs/specs/event-ingestion-service-accept-events-20260923T141200Z-3c9e7a15.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "state": "Handoff.FailureType",
+          "not": "PROJECT_CONTEXT",
+          "why": "a PROJECT_CONTEXT failure handoff would set this field"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 4,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            ".standards/docs/scope/**"
+          ],
+          "why": "Architect does not change the Scoper-owned scope"
+        }
+      ]
+    },
+    {
+      "assertion": 5,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.Architecture",
+          "equals": "${SPEC}",
+          "why": "no pre-existing design document exists, so the new design is created at the artifact init path"
+        },
+        {
+          "provenance": {
+            "path": "${SPEC}",
+            "artifact": "ARCHITECTURE",
+            "cycle": "${ID}"
+          }
+        },
+        {
+          "contains": {
+            "path": "${SPEC}",
+            "regex": "^## Acceptance Coverage",
+            "flags": "m"
+          },
+          "why": "template section that holds coverage"
+        },
+        {
+          "contains": {
+            "path": "${SPEC}",
+            "regex": "AC-001"
+          }
+        },
+        {
+          "contains": {
+            "path": "${SPEC}",
+            "regex": "AC-002"
+          }
+        },
+        {
+          "contains": {
+            "path": "${SPEC}",
+            "regex": "AC-003"
+          }
+        },
+        {
+          "contains": {
+            "path": "${SPEC}",
+            "regex": "AC-004"
+          }
+        }
+      ]
+    },
+    {
+      "assertion": 6,
+      "complete": false,
+      "all": [
+        {
+          "contains": {
+            "path": "${SPEC}",
+            "regex": "^## Technical Acceptance Criteria[ \\t]*\\n(?:(?!^## )[\\s\\S])*?AC-\\d{3}",
+            "flags": "m"
+          },
+          "why": "the Technical Acceptance Criteria section cites at least one AC identifier"
+        }
+      ]
+    },
+    {
+      "assertion": 7,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "AUDITING"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FORWARD"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "ARCHITECTING"
+        },
+        {
+          "reply_matches": "/auditor\\b",
+          "why": "Claude Code next-role invocation for Auditor"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "README.md",
+        ".standards/MODE.md"
+      ],
+      "why": "Architect writes no project files or implementation, so the project stays GREENFIELD"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the starting state is valid"
+    },
+    {
+      "cmd": "test ! -e .standards/CONTEXT.md",
+      "expect": "pass",
+      "why": "CONTEXT.md does not yet exist before the first greenfield audit"
+    },
+    {
+      "cmd": "grep -q GREENFIELD .standards/MODE.md",
+      "expect": "pass",
+      "why": "ProjectMode is GREENFIELD"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `ARCHITECTING' .standards/STATE.md",
+      "expect": "pass",
+      "why": "workflow is in ARCHITECTING"
+    }
+  ],
+  "notes": "Standalone greenfield fixture. 50-project (pre-install) commits only a short README; it contains no implementation. The installer runs with --mode greenfield. 60-scope commits three files. STATE.md is ARCHITECTING, STANDARD, recovery inactive, Handoff FORWARD from SCOPING, Scope pointing at the cycle scope record, and Architecture/Development NONE. MODE.md is GREENFIELD, identical to the installed file. The completed scope record (SCOPE provenance) defines AC-001 HTTP intake, AC-002 durable storage, AC-003 asynchronous processing, and AC-004 deployable runtime as list items. It names no frameworks or vendors. No CONTEXT.md exists. check.mjs passes: in ARCHITECTING a greenfield cycle is not yet held to design coverage. After a correct FORWARD to AUDITING, the turn-end check holds the design to cover all four ACs. Assertion 0 (FOUNDATION mode) is left to the judge, because reads are not checked.",
+  "case": "architect-3",
+  "caseHash": "016a9f8a76d5b5f2",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T00:29:30.352Z",
+    "verdict": "pass",
+    "fixtureHash": "54f84bdd115e4b25",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "4dfbf754db1533f8",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:05:20.319Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T00:17:43.697Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/60-scope/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:05:20.319Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

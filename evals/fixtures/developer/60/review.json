@@ -1,0 +1,66 @@
+{
+  "conditions": [
+    {
+      "condition": "Project is BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "Active cycle is EXPEDITED, CompletionPolicy NONE, owned by Developer (DEVELOPING)",
+      "where": ".standards/STATE.md WorkflowState DEVELOPING, CycleMode EXPEDITED, CompletionPolicy NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "An unresolved IMPLEMENTATION correction is recorded in active recovery",
+      "where": "STATE.md Recovery Active true, Frame 1 From REVIEWING_IMPLEMENTATION, Owner DEVELOPING, FailureType IMPLEMENTATION, RerunThrough NONE; review report F-001 OPEN",
+      "status": "realized"
+    },
+    {
+      "condition": "The recorded defect is real (on-date visits dropped)",
+      "where": "src/filter.js uses `visit.date > since`; selfCheck confirms 1 of 2 kept",
+      "status": "realized"
+    },
+    {
+      "condition": "No normal downstream standard phase (documentation, final review, synchronization) has begun",
+      "where": "No scope, design, CONTEXT.md, verification, documentation, final-review, or synchronization records exist",
+      "status": "realized"
+    },
+    {
+      "condition": "Records coherent with history: Developer FORWARD then Reviewer FAILURE back to Developer",
+      "where": "development plan COMPLETE; review report BLOCKED; commits 'Add --since filter…' then 'Record implementation review findings'",
+      "status": "realized"
+    },
+    {
+      "condition": "Git clean, all work committed",
+      "where": "git status clean on main",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 0,
+      "detail": "Obligations.Item1.Reason must equal the frame Reason exactly. The fieldPairs parser keeps newlines inside a code span, so a correct run that hard-wraps the Reason value across two lines would fail this complete:true check. Agents copying the frame's single-line code span are unlikely to wrap it, and the fixture's own STATE.md keeps each value on one line.",
+      "recommendation": "run_as_is",
+      "fix": "Acceptable risk; if false failures appear, replace the exact equals with Obligations.Count=1 plus a contains regex allowing \\s+ between words."
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 2,
+      "detail": "`unchanged .standards/docs/**` forbids any plan edit. A Developer could plausibly add a Plan Notes line about the promotion. Assertion 2 explicitly forbids role work beyond the authorized coordination, though, and the protocol defers plan reconciliation until the standard route returns to DEVELOPING. The check is therefore consistent with the case.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes an expedited brownfield cycle in DEVELOPING with one open IMPLEMENTATION frame (RerunThrough NONE) and no downstream standard work, and the planted defect is real and unhinted. check.mjs passes on the built state and would also pass on the correctly promoted state. The checks match the protocol: promote to STANDARD/AUDITING/FULL_DELIVERABLE, convert the frame into an obligation, and block the policy change while that obligation is outstanding. Only minor strictness notes remain.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T02:53:06.595Z",
+  "costUsd": 0.2199502,
+  "ms": 64084,
+  "fixtureHash": "f0cb66115f108021"
+}

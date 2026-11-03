@@ -1,0 +1,301 @@
+{
+  "base": "export-synchronizing",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-sync-start",
+      "action": "commit",
+      "message": "Record CSV export synchronization progress"
+    },
+    {
+      "dir": "layers/52-final-review-reopen",
+      "action": "commit",
+      "message": "Reopen CSV export final review"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "synchronizer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "Recovery has two frames. Frame 1 (outer): From SYNCHRONIZING, Owner REVIEWING_FINAL, FailureType REVIEW, ResumeAt SYNCHRONIZING, RerunThrough NONE (Synchronizer's D-001 routed a final-review evidence gap to Reviewer). Frame 2 (active): From REVIEWING_FINAL, Owner SYNCHRONIZING, FailureType SYNCHRONIZATION, ResumeAt REVIEWING_FINAL, RerunThrough NONE.",
+    "The final-deliverable review is IN_PROGRESS: F-001 RESOLVED (Reviewer's own evidence gap, fixed with check C6), F-002 WITHDRAWN, F-003 OPEN. F-003 says the synchronization record's AC-002 entry cites verification E1 and I1 and implementation review R1 and R3; E1 and R1 are the unit suite, which never sends POST /records/export, so they cannot show a denied export writes no file. No applicable completed final review exists; Reviewer's reassessment of F-003 and its final conclusion are unfinished.",
+    "The correct AC-002 evidence is the verification report's E2 (the integration run including 'export requests without an administrator are denied and write no file', 3 passed) with I1, as the verification report, implementation review (R2, R3), and final review AC-002 row already cite. E2 still passes on the current content; Synchronizer can verify the corrected reference against it.",
+    "Every other record and all implementation, test, and documentation content are sufficient and unchanged since they were assessed; there are no independent defects, and the correction invalidates no completed downstream work.",
+    "D-001 in the synchronization record stays Reviewer's to answer under frame 1; Synchronizer reconciles it only when frame 1 returns to SYNCHRONIZING, so the full Synchronizer gate cannot pass in this run.",
+    "Expected outcome: persist the verified AC-002 reference correction in the synchronization record, keep the record IN_PROGRESS (or BLOCKED) naming the pending Reviewer reassessment of F-003 and its final conclusion, pop only frame 2, set WorkflowState REVIEWING_FINAL with Handoff RESUME From SYNCHRONIZING, keep frame 1, leave the final review untouched, and give a fresh-chat Reviewer invocation for the FINAL_DELIVERABLE review."
+  ],
+  "history": null,
+  "vars": {},
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "REVIEWING_FINAL",
+          "why": "the verified correction returns to the interrupted final review"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "RESUME"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "SYNCHRONIZING"
+        },
+        {
+          "field": {
+            "path": "${REVIEW_FINAL}",
+            "name": "Status",
+            "equals": "IN_PROGRESS"
+          },
+          "why": "the final review is still unfinished when the return happens"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${SYNC}"
+        },
+        {
+          "provenance": {
+            "path": "${SYNC}",
+            "artifact": "SYNCHRONIZATION",
+            "cycle": "${ID}"
+          }
+        },
+        {
+          "field": {
+            "path": "${SYNC}",
+            "name": "Status",
+            "not": "COMPLETE"
+          },
+          "why": "the full gate is unmet; check_ok keeps the status a valid one"
+        },
+        {
+          "changed": [
+            "${SYNC}"
+          ],
+          "why": "the verified correction must be persisted in the record"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": true,
+      "all": [
+        {
+          "unchanged": [
+            "${REVIEW_FINAL}"
+          ],
+          "why": "F-003 and the review conclusion stay as Reviewer left them"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": true,
+      "all": [
+        {
+          "state": "Recovery.Active",
+          "equals": "true"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "1"
+        },
+        {
+          "state": "Recovery.Frame1.From",
+          "equals": "SYNCHRONIZING"
+        },
+        {
+          "state": "Recovery.Frame1.Owner",
+          "equals": "REVIEWING_FINAL"
+        },
+        {
+          "state": "Recovery.Frame1.FailureType",
+          "equals": "REVIEW"
+        },
+        {
+          "state": "Recovery.Frame1.ResumeAt",
+          "equals": "SYNCHRONIZING"
+        },
+        {
+          "state": "Recovery.Frame1.RerunThrough",
+          "equals": "NONE"
+        },
+        {
+          "state": "Recovery.Frame1.Reason",
+          "unchanged": true
+        },
+        {
+          "state": "WorkflowState",
+          "not": "AWAITING_USER_SIGNOFF"
+        },
+        {
+          "state": "Obligations.Active",
+          "equals": "false"
+        }
+      ]
+    },
+    {
+      "assertion": 4,
+      "complete": false,
+      "all": [
+        {
+          "reply_matches": "FINAL_DELIVERABLE|final[-_ ]deliverable|REVIEWING_FINAL|final review",
+          "flags": "i"
+        },
+        {
+          "reply_matches": "fresh (chat|session)|new (chat|session)|separate (chat|session|conversation)",
+          "flags": "i",
+          "why": "independent Reviewer session prefix"
+        },
+        {
+          "reply_matches": "/reviewer",
+          "why": "Claude Code invocation for the next role"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Synchronizer must not change the assessed identity"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "packages/**",
+        "docs/**",
+        "README.md",
+        "package.json",
+        ".gitignore",
+        "pnpm-lock.yaml"
+      ],
+      "why": "Synchronizer owns only its record and does not edit the deliverable"
+    },
+    {
+      "unchanged": [
+        ".standards/CONTEXT.md",
+        ".standards/docs/scope/**",
+        ".standards/docs/specs/**",
+        ".standards/docs/development/**",
+        ".standards/docs/verification/**",
+        ".standards/docs/reviews/**",
+        ".standards/docs/documentation/**"
+      ],
+      "why": "Synchronizer never changes another role's artifacts"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the nested-recovery SYNCHRONIZING state and all records are valid"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration > /tmp/it.log 2>&1 && grep -q 'without an administrator are denied and write no file' /tmp/it.log && grep -qE 'pass 3$' /tmp/it.log",
+      "expect": "pass",
+      "why": "verification evidence E2, which the corrected AC-002 reference should cite, still holds on the current content"
+    },
+    {
+      "cmd": "pnpm --filter export test && ! grep -q '/records/export' test/*.test.ts",
+      "expect": "pass",
+      "why": "E1's unit suite passes but never sends an export request, so it cannot evidence AC-002"
+    },
+    {
+      "cmd": "s=.standards/STATE.md && grep -q 'WorkflowState`: `SYNCHRONIZING` `CycleMode`: `STANDARD`' $s && grep -q '^`Kind`: `FAILURE` `From`: `REVIEWING_FINAL` `FailureType`: `SYNCHRONIZATION`' $s && test $(grep -c '^### Frame ' $s) -eq 2 && grep -q '^`From`: `SYNCHRONIZING` `Owner`: `REVIEWING_FINAL` `FailureType`: `REVIEW`$' $s && grep -q '^`ResumeAt`: `SYNCHRONIZING` `RerunThrough`: `NONE`$' $s && grep -q '^`From`: `REVIEWING_FINAL` `Owner`: `SYNCHRONIZING` `FailureType`: `SYNCHRONIZATION`$' $s && grep -q '^`ResumeAt`: `REVIEWING_FINAL` `RerunThrough`: `NONE`$' $s && test $(grep -c '`Active`: `true`' $s) -eq 1 && grep -q '^`PromotionReason`: `NONE` `AuditTarget`: `NONE` `BlockedOn`: `NONE`$' $s",
+      "expect": "pass",
+      "why": "STATE.md holds SYNCHRONIZING with the outer REVIEW frame and the active SYNCHRONIZATION frame, obligations inactive, nothing blocked"
+    },
+    {
+      "cmd": "f=.standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md && grep -q '^`Status`: `IN_PROGRESS` `User Style`: `NONE`$' $f && grep -A2 '^### F-001' $f | grep -q '`Status`: `RESOLVED`' && grep -A2 '^### F-002' $f | grep -q '`Status`: `WITHDRAWN`' && grep -A2 '^### F-003' $f | grep -q '`Status`: `OPEN` `Owner`: `Synchronizer` `FailureType`: `SYNCHRONIZATION`'",
+      "expect": "pass",
+      "why": "the final review is IN_PROGRESS with F-003 OPEN against the synchronization record"
+    },
+    {
+      "cmd": "y=.standards/docs/synchronization/export-20260924T090000Z-a7f3c1d2.md && head -4 $y | grep -qx 'Artifact: SYNCHRONIZATION' && grep -q '^`Cycle`: `export-20260924T090000Z-a7f3c1d2` `Status`: `IN_PROGRESS`$' $y && grep -q 'AC-002.*verification report E1 and I1' $y && grep -A2 '^### D-001' $y | grep -q '`Status`: `OPEN` `Owner`: `Reviewer` `FailureType`: `REVIEW`'",
+      "expect": "pass",
+      "why": "the synchronization record exists, is IN_PROGRESS, has the incorrect AC-002 reference, and D-001 open with Reviewer"
+    },
+    {
+      "cmd": "grep -q $(git rev-parse HEAD:.standards/docs/synchronization/export-20260924T090000Z-a7f3c1d2.md) .standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md && grep -q $(git rev-parse HEAD:src/routes/export.ts) .standards/docs/synchronization/export-20260924T090000Z-a7f3c1d2.md && ! grep -rqE 'COMMIT:|BLOB:' .standards/docs",
+      "expect": "pass",
+      "why": "cited identities resolve to the current content and no placeholder remains"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && test ! -e exports",
+      "expect": "pass",
+      "why": "everything is committed and no export files exist"
+    },
+    {
+      "cmd": "git log -2 --format=%s | paste -s -d '|' - | grep -qx 'Reopen CSV export final review|Record CSV export synchronization progress'",
+      "expect": "pass",
+      "why": "the overlay commits follow the base history"
+    }
+  ],
+  "notes": "Built on export-synchronizing (cycle export-20260924T090000Z-a7f3c1d2 at SYNCHRONIZING with all records COMPLETE). Layer 50-sync-start: Synchronizer's first pass creates the synchronization record (IN_PROGRESS) with assessed identities, evidence references for every AC, checks S1 to S4, and D-001 OPEN (Owner Reviewer, REVIEW): the final review accepted the guide's 405 and invalid-status-no-file statements on the documentation record's uncommitted one-off script G3 plus inspection. The same record's AC-002 entry mistakenly cites verification E1 and I1 and implementation review R1 and R3 (unit-suite runs) instead of E2. STATE moves to REVIEWING_FINAL with FAILURE REVIEW from SYNCHRONIZING and Frame 1 (From SYNCHRONIZING, Owner REVIEWING_FINAL, ResumeAt SYNCHRONIZING, RerunThrough NONE). Layer 52-final-review-reopen: Reviewer reopens the final review (IN_PROGRESS): F-001 RESOLVED by its own check C6, F-002 WITHDRAWN (README exports/ entry is accurate), F-003 OPEN (Owner Synchronizer, SYNCHRONIZATION) on the AC-002 reference; reassessment and final conclusion unfinished. STATE moves to SYNCHRONIZING with FAILURE SYNCHRONIZATION from REVIEWING_FINAL and active Frame 2 (From REVIEWING_FINAL, Owner SYNCHRONIZING, ResumeAt REVIEWING_FINAL, RerunThrough NONE). This is the two-frame nesting the catalog issue asks for, since reaching REVIEWING_FINAL after a synchronization record exists needs a frame. check.mjs passes: during recovery with a FAILURE handoff the full-boundary and completion checks are skipped; after the expected RESUME into REVIEWING_FINAL the turn-end check holds verification, plan, and design, all of which are complete, and the synchronization record is not held unless marked COMPLETE.",
+  "case": "synchronizer-33",
+  "caseHash": "c486a06ab8562eec",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-01T18:38:12.835Z",
+    "verdict": "pass",
+    "fixtureHash": "262ae761a5748b01",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "9e5d248f0faf91ed",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:39:09.826Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-01T18:17:55.505Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-synchronizing": "33937a9926a74652"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-sync-start/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/52-final-review-reopen/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:39:09.826Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

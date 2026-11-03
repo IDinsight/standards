@@ -1,0 +1,81 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed with --mode brownfield)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode DOCUMENTATION, CompletionPolicy NONE, Active Work.Id guide-20261004T120000Z-1a2b3c4d",
+      "where": ".standards/STATE.md header and Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "WorkflowState AUDITING",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Outer frame returns from DOCUMENTING to final Reviewer",
+      "where": ".standards/STATE.md Frame 1: From REVIEWING_FINAL, Owner DOCUMENTING, FailureType DOCUMENTATION, ResumeAt REVIEWING_FINAL, RerunThrough NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Auditor owns a nested PROJECT_CONTEXT frame returning to DOCUMENTING",
+      "where": ".standards/STATE.md Frame 2: From DOCUMENTING, Owner AUDITING, PROJECT_CONTEXT, ResumeAt DOCUMENTING, RerunThrough NONE; Handoff FAILURE from DOCUMENTING",
+      "status": "realized"
+    },
+    {
+      "condition": "The requested context correction is establishable from current source",
+      "where": "package.json docs:check script and scripts/verify-examples.mjs; CONTEXT.md wrongly says examples are hand-checked; npm run docs:check passes (selfCheck)",
+      "status": "realized"
+    },
+    {
+      "condition": "The correction invalidates neither scope nor design, so the canonical route is to pop and RESUME",
+      "where": "scope and spec name no check command",
+      "status": "realized"
+    },
+    {
+      "condition": "Saved Documenter target FILE docs/usage.md and GUIDED collaboration remain in Active Work.Request",
+      "where": ".standards/STATE.md Request; repeated in the documentation record header",
+      "status": "realized"
+    },
+    {
+      "condition": "Supporting records exist: scope, architecture, context, documentation, final review",
+      "where": ".standards/docs/scope, specs, CONTEXT.md, documentation (BLOCKED), reviews/.../final-deliverable.md (BLOCKED, F-001)",
+      "status": "realized"
+    },
+    {
+      "condition": "Committed, clean git state",
+      "where": "git status clean on main",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 0,
+      "detail": "The check `contains docs:check` on .standards/CONTEXT.md assumes the corrected context names the package.json script. A correct run could in principle record only `node scripts/verify-examples.mjs docs/usage.md`. The script name is the established identifier, and recording `npm run docs:check` is the natural form under Auditor invariant 10, so the risk is low.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The Frame 2 reason and DOC-002 state the context defect directly. That fits the case, which says the correction is already established. It is the routed defect, not the expected routing answer, so it is not a leak.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized: the two-frame nested recovery in AUDITING, a context defect that docs:check in package.json establishes and that affects neither scope nor design, and the Documenter choices in the request. I traced check.mjs for both the start state and the expected end state (Frame 2 popped, RESUME from AUDITING to DOCUMENTING) and it passes. The checks and invariants allow every correct run, with a minor note on the docs:check regex.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T02:51:55.473Z",
+  "costUsd": 0.274898,
+  "ms": 59381,
+  "fixtureHash": "81b19b04deeddd5d"
+}

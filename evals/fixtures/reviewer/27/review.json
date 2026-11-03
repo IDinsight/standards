@@ -1,0 +1,86 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is BROWNFIELD",
+      "where": ".standards/MODE.md (brownfield install, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode EXPEDITED, WorkflowState REVIEWING_IMPLEMENTATION",
+      "where": ".standards/STATE.md head fields",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id = note-20260924T113000Z-c8d2e5f0",
+      "where": ".standards/STATE.md Active Work.Id; plan provenance and header",
+      "status": "realized"
+    },
+    {
+      "condition": "Request is a bounded internal optional note field using established behavior",
+      "where": "STATE.md Active Work.Request (optional note validated like assignee via optionalText, internal view only)",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope and Architecture are NONE",
+      "where": "STATE.md Active Work.Scope/Architecture; no scope/spec records exist",
+      "status": "realized"
+    },
+    {
+      "condition": "Development plan is current and COMPLETE with satisfactory self-checks",
+      "where": ".standards/docs/development/note-...md: Status COMPLETE, DEV-001 DONE, Self-Check citing commit c3d49f7 and the src/tickets.js blob, with recorded output reproduced by selfCheck 3",
+      "status": "realized"
+    },
+    {
+      "condition": "Repository inspection supports the bounded request; no material defects",
+      "where": "src/tickets.js (note via optionalText(…,500), 'note' in changes on update, internalView only); src/api.js create/update staff-only; npm test passes 11/11",
+      "status": "realized"
+    },
+    {
+      "condition": "No recovery, outstanding obligations, or user blockers",
+      "where": "STATE.md Recovery.Active false, Outstanding Obligations.Active false, BlockedOn NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Prior handoff into review is a legal forward handoff from Developer",
+      "where": "STATE.md Handoff FORWARD from DEVELOPING; git log 'Complete internal note implementation'",
+      "status": "realized"
+    },
+    {
+      "condition": "Reviewer runs in a separate chat with no authoring history",
+      "where": "fresh headless session, history null",
+      "status": "realized"
+    },
+    {
+      "condition": "No Tester/documentation/review records exist (skipped in expedited)",
+      "where": "built tree contains only the development plan under .standards/docs",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 2,
+      "detail": "reply_not_matches \"Next role:\" could in principle trip on a correct reply that says something like \"Next role: none, awaiting your sign-off\". This is unlikely, because the protocol forbids emitting an invocation at AWAITING_USER_SIGNOFF and a correct summary lists the user actions instead. The '/<role> Continue' pattern is similarly low-risk.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally narrow the pattern to '^Next role:\\s*\\w' together with a following Claude Code invocation line. Acceptable as is."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The plan's self-check states candidly that the existing suite does not exercise `note` directly. This is realistic Developer wording and gives no verdict hint. graderOnly correctly records that the omission is not a material gap in EXPEDITED.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is in the files and git state: an EXPEDITED brownfield cycle in REVIEWING_IMPLEMENTATION, a COMPLETE plan with reproducible self-checks, and a clean, staff-only note implementation with no recovery or blockers. check.mjs passes and the selfChecks confirm the tests and the recorded sanity output. The checks and invariants are necessary conditions for a correct expedited pass to AWAITING_USER_SIGNOFF; only a minor theoretical over-strictness exists in a reply_not_matches pattern.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T23:26:10.877Z",
+  "costUsd": 0.17288879999999998,
+  "ms": 31797,
+  "fixtureHash": "04363363450fed6b"
+}

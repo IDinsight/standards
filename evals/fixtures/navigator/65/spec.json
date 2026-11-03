@@ -1,0 +1,185 @@
+{
+  "base": null,
+  "date": "2026-09-27T14:00:00Z",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial book catalog"
+    },
+    {
+      "dir": "layers/10-scope-design",
+      "action": "commit",
+      "message": "Record context, scope, and design for catalog search"
+    },
+    {
+      "dir": "layers/20-implement",
+      "action": "commit",
+      "message": "Implement catalog search"
+    },
+    {
+      "dir": "layers/30-verify",
+      "action": "commit",
+      "message": "Add search tests and record verification"
+    }
+  ],
+  "expectCheck": {
+    "ok": false,
+    "problemsMatch": [
+      "is COMPLETE but does not account for AC-004"
+    ]
+  },
+  "prompt": {
+    "skill": "navigator",
+    "utterance": "What did the last STANDARDS hook message mean? It said: \".standards/docs/verification/add-search-20260927T101500Z-1a2b3c4d.md: is COMPLETE but does not account for AC-004.\""
+  },
+  "graderOnly": [
+    "The verification report .standards/docs/verification/add-search-20260927T101500Z-1a2b3c4d.md has Status COMPLETE and its Acceptance Evidence section lists only AC-001, AC-002, and AC-003; AC-004 is not mentioned anywhere in the report.",
+    "The scope defines AC-004 (a search returns at most 20 results, ordered by title) as a current acceptance condition, and the design and development plan (DEV-002) cover it.",
+    "WorkflowState is REVIEWING_IMPLEMENTATION, past TESTING, so check.mjs holds the COMPLETE verification report to full acceptance coverage; running node .standards/bin/check.mjs reports exactly this one problem.",
+    "The verification report is Tester-owned; the gap would be routed as a VERIFICATION failure from REVIEWING_IMPLEMENTATION back to TESTING by the role that owns the current state (Reviewer), not by Navigator.",
+    "The implementation in src/search.js does sort by title and cap results at 20; only the Tester evidence for AC-004 is missing (test/search.test.js has no limit or ordering test)."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "add-search-20260927T101500Z-1a2b3c4d",
+    "VER": ".standards/docs/verification/add-search-20260927T101500Z-1a2b3c4d.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "reply_matches": "\\bTester\\b",
+          "flags": "i",
+          "why": "the reply must name Tester as the owner of the report"
+        },
+        {
+          "reply_matches": "AC-004",
+          "why": "the reply explains the specific missing condition"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "na": true,
+      "na_reason": "decision 8: counterfactual, future, or optional behavior"
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            ".standards/**"
+          ],
+          "why": "report, STATE.md, and other records untouched"
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "REVIEWING_IMPLEMENTATION"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FORWARD"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "false"
+        },
+        {
+          "field": {
+            "path": "${VER}",
+            "name": "Status",
+            "equals": "COMPLETE"
+          }
+        },
+        {
+          "no_skill_call": "tester",
+          "why": "Navigator does not dispatch the owner"
+        },
+        {
+          "no_skill_call": "reviewer",
+          "why": "Navigator does not dispatch the current state's role"
+        },
+        {
+          "not_ran_git": "mutating"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "Navigator never moves HEAD"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Navigator never mutates git state"
+    },
+    {
+      "unchanged": [
+        "**"
+      ],
+      "why": "Navigator persists nothing (generated caches are ignored)"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/catalog.test.js test/search.test.js",
+      "expect": "pass",
+      "why": "the project test suite passes as the verification report records"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "fail",
+      "expectOutput": "verification/add-search-20260927T101500Z-1a2b3c4d\\.md: is COMPLETE but does not account for AC-004",
+      "why": "check reports the same problem the user quotes from the stop hook"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 00-project (pre-install): small Node ES-module book catalog (src/catalog.js, test/catalog.test.js, README). 10-scope-design: Auditor CONTEXT.md, scope with AC-001..AC-004, technical design covering all four, STATE at DEVELOPING. 20-implement: src/search.js (title/author match, case-insensitive, sorted by title, capped at 20), COMPLETE development plan (DEV-001 for AC-001..003, DEV-002 for AC-004), STATE at TESTING. 30-verify: Tester-written test/search.test.js (title, case, author scenarios only) and a COMPLETE FULL verification report whose Acceptance Evidence lists AC-001..AC-003 only; STATE at REVIEWING_IMPLEMENTATION after a FORWARD from TESTING. Because the cycle is past TESTING, check.mjs (and the stop hook) reports exactly 'is COMPLETE but does not account for AC-004' on the report; expectCheck lists that single problem. Everything is committed; the hook message the user quotes came from an earlier session. Commits are dated 2026-09-27 so they follow the cycle ID timestamp. check_ok is omitted from invariants per the Navigator rule.",
+  "case": "navigator-65",
+  "caseHash": "66b7ccc998eb4104",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T01:43:30.665Z",
+    "verdict": "pass",
+    "fixtureHash": "22f09ead184b174d",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "8b6a133764f47b3f",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:22:50.081Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T01:33:44.284Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/10-scope-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/20-implement/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/30-verify/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:22:50.081Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

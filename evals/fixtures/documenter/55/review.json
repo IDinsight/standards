@@ -1,0 +1,86 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState DOCUMENTING, Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, architecture, context, development, verification, and implementation review have matching provenance and current evidence",
+      "where": ".standards/docs/{scope,specs,development,verification,reviews}/…, .standards/CONTEXT.md; check.mjs ok; cited blobs and commits match the built history",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-001 covers CSV export behavior; AC-002 requires an accurate usage guide",
+      "where": "scope Work items 1 and 2",
+      "status": "realized"
+    },
+    {
+      "condition": "A previously required migration guarantee exists in the completed scope",
+      "where": "scope Work item 3 / AC-003 (migration guidance in docs/usage.md)",
+      "status": "realized"
+    },
+    {
+      "condition": "Changing the guide would redefine the completed scope",
+      "where": "docs/usage.md section 'Moving the admin tool to the service export' satisfies AC-003",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and outstanding obligations inactive; no blocked user question",
+      "where": ".standards/STATE.md Recovery/Outstanding Obligations Active false, BlockedOn NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Editing is unrestricted",
+      "where": "documentation record: 'Editing boundary: unrestricted'",
+      "status": "realized"
+    },
+    {
+      "condition": "Remaining discrepancies exist that must survive the transition",
+      "where": "documentation record DOC-001 and DOC-002, both OPEN, record IN_PROGRESS",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation is sound; the change is user-requested rather than an agent-discovered failure",
+      "where": "src/routes/export.ts, src/export.ts; tests pass (selfChecks); review has no findings",
+      "status": "realized"
+    },
+    {
+      "condition": "Everything is committed",
+      "where": "git status clean",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "case-defect",
+      "assertion": 1,
+      "detail": "The case prompt says recovery is inactive, yet assertion 1 asks that existing recovery frames survive. The frame half is necessarily vacuous. The fixture correctly does not plant a frame, which would contradict the prompt. It checks Recovery.FrameCount == 1 after the push and exercises the discrepancy half through the open DOC-001 and DOC-002.",
+      "recommendation": "run_as_is",
+      "fix": "None needed in the fixture. The judge should grade assertion 1 on the preservation of DOC-001 and DOC-002 and on no lost or extra frames."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 2,
+      "detail": "`complete: true` rests on the state alone: USER_REWORK with FailureType SCOPING to SCOPING, and a frame From DOCUMENTING, Owner SCOPING, ResumeAt DOCUMENTING, RerunThrough NONE. This is the only legal route the protocol defines for this request. I traced the turn-end check for that end state: in SCOPING under recovery it holds no records, and the frame and owner rules are satisfied, so check_ok holds.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition. AC-003 in the completed scope carries the migration guarantee, the guide already satisfies it, and the documentation record is IN_PROGRESS with two open, unrelated discrepancies; the state is DOCUMENTING with recovery inactive. Checks are necessary conditions for the expected USER_REWORK→SCOPING route, the turn-end check accepts that end state, and nothing leaks. The only gap is the case's own vacuous 'existing frames' clause.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T16:39:30.583Z",
+  "costUsd": 0.3600966,
+  "ms": 56583,
+  "fixtureHash": "2112a5912c352cba"
+}

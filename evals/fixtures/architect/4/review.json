@@ -1,0 +1,81 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is BROWNFIELD",
+      "where": ".standards/MODE.md (installed with --mode brownfield)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode is STANDARD and WorkflowState is ARCHITECTING",
+      "where": ".standards/STATE.md header fields",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery is inactive with no outstanding obligations",
+      "where": ".standards/STATE.md `## Recovery` Active false; `## Outstanding Obligations` Active false",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Scope points to a completed scope",
+      "where": "STATE.md Active Work.Scope → .standards/docs/scope/propagate-correlation-ids-…-5b7e2c19.md; Handoff FORWARD from SCOPING",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope contains AC-001 with the case wording about one correlation identifier through API, bus, worker, logs, and callbacks",
+      "where": "scope record, Work item 1, `- `AC-001`: …`",
+      "status": "realized"
+    },
+    {
+      "condition": "Valid active-cycle project context exists",
+      "where": ".standards/CONTEXT.md committed in 'Record project context for correlation IDs', with STATE then moved SCOPING via FORWARD from AUDITING",
+      "status": "realized"
+    },
+    {
+      "condition": "A real multi-boundary project exists: API, message bus, worker, logger, outbound callbacks, and an async scheduled job",
+      "where": "src/api/server.js, src/bus/memoryBus.js, src/worker/*.js, src/log/logger.js, src/callbacks/notifier.js, src/jobs/scheduler.js",
+      "status": "realized"
+    },
+    {
+      "condition": "Existing project structure remains valid and no staged compatibility migration is primary (grader-only)",
+      "where": "graderOnly; reflected by CONTEXT.md describing a stable, tested structure and an undocumented x-request-id",
+      "status": "realized"
+    },
+    {
+      "condition": "No architecture document exists yet; Active Work.Architecture is NONE",
+      "where": "STATE.md; repository contains no spec/architecture doc",
+      "status": "realized"
+    },
+    {
+      "condition": "Existing tests pass at HEAD",
+      "where": "selfCheck: node --test on four files, 10 passed",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "The generator added AC-002 (caller-supplied identifier reused or one assigned and returned) and AC-003 (a scheduled job gets its own identifier) next to the case's AC-001. These are consistent with AC-001 and the context. They give assertion 3 real exceptions to address and assertion 5 several IDs to account for. They do not name or favor a mode: the primary risk is still one contract enforced across several boundaries.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 6,
+      "detail": "The check requires a `## Technical Acceptance Criteria` section that cites AC-00[1-3]. The template allows omitting empty sections. However, a cross-cutting propagation contract plainly needs technical conditions, so a correct design will include this section. The risk of a false failure is negligible.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every condition the case states is realized in STATE.md, CONTEXT.md, the completed scope record, and a dependency-free multi-boundary Node service whose tests pass; check.mjs reports ok. No file hints at the mode choice. The checks require only template headings, the fixed specs path (there is no project architecture document), provenance, and AC IDs within section bounds, so a correct Architect run would not fail them. The invariants fit the Architect role.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T00:29:44.825Z",
+  "costUsd": 0.816034,
+  "ms": 52609,
+  "fixtureHash": "90f6e2b9695b15a6"
+}

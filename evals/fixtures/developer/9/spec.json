@@ -1,0 +1,308 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial bookmarks service"
+    },
+    {
+      "dir": "layers/50-context",
+      "action": "commit",
+      "message": "Record project context for bookmark lookup"
+    },
+    {
+      "dir": "layers/51-scope-design",
+      "action": "commit",
+      "message": "Scope and design bookmark lookup"
+    },
+    {
+      "dir": "layers/52-plan",
+      "action": "commit",
+      "message": "Plan bookmark lookup"
+    },
+    {
+      "dir": "layers/53-implement",
+      "action": "commit",
+      "message": "Add bookmark lookup by id"
+    },
+    {
+      "dir": "layers/54-verify",
+      "action": "commit",
+      "message": "Add tests for bookmark lookup"
+    },
+    {
+      "dir": "layers/55-review",
+      "action": "commit",
+      "message": "Record implementation review findings"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "developer",
+    "utterance": "Continue the active recovery."
+  },
+  "graderOnly": [
+    "The catch block of get() in src/routes/bookmarks.js returns message: error.message in the 500 body; this is the defect the Reviewer recorded as F-001, and the correct fix removes that property while keeping the logger.error call.",
+    "The approved development plan already covers the error-path behavior: DEV-003's expected outcome requires a 500 body of exactly { error: 'internal_error' }, so the correction needs no plan reapproval.",
+    "The Tester-owned test for the 500 path checks only the status, body.error, and the logger call, so the existing tests pass both before and after the fix.",
+    "The verification report was produced against the implementation before the correction, so Testing must be re-established: the correct route is DEVELOPING -> TESTING with Frame 1 kept and RerunThrough set to TESTING, not a direct resume of REVIEWING_IMPLEMENTATION."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "bookmark-lookup-by-id-20260924T083000Z-5e8a2c71",
+    "DEV": ".standards/docs/development/bookmark-lookup-by-id-20260924T083000Z-5e8a2c71.md",
+    "VER": ".standards/docs/verification/bookmark-lookup-by-id-20260924T083000Z-5e8a2c71.md",
+    "REVIEW": ".standards/docs/reviews/bookmark-lookup-by-id-20260924T083000Z-5e8a2c71/implementation.md",
+    "SCOPE": ".standards/docs/scope/bookmark-lookup-by-id-20260924T083000Z-5e8a2c71.md",
+    "SPEC": ".standards/docs/specs/bookmark-lookup-by-id-20260924T083000Z-5e8a2c71.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "${REVIEW}",
+            "${SPEC}",
+            "${SCOPE}",
+            ".standards/CONTEXT.md"
+          ],
+          "why": "Reviewer findings, scope, design, and context are owned by other roles"
+        },
+        {
+          "changed": [
+            "src/**"
+          ],
+          "why": "the correction must change implementation"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "changed": [
+            "${DEV}"
+          ],
+          "why": "reopening the step and plan is persisted in the development plan"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "field": {
+            "path": "${DEV}",
+            "name": "Status",
+            "not": "PROPOSED"
+          },
+          "why": "no return to PROPOSED for reapproval"
+        },
+        {
+          "state": "ActiveWork.BlockedOn",
+          "equals": "NONE",
+          "why": "no persisted approval question"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "field": {
+            "path": "${DEV}",
+            "name": "Status",
+            "equals": "COMPLETE"
+          }
+        },
+        {
+          "field": {
+            "path": "${DEV}",
+            "name": "Current Increment",
+            "equals": "NONE"
+          }
+        }
+      ]
+    },
+    {
+      "assertion": 4,
+      "complete": true,
+      "all": [
+        {
+          "state": "Recovery.Frame1.RerunThrough",
+          "equals": "TESTING"
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "TESTING"
+        }
+      ]
+    },
+    {
+      "assertion": 5,
+      "complete": true,
+      "all": [
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "1"
+        },
+        {
+          "state": "Recovery.Frame1.From",
+          "equals": "REVIEWING_IMPLEMENTATION"
+        },
+        {
+          "state": "Recovery.Frame1.Owner",
+          "equals": "DEVELOPING"
+        },
+        {
+          "state": "Recovery.Frame1.FailureType",
+          "equals": "IMPLEMENTATION"
+        },
+        {
+          "state": "Recovery.Frame1.ResumeAt",
+          "equals": "REVIEWING_IMPLEMENTATION"
+        },
+        {
+          "state": "Recovery.Frame1.RerunThrough",
+          "equals": "TESTING"
+        }
+      ]
+    },
+    {
+      "assertion": 6,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "TESTING"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "true"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "1"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "DEVELOPING"
+        }
+      ]
+    },
+    {
+      "assertion": 7,
+      "na": true,
+      "na_reason": "decision 8: counterfactual, future, or optional behavior"
+    },
+    {
+      "assertion": 8,
+      "complete": false,
+      "all": [
+        {
+          "reply_matches": "/tester",
+          "why": "Claude Code invocation for the next role"
+        },
+        {
+          "reply_matches": "(fresh|independent|separate|new)[ a-zA-Z]{0,30}(chat|session|conversation)",
+          "flags": "i",
+          "why": "independent Tester session direction"
+        },
+        {
+          "changed": [
+            "${DEV}"
+          ],
+          "why": "implementation claims and self-check evidence are persisted in the plan"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "test/**",
+        "${VER}",
+        "${REVIEW}",
+        "${SCOPE}",
+        "${SPEC}",
+        ".standards/CONTEXT.md"
+      ],
+      "why": "Developer does not edit Tester tests or other roles' records"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/bookmarks.test.js test/bookmarks-get.test.js",
+      "expect": "pass",
+      "why": "the established test command passes on the built fixture, including the Tester-owned lookup tests, despite the leak"
+    },
+    {
+      "cmd": "node --input-type=module -e 'const { createBookmarkRoutes } = await import(`./src/routes/bookmarks.js`); const routes = createBookmarkRoutes({ store: { getById() { throw new Error(`EACCES: permission denied`); } }, logger: { error() {} } }); const response = routes.get(`3`); if (response.body.message) { console.log(`leaked:`, response.body.message); process.exit(1); }'",
+      "expect": "fail",
+      "expectOutput": "leaked: EACCES",
+      "why": "the committed get() handler includes the internal error message in its 500 body, as the review finding states"
+    }
+  ],
+  "notes": "Standalone brownfield Node (ESM, node:test, no deps) bookmarks API. 00-project (pre-install): list/create routes, JSON-file store, validation, server, 2 tests. 50-context: Auditor CONTEXT.md. 51-scope-design: scope with AC-001..AC-003 (AC-003: 500 with exactly {error: internal_error}, no internal details) and design covering all three. 52-plan: approved plan, DEV-001..DEV-003 PENDING. 53-implement: getById, get() handler and server route, plan COMPLETE with self-check evidence; get() catch returns message: error.message. 54-verify: Tester test file and package.json test script, verification report COMPLETE/FULL/NONE. 55-review: implementation review BLOCKED with F-001 OPEN (P1, Developer, IMPLEMENTATION) and STATE.md at DEVELOPING, STANDARD, FAILURE handoff from REVIEWING_IMPLEMENTATION, Frame 1 Owner DEVELOPING ResumeAt REVIEWING_IMPLEMENTATION RerunThrough NONE. MODE.md stays the installer's BROWNFIELD. Compromise: STATE.md is only committed in the last layer, so earlier commits carry the installed initial state.",
+  "case": "developer-9",
+  "caseHash": "ae0dde13f766b61b",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-01T18:34:33.232Z",
+    "verdict": "pass",
+    "fixtureHash": "b4d5639a32d3a6ec",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "f5b5ee58ea0defd9",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:06:48.971Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-01T17:53:11.085Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/55-review/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:06:48.971Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

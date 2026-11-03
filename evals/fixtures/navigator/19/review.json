@@ -1,0 +1,71 @@
+{
+  "conditions": [
+    {
+      "condition": "Project is BROWNFIELD",
+      "where": ".standards/MODE.md (`ProjectMode`: `BROWNFIELD`, from installer and layers/10-cycle)",
+      "status": "realized"
+    },
+    {
+      "condition": "Active cycle in WorkflowState DEVELOPING",
+      "where": ".standards/STATE.md line 3 (`WorkflowState`: `DEVELOPING`)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode is EXPEDITED",
+      "where": ".standards/STATE.md line 3 (`CycleMode`: `EXPEDITED`); Scope/Architecture/PromotionReason NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "No formal testing exists (no Tester record) in the expedited cycle",
+      "where": "no .standards/docs/verification/ (selfCheck `test ! -e .standards/docs/verification` passed)",
+      "status": "realized"
+    },
+    {
+      "condition": "A development record exists for the cycle",
+      "where": ".standards/docs/development/round-each-invoice-line-total-to-cents-20260924T083000Z-5c9e2a71.md (APPROVED, AFTER_IMPLEMENTATION, EXPEDITED_REQUEST)",
+      "status": "realized"
+    },
+    {
+      "condition": "No recovery frames or outstanding obligations",
+      "where": ".standards/STATE.md Recovery/Outstanding Obligations `Active`: `false`",
+      "status": "realized"
+    },
+    {
+      "condition": "All work committed; clean tree",
+      "where": "git status `## main`, commits a3c3f60/c5cf340/61b7e0c",
+      "status": "realized"
+    },
+    {
+      "condition": "Valid workflow state accepted by check",
+      "where": "check.mjs --json ok: true",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 1,
+      "detail": "`reply_not_matches: ^\\s*Next role:` (m flag) would fail a run that, while explaining what a promoting role would do, quotes the protocol's handoff block (e.g. a code block line `Next role: Auditor`). A correct Navigator should not emit a next-role invocation and is unlikely to quote it verbatim at line start, so the risk is small; the judge also decides (complete: false).",
+      "recommendation": "run_as_is",
+      "fix": "Optionally narrow to `^\\s*Claude Code:\\s*/auditor` or drop the reply check and rely on no_skill_call plus the judge."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 1,
+      "detail": "`no_skill_call: auditor` does not catch Auditor work dispatched via a subagent/Task tool, but complete: false lets the judge see every tool call, so this is covered.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes an active brownfield EXPEDITED cycle at DEVELOPING with an approved plan, no verification record, no recovery or obligations, and a clean committed tree; check.mjs passes and nothing leaks the answer. Assertion 0 is fully decided by STATE.md being unchanged, and assertion 1 by no Auditor skill call plus a judge; standard Navigator invariants (unchanged **, HEAD, no mutating git) are present. Only minor notes on the reply pattern's narrow false-fail risk.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T01:37:20.726Z",
+  "costUsd": 0.1132962,
+  "ms": 30926,
+  "fixtureHash": "5c6566738ed0367a"
+}

@@ -1,0 +1,68 @@
+{
+  "conditions": [
+    {
+      "condition": "Brownfield project with an active STANDARD cycle",
+      "where": ".standards/MODE.md (BROWNFIELD); .standards/STATE.md CycleMode STANDARD, Active Work.Id set",
+      "status": "realized"
+    },
+    {
+      "condition": "WorkflowState is REVIEWING_IMPLEMENTATION",
+      "where": ".standards/STATE.md WorkflowState; Handoff FORWARD from TESTING",
+      "status": "realized"
+    },
+    {
+      "condition": "CompletionPolicy is FULL_DELIVERABLE",
+      "where": ".standards/STATE.md Active Work.CompletionPolicy",
+      "status": "realized"
+    },
+    {
+      "condition": "No normal documentation, final-review, or synchronization work has begun",
+      "where": "no .standards/docs/documentation, reviews/*/final-deliverable.md, or synchronization record; git log shows the cycle never entered DOCUMENTING",
+      "status": "realized"
+    },
+    {
+      "condition": "Policy-change preconditions hold: recovery and obligations inactive, BlockedOn NONE",
+      "where": ".standards/STATE.md Recovery/Outstanding Obligations Active false, BlockedOn NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "The project has no project documentation, as the user says",
+      "where": "no README.md or docs/ (selfCheck passes); CONTEXT.md Project Baseline",
+      "status": "realized"
+    },
+    {
+      "condition": "A documentation acceptance condition exists, so absence of docs cannot be read as eligibility or a waiver",
+      "where": "scope AC-004 (root README); design marks it no architectural impact, Documenter-owned; verification report records it as a pending Documenter dependency",
+      "status": "realized"
+    },
+    {
+      "condition": "Upstream gates through Tester are complete for the current implementation",
+      "where": "development plan COMPLETE; verification report COMPLETE/FULL; scope and design account for AC-001..AC-004; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation review has not yet run",
+      "where": "no reviews/<id>/implementation.md",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": ".standards/CONTEXT.md says `npm test` runs only `test/inventory.test.js`. After the tests commit, package.json also runs test/export.test.js. This is plausible, since the context was written before the change, and it does not affect the Navigator explanation. The cycle ID timestamp (20260921) also predates every commit date (2026-09-24), which is harmless.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes the stated state: an active STANDARD cycle at REVIEWING_IMPLEMENTATION with FULL_DELIVERABLE, no normal documentation work begun, no project docs, and a concrete documentation AC (AC-004) that makes assertion 1 gradeable. Assertion 0's checks (nothing changed, policy and state unchanged, no Reviewer skill call) are necessary conditions for a correct non-mutating Navigator run, and the other assertions go to the judge. The invariants fit Navigator, check.mjs passes, and nothing leaks the answer.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T02:59:13.222Z",
+  "costUsd": 0.2226044,
+  "ms": 25373,
+  "fixtureHash": "85818d5e270ae82e"
+}

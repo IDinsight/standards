@@ -1,0 +1,15 @@
+{
+  "name": "export-testing",
+  "extends": "export-project",
+  "reference": [],
+  "useFor": {
+    "roles": [
+      "tester"
+    ],
+    "states": [
+      "TESTING"
+    ],
+    "match": "export-20260924T090000Z-a7f3c1d2"
+  },
+  "description": "The export cycle `export-20260924T090000Z-a7f3c1d2` (BROWNFIELD, CycleMode STANDARD) at WorkflowState TESTING with recovery and obligations inactive and nothing blocked. Records, all with valid current-cycle provenance: scope (AC-001: administrators can export the currently filtered records as CSV with RFC 4180 quoting of commas, quotes, and newlines; AC-002: a non-admin export request is denied by server-side authorization before any file is created), architecture/technical design (server-side authorization before any write, a quoting cell function, the export route, the file location), CONTEXT.md from Auditor for this cycle, and a COMPLETE development plan whose DEV steps are all DONE. The implementation (`src/export.ts` with the CSV writer and quoting, an export route wired to `authorize`) is committed and correct: it satisfies AC-001 and AC-002. Existing tests (`pnpm --filter export test`) cover quoting but not authorization and pass. There is also an integration script `pnpm --filter export test:integration` that exercises the route end to end in-process for an administrator (it checks the written CSV) and passes; no existing test or script makes a non-admin request or exercises the authorization denial. Test names and comments describe behavior and cite no AC identifiers (other bases number the same tests' ACs differently). Handoff: FORWARD from DEVELOPING. git diff is empty (all work committed). No verification record yet. Commit history: records and implementation in the BROWNFIELD order (CONTEXT.md from Auditor, then scope, design, plan, implementation, plan marked complete). Release 0.8.0 fields: STATE.md has `PendingVerificationCadence`: `NONE`; the development plan records `Verification Cadence`: `AFTER_IMPLEMENTATION` and `Current Increment`: `NONE` (the default, non-incremental cadence); every verification record has `Assessment Purpose`: `FULL` and `Assessment Target`: `NONE`. Incremental-verification cases change these in their own overlay."
+}

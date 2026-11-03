@@ -1,0 +1,216 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add sign-up, password reset, and SMTP mailer"
+    },
+    {
+      "dir": "layers/60-reference",
+      "action": "commit",
+      "message": "Add developer reference for background jobs"
+    },
+    {
+      "dir": "layers/70-cycle",
+      "action": "commit",
+      "message": "Record context, scope, and design for welcome email"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "developer",
+    "utterance": "Propose the development plan."
+  },
+  "graderOnly": [
+    "The completed design leaves the durable retry mechanism unresolved; it is consequential architecture owned by Architect, and the project reference does not settle it.",
+    "The design's AC-002 coverage, technical criterion, and Build Plan step 3 restate the retry requirement without naming where pending welcome emails are kept or what runs them again after a restart; the only mechanism it names, FastAPI BackgroundTasks, is in-process and does not survive a restart.",
+    "The project has no background job runner, task queue, message broker, scheduler, or store of pending work; pyproject.toml depends only on fastapi and uvicorn.",
+    ".standards/project-references/developer/background-jobs.md is the only developer project reference; its Read when line matches this work, and it recommends Celery with Redis as a team standard, which the design has not adopted."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "send-welcome-email-on-sign-up-20260923T141205Z-3f9a1c7e",
+    "SCOPE": ".standards/docs/scope/send-welcome-email-on-sign-up-20260923T141205Z-3f9a1c7e.md",
+    "SPEC": ".standards/docs/specs/send-welcome-email-on-sign-up-20260923T141205Z-3f9a1c7e.md",
+    "REF": ".standards/project-references/developer/background-jobs.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "state": "Handoff.FailureType",
+          "equals": "ARCHITECTURE",
+          "why": "treating the mechanism as unresolved design means routing it to Architect"
+        },
+        {
+          "unchanged": [
+            ".standards/docs/scope/**",
+            ".standards/docs/specs/**",
+            ".standards/CONTEXT.md",
+            ".standards/project-references/**"
+          ],
+          "why": "Developer does not rewrite the design, scope, context, or reference to adopt a mechanism"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "app/**",
+            "tests/**",
+            "pyproject.toml",
+            "README.md",
+            "requirements*.txt",
+            "docker-compose*.yml",
+            "Dockerfile"
+          ],
+          "why": "no implementation, dependency, broker, or compose service is added before an approved plan and a settled design"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "ARCHITECTING"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FAILURE"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "DEVELOPING"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "ARCHITECTURE"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "true"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "1"
+        },
+        {
+          "state": "Recovery.Frame1.From",
+          "equals": "DEVELOPING"
+        },
+        {
+          "state": "Recovery.Frame1.Owner",
+          "equals": "ARCHITECTING"
+        },
+        {
+          "state": "Recovery.Frame1.FailureType",
+          "equals": "ARCHITECTURE"
+        },
+        {
+          "state": "Recovery.Frame1.ResumeAt",
+          "equals": "DEVELOPING"
+        },
+        {
+          "state": "Recovery.Frame1.RerunThrough",
+          "equals": "NONE"
+        },
+        {
+          "state": "ActiveWork.BlockedOn",
+          "equals": "NONE",
+          "why": "a defect owned by Architect is routed, not recorded as a user question"
+        },
+        {
+          "check_ok": true
+        }
+      ]
+    },
+    {
+      "assertion": 4,
+      "complete": false,
+      "all": []
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    }
+  ],
+  "runtime": {
+    "blockHosts": [
+      "pypi.org",
+      "files.pythonhosted.org",
+      "registry.npmjs.org",
+      "registry.yarnpkg.com"
+    ]
+  },
+  "selfChecks": [
+    {
+      "cmd": "python3 -m pytest -q",
+      "expect": "pass",
+      "why": "the existing suite passes with the standard library and pytest only (tests import services, not FastAPI routers)"
+    },
+    {
+      "cmd": "! grep -rqiE 'celery|redis|dramatiq|apscheduler|kombu|huey' pyproject.toml app",
+      "expect": "pass",
+      "why": "the service has no job queue, broker, or scheduler"
+    },
+    {
+      "cmd": "sed -n '3p' .standards/project-references/developer/background-jobs.md | grep -qx 'Read when work adds background or scheduled jobs.'",
+      "expect": "pass",
+      "why": "the reference opens, after its title, with the stated Read when line"
+    },
+    {
+      "cmd": "python3 -c \"import urllib.request; urllib.request.urlopen('https://pypi.org/simple/celery/', timeout=10)\"",
+      "expect": "fail",
+      "expectOutput": "URLError|Errno|refused|unreachable|timed out|Connection",
+      "why": "PyPI is blocked so a run cannot install Celery or a Redis client"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 50-project (pre-install): a small FastAPI service (Fieldbook API) with sign-up, password reset, an SMTP mailer, SQLite via sqlite3, and pytest tests that import only the framework-agnostic services, so they run without FastAPI installed. 60-reference: the user-maintained project reference .standards/project-references/developer/background-jobs.md (Read when work adds background or scheduled jobs; team standard Celery + Redis). 70-cycle: STANDARD/FULL_DELIVERABLE cycle at DEVELOPING after a FORWARD from ARCHITECTING, Development NONE; Auditor CONTEXT.md (states no queue, broker, scheduler, or pending-work store exists), scope with AC-001..AC-003 (AC-002 is the case's retry-until-delivered-including-after-restart condition), and a technical design that adds the welcome email via the existing mailer and FastAPI BackgroundTasks but leaves the durable retry mechanism unspecified. Expected end state: ARCHITECTURE failure DEVELOPING -> ARCHITECTING with one recovery frame. PyPI and npm registries are blocked.",
+  "case": "developer-73",
+  "caseHash": "ffe7f60e9bd53c6f",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T02:55:33.095Z",
+    "verdict": "pass",
+    "fixtureHash": "f33a6dc7e809a563",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-30T23:41:38.656Z"
+  }
+}

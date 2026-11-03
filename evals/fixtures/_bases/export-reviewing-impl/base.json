@@ -1,0 +1,15 @@
+{
+  "name": "export-reviewing-impl",
+  "extends": "export-testing",
+  "reference": [],
+  "useFor": {
+    "roles": [
+      "reviewer"
+    ],
+    "states": [
+      "REVIEWING_IMPLEMENTATION"
+    ],
+    "match": "export-20260924T090000Z-a7f3c1d2"
+  },
+  "description": "The same export cycle one step later: Tester has run and passed. WorkflowState REVIEWING_IMPLEMENTATION, Handoff FORWARD from TESTING, recovery and obligations inactive. Adds a COMPLETE verification record (Tester's template, valid provenance) that accounts for AC-001 and AC-002, with execution evidence for the commands it ran, and a new authorization test Tester added (a non-admin request is denied and no file is created) that `pnpm --filter export test:integration` now runs, committed. The record's execution evidence holds Tester's actual runs of `pnpm --filter export test` and `pnpm --filter export test:integration` (the admin export and the non-admin denial both observed), and its assessed inputs identify the assessed commit with ${COMMIT:<subject>}. The implementation is unchanged from export-testing and has no material defects. git diff is empty. No implementation review record yet. Release 0.8.0 fields: STATE.md has `PendingVerificationCadence`: `NONE`; the development plan records `Verification Cadence`: `AFTER_IMPLEMENTATION` and `Current Increment`: `NONE` (the default, non-incremental cadence); every verification record has `Assessment Purpose`: `FULL` and `Assessment Target`: `NONE`. Incremental-verification cases change these in their own overlay."
+}

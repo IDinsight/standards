@@ -1,0 +1,81 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD, CycleMode STANDARD, WorkflowState SYNCHRONIZING, Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/MODE.md (installed BROWNFIELD); .standards/STATE.md header and Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Synchronizer runs at a recovery boundary",
+      "where": ".standards/STATE.md Frame 1 RerunThrough `SYNCHRONIZING`, Handoff FORWARD from REVIEWING_FINAL",
+      "status": "realized"
+    },
+    {
+      "condition": "Older active frame owned by DOCUMENTING, which must stay intact",
+      "where": ".standards/STATE.md ### Frame 1 (From/ResumeAt AWAITING_USER_SIGNOFF, Owner DOCUMENTING, FailureType DOCUMENTATION); reachable via the USER_REWORK at sign-off in commit 'Reopen usage guide for export examples'",
+      "status": "realized"
+    },
+    {
+      "condition": "Outstanding obligations inactive, nothing blocked, no pending cadence",
+      "where": ".standards/STATE.md Outstanding Obligations `Active`: `false`; BlockedOn NONE; PendingVerificationCadence NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, architecture, context, plan, verification, both reviews have valid ownership and identities (other than the stated defect)",
+      "where": ".standards/docs/{scope,specs,development,verification,reviews}/…, .standards/CONTEXT.md; provenance matches cycle; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "Documentation evidence is available",
+      "where": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md (COMPLETE, G1–G8 for the rework)",
+      "status": "realized"
+    },
+    {
+      "condition": "A new concrete test-evidence defect exists (Tester-owned)",
+      "where": "commit 'Tidy denied export integration test' rewrites test/integration/export-flow.test.ts: editor case, error bodies, and no-folder assertion removed; verification report E2/AC-002 row still claims them and cites the old blob c3ec364…",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation and guide otherwise sound, so the only owner is Tester",
+      "where": "src/** unchanged since 'Add CSV export of filtered records' (selfCheck); docs/usage.md examples verified by selfCheck",
+      "status": "realized"
+    },
+    {
+      "condition": "Existing synchronization record present (to be reopened)",
+      "where": ".standards/docs/synchronization/export-20260924T090000Z-a7f3c1d2.md (COMPLETE, from before the rework)",
+      "status": "realized"
+    },
+    {
+      "condition": "Clean committed git state",
+      "where": "git status clean; single branch main",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 0,
+      "detail": "Assertions 0 checks `Recovery.Frame1.Reason` equals the exact one-line string. If a run rewrites STATE.md and reflows that long code span across lines, the parsed value would contain a newline and fail although the frame is semantically preserved. Agents normally insert Frame 2 with an edit and leave Frame 1 untouched, so the risk is small; Frame 1 is otherwise fully pinned by From/Owner/FailureType/ResumeAt/RerunThrough.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally drop the Frame1.Reason equality from assertion 0 (the other Frame 1 fields already prove it was preserved), or have the harness normalize whitespace in state values."
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": -1,
+      "detail": "I traced check.mjs at turn end for the expected end state (TESTING, FAILURE from SYNCHRONIZING, Frame 2 Owner TESTING with RerunThrough NONE, sync record IN_PROGRESS or BLOCKED). fullBoundary is false, scoped is false, design is not held, and only the SYNCHRONIZING record would be held, and only if left COMPLETE. It covers AC-001 to AC-003 anyway. So check_ok cannot fail a correct run on these grounds.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture builds a reachable state: Frame 1 is a DOCUMENTING-owned USER_REWORK from sign-off with RerunThrough SYNCHRONIZING, and a later neutral-looking commit removes the editor/no-file coverage the verification report's AC-002 evidence relies on. That gives a concrete Tester-owned defect, with no leaks and coherent records. The deterministic checks fully decide the three state-based assertions and match every legal correct routing (nested VERIFICATION frame to TESTING, Frame 1 intact, no obligations); only a minor whitespace sensitivity on Frame1.Reason is worth noting.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T14:40:24.204Z",
+  "costUsd": 0.4127688,
+  "ms": 74718,
+  "fixtureHash": "1aaf57ce09a4ce55"
+}

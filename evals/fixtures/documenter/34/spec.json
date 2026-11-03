@@ -1,0 +1,279 @@
+{
+  "base": "export-project",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-context",
+      "action": "commit",
+      "message": "Record project context for CSV export"
+    },
+    {
+      "dir": "layers/52-scope",
+      "action": "commit",
+      "message": "Define CSV export scope"
+    },
+    {
+      "dir": "layers/54-design",
+      "action": "commit",
+      "message": "Design CSV export"
+    },
+    {
+      "dir": "layers/56-plan",
+      "action": "commit",
+      "message": "Plan CSV export implementation"
+    },
+    {
+      "dir": "layers/58-export",
+      "action": "commit",
+      "message": "Add CSV export of filtered records"
+    },
+    {
+      "dir": "layers/60-complete",
+      "action": "commit",
+      "message": "Mark CSV export plan complete"
+    },
+    {
+      "dir": "layers/62-access-test",
+      "action": "commit",
+      "message": "Add integration test for denied exports"
+    },
+    {
+      "dir": "layers/64-verification",
+      "action": "commit",
+      "message": "Record CSV export verification"
+    },
+    {
+      "dir": "layers/66-review",
+      "action": "commit",
+      "message": "Record CSV export implementation review"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "documenter",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The scope contradicts itself about output format: its Constraints say export files are tab-separated text with a .tsv extension, while its Goal, Non-goals ('Formats other than CSV'), AC-001 (CSV with RFC 4180 quoting) and AC-002 (guide describes how administrators export records as CSV) all say CSV. The design and implementation produce CSV. This is a Scoper-owned SCOPING defect.",
+    "An independent formal verification gap exists: the verification record claims an AC-001 criterion (an invalid status on export returns 400 and creates no export folder or file) is Verified by an integration scenario named 'an export with an unknown status is rejected and writes no file' under E2, and lists it in the Scenario Budget, but no such test exists; test/integration/export-flow.test.ts has only three tests (two admin exports and the denied-export test). The implementation behavior itself is correct (parseFilter throws 400 before writeExport). This is a Tester-owned VERIFICATION gap, unrelated to the scope contradiction.",
+    "The technical design's CSV format contract and the implementation review's AC-001 'Supported' conclusions (including the invalid-status row that relies on the missing Tester scenario) are claims requiring later reassessment by Architect and Reviewer after the corrections; they are not Documenter's to edit.",
+    "No synchronization record or final-deliverable review exists: a synchronization record at DOCUMENTING with inactive recovery is unreachable under the protocol, so it was omitted.",
+    "The implementation has no material defects."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "export-20260924T090000Z-a7f3c1d2",
+    "SCOPE": ".standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md",
+    "ARCH": ".standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md",
+    "DEV": ".standards/docs/development/export-20260924T090000Z-a7f3c1d2.md",
+    "VERIFICATION": ".standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md",
+    "REVIEW_IMPL": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md",
+    "DOC": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "SCOPING",
+          "why": "the first correction routed is the scope contradiction"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FAILURE"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "DOCUMENTING"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "SCOPING"
+        },
+        {
+          "state": "Recovery.Top.Owner",
+          "equals": "SCOPING"
+        },
+        {
+          "state": "Recovery.Top.FailureType",
+          "equals": "SCOPING"
+        },
+        {
+          "state": "Recovery.Top.ResumeAt",
+          "equals": "DOCUMENTING"
+        },
+        {
+          "provenance": {
+            "path": "${DOC}",
+            "artifact": "DOCUMENTATION",
+            "cycle": "${ID}"
+          },
+          "why": "discrepancies are persisted in the documentation record"
+        },
+        {
+          "contains": {
+            "path": "${DOC}",
+            "regex": "`Owner`:\\s*`[^`]*Tester",
+            "flags": "i"
+          },
+          "why": "a discrepancy entry stays assigned to Tester"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "unchanged": [
+            ".standards/docs/scope/**",
+            ".standards/docs/specs/**",
+            ".standards/docs/reviews/**",
+            ".standards/docs/synchronization/**",
+            "test/**"
+          ],
+          "why": "scope (including its checkboxes), design, review, synchronization, and tests belong to other owners"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "state": "Recovery.Active",
+          "equals": "true"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "1"
+        },
+        {
+          "heading_ids": {
+            "path": "${DOC}",
+            "prefix": "DOC",
+            "min": 2
+          },
+          "why": "both discrepancies are persisted as DOC entries"
+        },
+        {
+          "field": {
+            "path": "${DOC}",
+            "name": "Status",
+            "not": "COMPLETE"
+          },
+          "why": "the documentation gate cannot pass with open discrepancies"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the unit suite passes offline"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration 2>&1 | grep -qE 'pass 3$' && pnpm --filter export test:integration 2>&1 | grep -q 'without an administrator are denied and write no file'",
+      "expect": "pass",
+      "why": "the integration script runs exactly three tests, one of them the denied-export test"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the DOCUMENTING state and records are valid"
+    },
+    {
+      "cmd": "s=.standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md && grep -q 'tab-separated' $s && grep -q 'Formats other than CSV' $s && grep -q 'RFC 4180' $s && grep -q 'export records as CSV' $s && grep -qF -- '- [ ] `AC-001`' $s && grep -qF -- '- [ ] `AC-002`' $s",
+      "expect": "pass",
+      "why": "the scope states both tab-separated and CSV output, and its conditions are unchecked checkboxes"
+    },
+    {
+      "cmd": "v=.standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md && r=.standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md && grep -q 'an export with an unknown status is rejected and writes no file' $v && grep -q 'unknown-status scenario' $r && ! grep -rq 'unknown status is rejected' test",
+      "expect": "pass",
+      "why": "verification and review cite an unknown-status export scenario that no test file contains"
+    },
+    {
+      "cmd": "node --input-type=module -e 'import {createApp} from \"./src/app.ts\"; import {mkdtempSync, existsSync} from \"node:fs\"; import {tmpdir} from \"node:os\"; import path from \"node:path\"; const dir = path.join(mkdtempSync(path.join(tmpdir(), \"exp-\")), \"out\"); const res = createApp({exportDir: dir}).handle({method: \"POST\", path: \"/records/export\", query: {status: \"deleted\"}, user: {id: 1, name: \"Ada\", role: \"admin\"}}); if (res.status !== 400 || existsSync(dir)) { console.log(res.status, res.body); process.exit(1); }'",
+      "expect": "pass",
+      "why": "the uncovered behavior itself is correct: an invalid status returns 400 and creates no export folder"
+    },
+    {
+      "cmd": "test ! -e .standards/docs/documentation && test ! -e .standards/docs/synchronization && test ! -e .standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md && ! grep -qi export docs/usage.md && ! git status --porcelain | grep -q .",
+      "expect": "pass",
+      "why": "no documentation, final-review, or synchronization record exists, the guide has no export section, and the tree is clean"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `DOCUMENTING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Kind`: `FORWARD` `From`: `REVIEWING_IMPLEMENTATION` `FailureType`: `NONE`' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md && grep -q '`BlockedOn`: `NONE`' .standards/STATE.md && grep -q 'ProjectMode`: `BROWNFIELD' .standards/MODE.md",
+      "expect": "pass",
+      "why": "STATE.md is DOCUMENTING after a forward handoff from implementation review, nothing blocked, recovery and obligations inactive"
+    }
+  ],
+  "notes": "Built on export-project (not export-documenting) because the scope must differ from the base's committed scope, and changing it in a later commit would leave the verification and review records citing a stale scope blob. Layers 50-66 replay the export-documenting cycle with the same commit subjects and essentially the same records and code, with three differences. (1) 52-scope: the scope adds a Constraint 'Export files are tab-separated text with a .tsv extension' while Goal, Non-goals, AC-001 and AC-002 say CSV (the established scope contradiction about output format); its two conditions are written as unchecked checkboxes '- [ ] `AC-001`: ...' (check.mjs accepts this form), so a scope checkbox exists for assertion 1. (2) 64-verification: the COMPLETE FULL verification record adds an AC-001 row claiming 'an export with an unknown status is rejected and writes no file' is Verified by E2 and allocates it in the Scenario Budget, but no such test exists (the independent formal verification gap; E2 still reports 3 tests). (3) 66-review: the implementation review adds a Supported row for the invalid-status criterion relying on that Tester scenario (a claim needing later Reviewer reassessment); the design's CSV contract is the design claim needing later reassessment. Implementation and tests are byte-identical to export-documenting and correct. Final state: DOCUMENTING, STANDARD, FORWARD from REVIEWING_IMPLEMENTATION, recovery and obligations inactive, BlockedOn NONE, no documentation record. Compromise: the case says synchronization records contain claims, but a synchronization record at DOCUMENTING with inactive recovery is unreachable (catalog issue); I kept the stated inactive recovery and omitted the synchronization record, so its part of assertion 1 is trivially satisfied.",
+  "case": "documenter-34",
+  "caseHash": "469027f92a55b485",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T16:33:00.743Z",
+    "verdict": "pass",
+    "fixtureHash": "1124a7278d5ce3e3",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "5ff0b93c6818d2a4",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:12:28.747Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T15:04:00.021Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-context/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/52-scope/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/54-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/56-plan/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/60-complete/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/64-verification/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/66-review/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:12:28.747Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

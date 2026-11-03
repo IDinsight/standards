@@ -1,0 +1,147 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add job runner with timeouts, retries, and cancellation"
+    },
+    {
+      "dir": "layers/01-cli",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add batchrun CLI and usage docs"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "navigator",
+    "utterance": "GRILL_ME on advanced cancellation tradeoffs."
+  },
+  "graderOnly": [
+    "Earlier answers in this conversation correctly demonstrated the basic cancellation flow (queued jobs cancelled with attempts 0; the running job cancelled immediately through linkedController and raceAbort) and failure handling (retries, and timeout classified by link.signal.reason instanceof TimeoutError).",
+    "'Cancellation' here means cancellation of jobs in this project's runner (src/runner.js, src/signals.js, bin/batchrun.js), not STANDARDS cycle cancellation; no STANDARDS cycle is active and the workflow is in the installed initial brownfield state.",
+    "Tradeoffs present in the current code: raceAbort frees the concurrency slot immediately but does not stop work, so a job that ignores its signal keeps running in the background.",
+    "After a timeout, the next retry attempt starts while the timed-out attempt may still be running, so two attempts of the same job can overlap.",
+    "runOne's finally calls link.dispose(), which detaches the parent abort listener, so a timed-out attempt still running in the background no longer sees a later parent cancel.",
+    "The drain window (drainMs) runs only when the parent signal aborted, waits on the latest attempt of each started job (the started map overwrites earlier attempts), and only results with status 'cancelled' can be marked abandoned; a timed-out job still running is never marked abandoned.",
+    "The CLI passes the signal to spawn with shell: true, so abort sends SIGTERM to the spawned process; nothing handles process groups. A second Ctrl-C calls process.exit(130) without printing results."
+  ],
+  "history": {
+    "turns": [
+      {
+        "role": "user",
+        "text": "/navigator GRILL_ME on how cancellation works in the job runner. Start with the basics."
+      },
+      {
+        "role": "assistant",
+        "text": "We'll start with the big picture and go deeper as you show it.\n\nQuestion 1: `runJobs` in `src/runner.js` takes an optional `signal`. Suppose that signal aborts while one job is running and two more are still queued. What happens to the running job and to the queued ones, and what result does each get?"
+      },
+      {
+        "role": "user",
+        "text": "The queued ones never start. runOne checks signal.aborted at the top of every attempt, so they get status 'cancelled' with attempts 0. The running job's linked signal from linkedController aborts with the parent's reason, and raceAbort rejects right away, so the runner records it as 'cancelled' with attempts 1 without waiting for job.run to finish."
+      },
+      {
+        "role": "assistant",
+        "text": "That's right. The queued jobs hit the `signal?.aborted` check at the top of the loop in `runOne` before `attempts` is incremented, so they report `attempts: 0`. The running job's link signal aborts because `linkedController` in `src/signals.js` forwards the parent's reason, and `raceAbort` rejects with that reason as soon as the signal fires, so the catch block sees `signal.aborted` and records `cancelled`. You also caught the important detail that the runner stops waiting immediately rather than when the job finishes.\n\nQuestion 2, on failure handling: a job runs with `retries: 1` and `timeoutMs: 20`. Its first attempt throws an ordinary error, and its second attempt ignores its signal and takes 100 ms. What result does `runJobs` report for it, and how does the runner tell a timeout apart from an ordinary failure?"
+      },
+      {
+        "role": "user",
+        "text": "First attempt: attempts is 1, not more than retries, so it loops and retries. Second attempt: after 20 ms the link aborts with a TimeoutError, raceAbort rejects with it, attempts is 2 > 1, and because link.signal.reason is a TimeoutError the status is 'timeout'. So it's { status: 'timeout', attempts: 2, error: the TimeoutError }."
+      },
+      {
+        "role": "assistant",
+        "text": "Correct on every point. The distinction comes from `link.signal.reason instanceof TimeoutError`, not from the error the job threw, which is why a job that ignores its signal is still classified as a timeout: the rejection comes from `raceAbort`, not from the job. The parent signal never aborted, so the cancelled branch doesn't apply.\n\nYou've shown you understand the basic cancellation flow and how failures, retries, and timeouts are classified. If you want to keep going, we can move into the tradeoffs in this design."
+      }
+    ]
+  },
+  "vars": {},
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": []
+    }
+  ],
+  "invariants": [
+    {
+      "unchanged": [
+        "**"
+      ],
+      "why": "Navigator persists nothing (generated caches are ignored)"
+    },
+    {
+      "head_unchanged": true,
+      "why": "Navigator never moves HEAD"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Navigator never mutates git state"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/runner.test.js test/signals.test.js",
+      "expect": "pass",
+      "why": "the existing tests pass, covering order, retries, timeout, cancel of queued jobs (attempts 0), abandoned after drain, and linked signals"
+    },
+    {
+      "cmd": "node --input-type=module -e 'const {runJobs} = await import(`./src/runner.js`); let n = 0; const job = {id: `x`, run: () => { n += 1; if (n === 1) throw new Error(`boom`); return new Promise((r) => setTimeout(r, 100)); }}; const [r] = await runJobs([job], {retries: 1, timeoutMs: 20}); console.log(r.status, r.attempts, r.error.name); if (r.status !== `timeout` || r.attempts !== 2 || r.error.name !== `TimeoutError`) process.exit(1);'",
+      "expect": "pass",
+      "why": "the history's answer to question 2 (status timeout, attempts 2, TimeoutError) matches the code"
+    }
+  ],
+  "notes": "Standalone brownfield fixture with no active cycle (installer's initial STATE.md/MODE.md left as installed). Layer 00-project commits a small Node ESM job runner (src/runner.js, src/signals.js, src/index.js) with concurrency, per-job timeouts, retries, and AbortSignal cancellation plus a drain window that marks still-running cancelled jobs abandoned, with node:test tests. Layer 01-cli adds bin/batchrun.js (SIGINT -> abort, spawn with signal) and README docs on cancellation semantics. History is a prior Navigator GRILL_ME conversation in which the user correctly answered a basic-flow question and a failure-handling question; the run message asks for advanced cancellation tradeoffs. The code contains real design tradeoffs (background work after raceAbort, overlapping retry attempts, parent listener detached on dispose, drain only tracks the latest attempt and only cancelled results, CLI SIGTERM to shell) for the role to build questions from; none is marked as a defect.",
+  "case": "navigator-52",
+  "caseHash": "a5609c0e804ec5e8",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T15:40:55.856Z",
+    "verdict": "issues",
+    "fixtureHash": "e77c021733c33c63",
+    "fixedBy": "owner decision",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "ceb15d37b8bea478",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:20:53.862Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T15:23:51.022Z"
+  },
+  "decision": {
+    "action": "fixed",
+    "note": "Owner-approved (2026-10-03, stage 3): gate-3 recommendation applied.",
+    "at": "2026-10-03T16:14:21.389Z",
+    "fixtureHash": "ceb15d37b8bea478"
+  },
+  "migrations": [
+    {
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:20:53.862Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

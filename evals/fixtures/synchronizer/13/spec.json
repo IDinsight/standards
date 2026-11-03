@@ -1,0 +1,292 @@
+{
+  "base": "export-project",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-context",
+      "action": "commit",
+      "message": "Record project context for CSV export"
+    },
+    {
+      "dir": "layers/52-scope",
+      "action": "commit",
+      "message": "Define CSV export scope"
+    },
+    {
+      "dir": "layers/54-design",
+      "action": "commit",
+      "message": "Design CSV export"
+    },
+    {
+      "dir": "layers/56-plan",
+      "action": "commit",
+      "message": "Plan CSV export implementation"
+    },
+    {
+      "dir": "layers/58-export",
+      "action": "commit",
+      "message": "Add CSV export of filtered records"
+    },
+    {
+      "dir": "layers/60-complete",
+      "action": "commit",
+      "message": "Mark CSV export plan complete"
+    },
+    {
+      "dir": "layers/62-access-test",
+      "action": "commit",
+      "message": "Add integration test for denied exports"
+    },
+    {
+      "dir": "layers/64-verification",
+      "action": "commit",
+      "message": "Record CSV export verification"
+    },
+    {
+      "dir": "layers/66-review",
+      "action": "commit",
+      "message": "Record CSV export implementation review"
+    },
+    {
+      "dir": "layers/68-guide",
+      "action": "commit",
+      "message": "Add CSV export guide"
+    },
+    {
+      "action": "delete",
+      "paths": [
+        "docs/export.md"
+      ],
+      "stage": true
+    },
+    {
+      "dir": "layers/71-move",
+      "action": "commit",
+      "message": "Move export guide under docs/usage"
+    },
+    {
+      "dir": "layers/72-documentation",
+      "action": "commit",
+      "message": "Record CSV export documentation"
+    },
+    {
+      "dir": "layers/74-final-review",
+      "action": "commit",
+      "message": "Record CSV export final review"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "synchronizer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "docs/usage/export.md is byte-identical to docs/export.md as committed in 'Add CSV export guide'; the commit 'Move export guide under docs/usage' is a 100% rename of the guide plus link updates in README.md and docs/usage.md, and nothing else.",
+    "The moved guide accurately describes the implemented export, and the README.md link to docs/usage/export.md and the docs/usage.md link to usage/export.md resolve; no project file links the old path docs/export.md.",
+    "The documentation record is current and correct: it records both documentation commits, the move (R100), the new path and its blob, and checks of the updated links.",
+    "The final-deliverable review names only the deleted path docs/export.md (citing the blob the moved file still has), lists docs/export.md among the changed files, never mentions docs/usage/export.md, docs/usage.md, or README.md, and does not assess the navigation changes. Its content-level conclusions about the guide text still apply to the moved file because the blob is unchanged, but it is not evidence that the new path or the links are correct.",
+    "Implementation, tests, verification, and implementation review are sound and current. The only discrepancy is the final review's stale path and missing navigation assessment, owned by Reviewer (FailureType REVIEW, review kind FINAL_DELIVERABLE); no Documenter, Developer, or Tester defect exists."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "export-20260924T090000Z-a7f3c1d2",
+    "SCOPE": ".standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md",
+    "ARCH": ".standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md",
+    "DEV": ".standards/docs/development/export-20260924T090000Z-a7f3c1d2.md",
+    "VERIFICATION": ".standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md",
+    "REVIEW_IMPL": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md",
+    "REVIEW_FINAL": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md",
+    "DOC": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md",
+    "SYNC": ".standards/docs/synchronization/export-20260924T090000Z-a7f3c1d2.md",
+    "OLD_GUIDE": "docs/export.md",
+    "GUIDE": "docs/usage/export.md",
+    "GUIDE_COMMIT": "${COMMIT:Add CSV export guide}",
+    "MOVE_COMMIT": "${COMMIT:Move export guide under docs/usage}",
+    "HEAD_COMMIT": "${COMMIT:Record CSV export final review}"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "in": [
+            "SYNCHRONIZING",
+            "REVIEWING_FINAL"
+          ],
+          "why": "treating the move as proof that every reference is valid would advance to sign-off; treating it as loss of all evidence would route to Documenter or earlier"
+        },
+        {
+          "field": {
+            "path": "${SYNC}",
+            "name": "Status",
+            "not": "COMPLETE"
+          },
+          "why": "the final review does not cover the moved path or navigation, so the synchronization gate cannot pass"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "provenance": {
+            "path": "${SYNC}",
+            "artifact": "SYNCHRONIZATION",
+            "cycle": "${ID}"
+          }
+        },
+        {
+          "contains": {
+            "path": "${SYNC}",
+            "regex": "docs/usage/export[.]md"
+          },
+          "why": "the record must name the guide's current path"
+        },
+        {
+          "unchanged": [
+            "docs/**",
+            "README.md",
+            "${REVIEW_FINAL}",
+            "${DOC}"
+          ],
+          "why": "the guide, navigation, final review, and documentation record belong to other owners"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Synchronizer must not change git state"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "packages/**"
+      ],
+      "why": "Synchronizer does not edit implementation or tests"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the unit suite passes offline"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration",
+      "expect": "pass",
+      "why": "the integration suite passes, including the owner=dana export the guide reproduces and the denied-export test"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the SYNCHRONIZING state and records are valid"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && test ! -e exports && test ! -e docs/export.md && test -f docs/usage/export.md && test ! -e .standards/docs/synchronization && test ! -e .standards/user-styles",
+      "expect": "pass",
+      "why": "clean tree; the old guide path is gone and the new one exists; no synchronization record yet"
+    },
+    {
+      "cmd": "g=$(git log --format=%H -1 --fixed-strings --grep='Add CSV export guide') && m=$(git log --format=%H -1 --fixed-strings --grep='Move export guide under docs/usage') && test $(git rev-parse $g:docs/export.md) = $(git rev-parse HEAD:docs/usage/export.md) && git diff --name-status -M $g $m > /tmp/move.txt && grep -q '^R100.docs/export.md.docs/usage/export.md$' /tmp/move.txt && grep -q '^M.README.md$' /tmp/move.txt && grep -q '^M.docs/usage.md$' /tmp/move.txt && test $(wc -l < /tmp/move.txt) -eq 3",
+      "expect": "pass",
+      "why": "the guide moved unchanged and the move commit only updated the two links"
+    },
+    {
+      "cmd": "grep -qF '](docs/usage/export.md)' README.md && grep -qF '](usage/export.md)' docs/usage.md && ! grep -rqF 'docs/export.md' README.md docs && ! grep -rqF '](export.md)' README.md docs && grep -qF 'POST /records/export' docs/usage/export.md",
+      "expect": "pass",
+      "why": "navigation points at the new path and nothing links the old one"
+    },
+    {
+      "cmd": "f=.standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md && d=.standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md && grep -qF '`Status`: `COMPLETE`' $f && grep -qF 'docs/export.md' $f && ! grep -qF 'docs/usage' $f && ! grep -qF 'README' $f && grep -q $(git rev-parse HEAD:docs/usage/export.md) $f && grep -qF '`Status`: `COMPLETE`' $d && grep -qF 'docs/usage/export.md' $d && grep -qF 'R100' $d && grep -q $(git log --format=%H -1 --fixed-strings --grep='Move export guide under docs/usage') $d && grep -q $(git rev-parse HEAD:README.md) $d && grep -q $(git rev-parse HEAD:docs/usage.md) $d",
+      "expect": "pass",
+      "why": "final review names only the old path and no navigation file; the documentation record covers the move with current identities"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `SYNCHRONIZING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Kind`: `FORWARD` `From`: `REVIEWING_FINAL` `FailureType`: `NONE`' .standards/STATE.md && grep -q '^`PromotionReason`: `NONE` `AuditTarget`: `NONE` `BlockedOn`: `NONE`$' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md && grep -q 'ProjectMode`: `BROWNFIELD' .standards/MODE.md",
+      "expect": "pass",
+      "why": "SYNCHRONIZING after final review, nothing blocked, recovery and obligations inactive"
+    },
+    {
+      "cmd": "c=$(git log --format=%H -1 --fixed-strings --grep='Add CSV export of filtered records') && git diff --quiet $c HEAD -- src packages package.json .gitignore pnpm-lock.yaml && ! grep -rqE 'AC-[0-9]' src test packages docs README.md",
+      "expect": "pass",
+      "why": "implementation unchanged since its commit; project files cite no acceptance ids"
+    },
+    {
+      "cmd": "! grep -rqE 'COMMIT:|BLOB:' .standards/docs .standards/CONTEXT.md",
+      "expect": "pass",
+      "why": "all revision placeholders were resolved"
+    },
+    {
+      "cmd": "git log -13 --format=%s | paste -s -d '|' - | grep -qxF 'Record CSV export final review|Record CSV export documentation|Move export guide under docs/usage|Add CSV export guide|Record CSV export implementation review|Record CSV export verification|Add integration test for denied exports|Mark CSV export plan complete|Add CSV export of filtered records|Plan CSV export implementation|Design CSV export|Define CSV export scope|Record project context for CSV export'",
+      "expect": "pass",
+      "why": "history follows the brownfield order"
+    }
+  ],
+  "notes": "Built on export-project (the parent of the suggested base) because export-synchronizing puts the export documentation inside docs/usage.md and its scope, records, and BLOB identities all name that file; the case needs a separate guide that moved. Layers 50-66 replicate export-synchronizing 20-36 (context, scope, design, plan, implementation, completion, access test, verification, implementation review) with AC-003 reworded to: usage documentation under docs/ describes the export and README.md and docs/usage.md link to it. 68-guide adds the guide at docs/export.md (the base's export section as a standalone page with no relative links), a Roles bullet and short linking section in docs/usage.md, and README updates. The delete layer git-rms docs/export.md; 71-move adds the identical file at docs/usage/export.md and updates both links (a 100% rename commit). 72-documentation: COMPLETE documentation record citing both documentation commits, the move (G4, R100), link checks (G5), and current blobs. 74-final-review: COMPLETE FINAL_DELIVERABLE review that names only docs/export.md (with the moved file's unchanged blob, via BLOB of the new path since the old path no longer exists when the layer applies), lists docs/export.md as a changed file, and never inspects README.md or docs/usage.md; STATE SYNCHRONIZING, FORWARD from REVIEWING_FINAL. The catalog's deleted/untracked git hints are realized as a committed move, because Documenter's evidence for the move must predate final review.",
+  "case": "synchronizer-13",
+  "caseHash": "542bf5daa637925f",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T14:32:30.443Z",
+    "verdict": "pass",
+    "fixtureHash": "9609ba2f01b490f8",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "7cf8ddbcc959e803",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:34:58.518Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T13:03:28.800Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-context/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/52-scope/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/54-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/56-plan/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/60-complete/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/64-verification/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/66-review/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/72-documentation/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/74-final-review/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:34:58.518Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

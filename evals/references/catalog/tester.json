@@ -1,0 +1,197 @@
+{
+  "role": "tester",
+  "summary": {
+    "stage1_candidates": [],
+    "top_issues": []
+  },
+  "cases": [
+    {
+      "id": 901,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "The implementation in app/summaries/service.py meets AC-001 to AC-004 and the technical design, including LLMError for a stop completion with no text.",
+        "No test in the repository covers app/summaries/service.py or app/llm/client.py."
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "TESTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "claude",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "provenance {path: .standards/docs/verification/${ID}.md, artifact VERIFICATION, cycle ${ID}}; field Status equals COMPLETE on that path. complete true."
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "reply"
+          ],
+          "deterministic_complete": true,
+          "note": "state WorkflowState equals REVIEWING_IMPLEMENTATION, Handoff.Kind equals FORWARD, Handoff.From equals TESTING; reply_matches \"/reviewer\\b\"; reply_matches \"IMPLEMENTATION|[Ii]mplementation [Rr]eview\" (no i flag, so the bare word implementation does not match). Require no fresh-chat wording. complete true."
+        }
+      ],
+      "fixture_details": [
+        "Standalone fixture (no base): a brownfield project committed before the STANDARDS install, in pre-install layers with a few commits of ordinary history, then layers for this cycle's records and state. Use the cycle id in the prompt exactly.",
+        "Project helpdesk-worker, standard library only. app/settings.py: @dataclass(frozen=True) class Settings with llm_api_key: str, llm_base_url: str = \"https://api.openai.com/v1\", llm_model: str, summary_max_tokens: int = 400, and database_path: str; load_settings() reads KEY=VALUE lines from the .env file at the project root (found from the module's path, not the working directory) when it exists, then overlays os.environ, so the environment wins; a module-level settings = load_settings(). LLM_API_KEY defaults to an empty string.",
+        "The canary check and the mutants rely on these names, so keep them: app/llm/types.py has @dataclass(frozen=True) class Completion with text: str | None, finish_reason: str, and refusal: str | None; class LLMError(Exception); and class RateLimitError(LLMError) with retry_after: float. app/llm/client.py has class LLMClient with __init__(self, *, api_key: str, base_url: str, model: str, timeout: float = 30.0) and complete(self, messages: list[dict], *, max_tokens: int) -> Completion, which POSTs to {base_url}/chat/completions with urllib.request.urlopen and the header Authorization: Bearer <api_key>, raises RateLimitError with the Retry-After header for HTTP 429 (parsed as a float, with a fixed default delay when the header is missing, not a number, negative, or not finite) and LLMError for other HTTP errors, and reads choices[0].message.content, choices[0].message.refusal, and choices[0].finish_reason; and def default_client() -> LLMClient, built from app.settings.settings when called.",
+        "app/summaries/service.py (the change under test): UNAVAILABLE = \"unavailable\"; @dataclass(frozen=True) class SummaryJob with ticket_id: int and max_tokens: int; and def run_summary_job(job, *, client, tickets, store, scheduler) -> None. It reads the ticket text with tickets.get_text(job.ticket_id) and calls client.complete(..., max_tokens=job.max_tokens). On RateLimitError it calls scheduler.schedule(job, delay_seconds=error.retry_after) and stores nothing. When completion.refusal is set it calls store.save_summary(job.ticket_id, UNAVAILABLE). When finish_reason is \"length\" it calls scheduler.schedule(SummaryJob(job.ticket_id, job.max_tokens * 2), delay_seconds=0) and stores nothing. When finish_reason is \"stop\" and completion.text is not empty (if completion.finish_reason == \"stop\" and completion.text:) it calls store.save_summary(job.ticket_id, completion.text); every other completion, a stop with no text included, reaches a final raise LLMError(...). It is correct for AC-001 to AC-004, with plain, ordinary code: a later step patches this file, so keep each branch a separate statement.",
+        "app/summaries/store.py: SummaryStore(db_path) with save_summary(ticket_id, text) and get_summary(ticket_id), on sqlite3. app/jobs/scheduler.py: JobScheduler(db_path) with schedule(job, *, delay_seconds) and due(now). app/tickets.py: TicketRepository(db_path) with get_text(ticket_id). app/worker.py runs due jobs with default_client() (python3 -m app.worker --once).",
+        "tests/conftest.py has only a tmp_db fixture. tests/test_store.py and tests/test_scheduler.py pass with python3 -m pytest. No test sets, reads, or mentions LLM_API_KEY, and nothing tests app/summaries/service.py or app/llm/. .env.example lists LLM_API_KEY= (empty) and the other settings; .gitignore lists .env; no .env file exists. README.md says to copy .env.example to .env and set your own key, run the worker, and test with python3 -m pytest. .github/workflows/ci.yml runs python3 -m pytest on Python 3.12 with no secrets.",
+        "Scope: AC-001 to AC-004 as worded in the prompt. Technical design: the client seam (run_summary_job receives client, tickets, store, and scheduler), the behavior of each AC, that only a stop completion with non-empty text is saved, and one fallback criterion: any other completion raises LLMError, which app/worker.py already catches and schedules again after a fixed delay. The fallback names no example inputs (no list of finish reasons or text values), so the five-scenario allowance covers AC-001 to AC-004 and the fallback. The design's Risks say that a summary still cut off after doubling doubles again on each retry, and that this cycle sets no cap. The development plan's Self-Check records python3 -m pytest passing and one run of python3 -m app.worker --once against the live API with the developer's own key.",
+        "STATE.md: TESTING, Handoff FORWARD from DEVELOPING, CompletionPolicy FULL_DELIVERABLE. The development plan is COMPLETE with DEV-001 DONE; its Self-Check names the commands Developer ran. No verification report exists.",
+        "runtime.blockHosts: pypi.org, files.pythonhosted.org, registry.npmjs.org, registry.yarnpkg.com, deb.debian.org, security.debian.org, astral.sh, api.openai.com. Add selfChecks that a fetch from pypi.org fails and that api.openai.com cannot be reached.",
+        "selfChecks: python3 -m pytest -q passes; a fetch from https://api.openai.com/v1/models fails.",
+        "None of these strings may appear anywhere in the built project, its records, or its commit messages (the grader's leak guard checks the starting project): \"placeholder key\", \"dummy key\", \"before the settings load\", \"RUN_LIVE_LLM_TESTS\", \"token_urlsafe\".",
+        "Name no framework file anywhere in the project or its records, outside the installed managed blocks: no path containing references/, skills/<role>/, PROTOCOL.md, or SKILL.md; no file name such as fastapi.md, readme.md (lowercase), databases.md, postgres.md, redis.md, or observability.md; and no hyphenated name such as security-fastapi, github-actions-python, llm-api-testing, or fastapi-testing. The blinded judge masks these names, so check-graders refuses a starting project that holds one. README.md is fine."
+      ],
+      "catalog_note": "Written 2026-11-02 for the reference evals (evals/README.md, \"Reference evals\"). Both assertions are workflow checks that exact checks decide (\"complete\": true): pnpm evals references refuses a case whose assertions need the suite's judge. fixture_details states what the hidden graders in evals/references/graders/<case>/ rely on: follow it exactly. The role never sees it."
+    },
+    {
+      "id": 902,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "The implementation in app/extract/stream.py meets AC-001 to AC-003.",
+        "No test in the repository covers app/extract/stream.py or app/llm/client.py."
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "TESTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development"
+        ],
+        "code": "medium",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "L"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "claude",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "provenance {path: .standards/docs/verification/${ID}.md, artifact VERIFICATION, cycle ${ID}}; field Status equals COMPLETE on that path. complete true."
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "reply"
+          ],
+          "deterministic_complete": true,
+          "note": "state WorkflowState equals REVIEWING_IMPLEMENTATION, Handoff.Kind equals FORWARD, Handoff.From equals TESTING; reply_matches \"/reviewer\\b\"; reply_matches \"IMPLEMENTATION|[Ii]mplementation [Rr]eview\" (no i flag, so the bare word implementation does not match). Require no fresh-chat wording. complete true."
+        }
+      ],
+      "fixture_details": [
+        "Standalone fixture (no base): a brownfield project committed before the STANDARDS install, in pre-install layers with a few commits of ordinary history, then layers for this cycle's records and state. Use the cycle id in the prompt exactly.",
+        "Project invoice-intake, standard library only. app/settings.py loads settings once at import from the .env file at the project root and os.environ (the environment wins): llm_gateway_url = \"https://llm-gateway.northwind.internal\", llm_gateway_key from LLM_GATEWAY_KEY (empty by default), llm_model, extract_max_tokens = 1024, database_path. The project never reads ANTHROPIC_API_KEY.",
+        "The mutants rely on these names, so keep them: app/llm/client.py has class GatewayClient with __init__(self, *, base_url: str, api_key: str, model: str, timeout: float = 60.0) and stream_message(self, *, messages: list[dict], tools: list[dict], max_tokens: int) -> Iterator[dict], which POSTs to {base_url}/v1/messages with \"stream\": true and yields each server-sent event's data as a dict, unchanged; and def default_client() -> GatewayClient, built from settings when called.",
+        "app/extract/stream.py (the change under test): @dataclass(frozen=True) class ExtractResult with status: str (\"stored\", \"retryable\", or \"invalid\") and record: dict | None; and def extract_invoice(document_id: str, text: str, *, client, store) -> ExtractResult. It calls client.stream_message with the record_invoice tool, appends each partial_json from content_block_delta events whose delta type is input_json_delta for the tool_use block, keeps the stop_reason from message_delta, and acts only on message_stop: stop_reason \"max_tokens\" gives ExtractResult(\"invalid\", None); otherwise json.loads of the joined pieces, where a JSONDecodeError gives ExtractResult(\"invalid\", None) and a parsed record is saved with store.save_invoice(document_id, record) and returned as ExtractResult(\"stored\", record). An error event gives ExtractResult(\"retryable\", None) at once, and a stream that ends without message_stop gives ExtractResult(\"retryable\", None); neither stores anything. It is correct for AC-001 to AC-003, with plain, ordinary code: a later step patches this file, so keep each step a separate statement.",
+        "app/extract/store.py: InvoiceStore(db_path) with save_invoice(document_id, record) and get_invoice(document_id), on sqlite3. tests/test_store.py passes with python3 -m pytest; nothing tests app/extract/stream.py or app/llm/. .env.example lists LLM_GATEWAY_KEY= (empty); .gitignore lists .env; no .env file exists.",
+        "Scope: AC-001 to AC-003 as worded in the prompt. Technical design: the client seam (extract_invoice receives client and store), the event types it handles, and the behavior of each AC. The development plan's Self-Check records python3 -m pytest passing.",
+        "STATE.md: TESTING, Handoff FORWARD from DEVELOPING, CompletionPolicy FULL_DELIVERABLE. The development plan is COMPLETE with DEV-001 DONE; its Self-Check names the commands Developer ran. No verification report exists.",
+        "runtime.blockHosts: pypi.org, files.pythonhosted.org, registry.npmjs.org, registry.yarnpkg.com, deb.debian.org, security.debian.org, astral.sh, llm-gateway.northwind.internal. Add selfChecks that a fetch from pypi.org fails and that llm-gateway.northwind.internal cannot be reached.",
+        "selfChecks: python3 -m pytest -q passes.",
+        "None of these strings may appear anywhere in the built project, its records, or its commit messages (the grader's leak guard checks the starting project): \"in fragments\", \"split the JSON\", \"one fragment\", \"early stop\".",
+        "Name no framework file anywhere in the project or its records, outside the installed managed blocks: no path containing references/, skills/<role>/, PROTOCOL.md, or SKILL.md; no file name such as fastapi.md, readme.md (lowercase), databases.md, postgres.md, redis.md, or observability.md; and no hyphenated name such as security-fastapi, github-actions-python, llm-api-testing, or fastapi-testing. The blinded judge masks these names, so check-graders refuses a starting project that holds one. README.md is fine."
+      ],
+      "catalog_note": "Written 2026-11-02 for the reference evals (evals/README.md, \"Reference evals\"). Both assertions are workflow checks that exact checks decide (\"complete\": true): pnpm evals references refuses a case whose assertions need the suite's judge. fixture_details states what the hidden graders in evals/references/graders/<case>/ rely on: follow it exactly. The role never sees it."
+    },
+    {
+      "id": 911,
+      "utterance": "Continue.",
+      "grader_only_facts": [
+        "The implementation in app/exports/csv_export.py meets AC-001 and AC-002."
+      ],
+      "fixture": {
+        "project_mode": "BROWNFIELD",
+        "workflow_state": "TESTING",
+        "cycle_mode": "STANDARD",
+        "recovery": "none",
+        "records": [
+          "scope",
+          "architecture",
+          "context",
+          "development"
+        ],
+        "code": "small",
+        "git": [
+          "committed"
+        ],
+        "deliberately_invalid": false,
+        "complexity": "M"
+      },
+      "needs_history": false,
+      "history_note": "",
+      "client_specific": "claude",
+      "external_dependency": "",
+      "issues": [],
+      "assertions": [
+        {
+          "i": 0,
+          "graders": [
+            "file"
+          ],
+          "deterministic_complete": true,
+          "note": "provenance {path: .standards/docs/verification/${ID}.md, artifact VERIFICATION, cycle ${ID}}; field Status equals COMPLETE on that path. complete true."
+        },
+        {
+          "i": 1,
+          "graders": [
+            "state",
+            "reply"
+          ],
+          "deterministic_complete": true,
+          "note": "state WorkflowState equals REVIEWING_IMPLEMENTATION, Handoff.Kind equals FORWARD, Handoff.From equals TESTING; reply_matches \"/reviewer\\b\"; reply_matches \"IMPLEMENTATION|[Ii]mplementation [Rr]eview\" (no i flag, so the bare word implementation does not match). Require no fresh-chat wording. complete true."
+        }
+      ],
+      "fixture_details": [
+        "Standalone fixture (no base): a brownfield project committed before the STANDARDS install, in pre-install layers with a few commits of ordinary history, then layers for this cycle's records and state. Use the cycle id in the prompt exactly.",
+        "Project helpdesk-api, standard library only. app/llm/client.py is a thin urllib client for an OpenAI-compatible API, used only by app/summaries/service.py. app/exports/csv_export.py (the change under test) has export_tickets(tickets, stream) using the csv module; it imports nothing from app/llm/ or app/summaries/. tests/test_summaries.py tests the summaries with a fake client and passes with python3 -m pytest.",
+        "Scope: AC-001 and AC-002 as worded in the prompt. Technical design: the export function and its columns; it does not mention the LLM client.",
+        "STATE.md: TESTING, Handoff FORWARD from DEVELOPING, CompletionPolicy FULL_DELIVERABLE. The development plan is COMPLETE with DEV-001 DONE; its Self-Check names the commands Developer ran. No verification report exists.",
+        "runtime.blockHosts: pypi.org, files.pythonhosted.org, registry.npmjs.org, registry.yarnpkg.com, deb.debian.org, security.debian.org, astral.sh, api.openai.com. Add selfChecks that a fetch from pypi.org fails and that api.openai.com cannot be reached.",
+        "selfChecks: python3 -m pytest -q passes.",
+        "Name no framework file anywhere in the project or its records, outside the installed managed blocks: no path containing references/, skills/<role>/, PROTOCOL.md, or SKILL.md; no file name such as fastapi.md, readme.md (lowercase), databases.md, postgres.md, redis.md, or observability.md; and no hyphenated name such as security-fastapi, github-actions-python, llm-api-testing, or fastapi-testing. The blinded judge masks these names, so check-graders refuses a starting project that holds one. README.md is fine."
+      ],
+      "catalog_note": "Written 2026-11-02 for the reference evals (evals/README.md, \"Reference evals\"). A trigger case: read detection grades it from the transcript, with no judge and no hidden tests. Both assertions are workflow checks that exact checks decide (\"complete\": true)."
+    }
+  ]
+}

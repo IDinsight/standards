@@ -1,0 +1,150 @@
+{
+  "base": "export-documenting",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "documenter",
+    "utterance": "Edit only docs/usage.md and do not write any other files, including workflow records or state."
+  },
+  "graderOnly": [
+    "The user's restriction forbids creating the documentation record at .standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md and forbids any change to .standards/STATE.md, including Active Work.BlockedOn and a handoff to REVIEWING_FINAL; the Documenter skill requires those writes to persist progress, a blocker, or a handoff.",
+    "Apart from the user's restriction, the fixture matches the export-documenting base: the cycle is at DOCUMENTING with valid scope, design, context, COMPLETE plan, COMPLETE FULL verification, and COMPLETE implementation review with no findings; recovery and obligations are inactive and nothing is blocked.",
+    "docs/usage.md has no export section, so AC-002 is not yet satisfied; the implementation of POST /records/export has no material defects."
+  ],
+  "history": null,
+  "vars": {},
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            ".standards/**"
+          ],
+          "why": "the user forbade writing workflow records or state"
+        },
+        {
+          "absent": "${DOC}",
+          "why": "no documentation record may be created"
+        },
+        {
+          "state": "WorkflowState",
+          "unchanged": true
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "DOCUMENTING",
+          "why": "no handoff can have been persisted"
+        },
+        {
+          "state": "Handoff.Kind",
+          "unchanged": true
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "packages/**",
+        "package.json",
+        "pnpm-lock.yaml",
+        "README.md"
+      ],
+      "why": "Documenter does not change behavior or tests, and the user forbade writing any file other than docs/usage.md"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the established unit suite passes"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration",
+      "expect": "pass",
+      "why": "the integration suite passes"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the DOCUMENTING state is valid"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `DOCUMENTING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '`BlockedOn`: `NONE`' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md && test ! -e .standards/docs/documentation",
+      "expect": "pass",
+      "why": "DOCUMENTING with nothing blocked, no recovery, and no documentation record yet"
+    },
+    {
+      "cmd": "! grep -qi export docs/usage.md && ! git status --porcelain | grep -q .",
+      "expect": "pass",
+      "why": "the guide lacks an export section and the tree is clean"
+    }
+  ],
+  "notes": "Uses the export-documenting base unchanged: every stated fact (BROWNFIELD, STANDARD, DOCUMENTING, cycle export-20260924T090000Z-a7f3c1d2, scope with AC-001 CSV export and AC-002 accurate usage guide, design, context, COMPLETE plan, COMPLETE FULL verification, COMPLETE implementation review, recovery and obligations inactive, BlockedOn NONE, clean tree) already holds there, so no overlay layer is added. The only case-specific element is the user's restriction, which lives in the utterance. Assertion 0 is decided by .standards/** being unchanged and the documentation record being absent. Assertion 1 is judged from the reply, with the unchanged WorkflowState and Handoff.Kind as preconditions. Whether the role edits docs/usage.md is not graded either way.",
+  "case": "documenter-13",
+  "caseHash": "2c0da1a959371c9a",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T16:23:57.182Z",
+    "verdict": "pass",
+    "fixtureHash": "8cfc866c763451e1",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "5353002e5b09004a",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:10:52.114Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T14:17:24.353Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-documenting": "cad63ec878d1dad0"
+  },
+  "migrations": [
+    {
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:10:52.114Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

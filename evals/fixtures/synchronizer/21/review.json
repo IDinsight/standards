@@ -1,0 +1,76 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installer brownfield, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState SYNCHRONIZING, Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md (layer 74), FORWARD from REVIEWING_FINAL",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, architecture, context, development plan, verification and both review reports exist with valid ownership and content identities",
+      "where": ".standards/docs/{scope,specs,development,verification}/…, .standards/CONTEXT.md, reviews/<id>/implementation.md and final-deliverable.md; check.mjs ok; selfCheck confirms resolved BLOB/COMMIT identities and that final review cites the current implementation-review blob",
+      "status": "realized"
+    },
+    {
+      "condition": "Documentation evidence is available",
+      "where": ".standards/docs/documentation/<id>.md COMPLETE with G1–G4; docs/usage.md and README.md updated in 'Document CSV export in usage guide'",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and outstanding obligations inactive; no blocked user question",
+      "where": "STATE.md Recovery Active false, Obligations Active false, BlockedOn NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation review contains F-002 OPEN",
+      "where": "implementation.md ### F-002 Status OPEN (P1, Owner Tester, VERIFICATION), no Reassessment; gap row in the assessment table",
+      "status": "realized"
+    },
+    {
+      "condition": "Reviewer later supplied a contradictory conclusion with no resolution evidence",
+      "where": "commit 'Conclude CSV export implementation review': Status COMPLETE plus 'Resumed pass' saying no findings remain open, with inputs explicitly unchanged; F-002 block byte-identical (selfCheck); no src/test/verification change since verification (selfCheck)",
+      "status": "realized"
+    },
+    {
+      "condition": "Final review cites that conclusion as all-clear",
+      "where": "final-deliverable.md Assessed Inputs and C5: relies on the implementation review's 'no findings remain open' conclusion; COMPLETE, no material findings",
+      "status": "realized"
+    },
+    {
+      "condition": "No synchronization record yet; clean tree; HEAD at final-review commit",
+      "where": "git status clean; no .standards/docs/synchronization (selfCheck)",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 1,
+      "detail": "F-002 is a Tester-owned evidence gap (VERIFICATION). A Synchronizer could treat the missing invalid-status evidence as its own VERIFICATION discrepancy and route to TESTING. The state checks would then fail. That route goes against the case's expected output and the skill's ownership table, which assigns review findings and conclusions to Reviewer, and the graderOnly facts say Reviewer must decide F-002. So the checks match the case. Still, the fixture's choice of a Tester-owned finding makes this alternative more tempting than a finding whose substance Synchronizer cannot judge.",
+      "recommendation": "run_as_is",
+      "fix": "Acceptable as is. If false failures appear, consider making F-002 a finding Synchronizer cannot evaluate itself (e.g., a Developer-owned code-quality finding) so REVIEW routing is the only plausible route."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "The fixture is built on export-project rather than export-synchronizing and re-creates its layers 50–74, which is needed to keep the cited blob identities consistent. Layer order, history, and identities verify via selfChecks.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized: F-002 stays OPEN in a COMPLETE implementation review whose later 'Resumed pass' declares no findings open without any input change, and the final review relies on that all-clear. Records are coherent and check.mjs passes. The checks (reviews unchanged; FAILURE/REVIEW to REVIEWING_IMPLEMENTATION with a frame resuming at SYNCHRONIZING; the /reviewer invocation and verbatim fresh-chat prefix; no reviewer skill call) are necessary conditions for a correct run, and the invariants fit a Synchronizer.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T14:35:23.629Z",
+  "costUsd": 0.4712248,
+  "ms": 58877,
+  "fixtureHash": "25bcc0850c219282"
+}

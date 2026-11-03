@@ -1,0 +1,76 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield template)",
+      "status": "realized"
+    },
+    {
+      "condition": "Active cycle is EXPEDITED and WorkflowState is REVIEWING_IMPLEMENTATION",
+      "where": ".standards/STATE.md header",
+      "status": "realized"
+    },
+    {
+      "condition": "Expedited cycle has Scope and Architecture NONE, with no scope, design, documentation record, or CONTEXT.md",
+      "where": ".standards/STATE.md Active Work; .standards/docs/ holds only the development plan and implementation review",
+      "status": "realized"
+    },
+    {
+      "condition": "Development plan and implementation review exist for the cycle, with valid provenance",
+      "where": ".standards/docs/development/<ID>.md (COMPLETE, EXPEDITED_REQUEST); .standards/docs/reviews/<ID>/implementation.md (IN_PROGRESS after reopening)",
+      "status": "realized"
+    },
+    {
+      "condition": "Small committed brownfield code that actually implements --dry-run",
+      "where": "src/cli.js, src/prune.js; the selfCheck confirms dry-run lists the file and deletes nothing",
+      "status": "realized"
+    },
+    {
+      "condition": "Documentation for the change is missing, so the documentation guarantee is genuinely omitted",
+      "where": "README.md has no --dry-run (selfCheck 3)",
+      "status": "realized"
+    },
+    {
+      "condition": "Unresolved expedited recovery obligation exists for promotion to convert, so assertion 2 is non-vacuous",
+      "where": "STATE.md Recovery Frame 1 (USER_REWORK, Owner REVIEWING_IMPLEMENTATION, RerunThrough NONE)",
+      "status": "realized"
+    },
+    {
+      "condition": "Utterance carries only the user's explicit demand for the documentation guarantee",
+      "where": "prompt.utterance",
+      "status": "realized"
+    },
+    {
+      "condition": "Clean committed git state; check.mjs ok",
+      "where": "git status clean; gate checkMjs ok:true",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "case-defect",
+      "assertion": 0,
+      "detail": "PROTOCOL.md 'Rework an active cycle' and expedited.md Promotion step 3 allow updating Active Work.Request when a rework changes the contract. A run that folds 'documentation required' into Request could be called protocol-legal. The assertion literally says the request is preserved, and the user's message reads as a promote request rather than a contract change, so the `ActiveWork.Request unchanged` check matches the assertion as written.",
+      "recommendation": "run_as_is",
+      "fix": "None needed; the ambiguity is in the case, and the check follows the assertion's literal wording."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 2,
+      "detail": "The catalog listed recovery 'none'. The fixture plants a legal rework frame: review passed, the user asked at sign-off for missing-directory coverage, and Reviewer reopened its report. This makes assertion 2 observable. The case prompt leaves recovery open, so the choice is reasonable and consistent. Obligations.Item1.Reason must equal the frame Reason exactly; the protocol says 'preserving each converted frame's ... Reason', so a correct run copies it verbatim.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes a brownfield EXPEDITED cycle at REVIEWING_IMPLEMENTATION with no documentation, plus one legal rework frame for promotion to convert into an outstanding obligation. Tracing check.mjs shows the expected post-promotion state (STANDARD/AUDITING/PROMOTE, one REVIEW obligation, no recovery) passes the turn-end check, and the file-unchanged checks cannot fail a correct coordination-only promotion. The only open point is the case's own ambiguity about whether Request may change, and the check follows the assertion's wording.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T16:38:34.004Z",
+  "costUsd": 0.2144526,
+  "ms": 53810,
+  "fixtureHash": "5129142591afcfa6"
+}

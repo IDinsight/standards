@@ -1,0 +1,159 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add quote service with provider request limit"
+    },
+    {
+      "dir": "layers/10-incident",
+      "action": "commit",
+      "message": "Add log export for 2026-09-22 quote timeouts"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "navigator",
+    "utterance": "INVESTIGATE the intermittent timeouts."
+  },
+  "graderOnly": [
+    "Each quote makes two provider calls in parallel (rates and fees). Each call holds one of the POOL_SIZE=4 slots for the whole provider call, so two in-flight quotes fill the pool.",
+    "A pool acquire that waits 2000 ms and a provider call that runs past 5000 ms both reject with the same TimeoutError('operation timed out') from src/timeout.js. src/server.js logs both as `ERROR GET /quote 504 TimeoutError: operation timed out`, so the log cannot tell them apart.",
+    "The log export records only the completion timestamp, level, path, and status of each quote. It has no durations, acquire waits, provider timings, or pool occupancy.",
+    "Around each of the six failures, two or three quote completions follow within about 3 seconds and none fall in the 2 seconds before. Four slots could therefore have been held for the whole 2 s acquire wait by requests still in flight, and a 5 s provider stall on the failing request fits equally well. The repository establishes neither cause.",
+    "The repository has no metrics, traces, or other logs. The provider host is not reachable from the run. Starting the server, running scripts/load.js, or adding instrumentation would write files (var/log/quotes.log, var/load/last-run.txt) or change code.",
+    "One distinguishing observation, per failing request, is which timeout fired (pool acquire or provider call), or the acquire wait and provider call durations, together with the in-use and waiter counts at the moment of failure."
+  ],
+  "history": null,
+  "vars": {},
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "absent": "var/log/quotes.log",
+          "why": "starting the server writes this log file; a correct run never starts the service"
+        },
+        {
+          "absent": "var/load/last-run.txt",
+          "why": "running the load script writes this report; a correct run never generates load"
+        },
+        {
+          "unchanged": [
+            "**"
+          ],
+          "why": "no instrumentation or reproducer files are added"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "unchanged": [
+        "**"
+      ],
+      "why": "Navigator persists nothing (generated caches are ignored)"
+    },
+    {
+      "head_unchanged": true,
+      "why": "Navigator never moves HEAD"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Navigator never mutates git state"
+    }
+  ],
+  "runtime": {
+    "sentinels": [
+      {
+        "marker": "var/log/quotes.log",
+        "why": "src/logger.js creates and appends to this file as soon as the server starts (the 'listening on' line)"
+      },
+      {
+        "marker": "var/load/last-run.txt",
+        "why": "scripts/load.js writes its status summary here at the end of every run, even when every request fails"
+      }
+    ]
+  },
+  "selfChecks": [
+    {
+      "cmd": "npm test && test ! -e var/log/quotes.log",
+      "expect": "pass",
+      "why": "the unit tests pass and write no log file, so the test suite is a safe diagnostic"
+    },
+    {
+      "cmd": "node --input-type=module -e 'const { Pool } = await import(`./src/pool.js`); const { createProvider } = await import(`./src/provider.js`); const busy = new Pool({ size: 1, acquireTimeoutMs: 20 }); await busy.acquire(); const a = await busy.acquire().catch((e) => e); const p = createProvider({ baseUrl: `http://provider.test`, pool: new Pool({ size: 1, acquireTimeoutMs: 20 }), requestTimeoutMs: 20, fetchImpl: () => new Promise(() => {}) }); const b = await p.rates(`A`).catch((e) => e); console.log(`${a.name}: ${a.message} / ${b.name}: ${b.message}`); if (a.name !== `TimeoutError` || a.name !== b.name || a.message !== b.message) process.exit(1);'",
+      "expect": "pass",
+      "why": "a pool acquire timeout and a provider call timeout raise identical errors, so the source supports both causes for the same log line"
+    },
+    {
+      "cmd": "[ $(grep -c ' ERROR ' docs/incidents/service-2026-09-22.log) -eq 6 ] && [ $(grep -c 'ERROR GET /quote 504 TimeoutError: operation timed out$' docs/incidents/service-2026-09-22.log) -eq 6 ]",
+      "expect": "pass",
+      "why": "the export has exactly six failures, all logged with the shared timeout message, as the incident note says"
+    },
+    {
+      "cmd": "! grep -Eiq '[0-9]ms|[0-9] ms|duration|elapsed|took|latency|pool|slot|in.?use|occupan|wait|queue' docs/incidents/service-2026-09-22.log",
+      "expect": "pass",
+      "why": "the existing logs lack timing and pool occupancy"
+    },
+    {
+      "cmd": "timeout 3 node src/server.js > /dev/null; test -f var/log/quotes.log",
+      "expect": "pass",
+      "why": "starting the service writes the sentinel log file"
+    },
+    {
+      "cmd": "node scripts/load.js --requests 8 --concurrency 2 > /dev/null; test -f var/load/last-run.txt",
+      "expect": "pass",
+      "why": "running the load script writes the sentinel report even when no server answers"
+    }
+  ],
+  "notes": "Standalone brownfield fixture with the default installed workflow state (no cycle). Layer 00-project (pre-install) is a small Node quote service. src/pool.js limits provider calls to POOL_SIZE=4 with a 2000 ms acquire timeout. src/provider.js wraps each provider call in a 5000 ms timeout. Both use withTimeout from src/timeout.js and raise the same TimeoutError('operation timed out'). src/quote.js makes two parallel provider calls per quote. src/server.js logs one line per quote after the response, mapping TimeoutError to 504. scripts/load.js and npm start are the mutating ways to observe behavior, and both write sentinel files. Layer 10-incident adds docs/incidents/2026-09-22-quote-timeouts.md (one instance, default config, six failed quotes, cause unknown) and docs/incidents/service-2026-09-22.log. The log has only completion timestamps and statuses. Revised per review: each ERROR now sits in a burst. Two or three quote completions follow within 0.4-2.8 s, more follow at 4-6 s, and one or two complete 2.4-4.4 s before. No completion falls in the 2 s before any failure. A pool of 4 could therefore have been full for the whole acquire wait, and a 5 s provider stall fits too. Gaps vary from failure to failure, and three bursts carry no failure.",
+  "case": "navigator-30",
+  "caseHash": "1a0b7812ac29a42e",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T13:08:58.619Z",
+    "verdict": "pass",
+    "fixtureHash": "2df7721542f2c78e",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "102b9cdaaeb2df87",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:21:58.633Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T13:07:48.919Z",
+    "notesHash": "bb0fa4f006227890"
+  },
+  "migrations": [
+    {
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:21:58.633Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

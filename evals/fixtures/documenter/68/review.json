@@ -1,0 +1,81 @@
+{
+  "conditions": [
+    {
+      "condition": "BROWNFIELD project, STANDARD cycle, WorkflowState DOCUMENTING, Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/MODE.md (BROWNFIELD); .standards/STATE.md (DOCUMENTING, STANDARD, Id as stated)",
+      "status": "realized"
+    },
+    {
+      "condition": "Current-cycle documentation record with valid DOCUMENTATION provenance and matching visible Cycle",
+      "where": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md provenance block and header `Cycle`",
+      "status": "realized"
+    },
+    {
+      "condition": "Collaboration AUTONOMOUS, target ACTIVE_CHANGE, user style NONE",
+      "where": "documentation record header",
+      "status": "realized"
+    },
+    {
+      "condition": "No outstanding obligations, independent defects, or blocking user questions",
+      "where": "STATE.md (Obligations Active false, BlockedOn NONE); code, tests, and docs/usage.md, README.md, CONTRIBUTING.md are consistent with the implementation",
+      "status": "realized"
+    },
+    {
+      "condition": "An earlier valid Documenter Corrective Return happened, then normal STANDARD work reached DOCUMENTING again",
+      "where": "Commits for layers 62, 64, and 65: FAILURE DOCUMENTATION with Frame 1, CONTRIBUTING.md fix, record DOC-001 RESOLVED, RESUME to DEVELOPING. Layers 66-74 then go through TESTING and REVIEWING_IMPLEMENTATION to FORWARD into DOCUMENTING",
+      "status": "realized"
+    },
+    {
+      "condition": "Record IN_PROGRESS with AC-003 documentation deferred until Developer finished the export API",
+      "where": "documentation record: Status IN_PROGRESS; 'Remaining documentation work' AC-003 with prerequisite DEV-003",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, design, implementation, and owner evidence are current",
+      "where": "plan COMPLETE (DEV-001..003 DONE); verification COMPLETE FULL; implementation review COMPLETE with no findings; src/routes/export.ts matches the design's Interfaces and Contracts; selfChecks pass 21 unit and 3 integration tests",
+      "status": "realized"
+    },
+    {
+      "condition": "API guide docs/api/export.md is still absent",
+      "where": "no docs/api directory (selfCheck confirms)",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery inactive",
+      "where": "STATE.md Recovery Active false, no frames",
+      "status": "realized"
+    },
+    {
+      "condition": "Some recorded correction inputs are unchanged (evidence still applicable) and others have changed (need reconciliation)",
+      "where": "Record cites blobs of CONTRIBUTING.md, router.ts, messages.ts, and records.ts, which are unchanged at HEAD. Its cited plan blob 2dea649 differs from the current f8fbef4. The export route, verification, and review were added after it",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 1,
+      "detail": "The `heading_ids DOC min 1` check assumes a correct run keeps the resolved DOC-001 entry. The template says to keep useful history and avoid duplicate entries, so deleting it would be unusual, and a correct run almost certainly keeps it. The risk is small. The `contains AC-003` check is already satisfied before the run, so it is weak but harmless.",
+      "recommendation": "run_as_is",
+      "fix": "Optional: drop the heading_ids check if any concern remains."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The prior record's 'Next action on re-entry: reconcile the inputs above against their current versions' points toward the expected behavior. It is, however, exactly the resume note the Documenter template requires a role to persist, so it is realistic and does not reveal which inputs changed.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture faithfully builds a DOCUMENTING state reached by a normal forward route after an earlier Documenter Corrective Return. The record is IN_PROGRESS with AC-003 deferred, some cited inputs are unchanged and others have changed, the guide is absent, and owner evidence is complete and consistent. Checks and invariants are necessary conditions a correct run satisfies, including the turn-end check after a FORWARD into REVIEWING_FINAL with a COMPLETE record covering AC-001..003. Only minor notes remain.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T16:45:15.125Z",
+  "costUsd": 0.4156526,
+  "ms": 77773,
+  "fixtureHash": "c91fb6a8d0118241"
+}

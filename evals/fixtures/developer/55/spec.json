@@ -1,0 +1,266 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial bookmarks library"
+    },
+    {
+      "dir": "layers/55-design",
+      "action": "commit",
+      "message": "Add scope and design for bookmark tag filtering"
+    },
+    {
+      "dir": "layers/60-increment-1",
+      "action": "commit",
+      "message": "Add single-tag bookmark filter"
+    },
+    {
+      "dir": "layers/62-verify-increment-1",
+      "action": "commit",
+      "message": "Verify single-tag filter increment"
+    },
+    {
+      "dir": "layers/70-route-test-fix",
+      "action": "commit",
+      "message": "Switch to after-implementation verification and route filter test fix"
+    },
+    {
+      "dir": "layers/75-correction",
+      "action": "commit",
+      "message": "Tighten case-insensitive tag filter test"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "developer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "Frame 2 (From TESTING, Owner DEVELOPING, ResumeAt TESTING) is the active frame for the implementation defect Tester found while correcting the test; Frame 1 (From DEVELOPING, Owner TESTING, ResumeAt DEVELOPING) holds Tester's correction of the defective test assertion, and the plan's Suspended Assignment 1 (Recovery Frame 1, Purpose DEVELOPMENT, Target NONE) is Developer's interrupted normal-development assignment.",
+    "The implementation defect: filterByTag in src/filter.js normalizes the requested tag but compares it against stored tags without normalizing them, so a bookmark stored with tag 'Work' is missed for query 'work'. Normalizing each stored tag in the comparison makes node --test test/filter.test.js pass; the corrected test needs no change.",
+    "DEV-002 (filterByTags, the multi-tag filter for AC-002) is not implemented anywhere and is unrelated to the correction.",
+    "No work between DEVELOPING and Frame 2's ResumeAt (TESTING) needs a rerun, so after the correction Frame 2 should be popped and the workflow resumed to TESTING with Handoff Kind RESUME; Frame 1 must remain unchanged with Owner TESTING.",
+    "The pending INCREMENTAL cadence request must remain pending: it is applied only at a normal Developer boundary, which comes after Tester finishes the Frame 1 correction and resumes DEVELOPING.",
+    "The verification report's Suspended Assignment 1 (Recovery Frame 2, Purpose CORRECTION) is Tester's interrupted assignment; Developer must not edit the verification report or files under test/."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "filter-bookmarks-by-tags-20260922T101500Z-3e8a51c7",
+    "PLAN": ".standards/docs/development/filter-bookmarks-by-tags-20260922T101500Z-3e8a51c7.md",
+    "REPORT": ".standards/docs/verification/filter-bookmarks-by-tags-20260922T101500Z-3e8a51c7.md",
+    "R1": "The case-insensitive scenario in test/filter.test.js asserts only that some bookmark matches, so AC-001 matching is not checked."
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "changed": [
+            "src/filter.js"
+          ],
+          "why": "the implementation correction lives in src/filter.js"
+        },
+        {
+          "unchanged": [
+            "test/**"
+          ],
+          "why": "tests are Tester-owned; the corrected test needs no change"
+        },
+        {
+          "contains": {
+            "path": "${PLAN}",
+            "regex": "### DEV-002[^\\n]*\\n+`Status`:\\s*`PENDING`"
+          },
+          "why": "unrelated DEV-002 stays PENDING"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "state": "Handoff.Kind",
+          "equals": "RESUME"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "DEVELOPING"
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "TESTING",
+          "why": "Frame 2 ResumeAt"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "1",
+          "why": "Frame 2 popped, Frame 1 kept"
+        },
+        {
+          "state": "Recovery.Frame1.Owner",
+          "equals": "TESTING"
+        },
+        {
+          "state": "Recovery.Frame1.ResumeAt",
+          "equals": "DEVELOPING"
+        },
+        {
+          "state": "Recovery.Frame1.Reason",
+          "equals": "${R1}"
+        },
+        {
+          "contains": {
+            "path": "${PLAN}",
+            "regex": "### Suspended Assignment 1\\s+`Recovery Frame`:\\s*`1`"
+          },
+          "why": "outer suspended assignment kept"
+        },
+        {
+          "contains": {
+            "path": "${PLAN}",
+            "regex": "`Purpose`:\\s*`DEVELOPMENT`"
+          },
+          "why": "outer suspended assignment keeps its purpose"
+        },
+        {
+          "reply_matches": "/tester",
+          "why": "handoff into TESTING presents the Tester invocation"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": true,
+      "all": [
+        {
+          "state": "ActiveWork.PendingVerificationCadence",
+          "equals": "INCREMENTAL"
+        },
+        {
+          "field": {
+            "path": "${PLAN}",
+            "name": "Verification Cadence",
+            "equals": "AFTER_IMPLEMENTATION"
+          }
+        },
+        {
+          "field": {
+            "path": "${PLAN}",
+            "name": "Current Increment",
+            "equals": "NONE"
+          }
+        }
+      ]
+    },
+    {
+      "assertion": 4,
+      "complete": true,
+      "all": [
+        {
+          "field": {
+            "path": "${PLAN}",
+            "name": "Status",
+            "not": "COMPLETE"
+          }
+        },
+        {
+          "state": "WorkflowState",
+          "not": "REVIEWING_IMPLEMENTATION"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        ".standards/docs/verification/**",
+        ".standards/docs/scope/**",
+        ".standards/docs/specs/**",
+        ".standards/CONTEXT.md"
+      ],
+      "why": "Developer does not edit Tester, Scoper, Architect, or Auditor artifacts"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/store.test.js test/format.test.js",
+      "expect": "pass",
+      "why": "the established store and format tests pass"
+    },
+    {
+      "cmd": "node --test test/filter.test.js",
+      "expect": "fail",
+      "expectOutput": "matches tags regardless of case",
+      "why": "the corrected case-insensitive scenario fails against the current filterByTag (the Frame 2 implementation defect)"
+    }
+  ],
+  "notes": "Standalone brownfield fixture: a tiny Node ES-module bookmarks library. 50-project (pre-install): src/bookmarks.js (tags trimmed, case preserved), src/format.js, store/format tests. 55-design: CONTEXT.md, scope (AC-001 single tag, AC-002 several tags, both case-insensitive), design (filterByTag/filterByTags in src/filter.js, normalize both sides), STATE at DEVELOPING. 60-increment-1: src/filter.js with filterByTag that normalizes only the query; plan INCREMENTAL, Current Increment 1, DEV-001 DONE with self-check, DEV-002 PENDING; CHECKPOINT to TESTING. 62: Tester adds test/filter.test.js whose case-insensitive scenario only asserts a nonempty result (passes), report INCREMENT/Increment 1 VERIFIED, CHECKPOINT back; user asks for AFTER_IMPLEMENTATION (pending). 70: Developer applies the switch (AFTER_IMPLEMENTATION, Current Increment NONE, increments kept), notices the weak assertion, saves Suspended Assignment 1 (Frame 1, DEVELOPMENT, NONE) in Plan Notes, FAILURE VERIFICATION to TESTING with Frame 1. 75 (final): Tester tightens the assertion (now fails), report becomes REVERIFY/CORRECTION with Suspended Assignment 1 for Frame 2 (CORRECTION), Increment 1 row SUPERSEDED; STATE at DEVELOPING with Frame 1 and Frame 2 (Owner DEVELOPING, ResumeAt TESTING), Handoff FAILURE IMPLEMENTATION, PendingVerificationCadence INCREMENTAL. Frame reasons match the suspended-assignment Recovery Reasons exactly so check.mjs treats recovery as scoped. check passes before the run and should pass at turn end after a RESUME to TESTING.",
+  "case": "developer-55",
+  "caseHash": "87227863b8d8dae2",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T02:25:37.962Z",
+    "verdict": "pass",
+    "fixtureHash": "c55860d1d119521b",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "e9459210f39264bf",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:08:35.846Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T02:08:44.297Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/55-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/60-increment-1/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/62-verify-increment-1/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/70-route-test-fix/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/75-correction/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:08:35.846Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

@@ -1,0 +1,89 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is GREENFIELD",
+      "where": ".standards/MODE.md (installer, --mode greenfield, not overwritten)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode is STANDARD with an initialized first cycle",
+      "where": ".standards/STATE.md: CycleMode STANDARD, Active Work.Id build-a-small-internal-web-tool-that-20260924T090000Z-3e9a71c4, Handoff.Kind INITIAL",
+      "status": "realized"
+    },
+    {
+      "condition": "WorkflowState is SCOPING",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Scope is NONE and no persisted scope exists, so PLAN applies",
+      "where": ".standards/STATE.md; no .standards/docs/ and no project scope document in the tree",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery inactive and no outstanding obligations",
+      "where": ".standards/STATE.md Recovery.Active false, Outstanding Obligations.Active false",
+      "status": "realized"
+    },
+    {
+      "condition": "Request describes the support tool: search by email, view current plan and account status, copy customer ID, only authenticated support staff",
+      "where": ".standards/STATE.md Active Work.Request",
+      "status": "realized"
+    },
+    {
+      "condition": "No frameworks, storage, APIs, UI libraries, or auth mechanism are established by project constraints",
+      "where": "Repository holds only README.md ('Internal tooling for the customer support team.') plus the STANDARDS install; no CONTEXT.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Project context is intentionally absent before the first greenfield audit",
+      "where": "no .standards/CONTEXT.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Starting state is valid",
+      "where": "check.mjs --json ok:true; selfCheck passed",
+      "status": "realized"
+    },
+    {
+      "condition": "Starting state is committed with a clean tree",
+      "where": "git log commit 65affd7; git status clean",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 2,
+      "detail": "Assertion 2 is marked complete:true. The checks are provenance, an AC-001 list item, and check_ok, which catches duplicate or undefined-but-mentioned IDs. They would not catch a 'Done when' bullet that states a condition with no AC-NNN identifier at all. Such a scope would pass without a judge. A correct run is never failed by this, so it is only a looseness.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally set complete:false for assertion 2 so the judge confirms every condition carries an ID."
+    },
+    {
+      "severity": "note",
+      "kind": "check-wrong",
+      "assertion": 7,
+      "detail": "The reply_matches pattern '/architect\\b' would also match a path mention such as '.claude/skills/architect/SKILL.md' in the reply. With complete:true, a run that omitted the invocation line but mentioned that path could pass. A correct run never fails this check.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally tighten the pattern to '(^|\\s)/architect\\s+\\S' with flags 'm' so it matches the invocation, not a path segment."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The case prompt's 'Do not choose frameworks, storage, APIs, or UI libraries...' sentence is omitted from both the utterance and Active Work.Request, as the catalog advises. Assertions 1 and 4 are still observable, because the skill and template forbid technology choices. No CONTEXT.md or README establishes any, so the judge can grade whether Scoper invents them.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes a clean greenfield first STANDARD cycle in SCOPING with Scope NONE, no recovery, and the request persisted in STATE.md. Nothing in the repository establishes a technology or auth mechanism, and nothing leaks the answer. Checks and invariants cannot fail a correct PLAN run; the only notes are two slightly loose complete:true checks.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-01T18:36:24.736Z",
+  "costUsd": 0.15179679999999998,
+  "ms": 32913,
+  "fixtureHash": "8db8a2cecb62a8d9"
+}

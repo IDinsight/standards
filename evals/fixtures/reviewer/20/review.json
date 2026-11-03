@@ -1,0 +1,91 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is BROWNFIELD",
+      "where": ".standards/MODE.md (installer brownfield template, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState REVIEWING_FINAL",
+      "where": ".standards/STATE.md header",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id is export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md Active Work; all record provenance blocks",
+      "status": "realized"
+    },
+    {
+      "condition": "Current scope, architecture, context, development plan, Tester report, and Documenter record exist with valid ownership",
+      "where": ".standards/docs/scope|specs|development|verification|documentation/<id>.md, .standards/CONTEXT.md; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation review passed",
+      "where": ".standards/docs/reviews/<id>/implementation.md Status COMPLETE, no material findings",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and outstanding obligations inactive",
+      "where": ".standards/STATE.md Recovery.Active false, Outstanding Obligations.Active false",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-003 requires a restore guide",
+      "where": "scope `AC-003`: The user guide includes a restore guide...",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation review carried AC-003 as a permitted dependency pending Documenter",
+      "where": "implementation.md Contract table row AC-003 and Later Dependencies section",
+      "status": "realized"
+    },
+    {
+      "condition": "Final report draft still carries AC-003 pending Documenter",
+      "where": ".standards/docs/reviews/<id>/final-deliverable.md, Status IN_PROGRESS, AC-003 row 'Permitted dependency: pending Documenter'",
+      "status": "realized"
+    },
+    {
+      "condition": "The restore guide is absent",
+      "where": "docs/usage.md and README.md contain no restore steps; no docs/restore.md (selfCheck greps confirm)",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation and tests otherwise sound (AC-001, AC-002 supported)",
+      "where": "src/export.ts, src/routes/export.ts, tests pass 21 + 3",
+      "status": "realized"
+    },
+    {
+      "condition": "All work committed, no dirty tree",
+      "where": "git status clean",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 0,
+      "detail": "Assertion 0's checks require the DOCUMENTATION failure route (WorkflowState DOCUMENTING, frame Owner DOCUMENTING, ResumeAt REVIEWING_FINAL). A Reviewer could additionally argue an upstream gap (the design names createApp({records}) as the restore path, but there is no CSV parser or listener) and route ARCHITECTURE first. That would contradict the case's expected output (route to Documenter), so the check matches the case. The design does give a workable restore path, so the risk is small.",
+      "recommendation": "run_as_is",
+      "fix": "None needed; the judge can see the reasoning if a run diverges."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 1,
+      "detail": "The `contains AC-003` precondition is already satisfied by the pre-existing draft, so it only guards against deletion. This is harmless; the judge decides the substance.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture faithfully realizes a REVIEWING_FINAL STANDARD brownfield cycle. AC-003 (restore guide) is carried as pending Documenter in an IN_PROGRESS final-review draft, the Documenter record falsely maps AC-003 to an Export files section with no restore steps, and no guide exists anywhere. The checks align with the canonical DOCUMENTATION failure route and no-sign-off expectations, the invariants fit a Reviewer run, and check_ok holds after the expected transition.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T23:23:35.678Z",
+  "costUsd": 0.3640288,
+  "ms": 56085,
+  "fixtureHash": "0da0afa67da2ae14"
+}

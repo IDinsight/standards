@@ -1,0 +1,94 @@
+diff --git a/.github/workflows/api-ci.yml b/.github/workflows/api-ci.yml
+new file mode 100644
+index 0000000..56b7dfd
+--- /dev/null
++++ b/.github/workflows/api-ci.yml
+@@ -0,0 +1,88 @@
++name: API CI
++
++on:
++  push:
++    branches: [main]
++    paths:
++      - "apps/api/**"
++      - "packages/shared/**"
++      - ".github/workflows/api-ci.yml"
++  pull_request:
++    branches: [main]
++    paths:
++      - "apps/api/**"
++      - "packages/shared/**"
++      - ".github/workflows/api-ci.yml"
++
++permissions:
++  contents: read
++
++concurrency:
++  group: ${{ github.workflow }}-${{ github.ref }}
++  cancel-in-progress: true
++
++defaults:
++  run:
++    working-directory: apps/api
++
++jobs:
++  lint:
++    runs-on: ubuntu-latest
++    timeout-minutes: 10
++    steps:
++      - uses: actions/checkout@v4
++      - uses: astral-sh/setup-uv@v6
++        with:
++          enable-cache: true
++          cache-dependency-glob: apps/api/uv.lock
++      - run: uv sync --frozen
++      - run: uv run ruff check .
++      - run: uv run ruff format --check .
++
++  type-check:
++    runs-on: ubuntu-latest
++    timeout-minutes: 10
++    steps:
++      - uses: actions/checkout@v4
++      - uses: astral-sh/setup-uv@v6
++        with:
++          enable-cache: true
++          cache-dependency-glob: apps/api/uv.lock
++      - run: uv sync --frozen
++      - run: uv run mypy app
++
++  test:
++    runs-on: ubuntu-latest
++    timeout-minutes: 15
++    strategy:
++      fail-fast: false
++      matrix:
++        python-version: ["3.11", "3.12", "3.13"]
++    env:
++      # Overrides apps/api/.python-version, so each run really uses its version.
++      UV_PYTHON: ${{ matrix.python-version }}
++    steps:
++      - uses: actions/checkout@v4
++      - uses: astral-sh/setup-uv@v6
++        with:
++          enable-cache: true
++          cache-dependency-glob: apps/api/uv.lock
++      - working-directory: .
++        run: cd "apps/api" && uv sync --frozen && uv run pytest --cov=app --cov-report "xml:report.xml"
++      - uses: actions/upload-artifact@v4
++        if: always()
++        with:
++          name: coverage-${{ matrix.python-version }}
++          path: apps/api/report.xml
++          retention-days: 14
++
++  build:
++    runs-on: ubuntu-latest
++    timeout-minutes: 10
++    steps:
++      - uses: actions/checkout@v4
++      - uses: astral-sh/setup-uv@v6
++        with:
++          enable-cache: true
++          cache-dependency-glob: apps/api/uv.lock
++      - run: uv build

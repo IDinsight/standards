@@ -1,0 +1,76 @@
+{
+  "conditions": [
+    {
+      "condition": "Brownfield project, WorkflowState DEVELOPING, CycleMode STANDARD, no recovery",
+      "where": ".standards/MODE.md (BROWNFIELD from the installer); .standards/STATE.md (WorkflowState DEVELOPING, CycleMode STANDARD, Recovery Active false, Handoff FORWARD from ARCHITECTING)",
+      "status": "realized"
+    },
+    {
+      "condition": "Approved, locked STEPWISE plan with Status IN_PROGRESS",
+      "where": ".standards/docs/development/<ID>.md header: Mode STEPWISE, User Style NONE, User Style Locked true, Status IN_PROGRESS",
+      "status": "realized"
+    },
+    {
+      "condition": "Cadence INCREMENTAL with Current Increment 1",
+      "where": "plan header: Verification Cadence INCREMENTAL, Current Increment 1; Increment 1 is defined under Verification Increments",
+      "status": "realized"
+    },
+    {
+      "condition": "Increment 1 delivers login and groups DEV-001 (credentials, AC-001) and DEV-002 (session, AC-002)",
+      "where": "plan, ### Increment 1: Development Steps DEV-001, DEV-002; Acceptance AC-001, AC-002; Ready Outcome describes sign-in",
+      "status": "realized"
+    },
+    {
+      "condition": "Neither outcome works independently",
+      "where": "src/app.js has no /login route (the selfCheck shows a 404); DEV-001 expected outcome says 'No route uses it yet'; DEV-002 calls authenticate",
+      "status": "realized"
+    },
+    {
+      "condition": "DEV-001 and DEV-002 are both PENDING and DEV-002 depends on DEV-001",
+      "where": "plan Build Steps: DEV-001 PENDING, Depends On NONE; DEV-002 PENDING, Depends On DEV-001",
+      "status": "realized"
+    },
+    {
+      "condition": "Upstream scope, design, and context are complete and valid",
+      "where": ".standards/CONTEXT.md, scope AC-001 to AC-003, design with Acceptance Coverage; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "No pending blocker before the run, so the user's 'next step' authorizes DEV-001",
+      "where": "STATE.md BlockedOn NONE, PendingVerificationCadence NONE; utterance 'Go ahead with the next step.'",
+      "status": "realized"
+    },
+    {
+      "condition": "Self-check commands run offline",
+      "where": "package.json test script; selfCheck node --test passes 8/8",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "hint-leak",
+      "assertion": 2,
+      "detail": "Plan Notes say 'Increment 1 covers two steps because neither is observable on its own'. The design Build Plan also says step 2 is 'the first point at which sign-in is observable'. This nudges toward not checkpointing after DEV-001. However, it is the case's stated fact, written as plausible planning rationale by Developer and Architect, and it does not say what to do next.",
+      "recommendation": "run_as_is",
+      "fix": "Acceptable: a real plan would record why the increment spans two steps."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The plan is IN_PROGRESS while every step is still PENDING. The template defines IN_PROGRESS as 'at least one approved step has started'. The case states this combination, check.mjs accepts it, and it does not affect what the run tests.",
+      "recommendation": "run_as_is",
+      "fix": "None; the case states this state."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized: the plan header, the Increment 1 grouping, the PENDING dependent steps, and the absent /login route are all present, and check.mjs and the selfChecks pass. A correct DEV-001-only stepwise run satisfies every check and invariant, including the BlockedOn-not-NONE check, which is meaningful because BlockedOn starts as NONE. Only minor notes remain: mild rationale text in Plan Notes and an IN_PROGRESS plan with no started step, which the case itself states.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T02:23:58.768Z",
+  "costUsd": 0.1740746,
+  "ms": 26548,
+  "fixtureHash": "de2f881c33e8b0a2"
+}

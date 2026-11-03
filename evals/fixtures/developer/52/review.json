@@ -1,0 +1,64 @@
+{
+  "conditions": [
+    {
+      "condition": "Brownfield project with small existing implementation and passing tests",
+      "where": "MODE.md BROWNFIELD (install); src/store.js, src/cli.js, bin/tasks.js, test/*.test.js; selfCheck passes 7 tests",
+      "status": "realized"
+    },
+    {
+      "condition": "STANDARD cycle at normal DEVELOPING with no active recovery",
+      "where": ".standards/STATE.md: WorkflowState DEVELOPING, CycleMode STANDARD, Recovery Active false, Handoff FORWARD from ARCHITECTING",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope completed with existing ACs and dependencies",
+      "where": ".standards/docs/scope/<id>.md: AC-001..AC-004 as list items; work items 2 and 3 depend on 1",
+      "status": "realized"
+    },
+    {
+      "condition": "Architecture completed covering every AC",
+      "where": ".standards/docs/specs/<id>.md: Acceptance Coverage for AC-001..AC-004 plus a 3-step Build Plan",
+      "status": "realized"
+    },
+    {
+      "condition": "Valid Auditor project context for the cycle",
+      "where": ".standards/CONTEXT.md (commit 'Record project context for task tags')",
+      "status": "realized"
+    },
+    {
+      "condition": "No development plan exists",
+      "where": "Active Work.Development NONE; no .standards/docs/development/ file",
+      "status": "realized"
+    },
+    {
+      "condition": "User explicitly selected INCREMENTAL during Scoper's work, recorded in PendingVerificationCadence",
+      "where": "STATE.md PendingVerificationCadence INCREMENTAL; it first appears in the scope commit's STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "User has not approved implementation; no blocker pending",
+      "where": "BlockedOn NONE; no plan; implementation files untouched since the pre-install commit",
+      "status": "realized"
+    },
+    {
+      "condition": "Clean committed git state",
+      "where": "git status clean on main",
+      "status": "realized"
+    },
+    {
+      "condition": "check.mjs reports ok",
+      "where": "gate checkMjs ok: true",
+      "status": "realized"
+    }
+  ],
+  "issues": [],
+  "verdict": "pass",
+  "summary": "The fixture realizes a STANDARD brownfield cycle at DEVELOPING with completed scope, design, and context. There is no plan, PendingVerificationCadence is INCREMENTAL and was set during scoping, and nothing hints at the answer. The checks fit what the skill and protocol require: new-plan creation applies the pending cadence before clearing it, Current Increment 1 matches 'selects the first assignment', exact `### Increment N` headings are already enforced by check.mjs, and the PROPOSED status, unlocked style, BlockedOn, and unchanged implementation all follow the approval gate. A correct run cannot fail any of them.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T02:24:34.408Z",
+  "costUsd": 0.18503060000000002,
+  "ms": 40631,
+  "fixtureHash": "5df90a4c0e8949b4"
+}

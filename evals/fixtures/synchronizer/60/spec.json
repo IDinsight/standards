@@ -1,0 +1,276 @@
+{
+  "base": null,
+  "date": "2026-10-05T09:00:00Z",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add csvsum column summary tool"
+    },
+    {
+      "dir": "layers/52-cycle",
+      "action": "commit",
+      "message": "Start documentation cycle for csvsum guide"
+    },
+    {
+      "dir": "layers/54-audit",
+      "action": "commit",
+      "message": "Record project context for csvsum"
+    },
+    {
+      "dir": "layers/56-scope-design",
+      "action": "commit",
+      "message": "Define guide scope and existing contracts"
+    },
+    {
+      "dir": "layers/58-guide",
+      "action": "commit",
+      "message": "Write csvsum user guide"
+    },
+    {
+      "dir": "layers/60-final-review",
+      "action": "commit",
+      "message": "Record final review of csvsum guide"
+    },
+    {
+      "dir": "layers/62-sync",
+      "action": "commit",
+      "message": "Record synchronization of csvsum guide"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "synchronizer",
+    "utterance": "I've read the guide and accept it. Please sign off."
+  },
+  "graderOnly": [
+    "CompletionPolicy is NONE and Active Work.Id is guide-20261004T120000Z-1a2b3c4d.",
+    "All six included roles (Auditor, Scoper, Architect, Documenter, final Reviewer, Synchronizer) have COMPLETE or completed records, and their recorded commit and blob identities match the current committed files; nothing changed after the synchronization commit.",
+    "docs/guide.md and the README link accurately describe the existing csvsum behavior; no defect, discrepancy, or freshness problem exists, so a correct run signs off.",
+    "Recovery and outstanding obligations are inactive; Development, PromotionReason, PendingVerificationCadence, BaselineReconciliation, and BlockedOn are NONE.",
+    "No development plan, verification report, or implementation review exists or is required for this DOCUMENTATION cycle.",
+    "Correct sign-off sets WorkflowState SIGNED_OFF, CycleMode UNSET, Handoff Kind SIGNOFF From AWAITING_USER_SIGNOFF FailureType NONE, keeps Active Work (including CompletionPolicy NONE), keeps pending-cycle fields clear, and leaves recovery inactive; cycle records and MODE.md stay unchanged."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "guide-20261004T120000Z-1a2b3c4d",
+    "SCOPE": ".standards/docs/scope/guide-20261004T120000Z-1a2b3c4d.md",
+    "SPEC": ".standards/docs/specs/guide-20261004T120000Z-1a2b3c4d.md",
+    "DOCREC": ".standards/docs/documentation/guide-20261004T120000Z-1a2b3c4d.md",
+    "FINAL": ".standards/docs/reviews/guide-20261004T120000Z-1a2b3c4d/final-deliverable.md",
+    "SYNC": ".standards/docs/synchronization/guide-20261004T120000Z-1a2b3c4d.md",
+    "DEV": ".standards/docs/development/guide-20261004T120000Z-1a2b3c4d.md",
+    "VER": ".standards/docs/verification/guide-20261004T120000Z-1a2b3c4d.md",
+    "IMPL": ".standards/docs/reviews/guide-20261004T120000Z-1a2b3c4d/implementation.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "SIGNED_OFF",
+          "why": "sign-off proceeded without demanding omitted artifacts"
+        },
+        {
+          "absent": "${DEV}",
+          "why": "no development plan fabricated"
+        },
+        {
+          "absent": "${VER}",
+          "why": "no verification report fabricated"
+        },
+        {
+          "absent": "${IMPL}",
+          "why": "no implementation review fabricated"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "SIGNED_OFF"
+        },
+        {
+          "state": "CycleMode",
+          "equals": "UNSET"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "SIGNOFF"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "AWAITING_USER_SIGNOFF"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "NONE"
+        },
+        {
+          "state": "ActiveWork.CompletionPolicy",
+          "equals": "NONE",
+          "why": "historical policy preserved"
+        },
+        {
+          "state": "ActiveWork.Id",
+          "unchanged": true
+        },
+        {
+          "state": "ActiveWork.Scope",
+          "unchanged": true
+        },
+        {
+          "state": "ActiveWork.Architecture",
+          "unchanged": true
+        },
+        {
+          "state": "ActiveWork.Development",
+          "equals": "NONE"
+        },
+        {
+          "state": "ActiveWork.PendingVerificationCadence",
+          "equals": "NONE"
+        },
+        {
+          "state": "PendingCycleMode",
+          "equals": "UNSET"
+        },
+        {
+          "state": "PendingCycleRequest",
+          "equals": "UNSET"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "false"
+        },
+        {
+          "state": "Obligations.Active",
+          "equals": "false"
+        },
+        {
+          "unchanged": [
+            ".standards/docs/**",
+            ".standards/CONTEXT.md"
+          ],
+          "why": "cycle records remain as historical evidence"
+        },
+        {
+          "check_ok": true
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": true,
+      "all": [
+        {
+          "unchanged": [
+            ".standards/docs/reviews/**"
+          ],
+          "why": "no replacement Reviewer evidence"
+        },
+        {
+          "absent": "${IMPL}"
+        },
+        {
+          "unchanged": [
+            ".standards/MODE.md"
+          ],
+          "why": "project mode unchanged"
+        },
+        {
+          "state": "ProjectMode",
+          "equals": "BROWNFIELD"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "csvsum/**",
+        "tests/**",
+        "docs/**",
+        "examples/**",
+        "README.md"
+      ],
+      "why": "sign-off does not edit the project or its documentation"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "python3 -m pytest -q",
+      "expect": "pass",
+      "why": "the existing tests pass (7 tests, cited in the records)"
+    },
+    {
+      "cmd": "python3 -m csvsum examples/orders.csv > /tmp/csvsum-out.txt && grep -qx 'order: count=4 min=1001 max=1004 mean=1002.50' /tmp/csvsum-out.txt && grep -qx 'customer: no numeric values' /tmp/csvsum-out.txt && grep -qx 'total: count=3 min=4.5 max=17 mean=11.17' /tmp/csvsum-out.txt && grep -qx 'items: count=3 min=1 max=3 mean=2.00' /tmp/csvsum-out.txt",
+      "expect": "pass",
+      "why": "the guide's first example output matches the tool"
+    },
+    {
+      "cmd": "test \"$(python3 -m csvsum examples/orders.csv --column total --column items | tr '\\n' ';')\" = 'total: count=3 min=4.5 max=17 mean=11.17;items: count=3 min=1 max=3 mean=2.00;'",
+      "expect": "pass",
+      "why": "the guide's second example output matches the tool"
+    },
+    {
+      "cmd": "python3 -m csvsum examples/orders.csv --column price",
+      "expect": "fail",
+      "expectOutput": "csvsum: unknown column: price",
+      "why": "documented unknown-column message and nonzero exit"
+    },
+    {
+      "cmd": "python3 -m csvsum missing.csv",
+      "expect": "fail",
+      "expectOutput": "csvsum: no such file: missing.csv",
+      "why": "documented missing-file message and nonzero exit"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the starting state is valid"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 50-project (pre-install): Python stdlib csvsum CLI, tests, examples/orders.csv, short README. 52-cycle: STATE.md starts the DOCUMENTATION cycle guide-20261004T120000Z-1a2b3c4d in AUDITING (INITIAL, standalone Documenter request). 54-audit: CONTEXT.md, STATE SCOPING. 56-scope-design: scope (AC-001..AC-004) and documentation-mode technical design, STATE DOCUMENTING. 58-guide: docs/guide.md, README link, COMPLETE documentation record, STATE REVIEWING_FINAL. 60-final-review: COMPLETE FINAL_DELIVERABLE review citing the guide commit and blob hashes, STATE SYNCHRONIZING. 62-sync: COMPLETE synchronization record citing assessed identities, STATE AWAITING_USER_SIGNOFF (FORWARD from SYNCHRONIZING), CompletionPolicy NONE, all documentation-contract fields NONE, recovery and obligations inactive. No development, verification, or implementation-review records exist. A top-level date (2026-10-05) is set so commits postdate the cycle ID timestamp.",
+  "case": "synchronizer-60",
+  "caseHash": "a22a35c9c946cc6e",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T03:14:19.098Z",
+    "verdict": "pass",
+    "fixtureHash": "e7763311a03d9408",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-31T01:37:20.778Z"
+  }
+}

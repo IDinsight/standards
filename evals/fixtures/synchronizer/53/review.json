@@ -1,0 +1,94 @@
+{
+  "conditions": [
+    {
+      "condition": "Brownfield project in a STANDARD cycle with CompletionPolicy IMPLEMENTATION_REVIEWED at SYNCHRONIZING",
+      "where": ".standards/STATE.md, .standards/MODE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "A current-cycle synchronization record is IN_PROGRESS and preserves an earlier verified corrective return (D-001 RESOLVED) with the omitted documentation, final-review and normal-sync guarantees recorded as intentionally omitted",
+      "where": ".standards/docs/synchronization/admin-csv-export-20260921T140000Z-5c8e1a74.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Single active frame: From REVIEWING_IMPLEMENTATION, Owner DEVELOPING, FailureType IMPLEMENTATION, ResumeAt REVIEWING_IMPLEMENTATION, RerunThrough SYNCHRONIZING; handoff RESUME from DEVELOPING",
+      "where": ".standards/STATE.md Recovery/Handoff",
+      "status": "realized"
+    },
+    {
+      "condition": "The frame's saved rerun plan includes rerunning the existing synchronization correction after the implementation change, with no Tester rerun scheduled",
+      "where": "development plan Plan Notes; STATE Handoff.Reason",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation changed after verification: src/auth.js modified by the Developer correction",
+      "where": "commit 'Handle accounts without roles in export authorization'; src/auth.js",
+      "status": "realized"
+    },
+    {
+      "condition": "The old evidence reference now resolves (test/export-auth.test.js exists; test/auth.test.js does not)",
+      "where": "test/export-auth.test.js; sync record Completion and Evidence References; selfCheck 5",
+      "status": "realized"
+    },
+    {
+      "condition": "The authorization test has not run against the changed implementation, so AC-002 lacks current Tester evidence",
+      "where": "verification report (only run 1, at commit 63a735b, with the old auth.js blob); Developer correction self-check ran no tests",
+      "status": "realized"
+    },
+    {
+      "condition": "The gap is independent verification evidence, not merely pending Reviewer reassessment (tests still pass, so no implementation defect masks it)",
+      "where": "verification report vs src/auth.js history; selfCheck 1 passes",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation review is BLOCKED with F-002 open for Developer and closure NOT_ASSESSED, awaiting resume",
+      "where": ".standards/docs/reviews/.../implementation.md",
+      "status": "realized"
+    },
+    {
+      "condition": "User asks to use the scoped corrective-rerun exception and send work back to Reviewer",
+      "where": "prompt.utterance",
+      "status": "realized"
+    },
+    {
+      "condition": "check.mjs reports a valid state",
+      "where": "gate results checkMjs ok:true",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "case-defect",
+      "assertion": -1,
+      "detail": "The fixture does not explain how a synchronization record came to exist before implementation review under IMPLEMENTATION_REVIEWED. The record's own text says a prior SYNCHRONIZATION frame corrected it, but no state history shows how that frame arose. The case's premise requires this record, and the generator disclosed the gap.",
+      "recommendation": "run_as_is",
+      "fix": "None needed. The premise comes from the case."
+    },
+    {
+      "severity": "note",
+      "kind": "hint-leak",
+      "assertion": -1,
+      "detail": "Several record texts point mildly toward the gap. The plan's correction self-check ends with 'Implementation feedback only, not Tester verification.' The review's next action is 'reconcile AC-002 evidence against the changed content.' The sync conclusion asks to compare identities with current content. Each phrase is template-mandated or role-plausible wording, and none states the answer.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 0,
+      "detail": "Assertion 0 requires routing to TESTING (FAILURE/VERIFICATION, new top frame Owner TESTING, ResumeAt SYNCHRONIZING) plus a new D-002+ heading. A cautious run might instead treat the user's explicit 'send this back to Reviewer' as a conflict to raise with the user before routing. However, Failure Types forbids asking the user to settle another owner's correction, and the expected output says to route to Tester. These checks follow the protocol's normal route.",
+      "recommendation": "run_as_is",
+      "fix": "None. The judge sees the reply, and the checks match the expected output and protocol."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized. The Developer-owned frame has RerunThrough SYNCHRONIZING, src/auth.js changed after the only Tester run, the corrected AC-002 reference now resolves, and check.mjs reports the state as valid. Checks and invariants fit the expected route: a nested Tester VERIFICATION frame with Frame 1 left unchanged, and the record kept incomplete. A turn-end check of that resulting state finds no new problems. The only issues are minor notes: the unexplained origin of the sync record (case premise), mild template-phrase hints, and the strictness of the routing check.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T03:10:55.671Z",
+  "costUsd": 0.35154040000000003,
+  "ms": 54238,
+  "fixtureHash": "3ecfd299cbe6868e"
+}

@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: booking-api
+  namespace: clinic
+  labels:
+    app: booking-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: booking-api
+  template:
+    metadata:
+      labels:
+        app: booking-api
+    spec:
+      containers:
+        - name: booking-api
+          image: registry.clinic.internal/booking-api:1.4.0
+          ports:
+            - containerPort: 8080
+          env:
+            - name: PORT
+              value: "8080"
+            - name: RECORDS_API_URL
+              value: http://records-api.clinic.svc.cluster.local:8080
+            - name: MAILER_URL
+              value: http://mailer.clinic.svc.cluster.local:8080
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080

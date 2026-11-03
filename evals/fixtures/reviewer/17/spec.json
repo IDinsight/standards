@@ -1,0 +1,281 @@
+{
+  "base": "export-reviewing-impl",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-review",
+      "action": "commit",
+      "message": "Record implementation review of CSV export"
+    },
+    {
+      "dir": "layers/52-rework",
+      "action": "commit",
+      "message": "Record request change for CSV export"
+    },
+    {
+      "dir": "layers/54-scope",
+      "action": "commit",
+      "message": "Revise CSV export scope for the user guide"
+    },
+    {
+      "dir": "layers/56-design",
+      "action": "commit",
+      "message": "Reconcile CSV export design with revised scope"
+    },
+    {
+      "dir": "layers/58-plan",
+      "action": "commit",
+      "message": "Reconcile CSV export plan with revised scope"
+    },
+    {
+      "dir": "layers/60-verification",
+      "action": "commit",
+      "message": "Reverify CSV export against revised scope"
+    }
+  ],
+  "expectCheck": {
+    "ok": false,
+    "problemsMatch": [
+      "does not account for AC-004"
+    ]
+  },
+  "prompt": {
+    "skill": "reviewer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "Source, tests, dependencies, configuration, docs, and README are byte-identical to the content the existing COMPLETE implementation review assessed (commit Record CSV export verification); after that review only the scope, design, plan, verification report, and STATE.md changed.",
+    "The existing implementation review report still has Status COMPLETE, accounts for AC-001 and AC-002 only, and cites blob identities of the old scope, design, plan, and verification report, which no longer match the current files.",
+    "AC-001 wording and its design criteria are unchanged, so the earlier AC-001 evidence (unit suite, integration suite, handler inspection) is still applicable to the current content.",
+    "AC-004 (user guide) is legitimately pending Documenter; docs/usage.md has no export section yet, which is expected before DOCUMENTING.",
+    "AC-002 and AC-003 are retired. The denied-export integration test remains and passes but supports no current acceptance condition.",
+    "The implementation has no material defects. After reconciling the inventory a correct run can pass the implementation gate; with recovery inactive the normal next step is a FORWARD handoff to DOCUMENTING.",
+    "The full check reports exactly one problem, that the COMPLETE implementation review does not account for AC-004; the turn-end check (as the stop hook runs it) accepts the starting state.",
+    "The Developer also reconciled plan bookkeeping only (DEV-003 now maps to AC-001); no code changed."
+  ],
+  "history": null,
+  "vars": {
+    "REVIEWED_COMMIT": "${COMMIT:Record CSV export verification}"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "${SCOPE}"
+          ],
+          "why": "Scoper owns acceptance identifiers; Reviewer neither reuses nor renumbers them in the scope"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "contains": {
+            "path": "${REVIEW_IMPL}",
+            "regex": "AC-001"
+          },
+          "why": "the report keeps a disposition for AC-001"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "contains": {
+            "path": "${REVIEW_IMPL}",
+            "regex": "AC-004"
+          },
+          "why": "the later dependency is recorded under the exact current ID"
+        },
+        {
+          "contains": {
+            "path": "${REVIEW_IMPL}",
+            "regex": "Documenter",
+            "flags": "i"
+          },
+          "why": "the dependency names its owner"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": true,
+      "all": [
+        {
+          "changed": [
+            "${REVIEW_IMPL}"
+          ],
+          "why": "the earlier COMPLETE report must be reopened and reconciled"
+        },
+        {
+          "contains": {
+            "path": "${REVIEW_IMPL}",
+            "regex": "AC-004"
+          },
+          "why": "reconciliation covers the new current acceptance condition"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "Reviewer must not change the assessed identity"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Reviewer must not change git state"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "packages/**",
+        "package.json",
+        "pnpm-lock.yaml",
+        "docs/**",
+        "README.md"
+      ],
+      "why": "Reviewer does not edit implementation, tests, or documentation"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the unit suite still passes; code is unchanged"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration",
+      "expect": "pass",
+      "why": "the integration suite still passes; code is unchanged"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration 2>&1 | grep -qE 'pass 3$'",
+      "expect": "pass",
+      "why": "the integration suite still runs three tests, as the retained evidence states"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "fail",
+      "expectOutput": "is COMPLETE but does not account for AC-004",
+      "why": "the full check flags the stale COMPLETE implementation review"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs --json > /tmp/standards-check.json; node -e 'const r = JSON.parse(require(`fs`).readFileSync(`/tmp/standards-check.json`, `utf8`)); if (r.problems.length !== 1 || !r.problems[0].file.endsWith(`/implementation.md`) || !/does not account for AC-004/.test(r.problems[0].message)) { console.error(r.problems); process.exit(1); }'",
+      "expect": "pass",
+      "why": "that is the only problem the full check reports"
+    },
+    {
+      "cmd": "node -e 'import(`./.standards/bin/check.mjs`).then(async (m) => { const r = await m.runCheck(process.cwd(), { atTurnEnd: true }); if (r.problems.length) { console.error(r.problems); process.exit(1); } console.log(`turn-end ok`); })'",
+      "expect": "pass",
+      "why": "the turn-end check accepts the starting state"
+    },
+    {
+      "cmd": "c=$(git log --format=%H -1 --fixed-strings --grep='Record CSV export verification') && echo $c | grep -qE '^[0-9a-f]{40}$' && git diff --quiet $c HEAD -- src test packages package.json pnpm-lock.yaml .gitignore docs README.md",
+      "expect": "pass",
+      "why": "code, tests, configuration, and docs are unchanged since the content the earlier review assessed"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && test ! -e exports",
+      "expect": "pass",
+      "why": "all work is committed and no export files exist"
+    },
+    {
+      "cmd": "s=.standards/STATE.md && grep -q 'WorkflowState`: `REVIEWING_IMPLEMENTATION` `CycleMode`: `STANDARD`' $s && grep -q '^`Kind`: `RESUME` `From`: `TESTING` `FailureType`: `NONE`' $s && ! grep -q '`Active`: `true`' $s && ! grep -q '### Frame' $s && grep -q '^`PendingVerificationCadence`: `NONE`$' $s && grep -q 'separate permissions review' $s",
+      "expect": "pass",
+      "why": "REVIEWING_IMPLEMENTATION after the popped rerun frame, recovery and obligations inactive, updated request"
+    },
+    {
+      "cmd": "s=.standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md && grep -q '^- `AC-001`: ' $s && grep -q '^- `AC-004`: ' $s && grep -q '^- `AC-002`: Retired' $s && grep -q '^- `AC-003`: Retired' $s && test $(grep -c '^- `AC-' $s) -eq 4 && grep -q '^## Retired Acceptance Identifiers' $s",
+      "expect": "pass",
+      "why": "current set AC-001 and AC-004; AC-002 and AC-003 retired"
+    },
+    {
+      "cmd": "r=.standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md && grep -q '`Status`: `COMPLETE`' $r && grep -q AC-002 $r && ! grep -q AC-004 $r && test $(git log --format=%H -- $r | wc -l) -eq 1 && ! grep -qE 'COMMIT:|BLOB:' $r",
+      "expect": "pass",
+      "why": "the earlier COMPLETE review covers AC-001 and AC-002 and was not touched since"
+    },
+    {
+      "cmd": "v=.standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md && grep -q '`Mode`: `REVERIFY` `Status`: `COMPLETE`' $v && grep -q '`Assessment Purpose`: `FULL` `Assessment Target`: `NONE`' $v && grep -q 'Pending Documenter' $v && ! grep -qE 'COMMIT:|BLOB:|AWAITING_IMPLEMENTATION' $v",
+      "expect": "pass",
+      "why": "Tester reconciled its inventory with AC-004 pending Documenter"
+    },
+    {
+      "cmd": "d=.standards/docs/development/export-20260924T090000Z-a7f3c1d2.md && ! grep -q 'AC-001, AC-002' $d && grep -q '`Status`: `COMPLETE`' $d && test $(grep -c '^`Status`: `DONE`' $d) -eq 3",
+      "expect": "pass",
+      "why": "the plan stays COMPLETE with DEV-003 mapped to AC-001 only"
+    },
+    {
+      "cmd": "! grep -qi export docs/usage.md",
+      "expect": "pass",
+      "why": "the user guide has no export section yet"
+    },
+    {
+      "cmd": "git log -6 --format=%s | paste -s -d '|' - | grep -qx 'Reverify CSV export against revised scope|Reconcile CSV export plan with revised scope|Reconcile CSV export design with revised scope|Revise CSV export scope for the user guide|Record request change for CSV export|Record implementation review of CSV export'",
+      "expect": "pass",
+      "why": "commit history follows the review, rework, and rerun order"
+    }
+  ],
+  "notes": "Built on export-reviewing-impl (REVIEWING_IMPLEMENTATION, COMPLETE verification, correct code). 50-review: Reviewer's COMPLETE implementation review covering AC-001 (three criteria) and AC-002, no findings, citing blobs of the scope, design, context, plan, verification, code, and tests as they were then and the commit Record CSV export verification; STATE untouched because the user intervened before the handoff. 52-rework: USER_REWORK from REVIEWING_IMPLEMENTATION to SCOPING (FailureType SCOPING) with Frame 1 ResumeAt REVIEWING_IMPLEMENTATION and an updated Request (export permissions moved to a separate permissions review; user guide added). 54-scope: Scoper REPLAN: AC-001 unchanged, AC-004 new (user guide), AC-002 and AC-003 retired (AC-003 was a README variant replaced by AC-004, which explains why the new ID is AC-004); STATE ARCHITECTING with RerunThrough TESTING. 56-design: Architect drops AC-002 coverage and criterion, adds AC-004 No architectural impact (Documenter); STATE DEVELOPING. 58-plan: Developer bookkeeping only (DEV-003 maps to AC-001; Plan Notes), added to avoid a stale-mapping confound; STATE TESTING. 60-verification: Tester REVERIFY COMPLETE FULL/NONE, AC-001 evidence retained with a git-diff justification, AC-004 Pending Documenter with owner and required evidence, retired IDs noted; STATE REVIEWING_IMPLEMENTATION with RESUME from TESTING and recovery popped, so recovery is inactive as the case states and the next normal transition is FORWARD to DOCUMENTING. The full check deliberately reports one problem: the stale COMPLETE review does not account for AC-004 (the role is meant to reopen it); the turn-end check accepts the state.",
+  "case": "reviewer-17",
+  "caseHash": "8e901bf25da28b7b",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T23:22:23.375Z",
+    "verdict": "pass",
+    "fixtureHash": "92d7b17bdb16de28",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "805e385ad35f9730",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:28:09.757Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T22:04:05.700Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-testing": "fd7044646ac2c395",
+    "export-reviewing-impl": "e5b0bce49a675583"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/52-rework/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/54-scope/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/56-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/58-plan/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/60-verification/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:28:09.757Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

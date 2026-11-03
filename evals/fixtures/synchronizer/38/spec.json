@@ -1,0 +1,327 @@
+{
+  "base": "export-project",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-expedited-plan",
+      "action": "commit",
+      "message": "Plan CSV export implementation"
+    },
+    {
+      "dir": "layers/52-export",
+      "action": "commit",
+      "message": "Add CSV export of filtered records"
+    },
+    {
+      "dir": "layers/54-expedited-complete",
+      "action": "commit",
+      "message": "Mark CSV export plan complete"
+    },
+    {
+      "dir": "layers/56-expedited-review",
+      "action": "commit",
+      "message": "Record expedited CSV export review"
+    },
+    {
+      "dir": "layers/58-rework",
+      "action": "commit",
+      "message": "Record rework request for CSV export"
+    },
+    {
+      "dir": "layers/60-promote",
+      "action": "commit",
+      "message": "Promote CSV export cycle to standard"
+    },
+    {
+      "dir": "layers/62-context",
+      "action": "commit",
+      "message": "Record project context for CSV export"
+    },
+    {
+      "dir": "layers/64-scope",
+      "action": "commit",
+      "message": "Define CSV export scope"
+    },
+    {
+      "dir": "layers/66-design",
+      "action": "commit",
+      "message": "Design CSV export"
+    },
+    {
+      "dir": "layers/68-plan",
+      "action": "commit",
+      "message": "Reconcile CSV export plan with scope and design"
+    },
+    {
+      "dir": "layers/70-access-test",
+      "action": "commit",
+      "message": "Add integration test for denied exports"
+    },
+    {
+      "dir": "layers/72-verification",
+      "action": "commit",
+      "message": "Record CSV export verification"
+    },
+    {
+      "dir": "layers/74-review",
+      "action": "commit",
+      "message": "Record CSV export implementation review"
+    },
+    {
+      "dir": "layers/76-guide",
+      "action": "commit",
+      "message": "Document CSV export in usage guide"
+    },
+    {
+      "dir": "layers/78-documentation",
+      "action": "commit",
+      "message": "Record CSV export documentation"
+    },
+    {
+      "dir": "layers/80-final-review",
+      "action": "commit",
+      "message": "Record CSV export final review"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "synchronizer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "csvCell in src/export.ts writes values that begin with =, +, -, or @ unchanged (it only quotes values containing a comma, double quote, CR, or LF), so the defect recorded in Outstanding Obligation 1 is still present; no commit since the promotion touched src/.",
+    "No test covers formula prefixes; the unit suite (21 tests) and the integration suite (3 tests) pass on the current tree.",
+    "Outstanding Obligation 1 (Owner DEVELOPING, FailureType IMPLEMENTATION) was created by the promotion commit from the user-rework recovery frame and was carried unchanged through every later handoff; no Developer, Tester, Reviewer, or Documenter record mentions it or the formula-prefix correction.",
+    "Apart from the unresolved Developer obligation, the records are internally consistent: every record is COMPLETE, cites identities matching HEAD, and accounts for AC-001 to AC-003, none of which mentions formula prefixes."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "export-20260924T090000Z-a7f3c1d2",
+    "DEV": ".standards/docs/development/export-20260924T090000Z-a7f3c1d2.md",
+    "SYNC": ".standards/docs/synchronization/export-20260924T090000Z-a7f3c1d2.md",
+    "PROMOTE_COMMIT": "${COMMIT:Promote CSV export cycle to standard}",
+    "IMPL_COMMIT": "${COMMIT:Add CSV export of filtered records}",
+    "HEAD_COMMIT": "${COMMIT:Record CSV export final review}"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "state": "Obligations.Active",
+          "equals": "true",
+          "why": "the Developer obligation stays active despite the COMPLETE labels"
+        },
+        {
+          "state": "Obligations.Count",
+          "equals": "1",
+          "why": "the single obligation is preserved"
+        },
+        {
+          "state": "Obligations.Item1.Owner",
+          "equals": "DEVELOPING",
+          "why": "its owner is not changed"
+        },
+        {
+          "state": "Obligations.Item1.FailureType",
+          "equals": "IMPLEMENTATION",
+          "why": "its failure type is not changed"
+        },
+        {
+          "state": "Obligations.Item1.Reason",
+          "unchanged": true,
+          "why": "the recorded defect is not rewritten"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "state": "Obligations.Active",
+          "equals": "true",
+          "why": "Synchronizer does not remove another owner's obligation"
+        },
+        {
+          "state": "Obligations.Count",
+          "equals": "1"
+        },
+        {
+          "state": "Obligations.Item1.Owner",
+          "equals": "DEVELOPING"
+        },
+        {
+          "state": "Obligations.Item1.FailureType",
+          "equals": "IMPLEMENTATION"
+        },
+        {
+          "state": "Obligations.Item1.Reason",
+          "unchanged": true
+        },
+        {
+          "state": "WorkflowState",
+          "not": "AWAITING_USER_SIGNOFF",
+          "why": "sign-off readiness is forbidden while an obligation remains"
+        },
+        {
+          "state": "WorkflowState",
+          "not": "SIGNED_OFF",
+          "why": "no sign-off"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "packages/**",
+        "docs/**",
+        "README.md",
+        "package.json",
+        ".standards/CONTEXT.md",
+        ".standards/docs/scope/**",
+        ".standards/docs/specs/**",
+        ".standards/docs/development/**",
+        ".standards/docs/verification/**",
+        ".standards/docs/reviews/**",
+        ".standards/docs/documentation/**"
+      ],
+      "why": "Synchronizer owns only its record and routes defects; it does not repair code, tests, documentation, or other roles' records"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the unit suite passes offline"
+    },
+    {
+      "cmd": "pnpm --filter export test 2>&1 | grep -qE 'pass 21$'",
+      "expect": "pass",
+      "why": "the unit suite runs 21 tests"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration 2>&1 | grep -qE 'pass 3$' && pnpm --filter export test:integration 2>&1 | grep -q 'without an administrator are denied and write no file'",
+      "expect": "pass",
+      "why": "the integration suite passes three tests including the denied-export test"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the SYNCHRONIZING state with the active obligation is valid for check"
+    },
+    {
+      "cmd": "node -e 'import(`./src/export.ts`).then(({ csvCell }) => { const out = [`=1+2`, `+41`, `-7`, `@SUM(A1)`].map(csvCell); if (out.join(`|`) !== `=1+2|+41|-7|@SUM(A1)`) { console.error(out); process.exit(1); } console.log(`written unchanged: ` + out.join(` `)); })'",
+      "expect": "pass",
+      "why": "the current code still writes formula-prefixed cells unescaped, so the obligation's defect is present"
+    },
+    {
+      "cmd": "! grep -rqiE 'formula|injection' src test docs README.md",
+      "expect": "pass",
+      "why": "no code, test, or documentation addresses formula prefixes"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `SYNCHRONIZING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`PromotionReason`: `Documenting the export in the usage guide requires Documenter and final review.`$' .standards/STATE.md && grep -q '^### Obligation 1$' .standards/STATE.md && grep -q '^`Owner`: `DEVELOPING` `FailureType`: `IMPLEMENTATION` `Reason`:$' .standards/STATE.md && grep -q '^`Cells starting with =, +, -, or @ are exported unescaped, so spreadsheets run them as formulas.`$' .standards/STATE.md && test $(grep -c '`Active`: `true`' .standards/STATE.md) -eq 1 && grep -q '^`Kind`: `FORWARD` `From`: `REVIEWING_FINAL` `FailureType`: `NONE`' .standards/STATE.md && grep -q 'ProjectMode`: `BROWNFIELD' .standards/MODE.md",
+      "expect": "pass",
+      "why": "STATE.md holds SYNCHRONIZING, the promotion reason, inactive recovery, and one active DEVELOPING obligation"
+    },
+    {
+      "cmd": "git log --format=%s -S'### Obligation 1' -- .standards/STATE.md | grep -qx 'Promote CSV export cycle to standard' && test $(git log --format=%s -S'### Obligation 1' -- .standards/STATE.md | wc -l) -eq 1",
+      "expect": "pass",
+      "why": "the obligation was created by the promotion commit and carried unchanged since"
+    },
+    {
+      "cmd": "c=$(git log --format=%H -1 --fixed-strings --grep='Add CSV export of filtered records') && git diff --quiet $c HEAD -- src packages package.json .gitignore pnpm-lock.yaml && test $(git diff --name-only $c HEAD -- test) = test/integration/export-flow.test.ts",
+      "expect": "pass",
+      "why": "the implementation is unchanged since the expedited implementation commit"
+    },
+    {
+      "cmd": "for f in .standards/docs/development/export-20260924T090000Z-a7f3c1d2.md .standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md .standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md .standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md .standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md; do grep -q '`Status`: `COMPLETE`' $f || exit 1; done && grep -q 'Cycle mode `STANDARD`' .standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md",
+      "expect": "pass",
+      "why": "every upstream record says COMPLETE and the implementation review is the standard one"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && test ! -e exports && test ! -e .standards/docs/synchronization && ! grep -rqE 'COMMIT:|BLOB:' .standards",
+      "expect": "pass",
+      "why": "clean tree, no export files, no synchronization record, no unresolved placeholders"
+    },
+    {
+      "cmd": "git log -16 --format=%s | paste -s -d '|' - | grep -qx 'Record CSV export final review|Record CSV export documentation|Document CSV export in usage guide|Record CSV export implementation review|Record CSV export verification|Add integration test for denied exports|Reconcile CSV export plan with scope and design|Design CSV export|Define CSV export scope|Record project context for CSV export|Promote CSV export cycle to standard|Record rework request for CSV export|Record expedited CSV export review|Mark CSV export plan complete|Add CSV export of filtered records|Plan CSV export implementation'",
+      "expect": "pass",
+      "why": "history shows the expedited phase, the rework, the promotion, and the standard phases in order"
+    }
+  ],
+  "notes": "Built on export-project (not export-synchronizing, whose history starts the cycle as STANDARD with PromotionReason NONE and no obligations, contradicting a promoted cycle). Sixteen post-install commits tell the expedited-then-promoted story. 50: expedited first cycle (DEVELOPING, EXPEDITED, Handoff INITIAL) with an APPROVED plan using EXPEDITED_REQUEST. 52: the export implementation (byte-identical to export-synchronizing 28-export). 54: plan COMPLETE, REVIEWING_IMPLEMENTATION. 56: expedited implementation review COMPLETE with no findings, AWAITING_USER_SIGNOFF. 58: USER_REWORK from AWAITING_USER_SIGNOFF to DEVELOPING (IMPLEMENTATION) with recovery frame 1 for cells starting with =, +, -, or @. 60: PROMOTE from DEVELOPING to AUDITING/STANDARD with PromotionReason (usage-guide documentation needs Documenter), Request updated, frame converted to Outstanding Obligation 1 (DEVELOPING, IMPLEMENTATION, same Reason), recovery cleared. 62: Auditor CONTEXT.md with the expedited code under Active-Cycle Non-Baseline Work. 64-66: scope (AC-001..003) and design as in export-synchronizing. 68: plan reconciled to AC mappings, still COMPLETE, nothing reopened. 70: denied-export integration test. 72-80: verification, standard implementation review (superseding the expedited one), guide, documentation record, final review; all COMPLETE, mirroring export-synchronizing. Every STATE.md from 60 on keeps the obligation; final state SYNCHRONIZING, FORWARD from REVIEWING_FINAL, recovery inactive, obligation active. src/export.ts never neutralizes formula prefixes.",
+  "case": "synchronizer-38",
+  "caseHash": "27da76b2d1bbe014",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T15:57:08.777Z",
+    "verdict": "pass",
+    "fixtureHash": "6699577779c741d1",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "4c84358bfe2bf5f9",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:41:02.000Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T15:44:48.587Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-expedited-plan/.standards/STATE.md: NONE",
+        "layers/54-expedited-complete/.standards/STATE.md: NONE",
+        "layers/56-expedited-review/.standards/STATE.md: NONE",
+        "layers/58-rework/.standards/STATE.md: NONE",
+        "layers/60-promote/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/62-context/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/64-scope/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/66-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/68-plan/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/72-verification/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/74-review/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/78-documentation/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/80-final-review/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:41:02.000Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

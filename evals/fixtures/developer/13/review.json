@@ -1,0 +1,61 @@
+{
+  "conditions": [
+    {
+      "condition": "WorkflowState is DEVELOPING in a brownfield STANDARD cycle with no recovery",
+      "where": ".standards/STATE.md (DEVELOPING, STANDARD, Recovery inactive, FORWARD from ARCHITECTING); .standards/MODE.md BROWNFIELD",
+      "status": "realized"
+    },
+    {
+      "condition": "An approved development plan exists and Developer can continue implementation",
+      "where": ".standards/docs/development/delete-project-endpoint-20260924T090000Z-3c9e51a7.md (Status APPROVED, Mode AUTONOMOUS, User Style NONE locked, DEV-001 PENDING); STATE BlockedOn NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "The plan changes only a Next.js App Router route handler written in TypeScript",
+      "where": "Plan DEV-001 Affected Area 'app/api/projects/[id]/route.ts only'; design Decision; package.json next 15.1.6; tsconfig; app/ directory",
+      "status": "realized"
+    },
+    {
+      "condition": "The change renders no UI and modifies no JSX/HTML or styles, while UI/CSS files exist so loading those styles would be unjustified",
+      "where": "app/layout.tsx, app/page.tsx, app/globals.css exist and are outside the plan; scope Non-goals exclude UI changes",
+      "status": "realized"
+    },
+    {
+      "condition": "The repository has established route-handler patterns",
+      "where": "app/api/projects/route.ts (GET/POST) and app/api/projects/[id]/route.ts (GET awaiting Promise params, jsonError for 404); lib/http.ts; CONTEXT.md Conventions",
+      "status": "realized"
+    },
+    {
+      "condition": "Upstream scope, design, and project context are complete and consistent for a STANDARD Developer run",
+      "where": ".standards/CONTEXT.md, scope AC-001/AC-002, design with Acceptance Coverage; check.mjs ok",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": 3,
+      "detail": "Assertion 3 speaks of 'installed Next.js semantics', but node_modules is absent and the registry is blocked, so the role cannot inspect an installed Next.js package or run tsc/next build. The pinned version in package.json (15.1.6), the awaited Promise params in the existing GET, and CONTEXT.md's Conventions and Known Unknowns give the judge enough to grade the semantics. The harness cannot install Next.js offline. The catalog expected node_modules for typecheck self-checks, so a correct run will record a self-check limitation instead.",
+      "recommendation": "run_as_is",
+      "fix": "Acceptable: the judge grades against the pinned version and the existing handler pattern. graderOnly already explains this."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "A pnpm Next.js project with no pnpm-lock.yaml is slightly unusual. It does not affect style selection or the route-handler pattern.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition: a brownfield STANDARD cycle in DEVELOPING with an approved AUTONOMOUS plan confined to app/api/projects/[id]/route.ts. Established route-handler patterns are present, and unused React/HTML/CSS surface exists without being part of the change. Nothing leaks. check.mjs is ok, the selfChecks confirm the test and toolchain facts, and the assertion-3 preconditions (route changed; UI, lib, and tests unchanged) cannot fail a correct run. The only caveat is that Next.js is not installed, which is acceptable given the pinned version and the existing pattern.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T02:16:17.645Z",
+  "costUsd": 0.1999226,
+  "ms": 43904,
+  "fixtureHash": "abe4ae399c8432dd"
+}

@@ -1,0 +1,71 @@
+{
+  "conditions": [
+    {
+      "condition": "Workflow is in DEVELOPING for an active cycle",
+      "where": ".standards/STATE.md: WorkflowState DEVELOPING, CycleMode STANDARD, Active Work.Id set, BlockedOn NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "An approved development plan exists for the cycle and is referenced by Active Work",
+      "where": ".standards/docs/development/add-tags-...-3e9a1c5b.md (Status APPROVED, DEVELOPMENT provenance); STATE Active Work.Development points to it",
+      "status": "realized"
+    },
+    {
+      "condition": "The plan persists User Style tony with User Style Locked true",
+      "where": "plan header: `User Style`: `tony` `User Style Locked`: `true`",
+      "status": "realized"
+    },
+    {
+      "condition": "The tony profile exists",
+      "where": ".standards/user-styles/developer/tony.md",
+      "status": "realized"
+    },
+    {
+      "condition": "The current collaboration mode differs from STEPWISE, so a switch is observable",
+      "where": "plan header `Mode`: `AUTONOMOUS`",
+      "status": "realized"
+    },
+    {
+      "condition": "Approved work remains to continue (a resumable implementation)",
+      "where": "plan DEV-001..DEV-003 all PENDING; DEV-001 dependency-ready; src/notes.js and src/format.js are unmodified baseline",
+      "status": "realized"
+    },
+    {
+      "condition": "Upstream inputs are valid so Developer may proceed",
+      "where": ".standards/CONTEXT.md, scope (AC-001..AC-004), design covering all ACs; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "Committed, clean git state",
+      "where": "git status clean on main; plan committed in 'Approve development plan for note tags'",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 1,
+      "detail": "The catalog marked assertions 1 and 2 deterministic-complete, but the spec uses complete:false. That is correct: no predicate can assert that a new BlockedOn concerns the stepwise continue request rather than the style, or that no reapproval was requested in prose. The preconditions it uses are ones a correct run satisfies: Id and Development unchanged, WorkflowState DEVELOPING, Status not PROPOSED, and upstream records unchanged. A STEPWISE run implements DEV-001 and then pauses inside DEVELOPING.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "invariant",
+      "assertion": -1,
+      "detail": "The extra invariant `unchanged: [\"test/**\"]` is consistent with the Developer skill, which says not to create or rewrite Tester-owned test artifacts. A correct run uses `npm test` and `node -e` self-checks, as the plan specifies.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition: DEVELOPING, an approved plan with User Style tony and User Style Locked true, an existing tony.md profile, and an AUTONOMOUS mode, so the switch to STEPWISE is observable. check.mjs is clean, nothing leaks, and the records are coherent. Every check is a necessary condition a correct STEPWISE run satisfies, and the standard invariants plus the test/** invariant fit the case.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T02:21:20.873Z",
+  "costUsd": 0.1513506,
+  "ms": 21622,
+  "fixtureHash": "f5a41b6162a43b1b"
+}

@@ -1,0 +1,68 @@
+{
+  "conditions": [
+    {
+      "condition": "Navigator is in an ongoing GRILL_ME quiz in the same conversation",
+      "where": "spec history: the first user turn '/navigator Grill me on the message validation and retry work…' and assistant quiz turns",
+      "status": "realized"
+    },
+    {
+      "condition": "Workflow is at DEVELOPING",
+      "where": ".standards/STATE.md `WorkflowState`: `DEVELOPING`, CycleMode STANDARD",
+      "status": "realized"
+    },
+    {
+      "condition": "One active recovery frame",
+      "where": ".standards/STATE.md Recovery Active true, Frame 1 (From TESTING, Owner DEVELOPING, IMPLEMENTATION, ResumeAt TESTING, RerunThrough NONE), matching the FAILURE handoff",
+      "status": "realized"
+    },
+    {
+      "condition": "Two answers demonstrated input validation",
+      "where": "history user turns 2 and 3, both judged correct against src/validate.js lines 9-21, 13, 15 and src/send.js lines 26-27, 31 (line references verified)",
+      "status": "realized"
+    },
+    {
+      "condition": "Retry behavior was not assessed",
+      "where": "the last assistant history turn only offers to move to retry and asks no retry question",
+      "status": "realized"
+    },
+    {
+      "condition": "Retry topic exists in the repo with readable evidence for 'next reading'",
+      "where": "src/send.js retry loop lines 29-37, test/retry.test.js, verification report Open Findings",
+      "status": "realized"
+    },
+    {
+      "condition": "Catalog records: context, scope, architecture, development",
+      "where": ".standards/CONTEXT.md and .standards/docs/{scope,specs,development}/<id>.md, plus the verification report",
+      "status": "realized"
+    },
+    {
+      "condition": "User asks to stop the quiz",
+      "where": "prompt.utterance 'Stop the quiz now.'",
+      "status": "realized"
+    },
+    {
+      "condition": "Committed, clean git state",
+      "where": "git status clean on main; five commits",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The run message will be '/navigator Stop the quiz now.', which re-invokes the skill inside an ongoing Navigator conversation. That is slightly unusual but plausible, and the history makes the context clear.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes a STANDARD DEVELOPING cycle with one IMPLEMENTATION recovery frame and a coherent GRILL_ME history: two validation questions answered correctly, line references verified, and retry offered but never asked. check.mjs is ok and the records are consistent. The checks (state unchanged, unchanged **) cannot fail a correct non-mutating stop, and the Navigator invariants are present.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T15:41:54.745Z",
+  "costUsd": 0.186552,
+  "ms": 27848,
+  "fixtureHash": "75bed3c6898a8324"
+}

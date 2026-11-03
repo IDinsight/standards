@@ -1,0 +1,1 @@
+"""Household and beneficiary registry."""

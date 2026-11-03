@@ -1,0 +1,81 @@
+{
+  "conditions": [
+    {
+      "condition": "Project is initialized and BROWNFIELD",
+      "where": ".standards/MODE.md (installer brownfield template, `ProjectMode`: `BROWNFIELD`); install commit e841406",
+      "status": "realized"
+    },
+    {
+      "condition": "WorkflowState is AUDITING",
+      "where": ".standards/STATE.md line 3",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode is UNSET",
+      "where": ".standards/STATE.md line 3",
+      "status": "realized"
+    },
+    {
+      "condition": "PendingCycleMode is EXPEDITED, persisted from an earlier user preference",
+      "where": ".standards/STATE.md line 3; commit 7934dc7 'Choose expedited mode for the next cycle'",
+      "status": "realized"
+    },
+    {
+      "condition": "PendingCycleRequest UNSET and PendingCycleBlockedOn NONE before the run (no blocked request yet)",
+      "where": ".standards/STATE.md line 4",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id and Request are UNSET (first real request, no cycle yet), handoff INITIAL, recovery and obligations inactive",
+      "where": ".standards/STATE.md Active Work, Handoff, Recovery, Outstanding Obligations sections",
+      "status": "realized"
+    },
+    {
+      "condition": "A shared authentication contract exists that the API, web app, and worker all depend on",
+      "where": "shared/session.js (SessionStore, sid cookie, 30-day TTL); api/auth.js and api/routes.js; web/apiClient.js (credentials: include); worker/apiClient.js (SESSION_COOKIE + WORKER_SESSION_ID)",
+      "status": "realized"
+    },
+    {
+      "condition": "Components deploy separately, so replacing the contract needs staged compatibility (request is not a bounded expedited change)",
+      "where": "README.md 'The API, web app, and worker are deployed separately and do not always release together.'; utterance asks for staged compatibility",
+      "status": "realized"
+    },
+    {
+      "condition": "Small working brownfield codebase with passing tests, all committed",
+      "where": "package.json test script; selfCheck passes 14 tests; git status clean",
+      "status": "realized"
+    },
+    {
+      "condition": "check.mjs reports a valid state",
+      "where": "gate checkMjs ok:true",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "Commit 7934dc7 changes only STATE.md to record the earlier pending EXPEDITED preference. This is plausible for a persisted user preference and does not hint at the verdict.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 5,
+      "detail": "Assertion 5 is `complete: true` and graded on state and files: CycleMode UNSET, PendingCycleMode EXPEDITED, WorkflowState AUDITING, project files and .standards/docs unchanged. A reply that announces a STANDARD reinterpretation without persisting it would pass. That reply would not be silent, though, and the protocol forbids persisting the reinterpretation, which the checks catch. Acceptable.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition. It is an installed BROWNFIELD project in AUDITING with CycleMode UNSET, PendingCycleMode EXPEDITED, and unset Active Work, plus a small shared session contract used by separately deployed API, web, and worker components; nothing in the repository or utterance states the ineligibility verdict. Every check matches what the protocol's 'Start a cycle' step 3 requires: Active Work, CycleMode, PendingCycleMode, and WorkflowState unchanged, and the request and decision persisted in the pending fields. No check can fail a correct run, and the standard invariants are present.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T02:18:07.606Z",
+  "costUsd": 0.1486706,
+  "ms": 25891,
+  "fixtureHash": "365251a98b1f0372"
+}

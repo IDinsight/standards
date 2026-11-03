@@ -1,0 +1,101 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState DEVELOPING, CompletionPolicy FULL_DELIVERABLE",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id is login-rate-limit-20260924T090000Z-a84c1e6f",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery inactive, no outstanding obligations, BlockedOn NONE",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work points to this cycle's completed scope, technical design and development plan",
+      "where": ".standards/STATE.md Scope/Architecture/Development; .standards/docs/{scope,specs,development}/<id>.md with matching provenance",
+      "status": "realized"
+    },
+    {
+      "condition": "Valid Auditor context exists",
+      "where": ".standards/CONTEXT.md",
+      "status": "realized"
+    },
+    {
+      "condition": "NestJS TypeScript API; AuthController POST /auth/login calls AuthService.login",
+      "where": "src/auth/auth.controller.ts, src/auth/auth.service.ts, src/auth/auth.module.ts",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope AC-001: a client sending more than 10 login requests within one minute gets 429 until the minute ends",
+      "where": ".standards/docs/scope/<id>.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Design uses @nestjs/throttler with in-memory storage, applied to the login route only",
+      "where": ".standards/docs/specs/<id>.md Decision/Build Plan",
+      "status": "realized"
+    },
+    {
+      "condition": "package.json already lists @nestjs/throttler; nothing configures ThrottlerModule",
+      "where": "package.json; src/**",
+      "status": "realized"
+    },
+    {
+      "condition": "Plan APPROVED, AUTONOMOUS, User Style NONE, locked, AFTER_IMPLEMENTATION, Current Increment NONE",
+      "where": ".standards/docs/development/<id>.md header",
+      "status": "realized"
+    },
+    {
+      "condition": "Only step DEV-001 PENDING, Acceptance AC-001, adding rate limiting to the login route",
+      "where": ".standards/docs/development/<id>.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Dependencies not installed; registries blocked; build and tests cannot run",
+      "where": "node_modules absent; runtime.blockHosts; selfChecks show pnpm test, pnpm run build, and pnpm install failing",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope and design complete and consistent (grader-only)",
+      "where": "scope and spec agree on 10 requests per 60000 ms, login only, 429",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The catalog asked for a committed pnpm-lock.yaml, but none is committed (the generator explains why). The case does not state that a lockfile exists, and its absence does not affect what Developer does or how it is graded.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "case-defect",
+      "assertion": 1,
+      "detail": "Developer's full-completion gate allows self-check limitations only if they are 'routed as a blocker rather than ignored'. A run could read that as requiring Active Work.BlockedOn and a question to the user instead of a FORWARD handoff. The case's expected output explicitly calls for recording the limits and handing off to Tester, so the checks follow the case. The ambiguity lies in the case and skill wording, not in the fixture.",
+      "recommendation": "run_as_is",
+      "fix": "If runs split on this, clarify in the case or skill whether an environment-only limitation that is recorded in the plan permits handoff."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized: the brownfield NestJS project, a consistent scope and design, the approved AUTONOMOUS plan with DEV-001 PENDING, valid context, and uninstalled dependencies with blocked registries (selfChecks prove all of these). check.mjs is clean, nothing leaks, and the checks require only fixed state values, plan fields, and the /tester invocation, which every correct handoff produces. The only notes are the missing lockfile and a minor case-level ambiguity about whether a self-check limitation must block the handoff.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-11-02T17:30:09.815Z",
+  "costUsd": 0.2118756,
+  "ms": 38883,
+  "fixtureHash": "3ad8ce1ca159369e"
+}

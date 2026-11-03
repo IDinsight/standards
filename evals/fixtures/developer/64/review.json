@@ -1,0 +1,71 @@
+{
+  "conditions": [
+    {
+      "condition": "STANDARD cycle in DEVELOPING with an active cycle ID",
+      "where": ".standards/STATE.md (WorkflowState DEVELOPING, CycleMode STANDARD, CompletionPolicy FULL_DELIVERABLE, Id low-stock-report-20260924T090000Z-5c8e2a17)",
+      "status": "realized"
+    },
+    {
+      "condition": "Development plan exists, is PROPOSED and has never been approved",
+      "where": ".standards/docs/development/low-stock-report-...md header Status PROPOSED; both steps PENDING; Plan Notes say it awaits approval; STATE BlockedOn holds the approval request",
+      "status": "realized"
+    },
+    {
+      "condition": "Plan records User Style NONE and User Style Locked false",
+      "where": "development plan header",
+      "status": "realized"
+    },
+    {
+      "condition": "Both .standards/user-styles/developer/tony.md and tony.md.md exist",
+      "where": "commit 'Add personal developer styles'; selfCheck confirms both exist and differ",
+      "status": "realized"
+    },
+    {
+      "condition": "The two style files hold different preferences, so loading the unselected one is observable",
+      "where": "tony.md (JSDoc everywhere, reduce, grouped exports) vs tony.md.md (compact, for...of, inline exports)",
+      "status": "realized"
+    },
+    {
+      "condition": "Upstream scope, design, and context are complete and consistent, so no routing is required",
+      "where": ".standards/docs/scope, .standards/docs/specs, .standards/CONTEXT.md; AC-001..AC-003 covered; FORWARD handoff from ARCHITECTING",
+      "status": "realized"
+    },
+    {
+      "condition": "No implementation has started (small committed project, clean tree)",
+      "where": "src/report.js has only stockSummary; git status clean; npm test passes",
+      "status": "realized"
+    },
+    {
+      "condition": "User utterance is the style-selection request only",
+      "where": "prompt.utterance (catalog utterance; the leaking 'Make only...' sentence is omitted)",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 2,
+      "detail": "Assertion 2 (not reading tony.md contents) has no deterministic check because there is no read predicate. graderOnly tells the judge the exact path to watch for, and notes that tony.md.md contains it as a substring.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "tony.md conflicts with the project convention in CONTEXT.md ('named exports declared inline'), while tony.md.md agrees with it. This is harmless and does not hint at which file to select, since the user names the file explicitly.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes the stated state: a STANDARD cycle at DEVELOPING with a never-approved PROPOSED plan (User Style NONE, unlocked) and two distinct style files, tony.md and tony.md.md. check.mjs is ok, and the checks (User Style tony.md.md, Status PROPOSED, lock false, BlockedOn still set, source unchanged) are necessary conditions any correct run satisfies. Assertion 2 is correctly left to the judge, nothing leaks, and the invariants fit.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T02:53:35.482Z",
+  "costUsd": 0.1745342,
+  "ms": 38032,
+  "fixtureHash": "70e70299171b5ac6"
+}

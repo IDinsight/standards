@@ -1,0 +1,223 @@
+{
+  "base": null,
+  "date": "2026-10-05T09:00:00Z",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial reportkit"
+    },
+    {
+      "dir": "layers/51-retention",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Shorten default export retention to 14 days"
+    },
+    {
+      "dir": "layers/55-audit",
+      "action": "commit",
+      "message": "Record project context for operator guide update"
+    },
+    {
+      "dir": "layers/56-scope-design",
+      "action": "commit",
+      "message": "Scope and design for operator guide update"
+    },
+    {
+      "dir": "layers/60-guide",
+      "action": "commit",
+      "message": "docs(guide): document configuration, export, and pruning"
+    },
+    {
+      "dir": "layers/65-final-review",
+      "action": "commit",
+      "message": "Record final review of operator guide"
+    },
+    {
+      "dir": "layers/70-correction",
+      "action": "unstaged"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "documenter",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The unstaged correction in docs/operator-guide.md (retention_days default 14 plus a doctest of the three defaults) is accurate: reportkit/config.py sets DEFAULT_RETENTION_DAYS = 14, and python3 -m doctest docs/operator-guide.md and python3 scripts/check_links.py docs/operator-guide.md both pass on the working tree, so the record's check evidence is current.",
+    "The only remaining documentation item is the AC-005 docs/ERRATA.md entry. docs/CONTRIBUTING.md requires one entry per review once that review is finished and forbids adding an entry while the review is in progress. The final review is IN_PROGRESS and has not yet assessed AC-003, AC-004, or AC-005, so the entry depends solely on that unfinished assessment; writing it now would break the project convention.",
+    "No other documentation gap, discrepancy, blocker, or omitted-owner dependency exists: the Exporting, Pruning, and Related documents content is accurate against reportkit/export.py and reportkit/prune.py.",
+    "The expected route is the Documenter corrective return: keep the documentation record IN_PROGRESS (or BLOCKED), pop recovery frame 1, and move to REVIEWING_FINAL with Handoff RESUME from DOCUMENTING, presenting a fresh-chat Reviewer invocation for the FINAL_DELIVERABLE review; no errata entry, no COMPLETE record, no FORWARD, no AWAITING_USER_SIGNOFF.",
+    "Final review finding F-001 stays OPEN in the review report for Reviewer to reassess; Documenter must not edit the review report.",
+    "After Reviewer finishes, the documentation record is still incomplete, so the errata entry and the full Documenter gate (and then synchronization) must be re-established before sign-off readiness."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "guide-20261004T120000Z-1a2b3c4d",
+    "DOCREC": ".standards/docs/documentation/guide-20261004T120000Z-1a2b3c4d.md",
+    "REVIEW": ".standards/docs/reviews/guide-20261004T120000Z-1a2b3c4d/final-deliverable.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "provenance": {
+            "path": "${DOCREC}",
+            "artifact": "DOCUMENTATION",
+            "cycle": "${ID}"
+          },
+          "why": "the record is still this cycle's documentation record"
+        },
+        {
+          "field": {
+            "path": "${DOCREC}",
+            "name": "Status",
+            "not": "COMPLETE"
+          },
+          "why": "the full Documenter gate is unmet"
+        },
+        {
+          "contains": {
+            "path": "${DOCREC}",
+            "regex": "`Status`:[^`]*`(IN_PROGRESS|BLOCKED)`"
+          },
+          "why": "status is one of the two incomplete values"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "state": "CycleMode",
+          "equals": "DOCUMENTATION",
+          "why": "no conversion or promotion"
+        },
+        {
+          "state": "WorkflowState",
+          "in": [
+            "DOCUMENTING",
+            "REVIEWING_FINAL"
+          ],
+          "why": "only the interrupted included state or the frame's ResumeAt; never sign-off readiness or an omitted state"
+        },
+        {
+          "state": "Handoff.Kind",
+          "not": "FORWARD",
+          "why": "an incomplete corrective return never takes a normal forward handoff"
+        },
+        {
+          "check_ok": true
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "${REVIEW}"
+          ],
+          "why": "Documenter does not touch Reviewer's report or close its finding"
+        },
+        {
+          "reply_matches": "/reviewer",
+          "why": "returning to the interrupted final review requires a Reviewer invocation in Claude Code syntax"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "reportkit/**",
+        "tests/**",
+        "scripts/**"
+      ],
+      "why": "a documentation cycle does not change behavior, tests, or tooling"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "python3 -m pytest -q",
+      "expect": "pass",
+      "why": "the existing unit tests pass"
+    },
+    {
+      "cmd": "python3 -m doctest docs/operator-guide.md",
+      "expect": "pass",
+      "why": "the corrected guide's examples, including the new defaults example, pass, so the recorded doctest evidence is current"
+    },
+    {
+      "cmd": "python3 scripts/check_links.py docs/operator-guide.md",
+      "expect": "pass",
+      "why": "the guide's relative links resolve, as recorded"
+    },
+    {
+      "cmd": "python3 -c 'from reportkit.config import load_config; assert load_config({}).retention_days == 14'",
+      "expect": "pass",
+      "why": "the implemented default retention is 14 days"
+    },
+    {
+      "cmd": "git show HEAD:docs/operator-guide.md | grep -qF '| `retention_days` | `30` |'",
+      "expect": "pass",
+      "why": "the committed guide still states the 30-day default that final review flagged"
+    },
+    {
+      "cmd": "grep -qF '| `retention_days` | `14` |' docs/operator-guide.md",
+      "expect": "pass",
+      "why": "the working-tree guide carries the saved correction"
+    },
+    {
+      "cmd": "git diff --name-only | grep -qx docs/operator-guide.md",
+      "expect": "pass",
+      "why": "the guide correction is an unstaged working-tree change"
+    },
+    {
+      "cmd": "test $(grep -c '^## ' docs/ERRATA.md) -eq 1",
+      "expect": "pass",
+      "why": "docs/ERRATA.md has only the earlier June review entry; no entry exists yet for this cycle's review"
+    }
+  ],
+  "notes": "Brownfield Python library reportkit (stdlib + pytest). Pre-install: 50-project initial commit (DEFAULT_RETENTION_DAYS 30, guide says 30, docs/CONTRIBUTING.md with its Corrections after review rule, docs/ERRATA.md with one older entry, scripts/check_links.py); 51-retention code-and-test-only commit changing the default to 14 (guide not updated). Case layers: 55 Auditor context and STATE at SCOPING after FORWARD from AUDITING (standalone Documenter request, DOCUMENTATION, policy NONE); 56 scope AC-001..AC-005 (AC-005: review corrections recorded in docs/ERRATA.md per docs/CONTRIBUTING.md) and documentation-mode design covering every AC, STATE DOCUMENTING; 60 Documenter's first pass of the guide (still says 30 in the Configuration table) with a COMPLETE record, STATE REVIEWING_FINAL; 65 interrupted FINAL_DELIVERABLE review (IN_PROGRESS, F-001 OPEN on the retention default, AC-003..AC-005 not yet assessed) and STATE DOCUMENTING with FAILURE from REVIEWING_FINAL and Frame 1 From/ResumeAt REVIEWING_FINAL, Owner DOCUMENTING, FailureType DOCUMENTATION, RerunThrough NONE; 70 unstaged: guide corrected to 14 with a defaults doctest, and the record reopened IN_PROGRESS with DOC-001 RESOLVED, current check evidence, and the remaining AC-005 errata item. The remaining disposition that depends solely on the unfinished final review is the errata entry, which the project convention allows only once the review is finished.",
+  "case": "documenter-84",
+  "caseHash": "132ad4c5d3d9affc",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T02:59:32.725Z",
+    "verdict": "pass",
+    "fixtureHash": "657692d2be91c625",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-31T00:09:16.258Z"
+  }
+}

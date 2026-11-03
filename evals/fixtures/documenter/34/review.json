@@ -1,0 +1,94 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD, CycleMode STANDARD, WorkflowState DOCUMENTING",
+      "where": ".standards/MODE.md; .standards/STATE.md head",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id = export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, architecture, context, development, verification and implementation review exist with matching provenance and current evidence",
+      "where": ".standards/docs/{scope,specs,development,verification,reviews/<id>/implementation.md}, .standards/CONTEXT.md; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-001 covers CSV export behavior; AC-002 requires an accurate usage guide",
+      "where": "scope Work items 1 and 2 (checkbox list items)",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and obligations inactive, BlockedOn NONE, editing unrestricted",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope contradiction about output format",
+      "where": "scope Constraints 'tab-separated text with a .tsv extension' vs Goal, Non-goals 'Formats other than CSV', AC-001/AC-002 CSV",
+      "status": "realized"
+    },
+    {
+      "condition": "Independent formal verification gap",
+      "where": "verification Acceptance Evidence row and Scenario Budget claim 'an export with an unknown status is rejected and writes no file' under E2; test/integration/export-flow.test.ts has only 3 tests, none for that; behavior itself correct (selfCheck)",
+      "status": "realized"
+    },
+    {
+      "condition": "Design and review records contain claims requiring later reassessment",
+      "where": "specs CSV format contract; implementation review 'Supported' row for invalid status citing the nonexistent unknown-status scenario",
+      "status": "realized"
+    },
+    {
+      "condition": "Usage guide not yet documenting the export; no documentation record yet",
+      "where": "docs/usage.md has no export section; no .standards/docs/documentation/",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation has no material defect beyond the stated discrepancies",
+      "where": "src/routes/export.ts, src/export.ts; unit and integration suites pass",
+      "status": "realized"
+    },
+    {
+      "condition": "Committed, clean git tree",
+      "where": "git status clean on main",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "case-defect",
+      "assertion": 1,
+      "detail": "The case says synchronization records contain claims, but a synchronization record at DOCUMENTING with inactive recovery (also stated) is unreachable under Recovery Mechanics. The fixture keeps inactive recovery and omits the synchronization record, so the 'synchronization record is not edited' part of assertion 1 holds vacuously. The rest of assertion 1 (scope checkboxes, tests, design, review) is observable.",
+      "recommendation": "run_as_is",
+      "fix": "None; reasonable resolution of a contradictory case statement."
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 0,
+      "detail": "The contains regex '`Owner`:\\s*`[^`]*Tester' (case-insensitive) requires the DOC entry's Owner code span to contain 'Tester'. The template uses this field shape with a role name, so correct runs will almost certainly match. A run that writes the state name (`TESTING`) or uses bold prose instead of the code-span field would fail.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally widen to '`Owner`:\\s*`[^`]*(Tester|TESTING|VERIFICATION)'."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The verification record's Scenario Budget (2 reused plus 2 active-change scenarios) and its E2 count of 3 tests are mildly inconsistent. Read against the test file, this is how the gap becomes discoverable. It is ordinary-looking, not a hint.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Both established discrepancies are planted realistically and are independently discoverable from repository evidence: the scope's TSV constraint contradicts its CSV goal, non-goals and ACs, and the verification record claims an unknown-status integration scenario that does not exist. State, records and check.mjs are coherent. The checks for SCOPING routing, a single frame, at least two DOC entries, a non-COMPLETE record, and unchanged scope, design, review and tests are necessary conditions for a correct run. The only gaps are a vacuous synchronization clause, which comes from the case's own contradiction, and a slightly narrow Owner regex.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T16:33:00.743Z",
+  "costUsd": 0.3659366,
+  "ms": 98331,
+  "fixtureHash": "5ff0b93c6818d2a4"
+}

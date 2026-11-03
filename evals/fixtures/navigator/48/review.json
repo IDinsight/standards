@@ -1,0 +1,53 @@
+{
+  "conditions": [
+    {
+      "condition": "Navigator is already in GRILL_ME mode in an ongoing conversation",
+      "where": "spec history: the user turn '/navigator Grill me on how creating a contact works...' and two assistant quiz turns",
+      "status": "realized"
+    },
+    {
+      "condition": "The previous quiz question asked what happens when validation fails",
+      "where": "last assistant history turn: 'what does `create_contact` return in that case, and what happens in the `contacts` table?'",
+      "status": "realized"
+    },
+    {
+      "condition": "The user's answer claims failed validation still writes a row",
+      "where": "prompt.utterance 'Failed validation still writes a row.'",
+      "status": "realized"
+    },
+    {
+      "condition": "The inspected source returns before the save call on failed validation",
+      "where": "app/handlers.py lines 7-8 (`if errors: return 400, ...`) come before line 10 (`store.save(contact)`); the history says handlers.py was read",
+      "status": "realized"
+    },
+    {
+      "condition": "Repository evidence corroborates that no row is written",
+      "where": "tests/test_contacts.py::test_missing_email_is_rejected asserts store.count() == 0; selfChecks pass",
+      "status": "realized"
+    },
+    {
+      "condition": "Small committed code, no records needed, workflow state irrelevant",
+      "where": "pre-install commit 'Add contact creation with input validation'; installer default STATE.md; clean git status",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The test name test_missing_email_is_rejected and its count()==0 assertion directly support the correct answer. This is ordinary project evidence that a Navigator should use, not a hint about the case, so it is acceptable.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The history sets up an ongoing GRILL_ME quiz whose pending question is the validation-failure path. The utterance is the user's wrong answer, and handlers.py returns at line 8 before store.save at line 10, as stated. Invariants and the unchanged/head_unchanged preconditions fit a non-mutating Navigator, both assertions are left to the judge, and nothing leaks the answer, so the fixture is fit to run.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T15:40:14.421Z",
+  "costUsd": 0.0819342,
+  "ms": 14472,
+  "fixtureHash": "dfd5e02a9b8e7f44"
+}

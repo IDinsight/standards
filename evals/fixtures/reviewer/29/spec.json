@@ -1,0 +1,174 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial slug helper"
+    },
+    {
+      "dir": "layers/50-slug-change",
+      "action": "commit",
+      "message": "Collapse repeated hyphens in slugs"
+    },
+    {
+      "dir": "layers/60-impl-review",
+      "action": "commit",
+      "message": "Record implementation review"
+    },
+    {
+      "dir": "layers/70-final-start",
+      "action": "commit",
+      "message": "Start final review"
+    }
+  ],
+  "expectCheck": {
+    "ok": false,
+    "problemsMatch": [
+      "REVIEWING_FINAL is not part of an EXPEDITED cycle"
+    ]
+  },
+  "prompt": {
+    "skill": "reviewer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "No legal transition produced CycleMode EXPEDITED with WorkflowState REVIEWING_FINAL; the commit 'Record implementation review' moved an expedited cycle from REVIEWING_IMPLEMENTATION to REVIEWING_FINAL, which is not in the expedited topology (DEVELOPING -> REVIEWING_IMPLEMENTATION -> AWAITING_USER_SIGNOFF).",
+    "The final-deliverable review report at .standards/docs/reviews/collapse-repeated-hyphens-in-slugs-20260924T090000Z-3e9b7c41/final-deliverable.md is an IN_PROGRESS skeleton with no assessment; final review does not exist in EXPEDITED and must not be performed, adopted, or completed.",
+    "The implementation itself is correct and its tests pass; no implementation defect exists in this fixture."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "collapse-repeated-hyphens-in-slugs-20260924T090000Z-3e9b7c41",
+    "DEV": ".standards/docs/development/collapse-repeated-hyphens-in-slugs-20260924T090000Z-3e9b7c41.md",
+    "IMPL": ".standards/docs/reviews/collapse-repeated-hyphens-in-slugs-20260924T090000Z-3e9b7c41/implementation.md",
+    "FINAL": ".standards/docs/reviews/collapse-repeated-hyphens-in-slugs-20260924T090000Z-3e9b7c41/final-deliverable.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "unchanged": [
+            "${FINAL}"
+          ],
+          "why": "the existing final-deliverable report must not be adopted or written to"
+        },
+        {
+          "field": {
+            "path": "${FINAL}",
+            "name": "Status",
+            "not": "COMPLETE"
+          },
+          "why": "no final report is marked complete"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "REVIEWING_FINAL",
+          "why": "no invented transition off the inconsistent state"
+        },
+        {
+          "state": "CycleMode",
+          "equals": "EXPEDITED",
+          "why": "no silent promotion or mode change"
+        },
+        {
+          "state": "Handoff.Kind",
+          "unchanged": true,
+          "why": "no new handoff recorded"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "false",
+          "why": "no fabricated failure frame"
+        },
+        {
+          "unchanged": [
+            "${IMPL}",
+            "${DEV}"
+          ],
+          "why": "implementation review report and plan are not rewritten as a reinterpreted review"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles do not commit unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Reviewer must not change git state"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no problem that was not there before"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "package.json"
+      ],
+      "why": "Reviewer does not edit implementation or tests"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/slug.test.js",
+      "expect": "pass",
+      "why": "the committed implementation passes its tests, so the case is purely about the inconsistent workflow state"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 00-project (pre-install): small Node ESM slugify helper with node:test tests. 50-slug-change: implementation of the bounded expedited request (collapse repeated hyphens, trim edge hyphens), two new tests, a COMPLETE expedited development plan (EXPEDITED_REQUEST, AFTER_IMPLEMENTATION, Current Increment NONE), STATE at REVIEWING_IMPLEMENTATION. 60-impl-review: COMPLETE implementation review (no material findings, cites ${COMMIT}/${BLOB} identities) and STATE hand-moved to WorkflowState REVIEWING_FINAL with CycleMode EXPEDITED and Handoff FORWARD from REVIEWING_IMPLEMENTATION (the illegal combination). 70-final-start: an IN_PROGRESS skeleton final-deliverable review report, matching the catalog's 'review-final' record so assertion 0 (not adopted/marked complete) is meaningful. check.mjs reports exactly one problem: 'REVIEWING_FINAL is not part of an EXPEDITED cycle. Promote the cycle to STANDARD first.' No AC ids appear in any record (expedited). No CONTEXT.md (not needed for expedited).",
+  "case": "reviewer-29",
+  "caseHash": "e7ad65308e93bdde",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T23:27:29.124Z",
+    "verdict": "pass",
+    "fixtureHash": "7af9508d92a66a78",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "853cf3f35c5df846",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:31:48.526Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T22:33:26.832Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-slug-change/.standards/STATE.md: NONE",
+        "layers/60-impl-review/.standards/STATE.md: NONE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:31:48.526Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

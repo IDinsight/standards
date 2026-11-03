@@ -1,0 +1,81 @@
+{
+  "conditions": [
+    {
+      "condition": "STANDARD cycle, CompletionPolicy IMPLEMENTATION_REVIEWED, WorkflowState SYNCHRONIZING, brownfield",
+      "where": ".standards/STATE.md, .standards/MODE.md (installer brownfield)",
+      "status": "realized"
+    },
+    {
+      "condition": "Current-cycle synchronization record is IN_PROGRESS and preserves an earlier verified corrective return plus the intentionally omitted documentation/final-review guarantees",
+      "where": ".standards/docs/synchronization/interval-durations-20260924T090000Z-3e8a51c7.md (Assessed Inputs, Limitations and Remaining Work, Resume and Synchronization Conclusion)",
+      "status": "realized"
+    },
+    {
+      "condition": "An upstream correction invalidated the record's corrective evidence",
+      "where": "Record cites pre-correction blobs (src/duration.js 1a4cadc…, test/config.test.js 77a42b2…, verification f5d1db5…, HEAD 93455cb); commits 7cc26a3 and 09b54e0 changed src/duration.js and test/config.test.js afterwards",
+      "status": "realized"
+    },
+    {
+      "condition": "Single active frame: Owner DEVELOPING, From AWAITING_USER_SIGNOFF, ResumeAt AWAITING_USER_SIGNOFF, RerunThrough REVIEWING_IMPLEMENTATION",
+      "where": ".standards/STATE.md Recovery Frame 1",
+      "status": "realized"
+    },
+    {
+      "condition": "Saved rerun plan puts Synchronizer revalidation before implementation Reviewer reassessment",
+      "where": "Development plan Plan Notes (TESTING, SYNCHRONIZING, REVIEWING_IMPLEMENTATION); verification report Resume or Handoff; STATE Handoff RESUME from TESTING",
+      "status": "realized"
+    },
+    {
+      "condition": "All required implementation and full Tester evidence is current",
+      "where": "Plan COMPLETE with corrected DEV-001; verification report REVERIFY/FULL/COMPLETE citing commit 7cc26a3, test commit 09b54e0, and current blobs; selfCheck shows 6/6 pass",
+      "status": "realized"
+    },
+    {
+      "condition": "Revalidation against current identities succeeds; no owned defect or obligation remains",
+      "where": "Current src/test content matches the verification report's blobs; tests pass; Outstanding Obligations inactive; no open discrepancy",
+      "status": "realized"
+    },
+    {
+      "condition": "Only full-gate gaps are omitted final review and pending Reviewer reassessment",
+      "where": "No final-deliverable review or documentation record; implementation review predates the correction",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation review still carries a prior ELIGIBLE closure label",
+      "where": ".standards/docs/reviews/…/implementation.md Implementation-Reviewed Closure (Eligibility ELIGIBLE, assessed against a976dbb/13b36bd)",
+      "status": "realized"
+    },
+    {
+      "condition": "Git state committed and clean",
+      "where": "git status clean on main",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "STATE.md is committed only in 'Install STANDARDS' and 'Record reverification after interval correction', so git history never shows the cycle's intermediate states (the generator notes this compromise). A Synchronizer inspecting history may find this odd, but it does not change what is tested; the records and current STATE are coherent.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "hint-leak",
+      "assertion": -1,
+      "detail": "The verification report's Resume or Handoff and the plan notes spell out the next steps (Synchronizer revalidation, then implementation Reviewer reassessment). The case states that this saved rerun plan exists, so this is premise, not a leak of the answer; it does make assertion 0 somewhat easier.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized: there is a Developer-owned frame with the exact From, ResumeAt, and RerunThrough, an IN_PROGRESS corrective synchronization record whose cited identities the corrected parser and test commits made stale, current REVERIFY/FULL evidence, and a historical ELIGIBLE closure. check.mjs passes, and the expected end state (REVIEWING_IMPLEMENTATION via RESUME, frame kept, record IN_PROGRESS) also passes the turn-end check. The checks are necessary conditions for a correct run, and the invariants fit Synchronizer.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T03:11:03.306Z",
+  "costUsd": 0.3498604,
+  "ms": 70853,
+  "fixtureHash": "6df358b8060a16bf"
+}

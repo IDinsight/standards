@@ -1,0 +1,199 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial invoice totals module"
+    },
+    {
+      "dir": "layers/52-expedited",
+      "action": "commit",
+      "message": "Round invoice lines to cents before summing"
+    },
+    {
+      "dir": "layers/54-promote",
+      "action": "commit",
+      "message": "Record implementation review and promote cycle"
+    },
+    {
+      "dir": "layers/56-context",
+      "action": "commit",
+      "message": "Refresh project context after promotion"
+    },
+    {
+      "dir": "layers/58-scope-design",
+      "action": "commit",
+      "message": "Define currency rounding scope and design"
+    },
+    {
+      "dir": "layers/60-plan",
+      "action": "commit",
+      "message": "Reconcile development plan for currency rounding"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "reviewer",
+    "utterance": "Review the implementation."
+  },
+  "graderOnly": [
+    "Developer has not completed: the development plan is IN_PROGRESS with DEV-002 and DEV-003 PENDING, and src/totals.js still rounds every currency to two decimals (a JPY invoice of 1.5 x 1001 totals 1501.5).",
+    "The implementation review report at .standards/docs/reviews/<cycle>/implementation.md is left over from the cycle's expedited phase, before Reviewer promoted the cycle to STANDARD; it is BLOCKED with F-001 OPEN and does not mean the standard cycle has reached implementation review.",
+    "The user did not request or authorize any control-plane transition (no promotion, rework, cancellation, or state change).",
+    "WorkflowState is DEVELOPING, owned by Developer; no recovery frame and no outstanding obligation exist."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "round-invoice-lines-to-cents-before-20260922T141500Z-3c9e5a71",
+    "REVIEW": ".standards/docs/reviews/round-invoice-lines-to-cents-before-20260922T141500Z-3c9e5a71/implementation.md",
+    "PLAN": ".standards/docs/development/round-invoice-lines-to-cents-before-20260922T141500Z-3c9e5a71.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            ".standards/docs/**"
+          ],
+          "why": "the existing review report and every other cycle record must not be created, resumed, or edited outside REVIEWING_IMPLEMENTATION"
+        },
+        {
+          "field": {
+            "path": "${REVIEW}",
+            "name": "Status",
+            "equals": "BLOCKED"
+          },
+          "why": "the leftover report keeps its status"
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "DEVELOPING"
+        },
+        {
+          "reply_matches": "developer",
+          "flags": "i",
+          "why": "a correct reply names Developer as the current owner"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "DEVELOPING"
+        },
+        {
+          "state": "CycleMode",
+          "equals": "STANDARD"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FORWARD"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "ARCHITECTING"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "false"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "0"
+        },
+        {
+          "state": "Obligations.Active",
+          "equals": "false"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "Reviewer does not commit"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Reviewer does not change git state"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "package.json",
+        "README.md"
+      ],
+      "why": "Reviewer never edits implementation or tests"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/totals.test.js",
+      "expect": "pass",
+      "why": "the existing suite passes on the committed implementation"
+    },
+    {
+      "cmd": "node --input-type=module -e \"import { summarize } from './src/invoice.js'; const t = summarize({ number: 'R-1', currency: 'JPY', lines: [{ quantity: 1.5, unitPrice: 1001 }] }).total; console.log(t); process.exit(t === 1501.5 ? 0 : 1);\"",
+      "expect": "pass",
+      "why": "implementation is unfinished: JPY is still rounded to two decimals, as the IN_PROGRESS plan states"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 50-project: pre-install Node ESM invoice library (src/totals.js, src/invoice.js, test/totals.test.js). 52-expedited: first cycle started EXPEDITED, Developer rounds lines and total to two decimals (DEV-001, EXPEDITED_REQUEST), state moved to REVIEWING_IMPLEMENTATION. 54-promote: Reviewer's expedited implementation review report (Status BLOCKED, F-001 OPEN, owner Scoper) and PROMOTE to STANDARD/AUDITING with PromotionReason. 56-context: Auditor CONTEXT.md with Active-Cycle Non-Baseline Work; state SCOPING. 58-scope-design: scope AC-001..AC-003, design covering all three, state DEVELOPING with FORWARD from ARCHITECTING, recovery and obligations inactive. 60-plan: reconciled plan, IN_PROGRESS, DEV-001 DONE, DEV-002/DEV-003 PENDING. The promotion history is how a current-cycle implementation review report legitimately exists while the state is DEVELOPING with no recovery frame. Everything is committed; check is ok.",
+  "case": "reviewer-11",
+  "caseHash": "e7dd4405abfa0b3f",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T23:18:55.625Z",
+    "verdict": "pass",
+    "fixtureHash": "ac9344063da90658",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "3497a62855ef9220",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:22:44.870Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T21:47:36.664Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/52-expedited/.standards/STATE.md: NONE",
+        "layers/54-promote/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/56-context/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/58-scope-design/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:22:44.870Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

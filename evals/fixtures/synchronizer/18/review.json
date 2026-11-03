@@ -1,0 +1,81 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState SYNCHRONIZING, Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, architecture, context, plan, verification and both review reports have valid ownership and current content identities",
+      "where": "provenance blocks of all records; blob/commit citations resolved by ${BLOB}/${COMMIT}; selfCheck confirms they match HEAD; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "Documentation evidence available",
+      "where": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md (COMPLETE, G1–G4)",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and outstanding obligations inactive; no blocked user question",
+      "where": ".standards/STATE.md (Recovery/Obligations Active false, BlockedOn NONE)",
+      "status": "realized"
+    },
+    {
+      "condition": "Design requires a data retention interval that contradicts the completed scope",
+      "where": "scope Constraints ('kept for at least one year ... nothing introduced by this work may remove an export file sooner') vs design Interfaces and Contracts 'Retention: ... kept for 30 days' and Risks bullet",
+      "status": "realized"
+    },
+    {
+      "condition": "The contradiction is a design defect; scope meaning is established",
+      "where": "scope constraint framed as an established records retention policy; design alone introduces the 30-day removal",
+      "status": "realized"
+    },
+    {
+      "condition": "Affected downstream evidence exists to be recorded",
+      "where": "docs/usage.md Limits (30 days); documentation record G1; final review C3; verification limitations; implementation review R3",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation otherwise correct, tests pass, clean committed tree",
+      "where": "src/ (no deletion code), selfChecks for unit and integration suites, git status clean",
+      "status": "realized"
+    },
+    {
+      "condition": "No synchronization record yet",
+      "where": "selfCheck: .standards/docs/synchronization absent",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": 1,
+      "detail": "The one-year retention obligation lives only in the scope's Constraints with no AC. Scoper's template says verifiable obligations should not be left only in Constraints, so a very strict Synchronizer could additionally flag a SCOPING traceability gap and route to Scoper first, which would fail the ARCHITECTING/Recovery.Top.Owner checks. Phrased as an external records-retention policy constraint, this is a normal use of Constraints and the case states the scope meaning is established, so the main reading remains a design defect.",
+      "recommendation": "run_as_is",
+      "fix": "If runs show SCOPING routing, regenerate with the retention requirement as a policy constraint explicitly not a completion obligation of this cycle (or add a covered AC across all downstream records)."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 1,
+      "detail": "Assertion 1's checks require the full FAILURE routing (ARCHITECTING, frame ResumeAt SYNCHRONIZING) in addition to persistence. This matches the case's expected output 'Route ARCHITECTURE to Architect', and the turn-end check accepts that state (frame Owner equals WorkflowState, only the sync record is held and it won't be COMPLETE). The contains 'ARCHITECTURE' check relies on the template's required FailureType field, a canonical value.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes a clean SYNCHRONIZING state where the design's 30-day retention contract contradicts the scope's one-year retention constraint, with the guide, documentation record, and reviews carrying the affected evidence and all content identities current. Checks and invariants fit a correct ARCHITECTURE failure routing and do not forbid the Synchronizer's record or STATE updates; the only residual risk is a strict run also flagging the AC-less scope constraint.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T14:34:13.150Z",
+  "costUsd": 0.4444248,
+  "ms": 64554,
+  "fixtureHash": "fce03e6b1cf01e52"
+}

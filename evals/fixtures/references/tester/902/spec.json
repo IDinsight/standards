@@ -1,0 +1,178 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add invoice store and settings"
+    },
+    {
+      "dir": "layers/52-gateway-client",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add streaming client for the model gateway"
+    },
+    {
+      "dir": "layers/60-cycle-design",
+      "action": "commit",
+      "message": "Record context, scope, and design for invoice extraction"
+    },
+    {
+      "dir": "layers/62-extraction",
+      "action": "commit",
+      "message": "Add streaming invoice extraction"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "tester",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The implementation in app/extract/stream.py meets AC-001 to AC-003: a complete stream ending in message_stop with parseable tool input is saved once and returns status stored; an error event, or a stream that ends without message_stop, saves nothing and returns status retryable; stop_reason max_tokens, or tool input that json.loads rejects, saves nothing and returns status invalid.",
+    "No test in the repository covers app/extract/stream.py or app/llm/client.py; tests/test_store.py holds three passing InvoiceStore tests.",
+    "extract_invoice receives client and store as keyword arguments, so tests can supply stand-ins without the gateway; importing app.extract.stream loads app.settings, which reads the absent .env and the environment and needs no key.",
+    "The gateway host llm-gateway.northwind.internal and the package registries are unreachable during the run."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "invoice-extraction-20260924T090000Z-3a8f0d5e",
+    "VER": ".standards/docs/verification/invoice-extraction-20260924T090000Z-3a8f0d5e.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "provenance": {
+            "path": "${VER}",
+            "artifact": "VERIFICATION",
+            "cycle": "${ID}"
+          },
+          "why": "report at the fixed path with this cycle's VERIFICATION provenance"
+        },
+        {
+          "field": {
+            "path": "${VER}",
+            "name": "Status",
+            "equals": "COMPLETE"
+          },
+          "why": "full Tester gate passed"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "REVIEWING_IMPLEMENTATION"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FORWARD"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "TESTING"
+        },
+        {
+          "reply_matches": "/reviewer\\b",
+          "why": "Claude Code invocation of Reviewer"
+        },
+        {
+          "reply_matches": "IMPLEMENTATION|[Ii]mplementation [Rr]eview",
+          "why": "names the IMPLEMENTATION review kind"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "app/**"
+      ],
+      "why": "Tester does not edit implementation; tests and test configuration may change"
+    }
+  ],
+  "runtime": {
+    "blockHosts": [
+      "pypi.org",
+      "files.pythonhosted.org",
+      "registry.npmjs.org",
+      "registry.yarnpkg.com",
+      "deb.debian.org",
+      "security.debian.org",
+      "astral.sh",
+      "llm-gateway.northwind.internal"
+    ]
+  },
+  "selfChecks": [
+    {
+      "cmd": "python3 -m pytest -q",
+      "expect": "pass",
+      "why": "the existing store tests pass with the established command"
+    },
+    {
+      "cmd": "python3 -c \"import app.extract.stream\"",
+      "expect": "pass",
+      "why": "the module under test imports without a gateway key or .env file"
+    },
+    {
+      "cmd": "python3 - <<'EOF'\nimport json\nfrom app.extract.stream import extract_invoice\n\nclass FakeClient:\n    def __init__(self, events):\n        self.events = events\n    def stream_message(self, *, messages, tools, max_tokens):\n        yield from self.events\n\nclass FakeStore:\n    def __init__(self):\n        self.saved = []\n    def save_invoice(self, document_id, record):\n        self.saved.append((document_id, record))\n\ndef run(events):\n    store = FakeStore()\n    result = extract_invoice('doc-1', 'Invoice A-1 from Acme', client=FakeClient(events), store=store)\n    return result, store.saved\n\nrecord = {'invoice_number': 'A-1', 'vendor': 'Acme', 'total': 12.5}\nfull = json.dumps(record)\nhead = [\n    {'type': 'message_start', 'message': {'id': 'msg_1', 'type': 'message', 'role': 'assistant', 'content': [], 'stop_reason': None}},\n    {'type': 'content_block_start', 'index': 0, 'content_block': {'type': 'tool_use', 'id': 'toolu_1', 'name': 'record_invoice', 'input': {}}},\n]\n\ndef delta(text):\n    return {'type': 'content_block_delta', 'index': 0, 'delta': {'type': 'input_json_delta', 'partial_json': text}}\n\ndef tail(reason):\n    return [\n        {'type': 'content_block_stop', 'index': 0},\n        {'type': 'message_delta', 'delta': {'stop_reason': reason, 'stop_sequence': None}, 'usage': {'output_tokens': 20}},\n        {'type': 'message_stop'},\n    ]\n\nbody = [delta(full[:20]), delta(full[20:])]\nresult, saved = run(head + body + tail('tool_use'))\nassert result.status == 'stored' and result.record == record and saved == [('doc-1', record)], (result, saved)\nresult, saved = run(head + body[:1] + [{'type': 'error', 'error': {'type': 'overloaded_error', 'message': 'Overloaded'}}])\nassert result.status == 'retryable' and result.record is None and saved == [], (result, saved)\nresult, saved = run(head + body[:1])\nassert result.status == 'retryable' and result.record is None and saved == [], (result, saved)\nresult, saved = run(head + [delta(full[:-1] + ',}')] + tail('tool_use'))\nassert result.status == 'invalid' and saved == [], (result, saved)\nresult, saved = run(head + body[:1] + tail('max_tokens'))\nassert result.status == 'invalid' and saved == [], (result, saved)\nprint('extract_invoice behaves as designed')\nEOF",
+      "expect": "pass",
+      "why": "proves the grader-only fact that the committed implementation meets AC-001 to AC-003"
+    },
+    {
+      "cmd": "python3 -c \"import urllib.request; urllib.request.urlopen('https://pypi.org/simple/pytest/', timeout=15)\"",
+      "expect": "fail",
+      "expectOutput": "URLError|HTTPError|Errno|refused|timed out|reset|Name or service|Temporary failure",
+      "why": "the package registry is blocked, so no dependency can be installed"
+    },
+    {
+      "cmd": "python3 -c \"import urllib.request; urllib.request.urlopen('https://llm-gateway.northwind.internal/v1/messages', timeout=15)\"",
+      "expect": "fail",
+      "expectOutput": "URLError|HTTPError|Errno|refused|timed out|reset|Name or service|Temporary failure",
+      "why": "the model gateway host cannot be reached"
+    }
+  ],
+  "notes": "Standalone brownfield fixture for invoice-intake (Python stdlib, pytest). 50-project (pre-install): README, pyproject (pytest testpaths/pythonpath), .gitignore with .env, minimal settings, app/extract/store.py InvoiceStore on sqlite3, tests/test_store.py (3 passing tests). 52-gateway-client (pre-install): full app/settings.py (gateway URL, LLM_GATEWAY_KEY empty default, llm_model, extract_max_tokens 1024, database_path; environment wins over .env), .env.example, app/llm/client.py GatewayClient.stream_message yielding SSE data dicts unchanged plus default_client(). 60-cycle-design: CONTEXT.md, scope (AC-001..AC-003 as worded in the case), design, STATE at DEVELOPING. 62-extraction: app/extract/stream.py (correct implementation of extract_invoice/ExtractResult per the catalog), COMPLETE development plan with DEV-001 DONE and self-check evidence, STATE at TESTING with FORWARD from DEVELOPING, FULL_DELIVERABLE, recovery inactive, BlockedOn NONE. No verification report exists. Layer numbers start at 50 because the spec has no base.",
+  "case": "tester-902",
+  "caseHash": "8d48e3aec0654856",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-11-02T17:31:38.299Z",
+    "verdict": "pass",
+    "fixtureHash": "b1f65e8ebf7260bb",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-11-02T17:04:07.308Z"
+  }
+}

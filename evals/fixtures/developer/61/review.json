@@ -1,0 +1,66 @@
+{
+  "conditions": [
+    {
+      "condition": "STANDARD cycle in DEVELOPING with CompletionPolicy FULL_DELIVERABLE",
+      "where": ".standards/STATE.md (WorkflowState DEVELOPING, CycleMode STANDARD, CompletionPolicy FULL_DELIVERABLE)",
+      "status": "realized"
+    },
+    {
+      "condition": "Active recovery frame exists",
+      "where": ".standards/STATE.md Recovery Frame 1 (TESTING -> DEVELOPING, IMPLEMENTATION, RerunThrough NONE), matching FAILURE handoff and the verification report's Suspended Assignment 1",
+      "status": "realized"
+    },
+    {
+      "condition": "An outstanding obligation exists (reachable only via expedited promotion)",
+      "where": ".standards/STATE.md Obligation 1 (REVIEWING_IMPLEMENTATION/REVIEW); PromotionReason set; review report and CONTEXT.md Active-Cycle Non-Baseline Work explain the promotion",
+      "status": "realized"
+    },
+    {
+      "condition": "Normal documentation, final-review, and synchronization work has not begun",
+      "where": "No documentation, final-deliverable review, or synchronization records under .standards/docs/",
+      "status": "realized"
+    },
+    {
+      "condition": "A blocker and a pending cadence exist so assertion 1 can observe they are not cleared",
+      "where": "STATE.md BlockedOn (plan approval for DEV-003) and PendingVerificationCadence INCREMENTAL; plan Notes explain both",
+      "status": "realized"
+    },
+    {
+      "condition": "The correction cannot be completed in this run",
+      "where": "Development plan Status PROPOSED with new DEV-003 PENDING and matching BlockedOn; utterance gives no approval",
+      "status": "realized"
+    },
+    {
+      "condition": "Real implementation defect behind the recovery frame",
+      "where": "src/pricing.js lineTotal rounds the discounted unit price before multiplying; selfCheck shows 44.5 vs 44.55",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 1,
+      "detail": "`ActiveWork.BlockedOn unchanged` would also fail a run that rewords the still-pending plan-approval question instead of clearing it. The skill gives no reason to reword it and the question has not been answered, so the risk is small.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "The catalog suggested an obligation owned by DEVELOPING. The fixture uses a REVIEWING_IMPLEMENTATION/REVIEW obligation preserved from promotion, which keeps the DEVELOPING->TESTING handoff that produced frame 1 reachable. The assertions do not depend on the obligation's owner, so this choice is consistent and reasonable.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes a promoted STANDARD cycle at DEVELOPING with an active frame, an outstanding obligation, an unanswered plan-approval blocker, and a pending INCREMENTAL cadence; check.mjs is clean and the failing-rounding selfCheck confirms the recorded defect. The checks are necessary conditions for a correct refusal (policy, request, state, frames, obligations, blocker, cadence, and src/test all unchanged), the invariants are standard, and nothing leaks the answer.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T02:52:57.457Z",
+  "costUsd": 0.2446142,
+  "ms": 48671,
+  "fixtureHash": "56757e406cfec73c"
+}

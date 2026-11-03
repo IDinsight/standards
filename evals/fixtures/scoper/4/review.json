@@ -1,0 +1,58 @@
+{
+  "conditions": [
+    {
+      "condition": "CycleMode is STANDARD",
+      "where": ".standards/STATE.md `CycleMode`: `STANDARD`",
+      "status": "realized"
+    },
+    {
+      "condition": "WorkflowState is ARCHITECTING (owned by Architect)",
+      "where": ".standards/STATE.md `WorkflowState`: `ARCHITECTING`",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Scope points to a completed scope",
+      "where": "STATE.md Scope -> .standards/docs/scope/heavy-parcel-surcharge-20260924T090000Z-3c9e1f5a.md (valid SCOPE provenance, AC-001..AC-003 as list items); Handoff FORWARD from SCOPING; commit 'Define scope for heavy-parcel surcharge'",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery is inactive and there are no outstanding obligations",
+      "where": "STATE.md Recovery `Active`: `false`, Outstanding Obligations `Active`: `false`",
+      "status": "realized"
+    },
+    {
+      "condition": "No rework or other control-plane request; user just asks to continue",
+      "where": "prompt.utterance 'Continue the workflow.'; PendingCycle* and PendingVerificationCadence clear, BlockedOn NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Workflow state is valid so the role has no check-driven reason to act",
+      "where": "gate: check.mjs ok, no problems",
+      "status": "realized"
+    },
+    {
+      "condition": "Everything committed (clean tree)",
+      "where": "git status clean on main",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 3,
+      "detail": "Assertion 3 overlaps assertions 0 and 1 (catalog already flags it as duplicate). The `.standards/**` unchanged check is still a necessary condition for any correct read-only run (check.mjs only reads; the stop hook only runs check when workflow files are dirty).",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture builds a valid brownfield STANDARD cycle at ARCHITECTING with a committed, completed Scoper scope, inactive recovery, and a neutral 'Continue the workflow.' utterance, with nothing that hints at the expected answer. The checks are all necessary for a correct read-only response. `complete: true` is used only for the pure state and file assertions, and the invariants are the standard set.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T20:05:57.136Z",
+  "costUsd": 0.692625,
+  "ms": 20679,
+  "fixtureHash": "7f47cf0757ac473c"
+}

@@ -1,0 +1,79 @@
+{
+  "conditions": [
+    {
+      "condition": "Brownfield project, STANDARD cycle with CompletionPolicy IMPLEMENTATION_REVIEWED, WorkflowState DOCUMENTING",
+      "where": ".standards/STATE.md, .standards/MODE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery entered from AWAITING_USER_SIGNOFF with one active frame owned by DOCUMENTING, ResumeAt AWAITING_USER_SIGNOFF, RerunThrough NONE",
+      "where": ".standards/STATE.md Frame 1; Handoff USER_REWORK from AWAITING_USER_SIGNOFF, FailureType DOCUMENTATION",
+      "status": "realized"
+    },
+    {
+      "condition": "A saved implementation review is COMPLETE with an ELIGIBLE Implementation-Reviewed Closure",
+      "where": ".standards/docs/reviews/<id>/implementation.md (Implementation-Reviewed Closure section; selfCheck confirms ELIGIBLE)",
+      "status": "realized"
+    },
+    {
+      "condition": "The closure assessment names the guidance file as an assessed input, at its pre-correction identity",
+      "where": "implementation.md Assessed Inputs field cites CONTRIBUTING.md blob 427451ef… (equal to HEAD:CONTRIBUTING.md per selfCheck); closure prose also relies on CONTRIBUTING.md",
+      "status": "realized"
+    },
+    {
+      "condition": "A correction to existing project guidance has been made and verified in saved content",
+      "where": "unstaged CONTRIBUTING.md (WEBHOOK_MAX_ATTEMPTS row, rewritten Retries section) matching src/config.js and src/delivery.js; documentation record DOC-001 RESOLVED with inspection and command evidence",
+      "status": "realized"
+    },
+    {
+      "condition": "All required documentation is complete and no Documenter-owned defect or obligation remains",
+      "where": "documentation record: README no-change disposition, no other docs, DOC-001 resolved; Outstanding Obligations inactive",
+      "status": "realized"
+    },
+    {
+      "condition": "Upstream gates hold for a Reviewer re-entry (complete plan, FULL COMPLETE verification, design covers all ACs)",
+      "where": ".standards/docs/development, verification, specs records",
+      "status": "realized"
+    },
+    {
+      "condition": "Git: committed history plus unstaged changes",
+      "where": "git status: unstaged CONTRIBUTING.md and documentation record",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 1,
+      "detail": "Assertion 1 is complete:true on state alone and does not check Handoff.Kind. The protocol requires RESUME for this recovery-directed DOCUMENTING -> REVIEWING_IMPLEMENTATION jump. The omission does not make the check fail a correct run; it only leaves a wrong handoff kind ungraded.",
+      "recommendation": "run_as_is",
+      "fix": "Optional: add {\"state\":\"Handoff.Kind\",\"equals\":\"RESUME\"} to assertion 1's checks. The protocol mandates that value, so it is safe."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The corrected CONTRIBUTING.md Retries text lists waits of \"500 ms, 1 s, 2 s, and so on\" next to a 3-attempt default, which has only two waits. Read as a description of the backoff sequence it is accurate, but a careful Documenter might tidy it. That edit stays within Documenter ownership and no check or invariant forbids it, so the routing under test is unaffected.",
+      "recommendation": "run_as_is",
+      "fix": "None required."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The user rework added a documentation correction without updating Active Work.Request or adding a documentation AC. A role could question whether this is a scope change, but routing a stale-guidance defect to Documenter is a reasonable prior choice and consistent with the case.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is present: STANDARD/IMPLEMENTATION_REVIEWED in DOCUMENTING with an owned RerunThrough-NONE frame from sign-off, and a verified unstaged CONTRIBUTING.md correction whose pre-correction blob is cited in the saved ELIGIBLE closure assessment. I traced check.mjs for the expected post-run state (REVIEWING_IMPLEMENTATION, RESUME, frame retained with RerunThrough REVIEWING_IMPLEMENTATION) and found no new problem. No check or invariant can fail a correct run, and the routing answer is not leaked.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T02:57:05.948Z",
+  "costUsd": 0.34607140000000003,
+  "ms": 64684,
+  "fixtureHash": "5ef1e294c194097a"
+}

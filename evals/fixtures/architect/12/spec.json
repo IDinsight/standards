@@ -1,0 +1,197 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-cli",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add tally CSV summary command"
+    },
+    {
+      "dir": "layers/51-tests",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add CLI tests and sample data"
+    },
+    {
+      "dir": "layers/60-cycle",
+      "action": "commit",
+      "message": "Record project context and analyst guide scope"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "architect",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "Auditor context (.standards/CONTEXT.md) is current for this cycle. The current source (tally/cli.py, tally/summary.py) and the output of python3 -m tally --help establish the existing arguments and error messages AC-001 needs.",
+    "Existing arguments: positional FILE (or - for standard input); -c/--column (required); -g/--group-by COLUMN; -s/--stat with choices sum, mean, count, min, max (default sum); -d/--delimiter (default ',', the two characters \\t select tab, must be one character); -f/--format with choices table, csv, json (default table); -p/--precision integer (default 2, must be zero or more, affects table and csv output only); --version; -h/--help.",
+    "Argparse usage errors (missing --column, invalid --stat or --format choice, multi-character delimiter, negative or non-integer precision) print usage plus 'tally: error: ...' and exit with status 2. Input and data errors print 'tally: error: <message>' and exit with status 1: input file not found, input path is a directory, input file is not UTF-8 text, input has no header row, column 'X' not in header (available: ...), line N: value 'V' in column 'X' is not a number, column 'X' has no numeric values.",
+    "Neither AC needs implementation or formal testing; AC-002 (the analyst-audience guide) depends on Documenter-owned work.",
+    "No architecture or specification document exists in the repository, and there is no planted defect: the README, help text, and source agree."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "guide-20261004T120000Z-1a2b3c4d",
+    "SCOPE": ".standards/docs/scope/guide-20261004T120000Z-1a2b3c4d.md",
+    "SPEC": ".standards/docs/specs/guide-20261004T120000Z-1a2b3c4d.md",
+    "DEV": ".standards/docs/development/guide-20261004T120000Z-1a2b3c4d.md",
+    "VER": ".standards/docs/verification/guide-20261004T120000Z-1a2b3c4d.md",
+    "IMPL": ".standards/docs/reviews/guide-20261004T120000Z-1a2b3c4d/implementation.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.Architecture",
+          "equals": "${SPEC}",
+          "why": "no design document exists, so Architect creates one with artifact init at the fixed path"
+        },
+        {
+          "provenance": {
+            "path": "${SPEC}",
+            "artifact": "ARCHITECTURE",
+            "cycle": "${ID}"
+          }
+        },
+        {
+          "contains": {
+            "path": "${SPEC}",
+            "regex": "tally/(cli|summary)\\.py|-m tally (--help|-h)"
+          },
+          "why": "CLI facts must cite the source file or the help command as evidence"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "contains": {
+            "path": "${SPEC}",
+            "regex": "AC-002"
+          },
+          "why": "AC-002 must be accounted for in the design"
+        },
+        {
+          "check_ok": true,
+          "why": "after the handoff the turn-end check holds the design to full acceptance coverage"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "in": [
+            "ARCHITECTING",
+            "DOCUMENTING"
+          ],
+          "why": "no handoff to Developer or any omitted state"
+        },
+        {
+          "state": "ActiveWork.Development",
+          "equals": "NONE"
+        },
+        {
+          "contains": {
+            "path": "${SPEC}",
+            "regex": "^(?![\\s\\S]*\\n#{1,6}[ \\t]*Build Plan)"
+          },
+          "why": "the documentation design has no Build Plan section"
+        },
+        {
+          "unchanged": [
+            "tally/**",
+            "tests/**",
+            "examples/**",
+            "pyproject.toml"
+          ],
+          "why": "no behavior or test changes"
+        },
+        {
+          "absent": "${DEV}"
+        },
+        {
+          "absent": "${VER}"
+        },
+        {
+          "absent": "${IMPL}"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "python3 -m pytest -q",
+      "expect": "pass",
+      "why": "the existing test suite passes on the committed tree"
+    },
+    {
+      "cmd": "python3 -m tally --help",
+      "expect": "pass",
+      "why": "command help is available offline as the case states"
+    },
+    {
+      "cmd": "python3 -m tally examples/sales.csv --column amount --group-by region",
+      "expect": "pass",
+      "why": "the documented sample invocation works"
+    },
+    {
+      "cmd": "python3 -m tally examples/missing.csv --column amount",
+      "expect": "fail",
+      "expectOutput": "tally: error: input file not found",
+      "why": "runtime error path exists as described in graderOnly"
+    },
+    {
+      "cmd": "python3 -m tally examples/sales.csv --column amount --stat median",
+      "expect": "fail",
+      "expectOutput": "invalid choice",
+      "why": "usage error path exists as described in graderOnly"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 50-cli (pre-install): a small stdlib Python CLI 'tally' (tally/cli.py argparse parser, error reporting and rendering; tally/summary.py CSV reading and statistics; README with one example; pyproject). 51-tests (pre-install): tests/test_cli.py and examples/sales.csv. Installer runs brownfield with hooks. 60-cycle: STATE.md at ARCHITECTING, CycleMode DOCUMENTATION, CompletionPolicy NONE, Id guide-20261004T120000Z-1a2b3c4d, Scope set, Architecture/Development/BlockedOn NONE, Handoff FORWARD from SCOPING, no recovery; MODE.md BROWNFIELD; Auditor-written .standards/CONTEXT.md (current context); SCOPE record with AC-001 (accurate arguments, defaults, error messages and exit statuses) and AC-002 (analyst-audience guide). No architecture, development, verification, or implementation-review record exists. Commit dates use the builder default (2026-09-24), which precedes the time in the case-given cycle id; nothing reads that relation.",
+  "case": "architect-12",
+  "caseHash": "90d0a315717b7fe6",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-30T22:48:07.975Z",
+    "verdict": "pass",
+    "fixtureHash": "d42a9fdcdf8b12d0",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-30T22:32:12.040Z"
+  }
+}

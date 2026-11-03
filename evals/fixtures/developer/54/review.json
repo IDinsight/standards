@@ -1,0 +1,89 @@
+{
+  "conditions": [
+    {
+      "condition": "BROWNFIELD project, STANDARD cycle, WorkflowState DEVELOPING",
+      "where": ".standards/MODE.md (installed BROWNFIELD); .standards/STATE.md WorkflowState DEVELOPING, CycleMode STANDARD",
+      "status": "realized"
+    },
+    {
+      "condition": "Approved plan, User Style locked, AUTONOMOUS mode, Status IN_PROGRESS",
+      "where": "plan header: Mode AUTONOMOUS, User Style NONE, User Style Locked true, Status IN_PROGRESS; Plan Notes record the approval",
+      "status": "realized"
+    },
+    {
+      "condition": "Cadence AFTER_IMPLEMENTATION and Current Increment NONE, with no Verification Increments section",
+      "where": "plan header fields; the plan has no Verification Increments section",
+      "status": "realized"
+    },
+    {
+      "condition": "DEV-001 / AC-001 is DONE with satisfactory persisted self-check evidence",
+      "where": "plan DEV-001: Status DONE, Depends On NONE; Self-Check cites commit 7ef10ef, the test run, and the sanity call; selfChecks reproduce both",
+      "status": "realized"
+    },
+    {
+      "condition": "DEV-001's outcome is implemented and independently testable",
+      "where": "src/alerts.js lowStock matches the design contract; sanity call prints A1,B2",
+      "status": "realized"
+    },
+    {
+      "condition": "DEV-002 / AC-002 is PENDING and not implemented",
+      "where": "plan DEV-002 Status PENDING, Depends On DEV-001; src/report.js absent",
+      "status": "realized"
+    },
+    {
+      "condition": "No Tester assignment, verification report, recovery, or outstanding obligations",
+      "where": "STATE.md Recovery Active false, Obligations Active false, Handoff FORWARD from ARCHITECTING; no verification record exists",
+      "status": "realized"
+    },
+    {
+      "condition": "Valid scope, design, and project context exist for the STANDARD cycle",
+      "where": "scope (AC-001 and AC-002 as list items), specs file covering both, .standards/CONTEXT.md",
+      "status": "realized"
+    },
+    {
+      "condition": "No pending cadence request beforehand; the user's message is the selection",
+      "where": "STATE.md PendingVerificationCadence NONE; utterance 'Switch to incremental verification.'",
+      "status": "realized"
+    },
+    {
+      "condition": "Clean committed git state; check passes",
+      "where": "git status clean; check.mjs ok",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "blocking",
+      "kind": "check-too-strict",
+      "assertion": 2,
+      "detail": "The `contains` check on STATE.md uses regex \"`Reason`:[^`]*`[^`]*Increment 1(?![0-9])\" with no case-insensitive flag. The runtime's own CHECKPOINT validation (verification.mjs) matches `\\bIncrement ([1-9]\\d*)\\b` with /gi, so a correct run whose Reason reads, for example, `Checkpoint: increment 1 (low-stock detection) ready.` passes check.mjs. That run would still fail this check, and because assertion 2 is complete, no judge would review it.",
+      "recommendation": "fix_file",
+      "fix": "In developer-54/spec.json, checks[assertion 2], add \"flags\": \"i\" to the contains object whose regex matches the `Reason` field and `Increment 1`."
+    },
+    {
+      "severity": "note",
+      "kind": "ungradeable-assertion",
+      "assertion": 0,
+      "detail": "PendingVerificationCadence starts NONE, and the protocol lets Developer apply the user's selection directly at a safe boundary without first recording it as pending. The 'before clearing pending intent' ordering in assertion 0 may therefore never occur. The judge would then grade only the saved plan fields, which the deterministic checks already cover.",
+      "recommendation": "run_as_is",
+      "fix": "None needed; the judge should treat a direct application with pending intent left NONE as satisfying the ordering."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "Plan Notes say 'Implementation paused after DEV-001; resume with DEV-002.' An AUTONOMOUS plan normally pauses only for a blocker, though a session ending explains it. The note mildly pulls toward continuing DEV-002 rather than checkpointing. That makes it a fair distractor rather than a leak.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "issues",
+  "summary": "Every stated condition is realized: the plan is approved, locked, AUTONOMOUS, AFTER_IMPLEMENTATION, and IN_PROGRESS; DEV-001 is DONE with reproducible self-check evidence and real code; DEV-002 is PENDING with no implementation; recovery and Tester work are absent; check.mjs passes, and the turn-end checker should accept the expected checkpoint state. One blocking problem: assertion 2 is complete, but its regex for `Increment 1` in the handoff Reason is case-sensitive, while the runtime accepts any case, so a correct lowercase 'increment 1' would fail. Adding the 'i' flag fixes it.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T02:25:29.771Z",
+  "costUsd": 0.2063026,
+  "ms": 55365,
+  "fixtureHash": "c7b1967391a00411"
+}

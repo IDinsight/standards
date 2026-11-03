@@ -1,0 +1,208 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add notes module with archive filtering"
+    },
+    {
+      "dir": "layers/10-style",
+      "action": "commit",
+      "message": "Add personal developer style"
+    },
+    {
+      "dir": "layers/20-cycle",
+      "action": "commit",
+      "message": "Record scope and design for note tag filter"
+    },
+    {
+      "dir": "layers/30-plan",
+      "action": "commit",
+      "message": "Propose development plan for note tag filter"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "developer",
+    "utterance": "clear my personal style for this plan; I will review it afterward."
+  },
+  "graderOnly": [
+    "The development plan has never been approved by the user; User Style Locked is false because no approval has occurred, so clearing the style is permitted without a new cycle.",
+    "The user's message clears the style but does not approve the plan, so no implementation may start."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "filter-notes-by-tag-20260923T141200Z-5c8e2a91",
+    "PLAN": ".standards/docs/development/filter-notes-by-tag-20260923T141200Z-5c8e2a91.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "state": "ActiveWork.Id",
+          "unchanged": true,
+          "why": "no new cycle was started"
+        },
+        {
+          "state": "ActiveWork.Development",
+          "equals": "${PLAN}",
+          "why": "the same plan is kept"
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "DEVELOPING"
+        },
+        {
+          "state": "CycleMode",
+          "equals": "STANDARD"
+        },
+        {
+          "provenance": {
+            "path": "${PLAN}",
+            "artifact": "DEVELOPMENT",
+            "cycle": "${ID}"
+          }
+        },
+        {
+          "field": {
+            "path": "${PLAN}",
+            "name": "User Style",
+            "equals": "NONE"
+          },
+          "why": "the clearing was applied, not refused"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "field": {
+            "path": "${PLAN}",
+            "name": "User Style",
+            "equals": "NONE"
+          }
+        },
+        {
+          "field": {
+            "path": "${PLAN}",
+            "name": "User Style Locked",
+            "equals": "false"
+          }
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": true,
+      "all": [
+        {
+          "field": {
+            "path": "${PLAN}",
+            "name": "Status",
+            "equals": "PROPOSED"
+          }
+        },
+        {
+          "state": "ActiveWork.BlockedOn",
+          "not": "NONE",
+          "why": "plan approval is still pending"
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "DEVELOPING"
+        },
+        {
+          "unchanged": [
+            "src/**",
+            "test/**",
+            "package.json",
+            "README.md"
+          ],
+          "why": "no implementation before approval"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        ".standards/user-styles/**"
+      ],
+      "why": "user styles are user-owned; clearing the selection does not touch the file"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "npm test",
+      "expect": "pass",
+      "why": "the existing notes tests pass on the committed baseline"
+    },
+    {
+      "cmd": "test -f .standards/user-styles/developer/tony.md",
+      "expect": "pass",
+      "why": "the selected user style tony resolves to an existing file"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 00-project: small Node ESM notes module (src/store.js, src/notes.js) with node:test tests. 10-style: user-owned .standards/user-styles/developer/tony.md. 20-cycle: Auditor CONTEXT.md, scope (AC-001..AC-003) and design for a tag filter, STATE at DEVELOPING after FORWARD from ARCHITECTING. 30-plan: the Developer plan at the fixed path, Status PROPOSED, User Style tony, User Style Locked false, two PENDING steps, cadence AFTER_IMPLEMENTATION / NONE; STATE records Development path and BlockedOn awaiting plan approval. The run should set User Style to NONE, keep the plan PROPOSED and unlocked, keep an approval blocker, and not touch src/ or test/.",
+  "case": "developer-34",
+  "caseHash": "6b3315af2e399b70",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T02:20:25.826Z",
+    "verdict": "pass",
+    "fixtureHash": "570bb3ec826190dc",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "b1bd9084c61dddd0",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:08:00.522Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T01:35:26.134Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/20-cycle/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/30-plan/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:08:00.522Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState DOCUMENTING, Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, architecture, context, development, verification and implementation review exist with matching provenance and current evidence",
+      "where": ".standards/docs/{scope,specs,development,verification,reviews/.../implementation}.md, .standards/CONTEXT.md; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-001 covers CSV export behavior; AC-002 requires an accurate usage guide",
+      "where": ".standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and obligations inactive, no blocked user question",
+      "where": ".standards/STATE.md (Recovery.Active false, Obligations false, BlockedOn NONE)",
+      "status": "realized"
+    },
+    {
+      "condition": "Editing is unrestricted",
+      "where": "no target or restriction in STATE or utterance",
+      "status": "realized"
+    },
+    {
+      "condition": "All required guides already accurately describe actual behavior",
+      "where": "docs/usage.md and README.md (commit 'Document CSV export in usage guide') checked against src/export.ts, src/routes/export.ts, src/app.ts, src/records/filter.ts; selfCheck confirms the CSV example byte-for-byte",
+      "status": "realized"
+    },
+    {
+      "condition": "No documentation record exists yet (Documenter's first entry)",
+      "where": "no .standards/docs/documentation/ path; selfCheck",
+      "status": "realized"
+    },
+    {
+      "condition": "Tests and checks pass",
+      "where": "selfChecks: unit 21 pass, integration 3 pass, check.mjs passes",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "blocking",
+      "kind": "check-wrong",
+      "assertion": 0,
+      "detail": "Assertion 0 is marked complete:true, but its checks do not fully decide 'no manufactured discrepancy'. They only catch a '### DOC-' heading or a recovery frame. A run could still manufacture a discrepancy in prose under 'Discrepancies, Dependencies, and Remaining Work'. Examples: a bullet claiming .standards/CONTEXT.md is stale, or a doc gap logged without a DOC heading. A run could also set the record to BLOCKED, or set Active Work.BlockedOn to an invented question. Each of these would PASS with no judge. The catalog's deterministic_complete flag does not make that true here.",
+      "recommendation": "fix_file",
+      "fix": "In documenter-38/spec.json, checks entry for assertion 0: change \"complete\": true to \"complete\": false and keep the existing four checks as preconditions, so a judge also confirms no prose-level or blocker-style discrepancy was invented. Optionally add {\"state\": \"ActiveWork.BlockedOn\", \"equals\": \"NONE\"} as a further precondition."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The guide update was committed after the implementation review while the state was DOCUMENTING and no documentation record existed, so someone other than Documenter wrote it. This is plausible (the user or Developer drafted the docs), and it correctly forces Documenter to verify rather than trust them. .standards/CONTEXT.md still says no export exists. That is the Auditor's pre-cycle baseline, and the skill says planned implementation does not invalidate it.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "issues",
+  "summary": "The fixture realizes every stated condition. The committed guide and README match the implementation (export headers, CSV quoting and example, 401/403/400 with no file written, exportDir and same-second overwrite), check.mjs passes, and nothing leaks. One blocking issue: assertion 0 is marked complete:true although its checks only catch DOC-NNN headings and recovery frames, so a prose-level manufactured discrepancy or invented blocker would pass ungraded; set it to complete:false.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T16:54:41.010Z",
+  "costUsd": 0.844134,
+  "ms": 49808,
+  "fixtureHash": "f5930840b6d440ca"
+}

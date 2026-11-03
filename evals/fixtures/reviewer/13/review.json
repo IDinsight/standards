@@ -1,0 +1,81 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield template)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState REVIEWING_IMPLEMENTATION after a FORWARD from TESTING",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id is export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md and the provenance blocks of every record",
+      "status": "realized"
+    },
+    {
+      "condition": "Current scope, architecture, context, development plan, and Tester report exist with valid ownership",
+      "where": ".standards/docs/scope|specs|development|verification/export-20260924T090000Z-a7f3c1d2.md and .standards/CONTEXT.md; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and outstanding obligations inactive",
+      "where": ".standards/STATE.md Recovery/Outstanding Obligations `Active`: `false`",
+      "status": "realized"
+    },
+    {
+      "condition": "Tests mock out CSV escaping and assert only that the mock was called (with its inputs)",
+      "where": "test/export.test.ts uses mock.fn cell encoders; test/integration/export-flow.test.ts injects a mock serializer in all three tests; selfCheck shows both suites pass with quoting disabled",
+      "status": "realized"
+    },
+    {
+      "condition": "Tester claims AC-001 quoted output verified",
+      "where": "verification record Acceptance Evidence, AC-001 RFC 4180 row: 'Titles containing a comma or double quotes come out quoted, with embedded double quotes doubled.' Status COMPLETE",
+      "status": "realized"
+    },
+    {
+      "condition": "No real-output assertion or equivalent formal evidence exists for quoting",
+      "where": "No test calls csvCell or default toCsv; Execution Evidence E1/E2/I1 never observe real CSV text",
+      "status": "realized"
+    },
+    {
+      "condition": "Escaping implementation itself is not defective",
+      "where": "src/export.ts csvCell/toCsv; selfCheck proves correct RFC 4180 output",
+      "status": "realized"
+    },
+    {
+      "condition": "All work committed, clean tree",
+      "where": "git status clean; selfCheck",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The design's Components section lists `registerExportRoutes(router, store, { exportDir, now })` and createApp options `exportDir` and `now` only. The implementation (src/app.ts, src/routes/export.ts) also adds an undesigned `serialize` option, which the plan's DEV-003 mentions. A strict Reviewer might record this as a minor design deviation. It is unlikely to be material, and no assertion is graded on avoiding extra findings, so it does not change what the run tests.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 3,
+      "detail": "Assertion 3 is decided by WorkflowState not DOCUMENTING and review Status not COMPLETE. A run that leaves a BLOCKED or IN_PROGRESS report without routing, or that routes a different failure, also passes. This is consistent with the assertion's wording ('cannot pass'), and routing quality is left to the judge under assertions 0 and 2. The field check also requires the report to exist, which the skill requires before routing ('Create or resume the report early'; persist findings before routing).",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition. The implementation is correct, the unit tests mock the cell encoder, every integration test injects a mock serializer, and the COMPLETE verification record claims quoted output that no test observes; selfChecks prove both suites pass with quoting disabled. Checks and invariants cannot fail a correct VERIFICATION routing, and check_ok holds after the expected TESTING frame. Nothing leaks the answer.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T23:20:39.463Z",
+  "costUsd": 0.3255208,
+  "ms": 72236,
+  "fixtureHash": "66baa37ba19a1f98"
+}

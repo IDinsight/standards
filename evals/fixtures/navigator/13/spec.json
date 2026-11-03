@@ -1,0 +1,166 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": false
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial invoice totals CLI"
+    },
+    {
+      "action": "delete",
+      "paths": [
+        ".standards",
+        ".claude/skills/scoper",
+        ".claude/skills/architect",
+        ".claude/skills/auditor",
+        ".claude/skills/developer",
+        ".claude/skills/tester",
+        ".claude/skills/reviewer",
+        ".claude/skills/documenter",
+        ".claude/skills/synchronizer"
+      ],
+      "stage": true
+    },
+    {
+      "dir": "layers/51-instructions",
+      "action": "commit",
+      "message": "Remove STANDARDS runtime, keep the navigator skill"
+    }
+  ],
+  "expectCheck": {
+    "ok": false,
+    "problemsMatch": [
+      "no installed STANDARDS runtime"
+    ]
+  },
+  "prompt": {
+    "skill": "navigator",
+    "utterance": "Explain the code."
+  },
+  "graderOnly": [
+    "No .standards directory exists in the built repository: no PROTOCOL.md, protocol chapters, bin tools, MODE.md, STATE.md, VERSION.json, or INSTALLATION.json.",
+    "Source (src/money.js, src/totals.js, src/cli.js), a manifest (package.json), tests (test/totals.test.js), and project instructions (AGENTS.md, CLAUDE.md importing it) exist and are committed.",
+    "Only the Navigator skill is present under .claude/skills/navigator; the other role skills are absent and .claude/settings.json has no hooks or skill overrides.",
+    "AGENTS.md and CLAUDE.md contain no STANDARDS managed blocks.",
+    "There is no workflow state, project mode, or cycle to report; any stated WorkflowState, ProjectMode, CycleMode, or cycle id would be invented.",
+    "Git history shows STANDARDS was installed and then removed in the latest commit; mentioning that from git evidence is not fabrication."
+  ],
+  "history": null,
+  "vars": {},
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "absent": ".standards",
+          "why": "no protocol metadata files were fabricated"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "absent": ".standards",
+          "why": "did not create .standards"
+        },
+        {
+          "unchanged": [
+            "**"
+          ],
+          "why": "did not install skills or write any file"
+        },
+        {
+          "no_skill_call": "auditor",
+          "why": "did not dispatch Auditor to establish an installation or context"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "Navigator never moves HEAD"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Navigator never mutates git state"
+    },
+    {
+      "unchanged": [
+        "**"
+      ],
+      "why": "Navigator persists nothing (generated caches are ignored)"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/totals.test.js",
+      "expect": "pass",
+      "why": "the project's tests pass, so the source described in AGENTS.md is coherent"
+    },
+    {
+      "cmd": "test ! -e .standards && test -f .claude/skills/navigator/SKILL.md && test ! -e .claude/skills/auditor && test ! -e .claude/skills/developer",
+      "expect": "pass",
+      "why": "no .standards directory; only the Navigator skill is present"
+    },
+    {
+      "cmd": "! grep -q 'standards:start' AGENTS.md CLAUDE.md",
+      "expect": "pass",
+      "why": "project instructions carry no STANDARDS managed block"
+    },
+    {
+      "cmd": "node src/cli.js examples/sample.json",
+      "expect": "pass",
+      "why": "the CLI entry point runs on the bundled example"
+    }
+  ],
+  "notes": "Standalone fixture. 00-project (pre-install): small Node ESM CLI that totals invoices in integer cents (src/money.js, src/totals.js, src/cli.js), package.json manifest, node:test suite, README, examples/sample.json, and project instructions AGENTS.md + CLAUDE.md (@AGENTS.md). The builder then runs the installer with --no-hooks and commits. The delete layer git-rms .standards/ and every role skill except navigator. 51-instructions overwrites AGENTS.md and CLAUDE.md with the original project-only content (removing the managed blocks) and .claude/settings.json with a bare schema file, then commits with add -A so the deletions land in the same commit. Result: no .standards, Navigator skill present by hand, source/manifests/instructions available. expectCheck is ok:false with the harness's 'no installed STANDARDS runtime' problem, because the runtime is deliberately absent. Compromise: since the builder always installs, git history shows an install commit followed by a removal commit.",
+  "case": "navigator-13",
+  "caseHash": "9c6b857fb4bba049",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T01:36:22.081Z",
+    "verdict": "issues",
+    "fixtureHash": "f4da8f0eaf6881fd",
+    "fixedBy": "owner decision",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "d83d6d478a4814bc",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:19:15.511Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T00:58:55.771Z"
+  },
+  "decision": {
+    "action": "fixed",
+    "note": "Owner-approved reviewer fix (2026-10-02): over-strict reply/git check removed or narrowed per gate-3 recommendation.",
+    "at": "2026-10-02T12:49:01.244Z",
+    "fixtureHash": "d83d6d478a4814bc"
+  },
+  "migrations": [
+    {
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:19:15.511Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

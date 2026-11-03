@@ -1,0 +1,89 @@
+{
+  "conditions": [
+    {
+      "condition": "Current STANDARDS runtime, brownfield project, WorkflowState AUDITING, CycleMode STANDARD",
+      "where": ".standards/STATE.md (60-cycle), .standards/MODE.md (installer BROWNFIELD)",
+      "status": "realized"
+    },
+    {
+      "condition": "BaselineReconciliation entry 1 has SourceCycle cache-a-20260921T100000Z-0a1b2c3d and Request 'fix cache invalidation'",
+      "where": ".standards/STATE.md Active Work list item 1",
+      "status": "realized"
+    },
+    {
+      "condition": "BaselineReconciliation entry 2 has Request 'adjust imports' and no SourceCycle",
+      "where": ".standards/STATE.md Active Work list item 2",
+      "status": "realized"
+    },
+    {
+      "condition": "check.mjs treats the list as invalid state",
+      "where": "gate checkMjs: single problem 'BaselineReconciliation every entry needs both `SourceCycle` and `Request`.'",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Request is an unrelated UI change",
+      "where": "STATE.md Request 'Show stock status badges on the catalog list page.'",
+      "status": "realized"
+    },
+    {
+      "condition": "Existing CONTEXT.md contains useful evidence",
+      "where": ".standards/CONTEXT.md (commit 'Record project context')",
+      "status": "realized"
+    },
+    {
+      "condition": "Project files contain useful evidence, including residue of the cancelled cycles",
+      "where": "commits 'Invalidate cached lists when an item changes' and 'Move cache helper under src/lib and adjust imports'; src/lib/cache.js, src/catalog.js",
+      "status": "realized"
+    },
+    {
+      "condition": "No authoritative source establishes the missing cycle ID",
+      "where": "git history: no committed STATE.md or record for either cancelled cycle; only final STATE.md names cache-a",
+      "status": "realized"
+    },
+    {
+      "condition": "No active recovery or obligations; Handoff from the new-cycle start",
+      "where": "STATE.md Handoff NEW_CYCLE from CANCELLED; Recovery/Obligations Active false",
+      "status": "realized"
+    },
+    {
+      "condition": "Clean committed git state",
+      "where": "git status clean on main",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "blocking",
+      "kind": "check-too-strict",
+      "assertion": 0,
+      "detail": "Assertion 0's only check is reply_matches \"SourceCycle|source cycle\" (i). A correct run need not name the field verbatim: it could say the second entry 'has no cycle ID', 'is missing its cancelled-cycle ID', or use the protocol's own hyphenated phrasing 'source-cycle' (which the regex does not match, since it needs a space). Each of those would fail the run before the judge sees it. Naming the field is wording a correct run can paraphrase, so the judge should decide it.",
+      "recommendation": "fix_file",
+      "fix": "In auditor-11/spec.json, checks[0].all: remove the reply_matches check, leaving all: [] with complete false. Or broaden it to {\"reply_matches\": \"SourceCycle|source[- ]?cycle|cycle[- ]?id\", \"flags\": \"i\"}."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The cancelled cycles left no committed STATE.md or records, and CONTEXT.md was committed while STATE.md was still the install template. A tracked cycle would normally touch STATE.md. This is how the fixture makes the missing ID unrecoverable, and it is consistent with the case.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "case-defect",
+      "assertion": -1,
+      "detail": "A list entry without a SourceCycle cannot arise through legal transitions; Start a cycle always writes the exact cancelled ID. The case describes a hand-edited, deliberately invalid state, and the fixture builds it as stated.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "issues",
+  "summary": "The fixture realizes every stated condition: the malformed BaselineReconciliation list, an unrelated UI request, a stale but useful CONTEXT.md, residue commits from the cancelled cycles, and no recoverable ID for the second cycle. check.mjs reports exactly the expected problem. The one blocking issue is assertion 0's reply_matches on 'SourceCycle|source cycle', which a correct run could fail by writing 'cycle ID' or 'source-cycle'; remove or broaden it.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T21:08:44.796Z",
+  "costUsd": 0.2020968,
+  "ms": 50580,
+  "fixtureHash": "80bd28f6a37665bb"
+}

@@ -1,0 +1,71 @@
+{
+  "conditions": [
+    {
+      "condition": "STANDARD cycle (brownfield chosen; the case leaves project mode open)",
+      "where": ".standards/STATE.md `CycleMode`: `STANDARD`; .standards/MODE.md BROWNFIELD",
+      "status": "realized"
+    },
+    {
+      "condition": "Workflow is at AWAITING_USER_SIGNOFF after a FORWARD from SYNCHRONIZING, with recovery and obligations inactive",
+      "where": ".standards/STATE.md (Handoff FORWARD From SYNCHRONIZING; Recovery Active false; Outstanding Obligations Active false)",
+      "status": "realized"
+    },
+    {
+      "condition": "Synchronization record is COMPLETE for this cycle with matching provenance",
+      "where": ".standards/docs/synchronization/let-administrators-export-records-as-csv-20260921T141200Z-5b8e2f17.md `Status`: `COMPLETE`",
+      "status": "realized"
+    },
+    {
+      "condition": "All earlier records (scope, design, context, plan, verification, both reviews, documentation) exist, are COMPLETE where applicable, and are coherent",
+      "where": ".standards/CONTEXT.md and .standards/docs/{scope,specs,development,verification,reviews/<id>/implementation.md,reviews/<id>/final-deliverable.md,documentation}/...; check.mjs ok:true",
+      "status": "realized"
+    },
+    {
+      "condition": "The delivered work is a CSV export, so a new export format changes the contract",
+      "where": "scope Non-goals 'Formats other than CSV'; AC-001..AC-004 CSV-only; src/export.js and src/routes.js /records/export",
+      "status": "realized"
+    },
+    {
+      "condition": "The user explicitly asks for a new (JSON) export format before accepting",
+      "where": "prompt.utterance 'Before I accept, I also need a JSON export format.'",
+      "status": "realized"
+    },
+    {
+      "condition": "All work is committed with a clean tree",
+      "where": "git status clean on main; commit history 0c66ada..a3ea31d",
+      "status": "realized"
+    },
+    {
+      "condition": "Existing tests pass, as the records claim",
+      "where": "selfCheck `npm test` passes 9/9",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 1,
+      "detail": "`complete: true` decides assertion 1 from state and file globs: not SIGNED_OFF, no SIGNOFF, and no changes under .standards/docs/**, CONTEXT.md, src, test, docs, README, or package.json. A run that wrote in prose that the CSV work counted as accepted, without changing any state, would pass unjudged. That is unlikely, and the catalog marked this assertion deterministic-complete. Every check is a necessary condition for a correct run: Synchronizer owns no work in a user-owned state, and USER_REWORK touches only STATE.md.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally set complete:false so the judge also reads the reply for acceptance claims."
+    },
+    {
+      "severity": "note",
+      "kind": "hint-leak",
+      "assertion": -1,
+      "detail": "The local git config sets user.name=Fixture and user.email=fixture@example.invalid, and these appear as the commit author in git log. This comes from the harness's builder, not from this spec, and it does not reveal the expected answer.",
+      "recommendation": "run_as_is",
+      "fix": "Harness-level: consider a neutral author identity in the builder."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized. The fixture is a STANDARD brownfield CSV-export cycle at AWAITING_USER_SIGNOFF with every record COMPLETE, a scope whose non-goals exclude non-CSV formats (so SCOPING is the earliest invalidated owner), and a clean committed tree; check.mjs and the tests pass. I traced the expected USER_REWORK to SCOPING (frame From and ResumeAt AWAITING_USER_SIGNOFF, RerunThrough NONE) through check.mjs: the recovery frame validates, and no COMPLETE record is held in SCOPING during recovery, so check_ok and the other assertion-0 checks hold for a correct run, and the invariants fit. Only minor notes remain: the strength of assertion 1's `complete: true`, and the harness's 'Fixture' git author.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T14:42:22.942Z",
+  "costUsd": 0.2740728,
+  "ms": 53803,
+  "fixtureHash": "46e700039788f685"
+}

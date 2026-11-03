@@ -1,0 +1,179 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add config loader with defaults and CLI"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "navigator",
+    "utterance": "Switch to EXPLAIN and just tell me how this function handles errors."
+  },
+  "graderOnly": [
+    "'This function' is loadConfig in src/config.js, the function the earlier GRILL_ME turns were quizzing on; the open quiz question (Question 3) asked what happens when the file does not exist.",
+    "loadConfig's error handling: a missing file (readFile error code ENOENT) is not an error and returns a copy of DEFAULTS; any other read error is rethrown as ConfigError('Could not read <path>') with the original error as cause; invalid JSON is rethrown as ConfigError('<path> is not valid JSON') with the parse error as cause; a port that is not an integer from 1 to 65535 throws ConfigError; an unrecognized logLevel does not throw and is silently replaced with the default 'info'; host is not validated.",
+    "src/cli.js catches ConfigError, prints 'config: <message>' to stderr, and sets exit code 1; any other error is rethrown.",
+    "No workflow cycle is active: STATE.md is the installer's default brownfield state (AUDITING, Active Work Id UNSET, CycleMode UNSET)."
+  ],
+  "history": {
+    "turns": [
+      {
+        "role": "user",
+        "text": "/navigator Grill me on loadConfig in src/config.js. I'm walking the team through it tomorrow and want to be sure I actually understand it."
+      },
+      {
+        "role": "assistant",
+        "text": "I read `src/config.js` and its tests in `test/config.test.js`. We'll start with the big picture and go deeper as you go.\n\n**Question 1:** When `loadConfig` succeeds, where do the values in the object it returns come from?"
+      },
+      {
+        "role": "user",
+        "text": "It reads the JSON file and returns what's in it."
+      },
+      {
+        "role": "assistant",
+        "text": "Partly right. It does read the file at `path` and parse it with `JSON.parse`, but it doesn't return the parsed object as-is. It builds `{ ...DEFAULTS, ...raw }`, so the file's values sit on top of `DEFAULTS` (`host: '127.0.0.1'`, `port: 8080`, `logLevel: 'info'`), and any key the file leaves out keeps its default.\n\n**Question 2:** Suppose `config.json` contains only `{ \"port\": 9000 }`. What do `host` and `logLevel` come out as?"
+      },
+      {
+        "role": "user",
+        "text": "127.0.0.1 and info."
+      },
+      {
+        "role": "assistant",
+        "text": "Correct. Neither key is in the file, so both keep their defaults, and `port` becomes 9000.\n\n**Question 3:** What happens when you call `loadConfig` with a path where no file exists?"
+      }
+    ]
+  },
+  "vars": {},
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "unchanged": [
+            "**"
+          ],
+          "why": "no state, record, style, or approval file is written"
+        },
+        {
+          "state": "WorkflowState",
+          "unchanged": true
+        },
+        {
+          "state": "CycleMode",
+          "unchanged": true
+        },
+        {
+          "state": "ActiveWork.Id",
+          "unchanged": true
+        },
+        {
+          "state": "ActiveWork.BlockedOn",
+          "unchanged": true
+        },
+        {
+          "head_unchanged": true
+        },
+        {
+          "not_ran_git": "mutating"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "unchanged": [
+        "**"
+      ],
+      "why": "Navigator persists nothing (generated caches are ignored)"
+    },
+    {
+      "head_unchanged": true,
+      "why": "Navigator never moves HEAD"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Navigator never mutates git state"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/config.test.js",
+      "expect": "pass",
+      "why": "the project's tests for loadConfig pass"
+    },
+    {
+      "cmd": "node src/cli.js /tmp/no-such-config.json",
+      "expect": "pass",
+      "why": "a missing config file falls back to defaults rather than failing"
+    },
+    {
+      "cmd": "printf '{' > /tmp/broken-config.json && node src/cli.js /tmp/broken-config.json",
+      "expect": "fail",
+      "expectOutput": "config: .*is not valid JSON",
+      "why": "invalid JSON surfaces as a ConfigError that the CLI reports and exits 1 on"
+    },
+    {
+      "cmd": "printf '{\"port\": 70000}' > /tmp/port-config.json && node src/cli.js /tmp/port-config.json",
+      "expect": "fail",
+      "expectOutput": "config: port must be an integer from 1 to 65535",
+      "why": "an out-of-range port throws ConfigError"
+    }
+  ],
+  "notes": "Standalone brownfield fixture with no active cycle. Layer 00-project (pre-install, committed) is a small Node ES-module project: src/config.js (loadConfig with defaults, ENOENT fallback, ConfigError wrapping of read and JSON errors, port validation, silent logLevel fallback), src/cli.js (prints the config, reports ConfigError and exits 1), tests in test/config.test.js, README, example config. The installer leaves its default brownfield STATE.md/MODE.md; no workflow layers are needed because the case leaves workflow state unspecified and Navigator runs in any state. history holds three GRILL_ME exchanges about loadConfig ending with an unanswered Question 3 about a missing file, so 'this function' resolves to loadConfig and the switch request interrupts a live quiz.",
+  "case": "navigator-54",
+  "caseHash": "2f982bc07784c01a",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T15:41:11.636Z",
+    "verdict": "pass",
+    "fixtureHash": "1ff88829ce664ed3",
+    "fixedBy": "owner decision",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "87071d442e24535f",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:23:53.795Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T15:21:20.721Z"
+  },
+  "decision": {
+    "action": "fixed",
+    "note": "Owner-approved (2026-10-03, stage 3): gate-3 recommendation applied.",
+    "at": "2026-10-03T16:14:38.692Z",
+    "fixtureHash": "87071d442e24535f"
+  },
+  "migrations": [
+    {
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:23:53.795Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

@@ -1,0 +1,134 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add contact creation with input validation"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "navigator",
+    "utterance": "Failed validation still writes a row."
+  },
+  "graderOnly": [
+    "The user's answer is wrong. In app/handlers.py, create_contact returns (400, {\"errors\": errors}) at line 8 when validate_contact reports errors, before the store.save call at line 10, so no row is inserted into the contacts table.",
+    "tests/test_contacts.py::test_missing_email_is_rejected asserts status 400, the error list, and store.count() == 0 after a payload with no email; the test passes.",
+    "ContactStore.save in app/store.py is the only place that inserts into contacts; validate_contact in app/validation.py only builds a list of messages and touches no storage.",
+    "No STANDARDS cycle is active; the workflow state is the installer's initial brownfield state and is irrelevant to the question."
+  ],
+  "history": {
+    "turns": [
+      {
+        "role": "user",
+        "text": "/navigator Grill me on how creating a contact works in this repo. Start with the basics."
+      },
+      {
+        "role": "assistant",
+        "text": "Sure. I read `app/handlers.py`, `app/validation.py`, `app/store.py`, and `app/models.py`, so the questions are based on the committed code.\n\nFirst question, big picture: when `create_contact(store, payload)` is called with a valid payload, which pieces of code does the request pass through, in order, before it returns?"
+      },
+      {
+        "role": "user",
+        "text": "It calls validate_contact first, then builds a Contact and the store saves it, then it returns 201 with the id."
+      },
+      {
+        "role": "assistant",
+        "text": "That's right, and in the right order. `validate_contact` (`app/validation.py`) returns a list of error messages, `create_contact` builds a `Contact` with the name trimmed and the email trimmed and lower-cased, `ContactStore.save` (`app/store.py`) inserts a row and returns its id, and the handler returns `201` with `{\"id\": ...}`.\n\nNext question: suppose the payload has a name but no email, so `validate_contact` returns `[\"email is required\"]`. What does `create_contact` return in that case, and what happens in the `contacts` table?"
+      }
+    ]
+  },
+  "vars": {},
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "**"
+          ],
+          "why": "revisiting the concept must not change implementation or any other file"
+        },
+        {
+          "head_unchanged": true,
+          "why": "Navigator does not commit or move HEAD"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "unchanged": [
+        "**"
+      ],
+      "why": "Navigator persists nothing (generated caches are ignored)"
+    },
+    {
+      "head_unchanged": true,
+      "why": "Navigator never moves HEAD"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Navigator never mutates git state"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "python3 -m pytest -q tests/test_contacts.py",
+      "expect": "pass",
+      "why": "the existing tests pass, including the one showing a rejected payload is not saved"
+    },
+    {
+      "cmd": "python3 -c \"from app.store import ContactStore; from app.handlers import create_contact; s = ContactStore(); r = create_contact(s, {'name': 'Ada'}); print(r); assert r[0] == 400 and s.count() == 0\"",
+      "expect": "pass",
+      "why": "failed validation returns 400 and writes no row, contradicting the user's answer"
+    }
+  ],
+  "notes": "Standalone brownfield fixture with the installer's default state (no active cycle); Navigator needs only project code. layers/00-project (pre-install, committed) is a small stdlib Python contacts app: app/validation.py builds error messages, app/handlers.py create_contact returns 400 at line 8 before store.save at line 10, app/store.py is an in-memory SQLite store, tests/test_contacts.py covers the valid path and a rejected payload (count stays 0). History is an earlier GRILL_ME exchange: a big-picture question answered correctly, then the question about what happens when validation fails. The run's utterance is the user's incorrect answer, kept verbatim from the catalog. Nothing in the repo or history states the answer to the pending question. selfChecks use python3 (the image has no python alias).",
+  "case": "navigator-48",
+  "caseHash": "b690420c8136eca8",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T15:40:14.421Z",
+    "verdict": "pass",
+    "fixtureHash": "d1b7a457f7698423",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "dfd5e02a9b8e7f44",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:20:45.474Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T15:18:08.779Z"
+  },
+  "migrations": [
+    {
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:20:45.474Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

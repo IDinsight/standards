@@ -1,0 +1,270 @@
+{
+  "base": "export-project",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-context",
+      "action": "commit",
+      "message": "Record project context for CSV export"
+    },
+    {
+      "dir": "layers/52-scope",
+      "action": "commit",
+      "message": "Define CSV export scope"
+    },
+    {
+      "dir": "layers/54-design",
+      "action": "commit",
+      "message": "Design CSV export"
+    },
+    {
+      "dir": "layers/56-plan",
+      "action": "commit",
+      "message": "Plan CSV export implementation"
+    },
+    {
+      "dir": "layers/58-export",
+      "action": "commit",
+      "message": "Add CSV export of filtered records"
+    },
+    {
+      "dir": "layers/60-complete",
+      "action": "commit",
+      "message": "Mark CSV export plan complete"
+    },
+    {
+      "dir": "layers/62-access-test",
+      "action": "commit",
+      "message": "Add integration test for denied exports"
+    },
+    {
+      "dir": "layers/64-verification",
+      "action": "commit",
+      "message": "Record CSV export verification"
+    },
+    {
+      "dir": "layers/66-review",
+      "action": "commit",
+      "message": "Record CSV export implementation review"
+    },
+    {
+      "dir": "layers/68-guide",
+      "action": "commit",
+      "message": "Document CSV export in usage guide"
+    },
+    {
+      "dir": "layers/70-correction",
+      "action": "commit",
+      "message": "Correct export access errors in usage guide"
+    },
+    {
+      "dir": "layers/72-record",
+      "action": "commit",
+      "message": "Record verified usage guide correction"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "documenter",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The technical design's Interfaces and Contracts require that an export whose filters match no records returns 422 with {\"error\": \"no records match the filters\"} and writes no file; src/routes/export.ts does not implement this, so such an export writes a header-only file and returns 201.",
+    "The development plan, verification report, and implementation review do not mention the empty-export case; apart from it the implementation matches the design and all existing tests pass.",
+    "The same-state DOCUMENTATION correction (DOC-001, 401 versus 403 for editor and viewer export requests) is applied in docs/usage.md and verified.",
+    "Recovery is inactive, so Documenter owns no recovery frame and the Documenter Corrective Return conditions cannot hold; there is no ResumeAt destination to return to.",
+    "The documentation gate cannot pass: AC-002 requires the guide to describe the export's error responses, and the empty-export response depends on implementation that does not exist yet.",
+    "Routing the missing empty-export behavior as a normal IMPLEMENTATION failure from DOCUMENTING to DEVELOPING (frame From DOCUMENTING, Owner DEVELOPING, ResumeAt DOCUMENTING, RerunThrough NONE) is legitimate failure routing, not a fabricated frame; persisting a blocking user question instead is also legitimate handling."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "export-20260924T090000Z-a7f3c1d2",
+    "DOC": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md",
+    "DESIGN": ".standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md",
+    "PLAN": ".standards/docs/development/export-20260924T090000Z-a7f3c1d2.md",
+    "VERIFICATION": ".standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md",
+    "REVIEW_IMPL": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md",
+    "USAGE": "docs/usage.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "in": [
+            "DOCUMENTING",
+            "DEVELOPING",
+            "TESTING",
+            "REVIEWING_IMPLEMENTATION",
+            "ARCHITECTING",
+            "SCOPING",
+            "AUDITING"
+          ],
+          "why": "the documentation gate is unmet, so no forward handoff or invented return to final review, synchronization, or sign-off"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "in": [
+            "0",
+            "1"
+          ],
+          "why": "at most one legitimate failure frame can be pushed in this run"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${DOC}"
+        },
+        {
+          "field": {
+            "path": "${DOC}",
+            "name": "Status",
+            "not": "COMPLETE"
+          },
+          "why": "the full gate stays incomplete while the empty-export documentation is outstanding"
+        },
+        {
+          "contains": {
+            "path": "${DOC}",
+            "regex": "422"
+          },
+          "why": "the empty-export dependency remains recorded"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "test/**",
+        "packages/**",
+        "package.json",
+        "pnpm-lock.yaml",
+        ".gitignore"
+      ],
+      "why": "Documenter does not change tests, dependencies, or configuration"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the unit suite passes offline"
+    },
+    {
+      "cmd": "pnpm --filter export test 2>&1 | grep -qE 'pass 21$'",
+      "expect": "pass",
+      "why": "the unit suite runs 21 tests, as the records state"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration 2>&1 | grep -qE 'pass 3$'",
+      "expect": "pass",
+      "why": "the integration suite runs and passes 3 tests, including the denied-export test"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the DOCUMENTING state with a same-state DOCUMENTATION failure handoff is valid"
+    },
+    {
+      "cmd": "node --input-type=module -e 'import { createApp } from \"./src/app.ts\"; import { mkdtempSync, readdirSync } from \"node:fs\"; import { tmpdir } from \"node:os\"; import path from \"node:path\"; const dir = path.join(mkdtempSync(path.join(tmpdir(), \"empty-\")), \"out\"); const r = createApp({ exportDir: dir }).handle({ method: \"POST\", path: \"/records/export\", query: { owner: \"nobody\" }, user: { id: 1, name: \"Ada\", role: \"admin\" } }); if (r.status !== 201 || readdirSync(dir).length !== 1 || r.body.trim() !== \"id,title,owner,status,createdAt\") process.exit(1); console.log(\"empty export\", r.status);'",
+      "expect": "pass",
+      "why": "an admin export matching no records currently returns 201 and writes a header-only file, so the designed 422 behavior is not implemented"
+    },
+    {
+      "cmd": "grep -q 'no records match the filters' .standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md && ! grep -rq 'no records match' src && ! grep -q '422' docs/usage.md && grep -q 'POST /records/export' docs/usage.md && grep -q 'an `editor` or `viewer` gets `403`' docs/usage.md",
+      "expect": "pass",
+      "why": "the design specifies the empty-export response, the code and guide lack it, and the guide carries the corrected 403 text"
+    },
+    {
+      "cmd": "grep -q '^`WorkflowState`: `DOCUMENTING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Kind`: `FAILURE` `From`: `DOCUMENTING` `FailureType`: `DOCUMENTATION`' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md && grep -q '^`PromotionReason`: `NONE` `AuditTarget`: `NONE` `BlockedOn`: `NONE`$' .standards/STATE.md && grep -q 'ProjectMode`: `BROWNFIELD' .standards/MODE.md",
+      "expect": "pass",
+      "why": "DOCUMENTING after a same-state DOCUMENTATION failure, recovery and obligations inactive, nothing blocked"
+    },
+    {
+      "cmd": "d=.standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md && head -4 $d | grep -qx 'Artifact: DOCUMENTATION' && grep -q '`Status`: `IN_PROGRESS`' $d && grep -q '^`Status`: `RESOLVED` `Owner`: `Documenter`$' $d && grep -q '422' $d && ! grep -rqE 'COMMIT:|BLOB:' .standards/docs .standards/CONTEXT.md",
+      "expect": "pass",
+      "why": "the documentation record is IN_PROGRESS with the verified DOC-001 and the empty-export dependency, and no placeholder remains"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && test ! -e exports",
+      "expect": "pass",
+      "why": "all work is committed and no export files exist"
+    },
+    {
+      "cmd": "git log -12 --format=%s | paste -s -d '|' - | grep -qx 'Record verified usage guide correction|Correct export access errors in usage guide|Document CSV export in usage guide|Record CSV export implementation review|Record CSV export verification|Add integration test for denied exports|Mark CSV export plan complete|Add CSV export of filtered records|Plan CSV export implementation|Design CSV export|Define CSV export scope|Record project context for CSV export'",
+      "expect": "pass",
+      "why": "history follows the brownfield order"
+    }
+  ],
+  "notes": "Standalone cycle on export-project (not export-documenting, whose design and records cite blob identities that a design change would make stale). Layers 50-66 reproduce the export-documenting cycle (context, scope, design, plan, implementation, Tester's denied-export test, COMPLETE FULL verification, COMPLETE implementation review with no findings) with one difference: the design's Interfaces and Contracts and Data and Control Flow add a 422 'no records match the filters' response with no file for an export matching no records. The plan, implementation, tests, verification, and review are identical to export-documenting and never mention that case, so the implementation lacks it. 68-guide: Documenter's first pass adds an Exporting records as CSV section to docs/usage.md (wrongly giving 401 to editors and viewers), updates README, and creates the IN_PROGRESS documentation record (AUTONOMOUS, ACTIVE_CHANGE, User Style NONE). 70-correction: STATE records a same-state FAILURE (From DOCUMENTING, FailureType DOCUMENTATION), the guide is corrected (401 only without a user, 403 for editor/viewer), and the record holds DOC-001 OPEN. 72-record: the record marks DOC-001 RESOLVED with inspection and test evidence, cites revisions and blobs, and lists the remaining empty-export documentation as depending on behavior src/routes/export.ts does not provide (owner Developer), Status IN_PROGRESS, gate not passed. Recovery and obligations stay inactive; BlockedOn NONE.",
+  "case": "documenter-65",
+  "caseHash": "bffaed35a20a48f5",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T16:44:10.821Z",
+    "verdict": "pass",
+    "fixtureHash": "8a224f1c9aa5cedd",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "37ac22ffe1dc5f3b",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:18:39.810Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T16:02:08.529Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-context/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/52-scope/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/54-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/56-plan/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/60-complete/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/64-verification/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/66-review/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/70-correction/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:18:39.810Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

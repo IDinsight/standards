@@ -1,0 +1,76 @@
+{
+  "conditions": [
+    {
+      "condition": "Project is BROWNFIELD",
+      "where": ".standards/MODE.md (installed with --mode brownfield)",
+      "status": "realized"
+    },
+    {
+      "condition": "The previous cycle ended SIGNED_OFF with CycleMode UNSET",
+      "where": ".standards/STATE.md committed in 'Sign off survey results export' (WorkflowState SIGNED_OFF, CycleMode UNSET, Handoff SIGNOFF)",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work retains CompletionPolicy IMPLEMENTATION_REVIEWED from the finished cycle",
+      "where": ".standards/STATE.md Active Work.CompletionPolicy, with the policy instruction kept in Request",
+      "status": "realized"
+    },
+    {
+      "condition": "Old review reports keep their closure evidence and omitted-guarantee explanation",
+      "where": ".standards/docs/reviews/survey-results-export-20260923T140000Z-3f9a2c71/implementation.md, Implementation-Reviewed Closure section (ELIGIBLE, User Choice/Reason, Evidence, Omitted Phases/Guarantees, explanatory prose)",
+      "status": "realized"
+    },
+    {
+      "condition": "Other prior-cycle records and Auditor context exist",
+      "where": ".standards/docs/{scope,specs,development,verification}/<OLD>.md and .standards/CONTEXT.md",
+      "status": "realized"
+    },
+    {
+      "condition": "The new request selects no completion policy",
+      "where": "prompt.utterance 'Add a date-range filter to the survey results export.'",
+      "status": "realized"
+    },
+    {
+      "condition": "Auditor is not invoked",
+      "where": "user message is /scoper only",
+      "status": "realized"
+    },
+    {
+      "condition": "State is valid and a new cycle ID can be allocated",
+      "where": "check.mjs ok:true; selfCheck cycle.mjs new passes",
+      "status": "realized"
+    },
+    {
+      "condition": "Small committed codebase with passing tests",
+      "where": "src/*.js, test/*.js; selfCheck node --test passes; git status clean",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The prior cycle ID slug 'survey-results-export' does not match what cycle.mjs would derive from the stored Request ('let-survey-owners-download-a-survey-s...'). check.mjs accepts it, and it does not affect the tested behavior.",
+      "recommendation": "run_as_is",
+      "fix": "Optional: use an ID whose slug is derived from the Request text."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": ".standards/CONTEXT.md still says the project 'has no export', so it is stale after the signed-off export cycle. This is realistic, because Auditor refreshes context in the new cycle. It gives Scoper no reason to act, since state routes to AUDITING.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition: it commits a BROWNFIELD SIGNED_OFF state that retains IMPLEMENTATION_REVIEWED, keeps a complete Implementation-Reviewed Closure in the prior review, and check.mjs is clean. The checks are necessary conditions that any correct cycle start meets (FULL_DELIVERABLE, STANDARD, a new ID, NEW_CYCLE from SIGNED_OFF, AUDITING, an unchanged docs/CONTEXT, an /auditor invocation, check_ok), and the invariants fit a Scoper run. Only minor realism notes remain.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T03:07:56.279Z",
+  "costUsd": 0.221077,
+  "ms": 41775,
+  "fixtureHash": "9657850ec0e0cfab"
+}

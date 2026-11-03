@@ -1,0 +1,53 @@
+{
+  "conditions": [
+    {
+      "condition": "Navigator is invoked and a GRILL_ME conversation is already in progress",
+      "where": "spec history: user turn '/navigator Grill me on how adding a contact works…' followed by an assistant quiz question; prompt.skill navigator",
+      "status": "realized"
+    },
+    {
+      "condition": "The prior GRILL_ME turn asked a beginner question about what happens to invalid input",
+      "where": "history assistant turn: 'when `add_contact` is called with invalid input, for example an empty name, what happens to that input?'",
+      "status": "realized"
+    },
+    {
+      "condition": "The user answers in plain language that validation occurs before persistence and invalid input returns without saving",
+      "where": "prompt.utterance 'Validation happens before persistence, so invalid input returns without saving anything.'",
+      "status": "realized"
+    },
+    {
+      "condition": "Current source confirms the user's answer",
+      "where": "app/service.py add_contact: validate_contact runs first, then `return 400, {\"errors\": errors}` before store.save; tests/test_service.py test_invalid_contact_is_not_saved; selfCheck 2 passes",
+      "status": "realized"
+    },
+    {
+      "condition": "Small committed project code exists with room for a deeper follow-up question",
+      "where": "app/validation.py, app/store.py (DuplicateEmail → 409), normalization after validation in app/service.py; single commit 98b7548, clean tree",
+      "status": "realized"
+    },
+    {
+      "condition": "Workflow state irrelevant/unspecified; installed runtime valid",
+      "where": ".standards/STATE.md pristine brownfield install; check.mjs ok:true",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 1,
+      "detail": "Assertion 1 requires `reply_matches: \\?`. A correct run nearly always asks its next quiz question with a question mark, but an imperative prompt such as 'Walk me through what happens with a duplicate email.' would be a legitimate question with no '?'. The risk is low, and the judge already decides whether the run waits.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally drop the reply_matches check from assertion 1 in navigator-47/spec.json and leave the assertion entirely to the judge."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes the case: an in-progress GRILL_ME history whose question the user's accurate plain-language answer addresses, and committed source plus passing selfChecks that confirm validation precedes persistence with an early 400 return. There are no leaks, and the Navigator invariants are correct. The only concern is that the '?' check on assertion 1 is slightly narrow, which is acceptable.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T15:39:56.574Z",
+  "costUsd": 0.658563,
+  "ms": 17482,
+  "fixtureHash": "1d6d5d3f9505bdfa"
+}

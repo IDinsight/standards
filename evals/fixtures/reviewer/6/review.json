@@ -1,0 +1,111 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield template)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState REVIEWING_FINAL, Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and outstanding obligations inactive",
+      "where": ".standards/STATE.md: Recovery `Active`: `false`, Outstanding Obligations `Active`: `false`",
+      "status": "realized"
+    },
+    {
+      "condition": "Arrived at final review by a forward handoff from Documenter",
+      "where": ".standards/STATE.md Handoff FORWARD From DOCUMENTING",
+      "status": "realized"
+    },
+    {
+      "condition": "Current scope with AC-002 requiring administrators, enforced server-side",
+      "where": ".standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Current architecture requires requireAdmin first; non-admin gets 403, no user gets 401",
+      "where": ".standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Auditor context available",
+      "where": ".standards/CONTEXT.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Development plan COMPLETE with valid ownership",
+      "where": ".standards/docs/development/export-20260924T090000Z-a7f3c1d2.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation requires administrators",
+      "where": "src/routes/export.ts: requireAdmin(request.user) is the handler's first statement; selfCheck confirms a viewer gets 403 and no folder is created",
+      "status": "realized"
+    },
+    {
+      "condition": "Tester report COMPLETE with verified admin-only behavior",
+      "where": ".standards/docs/verification/...md (E2 denied-export scenario); test/integration/export-flow.test.ts passes 3/3",
+      "status": "realized"
+    },
+    {
+      "condition": "Passing implementation review",
+      "where": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md Status COMPLETE, no material findings",
+      "status": "realized"
+    },
+    {
+      "condition": "Documenter record available, COMPLETE, valid provenance",
+      "where": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Operations guide says all signed-in users can export",
+      "where": "docs/operations.md:40 'Any signed-in user can export the records list.'",
+      "status": "realized"
+    },
+    {
+      "condition": "docs/operations.md:42 tells support users to run the admin export command",
+      "where": "docs/operations.md:42-43 (counted and pinned by selfCheck)",
+      "status": "realized"
+    },
+    {
+      "condition": "No final-deliverable review exists yet",
+      "where": "absent .standards/docs/reviews/.../final-deliverable.md (selfCheck)",
+      "status": "realized"
+    },
+    {
+      "condition": "Clean committed git state",
+      "where": "git status clean on main",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 0,
+      "detail": "The contains regex `operations[.]md[^0-9]{0,60}4[0-4]` fails on an occurrence where a blob or commit hash sits between the path and the line number, e.g. \"`docs/operations.md` (blob `f8d647ed…`), lines 40–43\". This passes when another mention puts the line number first, and most runs will write `docs/operations.md:42`, so the risk is low. Separately, the Owner regex requires the value to be exactly Documenter or Documenting, case-insensitively, and `Documenter role` would fail it.",
+      "recommendation": "fix_file",
+      "fix": "In reviewer-6/spec.json, assertion 0, change the line-reference regex to `operations[.]md[\\s\\S]{0,200}?\\b4[0-4]\\b` (a looser necessary condition is safe because the judge decides with complete:false). Optionally relax the Owner regex to \"`Owner`:[^`]*`[^`]*document\" with flag i."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 1,
+      "detail": "complete:true on 'does not weaken the authorization requirement' is decided only by file-unchanged checks. A run that leaves files alone but whose finding's smallest correction recommends relaxing requireAdmin, or whose reply proposes allowing viewers, would pass without a judge. Wrong routing to Scoper is caught by assertion 2, so the gap is narrow and only produces false passes, never false failures.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally set assertion 1 to complete:false so the judge also confirms that the finding's correction keeps the admin-only requirement."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is in place: docs/operations.md:40 claims any signed-in user can export, and line 42 tells viewer-account support staff to run the admin export command, while AC-002, the design, the code, and the passing tests require admin. The records are coherent, check.mjs passes, and nothing hints at the answer. The state checks for assertion 2 match the only legal route (DOCUMENTATION FAILURE to DOCUMENTING with ResumeAt REVIEWING_FINAL) and pass the turn-end check. The only issues are minor regex looseness and complete-flag notes.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T23:19:27.235Z",
+  "costUsd": 0.3615048,
+  "ms": 124916,
+  "fixtureHash": "41a8ef60fe146404"
+}

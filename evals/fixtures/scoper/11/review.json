@@ -1,0 +1,86 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is BROWNFIELD",
+      "where": ".standards/MODE.md (installer brownfield template, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState SCOPING",
+      "where": ".standards/STATE.md header fields",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery inactive, no outstanding obligations",
+      "where": ".standards/STATE.md `## Recovery` Active false; `## Outstanding Obligations` Active false",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id is billing-copy-20260923T101500Z-4d7e9a13",
+      "where": ".standards/STATE.md Active Work.Id",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Scope is NONE (no scope yet, PLAN mode applies)",
+      "where": ".standards/STATE.md Active Work.Scope `NONE`; no .standards/docs/ records",
+      "status": "realized"
+    },
+    {
+      "condition": "Valid active-cycle project context exists, refreshed by Auditor",
+      "where": ".standards/CONTEXT.md committed in 'Record project context for billing copy change'; Handoff FORWARD from AUDITING",
+      "status": "realized"
+    },
+    {
+      "condition": "docs/product/scope.md is an established, project-owned canonical scope document",
+      "where": "docs/product/scope.md committed pre-install ('Owner: Product ... canonical description'); README.md 'Product scope' section; CONTEXT.md Structure and Boundaries",
+      "status": "realized"
+    },
+    {
+      "condition": "The billing-copy change belongs in that canonical scope",
+      "where": "README.md and CONTEXT.md say billing copy changes are scoped in docs/product/scope.md; scope doc has a 'Billing summary' section",
+      "status": "realized"
+    },
+    {
+      "condition": "No STANDARDS provenance block in docs/product/scope.md",
+      "where": "docs/product/scope.md (selfCheck grep confirms no 'STANDARDS')",
+      "status": "realized"
+    },
+    {
+      "condition": "A concrete billing-copy request that can be scoped without a blocking question",
+      "where": ".standards/STATE.md Active Work.Request names exact strings",
+      "status": "realized"
+    },
+    {
+      "condition": "Small brownfield code base, all committed, clean tree",
+      "where": "src/billing/*.js, test/summary.test.js; git status clean; tests pass (selfCheck)",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": ".standards/CONTEXT.md contains the literal text `\\u2014` (six characters) in place of an em dash on several lines (e.g. '`src/billing/copy.js` \\u2014 customer-facing strings'). An Auditor would not write this; it is an escaping artifact from generation. It does not affect any assertion or check.",
+      "recommendation": "fix_file",
+      "fix": "In layers/50-cycle/.standards/CONTEXT.md replace every literal `\\u2014` with `—` (or ' - ')."
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 3,
+      "detail": "The AC-001 list-item regex is slightly narrower than the runtime's definedIds (no `[ ]` checkbox form, no grouped '`AC-001`, `AC-002`:' form). Both forms are very unlikely for a fresh scope written from the template, so a correct run should satisfy it.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally widen to allow an optional `\\[[ xX]\\]\\s+` and a following `,`/`and` group, mirroring records.mjs definedIds."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized: brownfield STANDARD cycle in SCOPING with the exact Id, Scope NONE, Auditor context present, and an unmarked Product-owned docs/product/scope.md named as canonical in README and CONTEXT with no prior AC identifiers. Checks are necessary conditions for a correct PLAN run that reuses the project document and hands off to Architect, and invariants fit. Only a cosmetic escaping artifact in CONTEXT.md is worth fixing.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T20:08:07.357Z",
+  "costUsd": 0.14327220000000002,
+  "ms": 37542,
+  "fixtureHash": "d0db7c85571077ba"
+}

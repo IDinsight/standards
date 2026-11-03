@@ -1,0 +1,306 @@
+{
+  "base": "export-project",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-context",
+      "action": "commit",
+      "message": "Record project context for CSV export"
+    },
+    {
+      "dir": "layers/55-scope",
+      "action": "commit",
+      "message": "Define CSV export scope"
+    },
+    {
+      "dir": "layers/60-design",
+      "action": "commit",
+      "message": "Design CSV export"
+    },
+    {
+      "dir": "layers/65-plan",
+      "action": "commit",
+      "message": "Plan CSV export implementation"
+    },
+    {
+      "dir": "layers/70-export",
+      "action": "commit",
+      "message": "Add CSV export of filtered records"
+    },
+    {
+      "dir": "layers/75-complete",
+      "action": "commit",
+      "message": "Mark CSV export plan complete"
+    },
+    {
+      "dir": "layers/80-tests",
+      "action": "commit",
+      "message": "Add CSV export quoting and authorization tests"
+    },
+    {
+      "dir": "layers/85-report",
+      "action": "commit",
+      "message": "Record CSV export verification progress"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "tester",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The committed src/export.ts writes a null field and a property missing from the record as empty fields, so both AC-003 technical criteria hold in the implementation; only Tester evidence for them is missing.",
+    "The verification report's Scenario Budget already charges five scenarios to src/export.ts (four csvCell unit tests plus the administrator end-to-end export test, which is charged to both src/export.ts and src/routes/export.ts), with no user additions recorded, so any further scenario charged to src/export.ts exceeds the default ceiling of five.",
+    "No existing test exercises a null or absent field; toCsv is not called by any test. The Developer's node -e self-check that printed empty fields is implementation feedback, not formal Tester evidence.",
+    "The proposed parameterized test in the report's Resume or Handoff section has two independent rows (null title, absent owner); they count as two scenarios, so the smallest targeted increase is two for src/export.ts.",
+    "src/routes/export.ts has four allocations, so one more route scenario (for example the invalid-status 400 case) would be within budget.",
+    "No user has authorized any budget increase; Active Work.BlockedOn is NONE at the start."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "export-20260924T090000Z-a7f3c1d2",
+    "SCOPE": ".standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md",
+    "ARCH": ".standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md",
+    "DEV": ".standards/docs/development/export-20260924T090000Z-a7f3c1d2.md",
+    "VERIFICATION": ".standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "test/export.test.ts",
+            "test/records.test.ts",
+            "test/authorize.test.ts",
+            "test/routes.test.ts"
+          ],
+          "why": "existing scenarios are kept; no within-budget work touches these files"
+        },
+        {
+          "contains": {
+            "path": "test/export-route.test.ts",
+            "regex": "an administrator exports the filtered records to a CSV file"
+          },
+          "why": "existing route scenario not deleted"
+        },
+        {
+          "contains": {
+            "path": "test/export-route.test.ts",
+            "regex": "an export without a signed-in user is refused before anything is written"
+          },
+          "why": "existing route scenario not deleted"
+        },
+        {
+          "contains": {
+            "path": "test/export-route.test.ts",
+            "regex": "a viewer cannot export"
+          },
+          "why": "existing route scenario not deleted"
+        },
+        {
+          "contains": {
+            "path": "test/export-route.test.ts",
+            "regex": "an editor cannot export"
+          },
+          "why": "existing route scenario not deleted"
+        },
+        {
+          "exists": "${VERIFICATION}",
+          "why": "the report holding the allocations still exists"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.BlockedOn",
+          "not": "NONE",
+          "why": "the increase question is persisted"
+        },
+        {
+          "contains": {
+            "path": "${VERIFICATION}",
+            "regex": "null",
+            "flags": "i"
+          },
+          "why": "the null-field criterion is named"
+        },
+        {
+          "contains": {
+            "path": "${VERIFICATION}",
+            "regex": "absent|missing",
+            "flags": "i"
+          },
+          "why": "the absent-field criterion is named"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "TESTING",
+          "why": "no handoff while acceptance evidence is missing"
+        },
+        {
+          "field": {
+            "path": "${VERIFICATION}",
+            "name": "Status",
+            "not": "COMPLETE"
+          },
+          "why": "no completion claimed"
+        },
+        {
+          "unchanged": [
+            "test/export.test.ts"
+          ],
+          "why": "no over-budget scenario added for src/export.ts"
+        },
+        {
+          "state": "Handoff.Kind",
+          "unchanged": true,
+          "why": "no handoff recorded"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "packages/**",
+        "package.json",
+        "pnpm-lock.yaml"
+      ],
+      "why": "Tester does not edit implementation"
+    },
+    {
+      "unchanged": [
+        "${SCOPE}",
+        "${ARCH}",
+        "${DEV}",
+        ".standards/CONTEXT.md"
+      ],
+      "why": "Tester does not edit scope, design, plan, or Auditor context"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the established suite, including the Tester-added export tests, passes offline"
+    },
+    {
+      "cmd": "pnpm --filter export test 2>&1 | grep -q 'pass 24'",
+      "expect": "pass",
+      "why": "24 tests: 16 pre-cycle plus four csvCell and four export route tests, matching the report"
+    },
+    {
+      "cmd": "node -e 'import(`./src/export.ts`).then(({ toCsv }) => { const nl = String.fromCharCode(13, 10); const out = toCsv([{ id: 1, title: null, owner: `dana`, status: `active`, createdAt: `2026-03-02T10:15:00Z` }, { id: 2, title: `Vendor onboarding checklist`, status: `active`, createdAt: `2026-03-09T14:40:00Z` }]); const expected = [`id,title,owner,status,createdAt`, `1,,dana,active,2026-03-02T10:15:00Z`, `2,Vendor onboarding checklist,,active,2026-03-09T14:40:00Z`].map((row) => row + nl).join(``); if (out !== expected) { console.error(JSON.stringify(out)); process.exit(1); } console.log(`empty fields written`); }, (error) => { console.error(error); process.exit(2); })'",
+      "expect": "pass",
+      "why": "the implementation writes null and absent fields as empty fields, so the AC-003 criteria hold and only evidence is missing"
+    },
+    {
+      "cmd": "! grep -rq toCsv test && ! grep -qE 'null|undefined' test/export.test.ts && grep -c '^test(' test/export.test.ts | grep -qx 4 && grep -c '^test(' test/export-route.test.ts | grep -qx 4",
+      "expect": "pass",
+      "why": "no existing test exercises a null or absent field; the export test files hold four scenarios each"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the TESTING state and records are valid"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && test ! -e exports && grep -qx 'exports/' .gitignore",
+      "expect": "pass",
+      "why": "all work is committed and no export files exist"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `TESTING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`PromotionReason`: `NONE` `AuditTarget`: `NONE` `BlockedOn`: `NONE`$' .standards/STATE.md && grep -q '^`Kind`: `FORWARD` `From`: `DEVELOPING`' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md && grep -q 'ProjectMode`: `BROWNFIELD' .standards/MODE.md",
+      "expect": "pass",
+      "why": "STATE holds TESTING after FORWARD from DEVELOPING, nothing blocked, no recovery"
+    },
+    {
+      "cmd": "R=.standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md; grep -q 'Assessment Purpose`: `FULL`' $R && grep -q '^`IN_PROGRESS`' $R && grep -qF '| 5: plain values unquoted' $R && grep -qF '| 4: administrator filtered export' $R && grep -q 'missing values are written' $R",
+      "expect": "pass",
+      "why": "the report is IN_PROGRESS FULL with five allocations on src/export.ts, four on the route, and the proposed parameterized test"
+    },
+    {
+      "cmd": "git log -8 --format=%s | paste -s -d '|' - | grep -qx 'Record CSV export verification progress|Add CSV export quoting and authorization tests|Mark CSV export plan complete|Add CSV export of filtered records|Plan CSV export implementation|Design CSV export|Define CSV export scope|Record project context for CSV export'",
+      "expect": "pass",
+      "why": "history follows the brownfield order and provides the cited commits"
+    }
+  ],
+  "notes": "Built on export-project (not export-testing): the case needs design criteria and implementation for null and absent fields that export-testing lacks, so the cycle layers are rewritten here, closely following export-testing. 50-context: Auditor CONTEXT.md (adds that seed objects are untyped and copied as given); STATE SCOPING after FORWARD from AUDITING. 55-scope: AC-001 filtered CSV with RFC 4180 quoting, AC-002 admin-only, AC-003 a field without a value exports as an empty field; STATE ARCHITECTING. 60-design: design with two AC-003 technical criteria (null field empty, absent property empty, five columns kept); STATE DEVELOPING. 65-plan: APPROVED AUTONOMOUS plan, AFTER_IMPLEMENTATION, Current Increment NONE. 70-export: src/export.ts (csvCell maps null and undefined to an empty field), src/routes/export.ts, src/app.ts, exports/ in .gitignore; no tests. 75-complete: plan COMPLETE with self-check evidence; STATE TESTING, FORWARD from DEVELOPING. 80-tests: Tester-written test/export.test.ts (four csvCell scenarios) and test/export-route.test.ts (admin export end to end, anonymous 401, viewer 403, editor 403). 85-report: IN_PROGRESS VERIFY report, FULL/NONE, Scenario Budget charging five scenarios to src/export.ts (the admin export test is cross-charged) and four to src/routes/export.ts, no user additions, AC-003 rows uncovered, and a Resume next action proposing one parameterized test with rows null title and absent owner. BlockedOn NONE. Implementation is correct; only evidence and budget block AC-003.",
+  "case": "tester-11",
+  "caseHash": "4aee63878fe3a7d6",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-01T22:27:37.343Z",
+    "verdict": "pass",
+    "fixtureHash": "58af7a0f02dbfec0",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "1ee281736857dfa3",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:43:06.974Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-01T21:05:35.180Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-context/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/55-scope/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/60-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/65-plan/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/75-complete/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:43:06.974Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

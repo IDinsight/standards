@@ -1,0 +1,274 @@
+{
+  "base": null,
+  "date": "2026-10-06T09:00:00Z",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial ledger tool"
+    },
+    {
+      "dir": "layers/51-csv",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Write reports as CSV with a header row"
+    },
+    {
+      "dir": "layers/60-cycle",
+      "action": "commit",
+      "message": "Record report guide context, scope, and design"
+    },
+    {
+      "dir": "layers/70-guide",
+      "action": "commit",
+      "message": "Add report guide, final review, and synchronization findings"
+    },
+    {
+      "dir": "layers/80-account",
+      "action": "commit",
+      "message": "Document the --account filter in the report guide"
+    },
+    {
+      "dir": "layers/90-context",
+      "action": "commit",
+      "message": "Correct report output format in project context and scope"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "architect",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The corrected .standards/CONTEXT.md and tally/report.py show that tally report writes CSV: a header row account,entries,total, then one comma-separated row per account sorted by name with totals to two decimals. The existing design's Interfaces and Contracts still says one tab-separated line per account (account, total) with no header.",
+    "The scope was revised after the design was written: AC-002 (tab-separated output example) is retired and replaced by the new current AC-004 (output as the command writes it). The design's Acceptance Coverage and Technical Acceptance Criteria still list AC-002 and do not mention AC-004. Current ACs are AC-001, AC-003, AC-004.",
+    "The active recovery frame is Frame 3: Owner AUDITING, From and ResumeAt SYNCHRONIZING, RerunThrough SYNCHRONIZING, FailureType PROJECT_CONTEXT. Frames 1 and 2 are older frames (Owner DOCUMENTING with RerunThrough REVIEWING_FINAL; Owner SYNCHRONIZING with RerunThrough NONE) and must stay unchanged; Architect owns none of them.",
+    "The expected outcome is a revised design covering AC-001, AC-003, and AC-004 from current source and context, then a FORWARD handoff from ARCHITECTING to DOCUMENTING with all three frames kept. No development plan, verification report, or implementation review belongs in this cycle, and the design needs no Build Plan.",
+    "README.md and docs/reports.md still describe tab-separated output; correcting them is Documenter's later rerun work, not Architect's."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "guide-20261004T120000Z-1a2b3c4d",
+    "SCOPE": ".standards/docs/scope/guide-20261004T120000Z-1a2b3c4d.md",
+    "ARCH": ".standards/docs/specs/guide-20261004T120000Z-1a2b3c4d.md",
+    "DEVREC": ".standards/docs/development/guide-20261004T120000Z-1a2b3c4d.md",
+    "VERREC": ".standards/docs/verification/guide-20261004T120000Z-1a2b3c4d.md",
+    "IMPLREV": ".standards/docs/reviews/guide-20261004T120000Z-1a2b3c4d/implementation.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "contains": {
+            "path": "${ARCH}",
+            "regex": "AC-004"
+          },
+          "why": "the revised design must account for the new current acceptance condition"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "state": "Recovery.Active",
+          "equals": "true"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "3"
+        },
+        {
+          "state": "Recovery.Top.Owner",
+          "equals": "AUDITING"
+        },
+        {
+          "state": "Recovery.Top.RerunThrough",
+          "equals": "SYNCHRONIZING"
+        },
+        {
+          "state": "Recovery.Frame1.From",
+          "unchanged": true
+        },
+        {
+          "state": "Recovery.Frame1.Owner",
+          "unchanged": true
+        },
+        {
+          "state": "Recovery.Frame1.FailureType",
+          "unchanged": true
+        },
+        {
+          "state": "Recovery.Frame1.Reason",
+          "unchanged": true
+        },
+        {
+          "state": "Recovery.Frame1.ResumeAt",
+          "unchanged": true
+        },
+        {
+          "state": "Recovery.Frame1.RerunThrough",
+          "unchanged": true
+        },
+        {
+          "state": "Recovery.Frame2.From",
+          "unchanged": true
+        },
+        {
+          "state": "Recovery.Frame2.Owner",
+          "unchanged": true
+        },
+        {
+          "state": "Recovery.Frame2.FailureType",
+          "unchanged": true
+        },
+        {
+          "state": "Recovery.Frame2.Reason",
+          "unchanged": true
+        },
+        {
+          "state": "Recovery.Frame2.ResumeAt",
+          "unchanged": true
+        },
+        {
+          "state": "Recovery.Frame2.RerunThrough",
+          "unchanged": true
+        },
+        {
+          "state": "Recovery.Frame3.From",
+          "unchanged": true
+        },
+        {
+          "state": "Recovery.Frame3.Owner",
+          "unchanged": true
+        },
+        {
+          "state": "Recovery.Frame3.FailureType",
+          "unchanged": true
+        },
+        {
+          "state": "Recovery.Frame3.Reason",
+          "unchanged": true
+        },
+        {
+          "state": "Recovery.Frame3.ResumeAt",
+          "unchanged": true
+        },
+        {
+          "state": "Recovery.Frame3.RerunThrough",
+          "unchanged": true
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "in": [
+            "AUDITING",
+            "SCOPING",
+            "ARCHITECTING",
+            "DOCUMENTING",
+            "REVIEWING_FINAL",
+            "SYNCHRONIZING"
+          ],
+          "why": "only included documentation-cycle states"
+        },
+        {
+          "state": "CycleMode",
+          "equals": "DOCUMENTATION"
+        },
+        {
+          "state": "ActiveWork.Development",
+          "equals": "NONE"
+        },
+        {
+          "absent": "${DEVREC}"
+        },
+        {
+          "absent": "${VERREC}"
+        },
+        {
+          "absent": "${IMPLREV}"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "tally/**",
+        "tests/**",
+        "examples/**",
+        "docs/**",
+        "README.md"
+      ],
+      "why": "Architect writes no code, tests, or user documentation"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "python3 -m pytest -q",
+      "expect": "pass",
+      "why": "the existing tests pass, including the CSV-with-header writer test"
+    },
+    {
+      "cmd": "python3 -m tally report examples/sample.csv | head -n 1 | grep -qx 'account,entries,total'",
+      "expect": "pass",
+      "why": "current output is CSV with a header row, as the corrected context says"
+    },
+    {
+      "cmd": "python3 -m tally report examples/missing.csv",
+      "expect": "fail",
+      "expectOutput": "ledger file not found",
+      "why": "missing-file error contract cited by AC-001"
+    },
+    {
+      "cmd": "grep -q 'separated by a tab' docs/reports.md && grep -q 'separated by a tab' .standards/docs/specs/guide-20261004T120000Z-1a2b3c4d.md && grep -q 'AC-002' .standards/docs/specs/guide-20261004T120000Z-1a2b3c4d.md",
+      "expect": "pass",
+      "why": "the stale design and guide still describe tab-separated output and the design still covers retired AC-002"
+    }
+  ],
+  "notes": "Brownfield Python CLI 'tally'. 50-project/51-csv (pre-install): the report first wrote tab-separated lines, then switched to CSV with header 'account,entries,total'; README was never updated and still says tab-separated (why the first audit got it wrong). 60-cycle: DOCUMENTATION cycle guide-20261004T120000Z-1a2b3c4d with original (wrong) CONTEXT, scope v1 (AC-001..003) and the design, which is never touched again (stale: tab-separated output, covers AC-002, no AC-004, no Build Plan). 70-guide: Documenter's guide (tab-separated example), README link, documentation record, a COMPLETE first-pass final review, and a synchronization record whose D-001 caused Frame 1 (guide omitted --account). 80-account: Documenter fixed --account; Frame 1 RerunThrough REVIEWING_FINAL. 90-context: final review re-review raised F-001 on the synchronization record (Frame 2, Owner SYNCHRONIZING); Synchronizer's verification found CSV vs tab output (D-002, Frame 3 Owner AUDITING); Auditor corrected CONTEXT.md and set RerunThrough SYNCHRONIZING; Scoper retired AC-002 and added AC-004; STATE is ARCHITECTING after FORWARD from SCOPING. Compromise: no frame can come from AWAITING_USER_SIGNOFF over older frames, so the active frame is From/ResumeAt SYNCHRONIZING with RerunThrough SYNCHRONIZING (the case states that rerun boundary); check accepts it.",
+  "case": "architect-15",
+  "caseHash": "17898a484845fc06",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-30T22:49:31.079Z",
+    "verdict": "pass",
+    "fixtureHash": "1845d870f6bc8698",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-30T22:40:53.605Z"
+  }
+}

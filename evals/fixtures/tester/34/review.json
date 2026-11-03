@@ -1,0 +1,76 @@
+{
+  "conditions": [
+    {
+      "condition": "BROWNFIELD project, STANDARD cycle, WorkflowState TESTING",
+      "where": ".standards/MODE.md (installed BROWNFIELD); .standards/STATE.md WorkflowState TESTING, CycleMode STANDARD",
+      "status": "realized"
+    },
+    {
+      "condition": "Handoff is a CHECKPOINT from Developer for Increment 1, no recovery",
+      "where": ".standards/STATE.md Handoff Kind CHECKPOINT, From DEVELOPING, FailureType NONE, Reason names 'Increment 1'; Recovery Active false",
+      "status": "realized"
+    },
+    {
+      "condition": "Plan IN_PROGRESS, INCREMENTAL cadence, Current Increment 1, future implementation pending",
+      "where": ".standards/docs/development/<id>.md header; DEV-001 DONE with Self-Check, DEV-002 PENDING; Increments 1 and 2 defined",
+      "status": "realized"
+    },
+    {
+      "condition": "Verification report has Assessment Purpose INCREMENT / Target Increment 1",
+      "where": ".standards/docs/verification/<id>.md header, Status IN_PROGRESS",
+      "status": "realized"
+    },
+    {
+      "condition": "Tester's own new assertion uses the wrong fixture (Tester-owned VERIFICATION defect)",
+      "where": "test/search.test.js scenario 'matches the fragment anywhere in the name' loads contacts-sample.json; report records the file as added by the earlier Tester pass; selfChecks show it fails and passes once the fixture is corrected",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation for Increment 1 is correct, so no other role is needed",
+      "where": "src/search.js; selfCheck 3 shows all four scenarios pass with the fixture corrected",
+      "status": "realized"
+    },
+    {
+      "condition": "Existing scenario allocation recorded, so reuse of the allocation is observable",
+      "where": "report Scenario Budget: src/search.js 4 of 5 (S1–S4)",
+      "status": "realized"
+    },
+    {
+      "condition": "Supporting scope, architecture, and context records exist",
+      "where": ".standards/docs/scope/<id>.md (AC-001..003), .standards/docs/specs/<id>.md, .standards/CONTEXT.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Work is committed, clean tree",
+      "where": "git log (4 commits after install), git status clean",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The earlier Tester session wrote and committed test/search.test.js and the report without running anything ('Not yet run'). This is slightly unusual but is explained in the report's Execution Evidence and Resume sections. It lets the role find the failure itself without any record naming the cause.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 0,
+      "detail": "The report Mode is VERIFY. A correct run may keep VERIFY or switch to REVERIFY after the verification defect, and no check constrains Mode, which is correct. Whether the same-state FAILURE is recorded transiently in STATE.md or only in the report is left to the judge, and the checker tolerates either path. The end-state checks (DEVELOPING, CHECKPOINT from TESTING, FrameCount 0, report IN_PROGRESS) are necessary for any correct completion.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized: a valid TESTING checkpoint state, an INCREMENTAL plan at Increment 1, an INCREMENT report, and a real wrong-fixture scenario that the selfChecks prove is the only failure. Nothing leaks, check.mjs is clean, and every check is a necessary condition of a correct same-state correction followed by a CHECKPOINT return. The invariants fit the Tester role.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-01T22:36:55.951Z",
+  "costUsd": 0.21943120000000002,
+  "ms": 45809,
+  "fixtureHash": "3793802577b3b3c2"
+}

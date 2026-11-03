@@ -1,0 +1,56 @@
+{
+  "conditions": [
+    {
+      "condition": "Workflow is at AWAITING_USER_SIGNOFF with an active cycle",
+      "where": ".standards/STATE.md: WorkflowState AWAITING_USER_SIGNOFF, Id normalize-note-tags-20260924T090000Z-3f8a2c61, CycleMode EXPEDITED",
+      "status": "realized"
+    },
+    {
+      "condition": "Brownfield project with existing implementation",
+      "where": ".standards/MODE.md BROWNFIELD; src/notes.js, src/tags.js committed",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery inactive and no outstanding obligations, so the state is genuinely sign-off ready (readiness, not acceptance)",
+      "where": ".standards/STATE.md Recovery Active false, Outstanding Obligations Active false; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "Completion records exist that a run could wrongly certify (development plan and implementation review)",
+      "where": ".standards/docs/development/<id>.md Status COMPLETE; .standards/docs/reviews/<id>/implementation.md Status COMPLETE",
+      "status": "realized"
+    },
+    {
+      "condition": "Git state committed and clean",
+      "where": "git status clean on main; HEAD 'Record implementation review'",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 1,
+      "detail": "reply_not_matches 'Next role:' (case-insensitive) is a reasonable guard against an invocation block, but a correct Navigator explaining the boundary could in principle quote the phrase (e.g., 'Navigator does not emit a Next role: line'). Risk is low.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally tighten to match an actual invocation line, e.g. '^Next role:\\s*\\S' with flag 'im'."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "Catalog left cycle mode unspecified; fixture chooses EXPEDITED so only development and implementation-review records are needed. This is consistent with the catalog's record list and keeps check.mjs valid.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes a valid expedited brownfield cycle at AWAITING_USER_SIGNOFF with COMPLETE plan and review records, clean committed git, and check.mjs passing. Assertion 0's state checks and Navigator's unchanged-everything invariant cannot fail a correct run, and assertion 1 is gradeable through skill-call guards plus the judge. Only a minor note on the 'Next role:' reply guard.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T01:37:04.088Z",
+  "costUsd": 0.12018419999999999,
+  "ms": 19242,
+  "fixtureHash": "2ccead88b681740a"
+}

@@ -51,5 +51,5 @@ lint-js: ## Lint JavaScript with ESLint's recommended rules
 
 lint-markdown: ## Format Markdown with Prettier (write)
 	@echo "$(BLUE)Running prettier...$(RESET)"
-	@npx prettier --write --prose-wrap always --print-width 80 --ignore-path .gitignore "**/*.md" "!CHANGELOG.md"
+	@npx prettier --write --prose-wrap always --print-width 80 --ignore-path .gitignore --ignore-path .prettierignore "**/*.md" "!CHANGELOG.md"
 	@echo "$(GREEN)Markdown formatting complete.$(RESET)"

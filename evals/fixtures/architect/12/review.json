@@ -1,0 +1,84 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode DOCUMENTATION, CompletionPolicy NONE, Active Work.Id guide-20261004T120000Z-1a2b3c4d",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "WorkflowState ARCHITECTING after a normal SCOPING handoff, no recovery or obligations",
+      "where": ".standards/STATE.md (Handoff FORWARD from SCOPING, Recovery and Obligations inactive)",
+      "status": "realized"
+    },
+    {
+      "condition": "Current scope with AC-001 (accurate existing CLI arguments and errors) and AC-002 (analyst-audience guide)",
+      "where": ".standards/docs/scope/guide-20261004T120000Z-1a2b3c4d.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Auditor context is current for the cycle",
+      "where": ".standards/CONTEXT.md (committed with the scope; no stale non-baseline entries)",
+      "status": "realized"
+    },
+    {
+      "condition": "Source and command help are available offline and agree",
+      "where": "tally/cli.py, tally/summary.py; selfCheck `python3 -m tally --help` passes",
+      "status": "realized"
+    },
+    {
+      "condition": "No architecture artifact exists",
+      "where": "Active Work.Architecture NONE; no .standards/docs/specs/ and no project design document",
+      "status": "realized"
+    },
+    {
+      "condition": "No omitted-owner (development, verification, implementation-review) record",
+      "where": "built tree has only the scope record under .standards/docs/",
+      "status": "realized"
+    },
+    {
+      "condition": "Neither AC needs implementation or formal testing (no material defect: README, help, and source agree)",
+      "where": "tally/*, README.md, tests pass (selfCheck pytest 9 passed)",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 0,
+      "detail": "The evidence `contains` regex `tally/(cli|summary)\\.py|-m tally (--help|-h)` requires the repository-relative path or the `-m tally` help form. A correct design that cites only `cli.py` or the console-script form `tally --help` would fail. Such a design is unlikely, because CONTEXT.md and the documentation mode both steer toward concrete repository paths.",
+      "recommendation": "fix_file",
+      "fix": "In architect-12/spec.json, checks[0] contains regex: widen to `(tally/)?(cli|summary)\\.py|tally (--help|-h)`."
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 2,
+      "detail": "The no-Build-Plan regex also fails a design that keeps a `## Build Plan` heading saying it is not applicable. The template and the documentation mode both say to omit the section, so this follows the skill. It is only marginally strict.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "All commits are dated 2026-09-24, before the 2026-10-04T12:00:00Z timestamp in the cycle ID. As a result, the scope and context commit predates the cycle it belongs to. Nothing in the run depends on this.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally set top-level \"date\" in spec.json to a time after 2026-10-04T12:00:00Z."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes a brownfield DOCUMENTATION cycle at ARCHITECTING with current Auditor context, a two-AC scope, no design, and no omitted-owner records, and the stdlib CLI's source, help, and tests agree. Checks and invariants are necessary conditions for a correct run, check.mjs is clean, and the turn-end check will enforce AC coverage after the handoff to DOCUMENTING. Only minor notes remain: a slightly narrow evidence regex and commit dates earlier than the cycle-ID timestamp.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-30T22:48:07.975Z",
+  "costUsd": 1.154599,
+  "ms": 41411,
+  "fixtureHash": "d42a9fdcdf8b12d0"
+}

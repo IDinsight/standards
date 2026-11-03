@@ -1,0 +1,332 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial inventory CLI"
+    },
+    {
+      "dir": "layers/55-style",
+      "action": "commit",
+      "message": "Add personal developer style"
+    },
+    {
+      "dir": "layers/60-cycle",
+      "action": "commit",
+      "message": "Record low-stock report scope and design"
+    },
+    {
+      "dir": "layers/70-selection",
+      "action": "commit",
+      "message": "Add low-stock item selection"
+    },
+    {
+      "dir": "layers/80-revision",
+      "action": "commit",
+      "message": "Revise development plan for low command output"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "developer",
+    "utterance": "clear my personal style and continue DEV-002."
+  },
+  "graderOnly": [
+    "The development plan has never contained a `User Style Locked` field in any commit: it was absent when the plan was IN_PROGRESS with DEV-001 DONE and is still absent now that the plan is PROPOSED.",
+    "The plan had been approved earlier (it was IN_PROGRESS when DEV-001 was implemented) and returned to PROPOSED after a revision of DEV-002; the role must still not write a lock value itself.",
+    "DEV-002 is not implemented: src/cli.js has only the `list` command.",
+    ".standards/user-styles/developer/tony.md exists and resolves the persisted `tony` selection.",
+    "check.mjs does not report the missing `User Style Locked` field, so the built state passes check."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "low-stock-report-20260923T141500Z-3f9a62c1",
+    "PLAN": ".standards/docs/development/low-stock-report-20260923T141500Z-3f9a62c1.md",
+    "STYLE": ".standards/user-styles/developer/tony.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "reply_matches": "User Style Locked|style[- ]lock",
+          "flags": "i",
+          "why": "a correct reply names the missing plan field"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "DEVELOPING",
+          "why": "the workflow does not advance"
+        },
+        {
+          "state": "Handoff.Kind",
+          "unchanged": true,
+          "why": "no handoff is made"
+        },
+        {
+          "state": "ActiveWork.BlockedOn",
+          "changed": true,
+          "why": "a new blocker is persisted (the previous one was the plan-approval request)"
+        },
+        {
+          "contains": {
+            "path": ".standards/STATE.md",
+            "regex": "User Style Locked|style[- ]lock",
+            "flags": "i"
+          },
+          "why": "the persisted blocker identifies the missing field"
+        },
+        {
+          "unchanged": [
+            "src/**",
+            "test/**",
+            "data/**",
+            "package.json"
+          ],
+          "why": "DEV-002 is not implemented"
+        },
+        {
+          "contains": {
+            "path": "${PLAN}",
+            "regex": "### DEV-002[^#]*`Status`: `PENDING`"
+          },
+          "why": "DEV-002 stays PENDING"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "field": {
+            "path": "${PLAN}",
+            "name": "User Style",
+            "equals": "tony"
+          }
+        },
+        {
+          "field": {
+            "path": "${PLAN}",
+            "name": "Status",
+            "equals": "PROPOSED"
+          }
+        },
+        {
+          "field": {
+            "path": "${PLAN}",
+            "name": "Mode",
+            "equals": "AUTONOMOUS"
+          }
+        },
+        {
+          "field": {
+            "path": "${PLAN}",
+            "name": "Verification Cadence",
+            "equals": "AFTER_IMPLEMENTATION"
+          }
+        },
+        {
+          "field": {
+            "path": "${PLAN}",
+            "name": "Current Increment",
+            "equals": "NONE"
+          }
+        },
+        {
+          "provenance": {
+            "path": "${PLAN}",
+            "artifact": "DEVELOPMENT",
+            "cycle": "${ID}"
+          }
+        },
+        {
+          "heading_ids": {
+            "path": "${PLAN}",
+            "prefix": "DEV",
+            "min": 2
+          }
+        },
+        {
+          "contains": {
+            "path": "${PLAN}",
+            "regex": "### DEV-001[^#]*`Status`: `DONE`"
+          },
+          "why": "DEV-001 stays DONE"
+        },
+        {
+          "contains": {
+            "path": "${PLAN}",
+            "regex": "### DEV-002[^#]*`Status`: `PENDING`"
+          },
+          "why": "DEV-002 stays PENDING"
+        },
+        {
+          "state": "ActiveWork.Development",
+          "unchanged": true
+        },
+        {
+          "state": "ActiveWork.Id",
+          "unchanged": true
+        },
+        {
+          "unchanged": [
+            "src/**",
+            "test/**",
+            "data/**",
+            ".standards/user-styles/**"
+          ],
+          "why": "completed implementation and the style file are preserved"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "field": {
+            "path": "${PLAN}",
+            "name": "User Style",
+            "equals": "tony"
+          },
+          "why": "the style is not cleared"
+        },
+        {
+          "contains": {
+            "path": "${PLAN}",
+            "regex": "^(?!.*`User Style Locked`:[^`]*`(?:true|false)`)",
+            "flags": "s"
+          },
+          "why": "no lock value is written into the plan"
+        },
+        {
+          "field": {
+            "path": "${PLAN}",
+            "name": "Status",
+            "equals": "PROPOSED"
+          }
+        },
+        {
+          "provenance": {
+            "path": "${PLAN}",
+            "artifact": "DEVELOPMENT",
+            "cycle": "${ID}"
+          },
+          "why": "the plan is not replaced"
+        },
+        {
+          "state": "ActiveWork.Development",
+          "unchanged": true
+        },
+        {
+          "state": "ActiveWork.Id",
+          "unchanged": true,
+          "why": "no new cycle is started to escape the lock"
+        }
+      ]
+    },
+    {
+      "assertion": 4,
+      "complete": false,
+      "all": []
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/inventory.test.js",
+      "expect": "pass",
+      "why": "the existing tests (npm test) pass"
+    },
+    {
+      "cmd": "test -f .standards/user-styles/developer/tony.md",
+      "expect": "pass",
+      "why": "the selected tony style file exists"
+    },
+    {
+      "cmd": "grep -c 'User Style Locked' .standards/docs/development/low-stock-report-20260923T141500Z-3f9a62c1.md",
+      "expect": "fail",
+      "expectOutput": "^0",
+      "why": "the plan has no User Style Locked field"
+    },
+    {
+      "cmd": "node --input-type=module -e \"import { lowStock } from './src/report.js'; import { loadInventory } from './src/inventory.js'; const skus = lowStock(loadInventory('data/inventory.csv')).map((i) => i.sku).join(','); if (skus !== 'B200,A100') { console.error(skus); process.exit(1); }\"",
+      "expect": "pass",
+      "why": "DEV-001 is implemented as its recorded self-check states"
+    },
+    {
+      "cmd": "node src/cli.js low data/inventory.csv",
+      "expect": "fail",
+      "expectOutput": "usage: stock list",
+      "why": "DEV-002 (the low command) is not implemented"
+    }
+  ],
+  "notes": "Standalone brownfield STANDARD cycle at DEVELOPING. 50-project (pre-install): small Node ES-module CLI `stock` with a `list` command, CSV parser, formatTable, and a passing test file. 55-style: the user's style at .standards/user-styles/developer/tony.md. 60-cycle: CONTEXT.md, scope (AC-001..AC-003), design, STATE at DEVELOPING after FORWARD from ARCHITECTING. 70-selection: DEV-001 implemented (src/report.js lowStock) and the plan committed as IN_PROGRESS with User Style tony and no User Style Locked field. 80-revision: plan returned to PROPOSED after a DEV-002 revision (DEV-001 DONE, DEV-002 PENDING, still no lock field) and STATE.BlockedOn set to the plan-approval request. check.mjs does not inspect User Style Locked, so expectCheck is ok. The lock-absence check is a negative-lookahead regex over the plan that fails only if a `User Style Locked` field with a true/false value is written.",
+  "case": "developer-39",
+  "caseHash": "98a477300364fe8d",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T02:21:43.905Z",
+    "verdict": "pass",
+    "fixtureHash": "3bee56c6e7e5fbc2",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "901911c444d6159e",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:07:48.721Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T01:43:57.816Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/60-cycle/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/70-selection/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/80-revision/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:07:48.721Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

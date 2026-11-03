@@ -1,0 +1,36 @@
+diff --git a/.github/workflows/api-ci.yml b/.github/workflows/api-ci.yml
+new file mode 100644
+index 0000000..39d3a9a
+--- /dev/null
++++ b/.github/workflows/api-ci.yml
+@@ -0,0 +1,30 @@
++name: API CI
++on: [push, pull_request]
++jobs:
++  test:
++    runs-on: ubuntu-latest
++    timeout-minutes: 30
++    strategy:
++      matrix:
++        python-version: ["3.11", "3.12", "3.13"]
++    env:
++      UV_PYTHON: ${{ matrix.python-version }}
++    defaults:
++      run:
++        working-directory: apps/api
++    steps:
++      - uses: actions/checkout@v4
++      - uses: astral-sh/setup-uv@v6
++        with:
++          enable-cache: true
++      - run: uv sync --frozen
++      - run: uv run ruff check .
++      - run: uv run ruff format --check .
++      - run: uv run mypy app
++      - run: uv run pytest --cov=app --cov-report=xml
++      - run: uv build
++      - uses: actions/upload-artifact@v4
++        if: always()
++        with:
++          name: coverage-${{ matrix.python-version }}
++          path: apps/api/coverage.xml

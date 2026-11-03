@@ -1,0 +1,89 @@
+{
+  "conditions": [
+    {
+      "condition": "BROWNFIELD project, STANDARD cycle at DOCUMENTING with Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/MODE.md; .standards/STATE.md (WorkflowState, CycleMode, Id)",
+      "status": "realized"
+    },
+    {
+      "condition": "Current-cycle documentation record has valid DOCUMENTATION provenance and a matching visible Cycle",
+      "where": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md header and provenance block",
+      "status": "realized"
+    },
+    {
+      "condition": "Collaboration AUTONOMOUS, user style NONE, explicit FILE target docs/setup.md selected by the user",
+      "where": "documentation record header (Target FILE, Target Detail docs/setup.md) and the 'Editing boundary: docs/setup.md, the file the user selected' line",
+      "status": "realized"
+    },
+    {
+      "condition": "Single active recovery frame: Owner DOCUMENTING, ResumeAt DEVELOPING, RerunThrough NONE",
+      "where": ".standards/STATE.md Recovery Frame 1, with Handoff FAILURE DEVELOPING to DOCUMENTING (DOCUMENTATION)",
+      "status": "realized"
+    },
+    {
+      "condition": "The selected target's correction is saved and verified",
+      "where": "docs/setup.md (corrected command); record DOC-001 RESOLVED with C1–C3; selfChecks confirm 23 passing tests and that the old filter matched nothing",
+      "status": "realized"
+    },
+    {
+      "condition": "A required reference page outside the boundary can be completed now from current behavior",
+      "where": "scope AC-002 requires docs/reference/export-csv.md (absent); the committed src/export.ts (DEV-001 and DEV-002 DONE) and the design fully define file name, UTF-8 without BOM, header and column order, CRLF, and quoting",
+      "status": "realized"
+    },
+    {
+      "condition": "Another guide genuinely depends on unfinished implementation",
+      "where": "scope AC-003 (docs/usage.md export section) needs POST /records/export, which is DEV-003, PENDING in the plan; no route in src/",
+      "status": "realized"
+    },
+    {
+      "condition": "No outstanding obligations, independent defects, or blocking questions",
+      "where": "STATE.md Outstanding Obligations Active false, BlockedOn NONE; the code matches the design",
+      "status": "realized"
+    },
+    {
+      "condition": "Suspended Developer assignment saved for the frame",
+      "where": "development plan Plan Notes, Suspended Assignment 1 with the exact frame Reason",
+      "status": "realized"
+    },
+    {
+      "condition": "Clean committed git state",
+      "where": "git status clean; all layers committed",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "The fixture builds on export-project, the parent of the suggested export-documenting base, because that base has a COMPLETE implementation that conflicts with a frame resuming at DEVELOPING with unfinished work. The choice is reasonable and the layers are consistent.",
+      "recommendation": "run_as_is",
+      "fix": "None needed unless the harness restricts bases to the catalog suggestion; in that case inline export-project's pre-install layers into a standalone fixture."
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 2,
+      "detail": "Assertion 2 is complete:true and decided only by record Status not COMPLETE and WorkflowState not REVIEWING_FINAL. A run whose reply claimed full documentation completion while leaving Status IN_PROGRESS would still pass. Such a run is unlikely, and the record and state are the primary signal.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally set complete:false so a judge can also read the reply."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The previous Documenter session stopped after the verified correction without assessing the out-of-target work or deciding routing (the record says 'Full Documenter gate: not assessed'). This is a plausible interruption point and it gives the resumed run the decision under test.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized: a verified docs/setup.md correction under a FILE boundary, frame 1 Owner DOCUMENTING / ResumeAt DEVELOPING / RerunThrough NONE, an absent AC-002 reference page fully determined by the committed src/export.ts, and an AC-003 usage section blocked on PENDING DEV-003. Nothing leaks, check.mjs passes, and each check is a necessary condition a correct run satisfies (state unchanged, record updated to name the page or AC-002, nothing outside the boundary edited, BlockedOn set, Status not COMPLETE). Only minor notes remain.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T16:42:37.753Z",
+  "costUsd": 0.3099766,
+  "ms": 87197,
+  "fixtureHash": "1111d3b0d9a7c256"
+}

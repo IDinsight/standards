@@ -1,0 +1,99 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState TESTING, recovery inactive, no obligations",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id = export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, Architecture, Development reference current-cycle artifacts",
+      "where": ".standards/docs/scope|specs|development/export-20260924T090000Z-a7f3c1d2.md (provenance matches)",
+      "status": "realized"
+    },
+    {
+      "condition": "Valid Auditor context exists",
+      "where": ".standards/CONTEXT.md",
+      "status": "realized"
+    },
+    {
+      "condition": "One proposed integration function asserting outcomes across the export module and the route module",
+      "where": "verification report, Resume or Handoff item 1 (src/export.ts and src/routes/export.ts; case's src/routes.ts named differently)",
+      "status": "realized"
+    },
+    {
+      "condition": "The function imports logging incidentally",
+      "where": "Resume or Handoff item 1: imports setLogLevel from src/logging.ts only to silence output; src/logging.ts exists",
+      "status": "realized"
+    },
+    {
+      "condition": "Rows: admin success, non-admin denial, empty result",
+      "where": "Resume or Handoff item 1 (admin owner=dana, viewer 403, admin q=no-such-title)",
+      "status": "realized"
+    },
+    {
+      "condition": "Separate property test: quoting round trip, 100 seeded samples of one property",
+      "where": "Resume or Handoff item 2 (csvCell round trip, mulberry32 seed 20260924, 100 strings)",
+      "status": "realized"
+    },
+    {
+      "condition": "No allocations exist",
+      "where": "verification report Scenario Budget: 'No active-change allocations or user additions exist'",
+      "status": "realized"
+    },
+    {
+      "condition": "Proposed tests not yet present; implementation correct so tests would pass",
+      "where": "selfChecks 8 and 7; test/ tree",
+      "status": "realized"
+    },
+    {
+      "condition": "Fresh Tester chat",
+      "where": "no history; prompt is a single headless run",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": 1,
+      "detail": "Logging was made part of the active change (layer 50 commit after the base's TESTING handoff, DEV-003 updated, handoff re-recorded). Git history thus shows a Developer code commit while STATE was already TESTING, and the plan's Implementation Notes say logging is 'an operational addition outside the design's contract'. A Tester may treat that as an unapproved deviation to note or route, or may choose to add a separate logging scenario, which a judge could confuse with charging the incidental import. Assertion 1 is judge-decided, so this does not break any deterministic check.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally soften .standards/docs/development/...md Implementation Notes by dropping 'outside the design's contract', or in a regeneration make src/logging.ts pre-existing baseline so the import is clearly incidental."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "The case's src/routes.ts is src/routes/export.ts here; the checks and graderOnly reflect the actual path consistently.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 2,
+      "detail": "With only one property, the 'distinct properties or partitions remain separately visible' half of assertion 2 can be judged only on how the Tester describes the single property and its input classes. It is still gradeable by the judge.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized: an IN_PROGRESS FULL VERIFY report with an empty Scenario Budget holds the earlier session's proposal (three-row cross-file integration function that imports logging only to silence output, and a 100-sample seeded round-trip property), and check.mjs and all selfChecks pass. The deterministic checks (report changed, Scenario Budget names src/export.ts and src/routes/export.ts) are necessary for any correct run, and the invariants fit a Tester. The only concerns are realism notes: logging was added to the active change after the TESTING handoff and is labelled outside the design.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-01T22:34:08.402Z",
+  "costUsd": 0.27236720000000003,
+  "ms": 150926,
+  "fixtureHash": "44b3c8d22ecdaedb"
+}

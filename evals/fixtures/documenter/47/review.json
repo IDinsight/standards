@@ -1,0 +1,86 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed with --mode brownfield)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState DOCUMENTING, Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md header and Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, architecture, context, development, verification and implementation review exist with matching provenance and current evidence",
+      "where": ".standards/docs/{scope,specs,development,verification,reviews/.../implementation.md}, .standards/CONTEXT.md; blobs cited match current content",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-001 covers CSV export behavior; AC-002 requires an accurate usage guide",
+      "where": ".standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md Work items 1 and 2",
+      "status": "realized"
+    },
+    {
+      "condition": "One recovery frame: Owner DOCUMENTING, ResumeAt SYNCHRONIZING, RerunThrough NONE (overriding the 'recovery inactive' default)",
+      "where": ".standards/STATE.md Recovery Frame 1 (From SYNCHRONIZING, FailureType DOCUMENTATION); Handoff FAILURE from SYNCHRONIZING",
+      "status": "realized"
+    },
+    {
+      "condition": "Outstanding obligations inactive, no blocked user question, editing unrestricted",
+      "where": ".standards/STATE.md Outstanding Obligations Active false, BlockedOn NONE; no restriction in records or utterance",
+      "status": "realized"
+    },
+    {
+      "condition": "The public documentation is wrong and needs correcting",
+      "where": "docs/usage.md says 200 and records-<YYYYMMDD>.csv with same-day replacement; src/routes/export.ts returns 201 and src/export.ts exportFileName uses per-second UTC stamp; test/integration/export-flow.test.ts asserts 201 and records-20260924T090000Z.csv",
+      "status": "realized"
+    },
+    {
+      "condition": "An already-completed final review relied on the documentation the correction changes",
+      "where": ".standards/docs/reviews/.../final-deliverable.md Status COMPLETE, lists docs/usage.md blob a23dfe0 as deliverable content and R3 inspection marking AC-002 Supported",
+      "status": "realized"
+    },
+    {
+      "condition": "After correction the full documentation gate passes (no other doc defects)",
+      "where": "Rest of docs/usage.md (roles, filters, CSV format, errors, export errors) and README.md match the implementation and design; documentation record otherwise accurate",
+      "status": "realized"
+    },
+    {
+      "condition": "Synchronization record in progress with the discrepancy routed to Documenter",
+      "where": ".standards/docs/synchronization/... Status IN_PROGRESS, D-001 OPEN Owner Documenter",
+      "status": "realized"
+    },
+    {
+      "condition": "Committed, clean git tree",
+      "where": "git status clean; selfCheck confirms",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 0,
+      "detail": "Assertion 0 only states the frame keeps RerunThrough=REVIEWING_FINAL, but the checks also require WorkflowState REVIEWING_FINAL. Recovery Mechanics rule 5 requires transitioning to the earliest rerun state together with setting RerunThrough, and the case has no blocker, so every correct run satisfies it. Handoff.Kind is deliberately left unchecked, so either FORWARD or RESUME is accepted.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The earlier documentation record ends with 'Confirmation of the guide at final review is Reviewer's work.' and the final review's R3 lists docs/usage.md among assessed content. These are factual and realistic. They do not state that a rerun is needed, so they are not a leak. The Errors table row in docs/usage.md is slightly misaligned, which is cosmetic only.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition. The guide misstates the 200/201 status and the file naming, and the COMPLETE final review assessed that exact guide blob. One DOCUMENTING-owned frame resumes at SYNCHRONIZING with RerunThrough NONE, and the gate can pass after the correction; check.mjs passes, and the turn-end check would accept a correct REVIEWING_FINAL rerun state. The checks and invariants are necessary conditions for correct behavior, and no record leaks the expected rerun routing.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T16:37:44.882Z",
+  "costUsd": 0.33813259999999995,
+  "ms": 53579,
+  "fixtureHash": "e07b4af27846c56e"
+}

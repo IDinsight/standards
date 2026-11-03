@@ -1,0 +1,190 @@
+{
+  "base": "export-synchronizing",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-sync-progress",
+      "action": "commit",
+      "message": "Record CSV export synchronization progress"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "synchronizer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "D-001 in the synchronization record wrongly claims that src/export.ts differs from the content the final review assessed. The hash it lists for src/export.ts is the blob of src/routes/export.ts: a mix-up between the two export.ts files when reading git ls-files -s src.",
+    "A direct content check (git rev-parse HEAD:src/export.ts or git hash-object src/export.ts) gives exactly the blob that the verification report, implementation review, and final review cite. src/export.ts is unchanged since the commit 'Add CSV export of filtered records'.",
+    "The helper's relevant dependencies (src/records/store.ts, package.json, pnpm-lock.yaml, .gitignore) and all other project files are unchanged since the final review's assessed revision. The only later commits add the final review record and this synchronization record.",
+    "No other discrepancy exists. docs/usage.md and README.md match the identities the documentation record and final review cite, both test commands pass, and the full synchronization gate can pass once D-001 is withdrawn."
+  ],
+  "history": null,
+  "vars": {},
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "src/**",
+            "test/**",
+            "packages/**",
+            "docs/**",
+            "README.md",
+            "package.json",
+            "pnpm-lock.yaml",
+            ".gitignore",
+            "AGENTS.md",
+            "CLAUDE.md",
+            ".standards/CONTEXT.md",
+            ".standards/MODE.md",
+            ".standards/PROTOCOL.md",
+            ".standards/protocol/**",
+            ".standards/bin/**",
+            ".standards/docs/scope/**",
+            ".standards/docs/specs/**",
+            ".standards/docs/development/**",
+            ".standards/docs/verification/**",
+            ".standards/docs/reviews/**",
+            ".standards/docs/documentation/**"
+          ],
+          "why": "Synchronizer corrects only its own record; no other role's artifact or project file changes"
+        },
+        {
+          "changed": [
+            "${SYNC}"
+          ],
+          "why": "the mistaken entry in the synchronization record must be corrected"
+        },
+        {
+          "heading_ids": {
+            "path": "${SYNC}",
+            "prefix": "D",
+            "min": 1
+          },
+          "why": "the D-001 entry is kept, not deleted"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "state": "Recovery.Active",
+          "equals": "false"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "0"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "contains": {
+            "path": "${SYNC}",
+            "regex": "### D-001.{0,600}WITHDRAWN",
+            "flags": "s"
+          },
+          "why": "D-001 stays in the record and is marked withdrawn"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the SYNCHRONIZING state with an IN_PROGRESS synchronization record is valid"
+    },
+    {
+      "cmd": "pnpm --filter export test && pnpm --filter export test:integration",
+      "expect": "pass",
+      "why": "both established test commands pass offline"
+    },
+    {
+      "cmd": "test $(git rev-parse HEAD:src/export.ts) = $(git hash-object src/export.ts) && test $(git rev-parse HEAD:src/export.ts) != $(git rev-parse HEAD:src/routes/export.ts) && grep -q $(git rev-parse HEAD:src/export.ts) .standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md && grep -q $(git rev-parse HEAD:src/export.ts) .standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md && grep -q $(git rev-parse HEAD:src/export.ts) .standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md",
+      "expect": "pass",
+      "why": "a direct content check shows the current src/export.ts is exactly the blob that verification, implementation review, and final review cite, and differs from src/routes/export.ts"
+    },
+    {
+      "cmd": "c=$(git log --format=%H -1 --fixed-strings --grep='Record CSV export documentation') && git diff --quiet $c HEAD -- src test packages docs README.md package.json pnpm-lock.yaml .gitignore && test $(git diff --name-only $c HEAD | paste -s -d , -) = .standards/STATE.md,.standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md,.standards/docs/synchronization/export-20260924T090000Z-a7f3c1d2.md",
+      "expect": "pass",
+      "why": "since the final review's assessed revision, no implementation, dependency, test, or documentation file has changed; only the final review, STATE.md, and the synchronization record"
+    },
+    {
+      "cmd": "s=.standards/docs/synchronization/export-20260924T090000Z-a7f3c1d2.md && head -3 $s | grep -qx 'Artifact: SYNCHRONIZATION' && grep -q '`Status`: `IN_PROGRESS`$' $s && test $(grep -c '^### D-' $s) -eq 1 && grep -q '^### D-001 ' $s && grep -q '^`Status`: `OPEN` `Owner`: `Reviewer` `FailureType`: `REVIEW`$' $s && grep -q $(git rev-parse HEAD:src/routes/export.ts) $s && ! grep -qE 'COMMIT:|BLOB:' $s",
+      "expect": "pass",
+      "why": "the synchronization record is IN_PROGRESS with exactly one open discrepancy D-001, owned by Reviewer, which cites the src/routes/export.ts blob as the identity of src/export.ts"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `SYNCHRONIZING`' .standards/STATE.md && grep -q '^`Kind`: `FORWARD` `From`: `REVIEWING_FINAL`' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md && grep -q '`BlockedOn`: `NONE`' .standards/STATE.md && ! git status --porcelain | grep -q .",
+      "expect": "pass",
+      "why": "state is unchanged from the base: SYNCHRONIZING, recovery and obligations inactive, nothing blocked, clean tree"
+    }
+  ],
+  "notes": "Built on export-synchronizing (cycle export-20260924T090000Z-a7f3c1d2 at SYNCHRONIZING, FORWARD from REVIEWING_FINAL, all records COMPLETE, clean tree). One overlay commit, 50-sync-progress, adds an earlier Synchronizer session's IN_PROGRESS synchronization record at the fixed path. It records the assessed revision (the final-review commit), contract and record identities, and partial evidence references. It also records one discrepancy, D-001 (OPEN, Owner Reviewer, FailureType REVIEW), which claims that the reviewed CSV helper src/export.ts differs from the content final review assessed. The hash it gives for src/export.ts is actually the blob of src/routes/export.ts, a plausible mix-up when reading git ls-files -s src. The record lists the same hash for src/routes/export.ts. The record says D-001 was not yet routed, so STATE.md is untouched: no recovery, no obligations, nothing blocked. Dependencies and docs are listed as not yet compared. The real content identity is checkable directly and matches every review and the verification report. STATE.md is not changed by this layer.",
+  "case": "synchronizer-25",
+  "caseHash": "b834b98edbc660e4",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T14:36:30.100Z",
+    "verdict": "pass",
+    "fixtureHash": "0e0c644d5fb3b1b5",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "3558edbb8777bf0e",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:37:50.697Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T13:29:14.312Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-synchronizing": "33937a9926a74652"
+  },
+  "migrations": [
+    {
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:37:50.697Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

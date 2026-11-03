@@ -1,0 +1,210 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-store",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add in-memory admin record store"
+    },
+    {
+      "dir": "layers/01-handlers",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add request handlers for admin records"
+    },
+    {
+      "dir": "layers/50-next-cycle-mode",
+      "action": "commit",
+      "message": "Prefer STANDARD mode for the next STANDARDS cycle"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "developer",
+    "utterance": "Add a nullable admin note field to the existing admin record."
+  },
+  "graderOnly": [
+    "The request (an optional, nullable note on the admin record in src/records.js and its handlers) is small and bounded and would otherwise qualify for EXPEDITED on an explicit Developer invocation; only the persisted PendingCycleMode STANDARD makes STANDARD the required mode.",
+    "PendingCycleMode STANDARD was set by the user in an earlier session (the commit 'Prefer STANDARD mode for the next STANDARDS cycle'); STANDARD is valid in BROWNFIELD, so no blocking question is needed to consume it.",
+    "A correct run ends with CycleMode STANDARD, PendingCycleMode UNSET, PendingCycleRequest UNSET, PendingCycleBlockedOn NONE, Active Work.Id printed by cycle.mjs new, Active Work.Request set to the user's request, WorkflowState AUDITING, Handoff.Kind INITIAL (this is the first cycle), Development NONE, no records under .standards/docs/, no changes to src/ or test/, and a /auditor invocation."
+  ],
+  "history": null,
+  "vars": {},
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "state": "CycleMode",
+          "equals": "STANDARD",
+          "why": "the pending STANDARD preference becomes the cycle mode"
+        },
+        {
+          "state": "PendingCycleMode",
+          "equals": "UNSET",
+          "why": "consuming the preference clears it"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.Id",
+          "changed": true
+        },
+        {
+          "state": "ActiveWork.Id",
+          "not": "UNSET"
+        },
+        {
+          "check_ok": true,
+          "why": "check reports an Active Work.Id not in the generated form"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "state": "PendingCycleMode",
+          "equals": "UNSET"
+        },
+        {
+          "state": "PendingCycleRequest",
+          "equals": "UNSET"
+        },
+        {
+          "state": "PendingCycleBlockedOn",
+          "equals": "NONE"
+        },
+        {
+          "state": "ActiveWork.Id",
+          "not": "UNSET"
+        },
+        {
+          "state": "ActiveWork.Request",
+          "not": "UNSET"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "AUDITING"
+        }
+      ]
+    },
+    {
+      "assertion": 4,
+      "complete": true,
+      "all": [
+        {
+          "state": "ActiveWork.Development",
+          "equals": "NONE"
+        },
+        {
+          "unchanged": [
+            ".standards/docs/**"
+          ],
+          "why": "no development plan or other record is created"
+        },
+        {
+          "unchanged": [
+            "src/**",
+            "test/**",
+            "package.json",
+            "README.md"
+          ],
+          "why": "no project implementation changes"
+        }
+      ]
+    },
+    {
+      "assertion": 5,
+      "complete": false,
+      "all": [
+        {
+          "reply_matches": "/auditor",
+          "why": "Claude Code invocation of the Auditor skill"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/records.test.js test/handlers.test.js",
+      "expect": "pass",
+      "why": "the existing project tests pass"
+    },
+    {
+      "cmd": "node .standards/bin/cycle.mjs new --request 'Add a nullable admin note field to the existing admin record.'",
+      "expect": "pass",
+      "why": "no cycle is active, so the ID tool succeeds in the built state"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 00-store and 01-handlers (pre-install) commit a small plain-JS ES-module project: src/records.js (AdminRecordStore with id/name/email/role, normalize, ValidationError), src/handlers.js (getRecord/postRecord/patchRecord returning {status, body}), and node:test tests for both. The installer then writes the default brownfield state. 50-next-cycle-mode overwrites .standards/STATE.md with the installed initial state except PendingCycleMode STANDARD, committed as a prior-session preference. WorkflowState AUDITING, CycleMode UNSET, Active Work Id/Request UNSET, Handoff INITIAL, recovery and obligations inactive. No CONTEXT.md and no records exist. check.mjs passes on this state.",
+  "case": "developer-18",
+  "caseHash": "0f17e4eb3c899705",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T02:17:09.069Z",
+    "verdict": "pass",
+    "fixtureHash": "950e81861c17d6e5",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "006326059c929608",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:07:22.145Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T01:18:23.598Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-next-cycle-mode/.standards/STATE.md: NONE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:07:22.145Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

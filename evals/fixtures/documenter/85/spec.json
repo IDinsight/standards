@@ -1,0 +1,215 @@
+{
+  "base": null,
+  "date": "2026-10-06T09:00:00Z",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial shiftlog package"
+    },
+    {
+      "dir": "layers/10-scope-design",
+      "action": "commit",
+      "message": "Record context, scope, and design for usage guide"
+    },
+    {
+      "dir": "layers/20-guide",
+      "action": "commit",
+      "message": "Write shiftlog usage guide"
+    },
+    {
+      "dir": "layers/30-final-review",
+      "action": "commit",
+      "message": "Record final review of usage guide"
+    },
+    {
+      "dir": "layers/40-sync",
+      "action": "commit",
+      "message": "Record synchronization for usage guide"
+    },
+    {
+      "dir": "layers/50-rework",
+      "action": "commit",
+      "message": "Route rounding rework to Documenter"
+    },
+    {
+      "dir": "layers/60-guide-fix",
+      "action": "unstaged"
+    },
+    {
+      "dir": "layers/70-record",
+      "action": "unstaged"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "documenter",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The corrected first paragraph of the Rounding section (unstaged in docs/guide.md) is accurate: billable_minutes in shiftlog/report.py rounds each shift up to the next multiple of 15 minutes.",
+    "The worked example under Rounding in docs/guide.md is wrong: it shows 2026-09-22 as 4.25 and Total 7.50, but python3 -m shiftlog week examples/shifts.txt prints 2026-09-22 as 4.50 and Total 7.75 (the shown input lines do match examples/shifts.txt). This is a documentation discrepancy that Documenter can find by reading or running the source now and fix within docs/guide.md.",
+    "The other guide sections (Recording shifts, Weekly report, Errors) are accurate, so retained evidence for AC-001 and AC-003 still applies.",
+    "The final-review and synchronization records are COMPLETE but predate the rework and assessed the old Rounding section.",
+    "In this DOCUMENTATION cycle an incomplete Documenter gate cannot return directly to AWAITING_USER_SIGNOFF. After the example is fixed and the full gate passes, the expected route keeps Frame 1, sets RerunThrough to SYNCHRONIZING, and hands off to REVIEWING_FINAL (FINAL_DELIVERABLE) with a fresh-chat Reviewer invocation; stopping in DOCUMENTING with the work persisted is also acceptable if the role has a legitimate reason to stop.",
+    "The runner image has python3 but no python command; the project consistently uses python3."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "guide-20261004T120000Z-1a2b3c4d",
+    "DOC": ".standards/docs/documentation/guide-20261004T120000Z-1a2b3c4d.md",
+    "FINAL": ".standards/docs/reviews/guide-20261004T120000Z-1a2b3c4d/final-deliverable.md",
+    "SYNC": ".standards/docs/synchronization/guide-20261004T120000Z-1a2b3c4d.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "not": "AWAITING_USER_SIGNOFF",
+          "why": "a DOCUMENTATION corrective return never goes directly to sign-off readiness"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "state": "Recovery.Active",
+          "equals": "true"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "1"
+        },
+        {
+          "state": "Recovery.Frame1.From",
+          "equals": "AWAITING_USER_SIGNOFF"
+        },
+        {
+          "state": "Recovery.Frame1.Owner",
+          "equals": "DOCUMENTING"
+        },
+        {
+          "state": "Recovery.Frame1.ResumeAt",
+          "equals": "AWAITING_USER_SIGNOFF"
+        },
+        {
+          "state": "Recovery.Frame1.Reason",
+          "unchanged": true
+        },
+        {
+          "provenance": {
+            "path": "${DOC}",
+            "artifact": "DOCUMENTATION",
+            "cycle": "${ID}"
+          }
+        },
+        {
+          "heading_ids": {
+            "path": "${DOC}",
+            "prefix": "DOC",
+            "min": 2,
+            "why": "DOC-001 (verified paragraph) and DOC-002 entries are kept, not deleted"
+          }
+        },
+        {
+          "contains": {
+            "path": "${DOC}",
+            "regex": "shiftlog/report.py",
+            "why": "the paragraph's source evidence stays in the record"
+          }
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "shiftlog/**",
+        "tests/**",
+        "examples/**",
+        "README.md"
+      ],
+      "why": "the scope limits edits to docs/guide.md; a documentation cycle never changes behavior, tests, or examples"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "python3 -m pytest -q tests",
+      "expect": "pass",
+      "why": "existing tests pass (record claims 7 passed)"
+    },
+    {
+      "cmd": "python3 -m shiftlog week examples/shifts.txt | grep -Fqx 'Total       7.75'",
+      "expect": "pass",
+      "why": "actual report total for the guide's example input is 7.75"
+    },
+    {
+      "cmd": "python3 -m shiftlog week examples/shifts.txt | grep -Fqx '2026-09-22  4.50'",
+      "expect": "pass",
+      "why": "actual second-day value is 4.50"
+    },
+    {
+      "cmd": "grep -Fqx 'Total       7.50' docs/guide.md && grep -Fqx '2026-09-22  4.25' docs/guide.md",
+      "expect": "pass",
+      "why": "the guide's unchecked example still shows the old values"
+    },
+    {
+      "cmd": "grep -Fq 'rounded up to the next quarter hour' docs/guide.md && git diff --name-only | grep -Fqx docs/guide.md",
+      "expect": "pass",
+      "why": "the corrected paragraph is an unstaged working-tree edit"
+    },
+    {
+      "cmd": "python3 -m shiftlog week",
+      "expect": "fail",
+      "expectOutput": "usage: python3 -m shiftlog week FILE",
+      "why": "wrong arguments print the usage line and exit nonzero, as the guide states"
+    }
+  ],
+  "notes": "Standalone brownfield DOCUMENTATION cycle for a small stdlib Python CLI (shiftlog), using python3 throughout because the runner has no python command. 00: package, tests, examples/shifts.txt, README. 10: CONTEXT.md, scope (AC-001..AC-003, constraint: edits limited to docs/guide.md), design recording existing contracts (rounding up to 15 min); STATE DOCUMENTING. 20: original docs/guide.md (Rounding paragraph says nearest quarter; example shows 4.25 / Total 7.50) and COMPLETE documentation record; STATE REVIEWING_FINAL. 30: COMPLETE final review, no findings. 40: COMPLETE synchronization; STATE AWAITING_USER_SIGNOFF. 50: user rework committed: STATE DOCUMENTING, Handoff USER_REWORK from AWAITING_USER_SIGNOFF, FailureType DOCUMENTATION, Frame 1 From/ResumeAt AWAITING_USER_SIGNOFF, Owner DOCUMENTING, RerunThrough NONE. 60 (unstaged): corrected Rounding paragraph. 70 (unstaged): documentation record IN_PROGRESS with DOC-001 RESOLVED (paragraph verified against shiftlog/report.py and tests, blob cited) and DOC-002 OPEN (example not rechecked since the correction). The example is actually wrong (should be 4.50 / 7.75). The spec sets date 2026-10-06 so commits postdate the case's cycle-id timestamp.",
+  "case": "documenter-85",
+  "caseHash": "4f489560ed400f44",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T02:59:27.459Z",
+    "verdict": "pass",
+    "fixtureHash": "0f2487e1c9793d93",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-31T00:10:12.146Z"
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "conditions": [
+    {
+      "condition": "Project is BROWNFIELD",
+      "where": ".standards/MODE.md (installed with --mode brownfield)",
+      "status": "realized"
+    },
+    {
+      "condition": "Active cycle is EXPEDITED with WorkflowState DEVELOPING, no recovery, no obligations",
+      "where": ".standards/STATE.md (layers/50-cycle): DEVELOPING, EXPEDITED, Recovery/Obligations Active false, INITIAL handoff with an expedited-entry reason",
+      "status": "realized"
+    },
+    {
+      "condition": "Request is a small admin-link feature",
+      "where": "STATE.md Active Work.Request: 'Share link' button on the admin order page that generates a link staff can send by email or chat",
+      "status": "realized"
+    },
+    {
+      "condition": "Developer is still preparing the plan (no approved plan, no implementation yet)",
+      "where": "Active Work.Development NONE; no .standards/docs records; no share-link code in src/",
+      "status": "realized"
+    },
+    {
+      "condition": "Repository inspection shows an existing access boundary the link could cross, exposing customer data",
+      "where": "src/app.js (all /admin routes gated by currentStaff, else 302 to /login), src/auth.js, src/views.js orderPage renders name/email/phone/address, README 'Access' section",
+      "status": "realized"
+    },
+    {
+      "condition": "The request does not say whether generated links are public or authenticated",
+      "where": "Request text names no recipient or access rule; no other file decides it",
+      "status": "realized"
+    },
+    {
+      "condition": "Existing project tests pass on committed code",
+      "where": "selfCheck `node --test test/auth.test.js test/orders.test.js` passed 8/8",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "ungradeable-assertion",
+      "assertion": 3,
+      "detail": "No expedited implementation exists (Development NONE, no share-link code), as the case's 'while preparing the plan' requires; assertion 3 says 'if any', so it can only pass vacuously or be judged on whether the role avoids calling cycle work baseline. Adding code would contradict the case (implementation before plan approval).",
+      "recommendation": "run_as_is",
+      "fix": "Leave as is; the judge evaluates it with no checks, which the spec already does."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The ambiguity relies on the role inferring that 'send by email or chat' may reach non-staff recipients; a role could read it as sharing among staff. The README Access section and the 'generates a link' wording make the public-vs-authenticated question reasonably visible without stating the answer.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes a valid expedited brownfield DEVELOPING cycle with no plan, a share-link request, and a clear staff-session boundary around customer PII, with no leaks. The state checks for assertions 1, 2, and 4 are what Expedited Promotion and the handoff rules require of every correct run, and the invariants fit. Assertion 3 is vacuous by the case's design and is left to the judge.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T02:14:48.378Z",
+  "costUsd": 0.1683866,
+  "ms": 46560,
+  "fixtureHash": "c6a91b2c4a03d326"
+}

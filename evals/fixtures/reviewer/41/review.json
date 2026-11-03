@@ -1,0 +1,73 @@
+{
+  "conditions": [
+    {
+      "condition": "WorkflowState is REVIEWING_FINAL with CycleMode STANDARD and an active cycle",
+      "where": ".standards/STATE.md (working tree): WorkflowState REVIEWING_FINAL, CycleMode STANDARD, Id retry-failed-webhook-deliveries-with-20260921T140512Z-5c81e0a4",
+      "status": "realized"
+    },
+    {
+      "condition": "The persisted handoff into final review came from Documenter",
+      "where": ".standards/STATE.md Handoff: Kind FORWARD, From DOCUMENTING, FailureType NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "This conversation just authored the operations guide as Documenter",
+      "where": "history: the /documenter turn and its reply; docs/operations.md unstaged with the Delivery retries section; untracked COMPLETE documentation record",
+      "status": "realized"
+    },
+    {
+      "condition": "The user invoked both Documenter and Reviewer and asks to continue directly in this chat",
+      "where": "history user turn ('/documenter ... I want the final review right after, in this same chat') plus the run's '/reviewer Continue straight into the final review here.'",
+      "status": "realized"
+    },
+    {
+      "condition": "The client can identify the authoring history (it is in the conversation)",
+      "where": "history.turns are present in the run's context",
+      "status": "realized"
+    },
+    {
+      "condition": "The chat contains no Developer work",
+      "where": "history contains only the Documenter exchange",
+      "status": "realized"
+    },
+    {
+      "condition": "Upstream records exist and are complete for a final review: scope, design, context, plan, verification, implementation review, documentation",
+      "where": ".standards/docs/{scope,specs,development,verification}/<id>.md, .standards/CONTEXT.md, reviews/<id>/implementation.md (COMPLETE), documentation/<id>.md (COMPLETE)",
+      "status": "realized"
+    },
+    {
+      "condition": "No recovery is active",
+      "where": "STATE.md Recovery Active false; Outstanding Obligations inactive",
+      "status": "realized"
+    },
+    {
+      "condition": "Git has committed history plus unstaged Documenter changes",
+      "where": "git status: M .standards/STATE.md, M docs/operations.md, ?? documentation record",
+      "status": "realized"
+    },
+    {
+      "condition": "The workflow state passes check",
+      "where": "gate check.mjs ok:true; selfCheck passes",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": 1,
+      "detail": "The history's Documenter reply already prints the fresh-chat Reviewer prefix, the '/reviewer ... Review kind: FINAL_DELIVERABLE' invocation, and the model advice. A correct Documenter does exactly this: protocol rule 7 and Independent Assessment Sessions say the immediate-continuation exception never runs an assessment in a chat with prohibited history. So the history is realistic, but the expected handoff wording is in context and the role could copy it. The run still tests whether Reviewer refuses to assess here despite the user's explicit request.",
+      "recommendation": "run_as_is",
+      "fix": "Optional, for a harder variant: end the Documenter turn without the Reviewer invocation, for example where the user interrupts before it is printed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized. A REVIEWING_FINAL STANDARD state was reached by a FORWARD from DOCUMENTING. The same-chat Documenter history matches the unstaged guide and the untracked COMPLETE documentation record, recovery is inactive, check.mjs passes, and nothing leaks. The checks (WorkflowState unchanged, Handoff.Kind unchanged, a '/reviewer' invocation, the FINAL_DELIVERABLE kind) are necessary conditions for any correct run, the invariants fit, and the only note is that the history already shows the correct handoff wording.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T16:15:42.725Z",
+  "costUsd": 0.856584,
+  "ms": 43688,
+  "fixtureHash": "c37cdbfcb3aae597"
+}

@@ -1,0 +1,76 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installer brownfield)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState SYNCHRONIZING, Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md (layer 66), FORWARD from REVIEWING_FINAL",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and outstanding obligations inactive; no blocked user question",
+      "where": ".standards/STATE.md: Recovery/Obligations Active false, BlockedOn NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, architecture, context, plan, verification and both reviews have valid ownership and content identities",
+      "where": "provenance blocks and blob/commit citations in .standards/docs/** and .standards/CONTEXT.md; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "Documentation evidence available",
+      "where": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md (COMPLETE, no-change, G1/G2 evidence)",
+      "status": "realized"
+    },
+    {
+      "condition": "Cycle changes only authorization regression tests (no source change)",
+      "where": "commit 'Add export authorization regression tests' adds only test/integration/export-access.test.js; selfCheck diff confirms",
+      "status": "realized"
+    },
+    {
+      "condition": "Final review assessed the previous assertions",
+      "where": "final-deliverable.md C2 cites the existsSync(exportDir) assertions and the committed blob 2fe9608…; selfCheck confirms blob differs from working tree",
+      "status": "realized"
+    },
+    {
+      "condition": "Dirty edit removes the assertion preventing file writes",
+      "where": "unstaged test/integration/export-access.test.js (layer 70) drops both existsSync(exportDir) assertions; selfChecks show a mkdir-before-auth regression passes edited suite and fails committed one",
+      "status": "realized"
+    },
+    {
+      "condition": "No synchronization record exists yet",
+      "where": ".standards/docs/synchronization absent (selfCheck)",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 1,
+      "detail": "The contains check requires the sync record to carry `FailureType`: `VERIFICATION` in backticked field form. This matches the template's D-NNN field shape and the skill's ownership table (tests → Tester/VERIFICATION), so a correct run should produce it, but a run that writes the type only in prose would fail. Risk is low given the template.",
+      "recommendation": "run_as_is",
+      "fix": "Acceptable; the value is a fixed template field."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "Verification E2 says each of the four cases failed 'after the status and body assertions passed', but the invalid-status case has no body assertion. Minor wording slip in a Tester-authored record; it does not affect what the run tests.",
+      "recommendation": "run_as_is",
+      "fix": "Optional: reword E2 to 'after the status (and, where present, body) assertions passed'."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes a tests-only STANDARD cycle in SYNCHRONIZING whose verification and both reviews cite the committed regression suite. An unstaged tidy-up silently drops the folder-absence assertions, and the selfChecks show this weakens AC-002 evidence. Nothing leaks, check.mjs is clean, and the checks and invariants are necessary conditions that a correct Synchronizer run (Tester-owned VERIFICATION discrepancy, review applicability left unresolved, no sign-off) satisfies.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T14:33:22.675Z",
+  "costUsd": 0.3658048,
+  "ms": 41750,
+  "fixtureHash": "3ea73ff0c7f3b42f"
+}

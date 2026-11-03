@@ -1,0 +1,66 @@
+{
+  "conditions": [
+    {
+      "condition": "Navigator invoked in GRILL_ME mode on advanced cancellation tradeoffs",
+      "where": "spec prompt: skill navigator, utterance 'GRILL_ME on advanced cancellation tradeoffs.'",
+      "status": "realized"
+    },
+    {
+      "condition": "Earlier answers in the same conversation demonstrated the basic cancellation flow",
+      "where": "history turns 1–3: Q1 about queued vs running jobs on abort, answered correctly and confirmed against src/runner.js and src/signals.js",
+      "status": "realized"
+    },
+    {
+      "condition": "Earlier answers demonstrated failure handling (retries, timeout classification)",
+      "where": "history turns 4–6: Q2 on retries:1 plus timeoutMs:20, answered correctly; second selfCheck proves {timeout, 2, TimeoutError}",
+      "status": "realized"
+    },
+    {
+      "condition": "Project has real cancellation code with non-trivial tradeoffs to question at depth",
+      "where": "src/runner.js (raceAbort without stopping work, overlapping retries after timeout, drain window keyed to latest attempt, abandoned only for cancelled), src/signals.js (dispose detaches parent listener), bin/batchrun.js (spawn signal with shell:true, second SIGINT exit 130)",
+      "status": "realized"
+    },
+    {
+      "condition": "Topic 'cancellation' is unambiguous in context (project job cancellation, not STANDARDS cycle cancellation)",
+      "where": "history turn 1 '/navigator GRILL_ME on how cancellation works in the job runner'",
+      "status": "realized"
+    },
+    {
+      "condition": "Repository is committed and clean; STANDARDS installed with no active cycle",
+      "where": "git status clean on main; installed brownfield STATE.md unchanged; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "Existing tests pass",
+      "where": "selfCheck 1: node --test test/runner.test.js test/signals.test.js, 10 pass",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "blocking",
+      "kind": "check-too-strict",
+      "assertion": 1,
+      "detail": "Assertion 1's only check is reply_matches '\\?'. A correct GRILL_ME turn can pose its single question in imperative form ('Predict what runJobs reports when…', 'Walk me through what happens to the timed-out attempt after the retry starts.') with no literal question mark. Code citations like `signal?.aborted` might add one, but nothing guarantees it. The check also says nothing about the assertion's substance (no beginner restart, no new architecture decision), which is judge territory.",
+      "recommendation": "fix_file",
+      "fix": "In navigator-52/spec.json, change checks[1] to {\"assertion\": 1, \"complete\": false, \"all\": []} by removing the reply_matches '\\\\?' check."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The case says only 'cancellation tradeoffs'. The fixture reads it as the project's job-runner cancellation, not STANDARDS cycle cancellation, and makes that consistent through the history and the code. This is a reasonable choice for a case that leaves the topic open.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "issues",
+  "summary": "The fixture realizes the case well: the history shows two correct answers on basic flow and failure handling that match the code (the selfChecks prove this), and the runner code has real advanced tradeoffs to question with no leaking hints. The Navigator invariants are correct. The one blocking problem is assertion 1's reply_matches '\\?' check: a correct run could phrase its one question imperatively without a question mark, so the check should be removed.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T15:40:55.856Z",
+  "costUsd": 0.724344,
+  "ms": 30361,
+  "fixtureHash": "ceb15d37b8bea478"
+}

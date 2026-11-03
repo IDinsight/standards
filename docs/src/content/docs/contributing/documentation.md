@@ -58,12 +58,15 @@ the glossary for every paragraph.
 
 ## Edit the source of generated pages
 
-The Protocol page, the Installer Contract page, the Skill Eval Report page, and
-eight template pages are generated from `PROTOCOL.md` and its chapters in
-`protocol/`, `INSTALLER.md`, `SKILL_EVAL_REPORT.md`, and
-`skills/<role>/template.md`. Their content comes from those files; the
-introductory text comes from `docs/scripts/sync-reference.mjs`. Make changes in
-the relevant source, then run:
+The Protocol page, the Installer Contract page, the Skill Eval Report and
+Reference Eval Report pages, and eight template pages are generated from
+`PROTOCOL.md` and its chapters in `protocol/`, `INSTALLER.md`, the newest skill
+and reference eval reports in `evals/` (now
+`evals/SKILL_EVAL_REPORT_20261031.md` and
+`evals/REFERENCE_EVAL_REPORT_20261103.md`), and `skills/<role>/template.md`.
+Their content comes from those files; the introductory text comes from
+`docs/scripts/sync-reference.mjs`. Make changes in the relevant source, then
+run:
 
 ```sh
 pnpm run docs:sync-reference

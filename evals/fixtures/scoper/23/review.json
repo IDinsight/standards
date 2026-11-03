@@ -1,0 +1,49 @@
+{
+  "conditions": [
+    {
+      "condition": "Project is BROWNFIELD with existing implementation",
+      "where": ".standards/MODE.md (installer brownfield); src/results.js, src/admin.js, src/server.js, tests committed pre-install",
+      "status": "realized"
+    },
+    {
+      "condition": "No cycle is active (Active Work UNSET, CycleMode UNSET)",
+      "where": ".standards/STATE.md: Id/Request UNSET, CycleMode UNSET, WorkflowState AUDITING, Handoff INITIAL",
+      "status": "realized"
+    },
+    {
+      "condition": "PendingCycleMode is EXPEDITED, with no blocked pending request",
+      "where": ".standards/STATE.md: PendingCycleMode EXPEDITED, PendingCycleRequest UNSET, PendingCycleBlockedOn NONE (layer 50 commit)",
+      "status": "realized"
+    },
+    {
+      "condition": "New request explicitly selects IMPLEMENTATION_REVIEWED with a reason",
+      "where": "prompt.utterance: 'Finish after implementation review; we don't need documentation or a final review for this one.' (Change completion policy treats this as the shorter-policy selection)",
+      "status": "realized"
+    },
+    {
+      "condition": "User has not resolved the conflict or authorized replacing the saved preference",
+      "where": "utterance contains no mode instruction; history null",
+      "status": "realized"
+    },
+    {
+      "condition": "Admin page exists to which a CSV download could be added",
+      "where": "src/admin.js, src/server.js /admin route",
+      "status": "realized"
+    },
+    {
+      "condition": "check.mjs passes on the starting state",
+      "where": "gate checkMjs ok:true",
+      "status": "realized"
+    }
+  ],
+  "issues": [],
+  "verdict": "pass",
+  "summary": "The fixture realizes a brownfield project with no active cycle and a saved EXPEDITED preference, and the utterance explicitly selects IMPLEMENTATION_REVIEWED with a reason, so Start a cycle step 3 requires a blocked pending request. Assertion 0's unchanged-field checks fully decide it. The preconditions for assertions 1 and 2 hold on every correct blocking path: PendingCycleRequest/BlockedOn set, Id and CycleMode UNSET, Handoff INITIAL, no records, check_ok. Invariants are standard and appropriate.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T03:07:40.395Z",
+  "costUsd": 0.126445,
+  "ms": 19858,
+  "fixtureHash": "3141c36321364d83"
+}

@@ -1,0 +1,66 @@
+{
+  "conditions": [
+    {
+      "condition": "Old revision (1.4.0) exists and is inspectable",
+      "where": "commit 9ab66aa 'Release 1.4.0' (package.json 1.4.0, CHANGELOG); selfCheck 3 runs its tests from git archive",
+      "status": "realized"
+    },
+    {
+      "condition": "New revision (1.5.0) exists and is inspectable",
+      "where": "commit c242a07 'Release 1.5.0'; working tree matches it below the install commit",
+      "status": "realized"
+    },
+    {
+      "condition": "Retry sequence differs in when waits occur",
+      "where": "src/retry.js: 1.4.0 sleeps a fixed delayMs after every failure, including the last; 1.5.0 uses exponential backoffDelay only between attempts",
+      "status": "realized"
+    },
+    {
+      "condition": "Retry sequence differs in when cancellation takes effect",
+      "where": "src/retry.js: 1.4.0 checks the signal only at attempt start and never passes it to the transport; 1.5.0 wait() rejects on abort, checks again after a failure, and passes the signal via src/client.js and src/transport.js to fetch; selfCheck 6 confirms the 1.4.0 final-wait abort yields RetryExhaustedError",
+      "status": "realized"
+    },
+    {
+      "condition": "Affected callers exist with observable failure-behavior changes",
+      "where": "src/client.js (signal forwarding), src/sync.js (failed vs new rejected handling), src/cli.js (unchanged; still passes the ignored delayMs and reports only failed batches)",
+      "status": "realized"
+    },
+    {
+      "condition": "No timing measurements exist",
+      "where": "repository contains no logs, benchmarks, or measured durations; only constants in source",
+      "status": "realized"
+    },
+    {
+      "condition": "Workflow state unspecified; installation valid",
+      "where": ".standards/STATE.md pristine brownfield install; check.mjs ok",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The builder cannot create tags, so the releases are identified by commit subjects, package.json versions, and CHANGELOG sections. The utterance was adapted from 'v1.4.0 and v1.5.0' to 'the 1.4.0 and 1.5.0 releases'. A user could plausibly type this, and the role can locate both revisions from the log.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 0,
+      "detail": "The check reply_matches /sync/i is a valid necessary condition: any caller discussion names sync.js or syncRecords. It is weak, because the project name 'records-sync' alone satisfies it. The judge still decides the assertion (complete: false).",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Both release revisions exist as commits, and their retry wait and cancellation behavior differs in ways visible only from source. The affected callers (client.js, sync.js, an unchanged cli.js with a now-ignored delayMs) give the comparison real failure-behavior substance, and nothing in commits, comments, or the CHANGELOG leaks the subtler differences. The checks and Navigator invariants cannot fail a correct read-only run, and the selfChecks confirm the key grader facts.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T01:35:06.949Z",
+  "costUsd": 0.1545802,
+  "ms": 35279,
+  "fixtureHash": "b241d2e82388b5f8"
+}

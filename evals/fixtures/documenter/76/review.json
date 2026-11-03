@@ -1,0 +1,53 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is GREENFIELD",
+      "where": ".standards/MODE.md (installer greenfield template, untouched)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode UNSET and no active cycle (Active Work.Id and Request UNSET)",
+      "where": ".standards/STATE.md (installer template: SCOPING, CycleMode UNSET, Id UNSET, CompletionPolicy NONE, Handoff INITIAL)",
+      "status": "realized"
+    },
+    {
+      "condition": "No saved next-cycle preference (PendingCycleMode UNSET, no pending request)",
+      "where": ".standards/STATE.md: PendingCycleMode UNSET, PendingCycleRequest UNSET, PendingCycleBlockedOn NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "README.md exists",
+      "where": "README.md committed in 'Add project README'",
+      "status": "realized"
+    },
+    {
+      "condition": "No meaningful project implementation exists",
+      "where": "git tree holds only README.md, .gitignore and installed STANDARDS files (selfCheck 1)",
+      "status": "realized"
+    },
+    {
+      "condition": "Workflow state is valid (check passes)",
+      "where": "gate check.mjs ok:true",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-wrong",
+      "assertion": 2,
+      "detail": "The contains regex `PendingCycleRequest`:[\\s\\S]{0,600}?README` could also be satisfied by README appearing in the PendingCycleBlockedOn text that follows, so it does not by itself prove the request keeps the target. It cannot fail a correct run (a correct request names README.md near its start), and assertion 2 is complete:false, so the judge decides.",
+      "recommendation": "run_as_is",
+      "fix": "None needed; the judge verifies that PendingCycleRequest itself keeps the standalone Documenter intent and the README.md target."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture is the untouched greenfield install plus a README describing a planned CLI and no code, which matches the case exactly. The checks follow the protocol's pre-cycle block: WorkflowState, Active Work, CycleMode, PendingCycleMode and MODE.md stay unchanged, and the pending request and blocker are set. No check can fail a correct run, and nothing leaks the expected answer.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T02:57:02.339Z",
+  "costUsd": 0.1120674,
+  "ms": 26535,
+  "fixtureHash": "a0cf0c98f056a8bc"
+}

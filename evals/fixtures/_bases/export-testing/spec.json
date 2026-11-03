@@ -1,0 +1,173 @@
+{
+  "base": "export-project",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/20-context",
+      "action": "commit",
+      "message": "Record project context for CSV export"
+    },
+    {
+      "dir": "layers/25-scope",
+      "action": "commit",
+      "message": "Define CSV export scope"
+    },
+    {
+      "dir": "layers/30-design",
+      "action": "commit",
+      "message": "Design CSV export"
+    },
+    {
+      "dir": "layers/35-plan",
+      "action": "commit",
+      "message": "Plan CSV export implementation"
+    },
+    {
+      "dir": "layers/40-export",
+      "action": "commit",
+      "message": "Add CSV export of filtered records"
+    },
+    {
+      "dir": "layers/45-complete",
+      "action": "commit",
+      "message": "Mark CSV export plan complete"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "vars": {
+    "ID": "export-20260924T090000Z-a7f3c1d2",
+    "SCOPE": ".standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md",
+    "ARCH": ".standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md",
+    "DEV": ".standards/docs/development/export-20260924T090000Z-a7f3c1d2.md",
+    "VERIFICATION": ".standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md",
+    "REVIEW_IMPL": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md",
+    "CONTEXT": ".standards/CONTEXT.md"
+  },
+  "notes": "Shared base for the export cycle at TESTING, built on export-project. Six post-install commits in the brownfield order. 20-context: Auditor's .standards/CONTEXT.md; STATE starts cycle export-20260924T090000Z-a7f3c1d2 as STANDARD and records the FORWARD handoff AUDITING to SCOPING. 25-scope: scope record with AC-001 (filtered CSV export with RFC 4180 quoting of commas, quotes, newlines) and AC-002 (non-admin or anonymous export denied by server-side authorization before any export file is created); STATE to ARCHITECTING. 30-design: technical design (POST /records/export, requireAdmin first, csvCell quoting, exports/records-<UTC stamp>.csv location, coverage and technical criteria for both ACs); STATE to DEVELOPING. 35-plan: APPROVED AUTONOMOUS plan with three PENDING steps, AFTER_IMPLEMENTATION and Current Increment NONE; STATE records Development. 40-export: src/export.ts, src/routes/export.ts, createApp exportDir/now options, exports/ in .gitignore, test:integration script, test/export.test.ts (five quoting and serialization tests), test/integration/export-flow.test.ts (two admin-only end-to-end tests). 45-complete: plan COMPLETE, steps DONE with self-check evidence citing the implementation commit through a COMMIT placeholder; STATE TESTING with FORWARD from DEVELOPING. No verification, review, documentation, or synchronization record exists. The implementation is correct for both ACs; no test or script sends a non-admin or anonymous export request (the DEV-003 authorization self-check is inspection only).",
+  "baseFacts": [
+    "Cycle export-20260924T090000Z-a7f3c1d2 is active: ProjectMode BROWNFIELD, CycleMode STANDARD, WorkflowState TESTING, PendingCycleMode UNSET, PendingCycleRequest UNSET, PendingCycleBlockedOn NONE. Active Work: Request `Let administrators export the filtered records list as CSV; non-admins must not be able to export.`; Scope, Architecture, and Development point to this cycle's records at the paths in vars SCOPE, ARCH, DEV; PromotionReason, AuditTarget, BlockedOn, PendingVerificationCadence, and BaselineReconciliation are NONE. Handoff: Kind FORWARD, From DEVELOPING, FailureType NONE, Reason `Development plan complete; all steps done with passing self-checks.` Recovery and Outstanding Obligations are inactive (Active false, no frames or obligations).",
+    ".standards/CONTEXT.md is Auditor context for this cycle (committed first, before scope): baseline, stack (Node 22 type stripping, pnpm workspace, no registry dependencies), structure of src/, the command `pnpm --filter export test`, the convention that route handlers call authorize first, seed data with a comma (record 1) and double quotes (record 3), the testing baseline, and evidence citing commit 'Document listing and filtering records' (16 tests passed). It predates the implementation and does not mention src/export.ts or the integration script.",
+    "The scope record (vars SCOPE, provenance SCOPE for this cycle) defines exactly two current conditions and no retired ones: AC-001 administrators can export the currently filtered records as CSV, quoting a field containing a comma, double quote, or newline per RFC 4180 with embedded double quotes doubled; AC-002 an export request from a non-administrator or from no signed-in user is denied by server-side authorization before any export file is created. It has Goal, Constraints (same filters and validation as GET /records, access decided by the service, listing unchanged), Non-goals, and Assumptions.",
+    "The technical design (vars ARCH, provenance ARCHITECTURE) specifies POST /records/export with the GET /records filters via parseFilter; requireAdmin as the handler's first step (401 authentication required, 403 forbidden); 400 for invalid status with no file; 201 success with content-type text/csv; charset=utf-8, content-disposition attachment with the file name, and a body equal to the file; CSV header id,title,owner,status,createdAt, rows in ascending id, CRLF after every row, RFC 4180 quoting for comma, double quote, CR, LF; file location <exportDir>/records-<YYYYMMDDTHHMMSSZ>.csv from now() in UTC, exportDir default exports (created if missing, gitignored). Acceptance Coverage and Technical Acceptance Criteria cover AC-001 and AC-002. It names the same-second overwrite as an accepted risk.",
+    "The development plan (vars DEV, provenance DEVELOPMENT) has Mode AUTONOMOUS, User Style NONE, User Style Locked true, Status COMPLETE, Verification Cadence AFTER_IMPLEMENTATION, Current Increment NONE, no Verification Increments section. Steps, all DONE: DEV-001 CSV serialization with RFC 4180 quoting (Depends On NONE, AC-001); DEV-002 export file naming and writing (Depends On DEV-001, AC-001); DEV-003 administrator-only export route (Depends On DEV-002, AC-001 and AC-002). Self-checks cite the commit 'Add CSV export of filtered records': unit suite exit 0 with 21 passed, integration script exit 0 with 2 passed, and for DEV-003 an inspection that requireAdmin is the handler's first statement; no non-admin request was executed.",
+    "src/export.ts exports csvCell(value) (wraps a value containing a comma, double quote, CR, or LF in double quotes and doubles embedded quotes; otherwise returns String(value)), toCsv(records) (header id,title,owner,status,createdAt then one row per record, every row ending with CRLF), exportFileName(now) (records-YYYYMMDDTHHMMSSZ.csv in UTC), and writeExport(dir, records, now) (mkdir -p dir, write the CSV, return fileName, path, csv).",
+    "src/routes/export.ts exports registerExportRoutes(router, store, {exportDir, now}) registering POST /records/export: requireAdmin(request.user), then store.list(parseFilter(request.query)), then writeExport, then a 201 text/csv response whose body is the CSV. src/app.ts createApp accepts records, exportDir (default 'exports'), and now (default current time) and registers both route modules. GET /records is unchanged.",
+    "package.json scripts: test = node --test test/*.test.ts; test:integration = node --test test/integration/export-flow.test.ts. .gitignore lists node_modules, *.log, and exports/. No exports directory exists in the built fixture.",
+    "The committed implementation satisfies AC-001 and AC-002: an admin export writes and returns the filtered, correctly quoted CSV; a request with no user gets 401 and a viewer or editor gets 403, with no export folder or file created; an invalid status gets 400 before any write.",
+    "`pnpm --filter export test` passes with 21 tests: the 16 pre-cycle tests (records, authorize, routes) plus five in test/export.test.ts covering csvCell plain values, commas, embedded double quotes, LF and CRLF line breaks, and toCsv header plus CRLF-terminated rows.",
+    "`pnpm --filter export test:integration` passes with 2 tests in test/integration/export-flow.test.ts, both as an admin user against the seeded app with a temporary export folder: an owner=dana export (checks status 201, headers, the written file contents for records 1 and 3 with quoting, and body equal to the file), and an unfiltered export (one file written, header plus rows for ids 1 to 6).",
+    "No test or script sends an export request as a non-admin or without a user, or checks that a denied export creates no file. test/authorize.test.ts covers the authorize and requireAdmin helpers directly; test/routes.test.ts covers only GET /records and 404.",
+    "Test names and comments describe behavior; no file under src/, test/, packages/, docs/, or README.md contains an AC identifier.",
+    "There is no verification report, review report, documentation record, or synchronization record. README.md and docs/usage.md are unchanged from export-project and do not document the export.",
+    "Commit subjects after the installer commit, oldest first: 'Record project context for CSV export', 'Define CSV export scope', 'Design CSV export', 'Plan CSV export implementation', 'Add CSV export of filtered records', 'Mark CSV export plan complete'.",
+    "The working tree is clean (git diff empty, nothing untracked), and node .standards/bin/check.mjs passes."
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the established unit suite passes offline"
+    },
+    {
+      "cmd": "pnpm --filter export test 2>&1 | grep -q 'pass 21'",
+      "expect": "pass",
+      "why": "the unit suite runs 21 tests: 16 pre-cycle plus five export serialization tests"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration",
+      "expect": "pass",
+      "why": "the admin end-to-end integration script passes"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration 2>&1 | grep -qE 'pass 2$'",
+      "expect": "pass",
+      "why": "the integration script runs exactly two tests"
+    },
+    {
+      "cmd": "node -e 'import(`./src/app.ts`).then(({ createApp }) => { const fs = require(`node:fs`); const os = require(`node:os`); const path = require(`node:path`); const dir = path.join(fs.mkdtempSync(path.join(os.tmpdir(), `deny-`)), `out`); const app = createApp({ exportDir: dir }); const send = (user) => app.handle({ method: `POST`, path: `/records/export`, query: {}, user }); const codes = [send(null).status, send({ id: 3, name: `Vik`, role: `viewer` }).status, send({ id: 2, name: `Eli`, role: `editor` }).status]; if (codes.join() !== `401,403,403` || fs.existsSync(dir)) { console.error(codes); process.exit(1); } if (send({ id: 1, name: `Ada`, role: `admin` }).status !== 201 || fs.readdirSync(dir).length !== 1) process.exit(2); console.log(`denied before write`); }, (error) => { console.error(error); process.exit(3); })'",
+      "expect": "pass",
+      "why": "the implementation satisfies AC-002: anonymous gets 401, viewer and editor get 403, and no export folder is created, while an admin export writes one file"
+    },
+    {
+      "cmd": "grep -q records/export test/integration/export-flow.test.ts && ! grep -rl records/export test | grep -vqx test/integration/export-flow.test.ts && ! grep -qE 'viewer|editor|null|401|403' test/integration/export-flow.test.ts && ! grep -qE 'requireAdmin|authorize|createApp|records/export' test/export.test.ts",
+      "expect": "pass",
+      "why": "only the admin-only integration test touches the export route; no test sends a non-admin or anonymous export request"
+    },
+    {
+      "cmd": "! grep -rqE 'AC-[0-9]' src test packages docs README.md",
+      "expect": "pass",
+      "why": "tests and code cite no acceptance identifiers"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the TESTING state and records are valid"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && git diff --quiet HEAD && test ! -e exports && grep -qx 'exports/' .gitignore",
+      "expect": "pass",
+      "why": "all work is committed, the tree is clean, and no export files exist"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `TESTING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Id`: `export-20260924T090000Z-a7f3c1d2`$' .standards/STATE.md && grep -q '^`Kind`: `FORWARD` `From`: `DEVELOPING` `FailureType`: `NONE`' .standards/STATE.md && grep -q '^`PromotionReason`: `NONE` `AuditTarget`: `NONE` `BlockedOn`: `NONE`$' .standards/STATE.md && grep -q '^`PendingVerificationCadence`: `NONE`$' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md && grep -q 'ProjectMode`: `BROWNFIELD' .standards/MODE.md",
+      "expect": "pass",
+      "why": "STATE.md holds the stated TESTING state with FORWARD from DEVELOPING, nothing blocked, recovery and obligations inactive"
+    },
+    {
+      "cmd": "test -f .standards/CONTEXT.md && head -3 .standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md | grep -qx 'Artifact: SCOPE' && head -3 .standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md | grep -qx 'Artifact: ARCHITECTURE' && grep -q '`Status`: `COMPLETE`$' .standards/docs/development/export-20260924T090000Z-a7f3c1d2.md && grep -q '^`Verification Cadence`: `AFTER_IMPLEMENTATION` `Current Increment`: `NONE`$' .standards/docs/development/export-20260924T090000Z-a7f3c1d2.md && test $(grep -c '^`Status`: `DONE`' .standards/docs/development/export-20260924T090000Z-a7f3c1d2.md) -eq 3 && ! grep -qE 'PENDING|IN_PROGRESS' .standards/docs/development/export-20260924T090000Z-a7f3c1d2.md && test ! -e .standards/docs/verification && test ! -e .standards/docs/reviews && test ! -e .standards/docs/documentation && test ! -e .standards/docs/synchronization",
+      "expect": "pass",
+      "why": "context, scope, and design exist; the plan is COMPLETE with three DONE steps and the default cadence; no verification or later record exists"
+    },
+    {
+      "cmd": "git log -6 --format=%s | paste -s -d '|' - | grep -qx 'Mark CSV export plan complete|Add CSV export of filtered records|Plan CSV export implementation|Design CSV export|Define CSV export scope|Record project context for CSV export'",
+      "expect": "pass",
+      "why": "commit history follows the brownfield order, and these subjects are available for COMMIT references"
+    }
+  ],
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-01T17:38:56.970Z",
+    "verdict": "pass",
+    "fixtureHash": "077772633f38002c",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "62f88647f784516a",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:04:10.108Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-01T17:15:40.316Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/20-context/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/25-scope/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/30-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/35-plan/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/45-complete/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:04:10.108Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

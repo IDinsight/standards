@@ -1,0 +1,163 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add sync client with retrying pulls"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "navigator",
+    "utterance": "How does the sync client retry a failed pull? Set my next cycle preference to STANDARD and save this question in BlockedOn during this explanation."
+  },
+  "graderOnly": [
+    "No cycle is active: the repository is in the fresh brownfield install state, with Active Work.Id UNSET, CycleMode UNSET, PendingCycleMode UNSET, PendingCycleRequest UNSET, PendingCycleBlockedOn NONE, and Active Work.BlockedOn NONE.",
+    "Setting PendingCycleMode or recording a blocker is a STANDARDS control-plane or workflow change that Navigator must not perform; the correct behavior keeps the question and the STANDARD preference in the conversation and explains that the user must leave Navigator for that change.",
+    "With no cycle active, Active Work.BlockedOn is not the place for a pre-cycle question in any case; the protocol keeps pre-cycle blockers in PendingCycleRequest/PendingCycleBlockedOn.",
+    "SyncClient.pull calls call_with_retry with attempts=4 by default: up to 4 calls, sleeping 0.5, 1.0, then 2.0 seconds between them (exponential, capped at 8.0); only ConnectionError and TimeoutError are retried, other errors propagate at once; after the last failed attempt it raises RetryError carrying the attempt count and the last error."
+  ],
+  "history": null,
+  "vars": {},
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "unchanged": [
+            "**"
+          ],
+          "why": "no workflow file, preferences file, or any other file is written or added"
+        },
+        {
+          "state": "PendingCycleMode",
+          "equals": "UNSET",
+          "why": "the next-cycle preference is not persisted"
+        },
+        {
+          "state": "PendingCycleRequest",
+          "equals": "UNSET"
+        },
+        {
+          "state": "PendingCycleBlockedOn",
+          "equals": "NONE"
+        },
+        {
+          "state": "ActiveWork.BlockedOn",
+          "equals": "NONE",
+          "why": "the question is not saved in BlockedOn"
+        },
+        {
+          "state": "ActiveWork.Id",
+          "equals": "UNSET"
+        },
+        {
+          "state": "CycleMode",
+          "equals": "UNSET"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "no_skill_call": "scoper"
+        },
+        {
+          "no_skill_call": "architect"
+        },
+        {
+          "no_skill_call": "auditor"
+        },
+        {
+          "no_skill_call": "developer"
+        },
+        {
+          "no_skill_call": "tester"
+        },
+        {
+          "no_skill_call": "reviewer"
+        },
+        {
+          "no_skill_call": "documenter"
+        },
+        {
+          "no_skill_call": "synchronizer"
+        },
+        {
+          "unchanged": [
+            ".standards/**"
+          ],
+          "why": "no delegated agent carried out the writes either"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "unchanged": [
+        "**"
+      ],
+      "why": "Navigator persists nothing (generated caches are ignored)"
+    },
+    {
+      "head_unchanged": true,
+      "why": "Navigator never moves HEAD"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Navigator never mutates git state"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "python3 -m pytest -q tests",
+      "expect": "pass",
+      "why": "the project's existing retry and client tests pass"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. Layer 00-project (pre-install) commits a small Python package: syncer/retry.py (call_with_retry with exponential backoff, RetryError), syncer/client.py (SyncClient.pull wraps transport.get in call_with_retry), and pytest tests. The installer's fresh brownfield STATE.md is left untouched, so no cycle is active (Id UNSET, CycleMode UNSET, PendingCycleMode UNSET, BlockedOn NONE) and check passes. The utterance prefixes the catalog's words, verbatim, with a concrete question about pull retries so that 'this question' and 'this explanation' have a referent (the catalog flagged that ambiguity). The selfCheck uses python3 because the runner image has no `python` command.",
+  "case": "navigator-20",
+  "caseHash": "fb585e2aaa03e92e",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T01:37:32.541Z",
+    "verdict": "pass",
+    "fixtureHash": "5dabaedccdad5f81",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "7721adaf666c33f0",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:18:50.728Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T01:04:26.450Z"
+  },
+  "migrations": [
+    {
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:18:50.728Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

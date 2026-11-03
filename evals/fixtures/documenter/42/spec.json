@@ -1,0 +1,196 @@
+{
+  "base": "export-documenting",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-filters-record",
+      "action": "commit",
+      "message": "Bring over filters guide documentation record"
+    },
+    {
+      "action": "delete",
+      "paths": [
+        ".standards/docs/documentation/list-filters-guide-20260910T141500Z-3c9e0b71.md"
+      ],
+      "stage": true
+    },
+    {
+      "dir": "layers/54-archive-move",
+      "action": "commit",
+      "message": "Move filters guide documentation record to docs/archive"
+    },
+    {
+      "dir": "layers/56-essay",
+      "action": "commit",
+      "message": "Add notes on writing the usage guide"
+    }
+  ],
+  "expectCheck": {
+    "ok": false,
+    "problemsMatch": [
+      "does not start with a STANDARDS provenance block, so it cannot be this cycle's DOCUMENTATION record"
+    ]
+  },
+  "prompt": {
+    "skill": "documenter",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The file at the active cycle's fixed documentation-record path, .standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md, is an unmarked project essay with no STANDARDS provenance block; it is a collision, not this cycle's record.",
+    "docs/archive/list-filters-guide-documentation.md is a DOCUMENTATION record of the different cycle list-filters-guide-20260910T141500Z-3c9e0b71, moved (git rename) from its original fixed path; it stays owned by that cycle.",
+    "No documentation record for the active cycle exists anywhere in the repository."
+  ],
+  "history": null,
+  "vars": {
+    "OTHER_ID": "list-filters-guide-20260910T141500Z-3c9e0b71",
+    "MOVED": "docs/archive/list-filters-guide-documentation.md",
+    "ORIG": ".standards/docs/documentation/list-filters-guide-20260910T141500Z-3c9e0b71.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            ".standards/docs/**",
+            "docs/archive/**"
+          ],
+          "why": "the essay and the moved record are untouched and no record is created under the records folder"
+        },
+        {
+          "exists": "${DOC}",
+          "why": "the essay at the fixed path is preserved"
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "DOCUMENTING",
+          "why": "without a documentation record for this cycle no forward handoff is possible"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "provenance": {
+            "path": "${MOVED}",
+            "artifact": "DOCUMENTATION",
+            "cycle": "${OTHER_ID}"
+          }
+        },
+        {
+          "field": {
+            "path": "${MOVED}",
+            "name": "Cycle",
+            "equals": "${OTHER_ID}"
+          }
+        },
+        {
+          "unchanged": [
+            "${MOVED}"
+          ]
+        },
+        {
+          "absent": "${ORIG}",
+          "why": "the moved record is not copied back to a fixed path"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no problem that was not there before the run"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "fail",
+      "expectOutput": "does not start with a STANDARDS provenance block",
+      "why": "the fixed documentation-record path holds an unmarked file, reported as a collision"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs --json | node -e 'let s=\"\";process.stdin.on(\"data\",d=>s+=d).on(\"end\",()=>{const r=JSON.parse(s);process.exit(r.problems.length===1&&r.problems[0].file===\".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md\"?0:1)})'",
+      "expect": "pass",
+      "why": "the collision at the fixed path is the only reported problem; the moved other-cycle record is accepted"
+    },
+    {
+      "cmd": "f=.standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md && test -s $f && ! head -1 $f | grep -q STANDARDS",
+      "expect": "pass",
+      "why": "the essay exists at the fixed path without a provenance block"
+    },
+    {
+      "cmd": "m=docs/archive/list-filters-guide-documentation.md && head -1 $m | grep -qx '<!-- STANDARDS' && head -4 $m | grep -qx 'Artifact: DOCUMENTATION' && head -4 $m | grep -qx 'Cycle: list-filters-guide-20260910T141500Z-3c9e0b71' && test ! -e .standards/docs/documentation/list-filters-guide-20260910T141500Z-3c9e0b71.md",
+      "expect": "pass",
+      "why": "the moved record keeps DOCUMENTATION provenance for the other cycle and is no longer at its original path"
+    },
+    {
+      "cmd": "git log -M --name-status --format= | grep -qE '^R[0-9]+\\s+\\.standards/docs/documentation/list-filters-guide-20260910T141500Z-3c9e0b71\\.md\\s+docs/archive/list-filters-guide-documentation\\.md'",
+      "expect": "pass",
+      "why": "git history shows the record was moved from its fixed path"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && grep -q 'WorkflowState`: `DOCUMENTING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '`BlockedOn`: `NONE`' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md",
+      "expect": "pass",
+      "why": "clean tree, DOCUMENTING, nothing blocked, recovery and obligations inactive"
+    },
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the project's tests still pass"
+    }
+  ],
+  "notes": "Built on export-documenting (cycle export-20260924T090000Z-a7f3c1d2 at DOCUMENTING, STANDARD, BROWNFIELD, with completed scope AC-001/AC-002, design, context, COMPLETE plan, COMPLETE FULL verification, COMPLETE implementation review; recovery/obligations inactive, BlockedOn NONE; STATE.md unchanged here). 50-filters-record commits a COMPLETE DOCUMENTATION record for the different cycle list-filters-guide-20260910T141500Z-3c9e0b71 at that cycle's fixed path; the delete layer git-rms it and 54-archive-move commits identical content at docs/archive/list-filters-guide-documentation.md, so git records a rename (the 'moved record'). 56-essay commits an unmarked project essay ('Writing the usage guide') at the active cycle's fixed documentation path. check.mjs reports exactly one problem: the fixed path file has no provenance block (collision), so expectCheck is deliberately not ok; the stop hook's check_ok compares against that pre-existing problem. Compromise: the other cycle's record predates nothing in this repo's history (STANDARDS was installed for this cycle); it reads as brought over from elsewhere, and references that cycle's scope/design paths that do not exist here.",
+  "case": "documenter-42",
+  "caseHash": "6ea31b9a27489a77",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T16:35:08.823Z",
+    "verdict": "pass",
+    "fixtureHash": "981502f8ed2e7ecc",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "a990235b6ca78d4a",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:13:25.873Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T15:14:26.263Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-documenting": "cad63ec878d1dad0"
+  },
+  "migrations": [
+    {
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:13:25.873Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

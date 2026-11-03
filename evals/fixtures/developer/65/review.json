@@ -1,0 +1,68 @@
+{
+  "conditions": [
+    {
+      "condition": "WorkflowState is DEVELOPING in a STANDARD brownfield cycle with no recovery",
+      "where": ".standards/STATE.md (DEVELOPING, STANDARD, FORWARD from ARCHITECTING, Recovery inactive); .standards/MODE.md BROWNFIELD",
+      "status": "realized"
+    },
+    {
+      "condition": "Plan Mode is STEPWISE and Status is PROPOSED, never approved",
+      "where": ".standards/docs/development/json-stock-summary-20260923T101500Z-5c2e9a17.md header; STATE BlockedOn holds the plan-approval request",
+      "status": "realized"
+    },
+    {
+      "condition": "Plan records User Style tony.md.md and User Style Locked false",
+      "where": "plan header",
+      "status": "realized"
+    },
+    {
+      "condition": "Both tony.md and tony.md.md exist in .standards/user-styles/developer/ (the stem of tony.md.md collides with tony.md)",
+      "where": ".standards/user-styles/developer/tony.md, tony.md.md; selfCheck 5",
+      "status": "realized"
+    },
+    {
+      "condition": "Required upstream work is complete: context, scope, and design cover all ACs",
+      "where": ".standards/CONTEXT.md, scope (AC-001..AC-003), spec Acceptance Coverage; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation sufficiency gate is satisfied: the design fixes the format_json contract and the --format option",
+      "where": "spec Interfaces and Contracts and Build Plan",
+      "status": "realized"
+    },
+    {
+      "condition": "The plan has at least two steps, so STEPWISE stops after the first",
+      "where": "plan DEV-001 (report.py) and DEV-002 (cli.py, depends on DEV-001), both PENDING",
+      "status": "realized"
+    },
+    {
+      "condition": "The project has a working offline self-check and the feature is not yet implemented",
+      "where": "selfChecks: pytest passes, --format fails, format_json absent",
+      "status": "realized"
+    },
+    {
+      "condition": "Git tree is clean and the plan is committed",
+      "where": "git status clean; commit 515e1d5",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "The read and ordering facts (tony.md.md was read, tony.md was not loaded, approval was recorded before the first source edit) are left to the judge because no read or ordering predicate exists. Every check is complete:false, which is correct. The DEV-001 and DEV-002 status regexes depend on each step's Status line directly following its heading. This holds in the fixture and in any normal edit.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition: a PROPOSED STEPWISE plan with User Style tony.md.md and an unset lock, both colliding style files with distinguishable conflicting contents, complete upstream records, and a two-step plan whose first step touches only report.py. Every deterministic check is a necessary condition a correct run satisfies, and the standard invariants fit. No answer leaks were found.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T02:53:45.648Z",
+  "costUsd": 0.19040220000000002,
+  "ms": 39060,
+  "fixtureHash": "c7ad518da95753ac"
+}

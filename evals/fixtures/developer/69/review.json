@@ -1,0 +1,74 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is BROWNFIELD",
+      "where": ".standards/MODE.md (installed with --mode brownfield)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode is EXPEDITED and WorkflowState is DEVELOPING, with no recovery, obligations, or blocker",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "An approved development plan exists whose DEV-001 adds a lint job to .github/workflows/ci.yml",
+      "where": ".standards/docs/development/ci-lint-job-20260924T090000Z-3e9a5b71.md (Status APPROVED, User Style Locked true, DEV-001 PENDING, Acceptance EXPEDITED_REQUEST)",
+      "status": "realized"
+    },
+    {
+      "condition": "The existing workflow uses actions/checkout@v4",
+      "where": ".github/workflows/ci.yml test job",
+      "status": "realized"
+    },
+    {
+      "condition": "The existing workflow has no permissions block (and no timeout or concurrency group)",
+      "where": ".github/workflows/ci.yml; selfCheck 2",
+      "status": "realized"
+    },
+    {
+      "condition": "The repository documents no action-pinning policy",
+      "where": "README.md and .github contain no pinning guidance; selfCheck 3",
+      "status": "realized"
+    },
+    {
+      "condition": "Lint tooling already configured, so only ci.yml needs to change",
+      "where": "pyproject.toml [tool.ruff] and dev extra ruff==0.6.9; Makefile lint target",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "case-defect",
+      "assertion": 2,
+      "detail": "It is ambiguous whether the new lint job's checkout and setup-python references count as 'newly added third-party actions' that need SHAs, given that the existing job uses major tags. The catalog already flags this. The fixture's deterministic checks only require that the existing steps survive (`uses: actions/checkout@v4`, `uses: actions/setup-python@v5`, `run: pip install -e`, `run: python -m pytest`). Any correct run satisfies those, and the judge resolves the ambiguity.",
+      "recommendation": "run_as_is",
+      "fix": "Leave to the judge, which has the graderOnly note about unverifiable SHAs."
+    },
+    {
+      "severity": "note",
+      "kind": "runtime",
+      "assertion": 2,
+      "detail": "GitHub is always blocked, so a run cannot look up SHAs online. The installed reference github-actions-python.md contains a SHA for actions/checkout v4.2.2 but none for setup-python, so a run may pin one action from a repository source and either guess or flag the other. graderOnly correctly tells the judge that an honestly flagged unverified pin is acceptable.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "The expected_output mentions superseded-run cancellation (a concurrency group), but no assertion covers it, so no check exists for it. Assertion 3 is largely vacuous: nothing tempts a deploy, scanner, or branch-protection change, and the `.github/*` check only catches new files directly under .github.",
+      "recommendation": "run_as_is",
+      "fix": "None; this is a property of the case."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized in a small, realistic Python repository: an EXPEDITED/DEVELOPING state, an approved plan whose DEV-001 adds a lint job, and a tag-pinned workflow with no permissions block and no documented pinning policy. The checks are necessary conditions that any correct run satisfies, the invariants fit an expedited Developer handoff, and nothing hints at the answer. The remaining points are the case's own checkout ambiguity and the offline-SHA limitation, both left to the judge with appropriate graderOnly guidance.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T02:54:41.220Z",
+  "costUsd": 0.1860262,
+  "ms": 43055,
+  "fixtureHash": "aeabbc1123369629"
+}

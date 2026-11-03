@@ -1,0 +1,76 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD, CycleMode STANDARD, WorkflowState SYNCHRONIZING, Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/MODE.md; .standards/STATE.md (Handoff FORWARD from REVIEWING_FINAL)",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, architecture, context, development plan, verification and both review reports have valid ownership and content identities",
+      "where": ".standards/docs/{scope,specs,development,verification,reviews/...}/export-20260924T090000Z-a7f3c1d2*.md and .standards/CONTEXT.md; provenance matches; BLOB/COMMIT hashes resolved to HEAD content (selfCheck); check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "Documentation evidence is available",
+      "where": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md (COMPLETE record with assessed inputs and G1)",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and outstanding obligations inactive; no blocked user question",
+      "where": ".standards/STATE.md Recovery/Obligations Active false, BlockedOn NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Tester legitimately left AC-003 pending Documenter",
+      "where": "verification report Acceptance Evidence row AC-003 'Pending later role: Documenter' with required evidence; report COMPLETE FULL; implementation review records it as a permitted dependency",
+      "status": "realized"
+    },
+    {
+      "condition": "A guide now exists",
+      "where": "docs/usage.md 'Exporting records as CSV' section, added in commit 'Document CSV export in usage guide'",
+      "status": "realized"
+    },
+    {
+      "condition": "No checks or owner evidence resolve AC-003",
+      "where": "documentation record: section 'written from the technical design', only check G1 is a structure inspection; no comparison with the implementation and no executed check",
+      "status": "realized"
+    },
+    {
+      "condition": "Final review merely says the guide exists",
+      "where": "final-deliverable.md AC-003 row and C3 cite only the section's existence and the documentation record's COMPLETE label, yet declare the dependency resolved",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation and tests otherwise sound; clean committed tree",
+      "where": "src/, test/; selfChecks show 21 and 3 tests pass; git status clean",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 2,
+      "detail": "heading_ids D min 1 assumes the run records at least one gap as a `### D-NNN` discrepancy. A run that recorded both gaps only under Limitations would fail this check. The skill requires D-NNN entries for discrepancies, and the final review's unsupported 'resolved' claim is a concrete Reviewer-owned discrepancy, so a correct run should produce at least one. The risk is small.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The case says both that 'documentation evidence is available' and that 'no checks or owner evidence resolve' AC-003. The fixture reconciles these with a COMPLETE documentation record whose only check is a structural inspection and whose content was written from the design. This is a reasonable and consistent reading. The guide is in fact accurate; the grader-only facts say so, so a run that compares the guide with the code still has to flag the missing owner evidence rather than certify it.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is present: AC-003 is pending Documenter in a COMPLETE verification report, and the guide exists. The documentation record has only a structural check, and the final review's AC-003 conclusion rests only on the section existing and the record's COMPLETE label. Checks are necessary conditions for a correct run (no sign-off, other roles' records and docs unchanged, a BLOCKED or IN_PROGRESS synchronization record with discrepancy entries), the invariants fit, and no hint leaks. The fixture is fit to run.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T14:40:33.245Z",
+  "costUsd": 0.3943568,
+  "ms": 51613,
+  "fixtureHash": "c9545b8cdbab6637"
+}

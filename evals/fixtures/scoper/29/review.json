@@ -1,0 +1,76 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is BROWNFIELD",
+      "where": ".standards/MODE.md (installed with --mode brownfield, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState SCOPING",
+      "where": ".standards/STATE.md header",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Scope is NONE (no current-cycle scope, so PLAN mode applies)",
+      "where": ".standards/STATE.md Active Work; no scope record or project scope document in the tree",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery inactive, no outstanding obligations",
+      "where": ".standards/STATE.md Recovery/Outstanding Obligations Active: false",
+      "status": "realized"
+    },
+    {
+      "condition": "Valid Auditor context for the active cycle shows an existing FastAPI service with no survey features",
+      "where": ".standards/CONTEXT.md (Project Baseline, Stack and Tooling); Handoff FORWARD from AUDITING",
+      "status": "realized"
+    },
+    {
+      "condition": "Existing FastAPI service code with no survey submission feature",
+      "where": "app/main.py, app/routers/enumerators.py, app/routers/assignments.py; docs/household-survey.md is a paper questionnaire only",
+      "status": "realized"
+    },
+    {
+      "condition": "Request: build the survey submission API at Level 3 so the field team can test it internally",
+      "where": ".standards/STATE.md Active Work.Request",
+      "status": "realized"
+    },
+    {
+      "condition": "STANDARD cycle uses a valid completion policy",
+      "where": "STATE.md CompletionPolicy FULL_DELIVERABLE",
+      "status": "realized"
+    },
+    {
+      "condition": "Committed, clean git state",
+      "where": "git status clean on main; three commits",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 3,
+      "detail": "The Non-goals heading check `^##\\s+Non-?goals` (flags mi) would miss a heading written \"## Non goals\". The template prescribes \"## Non-goals\", which the regex matches case-insensitively, so a template-following run passes.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally widen to `^##\\s+Non[- ]?goals` in spec.json checks[3]."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 3,
+      "detail": "\"Does not add the level to STATE.md\" is enforced deterministically only through `ActiveWork.Request unchanged`. A new level field would also break check/parse or be visible to the judge, so this is adequate.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition: a brownfield STANDARD cycle in SCOPING with Scope NONE, inactive recovery, a Level 3 request, and Auditor context describing a FastAPI service with no survey features. check.mjs is ok and the selfCheck passes. The checks are necessary conditions a correct PLAN-mode run satisfies (default scope path, provenance, AC list items, Level 3 under Constraints, a Non-goals heading, request unchanged), and the invariants fit Scoper; no hints leak.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T03:09:25.975Z",
+  "costUsd": 0.164629,
+  "ms": 30667,
+  "fixtureHash": "72ee05182c7d8199"
+}

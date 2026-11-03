@@ -1,0 +1,49 @@
+{
+  "conditions": [
+    {
+      "condition": "Navigator is in a GRILL_ME conversation on retry behavior",
+      "where": "history turns 1-4: '/navigator Grill me on how retries work…', with GRILL_ME announced",
+      "status": "realized"
+    },
+    {
+      "condition": "A user style (tony) was explicitly selected earlier in the conversation",
+      "where": "history user turn 1 'Use user style tony.'; .standards/user-styles/navigator/tony.md",
+      "status": "realized"
+    },
+    {
+      "condition": "At least one quiz question was answered and graded, and a later question is pending",
+      "where": "history: the 503 question is answered and graded; the 404 question is pending in the last assistant turn",
+      "status": "realized"
+    },
+    {
+      "condition": "Earlier feedback cites real code evidence for the retry topic",
+      "where": "src/retry.js:1,4,16 and src/client.js:10-13,18 match the history citations; the 100/200/400 ms waits match backoffDelay",
+      "status": "realized"
+    },
+    {
+      "condition": "The discovery helper is available and its catalog includes INVESTIGATE",
+      "where": ".standards/bin/invocation.mjs installed; selfCheck grep INVESTIGATE passes",
+      "status": "realized"
+    },
+    {
+      "condition": "The style inventory offers an alternative style, so inferring a substitute would be observable",
+      "where": ".standards/user-styles/navigator/brief.md (never selected)",
+      "status": "realized"
+    },
+    {
+      "condition": "Retry behavior in code matches tests",
+      "where": "test/retry.test.js; selfCheck node --test passes",
+      "status": "realized"
+    }
+  ],
+  "issues": [],
+  "verdict": "pass",
+  "summary": "The history establishes a GRILL_ME conversation on retry behavior. Style tony is selected, one question is answered, and one is pending. Every line citation matches src/retry.js and src/client.js, and the helper's catalog includes INVESTIGATE and both styles. The checks are safe necessary conditions: the reply must mention 'investigate', no files may change, WorkflowState and tony.md must be unchanged, and the judgment is left to the judge. The Navigator invariants are correct.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T03:00:48.482Z",
+  "costUsd": 0.1105124,
+  "ms": 25268,
+  "fixtureHash": "2b8eccb785db5b77"
+}

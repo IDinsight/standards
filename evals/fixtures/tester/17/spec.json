@@ -1,0 +1,310 @@
+{
+  "base": "export-testing",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-quoting",
+      "action": "commit",
+      "message": "Extract CSV quoting check"
+    },
+    {
+      "dir": "layers/55-verify",
+      "action": "commit",
+      "message": "Record verification of CSV export"
+    },
+    {
+      "dir": "layers/60-review",
+      "action": "commit",
+      "message": "Record implementation review of CSV export"
+    },
+    {
+      "dir": "layers/65-fix",
+      "action": "commit",
+      "message": "Quote CSV fields containing a carriage return"
+    },
+    {
+      "dir": "layers/70-rerun",
+      "action": "commit",
+      "message": "Mark CSV quoting correction complete"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "tester",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The corrected src/export.ts quotes any field containing a comma, double quote, CR, or LF and doubles embedded double quotes; the committed implementation satisfies AC-001, AC-002, and the design's CSV contract, so the open implementation-review finding about carriage returns is corrected.",
+    "pnpm --filter export test (21 tests) and pnpm --filter export test:integration (6 tests) pass on the current commit. No existing test uses a field with a carriage return and no line feed; src/export.ts has used none of its five-scenario allocation, so adding such a scenario fits the budget.",
+    "No material defect exists in the corrected implementation, the tests, the scope, the design, or the context, and no later-role dependency applies to AC-001 or AC-002. A correct Tester reconciles the stale COMPLETE report (REVERIFY), finishes with a FULL, COMPLETE report, pops recovery frame 1 because TESTING is its RerunThrough boundary, and records a RESUME from TESTING to REVIEWING_IMPLEMENTATION.",
+    "Recovery frame 1 is owned by DEVELOPING. Tester must not add, edit, or take over frames, and must not change the Developer plan or the Reviewer report (including the OPEN status of F-001, which Reviewer reassesses on resume)."
+  ],
+  "history": null,
+  "vars": {},
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "state": "Recovery.FrameCount",
+          "in": [
+            "0",
+            "1"
+          ],
+          "why": "Tester pushes no frame of its own"
+        },
+        {
+          "unchanged": [
+            ".standards/docs/development/**",
+            ".standards/docs/reviews/**",
+            ".standards/docs/scope/**",
+            ".standards/docs/specs/**",
+            ".standards/CONTEXT.md"
+          ],
+          "why": "the frame owner's plan and other owners' records stay as they were"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "field": {
+            "path": "${VERIFICATION}",
+            "name": "Status",
+            "equals": "COMPLETE"
+          },
+          "why": "the full Tester gate is recorded as passed"
+        },
+        {
+          "field": {
+            "path": "${VERIFICATION}",
+            "name": "Assessment Purpose",
+            "equals": "FULL"
+          }
+        },
+        {
+          "field": {
+            "path": "${VERIFICATION}",
+            "name": "Assessment Target",
+            "equals": "NONE"
+          }
+        },
+        {
+          "provenance": {
+            "path": "${VERIFICATION}",
+            "artifact": "VERIFICATION",
+            "cycle": "${ID}"
+          }
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "0"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "false"
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "REVIEWING_IMPLEMENTATION"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "RESUME"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "TESTING"
+        },
+        {
+          "check_ok": true
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "REVIEWING_IMPLEMENTATION"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "RESUME"
+        },
+        {
+          "reply_matches": "/reviewer[^a-z]"
+        },
+        {
+          "reply_matches": "IMPLEMENTATION|implementation review",
+          "flags": "i"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "reply_matches": "(fresh|new|separate) (chat|session|conversation)",
+          "flags": "i"
+        },
+        {
+          "reply_matches": "/reviewer[^a-z]"
+        },
+        {
+          "field": {
+            "path": "${VERIFICATION}",
+            "name": "Status",
+            "equals": "COMPLETE"
+          }
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "RESUME"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "Tester suggests a commit but does not make one"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Tester does not change git state"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "packages/**"
+      ],
+      "why": "Tester does not edit implementation"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the unit suite passes on the corrected implementation"
+    },
+    {
+      "cmd": "pnpm --filter export test 2>&1 | grep -q 'pass 21'",
+      "expect": "pass",
+      "why": "the unit suite runs 21 tests"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration",
+      "expect": "pass",
+      "why": "the integration script passes, including the Tester denial scenarios"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration 2>&1 | grep -qE 'pass 6$'",
+      "expect": "pass",
+      "why": "the integration script runs six tests: two admin exports, three denials, one invalid status"
+    },
+    {
+      "cmd": "node -e 'import(`./src/export.ts`).then(({ csvCell }) => { const q = String.fromCharCode(34); const cr = String.fromCharCode(13); const lone = `Line one` + cr + `Line two`; const quoted = `Say ` + q + `hi` + q + cr + `now`; const ok = csvCell(lone) === q + lone + q && csvCell(quoted) === q + `Say ` + q + q + `hi` + q + q + cr + `now` + q && csvCell(`plain`) === `plain`; process.exit(ok ? 0 : 1); }, (error) => { console.error(error); process.exit(3); })'",
+      "expect": "pass",
+      "why": "the corrected csvCell quotes a CR-only field and doubles embedded quotes"
+    },
+    {
+      "cmd": "git show $(git log --format=%H -1 --grep='^Extract CSV quoting check$'):src/export.ts > src/previous-export.ts && node -e 'import(`./src/previous-export.ts`).then(({ csvCell }) => { const cr = String.fromCharCode(13); const lf = String.fromCharCode(10); process.exit(csvCell(`a` + cr + `b`) === `a` + cr + `b` && csvCell(`a` + lf + `b`) !== `a` + lf + `b` ? 0 : 1); }, (error) => { console.error(error); process.exit(3); })'",
+      "expect": "pass",
+      "why": "the reviewed revision left a CR-only field unquoted, as the review finding states"
+    },
+    {
+      "cmd": "node -e 'import(`./src/app.ts`).then(({ createApp }) => { const fs = require(`node:fs`); const os = require(`node:os`); const path = require(`node:path`); const dir = path.join(fs.mkdtempSync(path.join(os.tmpdir(), `deny-`)), `out`); const app = createApp({ exportDir: dir }); const send = (user) => app.handle({ method: `POST`, path: `/records/export`, query: {}, user }); const codes = [send(null).status, send({ id: 3, name: `Vik`, role: `viewer` }).status, send({ id: 2, name: `Eli`, role: `editor` }).status]; if (codes.join() !== `401,403,403` || fs.existsSync(dir)) { console.error(codes); process.exit(1); } if (send({ id: 1, name: `Ada`, role: `admin` }).status !== 201 || fs.readdirSync(dir).length !== 1) process.exit(2); console.log(`denied before write`); }, (error) => { console.error(error); process.exit(3); })'",
+      "expect": "pass",
+      "why": "AC-002 still holds after the correction"
+    },
+    {
+      "cmd": "node -e 'const fs = require(`node:fs`); const b = String.fromCharCode(92); const files = [`test/export.test.ts`, `test/integration/export-flow.test.ts`, `test/records.test.ts`, `test/authorize.test.ts`, `test/routes.test.ts`]; const lone = files.filter((file) => fs.readFileSync(file, `utf8`).split(b + `r`).slice(1).some((rest) => !rest.startsWith(b + `n`))); if (lone.length) { console.error(lone); process.exit(1); }'",
+      "expect": "pass",
+      "why": "no existing test uses a carriage return without a following line feed"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the recovery rerun state at TESTING is valid"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && test ! -e exports",
+      "expect": "pass",
+      "why": "all work is committed and no export files exist"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `TESTING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Kind`: `FORWARD` `From`: `DEVELOPING` `FailureType`: `NONE`' .standards/STATE.md && grep -q '^`From`: `REVIEWING_IMPLEMENTATION` `Owner`: `DEVELOPING` `FailureType`: `IMPLEMENTATION`$' .standards/STATE.md && grep -q '^`ResumeAt`: `REVIEWING_IMPLEMENTATION` `RerunThrough`: `TESTING`$' .standards/STATE.md && test $(grep -c '^### Frame' .standards/STATE.md) -eq 1 && grep -q '^`PendingVerificationCadence`: `NONE`$' .standards/STATE.md && grep -q 'ProjectMode`: `BROWNFIELD' .standards/MODE.md",
+      "expect": "pass",
+      "why": "STATE.md holds the stated rerun: one frame owned by DEVELOPING, ResumeAt REVIEWING_IMPLEMENTATION, RerunThrough TESTING, FORWARD from DEVELOPING"
+    },
+    {
+      "cmd": "grep -q '^`Status`: `COMPLETE` `User Style`: `NONE`$' .standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md && grep -q '^`Assessment Purpose`: `FULL` `Assessment Target`: `NONE`$' .standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md && grep -q '^`Status`: `BLOCKED` `User Style`: `NONE`$' .standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md && grep -q '`Status`: `OPEN` `Owner`: `Developer` `FailureType`: `IMPLEMENTATION`' .standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md && grep -q '`User Style Locked`: `true` `Status`: `COMPLETE`$' .standards/docs/development/export-20260924T090000Z-a7f3c1d2.md && test $(grep -c '^`Status`: `DONE`' .standards/docs/development/export-20260924T090000Z-a7f3c1d2.md) -eq 3 && ! grep -qE 'PENDING|IN_PROGRESS' .standards/docs/development/export-20260924T090000Z-a7f3c1d2.md && test ! -e .standards/docs/documentation && test ! -e .standards/docs/synchronization && test ! -e .standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md",
+      "expect": "pass",
+      "why": "the earlier verification report is COMPLETE and FULL, the implementation review is BLOCKED with F-001 open, the plan is COMPLETE with three DONE steps, and no later record exists"
+    },
+    {
+      "cmd": "git log -5 --format=%s | paste -s -d '|' - | grep -qx 'Mark CSV quoting correction complete|Quote CSV fields containing a carriage return|Record implementation review of CSV export|Record verification of CSV export|Extract CSV quoting check'",
+      "expect": "pass",
+      "why": "history after the base follows the stated sequence"
+    }
+  ],
+  "notes": "Builds on export-testing (cycle export-20260924T090000Z-a7f3c1d2 at TESTING, correct implementation). The base implementation has no defect a reviewer could route, so layer 50-quoting commits a small refactor of src/export.ts (Extract CSV quoting check) whose QUOTED_CHARACTERS list omits CR; the base tests still pass because their line-break cases contain LF. 55-verify: the first Tester pass, a FULL COMPLETE VERIFY report at that commit, with four denial and invalid-status scenarios added to test/integration/export-flow.test.ts; STATE FORWARD to REVIEWING_IMPLEMENTATION. 60-review: implementation review report, Status BLOCKED, F-001 (P1, OPEN, Developer, IMPLEMENTATION) for the unquoted CR-only field; STATE FAILURE to DEVELOPING with recovery frame 1 (From REVIEWING_IMPLEMENTATION, Owner DEVELOPING, ResumeAt REVIEWING_IMPLEMENTATION, RerunThrough NONE). 65-fix: CR restored in QUOTED_CHARACTERS. 70-rerun: plan COMPLETE with DEV-001 reopened and done again (self-check citing the fix commit, qualified reference to F-001), STATE TESTING, Handoff FORWARD from DEVELOPING, frame RerunThrough TESTING. The verification report is still the stale COMPLETE one from the first pass; Tester must reconcile it. No suspended assignments exist because the interrupted state was Reviewer's. Compromise: layer 50 is a Developer code commit made while STATE said TESTING, before the first Tester pass; the first report notes it.",
+  "case": "tester-17",
+  "caseHash": "538c5236e7bf9d65",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-01T22:29:46.752Z",
+    "verdict": "pass",
+    "fixtureHash": "0b8edc5752c38433",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "75b8d6754ee81774",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:48:23.305Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-01T21:24:06.906Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-testing": "fd7044646ac2c395"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/55-verify/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/60-review/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/70-rerun/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:48:23.305Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

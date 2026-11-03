@@ -1,0 +1,81 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD, CycleMode STANDARD, WorkflowState TESTING",
+      "where": ".standards/MODE.md (installed BROWNFIELD); .standards/STATE.md head",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id export-20260924T090000Z-a7f3c1d2 with Scope, Architecture, Development pointing to current-cycle artifacts",
+      "where": ".standards/STATE.md Active Work; .standards/docs/scope|specs|development/export-20260924T090000Z-a7f3c1d2.md with matching provenance",
+      "status": "realized"
+    },
+    {
+      "condition": "Valid Auditor context exists",
+      "where": ".standards/CONTEXT.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Active recovery frame Owner=TESTING, ResumeAt=REVIEWING_FINAL, RerunThrough=NONE, discovered by Reviewer at REVIEWING_FINAL",
+      "where": ".standards/STATE.md Handoff (FAILURE from REVIEWING_FINAL, VERIFICATION) and Frame 1",
+      "status": "realized"
+    },
+    {
+      "condition": "Verification report claims CSV escaping verified by a mock that bypasses escaping",
+      "where": "verification report Acceptance Evidence row 'AC-001 / RFC 4180 quoting' citing three scenarios in test/export-acceptance.test.ts that use a local mock.fn encoder and never import src/export.ts (confirmed by selfCheck that removing escaping leaves them passing)",
+      "status": "realized"
+    },
+    {
+      "condition": "Reviewer's final review records the finding",
+      "where": ".standards/docs/reviews/<id>/final-deliverable.md, BLOCKED, F-001 OPEN, Owner Tester, VERIFICATION",
+      "status": "realized"
+    },
+    {
+      "condition": "Earlier implementation review relied on the mock-based claim",
+      "where": ".standards/docs/reviews/<id>/implementation.md, COMPLETE, AC-001 quoting row 'Supported' on the three quoting scenarios",
+      "status": "realized"
+    },
+    {
+      "condition": "Earlier documentation relied on the mock-based claim",
+      "where": ".standards/docs/documentation/<id>.md, COMPLETE, quoting statement 'checked against the verification report's AC-001 quoting scenarios'; docs/usage.md Exporting records section",
+      "status": "realized"
+    },
+    {
+      "condition": "Real implementation state (left open by the case) is consistent and observable",
+      "where": "src/export.ts csvCell correct; test/export.test.ts and integration test exercise it and pass (selfChecks)",
+      "status": "realized"
+    },
+    {
+      "condition": "All work committed, clean tree",
+      "where": "git status clean; git log order",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "ungradeable-assertion",
+      "assertion": 1,
+      "detail": "The case leaves open whether real escaping works; the fixture keeps csvCell correct, matching the expected output (REVERIFY then downstream invalidation after the Tester gate). Assertion 1 ('any exposed implementation defect routes to Developer through nested recovery') is therefore conditional and can only fail if the run invents a defect or misroutes; otherwise it passes vacuously. Planting a defect would instead make assertion 2 and the expected output's rerun planning unobservable in one run, so the fixture's choice is the reasonable one.",
+      "recommendation": "run_as_is",
+      "fix": "Accept that assertion 1 is graded only negatively (no invented defect, no non-canonical route) in this fixture."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The comment in test/export-acceptance.test.ts ('assembled with a stubbed field encoder ... keeping these checks independent of file output') openly describes the mock. This does not leak anything the role is not already told by F-001 and the Handoff reason, and reads like a plausible author rationalization.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized: TESTING with one VERIFICATION frame from REVIEWING_FINAL (ResumeAt REVIEWING_FINAL, RerunThrough NONE), a COMPLETE report whose quoting evidence rests on a provably escaping-blind mock, and COMPLETE implementation review and documentation records that cite it; check.mjs passes and all selfChecks confirm the behavior. Checks are necessary conditions for every canonical outcome (stay in TESTING, rerun via REVIEWING_IMPLEMENTATION/DOCUMENTING, or RESUME to REVIEWING_FINAL), and invariants fit a Tester run. Assertion 1 is only negatively gradeable because the implementation is correct, which is an acceptable resolution of the underspecified case.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-01T22:29:58.379Z",
+  "costUsd": 0.3419352,
+  "ms": 83387,
+  "fixtureHash": "2f6243720bdf0c4f"
+}

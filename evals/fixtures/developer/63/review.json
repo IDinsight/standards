@@ -1,0 +1,64 @@
+{
+  "conditions": [
+    {
+      "condition": "Developer has completed all handoff work and the cycle has legally transitioned to TESTING",
+      "where": ".standards/STATE.md: WorkflowState TESTING, STANDARD, FULL_DELIVERABLE, Handoff FORWARD from DEVELOPING, recovery and obligations inactive; plan COMPLETE with both steps DONE and self-check evidence",
+      "status": "realized"
+    },
+    {
+      "condition": "The installed invocation helper cannot assemble Tester's catalog because a mode's metadata is malformed",
+      "where": ".claude/skills/tester/modes/verify.md (an installed file, absent from the unchanged list) has a trailing comma in its standards:invocation JSON; selfCheck 3 confirms catalogStatus is unavailable or invalid",
+      "status": "realized"
+    },
+    {
+      "condition": "All other workflow handoff evidence is valid",
+      "where": "check.mjs ok; scope AC-001..AC-003, design coverage, CONTEXT.md, src/slug.js implements maxLength (selfCheck 2 passes), npm test passes",
+      "status": "realized"
+    },
+    {
+      "condition": "The client is Claude Code",
+      "where": "claude install; utterance sent through /developer",
+      "status": "realized"
+    },
+    {
+      "condition": "No verification report exists yet",
+      "where": "no .standards/docs/verification/ file",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 1,
+      "detail": "The reply_not_matches check rejects any fenced block that begins with `node`. A correct run could show, in a fence, the helper command it ran itself as a diagnostic, without proposing it to the user. That is unlikely, and the pattern is narrow enough to accept.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 1,
+      "detail": "`unchanged: [\".claude/**\"]` would also flag a client-written file such as .claude/settings.local.json. Headless runs normally do not write one.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The commit \"Reword tester verify mode description\" is a hand edit of a framework-owned skill file. That edit is how the case's premise arises, and the message gives no hint of the expected reply. The helper's own diagnostics would point at the file anyway.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes a valid TESTING handoff in a STANDARD cycle and a Tester mode file whose malformed invocation metadata makes the helper report an unusable catalog; selfChecks confirm both. The reply checks require only verbatim protocol text: the independent Tester prefix, the /tester line, and the persisted-input phrase. The invariants and file checks fit the case, and only minor narrowness notes remain.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T02:52:51.293Z",
+  "costUsd": 0.1932502,
+  "ms": 36451,
+  "fixtureHash": "2bcf723cbd938a9f"
+}

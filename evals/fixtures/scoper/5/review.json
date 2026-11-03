@@ -1,0 +1,76 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is BROWNFIELD",
+      "where": ".standards/MODE.md (installed with --mode brownfield)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState SCOPING",
+      "where": ".standards/STATE.md header",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Scope points to docs/scope/session-policy.md, an existing persisted scope for the active cycle",
+      "where": ".standards/STATE.md Active Work.Scope; docs/scope/session-policy.md (unmarked project doc, committed in 'Draft session policy scope')",
+      "status": "realized"
+    },
+    {
+      "condition": "Valid active-cycle project context exists",
+      "where": ".standards/CONTEXT.md committed after install; STATE Handoff FORWARD from AUDITING",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery inactive, no outstanding obligations",
+      "where": ".standards/STATE.md Recovery.Active false, Outstanding Obligations.Active false",
+      "status": "realized"
+    },
+    {
+      "condition": "Current scope defines AC-001 (expire after 30 minutes of inactivity) and AC-002 (signed out when browser closes) as list items",
+      "where": "docs/scope/session-policy.md Work item 1 'Done when'",
+      "status": "realized"
+    },
+    {
+      "condition": "No identifier beyond AC-002 ever used, so the next unused ID is AC-003",
+      "where": "docs/scope/session-policy.md (no Retired or Previous Cycles section; committed history has only AC-001/AC-002)",
+      "status": "realized"
+    },
+    {
+      "condition": "Unaffected scope content exists to preserve (Goal, Constraints, Non-goals, Assumptions)",
+      "where": "docs/scope/session-policy.md",
+      "status": "realized"
+    },
+    {
+      "condition": "User replaces browser-close sign-out with 8-hour browser-restart survival",
+      "where": "prompt.utterance",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "AC-001 (30-minute inactivity expiry) and the new 'survive browser restarts for up to 8 hours' requirement interact; a cautious Scoper could persist BlockedOn and ask before editing, which would fail the complete:true file checks for assertions 1-4. The natural reading (persistent session capped at 8 hours, still subject to idle expiry) is non-blocking, REPLAN step 6 places blocking after the revision, and the expected output is a revision, so this is inherent to the case rather than the fixture.",
+      "recommendation": "run_as_is",
+      "fix": "None; the fixture states the case's facts exactly and the utterance adds no answer-bearing words."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "The file regexes mirror check.mjs's definedIds and sectionName rules (list marker, optional backticks/bold, ':'/'—'/'–'/'- ' separator; exact '## Retired Acceptance Identifiers' H2), so a run that check.mjs accepts as a correct revision also matches them. Exotic phrasings such as 'eight (8) hours' or '8h' would miss the 8-hour regex but are unlikely.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition holds: a brownfield STANDARD cycle in SCOPING with a committed unmarked scope defining AC-001 and AC-002, valid context, and inactive recovery; check.mjs passes and nothing leaks. The checks align with check.mjs's definition and retirement rules and should not fail a correct REPLAN that retires AC-002 and adds AC-003. The only risk is a Scoper blocking on the idle-versus-8-hour interaction, which comes from the case itself.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T20:06:44.748Z",
+  "costUsd": 0.799329,
+  "ms": 68289,
+  "fixtureHash": "910fb728f149161c"
+}

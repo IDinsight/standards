@@ -1,0 +1,272 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-core",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add expense parsing and category totals"
+    },
+    {
+      "dir": "layers/51-report",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add report command and text formatter"
+    },
+    {
+      "dir": "layers/60-upstream",
+      "action": "commit",
+      "message": "Record project context, scope, and design for report date range"
+    },
+    {
+      "dir": "layers/70-filter",
+      "action": "commit",
+      "message": "Add date-range filter for expenses"
+    },
+    {
+      "dir": "layers/80-increment-1",
+      "action": "commit",
+      "message": "Add date filter tests and record increment 1 verification"
+    },
+    {
+      "dir": "layers/90-next-step",
+      "action": "commit",
+      "message": "Advance plan to increment 2"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "developer",
+    "utterance": "Switch verification cadence to AFTER_IMPLEMENTATION."
+  },
+  "graderOnly": [
+    "The Increment 1 evidence in the verification report is current and passing: src/expenses.js is unchanged since the assessed commit and all three test files pass (9 tests).",
+    "Active Work.BlockedOn holds Developer's STEPWISE continuation question for DEV-002; the user has not answered it, and the cadence request does not answer it.",
+    "DEV-002 and DEV-003 are unimplemented: bin/report.js has no --from or --to options and src/expenses.js has no isIsoDate.",
+    "Switching to AFTER_IMPLEMENTATION changes only scheduling: no approved step, dependency, behavior, or technical approach changes, so no new plan approval is needed.",
+    "Increment 2 is selected in the plan but was never handed to Tester."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "add-date-range-filtering-to-the-expense-20260923T141205Z-5e2b9c47",
+    "PLAN": ".standards/docs/development/add-date-range-filtering-to-the-expense-20260923T141205Z-5e2b9c47.md",
+    "VER": ".standards/docs/verification/add-date-range-filtering-to-the-expense-20260923T141205Z-5e2b9c47.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "DEVELOPING",
+          "why": "the switch is applied at the normal Developer boundary without a transition"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "CHECKPOINT",
+          "why": "a cadence switch preserves the current handoff"
+        },
+        {
+          "field": {
+            "path": "${PLAN}",
+            "name": "Verification Cadence",
+            "equals": "AFTER_IMPLEMENTATION"
+          }
+        },
+        {
+          "field": {
+            "path": "${PLAN}",
+            "name": "Current Increment",
+            "equals": "NONE"
+          }
+        },
+        {
+          "contains": {
+            "path": "${PLAN}",
+            "regex": "^### Increment 1(?![0-9])",
+            "flags": "m"
+          },
+          "why": "earlier increment definitions are retained after a cadence switch"
+        },
+        {
+          "contains": {
+            "path": "${PLAN}",
+            "regex": "^### Increment 2(?![0-9])",
+            "flags": "m"
+          },
+          "why": "increment definitions are retained, not deleted"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "unchanged": [
+            ".standards/docs/verification/**"
+          ],
+          "why": "Developer never edits Tester's report; its historical target and status stay as written"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "field": {
+            "path": "${PLAN}",
+            "name": "Mode",
+            "equals": "STEPWISE"
+          }
+        },
+        {
+          "field": {
+            "path": "${PLAN}",
+            "name": "User Style",
+            "equals": "NONE"
+          }
+        },
+        {
+          "field": {
+            "path": "${PLAN}",
+            "name": "User Style Locked",
+            "equals": "true"
+          }
+        },
+        {
+          "state": "ActiveWork.BlockedOn",
+          "not": "NONE",
+          "why": "the unanswered STEPWISE continuation question remains"
+        },
+        {
+          "unchanged": [
+            "src/**",
+            "bin/**",
+            "test/**",
+            "data/**",
+            "package.json"
+          ],
+          "why": "cadence selection does not authorize DEV-002"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "field": {
+            "path": "${PLAN}",
+            "name": "Status",
+            "not": "PROPOSED"
+          },
+          "why": "regrouping unchanged approved work does not return the plan to PROPOSED"
+        },
+        {
+          "field": {
+            "path": "${PLAN}",
+            "name": "User Style Locked",
+            "equals": "true"
+          }
+        }
+      ]
+    },
+    {
+      "assertion": 4,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.PendingVerificationCadence",
+          "equals": "NONE"
+        },
+        {
+          "field": {
+            "path": "${PLAN}",
+            "name": "Verification Cadence",
+            "equals": "AFTER_IMPLEMENTATION"
+          }
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/expenses.test.js test/report.test.js test/filter.test.js",
+      "expect": "pass",
+      "why": "existing tests and Tester's Increment 1 tests pass, so the Increment 1 evidence is current"
+    },
+    {
+      "cmd": "node bin/report.js data/sample.csv",
+      "expect": "pass",
+      "why": "the unfiltered report command works"
+    },
+    {
+      "cmd": "node -e \"const fs=require('fs');const t=fs.readFileSync('bin/report.js','utf8')+fs.readFileSync('src/expenses.js','utf8');process.exit(/--from|parseArgs|isIsoDate/.test(t)?1:0)\"",
+      "expect": "pass",
+      "why": "DEV-002 and DEV-003 are not implemented yet"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 50/51 (pre-install): dependency-free Node ES-module expense report CLI (src/expenses.js parse and totals, src/report.js formatter, bin/report.js) with 5 passing node:test tests. 60: Auditor CONTEXT.md, scope with AC-001..AC-003, design; STATE at DEVELOPING after FORWARD from ARCHITECTING. 70: DEV-001 filterByDate committed; plan STEPWISE, User Style NONE, locked, IN_PROGRESS, INCREMENTAL, Current Increment 1, two increments (1: DEV-001/AC-001; 2: DEV-002, DEV-003/AC-002, AC-003); STATE TESTING with CHECKPOINT from DEVELOPING. 80: Tester's test/filter.test.js and package.json script, verification report IN_PROGRESS / VERIFY / INCREMENT / Increment 1 with a VERIFIED Increment 1 row citing the 70 commit and src/expenses.js blob; STATE DEVELOPING with CHECKPOINT from TESTING. 90: Developer reconciled the return, set Current Increment 2 (never handed to Tester), and set Active Work.BlockedOn to the STEPWISE continuation question for DEV-002. PendingVerificationCadence is NONE in the fixture; the user's AFTER_IMPLEMENTATION selection arrives in the utterance.",
+  "case": "developer-53",
+  "caseHash": "d0da63c6531444c3",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T02:24:47.279Z",
+    "verdict": "pass",
+    "fixtureHash": "b6ebad8a9a22435b",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "bf5b97c695c78ad7",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:08:58.260Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T02:05:51.867Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/60-upstream/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/70-filter/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/80-increment-1/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/90-next-step/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:08:58.260Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

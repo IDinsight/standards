@@ -1,0 +1,227 @@
+{
+  "base": null,
+  "install": {
+    "mode": "greenfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial commit"
+    },
+    {
+      "dir": "layers/50-cycle",
+      "action": "commit",
+      "message": "Start support customer lookup cycle"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "scoper",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "Active Work.Request asks for a small internal web tool that lets support staff search customers by email, view the customer's current plan and account status, and copy the customer ID; only authenticated support staff may use it.",
+    "No frameworks, storage, APIs, UI libraries, or authentication mechanism are established by project constraints; the repository holds only a one-paragraph README and the STANDARDS installation.",
+    "No persisted scope exists for the active cycle and no existing project scope document exists, so PLAN mode applies and a new scope must be created with artifact init at .standards/docs/scope/${ID}.md."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "build-a-small-internal-web-tool-that-20260924T090000Z-3e9a71c4",
+    "SCOPE": ".standards/docs/scope/build-a-small-internal-web-tool-that-20260924T090000Z-3e9a71c4.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${SCOPE}",
+          "why": "a persisted scope must exist to define anything"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": true,
+      "all": [
+        {
+          "provenance": {
+            "path": "${SCOPE}",
+            "artifact": "SCOPE",
+            "cycle": "${ID}"
+          },
+          "why": "the scope is owned by the active cycle"
+        },
+        {
+          "contains": {
+            "path": "${SCOPE}",
+            "regex": "^\\s*(?:[-*+]|\\d+[.)])\\s+(?:\\[[ xX]\\]\\s+)?[*_`]*AC-001",
+            "flags": "m"
+          },
+          "why": "acceptance conditions are defined as AC-NNN list items"
+        },
+        {
+          "check_ok": true,
+          "why": "check reports duplicate or undefined acceptance identifiers"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "contains": {
+            "path": "${SCOPE}",
+            "regex": "AC-00[1-9]"
+          },
+          "why": "at least one acceptance condition exists"
+        }
+      ]
+    },
+    {
+      "assertion": 4,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${SCOPE}"
+        }
+      ]
+    },
+    {
+      "assertion": 5,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${SCOPE}"
+        }
+      ]
+    },
+    {
+      "assertion": 6,
+      "complete": true,
+      "all": [
+        {
+          "state": "ActiveWork.Scope",
+          "equals": "${SCOPE}"
+        },
+        {
+          "exists": "${SCOPE}"
+        }
+      ]
+    },
+    {
+      "assertion": 7,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "ARCHITECTING"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FORWARD"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "SCOPING"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "NONE"
+        },
+        {
+          "state": "ActiveWork.BlockedOn",
+          "equals": "NONE"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "false"
+        },
+        {
+          "reply_matches": "/architect\\b",
+          "why": "Claude Code next-role invocation for Architect"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        ".standards/MODE.md",
+        ".standards/PROTOCOL.md",
+        ".standards/protocol/**",
+        ".standards/bin/**",
+        ".claude/**",
+        "README.md"
+      ],
+      "why": "Scoper changes neither the project mode, framework files, nor project files outside its scope record"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the starting workflow state is valid"
+    }
+  ],
+  "notes": "Standalone greenfield fixture. 00-project (pre-install) commits only a short README naming the internal support tooling repo, so no implementation, framework, storage, or auth mechanism is established. The installer runs with --mode greenfield (MODE.md GREENFIELD from the installer, not overwritten). 50-cycle commits STATE.md: WorkflowState SCOPING, CycleMode STANDARD, first cycle initialized (Handoff.Kind INITIAL per Start a cycle for a first cycle), Active Work.Id ${ID} (slug derived as cycle.mjs would from the request), Request holding the support-tool request including the authentication requirement, Scope/Architecture/Development NONE, PendingVerificationCadence NONE, recovery and obligations inactive. No CONTEXT.md, intentionally absent before the first greenfield audit. The 'do not choose frameworks...' sentence from the case prompt is omitted from both the utterance and the request, as the catalog advises.",
+  "case": "scoper-1",
+  "caseHash": "4025089f934f4675",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-01T18:36:24.736Z",
+    "verdict": "pass",
+    "fixtureHash": "4f379ff472ad6819",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "8db8a2cecb62a8d9",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:32:09.374Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-01T17:59:04.943Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-cycle/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:32:09.374Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

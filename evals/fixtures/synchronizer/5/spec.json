@@ -1,0 +1,174 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add invoice summary module"
+    },
+    {
+      "dir": "layers/10-plan",
+      "action": "commit",
+      "message": "Plan two-decimal invoice totals"
+    },
+    {
+      "dir": "layers/20-implementation",
+      "action": "commit",
+      "message": "Round invoice totals in summary line"
+    },
+    {
+      "dir": "layers/30-development-complete",
+      "action": "commit",
+      "message": "Record development completion for summary rounding"
+    },
+    {
+      "dir": "layers/40-review",
+      "action": "commit",
+      "message": "Record implementation review for summary rounding"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "synchronizer",
+    "utterance": "What would synchronization add here?"
+  },
+  "graderOnly": [
+    "The user has not requested promotion or rework; the question is informational only.",
+    "The active cycle is EXPEDITED at AWAITING_USER_SIGNOFF with a COMPLETE development plan and a COMPLETE implementation review; no verification, documentation, final-review, or synchronization records exist, as the expedited topology intends.",
+    "The committed implementation passes the existing tests and renders totals with two decimals."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "round-invoice-totals-20260924T090000Z-3c9e1a7b",
+    "SYNC": ".standards/docs/synchronization/round-invoice-totals-20260924T090000Z-3c9e1a7b.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "absent": "${SYNC}",
+          "why": "no synchronization record at the fixed path for the expedited cycle"
+        },
+        {
+          "unchanged": [
+            ".standards/docs/**"
+          ],
+          "why": "no cycle record of any kind is created or edited, so no synchronization record exists under another name"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "AWAITING_USER_SIGNOFF",
+          "why": "no sign-off and no promotion to AUDITING"
+        },
+        {
+          "state": "CycleMode",
+          "equals": "EXPEDITED",
+          "why": "no promotion to STANDARD"
+        },
+        {
+          "state": "ActiveWork.PromotionReason",
+          "equals": "NONE",
+          "why": "no promotion recorded"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FORWARD",
+          "why": "no PROMOTE or SIGNOFF handoff recorded"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "REVIEWING_IMPLEMENTATION",
+          "why": "the handoff into sign-off readiness is untouched"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "package.json"
+      ],
+      "why": "Synchronizer never edits implementation or tests"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/summary.test.js",
+      "expect": "pass",
+      "why": "the plan and review record that the existing tests pass on the committed implementation"
+    },
+    {
+      "cmd": "node -e 'import(`./src/summary.js`).then((m)=>{const s=m.summaryLine({number:`INV-12`,currency:`USD`,lines:[{quantity:2,unitPrice:4.25},{quantity:1,unitPrice:23}]});console.log(s);if(s!==`INV-12: 2 item(s), total USD 31.50`)process.exit(1);})'",
+      "expect": "pass",
+      "why": "the recorded one-off self-check output (INV-12 ... total USD 31.50) is true of the committed code"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 00-project (pre-install): small ESM invoice-summary module (src/summary.js, src/report.js) with node:test tests. Installer then writes a brownfield install. 10-plan: first cycle started EXPEDITED at DEVELOPING (Handoff INITIAL), approved AFTER_IMPLEMENTATION plan with DEV-001 PENDING, Acceptance EXPEDITED_REQUEST. 20-implementation: summaryLine formats the total with toFixed(2). 30-development-complete: plan COMPLETE, DEV-001 DONE with self-check citing the implementation commit; STATE at REVIEWING_IMPLEMENTATION via FORWARD. 40-review: COMPLETE implementation review (no material findings) citing the commits; STATE at AWAITING_USER_SIGNOFF, CycleMode EXPEDITED, FORWARD from REVIEWING_IMPLEMENTATION, recovery and obligations inactive, PromotionReason NONE. No scope, design, verification, documentation, final review, or synchronization records exist. No record mentions any acceptance identifier (EXPEDITED check rule). Checks: assertion 0 requires no synchronization record and no change under .standards/docs; assertion 1 requires the state, mode, promotion reason, and handoff to be exactly as built.",
+  "case": "synchronizer-5",
+  "caseHash": "78f23eab6221d10f",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T14:29:27.894Z",
+    "verdict": "pass",
+    "fixtureHash": "af26f215b2a4a0df",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "0a04ca678437c23b",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:33:44.000Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T12:45:54.398Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/10-plan/.standards/STATE.md: NONE",
+        "layers/30-development-complete/.standards/STATE.md: NONE",
+        "layers/40-review/.standards/STATE.md: NONE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:33:44.000Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

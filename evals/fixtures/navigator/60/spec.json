@@ -1,0 +1,115 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-bucket",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add token bucket"
+    },
+    {
+      "dir": "layers/10-limiter",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add per-client rate limiter and HTTP wrapper"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "navigator",
+    "utterance": "Let's stop here."
+  },
+  "graderOnly": [
+    "No quiz answer was given in this conversation: the user stopped right after Navigator asked its first GRILL_ME question, so understanding was never assessed.",
+    "The first question asked what RateLimiter.check does for a client it has never seen before. In src/limiter.js, bucketFor creates a new, full TokenBucket for that key (evicting the oldest key first when maxKeys is reached), then check calls take on it.",
+    "Relevant reading for this quiz topic is src/limiter.js, src/bucket.js, src/http.js, README.md, and the tests in test/bucket.test.js and test/limiter.test.js."
+  ],
+  "history": {
+    "turns": [
+      {
+        "role": "user",
+        "text": "/navigator Grill me on how the rate limiter in this repo works. Start easy."
+      },
+      {
+        "role": "assistant",
+        "text": "Sure. I looked through `src/limiter.js`, `src/bucket.js`, and `src/http.js` so I can check your answers against the actual code. We'll start with the big picture and go deeper as you go. You can ask for a hint, skip, or stop at any point.\n\nFirst question: when a client the limiter has never seen before sends its first request, what happens inside `RateLimiter.check` before it decides whether to allow that request?"
+      }
+    ]
+  },
+  "vars": {},
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": []
+    }
+  ],
+  "invariants": [
+    {
+      "unchanged": [
+        "**"
+      ],
+      "why": "Navigator persists nothing (generated caches are ignored)"
+    },
+    {
+      "head_unchanged": true,
+      "why": "Navigator never moves HEAD"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Navigator never mutates git state"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/bucket.test.js test/limiter.test.js",
+      "expect": "pass",
+      "why": "the project's existing tests pass, so the code the quiz is about behaves as the history turn describes"
+    }
+  ],
+  "notes": "Standalone brownfield fixture with the installer's default state (AUDITING, no cycle); the case leaves workflow state unspecified and Navigator needs none. Two pre-install commits build a small plain-JS token-bucket rate limiter: layers/00-bucket adds src/bucket.js, its test, package.json, .gitignore; layers/10-limiter adds src/limiter.js (per-key buckets with oldest-key eviction), src/http.js (429 wrapper with Retry-After), its test, and README.md. The history holds the prior GRILL_ME exchange: the user asked to be quizzed, Navigator asked one first question about RateLimiter.check, and the run's message is the user stopping before answering. Both assertions need judgment (no invented strengths or mastery; any suggested reading was inspected in this run and no further quiz question is asked), so both are complete:false with no deterministic preconditions; a regex on '?' would fail correct runs that offer to resume later.",
+  "case": "navigator-60",
+  "caseHash": "c4d591ed6a12b60a",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T15:42:11.624Z",
+    "verdict": "pass",
+    "fixtureHash": "fce130ee5ba87337",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "9e5b52e0b29f5319",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:21:21.196Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T15:26:09.699Z"
+  },
+  "migrations": [
+    {
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:21:21.196Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

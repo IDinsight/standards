@@ -1,0 +1,274 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Set up records service with in-memory store"
+    },
+    {
+      "dir": "layers/05-routes",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add router, role checks, and GET /records"
+    },
+    {
+      "dir": "layers/10-limit",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Reject oversized query strings with 414"
+    },
+    {
+      "dir": "layers/50-planning",
+      "action": "commit",
+      "message": "Record context, scope, design, and plan for CSV export"
+    },
+    {
+      "dir": "layers/55-export",
+      "action": "commit",
+      "message": "Add CSV export of filtered records"
+    },
+    {
+      "dir": "layers/60-complete",
+      "action": "commit",
+      "message": "Mark CSV export plan complete"
+    },
+    {
+      "dir": "layers/65-access-tests",
+      "action": "commit",
+      "message": "Add integration tests for denied and oversized exports"
+    },
+    {
+      "dir": "layers/70-verification",
+      "action": "commit",
+      "message": "Record CSV export verification"
+    },
+    {
+      "dir": "layers/75-review",
+      "action": "commit",
+      "message": "Record implementation review progress"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "reviewer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "F-001 is mistaken. Router.handle in src/http/router.js, unchanged since the pre-install commit 'Reject oversized query strings with 414', returns 414 {error: 'query too long'} for any request whose URL-encoded query exceeds MAX_QUERY_BYTES (2048) before it looks up a route, so the export handler never runs and no file is written.",
+    "Every relevant caller enforces the limit: the export handler is only registered on the Router by registerExportRoutes (called only from src/app.js), and createApp().handle delegates every request to router.handle; there is no other entry point and no HTTP listener in the repository.",
+    "Tester's integration test 'an export with an oversized query is rejected with 414 and writes no file' passes; an admin export with a 2047-character q gets 414 and creates no folder, while a 2046-character q (2048 bytes encoded) is accepted.",
+    "The implementation has no material defects; no replacement finding is warranted.",
+    "Before this run the review report had not yet assessed AC-001 listing equivalence and the response contract, AC-002, or rerun npm test and npm run test:integration; withdrawing F-001 does not by itself establish those."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "export-20260924T090000Z-a7f3c1d2",
+    "REVIEW": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md",
+    "VERIFICATION": ".standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md",
+    "DEV": ".standards/docs/development/export-20260924T090000Z-a7f3c1d2.md",
+    "SCOPE": ".standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md",
+    "ARCH": ".standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "contains": {
+            "path": "${REVIEW}",
+            "regex": "### F-001(?:(?!\\n### )[\\s\\S])*?`Status`:\\s*`WITHDRAWN`"
+          },
+          "why": "the mistaken finding is withdrawn in the review report, inside its own F-001 entry"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "state": "Recovery.Active",
+          "equals": "false"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "0"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "contains": {
+            "path": "${REVIEW}",
+            "regex": "^### F-001\\b",
+            "flags": "m"
+          },
+          "why": "F-001 keeps its identity instead of being deleted or renumbered"
+        },
+        {
+          "provenance": {
+            "path": "${REVIEW}",
+            "artifact": "REVIEW",
+            "cycle": "${ID}",
+            "kind": "IMPLEMENTATION"
+          },
+          "why": "the same implementation review report is kept"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "Reviewer must not change the assessed identity"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Reviewer does not change git state"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "package.json",
+        ".gitignore",
+        "docs/**",
+        "README.md"
+      ],
+      "why": "Reviewer does not edit implementation, tests, or project documentation"
+    },
+    {
+      "unchanged": [
+        ".standards/CONTEXT.md",
+        ".standards/docs/scope/**",
+        ".standards/docs/specs/**",
+        ".standards/docs/development/**",
+        ".standards/docs/verification/**"
+      ],
+      "why": "Reviewer does not edit other roles' records"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "npm test",
+      "expect": "pass",
+      "why": "the established unit suite passes offline"
+    },
+    {
+      "cmd": "npm test 2>&1 | grep -qE 'pass 18$'",
+      "expect": "pass",
+      "why": "the unit suite runs 18 tests (6 records, 7 routes including the two query-limit tests, 5 export serialization)"
+    },
+    {
+      "cmd": "npm run test:integration",
+      "expect": "pass",
+      "why": "the integration script passes"
+    },
+    {
+      "cmd": "npm run test:integration 2>&1 | grep -qE 'pass 4$' && npm run test:integration 2>&1 | grep -q 'oversized query is rejected with 414'",
+      "expect": "pass",
+      "why": "the integration script runs four tests, including Tester's oversized-export test"
+    },
+    {
+      "cmd": "node -e 'const fs = require(`node:fs`); const os = require(`node:os`); const path = require(`node:path`); import(`./src/app.js`).then(({ createApp }) => { const dir = path.join(fs.mkdtempSync(path.join(os.tmpdir(), `big-`)), `out`); const app = createApp({ exportDir: dir }); const admin = { id: 1, name: `Ada`, role: `admin` }; const big = app.handle({ method: `POST`, path: `/records/export`, query: { q: `x`.repeat(2047) }, user: admin }); if (big.status !== 414 || fs.existsSync(dir)) process.exit(1); const ok = app.handle({ method: `POST`, path: `/records/export`, query: { q: `x`.repeat(2046) }, user: admin }); if (ok.status !== 201 || fs.readdirSync(dir).length !== 1) process.exit(2); console.log(`limit enforced before write`); }, (e) => { console.error(e); process.exit(3); })'",
+      "expect": "pass",
+      "why": "F-001 is mistaken: an admin export over the 2048-byte limit gets 414 and writes nothing; one at the limit is accepted"
+    },
+    {
+      "cmd": "! grep -qE 'MAX_QUERY_BYTES|queryBytes' src/routes/export.js src/export.js && grep -q 'queryBytes(request.query) > MAX_QUERY_BYTES' src/http/router.js",
+      "expect": "pass",
+      "why": "the changed export code has no size check of its own (F-001's observation), while the router enforces the limit"
+    },
+    {
+      "cmd": "c=$(git log --format=%H -1 --fixed-strings --grep='Reject oversized query strings with 414') && test -n $c && git diff --quiet $c HEAD -- src/http/router.js src/http/messages.js src/http/errors.js",
+      "expect": "pass",
+      "why": "the router (the caller that enforces the limit) is unchanged since before the cycle"
+    },
+    {
+      "cmd": "test $(grep -rln 'router.handle(' src) = src/app.js && test $(grep -rl registerExportRoutes src | sort | paste -s -d , -) = src/app.js,src/routes/export.js",
+      "expect": "pass",
+      "why": "the export handler is reachable only through the router, and app.handle is the only caller of router.handle"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the state and records are valid"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `REVIEWING_IMPLEMENTATION` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '`Kind`: `FAILURE` `From`: `REVIEWING_IMPLEMENTATION` `FailureType`: `REVIEW`' .standards/STATE.md && ! grep -q '^### Frame' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md && grep -q '`BlockedOn`: `NONE`' .standards/STATE.md && grep -q 'ProjectMode`: `BROWNFIELD' .standards/MODE.md",
+      "expect": "pass",
+      "why": "same-state REVIEW failure handoff, no recovery frame, no obligations, nothing blocked"
+    },
+    {
+      "cmd": "f=.standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md && grep -q '^### F-001' $f && grep -q '`Status`: `OPEN`' $f && grep -q '`Status`: `IN_PROGRESS`' $f && ! grep -qE 'COMMIT:|BLOB:|WITHDRAWN' $f && grep -q 'Owner response' $f",
+      "expect": "pass",
+      "why": "the review report is IN_PROGRESS with F-001 OPEN and the owner's response recorded"
+    },
+    {
+      "cmd": "f=.standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md && grep -q '`Status`: `COMPLETE`' $f && grep -q '`Assessment Purpose`: `FULL` `Assessment Target`: `NONE`' $f && grep -q AC-003 $f && grep -q '`Status`: `COMPLETE`' .standards/docs/development/export-20260924T090000Z-a7f3c1d2.md",
+      "expect": "pass",
+      "why": "verification and plan are complete"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && test ! -e exports && ! grep -rqE 'AC-[0-9]' src test docs README.md",
+      "expect": "pass",
+      "why": "clean tree, no export files, no AC ids in project files"
+    }
+  ],
+  "notes": "Standalone fixture (base null): the export bases have no byte limit anywhere in their fixed pre-install code, and the case needs a limit enforced in an unchanged caller. Pre-install: 00-project (JS store, seed with a comma in record 1 and quotes in record 3, store tests), 05-routes (HttpError, json, Router, authorize/requireAdmin, parseFilter, GET /records, createApp, route tests, README, docs/usage.md), 10-limit (Router.handle rejects a URL-encoded query over MAX_QUERY_BYTES=2048 with 414 before route lookup; two route tests; docs). Install brownfield with hooks. 50-planning: CONTEXT.md, scope (AC-001 CSV quoting, AC-002 admin-only, AC-003 oversized query gets 414 and no file), design, APPROVED plan, STATE DEVELOPING. 55-export: src/export.js, src/routes/export.js (no size check of its own), createApp exportDir/now, scripts, tests. 60-complete: plan COMPLETE, STATE TESTING. 65-access-tests: Tester adds denied and oversized integration tests. 70-verification: COMPLETE FULL report, STATE REVIEWING_IMPLEMENTATION. 75-review: implementation review IN_PROGRESS with F-001 (P1, OPEN, Developer/IMPLEMENTATION) claiming the export ignores the byte limit, an Owner response bullet quoting Router.handle, remaining areas listed; STATE Handoff FAILURE From REVIEWING_IMPLEMENTATION FailureType REVIEW (same-state, no frame), recovery and obligations inactive. The owner's counter-evidence lives in the F-001 entry (recorded when the user relayed it) and the Handoff Reason.",
+  "case": "reviewer-21",
+  "caseHash": "f9d18550c3f4637f",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T23:25:01.791Z",
+    "verdict": "pass",
+    "fixtureHash": "35249774e2373bb0",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "d9d1264e2c894579",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:29:40.423Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T22:16:43.859Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-planning/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/60-complete/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/70-verification/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/75-review/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:29:40.423Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

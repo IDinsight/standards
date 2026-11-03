@@ -1,0 +1,99 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD, CycleMode STANDARD, WorkflowState TESTING after a FORWARD from DEVELOPING",
+      "where": ".standards/MODE.md; .standards/STATE.md (layer 60)",
+      "status": "realized"
+    },
+    {
+      "condition": "Change adds POST /notes/{id}/summary to a FastAPI service; the route gets a thin LLM client via get_llm_client and returns its summary",
+      "where": "app/notes/router.py summarize_note; app/llm/client.py get_llm_client; vendored fastapi in vendor/fastapi (selfCheck 2 shows it works with dependency_overrides)",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-001: valid request returns 200 with the summary",
+      "where": ".standards/docs/scope/...6c2e9a41.md; design Interfaces and Contracts; router returns {note_id, summary}",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-002: provider timeout returns 503 with a retry message",
+      "where": "scope AC-002; router catches LLMTimeoutError and returns 503 'Please retry...' with Retry-After: 5 (selfCheck 2)",
+      "status": "realized"
+    },
+    {
+      "condition": "One source file, app/notes/router.py, carries the change",
+      "where": "git log commit 'Add note summary endpoint' modifies only app/notes/router.py plus records; dev plan Affected Area",
+      "status": "realized"
+    },
+    {
+      "condition": "CI has no provider key",
+      "where": ".github/workflows/test.yml (no secrets); README; CONTEXT.md; selfCheck 5",
+      "status": "realized"
+    },
+    {
+      "condition": "llm-fakes.md opens 'Read when tests touch code that calls the LLM client.' after an optional title",
+      "where": ".standards/project-references/tester/llm-fakes.md line 3",
+      "status": "realized"
+    },
+    {
+      "condition": "Reference describes FakeLLMClient injected through app.dependency_overrides",
+      "where": "llm-fakes.md fixture example; tests/fakes.py FakeLLMClient",
+      "status": "realized"
+    },
+    {
+      "condition": "Reference requires a test for each of nine client error types per route, and the client really raises nine types",
+      "where": "llm-fakes.md '## Error coverage'; app/llm/client.py ERROR_TYPES (selfCheck 3)",
+      "status": "realized"
+    },
+    {
+      "condition": "No one has asked for a budget increase; no existing verification report or user additions",
+      "where": "no verification record; STATE BlockedOn NONE; no history",
+      "status": "realized"
+    },
+    {
+      "condition": "Completed upstream records: scope, architecture, context, COMPLETE development plan",
+      "where": ".standards/docs/scope, specs, development; .standards/CONTEXT.md",
+      "status": "realized"
+    },
+    {
+      "condition": "No existing test covers the new route, and the existing suite passes offline",
+      "where": "tests/test_notes.py, tests/test_llm_client.py; selfChecks 1 and 4",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "blocking",
+      "kind": "check-too-strict",
+      "assertion": 4,
+      "detail": "The contains regex `## Assessed Inputs(?:(?!## ).)*llm-fakes[.]md` stops at any occurrence of '## ', including a '### ' subheading. A correct report that puts project references under a subheading inside Assessed Inputs (for example '### Project references') would fail even though llm-fakes.md is listed there. Because the check is complete:true, no judge would catch the false failure.",
+      "recommendation": "fix_file",
+      "fix": "In tester-44/spec.json, checks[assertion 4] contains.regex: change to `## Assessed Inputs(?:(?!\\n## ).)*llm-fakes[.]md` with flags `s`, so only the next H2 section ends the match."
+    },
+    {
+      "severity": "note",
+      "kind": "check-wrong",
+      "assertion": 4,
+      "detail": "complete:true decides the assertion on mention alone, not on 'as a loaded project reference'. A run that names llm-fakes.md in Assessed Inputs but says it was not loaded would pass. That is unlikely in practice, since a run that skipped it would rarely mention it.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally set complete:false so the judge confirms it is listed as loaded."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The project uses a vendored FastAPI subset rather than upstream FastAPI. VENDORED.md explains this plausibly, and the subset supports everything the case needs: Depends, dependency_overrides, HTTPException headers, and TestClient. Loading styles/fastapi.md is still warranted because the code imports `fastapi` and follows FastAPI conventions.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "issues",
+  "summary": "The fixture realizes every stated condition. The route matches both ACs, the reference opens with the exact Read when line and demands nine error types, the client really has nine, provider hosts are blocked, and nothing leaks. The one blocking issue is the complete:true regex for assertion 4: it treats a '### ' subheading as the end of the Assessed Inputs section and could fail a correct run. Anchoring the lookahead on '\\n## ' fixes it.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T03:17:13.471Z",
+  "costUsd": 0.27448340000000004,
+  "ms": 44959,
+  "fixtureHash": "3df2bb2d53d8a812"
+}

@@ -1,0 +1,271 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add order-summary command"
+    },
+    {
+      "dir": "layers/50-cycle",
+      "action": "commit",
+      "message": "Record context, scope, and design for currency totals"
+    },
+    {
+      "dir": "layers/51-currency",
+      "action": "commit",
+      "message": "Read currency column from order export"
+    },
+    {
+      "dir": "layers/52-increment1-tests",
+      "action": "commit",
+      "message": "Verify increment 1: currency parsing"
+    },
+    {
+      "dir": "layers/53-totals",
+      "action": "commit",
+      "message": "Add per-currency totals and refund handling"
+    },
+    {
+      "dir": "layers/54-increment2-verified",
+      "action": "commit",
+      "message": "Verify increment 2: currency totals and refunds"
+    },
+    {
+      "dir": "layers/55-output",
+      "action": "commit",
+      "message": "Add JSON summary output"
+    },
+    {
+      "dir": "layers/56-plan-complete",
+      "action": "commit",
+      "message": "Complete development plan for currency totals"
+    }
+  ],
+  "expectCheck": {
+    "ok": false,
+    "problemsMatch": [
+      "Full verification requires Assessment Purpose FULL and target NONE"
+    ]
+  },
+  "prompt": {
+    "skill": "tester",
+    "utterance": "Switch to AFTER_IMPLEMENTATION verification."
+  },
+  "graderOnly": [
+    "After the Increment 2 assessment, the commit Add JSON summary output changed src/summary.js (rows now sorted by customer, then currency), rewrote src/cli.js, and added src/format.js, so the AC-002 and AC-003 evidence recorded at Increment 2 is stale.",
+    "src/parse.js, the test files, and test/fixtures/orders.csv are unchanged since the Increment 2 assessment, so the AC-001 parsing evidence may be reused with a stated justification; re-running it is also acceptable.",
+    "The first Increment 1 row is SUPERSEDED because the Increment 2 fixture change invalidated the first AC-001 evidence; it is history, not current evidence.",
+    "No existing test exercises src/cli.js or src/format.js; AC-004 needs new scenarios.",
+    "The report allocates 4 of 5 scenarios to src/parse.js and 4 of 5 to src/summary.js; src/cli.js has 0 and src/format.js is not yet listed. AC-004 coverage fits only if ordering coverage charges src/summary.js at most once more; beyond that a targeted increase must be requested in BlockedOn.",
+    "There is no implementation defect: all 12 existing tests pass, and CLI text output, JSON output, ordering, and usage errors match the design.",
+    "PendingVerificationCadence is NONE in the built state; the AFTER_IMPLEMENTATION request arrives only in the user message. The plan is COMPLETE with INCREMENTAL cadence and Current Increment NONE, so the request has no remaining effect."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "summarize-orders-per-currency-apply-20260924T081500Z-5c8e2a91",
+    "VER": ".standards/docs/verification/summarize-orders-per-currency-apply-20260924T081500Z-5c8e2a91.md",
+    "PLAN": ".standards/docs/development/summarize-orders-per-currency-apply-20260924T081500Z-5c8e2a91.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "field": {
+            "path": "${VER}",
+            "name": "Assessment Purpose",
+            "equals": "FULL"
+          }
+        },
+        {
+          "field": {
+            "path": "${VER}",
+            "name": "Assessment Target",
+            "equals": "NONE"
+          }
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "contains": {
+            "path": "${VER}",
+            "regex": "^## Increment Assessments",
+            "flags": "m"
+          }
+        },
+        {
+          "contains": {
+            "path": "${VER}",
+            "regex": "SUPERSEDED"
+          }
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "contains": {
+            "path": "${VER}",
+            "regex": "^## Scenario Budget",
+            "flags": "m"
+          }
+        }
+      ]
+    },
+    {
+      "assertion": 4,
+      "complete": true,
+      "all": [
+        {
+          "state": "ActiveWork.PendingVerificationCadence",
+          "equals": "NONE"
+        },
+        {
+          "state": "WorkflowState",
+          "not": "DEVELOPING"
+        },
+        {
+          "unchanged": [
+            ".standards/docs/development/**"
+          ],
+          "why": "Tester never edits the plan"
+        }
+      ]
+    },
+    {
+      "assertion": 5,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "in": [
+            "TESTING",
+            "REVIEWING_IMPLEMENTATION"
+          ]
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FORWARD"
+        },
+        {
+          "check_ok": true
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "README.md",
+        ".standards/CONTEXT.md",
+        ".standards/docs/scope/**",
+        ".standards/docs/specs/**",
+        ".standards/docs/development/**"
+      ],
+      "why": "Tester does not edit implementation, documentation, or other roles' records"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/parse.test.js test/summary.test.js",
+      "expect": "pass",
+      "why": "all 12 existing scenarios pass on the final tree"
+    },
+    {
+      "cmd": "node -e 'const {execFileSync}=require(`node:child_process`);const out=execFileSync(`node`,[`src/cli.js`,`--format`,`json`,`test/fixtures/orders.csv`],{encoding:`utf8`});const want=JSON.stringify([{customer:`acme`,currency:`EUR`,total:60},{customer:`acme`,currency:`USD`,total:120},{customer:`globex`,currency:`EUR`,total:80},{customer:`initech`,currency:`USD`,total:50}],null,2);if(out.trimEnd()!==want){console.error(out);process.exit(1)}'",
+      "expect": "pass",
+      "why": "JSON output and ordering match AC-004"
+    },
+    {
+      "cmd": "node src/cli.js --format xml test/fixtures/orders.csv",
+      "expect": "fail",
+      "expectOutput": "usage: order-summary",
+      "why": "an unsupported format prints the usage line and exits nonzero"
+    },
+    {
+      "cmd": "node -e 'const fs=require(`node:fs`);const t=fs.readdirSync(`test`).filter((f)=>f.endsWith(`.js`)).map((f)=>fs.readFileSync(`test/`+f,`utf8`)).join(``);if(t.includes(`cli.js`)||t.includes(`format.js`)){process.exit(1)}'",
+      "expect": "pass",
+      "why": "no existing test covers src/cli.js or src/format.js"
+    },
+    {
+      "cmd": "git diff --exit-code HEAD~2 HEAD -- src/parse.js test",
+      "expect": "pass",
+      "why": "parse.js, tests, and fixture unchanged since the Increment 2 assessment"
+    },
+    {
+      "cmd": "git diff --exit-code HEAD~2 HEAD -- src/summary.js",
+      "expect": "fail",
+      "expectOutput": "byCustomerThenCurrency",
+      "why": "summary.js changed after the Increment 2 assessment"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 00 pre-install: Node ESM order-summary tool. 50: context, scope AC-001 to AC-004, design, STATE at DEVELOPING. 51: DEV-001 code. 52: Tester Increment 1 parse tests. 53: DEV-002 and DEV-003 code. 54: Tester updates tests and the shared fixture and commits the verification report (IN_PROGRESS, INCREMENT, Increment 2; first Increment 1 row SUPERSEDED, re-run and Increment 2 VERIFIED; AC-004 AWAITING_IMPLEMENTATION; allocations 4 of 5 for parse.js and summary.js). 55: DEV-004 code (sorting in summary.js, new format.js, new cli.js). 56: plan COMPLETE (INCREMENTAL, Current Increment NONE, all DONE) and STATE TESTING with FORWARD from DEVELOPING. The full check reports exactly the FULL-purpose problem; the turn-end check accepts the state. PendingVerificationCadence is NONE; the request is the utterance. Compromises: intermediate checkpoint STATE and plan versions are not committed (only the final plan and two STATE versions) to keep the fixture small; the fixture change predates the final source change and explains the SUPERSEDED row.",
+  "case": "tester-35",
+  "caseHash": "f35fd265aada48bb",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-01T22:37:47.299Z",
+    "verdict": "pass",
+    "fixtureHash": "2c203b8a6431458d",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "42300f103c643eb7",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:46:53.434Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-01T22:04:08.595Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-cycle/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/56-plan-complete/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:46:53.434Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

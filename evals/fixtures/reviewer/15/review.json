@@ -1,0 +1,91 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState REVIEWING_IMPLEMENTATION, entered by FORWARD from TESTING",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Current scope, architecture, context, development plan, and Tester report exist with valid provenance and ownership",
+      "where": ".standards/docs/{scope,specs,development,verification}/export-20260924T090000Z-a7f3c1d2.md, .standards/CONTEXT.md; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and outstanding obligations inactive",
+      "where": ".standards/STATE.md (Recovery Active false, Obligations Active false)",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope requires bounded retry behavior",
+      "where": "scope AC-002 ('retrying is bounded ... instead of retrying indefinitely'); Request 'but not indefinitely'",
+      "status": "realized"
+    },
+    {
+      "condition": "Architecture omits the retry limit and deadline propagation",
+      "where": "specs/...md Interfaces and Contracts defines only the 500 ms doubling schedule capped at 30 s per wait; no attempt limit, run deadline, or timeout (selfCheck grep)",
+      "status": "realized"
+    },
+    {
+      "condition": "No established convention determines the limit or deadline",
+      "where": ".standards/CONTEXT.md Conventions: no scripts, outbound calls, or shared retry/timeout helpers",
+      "status": "realized"
+    },
+    {
+      "condition": "Developer chose infinite retries",
+      "where": "src/archive/retry.ts uploadWithRetry `for (let attempt = 1; ; ...)`; DEV-002 Implementation Notes; selfCheck shows still retrying after 1000 waits",
+      "status": "realized"
+    },
+    {
+      "condition": "Concrete failure/resource case is observable (unattended hourly runs never exit while archive keeps failing)",
+      "where": "scope Goal/Constraints (hourly scheduler, non-zero exit alerts) plus retry.ts loop",
+      "status": "realized"
+    },
+    {
+      "condition": "A separately supported implementation concern exists to preserve",
+      "where": "retry.ts contradicts AC-002 directly (Developer-owned); verification AC-002 evidence covers only retry-then-succeed",
+      "status": "realized"
+    },
+    {
+      "condition": "All work committed; no review report yet",
+      "where": "git status clean; no .standards/docs/reviews",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "The fixture uses the export-project base and runs its own full cycle (layers 50–62) instead of the export-reviewing-impl base; this is consistent and the records chain coherently (AUDITING→SCOPING→ARCHITECTING→DEVELOPING→TESTING→REVIEWING_IMPLEMENTATION).",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": 1,
+      "detail": "The scope Goal explains why runs must end ('so that the next hourly run starts cleanly'), which supports the concrete failure case. This is ordinary scope rationale derived from the user's 'not indefinitely' request and does not name the architecture omission or the expected routing.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is present in the files. AC-002 requires bounded retries, the design defines only a backoff schedule with no limit or deadline, CONTEXT.md establishes there is no convention, and retry.ts loops forever (proven by a selfCheck). Checks are necessary conditions for a correct run: the spec and scope stay unchanged, a REVIEW/IMPLEMENTATION report holds at least one F-NNN finding, and the canonical FAILURE ARCHITECTURE frame resumes at REVIEWING_IMPLEMENTATION; the turn-end check would accept that post-routing state, and the invariants fit a Reviewer.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T23:22:10.834Z",
+  "costUsd": 0.35007679999999997,
+  "ms": 91385,
+  "fixtureHash": "de19e7b5c287795e"
+}

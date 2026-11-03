@@ -1,0 +1,76 @@
+{
+  "conditions": [
+    {
+      "condition": "STANDARD cycle in AWAITING_USER_SIGNOFF with CompletionPolicy IMPLEMENTATION_REVIEWED, reached by a FORWARD from REVIEWING_IMPLEMENTATION",
+      "where": ".standards/STATE.md (layer 80-review)",
+      "status": "realized"
+    },
+    {
+      "condition": "Brownfield project mode",
+      "where": ".standards/MODE.md (installer, brownfield)",
+      "status": "realized"
+    },
+    {
+      "condition": "Current COMPLETE implementation review",
+      "where": ".standards/docs/reviews/<ID>/implementation.md Status COMPLETE; it cites commits 9d77484/df7da10, and no project file changed after them",
+      "status": "realized"
+    },
+    {
+      "condition": "Applicable COMPLETE FULL verification",
+      "where": ".standards/docs/verification/<ID>.md Status COMPLETE, Assessment Purpose FULL, target NONE; all ACs verified",
+      "status": "realized"
+    },
+    {
+      "condition": "ELIGIBLE Implementation-Reviewed Closure with the user's choice and reason recorded",
+      "where": "implementation.md '## Implementation-Reviewed Closure' (Eligibility ELIGIBLE, Unmet NONE, three omitted phases); STATE Active Work.Request holds the policy instruction and reason",
+      "status": "realized"
+    },
+    {
+      "condition": "No normal downstream work begun",
+      "where": "No documentation, final-deliverable, or synchronization record exists; README untouched since pre-install",
+      "status": "realized"
+    },
+    {
+      "condition": "No blockers, recovery, obligations, pending cadence, or baseline reconciliation",
+      "where": "STATE.md: BlockedOn NONE, Recovery false, Obligations false, PendingVerificationCadence NONE, BaselineReconciliation NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Documenter is not invoked; the user only asks to withdraw",
+      "where": "prompt.utterance 'I want to withdraw the implementation-reviewed completion choice.' with skill reviewer",
+      "status": "realized"
+    },
+    {
+      "condition": "Upstream records (scope, design, context, plan) exist, are complete, and remain valid",
+      "where": "scope, specs, CONTEXT.md, development plan COMPLETE; selfChecks show tests pass",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 0,
+      "detail": "The Reason regex requires 'implementation[ _-]reviewed' and 'full[ _-]deliverable' in Handoff.Reason. A correct run could describe the policies indirectly (for example 'shorter completion policy' or 'implementation-review'). However, the assertion and user-decisions.md both require a reason 'identifying the old and new policies', and the policy identifiers are fixed protocol values, so requiring them is defensible.",
+      "recommendation": "run_as_is",
+      "fix": "Acceptable as written."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 1,
+      "detail": "The check requires implementation.md to be byte-identical. This is supported by user-decisions.md ('do not ... overwrite report conclusions'; 'Existing review reports retain their historical assessments') and the template ('Do not delete a prior assessment on withdrawal'). Reviewer also owns no work in AWAITING_USER_SIGNOFF. A run that annotates the closure section would fail this check, which is consistent with the protocol.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture faithfully realizes a STANDARD/IMPLEMENTATION_REVIEWED cycle awaiting sign-off with current COMPLETE review, FULL verification, and ELIGIBLE closure, and no downstream records; check.mjs and selfChecks pass. After a correct COMPLETION_CHANGE to DOCUMENTING with FULL_DELIVERABLE, check.mjs still passes, so check_ok holds. The checks are necessary conditions, with only minor notes on the Reason regex and the strict unchanged-report precondition.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T03:04:27.130Z",
+  "costUsd": 0.2563898,
+  "ms": 63698,
+  "fixtureHash": "bdc13e96c375ec57"
+}

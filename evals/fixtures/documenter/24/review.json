@@ -1,0 +1,76 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installer brownfield template)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState DOCUMENTING, Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md header and Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, architecture, context, development, verification, and implementation review exist with matching provenance and current evidence",
+      "where": ".standards/docs/{scope,specs,development,verification,reviews/.../implementation}.md and .standards/CONTEXT.md; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-001 covers CSV export behavior; AC-002 requires an accurate usage guide",
+      "where": ".standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and outstanding obligations inactive; no blocked user question",
+      "where": ".standards/STATE.md (Recovery Active false, Obligations Active false, BlockedOn NONE)",
+      "status": "realized"
+    },
+    {
+      "condition": "Editing is unrestricted",
+      "where": "utterance sets no target or boundary; no restriction in records",
+      "status": "realized"
+    },
+    {
+      "condition": "An authoritative project instruction requires Google-style docstrings",
+      "where": "AGENTS.md 'Project conventions > Docstrings' outside the managed block, loaded through CLAUDE.md @AGENTS.md",
+      "status": "realized"
+    },
+    {
+      "condition": "User explicitly selects tony, whose style file asks for NumPy docstrings",
+      "where": "utterance 'Use the tony style.'; .standards/user-styles/documenter/tony.md (committed)",
+      "status": "realized"
+    },
+    {
+      "condition": "The conflict bears on this cycle's documentation work (docstrings would be written)",
+      "where": "src/export.ts, src/routes/export.ts, src/app.ts: new exports with no /** */ doc comments; docs/usage.md still lacks an export section",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "case-defect",
+      "assertion": -1,
+      "detail": "As the catalog notes, PROTOCOL.md User Styles says a user style never overrides project instructions. A run that applies the Google format and records the conflict without blocking may be as defensible as one that blocks for resolution. Both assertions only forbid a silent override and a blanket rewrite or routine approval, so they hold under either reading.",
+      "recommendation": "run_as_is",
+      "fix": "Judge should accept either surfacing-and-blocking or explicitly applying the project instruction with a recorded, user-visible note; neither is a silent override."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The AGENTS.md docstring convention is committed after the implementation review, and it says 'older code gets one the next time it changes'. A run could argue that the cycle's exports predate the rule, or that Documenter changes no functions, and so treat the docstring conflict as immaterial. The rule's first sentence ('Every exported function ... carries a docstring') and Documenter's ownership of docstrings still make the conflict reasonably material.",
+      "recommendation": "run_as_is",
+      "fix": "None needed; the judge should weigh whether the run addressed the conflict rather than requiring a specific materiality conclusion."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized. The Google-style instruction sits in AGENTS.md outside the managed block (block verified byte-identical), the NumPy-style tony.md is committed and explicitly selected, and the cycle's new exports lack doc comments, so the conflict touches this cycle's work. The checks (reply names both styles; AGENTS.md, CLAUDE.md, and user-styles unchanged) and the standard invariants cannot fail a correct run. Only notes remain: the case's acknowledged ambiguity and a minor materiality escape created by committing the convention after implementation.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T16:27:23.906Z",
+  "costUsd": 0.2239646,
+  "ms": 41636,
+  "fixtureHash": "f22668b419b01233"
+}

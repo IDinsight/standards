@@ -1,0 +1,219 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial reports service"
+    },
+    {
+      "dir": "layers/10-audit",
+      "action": "commit",
+      "message": "Record project context for report links"
+    },
+    {
+      "dir": "layers/20-scope",
+      "action": "commit",
+      "message": "Define scope for shareable report links"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "architect",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The completed scope does not state whether report links are public, require authentication, expire, or may be revoked; these choices materially change who can access reports and what users are promised, so they are scope decisions owned by Scoper, not architecture details.",
+    "Neither the scope nor .standards/CONTEXT.md decides link access policy; CONTEXT.md only describes the existing baseline (bearer-session authentication on every route, workspace-membership access to reports, no existing link or anonymous-access mechanism).",
+    "No technical design exists for the cycle at the start: Active Work.Architecture is NONE and there is no file under .standards/docs/specs/."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "add-shareable-report-links-20260924T090000Z-5c8e2a91",
+    "SCOPE": ".standards/docs/scope/add-shareable-report-links-20260924T090000Z-5c8e2a91.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "state": "Handoff.FailureType",
+          "equals": "SCOPING",
+          "why": "routing the gap as a SCOPING failure is the classification as a scope defect"
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "SCOPING"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 3,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "SCOPING"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FAILURE"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "ARCHITECTING"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "SCOPING"
+        },
+        {
+          "check_ok": true
+        }
+      ]
+    },
+    {
+      "assertion": 4,
+      "complete": true,
+      "all": [
+        {
+          "state": "Recovery.Active",
+          "equals": "true"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "1"
+        },
+        {
+          "state": "Recovery.Frame1.From",
+          "equals": "ARCHITECTING"
+        },
+        {
+          "state": "Recovery.Frame1.Owner",
+          "equals": "SCOPING"
+        },
+        {
+          "state": "Recovery.Frame1.FailureType",
+          "equals": "SCOPING"
+        },
+        {
+          "state": "Recovery.Frame1.ResumeAt",
+          "equals": "ARCHITECTING"
+        },
+        {
+          "state": "Recovery.Frame1.RerunThrough",
+          "equals": "NONE"
+        }
+      ]
+    },
+    {
+      "assertion": 5,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "SCOPING",
+          "why": "the transition is persisted"
+        },
+        {
+          "reply_matches": "(^|\\s|`)/scoper\\b",
+          "flags": "m",
+          "why": "Claude Code invocation of the Scoper skill"
+        },
+        {
+          "reply_matches": "active recovery",
+          "flags": "i",
+          "why": "protocol requires replacing 'active workflow' with 'active recovery' while recovery is active"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "package.json",
+        "README.md",
+        ".standards/CONTEXT.md",
+        "${SCOPE}"
+      ],
+      "why": "Architect writes no production code or tests and does not edit Auditor- or Scoper-owned artifacts"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/routes.test.js test/reports.test.js",
+      "expect": "pass",
+      "why": "CONTEXT.md states the existing suite (8 tests) passes on the baseline"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 00-project (pre-install): small Node ESM reports service (src/routes.js request handler with bearer-session auth and workspace-membership access, src/auth.js, src/workspaces.js, src/store.js) and node:test suites. Install: brownfield with hooks. 10-audit: Auditor's .standards/CONTEXT.md describing the baseline, and STATE.md for cycle add-shareable-report-links-20260924T090000Z-5c8e2a91 in SCOPING after a FORWARD from AUDITING. 20-scope: completed scope record with exactly one current condition, AC-001 'Users can create shareable report links.', with no statement about public vs authenticated access, expiry, or revocation; STATE.md at ARCHITECTING, STANDARD, FORWARD from SCOPING, Architecture NONE, recovery and obligations inactive. The case prompt's verdict sentence ('Those choices materially change... Do not silently choose') is kept out of the repo and the utterance; it is in graderOnly. check.mjs passes on the final state.",
+  "case": "architect-5",
+  "caseHash": "fc01b5432dbf0211",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T00:29:24.102Z",
+    "verdict": "pass",
+    "fixtureHash": "3b0f7a59b5bb504c",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "a25cb0450250a225",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:05:25.211Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T00:18:04.462Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/10-audit/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/20-scope/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:05:25.211Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

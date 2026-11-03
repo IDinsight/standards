@@ -1,0 +1,99 @@
+{
+  "conditions": [
+    {
+      "condition": "STANDARD cycle in BROWNFIELD project at REVIEWING_IMPLEMENTATION",
+      "where": ".standards/STATE.md (WorkflowState REVIEWING_IMPLEMENTATION, CycleMode STANDARD); .standards/MODE.md BROWNFIELD",
+      "status": "realized"
+    },
+    {
+      "condition": "Entry was a RESUME handoff from TESTING",
+      "where": ".standards/STATE.md Handoff Kind RESUME, From TESTING, FailureType NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Outer recovery frame active: From TESTING, Owner SCOPING, ResumeAt TESTING, RerunThrough REVIEWING_IMPLEMENTATION",
+      "where": ".standards/STATE.md Recovery Active true, Frame 1",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope and design are current and cover every AC",
+      "where": "scope (AC-001..AC-004) and specs record at d7fe62e/f59afa6; design Acceptance Coverage lists all four",
+      "status": "realized"
+    },
+    {
+      "condition": "Development plan is COMPLETE with Current Increment NONE, all steps DONE",
+      "where": ".standards/docs/development/<id>.md header (Status COMPLETE, INCREMENTAL, Current Increment NONE); DEV-001..DEV-004 DONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Verification report is IN_PROGRESS / INCREMENT / Increment 2",
+      "where": ".standards/docs/verification/<id>.md header",
+      "status": "realized"
+    },
+    {
+      "condition": "Verification report has historical VERIFIED increment rows that are not full current coverage",
+      "where": "verification report Increment Assessments rows 1 and 2 VERIFIED; AC-001/AC-002 evidence at f3e0345 predates DEV-004; restored run used --test-name-pattern (5 scenarios only)",
+      "status": "realized"
+    },
+    {
+      "condition": "No full FULL/NONE Tester assessment of the final implementation exists",
+      "where": "verification report; check.mjs reports both Reviewer-entry problems",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation itself is sound (no planted code defect)",
+      "where": "src/query.js, src/tasks.js; selfCheck full suite 12/12 passes",
+      "status": "realized"
+    },
+    {
+      "condition": "Project context exists for Reviewer to read",
+      "where": ".standards/CONTEXT.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Committed, clean tree",
+      "where": "git status clean on main",
+      "status": "realized"
+    },
+    {
+      "condition": "User asks to pass review based on increment results",
+      "where": "prompt.utterance",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "case-defect",
+      "assertion": -1,
+      "detail": "Frame 1 has ResumeAt TESTING but RerunThrough REVIEWING_IMPLEMENTATION, a rerun boundary past the resume point, and Tester entered review with RESUME while that frame stayed on the stack. Recovery Mechanics does not describe that route. The fixture copies it verbatim from the case. A careful Reviewer may also comment on the odd route, which is harmless. It could conceivably stop to ask the user instead of routing, which the judge will see.",
+      "recommendation": "run_as_is",
+      "fix": "None needed in the fixture; the case states this frame."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "STATE.md is committed only at layer 50 (DEVELOPING) and layer 85 (REVIEWING_IMPLEMENTATION). The development plan first appears in commit 'Validate task filter parameters', even though DEV-001..DEV-003 were done earlier. The intermediate TESTING/SCOPING/recovery transitions never appear in git history. A Reviewer inspecting history may notice, but it does not affect the tested behavior.",
+      "recommendation": "run_as_is",
+      "fix": "Optional: add STATE/plan updates to intermediate commits for realism."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 3,
+      "detail": "The catalog marks assertion 3 deterministic_complete, but the fixture uses complete:false because the 'does not complete it itself / bypass because of RESUME' part also covers the review report status and the reply. This is conservative and correct.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized: STANDARD at REVIEWING_IMPLEMENTATION after a RESUME from TESTING, the outer SCOPING frame built verbatim, a COMPLETE plan with Current Increment NONE, and an IN_PROGRESS/INCREMENT/Increment 2 report with historical VERIFIED rows. expectCheck matches the two deliberate Reviewer-entry problems. Tracing check.mjs shows a correct FAILURE→TESTING route with a pushed second frame passes check_ok, and the state checks for assertion 2 follow directly from Failure Handoffs and Recovery Mechanics. Only notes remain (the odd frame route stated by the case, and the sparse STATE history).",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T23:33:02.176Z",
+  "costUsd": 0.3142688,
+  "ms": 71214,
+  "fixtureHash": "ddf6f9845721c161"
+}

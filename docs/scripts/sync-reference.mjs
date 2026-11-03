@@ -18,10 +18,16 @@ const sources = [
     "The exact rules the STANDARDS CLI follows when it installs, upgrades, and uninstalls.",
   ],
   [
-    "SKILL_EVAL_REPORT.md",
+    "evals/SKILL_EVAL_REPORT_20261031.md",
     "skill-eval-report",
     "Skill Eval Report",
     "How the role skills were evaluated against their eval cases and how they performed.",
+  ],
+  [
+    "evals/REFERENCE_EVAL_REPORT_20261103.md",
+    "reference-eval-report",
+    "Reference Eval Report",
+    "How we tested whether the role references make the roles' work better, and what we found.",
   ],
   [
     "skills/scoper/template.md",
@@ -125,7 +131,7 @@ for (const [source, slug, title, description] of sources) {
     : slug === "installer"
     ? `This page contains the exact rules the \`standards\` CLI follows. For a shorter explanation, see [Installation and Setup](${prefix}getting-started/installation/). Installed projects do not include this file; agents follow the [Installed Runtime Contract](${prefix}reference/protocol/#installed-runtime-contract) in the protocol.\n\n` +
       `The rules below come from \`${source}\` during docs setup and builds. Contributors change the source file, then rebuild the docs. [Download the original Markdown](${prefix}reference/${source}).\n\n`
-    : slug === "skill-eval-report"
+    : slug === "skill-eval-report" || slug === "reference-eval-report"
     ? `The text below comes from \`${source}\` during docs setup and builds. Contributors change the source file, then rebuild the docs. [Download the original Markdown](${prefix}reference/${source}).\n\n`
     : `:::note[About this reference]\n${description} For usage and examples, see [the role guide](${prefix}roles/${slug.split("/")[1]}/).\n\n` +
       `The text below is copied from \`${source}\` during docs setup and builds. ` +

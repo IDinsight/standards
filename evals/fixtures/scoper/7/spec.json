@@ -1,0 +1,196 @@
+{
+  "base": null,
+  "install": {
+    "mode": "greenfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add project README and operations guide outline"
+    },
+    {
+      "dir": "layers/60-cycle",
+      "action": "commit",
+      "message": "Start account backup export cycle"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "scoper",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "Active Work.Request is: Add a command that exports an account backup archive, and ensure the project-facing operations guide documents how to restore that archive before sign-off.",
+    "No project implementation exists; README.md and docs/operations.md are the only project files outside the STANDARDS install.",
+    "docs/operations.md is the project-facing operations guide; it has no backup or restore section yet, and writing one is Documenter's work, not Scoper's.",
+    "No scope, design, development, or other cycle record exists for this cycle, so Scoper must use PLAN."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "add-a-command-that-exports-an-account-20260924T090000Z-5c81e2a7",
+    "SCOPE": ".standards/docs/scope/add-a-command-that-exports-an-account-20260924T090000Z-5c81e2a7.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.Scope",
+          "not": "NONE",
+          "why": "separate acceptance conditions require a persisted scope"
+        },
+        {
+          "provenance": {
+            "path": "${SCOPE}",
+            "artifact": "SCOPE",
+            "cycle": "${ID}"
+          },
+          "why": "no reusable project scope document exists, so PLAN creates the scope with artifact init at its default path"
+        },
+        {
+          "contains": {
+            "path": "${SCOPE}",
+            "regex": "^\\s*(?:[-*+]|\\d+[.)])\\s+(?:\\[[ xX]\\]\\s+)?[*_`]*AC-002",
+            "flags": "m"
+          },
+          "why": "at least two acceptance conditions are defined as list items"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "docs/**",
+            "README.md"
+          ],
+          "why": "Scoper does not write the operations guide or other project documentation"
+        },
+        {
+          "unchanged": [
+            ".standards/docs/specs/**",
+            ".standards/docs/development/**",
+            ".standards/docs/documentation/**",
+            ".standards/CONTEXT.md"
+          ],
+          "why": "Scoper writes no design, plan, documentation record, or project context"
+        }
+      ]
+    },
+    {
+      "assertion": 4,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "ARCHITECTING"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FORWARD"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "SCOPING"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "NONE"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "false"
+        },
+        {
+          "state": "ActiveWork.BlockedOn",
+          "equals": "NONE"
+        },
+        {
+          "reply_matches": "/architect\\b",
+          "why": "Claude Code next-role invocation for Architect"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the starting workflow state is valid"
+    },
+    {
+      "cmd": "grep -q '`WorkflowState`: `SCOPING`' .standards/STATE.md && grep -q '`Scope`: `NONE`' .standards/STATE.md && grep -q '`ProjectMode`: `GREENFIELD`' .standards/MODE.md && test ! -e .standards/docs",
+      "expect": "pass",
+      "why": "SCOPING in a GREENFIELD project with no scope and no cycle records yet"
+    }
+  ],
+  "notes": "Standalone greenfield fixture. Layer 50-project (pre-install) commits a README describing the planned notekeep CLI (accounts hold notebooks, notes, tags, settings; no code yet) and docs/operations.md, the project-facing operations guide, which has only an intro and no backup/restore section. The installer runs with --mode greenfield, so MODE.md stays GREENFIELD. Layer 60-cycle commits STATE.md with the first cycle started from the installed state: WorkflowState SCOPING, CycleMode STANDARD, Active Work Id/Request set (Id slug matches what cycle.mjs would derive from the request), Scope/Architecture/Development NONE, Handoff INITIAL (first-cycle rule), recovery and obligations inactive, PendingVerificationCadence NONE. The case's 'Do not choose implementation technology' is dropped from the utterance (catalog: leaks assertion 3); the utterance is just 'Continue.'. No CONTEXT.md: greenfield scoping before the first audit proceeds without it.",
+  "case": "scoper-7",
+  "caseHash": "44fbe0549bc71adb",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T20:06:40.395Z",
+    "verdict": "pass",
+    "fixtureHash": "d7f38c42c9f20c48",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "fa95e7d7854431e7",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:33:45.257Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T19:41:31.052Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/60-cycle/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:33:45.257Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

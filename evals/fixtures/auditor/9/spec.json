@@ -1,0 +1,235 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial inventory service"
+    },
+    {
+      "dir": "layers/51-cache-records",
+      "action": "commit",
+      "message": "Record context, scope, design, and plan for cache invalidation"
+    },
+    {
+      "dir": "layers/52-cache-change",
+      "action": "commit",
+      "message": "Invalidate cached entries by key prefix"
+    },
+    {
+      "dir": "layers/53-cache-cancel",
+      "action": "commit",
+      "message": "Cancel cache invalidation cycle"
+    },
+    {
+      "dir": "layers/54-import-start",
+      "action": "commit",
+      "message": "Start import adjustment cycle"
+    },
+    {
+      "dir": "layers/55-import-question",
+      "action": "commit",
+      "message": "Record audit question on cache changes"
+    },
+    {
+      "dir": "layers/56-import-change",
+      "action": "commit",
+      "message": "Accept semicolon-delimited product imports"
+    },
+    {
+      "dir": "layers/57-cache-revert",
+      "action": "commit",
+      "message": "Revert \"Invalidate cached entries by key prefix\""
+    },
+    {
+      "dir": "layers/58-import-cancel",
+      "action": "commit",
+      "message": "Cancel import adjustment cycle"
+    },
+    {
+      "dir": "layers/59-current-cycle",
+      "action": "commit",
+      "message": "Start rejected import rows cycle"
+    },
+    {
+      "dir": "layers/60-importer-wip",
+      "action": "unstaged"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "auditor",
+    "utterance": "Refresh the baseline. The cache-a-20260921T100000Z-0a1b2c3d changes were reverted."
+  },
+  "graderOnly": [
+    "BaselineReconciliation lists cache-a-20260921T100000Z-0a1b2c3d (Request: Fix cache invalidation.) and import-b-20260922T100000Z-4e5f6a7b (Request: Adjust imports.), in that order.",
+    "The commit 'Revert Invalidate cached entries by key prefix' restored src/cache.js and src/catalog.js to their exact content in 'Initial inventory service', so no cache-a-20260921T100000Z-0a1b2c3d residue remains; cache-a is resolved as reverted.",
+    "The import-b-20260922T100000Z-4e5f6a7b residue is the committed change 'Accept semicolon-delimited product imports' (delimiter detection in src/importer.js plus a test) and an unstaged edit to src/importer.js that lowercases header names. Both change parseProducts, which the active request (rejected import rows) depends on, so the residue is material.",
+    "Nothing in the repository or the user message says whether the import-b changes were adopted; that is unresolved and needs a user answer.",
+    "import-b-20260922T100000Z-4e5f6a7b never left AUDITING, so it has no scope, design, or plan records; its code changes were committed while it was active, outside any Developer step.",
+    ".standards/CONTEXT.md was written during the cache-a cycle and still describes the comma-only, exact-lowercase-header importer.",
+    "A correct run keeps both BaselineReconciliation entries, sets Active Work.BlockedOn to a question about the import-b changes, stays in AUDITING, and does not record the import-b changes as established baseline or as Active-Cycle Non-Baseline Work of the current cycle."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "report-rejected-import-rows-20260924T083000Z-9c4d2e71",
+    "CACHE": "cache-a-20260921T100000Z-0a1b2c3d",
+    "IMPORT": "import-b-20260922T100000Z-4e5f6a7b"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "contains": {
+            "path": ".standards/STATE.md",
+            "regex": "-\\s*`SourceCycle`:\\s*`import-b-20260922T100000Z-4e5f6a7b`"
+          },
+          "why": "the unresolved import-b entry is still a BaselineReconciliation list item, so the list was neither cleared nor stripped of it"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": true,
+      "all": [
+        {
+          "contains": {
+            "path": ".standards/STATE.md",
+            "regex": "`SourceCycle`:\\s*`cache-a-20260921T100000Z-0a1b2c3d`\\s*`Request`:\\s*`Fix cache invalidation\\.`\\s*-\\s*`SourceCycle`:\\s*`import-b-20260922T100000Z-4e5f6a7b`\\s*`Request`:\\s*`Adjust imports\\.`"
+          },
+          "why": "both entries remain, unchanged and in their original order, while import-b is unresolved"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.BlockedOn",
+          "not": "NONE",
+          "why": "a blocking question is persisted"
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "AUDITING",
+          "why": "Auditor blocks instead of handing off to Scoper"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "NEW_CYCLE",
+          "why": "a blocking question does not change the handoff"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Auditor inspects version control without changing it"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "package.json",
+        "README.md",
+        ".standards/docs/**"
+      ],
+      "why": "Auditor does not mutate project artifacts or other cycles' records to learn about them"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/cache.test.js test/catalog.test.js test/importer.test.js",
+      "expect": "pass",
+      "why": "the established test command passes on the working tree"
+    },
+    {
+      "cmd": "git diff --quiet $(git log --format=%H --grep='^Initial inventory service$' -n 1) -- src/cache.js src/catalog.js",
+      "expect": "pass",
+      "why": "cache-a's code changes were reverted: the cache and catalog match the pre-cycle baseline"
+    },
+    {
+      "cmd": "git log --format=%s | grep -q '^Revert .Invalidate cached entries by key prefix.$'",
+      "expect": "pass",
+      "why": "version-control evidence of the cache-a revert exists"
+    },
+    {
+      "cmd": "git diff --exit-code $(git log --format=%H --grep='^Initial inventory service$' -n 1) HEAD -- src/importer.js",
+      "expect": "fail",
+      "expectOutput": "delimiterFor",
+      "why": "committed import-b changes remain in HEAD"
+    },
+    {
+      "cmd": "git diff --exit-code -- src/importer.js",
+      "expect": "fail",
+      "expectOutput": "toLowerCase",
+      "why": "unstaged import-b residue remains in the working tree"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 50-project (pre-install): stockroom, a dependency-free Node ESM library (TtlCache, Catalog, CSV importer) with node:test tests. 51: cache-a cycle records written by its roles (CONTEXT.md, scope, design, approved plan) and STATE in DEVELOPING. 52: cache-a Developer change (TtlCache.invalidatePrefix, used by Catalog.upsert) and plan with both steps DONE. 53: cache-a CANCELLED. 54: import-b started from CANCELLED in AUDITING with a cache-a BaselineReconciliation entry. 55: import-b Auditor's BlockedOn question about the cache-a changes. 56: committed import change (semicolon delimiter detection plus test), made while import-b was active. 57: revert commit restoring src/cache.js and src/catalog.js to the initial content. 58: import-b CANCELLED (Active Work preserved, cache-a entry carried). 59: current cycle report-rejected-import-rows-20260924T083000Z-9c4d2e71 in AUDITING, STANDARD, with both BaselineReconciliation entries in order and Handoff NEW_CYCLE from CANCELLED. 60: unstaged src/importer.js edit lowercasing header names (import-b residue). Compromise: all commits share the builder's date, so commit dates do not match the 20260921/20260922 cycle-ID timestamps. Under the protocol import-b could not leave AUDITING with cache-a unresolved, so its residue is modeled as commits and working-tree edits made during the cycle outside any Developer step.",
+  "case": "auditor-9",
+  "caseHash": "aafda7d1d3d5cd6e",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T21:08:04.435Z",
+    "verdict": "pass",
+    "fixtureHash": "a2da234c04755859",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "0faf1dbb438140c0",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:06:16.076Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T21:03:18.980Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/51-cache-records/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/53-cache-cancel/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/54-import-start/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/55-import-question/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/58-import-cancel/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/59-current-cycle/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:06:16.076Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

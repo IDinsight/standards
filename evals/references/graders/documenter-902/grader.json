@@ -1,0 +1,70 @@
+{
+  "label": "Doc2",
+  "reference": "skills/documenter/references/readme.md",
+  "checks": [
+    {
+      "id": "no-doc-change",
+      "tier": "outcome",
+      "atStart": "pass",
+      "text": "No document, API contract, or sample configuration changes: README.md, docs/, openapi.yaml, .env.example, and every other Markdown file outside .standards/, .claude/, and .agents/ stay as they were."
+    }
+  ],
+  "judge": {
+    "task": "imports-api is a FastAPI service. In this change, a private helper in app/imports/parser.py was renamed and its tests moved; behavior, the HTTP API, the settings, and the commands did not change. A documentation step then reviewed the project's documents and wrote a record of its work. The evidence holds that record and any other files that changed. Grade the documentation work.",
+    "include": [
+      ".standards/docs/documentation/**"
+    ],
+    "items": [
+      {
+        "id": "records-unchanged-docs",
+        "tier": "reference",
+        "text": "The documentation record names the project documents it checked and left unchanged (at least the README, the API contract, and the sample configuration), each with the reason no change is needed."
+      }
+    ]
+  },
+  "rules": [
+    {
+      "check": "no-doc-change",
+      "file": "skills/documenter/references/readme.md",
+      "text": "Backend README only if architecture, setup, commands, or behavior changed."
+    },
+    {
+      "check": "no-doc-change",
+      "file": "skills/documenter/references/readme.md",
+      "text": "Do not update it for internal refactors that leave the public contract"
+    },
+    {
+      "check": "records-unchanged-docs",
+      "file": "skills/documenter/references/readme.md",
+      "text": "documents intentionally left unchanged with the reason."
+    }
+  ],
+  "leakGuard": [
+    "intentionally left unchanged",
+    "Documentation Impact",
+    "no documentation change",
+    "no documentation impact",
+    "Internal API refactor"
+  ],
+  "solutions": [
+    {
+      "patch": "good.patch",
+      "kind": "good"
+    },
+    {
+      "patch": "bad-readme.patch",
+      "kind": "bad",
+      "fails": [
+        "no-doc-change",
+        "records-unchanged-docs"
+      ]
+    },
+    {
+      "patch": "bad-no-reasons.patch",
+      "kind": "bad",
+      "fails": [
+        "records-unchanged-docs"
+      ]
+    }
+  ]
+}

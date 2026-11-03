@@ -1,0 +1,84 @@
+{
+  "conditions": [
+    {
+      "condition": "Brownfield project, STANDARD cycle with CompletionPolicy IMPLEMENTATION_REVIEWED, WorkflowState SYNCHRONIZING",
+      "where": ".standards/MODE.md; .standards/STATE.md header and Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Single active frame owned by SYNCHRONIZING, pushed from AWAITING_USER_SIGNOFF, ResumeAt AWAITING_USER_SIGNOFF, RerunThrough NONE (user rework at sign-off)",
+      "where": ".standards/STATE.md Handoff (USER_REWORK, SYNCHRONIZATION) and Recovery Frame 1",
+      "status": "realized"
+    },
+    {
+      "condition": "Existing current-cycle synchronization record with a reconciliation error",
+      "where": ".standards/docs/synchronization/export-columns-…md, Completion and Evidence References: AC-002 cites 'uses the first row keys when no columns are given' instead of 'leaves a missing requested field empty'",
+      "status": "realized"
+    },
+    {
+      "condition": "Correction is verifiable against current implementation and full Tester evidence",
+      "where": "verification report (COMPLETE, FULL) maps AC-002 to the missing-field scenario; test/csv.test.js and src/csv.js pass (selfChecks 1-2); no changes since review commit",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation review COMPLETE with current ELIGIBLE closure",
+      "where": ".standards/docs/reviews/<id>/implementation.md, Implementation-Reviewed Closure section",
+      "status": "realized"
+    },
+    {
+      "condition": "No other Synchronizer-owned work remains; no blocking question",
+      "where": "sync record has no other discrepancy; BlockedOn NONE; obligations inactive",
+      "status": "realized"
+    },
+    {
+      "condition": "Full synchronization cannot pass only because normal final review (and documentation) is intentionally omitted and not required by the contract",
+      "where": "no final-deliverable review or documentation record exists; scope Non-goals exclude documentation; closure section lists omitted phases",
+      "status": "realized"
+    },
+    {
+      "condition": "Upstream records (scope, design, context, plan) complete and coherent",
+      "where": ".standards/docs/scope, specs, development, CONTEXT.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Clean committed git state",
+      "where": "git status clean on main",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "Under IMPLEMENTATION_REVIEWED a synchronization record can only exist from earlier corrective work, but the record shows 'Discrepancies: NONE' and no earlier correction or frame association; and STATE.md stays at the installer default through every commit until 'Route sign-off rework to synchronization', so history shows the cycle never moving through states. A careful role could mention this as a limitation, but check.mjs passes and it does not change the routing under test.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally add a resolved D-001 describing an earlier corrective return in the layer-75 record; not required."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": 1,
+      "detail": "The pre-existing record already states that full synchronization cannot pass because final review is omitted and that readiness rests on the closure assessment. This is realistic for a record left incomplete by an earlier corrective return, and it does not reveal the routing answer (RerunThrough REVIEWING_IMPLEMENTATION). The judge should look for the run's own separation of the new correction from omitted guarantees, not the inherited text.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "src/csv.js now returns '' for rows whose first row has no keys (e.g. toCsv([{}])), where the original returned '\\n'. This is technically an AC-003 deviation but pathological, and it falls to the Reviewer, not the Synchronizer. A Synchronizer is very unlikely to raise it as an independent defect that would change routing.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized: the frame and state match the case, the planted AC-002 mismatch is in the sync record, its correct target is verifiable from the full verification report and passing tests, and no final review or documentation record exists. I traced the turn-end check for the expected post-run state (REVIEWING_IMPLEMENTATION, frame kept, RerunThrough REVIEWING_IMPLEMENTATION, RESUME) and it passes. Assertion 0's complete state checks match the only protocol-legal route, and the other checks and invariants are necessary conditions for a correct run.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T03:12:11.893Z",
+  "costUsd": 0.291006,
+  "ms": 68591,
+  "fixtureHash": "f764c2752b553044"
+}

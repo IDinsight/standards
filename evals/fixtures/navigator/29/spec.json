@@ -1,0 +1,124 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-query",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add records query layer"
+    },
+    {
+      "dir": "layers/10-notify",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add daily owner digest"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "navigator",
+    "utterance": "INVESTIGATE why run_query({\"filter\": {}}) returns an empty result."
+  },
+  "graderOnly": [
+    "src/query.py lines 20-23 read the filter from the request and return [] when it is empty or missing, before build_where and before get_connection is called; no database query runs for run_query({\"filter\": {}}).",
+    "The empty result comes from that early return, not from a query that matched no rows; the records table and data/records.db are never touched on this path.",
+    "src/notify/ (digest rendering and the SMTP mailer) is unrelated to the question; src/cli.py is only a thin caller that passes a JSON request to run_query.",
+    "No existing test covers the empty-filter case; tests/test_query.py covers filtered queries and an unknown field."
+  ],
+  "history": null,
+  "vars": {},
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "reply_matches": "query\\.py",
+          "why": "the source-supported answer names the file holding the early return"
+        },
+        {
+          "reply_matches": "\\b(20|21|22|23)\\b",
+          "why": "the answer cites exact line numbers within the 20-23 guard"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": []
+    }
+  ],
+  "invariants": [
+    {
+      "unchanged": [
+        "**"
+      ],
+      "why": "Navigator persists nothing (generated caches are ignored)"
+    },
+    {
+      "head_unchanged": true,
+      "why": "Navigator never moves HEAD"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Navigator never mutates git state"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "python3 -m pytest -q",
+      "expect": "pass",
+      "why": "the existing query and digest tests pass"
+    },
+    {
+      "cmd": "python3 -c \"import src.query as q; q.get_connection = lambda *a: (_ for _ in ()).throw(AssertionError('db')); assert q.run_query({'filter': {}}) == []; print('ok')\"",
+      "expect": "pass",
+      "why": "run_query with an empty filter returns [] without ever opening a database connection"
+    },
+    {
+      "cmd": "sed -n '21p' src/query.py | grep -q 'if not filter_' && sed -n '23p' src/query.py | grep -q 'return \\[\\]'",
+      "expect": "pass",
+      "why": "the empty-filter guard and its return [] sit at src/query.py lines 20-23 as the case states"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. The installer's default state (AUDITING, CycleMode UNSET, no cycle) is left untouched because the case specifies no workflow state.\n\nLayer 00-query (pre-install commit) adds a small Python records query layer:\n- src/query.py: run_query, with the empty-filter early return at lines 20-23, before build_where and get_connection.\n- src/db.py: a sqlite connection from RECORDS_DB or data/records.db, which does not exist.\n- src/cli.py: a thin caller that takes a JSON argument.\n- tests/test_query.py: in-memory sqlite tests for filtered queries and an unknown field. There is no empty-filter test.\n- pytest.ini and README.\n\nLayer 10-notify (pre-install commit) adds the unrelated subsystem src/notify/ (digest rendering and an SMTP mailer) with a test. Assertion 1's judge can use it to see whether Navigator wandered off the question.\n\nThe user's supplied input lives only in the utterance. The selfChecks prove that the tests pass, that the empty filter returns [] without opening a connection, and that the guard sits on the stated lines. The selfChecks and the README use python3 because the runner image has no bare python command.",
+  "case": "navigator-29",
+  "caseHash": "ce8fff4c9d6ee0b3",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T01:38:44.357Z",
+    "verdict": "pass",
+    "fixtureHash": "b6e8de171a642292",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "a9def924d59c76bc",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:20:35.323Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T01:10:32.394Z"
+  },
+  "migrations": [
+    {
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:20:35.323Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

@@ -1,0 +1,86 @@
+{
+  "conditions": [
+    {
+      "condition": "STANDARD brownfield cycle with WorkflowState DEVELOPING",
+      "where": ".standards/STATE.md (WorkflowState DEVELOPING, CycleMode STANDARD, CompletionPolicy FULL_DELIVERABLE); .standards/MODE.md BROWNFIELD",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Development is NONE",
+      "where": ".standards/STATE.md Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Prior handoff is a completed Architect forward handoff",
+      "where": ".standards/STATE.md Handoff FORWARD From ARCHITECTING",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-002 requires the welcome email to be retried until delivered, including after a service restart",
+      "where": ".standards/docs/scope/send-welcome-email-on-sign-up-20260923T141205Z-3f9a1c7e.md AC-002",
+      "status": "realized"
+    },
+    {
+      "condition": "Completed design adds the email to sign-up but chooses no job queue, broker, or durable retry store",
+      "where": ".standards/docs/specs/...md: AC-002 coverage, the technical criterion, and Build Plan step 3 restate the retry requirement. The only mechanism named is in-process FastAPI BackgroundTasks.",
+      "status": "realized"
+    },
+    {
+      "condition": "The FastAPI service has no queue, broker, scheduler, or pending-work store",
+      "where": "pyproject.toml (fastapi and uvicorn only); app/ code; .standards/CONTEXT.md 'Relevant Existing Behavior'; selfCheck grep",
+      "status": "realized"
+    },
+    {
+      "condition": "Valid Auditor context exists for the active cycle",
+      "where": ".standards/CONTEXT.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Developer project reference background-jobs.md opens with 'Read when work adds background or scheduled jobs.' and names Celery with a Redis broker as the team standard",
+      "where": ".standards/project-references/developer/background-jobs.md (line 3 checked by selfCheck)",
+      "status": "realized"
+    },
+    {
+      "condition": "The work matches the reference's Read when line",
+      "where": "The design schedules sends with BackgroundTasks and needs retries that survive a restart; this is background work",
+      "status": "realized"
+    },
+    {
+      "condition": "No path lets the role install Celery or Redis",
+      "where": "runtime.blockHosts includes pypi.org, files.pythonhosted.org, and npm registries; selfCheck confirms PyPI is refused",
+      "status": "realized"
+    },
+    {
+      "condition": "check.mjs is clean at the start",
+      "where": "gate results: checkMjs ok true",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "ungradeable-assertion",
+      "assertion": 0,
+      "detail": "Assertion 0 (loads background-jobs.md) has no deterministic check because the check vocabulary cannot observe reads. The judge must decide it from the tool trace. The fixture does contain the reference, so the assertion is observable.",
+      "recommendation": "run_as_is",
+      "fix": "None needed; the judge grades from the trace."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 3,
+      "detail": "A correct run might first create a PROPOSED development plan, possibly with a Suspended Assignment in Plan Notes, before routing. The check source tolerates this. In ARCHITECTING the plan is not required to be COMPLETE. recoveryScope reports a problem only if some suspended assignment matches a frame. No state check depends on the plan existing. check_ok and the invariants therefore hold whether or not a plan is created.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized: DEVELOPING with Development NONE, AC-002 requiring retry that survives a restart, a completed design that names only in-process BackgroundTasks, no queue or broker in the project, and the Celery/Redis project reference with the exact Read when line. Nothing leaks the answer, the records are coherent and check.mjs is clean. Each check (state frame fields, BlockedOn NONE, unchanged implementation and upstream records, check_ok) is a necessary condition for any correct ARCHITECTURE failure routing. Registries are blocked so a run cannot install Celery or a Redis client.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T02:55:33.095Z",
+  "costUsd": 0.2230462,
+  "ms": 37160,
+  "fixtureHash": "f33a6dc7e809a563"
+}

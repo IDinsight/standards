@@ -1,0 +1,111 @@
+{
+  "conditions": [
+    {
+      "condition": "Cycle export-20260924T090000Z-a7f3c1d2 active, BROWNFIELD, CycleMode STANDARD, WorkflowState TESTING",
+      "where": ".standards/STATE.md lines 3-9; .standards/MODE.md (BROWNFIELD)",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and Outstanding Obligations inactive; BlockedOn NONE",
+      "where": ".standards/STATE.md Recovery/Obligations Active false; BlockedOn NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Handoff FORWARD from DEVELOPING",
+      "where": ".standards/STATE.md Handoff section",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope record with valid provenance: AC-001 filtered CSV export with RFC 4180 quoting; AC-002 non-admin denied server-side before any file is created",
+      "where": ".standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Technical design: authorization before any write, quoting cell function, export route, file location",
+      "where": ".standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md (Decision, Interfaces and Contracts, TAC)",
+      "status": "realized"
+    },
+    {
+      "condition": "CONTEXT.md from Auditor for this cycle, committed before scope",
+      "where": ".standards/CONTEXT.md, commit 'Record project context for CSV export'",
+      "status": "realized"
+    },
+    {
+      "condition": "Development plan COMPLETE, all DEV steps DONE, AFTER_IMPLEMENTATION / Current Increment NONE",
+      "where": ".standards/docs/development/export-20260924T090000Z-a7f3c1d2.md header and DEV-001..003",
+      "status": "realized"
+    },
+    {
+      "condition": "Committed implementation is correct and satisfies AC-001 and AC-002 (requireAdmin first, csvCell quoting, file written only after authorization)",
+      "where": "src/export.ts, src/routes/export.ts, src/app.ts; selfCheck 'denied before write' passes",
+      "status": "realized"
+    },
+    {
+      "condition": "Existing unit tests cover quoting but not export authorization, and pass",
+      "where": "test/export.test.ts (5 quoting/serialization tests); pnpm --filter export test passes 21",
+      "status": "realized"
+    },
+    {
+      "condition": "Integration script exercises the route end to end for an admin only and passes; no test makes a non-admin or anonymous export request",
+      "where": "package.json test:integration; test/integration/export-flow.test.ts (admin only); selfChecks pass",
+      "status": "realized"
+    },
+    {
+      "condition": "Test names and comments cite no AC identifiers",
+      "where": "src/, test/ (grep selfCheck passes)",
+      "status": "realized"
+    },
+    {
+      "condition": "No verification record yet",
+      "where": ".standards/docs/verification absent",
+      "status": "realized"
+    },
+    {
+      "condition": "git diff empty, working tree clean",
+      "where": "git_status '## main' only",
+      "status": "realized"
+    },
+    {
+      "condition": "Commit history in brownfield order: context, scope, design, plan, implementation, plan complete",
+      "where": "git log after 'Install STANDARDS'",
+      "status": "realized"
+    },
+    {
+      "condition": "0.8.0 fields: PendingVerificationCadence NONE in STATE; plan cadence fields",
+      "where": ".standards/STATE.md; development plan header",
+      "status": "realized"
+    },
+    {
+      "condition": "check.mjs passes",
+      "where": "gate_results checkMjs ok:true",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "test/authorize.test.ts (from export-project) exercises requireAdmin rejecting a viewer at the helper level, so 'no existing test exercises the authorization denial' holds only at route level (no test sends a non-admin/anonymous POST /records/export or checks that no file is created). baseFacts state this precisely, and the route wiring and no-file-before-denial behavior remain untested, so Tester cases about the AC-002 gap stay meaningful.",
+      "recommendation": "run_as_is",
+      "fix": "Cases built on this base should phrase the gap as route-level export authorization (non-admin/anonymous export request, no file created), consistent with baseFacts."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "Local git config sets user.name=Fixture / user.email=fixture@example.invalid, so every commit author reads 'Fixture' in git log. This is presumably harness-wide, not specific to this base, and does not point at any answer.",
+      "recommendation": "run_as_is",
+      "fix": "If the harness allows, use a neutral author name (e.g. a plausible developer name) for all fixtures."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition of the export-testing base is realized: TESTING state with FORWARD from DEVELOPING, coherent scope/design/context/plan records, a correct committed implementation verified by selfChecks, quoting unit tests and an admin-only integration script that pass, and no route-level non-admin export test. check.mjs passes and nothing in names, comments, or records hints at an expected answer. The only notes are the pre-existing helper-level requireAdmin test and the harness-wide 'Fixture' git author.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-01T17:38:56.970Z",
+  "costUsd": 0.793359,
+  "ms": 57657,
+  "fixtureHash": "62f88647f784516a"
+}

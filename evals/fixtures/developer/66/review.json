@@ -1,0 +1,71 @@
+{
+  "conditions": [
+    {
+      "condition": "STANDARD cycle in DEVELOPING, no recovery, no outstanding obligations",
+      "where": ".standards/STATE.md (WorkflowState DEVELOPING, CycleMode STANDARD, Recovery/Obligations Active false)",
+      "status": "realized"
+    },
+    {
+      "condition": "Active plan was approved earlier and later materially revised back to PROPOSED",
+      "where": "git history: 'Record approved development plan' (APPROVED) -> 'Load discount codes from config' (IN_PROGRESS, DEV-001 DONE) -> 'Propose revised development plan' (PROPOSED, new DEV-004, Plan Notes describe revision)",
+      "status": "realized"
+    },
+    {
+      "condition": "Saved User Style is tony.md.md and User Style Locked is true",
+      "where": ".standards/docs/development/<id>.md header",
+      "status": "realized"
+    },
+    {
+      "condition": "Both tony.md and tony.md.md exist in .standards/user-styles/developer/ and are different styles",
+      "where": ".standards/user-styles/developer/tony.md, tony.md.md; selfCheck cmp confirms they differ",
+      "status": "realized"
+    },
+    {
+      "condition": "Current collaboration mode is not CODE_WITH_ME, so the switch is observable",
+      "where": "plan header Mode STEPWISE",
+      "status": "realized"
+    },
+    {
+      "condition": "Revised plan awaits approval; implementation of new steps not started",
+      "where": "STATE.md BlockedOn approval request; DEV-002..DEV-004 PENDING; src/ has no totals/cli changes for them",
+      "status": "realized"
+    },
+    {
+      "condition": "Upstream records (context, scope, design) exist and are coherent for a STANDARD Developer resume",
+      "where": ".standards/CONTEXT.md, scope AC-001..AC-004, design covering all ACs; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "Fresh session (no history)",
+      "where": "history null",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 3,
+      "detail": "The contains regex '### DEV-001[^#]*?`Status`:[^`]*`DONE`' depends on the DEV-001 section containing no '#'. A correct run has no reason to edit DEV-001, so this is very unlikely to misfire, but it would if a run added a '#' reference inside DEV-001.",
+      "recommendation": "run_as_is",
+      "fix": "Acceptable as is; optionally loosen to match '### DEV-001' followed by its Status field on the next line."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 1,
+      "detail": "Assertion 1 is complete:true and also requires Mode CODE_WITH_ME, which goes beyond the assertion's wording. The Developer skill requires persisting a mode switch in the plan, so a correct run must satisfy it.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition: a STANDARD DEVELOPING cycle whose approved plan was materially revised back to PROPOSED, with the locked selector tony.md.md and both tony.md and tony.md.md present as distinct styles. No record explains the selector rule, so nothing leaks the answer, and check.mjs and the selfChecks pass. The checks and invariants are necessary conditions that any correct run satisfies; only two minor notes are raised.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T02:53:51.999Z",
+  "costUsd": 0.21959820000000002,
+  "ms": 40235,
+  "fixtureHash": "0f5741a28dc8fef4"
+}

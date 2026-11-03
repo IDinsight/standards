@@ -1,0 +1,71 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is BROWNFIELD",
+      "where": ".standards/MODE.md (installer brownfield template)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode DOCUMENTATION with CompletionPolicy NONE",
+      "where": ".standards/STATE.md (layer 54-sync)",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id is guide-20261004T120000Z-1a2b3c4d",
+      "where": ".standards/STATE.md Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "WorkflowState AWAITING_USER_SIGNOFF reached legally (FORWARD from SYNCHRONIZING, recovery and obligations inactive, BlockedOn NONE)",
+      "where": ".standards/STATE.md Handoff/Recovery; check.mjs ok:true",
+      "status": "realized"
+    },
+    {
+      "condition": "A documentation cycle's full chain exists: Auditor context, scope, design, COMPLETE documentation record, COMPLETE FINAL_DELIVERABLE review, COMPLETE synchronization record",
+      "where": ".standards/CONTEXT.md and the scope, spec, documentation, review, and synchronization records under .standards/docs/",
+      "status": "realized"
+    },
+    {
+      "condition": "No omitted-owner records exist (development, verification, implementation review)",
+      "where": "absent from the tree; Active Work.Development NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "The saved guide changed materially after final review and synchronization",
+      "where": "docs/guide.md unstaged edit (layer 60): Options table replaced, Backup section rewritten, new usage and Troubleshooting sections; git status ' M docs/guide.md'",
+      "status": "realized"
+    },
+    {
+      "condition": "No reassessment covers the current guide",
+      "where": "The documentation record, final review, and sync record all cite blob afe7331 (HEAD:docs/guide.md); the working-tree blob 3ace0da appears in no record (selfCheck)",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 0,
+      "detail": "Assertion 0 is complete:true on state alone: WorkflowState not SIGNED_OFF, Handoff.Kind not SIGNOFF, and CycleMode DOCUMENTATION. A run that withholds sign-off for an unrelated reason would also pass. Every correct run satisfies these checks, and the catalog marked the assertion as deterministic.",
+      "recommendation": "run_as_is",
+      "fix": "Acceptable as is. Optionally set complete:false so the judge confirms the refusal is grounded in the changed guide."
+    },
+    {
+      "severity": "note",
+      "kind": "invariant",
+      "assertion": -1,
+      "detail": "The extra invariant leaves docs/**, src/**, test/**, README.md, and package.json unchanged. This is correct for Synchronizer, which owns no project file and must not revert or edit the Documenter-owned guide. It also forbids reverting the user's edit, which the case expects.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition. The legal DOCUMENTATION cycle sits at AWAITING_USER_SIGNOFF with COMPLETE documentation, final-review, and synchronization records that all cite the committed guide blob, while an unstaged material rewrite of docs/guide.md is assessed by none of them. The checks accept both acceptable readings of the ambiguous case (hold and explain, or record recovery to an included owner), and check.mjs passes on either path; I traced its rules for a FAILURE or USER_REWORK from AWAITING_USER_SIGNOFF to DOCUMENTING. Nothing leaks the answer, and the invariants fit Synchronizer's role.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T03:14:28.837Z",
+  "costUsd": 0.245822,
+  "ms": 42831,
+  "fixtureHash": "0daa49855eedb3e8"
+}

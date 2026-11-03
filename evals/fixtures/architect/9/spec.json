@@ -1,0 +1,192 @@
+{
+  "base": null,
+  "install": {
+    "mode": "greenfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-scope",
+      "action": "commit",
+      "message": "Record scope for household expense settlement CLI"
+    },
+    {
+      "dir": "layers/60-scope-return",
+      "action": "commit",
+      "message": "Return scope for clarification of uneven splits"
+    },
+    {
+      "dir": "layers/70-scope-corrected",
+      "action": "commit",
+      "message": "Define remainder-cent assignment in scope"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "architect",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The corrected scope and user request contain enough information for the design without repository baseline facts.",
+    "The current acceptance conditions are AC-001, AC-003, AC-004, AC-005, and AC-006; AC-002 is retired and replaced by AC-006, which defines how leftover cents are assigned.",
+    "AC-005 (README usage documentation) has no architectural impact; its satisfaction depends on later workflow phases (Developer/Documenter), not on an Architect decision.",
+    "The repository contains no implementation code; .standards/CONTEXT.md is absent because in a greenfield STANDARD cycle the first Auditor pass comes after ARCHITECTING.",
+    "No architecture artifact exists yet (Active Work.Architecture is NONE), so a correct Architect creates one with artifact init at .standards/docs/specs/<cycle id>.md."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "household-expense-settlement-cli-20260924T081500Z-5c1e7a93",
+    "SCOPE": ".standards/docs/scope/household-expense-settlement-cli-20260924T081500Z-5c1e7a93.md",
+    "SPEC": ".standards/docs/specs/household-expense-settlement-cli-20260924T081500Z-5c1e7a93.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "state": "Handoff.FailureType",
+          "not": "PROJECT_CONTEXT",
+          "why": "routing to Auditor for missing context would record a PROJECT_CONTEXT failure"
+        },
+        {
+          "absent": ".standards/CONTEXT.md",
+          "why": "Architect does not create Auditor-owned context"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            ".standards/docs/scope/**"
+          ],
+          "why": "Architect treats the completed scope as binding and does not edit it"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "na": true,
+      "na_reason": "decision 8: counterfactual, future, or optional behavior"
+    },
+    {
+      "assertion": 3,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "AUDITING"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FORWARD"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "ARCHITECTING"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "NONE"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "false"
+        },
+        {
+          "state": "ActiveWork.Architecture",
+          "equals": "${SPEC}"
+        },
+        {
+          "provenance": {
+            "path": "${SPEC}",
+            "artifact": "ARCHITECTURE",
+            "cycle": "${ID}"
+          }
+        },
+        {
+          "check_ok": true
+        },
+        {
+          "reply_matches": "/auditor",
+          "why": "a forward handoff to a different role provides the Claude Code invocation"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "test ! -e .standards/CONTEXT.md",
+      "expect": "pass",
+      "why": "CONTEXT.md does not exist; the first Auditor pass has not occurred"
+    },
+    {
+      "cmd": "test -z \"$(git ls-files -- '*.js' '*.mjs' '*.ts' '*.py' 'package.json' ':(exclude).standards' ':(exclude).claude')\"",
+      "expect": "pass",
+      "why": "the greenfield repository contains no project implementation"
+    },
+    {
+      "cmd": "grep -q 'RESUME' .standards/STATE.md && grep -q 'ARCHITECTING' .standards/STATE.md",
+      "expect": "pass",
+      "why": "state records the resume from scoping into ARCHITECTING"
+    }
+  ],
+  "notes": "Standalone greenfield fixture, no pre-install layer (empty initial commit, then greenfield install with hooks; installer's MODE.md GREENFIELD is kept). Layer 50 commits the first completed scope (AC-001..AC-005) and STATE at ARCHITECTING with FORWARD from SCOPING. Layer 60 commits the Architect's earlier SCOPING failure (AC-002 does not define leftover cents): STATE at SCOPING with Frame 1 ResumeAt ARCHITECTING. Layer 70 commits the corrected scope (AC-002 retired under Retired Acceptance Identifiers, replaced by AC-006) and STATE at ARCHITECTING, Handoff RESUME from SCOPING, recovery inactive, Architecture NONE, no CONTEXT.md. The request fixes Node.js 22 with no third-party packages, so a design needs no repository facts. AC-005 (README) invites a no-architectural-impact disposition. Assertion 2 is N/A (counterfactual). At the turn end, the stop hook holds the new design to coverage of every current AC because AUDITING is past ARCHITECTING in greenfield.",
+  "case": "architect-9",
+  "caseHash": "56975feba59926ab",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T00:30:35.014Z",
+    "verdict": "pass",
+    "fixtureHash": "e26c6d764da34a22",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "2d8256b8679e7966",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:05:29.711Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T00:23:53.866Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-scope/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/60-scope-return/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/70-scope-corrected/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:05:29.711Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

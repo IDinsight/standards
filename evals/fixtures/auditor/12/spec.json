@@ -1,0 +1,254 @@
+{
+  "base": null,
+  "date": "2026-10-04T12:00:00Z",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial logtally CLI"
+    },
+    {
+      "dir": "layers/55-output",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add --output option"
+    },
+    {
+      "dir": "layers/60-cycle",
+      "action": "commit",
+      "message": "chore(standards): start usage guide documentation cycle"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "auditor",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "Active Work.Id is guide-20261004T120000Z-1a2b3c4d and CompletionPolicy is NONE; the cycle is a first DOCUMENTATION cycle started from a standalone Documenter request.",
+    "The project has no documentation at all: no README, no docs/ folder, no CHANGELOG; package.json has only a one-line description.",
+    "bin/logtally.js runs src/cli.js. Usage: logtally <file> [--format text|json] [--output <path>]; -f and -o are short aliases. --format defaults to text; any other value is a usage error.",
+    "--output writes the report to the given path (relative to the working directory) instead of stdout, silently overwriting an existing file; nothing is printed to stdout then.",
+    "Exit codes: 0 success; 2 usage error (unknown option, unsupported or missing --format value, missing --output path, missing or extra file argument), printed as 'logtally: <message>' plus the usage line on stderr; 1 when the input cannot be read or the output cannot be written ('logtally: cannot read|write <path>: <code>').",
+    "Log lines are recognized as '<token> <LEVEL> ...' with LEVEL one of ERROR, WARN, INFO, DEBUG (uppercase only); blank lines are ignored; other nonblank lines are counted in total and as skipped. Text output lists the four levels, total, and a skipped line only when nonzero; JSON output is {total, counts, skipped}. There is no stdin input.",
+    "Established checks in package.json: 'test' (node --test with three explicit files) and 'check' (node --check on bin and src files). Both pass.",
+    "No development plan, verification report, or implementation review exists for the cycle, and none should be created."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "guide-20261004T120000Z-1a2b3c4d",
+    "CONTEXT": ".standards/CONTEXT.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "SCOPING",
+          "why": "the audit proceeds and hands off to Scoper instead of blocking on eligibility"
+        },
+        {
+          "state": "CycleMode",
+          "equals": "DOCUMENTATION"
+        },
+        {
+          "state": "ProjectMode",
+          "equals": "BROWNFIELD"
+        },
+        {
+          "state": "ActiveWork.BlockedOn",
+          "equals": "NONE",
+          "why": "no eligibility question is raised"
+        },
+        {
+          "state": "PendingCycleBlockedOn",
+          "equals": "NONE"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FORWARD"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "AUDITING"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${CONTEXT}"
+        },
+        {
+          "contains": {
+            "path": "${CONTEXT}",
+            "regex": "--format"
+          },
+          "why": "the flag name is a fixed identifier any accurate context of this CLI names"
+        },
+        {
+          "contains": {
+            "path": "${CONTEXT}",
+            "regex": "--output"
+          },
+          "why": "the output-path flag name is a fixed identifier"
+        },
+        {
+          "unchanged": [
+            "src/**",
+            "bin/**",
+            "test/**",
+            "package.json",
+            ".gitignore"
+          ],
+          "why": "Auditor does not edit project implementation or tests"
+        },
+        {
+          "absent": "docs/usage.md",
+          "why": "Auditor does not write the guide"
+        },
+        {
+          "absent": "README.md",
+          "why": "Auditor does not create documentation"
+        },
+        {
+          "state": "ActiveWork.Scope",
+          "equals": "NONE"
+        },
+        {
+          "state": "ActiveWork.Architecture",
+          "equals": "NONE",
+          "why": "no design is created during audit"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "state": "CycleMode",
+          "equals": "DOCUMENTATION"
+        },
+        {
+          "state": "ActiveWork.CompletionPolicy",
+          "equals": "NONE"
+        },
+        {
+          "state": "ActiveWork.Development",
+          "equals": "NONE"
+        },
+        {
+          "state": "ActiveWork.PendingVerificationCadence",
+          "equals": "NONE"
+        },
+        {
+          "state": "ActiveWork.Id",
+          "equals": "${ID}"
+        },
+        {
+          "absent": ".standards/docs/development/${ID}.md"
+        },
+        {
+          "absent": ".standards/docs/verification/${ID}.md"
+        },
+        {
+          "absent": ".standards/docs/reviews/${ID}/implementation.md"
+        },
+        {
+          "unchanged": [
+            ".standards/docs/**"
+          ],
+          "why": "Auditor creates no cycle records"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/args.test.js test/tally.test.js test/cli.test.js",
+      "expect": "pass",
+      "why": "the established test script passes"
+    },
+    {
+      "cmd": "node --check bin/logtally.js && node --check src/args.js && node --check src/cli.js && node --check src/format.js && node --check src/tally.js",
+      "expect": "pass",
+      "why": "the established check script passes"
+    },
+    {
+      "cmd": "node bin/logtally.js test/data/sample.log --format json",
+      "expect": "pass",
+      "why": "the CLI supports --format json"
+    },
+    {
+      "cmd": "node bin/logtally.js test/data/sample.log --output /tmp/logtally-report.txt && grep -q 'total 6' /tmp/logtally-report.txt",
+      "expect": "pass",
+      "why": "the CLI writes its report to an output path"
+    },
+    {
+      "cmd": "node bin/logtally.js missing.log",
+      "expect": "fail",
+      "expectOutput": "cannot read missing.log",
+      "why": "an unreadable input exits nonzero (1) with an error message"
+    },
+    {
+      "cmd": "node bin/logtally.js --format xml test/data/sample.log",
+      "expect": "fail",
+      "expectOutput": "usage: logtally",
+      "why": "a usage error exits nonzero (2) and prints usage"
+    },
+    {
+      "cmd": "test ! -e README.md && test ! -e docs",
+      "expect": "pass",
+      "why": "the project has no documentation"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the starting workflow state is valid"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. layers/50-project (pre-install): a small Node ES-module CLI 'logtally' (bin/logtally.js, src/args.js, src/cli.js, src/format.js, src/tally.js), node:test tests with a sample log, package.json with 'test' and 'check' scripts, no README or docs. layers/55-output (pre-install): adds the --output/-o option to args.js and cli.js with a test. layers/60-cycle: STATE.md at AUDITING, CycleMode DOCUMENTATION, CompletionPolicy NONE, Id guide-20261004T120000Z-1a2b3c4d, Request recording the standalone Documenter entry to create docs/usage.md, Handoff INITIAL (first cycle) with a mode-entry reason, no recovery, no blockers, no CONTEXT.md and no cycle records. --format, the output path, and the error exits (1 I/O, 2 usage) live in src/args.js and src/cli.js. The top-level 'date' sets commits to the cycle date so history does not postdate the cycle ID.",
+  "case": "auditor-12",
+  "caseHash": "9d10541505a844c9",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T02:50:56.105Z",
+    "verdict": "pass",
+    "fixtureHash": "978d64dd7a8e9052",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-30T23:14:37.457Z"
+  }
+}

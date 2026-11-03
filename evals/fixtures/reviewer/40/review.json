@@ -1,0 +1,84 @@
+{
+  "conditions": [
+    {
+      "condition": "BROWNFIELD project, STANDARD cycle, Active Work.Id export-20260924T090000Z-a7f3c1d2, WorkflowState REVIEWING_FINAL",
+      "where": ".standards/MODE.md; .standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "No blockers, recovery, or outstanding obligations",
+      "where": ".standards/STATE.md (BlockedOn NONE, Recovery Active false, Obligations Active false)",
+      "status": "realized"
+    },
+    {
+      "condition": "Interrupted final report lists documentation pages already inspected and a remaining command example",
+      "where": ".standards/docs/reviews/<id>/final-deliverable.md (IN_PROGRESS; I1/I2 inspected sections; Remaining: command-line section with `--out exports/dana` example)",
+      "status": "realized"
+    },
+    {
+      "condition": "Since the interruption, the command flag changed in source",
+      "where": "src/cli/export-records.ts (--out -> --dir, commit 'Rename export-records --out flag to --dir', after 'Save partial final review')",
+      "status": "realized"
+    },
+    {
+      "condition": "The flag also changed in the guide, with other guide sections untouched",
+      "where": "docs/usage.md command example and option bullet; selfCheck proves only those two lines differ from the final report's assessed commit",
+      "status": "realized"
+    },
+    {
+      "condition": "Corresponding current Tester evidence exists",
+      "where": ".standards/docs/verification/<id>.md (REVERIFY, COMPLETE, FULL, assessed at 'Update export-records tests for --dir'; E1-E4)",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation review report is preserved from an earlier revision",
+      "where": ".standards/docs/reviews/<id>/implementation.md (COMPLETE, assessed f6cc4b0 with --out, unchanged since)",
+      "status": "realized"
+    },
+    {
+      "condition": "Repository evidence available and consistent; tests pass",
+      "where": "src/, test/; selfChecks show 24 unit and 3 integration tests pass, --dir example works, --out rejected",
+      "status": "realized"
+    },
+    {
+      "condition": "Owned artifacts current: scope, design, context, plan, documentation record",
+      "where": ".standards/docs/scope, specs, development (COMPLETE), documentation (COMPLETE), .standards/CONTEXT.md",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "blocking",
+      "kind": "check-too-strict",
+      "assertion": 2,
+      "detail": "Assertion 2 is `complete: true` and requires `unchanged: [${REVIEW_IMPL}]`. The assertion only forbids merging the reports, overwriting one into the other, or choosing the mode by which report exists. The implementation report assessed source that has since changed, and the rerun route skipped REVIEWING_IMPLEMENTATION. A Reviewer could legitimately judge that the implementation gate must be re-established. It would then route a REVIEW failure to REVIEWING_IMPLEMENTATION. Because it was explicitly invoked and owns that state, it could continue there and reopen implementation.md, for example setting Status to IN_PROGRESS and adding a reassessment. That run neither merges nor overwrites the reports, yet it would fail deterministically. The provenance and ReviewKind checks also cannot fully decide whether content was merged, so `complete: true` is not justified.",
+      "recommendation": "fix_file",
+      "fix": "In reviewer-40/spec.json, checks[2]: remove the `{\"unchanged\": [\"${REVIEW_IMPL}\"]}` entry, keep the two provenance checks and the ReviewKind field check, and set `complete` to false so the judge decides whether the reports were merged, overwritten, or treated as alternative modes."
+    },
+    {
+      "severity": "note",
+      "kind": "case-defect",
+      "assertion": -1,
+      "detail": "As the catalog notes, the history reaches REVIEWING_FINAL with source changed but no implementation re-review. This relies on the DEVELOPING frame owner choosing a rerun route through DOCUMENTING that skips REVIEWING_IMPLEMENTATION, even though implementation review is already-produced downstream work affected by the change. The fixture records this choice consistently in the plan notes, the verification report, the documentation record, and the Handoff reason.",
+      "recommendation": "run_as_is",
+      "fix": "None needed; the judge should accept either a final review that independently assesses the changed command or a reasoned REVIEW routing to implementation review."
+    },
+    {
+      "severity": "note",
+      "kind": "record-format",
+      "assertion": -1,
+      "detail": "Plan Notes still say 'current recovery frame 1, owned by DEVELOPING', but STATE.md shows recovery inactive after the RESUME. The intermediate STATE transitions of both reworks are never committed (a stated compromise). Both are minor realism issues.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally reword the plan note to 'recovery frame 1 of that rework' to match the first note's past-tense style."
+    }
+  ],
+  "verdict": "issues",
+  "summary": "Every stated condition is realized: the interrupted final report names inspected sections and the remaining `--out` example, the flag changed in source and guide, Tester evidence is current at the --dir revision, and the implementation report is preserved from the --out revision. The check for assertion 2 requires implementation.md to be unchanged and is marked complete, which is stricter than the assertion. A correct run that routes to implementation review and reopens that report would fail it, so drop that predicate and make the assertion judge-decided.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T23:32:40.120Z",
+  "costUsd": 0.3830648,
+  "ms": 59303,
+  "fixtureHash": "bf16e16e1f2aa79b"
+}

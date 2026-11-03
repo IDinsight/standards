@@ -1,0 +1,287 @@
+{
+  "base": null,
+  "date": "2026-10-06T09:00:00Z",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial csvsum CLI"
+    },
+    {
+      "dir": "layers/01-rename",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Rename --sep option to --delimiter"
+    },
+    {
+      "dir": "layers/50-context",
+      "action": "commit",
+      "message": "Record project context for usage guide"
+    },
+    {
+      "dir": "layers/51-scope",
+      "action": "commit",
+      "message": "Define usage guide scope"
+    },
+    {
+      "dir": "layers/52-design",
+      "action": "commit",
+      "message": "Record usage guide contracts"
+    },
+    {
+      "dir": "layers/55-first-pass",
+      "action": "commit",
+      "message": "Document JSON output in usage guide"
+    },
+    {
+      "dir": "layers/60-final-review",
+      "action": "commit",
+      "message": "Record final review of usage guide"
+    },
+    {
+      "dir": "layers/63-guided-edit",
+      "action": "commit",
+      "message": "Use --delimiter in usage guide"
+    },
+    {
+      "dir": "layers/65-correction",
+      "action": "commit",
+      "message": "Record usage guide correction progress"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "auditor",
+    "utterance": "Resume."
+  },
+  "graderOnly": [
+    "The only material context defect: .standards/CONTEXT.md (Testing and Verification Baseline) says the guide's examples are not checked automatically, and its Commands section omits any example check, but package.json defines the docs:check script (node scripts/verify-examples.mjs docs/usage.md), which runs every '$ csvsum' line in a console block of the guide and compares the output.",
+    "The correction is established from current source (package.json, scripts/verify-examples.mjs); npm run docs:check passes on the current tree because the user already applied the guided --delimiter edit.",
+    "Neither the scope nor the technical design names a check command, so the corrected context invalidates no completed upstream artifact: the canonical route is to pop Frame 2 and RESUME to DOCUMENTING, leaving Frame 1 (From REVIEWING_FINAL, Owner DOCUMENTING, FailureType DOCUMENTATION, ResumeAt REVIEWING_FINAL, RerunThrough NONE) as the only and active frame.",
+    "Active Work.Request carries the standalone Documenter entry with target FILE docs/usage.md and GUIDED collaboration; the documentation record header repeats them. Both must survive unchanged.",
+    "README.md does not mention the example check; it is outside the documentation target and the Auditor must not edit it or docs/usage.md.",
+    "The next role is Documenter; its copy/paste invocation should use the active-recovery wording and point at the active recovery frame. Documenter is not an independent-session role."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "guide-20261004T120000Z-1a2b3c4d",
+    "CTX": ".standards/CONTEXT.md",
+    "DOCREC": ".standards/docs/documentation/guide-20261004T120000Z-1a2b3c4d.md",
+    "FINAL": ".standards/docs/reviews/guide-20261004T120000Z-1a2b3c4d/final-deliverable.md",
+    "DEV": ".standards/docs/development/guide-20261004T120000Z-1a2b3c4d.md",
+    "VER": ".standards/docs/verification/guide-20261004T120000Z-1a2b3c4d.md",
+    "IMPL": ".standards/docs/reviews/guide-20261004T120000Z-1a2b3c4d/implementation.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "state": "Recovery.Active",
+          "equals": "true",
+          "why": "the outer frame keeps recovery active"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "1",
+          "why": "only the nested PROJECT_CONTEXT frame is popped"
+        },
+        {
+          "state": "Recovery.Frame1.Owner",
+          "equals": "DOCUMENTING",
+          "why": "the remaining frame is the outer Documenter frame"
+        },
+        {
+          "state": "Recovery.Frame1.ResumeAt",
+          "equals": "REVIEWING_FINAL"
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "DOCUMENTING",
+          "why": "scope and design are unaffected, so the popped frame resumes directly at DOCUMENTING"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "RESUME"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "AUDITING"
+        },
+        {
+          "changed": [
+            "${CTX}"
+          ],
+          "why": "the frame's assignment is the context correction"
+        },
+        {
+          "contains": {
+            "path": "${CTX}",
+            "regex": "docs:check"
+          },
+          "why": "the corrected context names the established package.json script"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "state": "Recovery.Frame1.From",
+          "unchanged": true
+        },
+        {
+          "state": "Recovery.Frame1.Owner",
+          "unchanged": true
+        },
+        {
+          "state": "Recovery.Frame1.FailureType",
+          "unchanged": true
+        },
+        {
+          "state": "Recovery.Frame1.Reason",
+          "unchanged": true
+        },
+        {
+          "state": "Recovery.Frame1.ResumeAt",
+          "unchanged": true
+        },
+        {
+          "state": "Recovery.Frame1.RerunThrough",
+          "unchanged": true
+        },
+        {
+          "state": "ActiveWork.Request",
+          "unchanged": true,
+          "why": "the saved Documenter target and collaboration live in the request"
+        },
+        {
+          "state": "ActiveWork.Id",
+          "unchanged": true
+        },
+        {
+          "state": "CycleMode",
+          "equals": "DOCUMENTATION"
+        },
+        {
+          "unchanged": [
+            "${DOCREC}"
+          ],
+          "why": "the documentation record header keeps FILE docs/usage.md and GUIDED"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": true,
+      "all": [
+        {
+          "unchanged": [
+            "docs/**",
+            "README.md",
+            "${DOCREC}",
+            "${FINAL}"
+          ],
+          "why": "no documentation edit and no Documenter or Reviewer record edit"
+        },
+        {
+          "state": "WorkflowState",
+          "in": [
+            "AUDITING",
+            "SCOPING",
+            "ARCHITECTING",
+            "DOCUMENTING"
+          ],
+          "why": "never an omitted implementation state"
+        },
+        {
+          "absent": "${DEV}"
+        },
+        {
+          "absent": "${VER}"
+        },
+        {
+          "absent": "${IMPL}"
+        },
+        {
+          "check_ok": true,
+          "why": "check rejects omitted states in documentation frames and RerunThrough"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "bin/**",
+        "src/**",
+        "test/**",
+        "scripts/**",
+        "package.json"
+      ],
+      "why": "Auditor does not change implementation, tests, or tooling"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "npm test",
+      "expect": "pass",
+      "why": "The established unit tests pass."
+    },
+    {
+      "cmd": "npm run docs:check",
+      "expect": "pass",
+      "why": "package.json defines the guide example check, and it passes on the guide after the applied guided edit, so the context correction is establishable from current source."
+    },
+    {
+      "cmd": "node bin/csvsum.js docs/examples/costs.csv --column cost --sep ';'",
+      "expect": "fail",
+      "expectOutput": "Unknown option '--sep'",
+      "why": "The CLI rejects the --sep option that the guide named before the correction (final review F-001)."
+    },
+    {
+      "cmd": "grep -q 'not checked automatically' .standards/CONTEXT.md",
+      "expect": "pass",
+      "why": "The current context wrongly says guide examples have no automated check (the PROJECT_CONTEXT defect)."
+    }
+  ],
+  "notes": "Standalone fixture. 00-project (pre-install): csvsum, a dependency-free Node ESM CLI (bin/csvsum.js, src/parse.js, src/summarize.js, node:test unit tests, docs/usage.md guide with console examples, docs/examples CSVs, scripts/verify-examples.mjs behind the package.json docs:check script). 01-rename (pre-install): the CLI option --sep becomes --delimiter; the guide is left stale. 50-context: Auditor context for the documentation cycle (correct except that it says guide examples are not checked automatically and omits docs:check); STATE at SCOPING. 51-scope: AC-001..AC-003, documentation-only, FILE docs/usage.md. 52-design: existing contracts; mentions no check command. 55-first-pass: Documenter adds JSON and error sections (guide still says --sep), record COMPLETE, STATE REVIEWING_FINAL. 60-final-review: final review BLOCKED with F-001 (guide documents --sep), STATE DOCUMENTING with Frame 1 (REVIEWING_FINAL -> DOCUMENTING, DOCUMENTATION). 63-guided-edit: the user applies the --delimiter edit. 65-correction: documentation record BLOCKED with DOC-001 (correction pending check) and DOC-002 (context gap, owner Auditor); STATE AUDITING with nested Frame 2 (DOCUMENTING -> AUDITING, PROJECT_CONTEXT, ResumeAt DOCUMENTING), Handoff FAILURE. Active Work.Request keeps the standalone Documenter entry with FILE docs/usage.md and GUIDED. Intermediate STATE files are plausible history only; check runs on the final state. The spec date is set after the cycle ID's timestamp.",
+  "case": "auditor-15",
+  "caseHash": "7ff8bcc2c1a83980",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T02:51:55.473Z",
+    "verdict": "pass",
+    "fixtureHash": "81b19b04deeddd5d",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-30T23:24:20.019Z"
+  }
+}

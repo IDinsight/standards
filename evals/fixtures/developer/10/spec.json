@@ -1,0 +1,206 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Orders dashboard with customer search"
+    },
+    {
+      "dir": "layers/10-cycle",
+      "action": "commit",
+      "message": "Record project context, scope, and design for the order status filter"
+    },
+    {
+      "dir": "layers/20-plan",
+      "action": "commit",
+      "message": "Record approved development plan for the order status filter"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "developer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The Developer style files relevant to the approved plan are universal, TypeScript, React, Next.js, HTML, and SQL. HTML applies because DEV-002 states that the page's rendered markup changes (a new filter nav and a Customer column). SQL applies because DEV-001 changes lib/sql/recent-orders.sql.",
+    "The plan states that there are no stylesheet changes (it reuses .pill-nav, .data-table, and .muted from app/globals.css), so css.md does not apply. The repository contains no Python files, so python.md does not apply.",
+    "Repository-enforced rules live in scripts/format.mjs and scripts/lint.mjs. The formatter enforces no statement-ending semicolons in .ts/.tsx/.mjs, 2-space indentation, at most 100 columns, and no trailing whitespace. Lint enforces lowercase SQL keywords and no select * in lib/sql/*.sql, no SQL template strings passed to .query(), no any, no console.log in app/ or lib/, and no 'use client' directive in page.tsx. Both pass on the built commit.",
+    "The project uses Next.js 15.1. In that version a page's searchParams prop is a Promise, and app/customers/page.tsx already awaits it.",
+    "No conflict exists between the repository's formatter, lint, or framework constraints and the scope or design.",
+    "Next.js and the other npm dependencies are not installed and the npm registry is blocked, so pnpm typecheck and pnpm build cannot run. pnpm format:check, pnpm lint, and pnpm test run offline.",
+    "app/customers/page.tsx (which uses index keys), lib/customers.ts, lib/money.ts, lib/db.ts, lib/sql.ts, and app/layout.tsx are unrelated to the plan."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "filter-orders-by-status-and-show-20260923T141200Z-5b8d2f61",
+    "PLAN": ".standards/docs/development/filter-orders-by-status-and-show-20260923T141200Z-5b8d2f61.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "scripts/**",
+            ".editorconfig",
+            "tsconfig.json",
+            "package.json",
+            "next.config.mjs"
+          ],
+          "why": "repository-enforced formatter, lint, and toolchain configuration constrains the work; a correct run does not loosen or rewrite it"
+        }
+      ]
+    },
+    {
+      "assertion": 4,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "app/customers/**",
+            "app/layout.tsx",
+            "app/page.tsx",
+            "app/globals.css",
+            "lib/customers.ts",
+            "lib/money.ts",
+            "lib/db.ts",
+            "lib/sql.ts",
+            "lib/sql/search-customers.sql"
+          ],
+          "why": "these files are outside the approved plan's affected area"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "Developer suggests commits but does not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Developer does not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "test/**"
+      ],
+      "why": "tests are Tester-owned; Developer does not create or rewrite them"
+    }
+  ],
+  "runtime": {
+    "blockHosts": [
+      "registry.npmjs.org",
+      "registry.yarnpkg.com",
+      "pypi.org",
+      "files.pythonhosted.org"
+    ]
+  },
+  "selfChecks": [
+    {
+      "cmd": "pnpm run format:check",
+      "expect": "pass",
+      "why": "the repository formatter passes on the built project"
+    },
+    {
+      "cmd": "pnpm run lint",
+      "expect": "pass",
+      "why": "the repository lint rules pass on the built project"
+    },
+    {
+      "cmd": "pnpm test",
+      "expect": "pass",
+      "why": "the existing unit tests pass offline"
+    },
+    {
+      "cmd": "echo 'export const answer = 42;' > lib/answer.ts; pnpm run format:check; rc=$?; rm -f lib/answer.ts; exit $rc",
+      "expect": "fail",
+      "expectOutput": "no semicolons at the end of statements",
+      "why": "the repository formatter enforces the no-semicolon rule"
+    },
+    {
+      "cmd": "echo 'SELECT id from orders' > lib/sql/example.sql; pnpm run lint; rc=$?; rm -f lib/sql/example.sql; exit $rc",
+      "expect": "fail",
+      "expectOutput": "lowercase SQL keywords",
+      "why": "repository lint enforces lowercase SQL keywords"
+    },
+    {
+      "cmd": "node -e 'require.resolve(`next`)'",
+      "expect": "fail",
+      "expectOutput": "Cannot find module",
+      "why": "Next.js is not installed, so typecheck and build cannot run here"
+    },
+    {
+      "cmd": "node -e 'fetch(`https://registry.npmjs.org/next`).then(r => { if (!r.ok) { console.error(`blocked status`, r.status); process.exit(1) } console.log(`reachable`) }, e => { console.error(`fetch failed`, e.cause && e.cause.code); process.exit(1) })'",
+      "expect": "fail",
+      "expectOutput": "fetch failed|blocked status",
+      "why": "the npm registry is blocked, so the toolchain cannot be installed"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. Layer 00-project (pre-install) is a small Next.js 15 App Router dashboard in TypeScript/React with Postgres via pg. It has app/orders/page.tsx, app/customers/page.tsx, lib query modules that load SQL from lib/sql/*.sql, and node:test tests using fake Db objects. The repository's own formatter (scripts/format.mjs, pnpm format / format:check) and lint (scripts/lint.mjs, pnpm lint) are dependency-free so they run offline. next, react, pg, and typescript are declared in package.json but not installed. There are no Python files and no stylesheet work. Layer 10-cycle adds the Auditor CONTEXT.md, the scope (AC-001..AC-005), and the technical design, with STATE at DEVELOPING (STANDARD) and a FORWARD handoff from ARCHITECTING. Layer 20-plan adds the development plan: AUTONOMOUS, User Style NONE, locked, Status APPROVED, AFTER_IMPLEMENTATION/NONE. DEV-001 covers the SQL query and lib/orders.ts. DEV-002 covers the page, and states that its rendered markup changes and that no stylesheet changes are made. STATE.Development points at the plan and BlockedOn is NONE. Style-loading assertions 0-2 can only be judged from the trace. Assertions 3 and 4 have unchanged-file preconditions. Registry hosts are blocked so runs cannot install the Next toolchain.",
+  "case": "developer-10",
+  "caseHash": "e7c2f8f3f4de028c",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T02:15:33.948Z",
+    "verdict": "pass",
+    "fixtureHash": "9d5bacaeb542f2cc",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "9c66ebafaab0206a",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:06:48.515Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T01:12:54.390Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/10-cycle/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/20-plan/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:06:48.515Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

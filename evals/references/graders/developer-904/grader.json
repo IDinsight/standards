@@ -1,0 +1,150 @@
+{
+  "label": "D4",
+  "reference": "skills/developer/references/github-actions-python.md",
+  "checks": [
+    {
+      "id": "audit-locked-deps",
+      "tier": "outcome",
+      "text": "A dependency audit exists and checks the project's locked dependencies: uv run pip-audit with pip-audit in a development dependency group, pip-audit -r on requirements exported from uv.lock, or the PyPA action pointed at the synced environment or at exported requirements. pip-audit with no input outside the project's environment (uvx pip-audit, or pip install pip-audit then pip-audit) fails."
+    },
+    {
+      "id": "notify-needs-all",
+      "tier": "outcome",
+      "text": "A Slack notification exists and covers every CI job: a job that needs lint, type-check, test, and build; a workflow that runs when the whole CI workflow completes (workflow_run); or a failure step in each of those four jobs."
+    },
+    {
+      "id": "notify-on-main-failure",
+      "tier": "outcome",
+      "text": "A Slack notification exists and runs only when CI failed on main."
+    },
+    {
+      "id": "notify-not-on-pr",
+      "tier": "outcome",
+      "text": "A Slack notification exists and never runs for pull_request events, nor for a CI run that a pull request started."
+    },
+    {
+      "id": "audit-own-workflow",
+      "tier": "reference",
+      "text": "The audit runs in its own workflow file, not in ci.yml."
+    },
+    {
+      "id": "notify-timeout-5",
+      "tier": "reference",
+      "text": "The notification job's timeout is 5 minutes."
+    },
+    {
+      "id": "audit-triggers",
+      "tier": "control",
+      "text": "The audit runs on pull requests and on a weekly schedule."
+    },
+    {
+      "id": "secret-context",
+      "tier": "control",
+      "text": "The webhook URL is read only as secrets.SLACK_WEBHOOK_URL."
+    },
+    {
+      "id": "job-timeouts",
+      "tier": "control",
+      "text": "Every new job sets timeout-minutes."
+    },
+    {
+      "id": "read-only-permissions",
+      "tier": "control",
+      "text": "Every new or changed workflow keeps read-only permissions."
+    },
+    {
+      "id": "frozen-sync",
+      "tier": "control",
+      "text": "Where the audit job syncs, it uses uv sync --frozen or --locked."
+    }
+  ],
+  "rules": [
+    {
+      "check": "audit-locked-deps",
+      "file": "skills/developer/references/github-actions-python.md",
+      "text": "- run: uv run pip-audit # audits the synced project environment"
+    },
+    {
+      "check": "audit-locked-deps",
+      "file": "skills/developer/references/github-actions-python.md",
+      "text": "`pip-audit` must be in the project's development dependency group for `uv run`"
+    },
+    {
+      "check": "notify-needs-all",
+      "file": "skills/developer/references/github-actions-python.md",
+      "text": "needs: [lint, type-check, test, build]"
+    },
+    {
+      "check": "notify-on-main-failure",
+      "file": "skills/developer/references/github-actions-python.md",
+      "text": "if: failure() && github.ref == 'refs/heads/main'"
+    },
+    {
+      "check": "notify-not-on-pr",
+      "file": "skills/developer/references/github-actions-python.md",
+      "text": "# cannot read secrets, so never notify from pull_request runs."
+    },
+    {
+      "check": "audit-own-workflow",
+      "file": "skills/developer/references/github-actions-python.md",
+      "text": "When the design adds audit or SAST scanning"
+    },
+    {
+      "check": "notify-timeout-5",
+      "file": "skills/developer/references/github-actions-python.md",
+      "text": "timeout-minutes: 5"
+    }
+  ],
+  "leakGuard": [
+    "failure()",
+    "refs/heads/main",
+    "uv run pip-audit",
+    "uv export",
+    "security.yml",
+    "schedule:",
+    "cron"
+  ],
+  "solutions": [
+    {
+      "patch": "good.patch",
+      "kind": "good"
+    },
+    {
+      "patch": "good-run.patch",
+      "kind": "good"
+    },
+    {
+      "patch": "good-pipe.patch",
+      "kind": "good"
+    },
+    {
+      "patch": "good-curl.patch",
+      "kind": "good"
+    },
+    {
+      "patch": "good-wfenv.patch",
+      "kind": "good"
+    },
+    {
+      "patch": "bad-uvx.patch",
+      "kind": "bad",
+      "fails": [
+        "audit-locked-deps",
+        "notify-needs-all",
+        "notify-on-main-failure",
+        "notify-not-on-pr",
+        "audit-own-workflow",
+        "notify-timeout-5",
+        "audit-triggers",
+        "job-timeouts"
+      ]
+    },
+    {
+      "patch": "bad-headbranch.patch",
+      "kind": "bad",
+      "fails": [
+        "notify-not-on-pr"
+      ]
+    }
+  ]
+}

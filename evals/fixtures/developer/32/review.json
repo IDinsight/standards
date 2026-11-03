@@ -1,0 +1,66 @@
+{
+  "conditions": [
+    {
+      "condition": "Brownfield project, STANDARD cycle in DEVELOPING owned by Developer",
+      "where": ".standards/MODE.md (BROWNFIELD); .standards/STATE.md WorkflowState DEVELOPING, CycleMode STANDARD",
+      "status": "realized"
+    },
+    {
+      "condition": "A development plan exists, is PROPOSED, and has never been approved",
+      "where": ".standards/docs/development/overdue-grace-period-20260924T090000Z-3e9a71c4.md header Status PROPOSED; STATE BlockedOn asks for plan approval",
+      "status": "realized"
+    },
+    {
+      "condition": "User Style Locked is false",
+      "where": "plan header `User Style Locked`: `false`, `User Style`: `NONE`",
+      "status": "realized"
+    },
+    {
+      "condition": "The only Developer user-style file is .standards/user-styles/developer/tony.md",
+      "where": ".standards/user-styles/developer/tony.md; selfCheck confirms it is the only file",
+      "status": "realized"
+    },
+    {
+      "condition": "The planned implementation modifies Python",
+      "where": "loans/fees.py; architecture Build Plan MODIFY loans/fees.py; plan DEV-001/DEV-002 affected area",
+      "status": "realized"
+    },
+    {
+      "condition": "Upstream scope, architecture, and context are complete and valid so Developer can plan",
+      "where": "scope (AC-001..003), spec covering all ACs, .standards/CONTEXT.md; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "User explicitly selects tony.md as the style",
+      "where": "prompt.utterance 'use tony.md as my development style. Update the development plan.'",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "ungradeable-assertion",
+      "assertion": 3,
+      "detail": "tony.md and styles/python.md have no planted discretionary conflict, so the precedence order (universal > user style > technology) cannot be observed in output; the judge can only see that styles/universal.md, tony.md, and styles/python.md were loaded. The catalog already records this ('read order only').",
+      "recommendation": "run_as_is",
+      "fix": "Acceptable; the judge grades loading of the three style layers from the trace."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 1,
+      "detail": "Assertions 1 and 2 are fully decided by the plan's `User Style` equalling `tony`. This is required of every correct run: the developer template states that with only tony.md present, both tony and tony.md persist as tony, and the user asks for the plan to be updated. The plan stays PROPOSED and unlocked with BlockedOn intact, so check_ok and the implementation-unchanged invariants hold for a correct run.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition: a DEVELOPING STANDARD cycle, a never-approved PROPOSED plan with User Style NONE and Locked false, tony.md as the only developer style file, and a Python change. Checks require only the template-mandated `User Style: tony`, and the invariants fit an unapproved plan. The one limitation is that style precedence (assertion 3) is unobservable without a planted conflict, which the catalog already acknowledges.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-30T20:50:40.226Z",
+  "costUsd": 1.303503,
+  "ms": 39222,
+  "fixtureHash": "71fa00f3ce967eea"
+}

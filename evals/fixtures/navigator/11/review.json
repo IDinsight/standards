@@ -1,0 +1,66 @@
+{
+  "conditions": [
+    {
+      "condition": "Brownfield project with an existing small app to explain",
+      "where": "MODE.md BROWNFIELD (installed); src/tasks.js, src/cli.js, test/tasks.test.js, README.md, tasks.example.json",
+      "status": "realized"
+    },
+    {
+      "condition": "WorkflowState is SIGNED_OFF",
+      "where": ".standards/STATE.md line 3 (layer 70-signoff)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode is UNSET and pending-cycle fields are clear",
+      "where": ".standards/STATE.md line 3-4",
+      "status": "realized"
+    },
+    {
+      "condition": "Retained Active Work describes the previous cycle",
+      "where": ".standards/STATE.md Active Work: Id sort-tasks-by-due-date-20260922T141000Z-3c9e1f5a, Request, Development path; records under .standards/docs/development and reviews",
+      "status": "realized"
+    },
+    {
+      "condition": "Handoff reflects sign-off (no NEW_CYCLE yet)",
+      "where": ".standards/STATE.md Handoff Kind SIGNOFF From AWAITING_USER_SIGNOFF",
+      "status": "realized"
+    },
+    {
+      "condition": "Current diff is empty: clean working tree and index, all work committed",
+      "where": "git status '## main' with no entries; selfCheck git status --porcelain empty",
+      "status": "realized"
+    },
+    {
+      "condition": "Workflow state is valid",
+      "where": "check.mjs ok:true; selfCheck passes",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 1,
+      "detail": "reply_matches 'tasks\\.js|cli\\.js' assumes the explanation names a source file. The Navigator skill requires tying material claims to exact file paths, so a correct run will almost certainly cite src/tasks.js or src/cli.js; the residual risk is very small.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "All commits share the 2026-09-24T09:00:00Z timestamp while the cycle ID encodes 2026-09-22; harmless and not something the role would reason about.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes a signed-off brownfield project with CycleMode UNSET, retained Active Work and coherent expedited plan/review records, and a clean tree over a small committed Node CLI app. Checks are necessary conditions a correct Navigator run satisfies, and the Navigator invariants (unchanged **, HEAD unchanged, no mutating git) fit. Nothing leaks the expected answer.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T01:36:03.005Z",
+  "costUsd": 0.13236820000000002,
+  "ms": 22104,
+  "fixtureHash": "45421dcfaff32f03"
+}

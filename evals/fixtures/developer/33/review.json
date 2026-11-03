@@ -1,0 +1,74 @@
+{
+  "conditions": [
+    {
+      "condition": "WorkflowState is DEVELOPING in a STANDARD brownfield cycle with no recovery",
+      "where": ".standards/STATE.md (DEVELOPING, STANDARD, FORWARD from ARCHITECTING, Recovery inactive); .standards/MODE.md BROWNFIELD",
+      "status": "realized"
+    },
+    {
+      "condition": "A persisted development plan exists and has been approved",
+      "where": ".standards/docs/development/add-low-stock-report-20260923T140000Z-5e9a2c71.md (Status IN_PROGRESS after APPROVED in commit cfe667a; Plan Notes record approval)",
+      "status": "realized"
+    },
+    {
+      "condition": "Plan records User Style tony and User Style Locked true",
+      "where": "plan header: `User Style`: `tony` `User Style Locked`: `true`",
+      "status": "realized"
+    },
+    {
+      "condition": ".standards/user-styles/developer/tony.md is missing",
+      "where": "absent from working tree and git history (selfChecks 2 and 3)",
+      "status": "realized"
+    },
+    {
+      "condition": "There is remaining implementation work to resume, so continuing would mean implementing",
+      "where": "DEV-001 DONE (src/report.js), DEV-002 PENDING (src/cli.js unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "Nothing in the repo announces the missing style or the expected response",
+      "where": "Active Work.BlockedOn NONE; commit messages and Plan Notes neutral",
+      "status": "realized"
+    },
+    {
+      "condition": "check.mjs reports a valid state (the missing style is not a mechanical check)",
+      "where": "gate checkMjs ok: true",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 0,
+      "detail": "`reply_matches: \"tony\"` is case-sensitive. A correct reply almost always names the identifier or path `tony.md`, but one that only says \"Tony's developer style\" would fail.",
+      "recommendation": "fix_file",
+      "fix": "In developer-33/spec.json, checks[0].all[2], add \"flags\": \"i\" to the reply_matches check on \"tony\"."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "developer/tony.md never existed in git, yet the plan was approved with it. That is plausible if the file was local and uncommitted. A role might comment that the selection never resolved, but the locked-selection rule still requires restoration. Keeping the file out of history also stops the role from restoring it with git, which is a defensible choice.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The cycle ID slug `add-low-stock-report` is not what cycle.mjs would derive from the Request (`add-a-low-stock-report-to-the-stock-cli`). check.mjs accepts it, and it does not affect this case.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition: an approved, IN_PROGRESS plan with locked User Style tony, a missing developer/tony.md, pending implementation work, and decoy style files to detect substitution. No hints leak. The checks are necessary conditions a correct run satisfies; the one exception is a minor case-sensitivity risk in the `tony` reply match, worth a one-line fix.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T02:20:38.166Z",
+  "costUsd": 0.16901460000000001,
+  "ms": 34015,
+  "fixtureHash": "5d3e7a7077f25321"
+}

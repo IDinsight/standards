@@ -1,0 +1,91 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield template)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState SYNCHRONIZING",
+      "where": ".standards/STATE.md header",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, architecture, context, development plan, verification, and both review reports exist with valid ownership and matching content identities",
+      "where": ".standards/docs/{scope,specs,development,verification,reviews/<id>/implementation.md,reviews/<id>/final-deliverable.md}, .standards/CONTEXT.md; blob/commit citations match the git log and the identity selfCheck",
+      "status": "realized"
+    },
+    {
+      "condition": "Documentation evidence available",
+      "where": ".standards/docs/documentation/<id>.md (COMPLETE, G1–G4, docs/usage.md blob cited)",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and outstanding obligations inactive; no blocking user question",
+      "where": "STATE.md Recovery/Outstanding Obligations Active false, BlockedOn NONE, PendingCycleBlockedOn NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-001 quoted CSV export, AC-002 reject non-admin before writes, AC-003 accurate usage guide",
+      "where": ".standards/docs/scope/<id>.md Work items 1–3",
+      "status": "realized"
+    },
+    {
+      "condition": "Current Tester results support AC-001 and AC-002",
+      "where": "verification report E1, E2, I1 at efd6fa7; implementation unchanged since then (git log)",
+      "status": "realized"
+    },
+    {
+      "condition": "Documenter evidence and final review support AC-003",
+      "where": "documentation record G1–G4; final-deliverable review C3, AC-003 Supported",
+      "status": "realized"
+    },
+    {
+      "condition": "Every relevant technical criterion evidenced",
+      "where": "design's three Technical Acceptance Criteria map to rows in verification Acceptance Evidence and both review tables",
+      "status": "realized"
+    },
+    {
+      "condition": "Repository matches recorded identities; no gaps or findings; code actually behaves as recorded",
+      "where": "clean tree at c0ee414; src/export.ts quoting, src/routes/export.ts requireAdmin first; docs/usage.md matches code; both test suites pass (selfChecks); both reviews 'No material findings'",
+      "status": "realized"
+    },
+    {
+      "condition": "No synchronization record exists yet",
+      "where": "selfCheck: .standards/docs/synchronization absent",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "Git config sets user.name=Fixture / user.email=fixture@example.invalid, so commit authors visible via git log say 'Fixture'. This is harness-wide and does not hint at the expected answer.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally use a neutral author name in the builder."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 2,
+      "detail": "reply_matches 'sign[- ]?off' (case-insensitive) also matches the state name AWAITING_USER_SIGNOFF, which a correct run will almost certainly mention. Sign-off is also protocol vocabulary for the action being offered, so the check is unlikely to fail a correct run.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The export-synchronizing base fully realizes the case: a clean BROWNFIELD/STANDARD/SYNCHRONIZING cycle with complete, mutually consistent records whose cited identities match the tree. There are no findings or gaps, both suites pass, and there is no synchronization record yet. The checks and invariants are necessary conditions a correct run satisfies, and every assertion is observable; only minor notes remain.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T14:29:05.573Z",
+  "costUsd": 0.841468,
+  "ms": 39549,
+  "fixtureHash": "092803d603608e22"
+}

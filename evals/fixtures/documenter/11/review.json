@@ -1,0 +1,86 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState DOCUMENTING, Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, architecture, context, development, verification and implementation review exist with matching provenance and current evidence",
+      "where": ".standards/docs/{scope,specs,development,verification,reviews/.../implementation}.md, .standards/CONTEXT.md",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-001 covers CSV export behavior; AC-002 requires an accurate usage guide",
+      "where": ".standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and outstanding obligations inactive",
+      "where": ".standards/STATE.md Recovery/Outstanding Obligations Active false",
+      "status": "realized"
+    },
+    {
+      "condition": "No unrelated user question blocked; the only blocker is the guided apply-step request (case override: GUIDED with pending snippet, and assertion 2 needs a guided blocker)",
+      "where": ".standards/STATE.md Active Work.BlockedOn",
+      "status": "realized"
+    },
+    {
+      "condition": "Documentation record is GUIDED / FILE with a pending snippet",
+      "where": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md header and Resume and Conclusion (step 2 offered, not applied)",
+      "status": "realized"
+    },
+    {
+      "condition": "Still-applicable evidence exists in the record to survive the switch",
+      "where": "documentation record I1, I2, step 1 inspected complete, Errors no-change disposition",
+      "status": "realized"
+    },
+    {
+      "condition": "Intervening partial edit in the target file",
+      "where": "unstaged docs/usage.md: step 2 heading and first two paragraphs, reworded, rest missing",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation matches design and snippet, so remaining edits are permitted documentation-only work",
+      "where": "src/routes/export.ts, src/export.ts vs design Interfaces and Contracts",
+      "status": "realized"
+    },
+    {
+      "condition": "User's explicit switch to AUTONOMOUS",
+      "where": "prompt utterance 'Switch to autonomous and finish it.'",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The case says editing is unrestricted. The record adds a user direction to leave README.md unchanged, to cover the base's README Layout omission of src/export.ts. The README surface is not required by AC-002, and the record already gives it a non-blocking disposition. A run could still reopen it and raise a new question, which would fail the complete BlockedOn NONE check for assertion 2. The risk is low because the user direction is explicit and recorded.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "hint-leak",
+      "assertion": -1,
+      "detail": "The record's Next action says 'reconcile any edits made since this record was saved'. This mirrors guided.md's own resume instruction, so it is realistic Documenter text rather than a leak.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes a DOCUMENTING standard cycle with a GUIDED/FILE record, a pending step 2 snippet with its blocker, and an unstaged, accurate partial application of that step. The deterministic checks fit any correct AUTONOMOUS reconciliation: target fields preserved, no new cycle, plan, scope and design untouched, no duplicated section, blocker cleared, Collaboration persisted. check_ok also holds after a FORWARD to REVIEWING_FINAL, since the record would account for both ACs. The only concern is the added README exclusion, which conflicts mildly with 'editing is unrestricted' but is harmless.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T16:23:31.989Z",
+  "costUsd": 0.2893966,
+  "ms": 56395,
+  "fixtureHash": "649ed75bac9eb4c4"
+}

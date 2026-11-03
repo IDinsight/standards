@@ -1,0 +1,86 @@
+{
+  "conditions": [
+    {
+      "condition": "BROWNFIELD project, STANDARD cycle at normal DEVELOPING (no recovery, no obligations)",
+      "where": ".standards/MODE.md (BROWNFIELD); .standards/STATE.md WorkflowState DEVELOPING, CycleMode STANDARD, Recovery/Obligations Active false, Handoff FORWARD from ARCHITECTING",
+      "status": "realized"
+    },
+    {
+      "condition": "Approved, locked CODE_WITH_ME plan, IN_PROGRESS",
+      "where": "development plan header: Mode CODE_WITH_ME, User Style NONE, User Style Locked true, Status IN_PROGRESS",
+      "status": "realized"
+    },
+    {
+      "condition": "INCREMENTAL cadence with Current Increment 1",
+      "where": "plan header Verification Cadence INCREMENTAL, Current Increment 1; PendingVerificationCadence NONE in STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Increment 1 covers DEV-001 / AC-001, the usable search endpoint",
+      "where": "plan ## Verification Increments ### Increment 1 (DEV-001, AC-001); scope AC-001; design GET /contacts/search",
+      "status": "realized"
+    },
+    {
+      "condition": "DEV-002 is a future UI step, still pending",
+      "where": "plan ### DEV-002 Status PENDING, Depends On DEV-001, AC-002, public/ files; Increment 2",
+      "status": "realized"
+    },
+    {
+      "condition": "A final DEV-001 edit remains and is described so the user can direct it",
+      "where": "plan DEV-001 Implementation Notes (route registration in src/app.js); src/app.js lacks the route (selfCheck: status 404); src/search.js already present",
+      "status": "realized"
+    },
+    {
+      "condition": "DEV-001 has an existing self-check command",
+      "where": "plan DEV-001 **Self-Check** (npm test plus four-request node command); npm test passes in selfChecks",
+      "status": "realized"
+    },
+    {
+      "condition": "The directed edit plus self-check satisfy Increment 1",
+      "where": "src/search.js correct (selfCheck returns Ada Lovelace, Alan Turing); described route edit yields 200/200/400/400 for the plan's requests on inspection",
+      "status": "realized"
+    },
+    {
+      "condition": "Code With Me is waiting on user direction, which the utterance supplies",
+      "where": "STATE.md Active Work.BlockedOn 'Code With Me: waiting for the user's direction on the remaining DEV-001 work.'",
+      "status": "realized"
+    },
+    {
+      "condition": "Upstream records (scope, design, context) complete and consistent",
+      "where": ".standards/docs/scope/..., .standards/docs/specs/..., .standards/CONTEXT.md; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "Clean committed git state",
+      "where": "git status clean on main; history of five commits",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 2,
+      "detail": "The `contains` regex on STATE.md requires case-sensitive `Increment 1`. check.mjs matches the checkpoint Reason with /\\bIncrement ([1-9]\\d*)\\b/gi, so a Reason such as `increment 1 ready` is legal but would fail this complete check. A capitalized form is far more likely because the protocol and plan headings use it, so the risk is small.",
+      "recommendation": "fix_file",
+      "fix": "In developer-51/spec.json, checks[2].all[4].contains, add \"flags\": \"i\" so that it matches the runtime's case-insensitive rule."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "No selfCheck applies the described src/app.js edit to show that Increment 1 then holds. I checked it by inspection: the route sits before the \\d+ match, which /contacts/search would not match anyway. `ADA` matches only Ada Lovelace, `example.org` matches Ada and Alan, and blank or missing q returns 400 through searchParams and trim. The DEV-001/DEV-002 status regexes also hold: neither heading contains a backtick.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition. The CODE_WITH_ME plan is locked, INCREMENTAL, and IN_PROGRESS at Increment 1, with DEV-001 one described route edit from ready, DEV-002 PENDING, and a persisted Code With Me blocker that the utterance answers; it has no leaks, and check.mjs is clean. After a correct checkpoint the turn-end check passes, and the checks are necessary conditions apart from a minor case-sensitivity tightening worth fixing on the Reason regex.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T02:24:30.185Z",
+  "costUsd": 0.23709460000000002,
+  "ms": 52687,
+  "fixtureHash": "aa07fd5f4bdf6635"
+}

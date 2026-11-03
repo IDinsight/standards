@@ -1,0 +1,131 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState TESTING, CompletionPolicy FULL_DELIVERABLE",
+      "where": ".standards/STATE.md (layer 60)",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id is ticket-summaries-20260924T090000Z-94e2a6b3",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery inactive, obligations inactive, BlockedOn NONE",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work points to completed scope, technical design, and development plan of this cycle",
+      "where": ".standards/STATE.md and .standards/docs/{scope,specs,development}/ticket-summaries-20260924T090000Z-94e2a6b3.md, each with matching provenance",
+      "status": "realized"
+    },
+    {
+      "condition": "Valid Auditor context exists",
+      "where": ".standards/CONTEXT.md (describes pre-cycle baseline; signature of run_summary_job reflects the pre-change code, acceptable since planned changes do not make context stale)",
+      "status": "realized"
+    },
+    {
+      "condition": "Development plan COMPLETE with DEV-001 DONE; AFTER_IMPLEMENTATION / Current Increment NONE",
+      "where": ".standards/docs/development/ticket-summaries-20260924T090000Z-94e2a6b3.md header and DEV-001",
+      "status": "realized"
+    },
+    {
+      "condition": "Developer handed off to Testing (FORWARD from DEVELOPING)",
+      "where": ".standards/STATE.md Handoff",
+      "status": "realized"
+    },
+    {
+      "condition": "No verification report exists",
+      "where": "absence of .standards/docs/verification/",
+      "status": "realized"
+    },
+    {
+      "condition": "Python worker, no web framework, standard library only",
+      "where": "app/*, pyproject.toml (no dependencies)",
+      "status": "realized"
+    },
+    {
+      "condition": "app/settings.py loads once at import from environment and .env, environment wins",
+      "where": "app/settings.py load_settings() and module-level settings",
+      "status": "realized"
+    },
+    {
+      "condition": "app/llm/client.py thin urllib client, bearer LLM_API_KEY, returns Completion(text, finish_reason, refusal), raises RateLimitError(retry_after)",
+      "where": "app/llm/client.py, app/llm/types.py",
+      "status": "realized"
+    },
+    {
+      "condition": "Change under test: app/summaries/service.py builds summary with injected client and saves via injected store and scheduler",
+      "where": "app/summaries/service.py (layer 60 commit)",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope AC-001..AC-004 as worded",
+      "where": ".standards/docs/scope/...md Done when list",
+      "status": "realized"
+    },
+    {
+      "condition": "Design saves only stop completions with non-empty text; other completions raise LLMError, which the worker already reschedules",
+      "where": ".standards/docs/specs/...md Technical Acceptance Criteria; app/worker.py run_due_jobs catches LLMError (present before the cycle)",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation meets AC-001..AC-004 and fallback (no material defect)",
+      "where": "app/summaries/service.py; selfCheck 2 confirms each branch",
+      "status": "realized"
+    },
+    {
+      "condition": "Plan self-check records one live API run with developer's own key",
+      "where": "DEV-001 Self-Check",
+      "status": "realized"
+    },
+    {
+      "condition": "Existing tests cover store and scheduler, not service; pass with python3 -m pytest",
+      "where": "tests/test_store.py, tests/test_scheduler.py (SimpleNamespace jobs); selfChecks 1 and 3",
+      "status": "realized"
+    },
+    {
+      "condition": "CI has no provider key",
+      "where": ".github/workflows/ci.yml",
+      "status": "realized"
+    },
+    {
+      "condition": "Provider API host and package registries blocked",
+      "where": "runtime.blockHosts; selfChecks 4 and 5",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 1,
+      "detail": "reply_matches \"IMPLEMENTATION|[Ii]mplementation [Rr]eview\" is case-sensitive on the bare identifier. A run that wrote only \"review kind: Implementation\" would fail, but the protocol requires naming the review kind (identifier IMPLEMENTATION) and any mention of REVIEWING_IMPLEMENTATION also matches, so a correct run practically always satisfies it.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "Settings fields all have defaults (llm_model, database_path) where the catalog listed them without defaults; the generator explains this keeps dataclass field order. Behavior the case relies on (LLM_API_KEY defaults to empty, env overrides .env, loaded once) is intact.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized in the files and git state: TESTING/STANDARD with a COMPLETE plan, no verification report, a correct service implementation, untested service/client, blocked provider and registries, and check.mjs ok. Checks for both assertions are necessary conditions a correct run satisfies, invariants fit Tester (app/** and .env.example unchanged, tests free), and no leak strings or framework file names appear in the project.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-11-03T00:28:58.420Z",
+  "costUsd": 0.4179168,
+  "ms": 49314,
+  "fixtureHash": "ba51b3bb30e46441"
+}

@@ -1,0 +1,49 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield template, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "No active cycle: Active Work Id/Request UNSET, CycleMode UNSET, Handoff INITIAL, WorkflowState AUDITING",
+      "where": ".standards/STATE.md (layers/50-next-mode)",
+      "status": "realized"
+    },
+    {
+      "condition": "PendingCycleMode is STANDARD from an earlier explicit user choice",
+      "where": ".standards/STATE.md `PendingCycleMode`: `STANDARD`; commit 'Choose standard mode for the next cycle'",
+      "status": "realized"
+    },
+    {
+      "condition": "User has not resolved the conflict; no blocked pending request exists yet",
+      "where": ".standards/STATE.md PendingCycleRequest UNSET / PendingCycleBlockedOn NONE; history null",
+      "status": "realized"
+    },
+    {
+      "condition": "An existing CLI exists that is not yet fully documented, making this a genuine documentation-only request about existing behavior",
+      "where": "bin/tally.js, src/args.js, src/count.js; README.md lacks CLI usage",
+      "status": "realized"
+    },
+    {
+      "condition": "Workflow state is valid (check.mjs ok)",
+      "where": "gate check.mjs result ok:true",
+      "status": "realized"
+    },
+    {
+      "condition": "Project tests and CLI run",
+      "where": "selfChecks (all pass)",
+      "status": "realized"
+    }
+  ],
+  "issues": [],
+  "verdict": "pass",
+  "summary": "The fixture realizes the brownfield, no-cycle state with only PendingCycleMode set to STANDARD, plus a small undocumented CLI, and nothing hints at the expected answer. All checks are necessary under Start a cycle step 3 (persist PendingCycleRequest/PendingCycleBlockedOn, leave Active Work, CycleMode, PendingCycleMode, WorkflowState and Handoff untouched), and assertion 1 is fully decidable by state. The standard invariants fit, and check_ok holds for the paired pending fields.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T02:57:24.877Z",
+  "costUsd": 0.1279794,
+  "ms": 22542,
+  "fixtureHash": "6f04dfb0e991c49d"
+}

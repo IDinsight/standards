@@ -1,0 +1,30 @@
+# S.T.A.N.D.A.R.D.S. Workflow State
+
+`WorkflowState`: `REVIEWING_IMPLEMENTATION` `CycleMode`: `STANDARD` `PendingCycleMode`: `UNSET`
+`PendingCycleRequest`: `UNSET` `PendingCycleBlockedOn`: `NONE`
+
+## Active Work
+
+`CompletionPolicy`: `IMPLEMENTATION_REVIEWED`
+`Id`: `export-20260924T090000Z-a7f3c1d2`
+`Request`: `Let administrators export the filtered records list as CSV; non-admins must not be able to export. Workflow instruction: finish after implementation review (IMPLEMENTATION_REVIEWED), because the usage guide will be updated in a later cycle.`
+`Scope`: `.standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md`
+`Architecture`: `.standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md`
+`Development`: `.standards/docs/development/export-20260924T090000Z-a7f3c1d2.md`
+`PromotionReason`: `NONE` `AuditTarget`: `NONE` `BlockedOn`: `NONE`
+`PendingVerificationCadence`: `NONE`
+
+`BaselineReconciliation`: `NONE`
+
+## Handoff
+
+`Kind`: `RESUME` `From`: `SYNCHRONIZING` `FailureType`: `NONE` `Reason`:
+`Reconciliation correction verified; the synchronization record stays incomplete because final review is omitted under IMPLEMENTATION_REVIEWED.`
+
+## Recovery
+
+`Active`: `false`
+
+## Outstanding Obligations
+
+`Active`: `false`

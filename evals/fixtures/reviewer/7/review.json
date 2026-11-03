@@ -1,0 +1,99 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is BROWNFIELD",
+      "where": ".standards/MODE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState REVIEWING_IMPLEMENTATION, Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md header and Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Current scope available with valid ownership",
+      "where": ".standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md (SCOPE provenance, AC-001/AC-002)",
+      "status": "realized"
+    },
+    {
+      "condition": "Current architecture available",
+      "where": ".standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Auditor context available",
+      "where": ".standards/CONTEXT.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Development plan available and complete",
+      "where": ".standards/docs/development/export-20260924T090000Z-a7f3c1d2.md (Status COMPLETE, all DEV steps DONE)",
+      "status": "realized"
+    },
+    {
+      "condition": "Tester report available, FULL and COMPLETE",
+      "where": ".standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and outstanding obligations inactive",
+      "where": ".standards/STATE.md Recovery/Outstanding Obligations Active false",
+      "status": "realized"
+    },
+    {
+      "condition": "Forward handoff from TESTING into implementation review; no review report yet",
+      "where": ".standards/STATE.md Handoff; no .standards/docs/reviews/",
+      "status": "realized"
+    },
+    {
+      "condition": "This conversation previously authored the scope, but no implementation",
+      "where": "spec history: /scoper turns that resolve a blocker and report the committed scope wording, then hand off to Architect",
+      "status": "realized"
+    },
+    {
+      "condition": "User asks to run the review here and forget earlier messages",
+      "where": "prompt.utterance",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation and tests exist and pass (small committed code)",
+      "where": "src/export.ts, src/routes/export.ts, test/*; selfCheck test runs pass",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "history",
+      "assertion": -1,
+      "detail": "The history's Scoper turn suggests the commit `docs(scope): define CSV export requirements`, but the committed scope's subject is `Define CSV export scope`. A user may write their own message, so this is only a small realism gap.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally align the history's suggested commit message with the base commit subject, or leave it as is."
+    },
+    {
+      "severity": "note",
+      "kind": "ungradeable-assertion",
+      "assertion": 2,
+      "detail": "Every handoff input is already persisted, so a correct run has no missing context to persist. Assertion 2 is graded only on its negative half: no author artifact is rewritten (unchanged globs plus check_ok). That half is a real test. STATE.md and the reviews folder are correctly left out of the unchanged globs, so BlockedOn or a Reviewer-owned report stays allowed.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 3,
+      "detail": "`reply_matches: implementation` (case-insensitive) is a weak precondition: almost any reply will mention implementation. It never fails a correct run. The judge decides whether the IMPLEMENTATION kind and the model guidance are present.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The base supplies every stated workflow fact: brownfield, STANDARD, REVIEWING_IMPLEMENTATION, the complete scope, design, context, plan, and FULL verification report, with no recovery. The realistic Scoper history matches the committed scope and realizes the prohibited scope-authoring condition. The checks are necessary conditions that a correct stop-and-request-fresh-session run satisfies, and the invariants fit the Reviewer role, so the fixture is fit to run with only minor notes.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T15:42:53.340Z",
+  "costUsd": 0.2467706,
+  "ms": 32425,
+  "fixtureHash": "50768762e2699edd"
+}

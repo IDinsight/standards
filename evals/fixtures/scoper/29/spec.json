@@ -1,0 +1,154 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial fieldops API with enumerator and assignment endpoints"
+    },
+    {
+      "dir": "layers/60-workflow",
+      "action": "commit",
+      "message": "Record project context for survey submission API"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "scoper",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "Active Work.Request is 'Build the survey submission API at Level 3 so the field team can test it internally.'; Active Work.Scope is NONE and recovery is inactive.",
+    ".standards/CONTEXT.md describes an existing FastAPI service (fieldops-api) with enumerator and assignment endpoints and no survey features.",
+    "The existing routers require an X-API-Key header through app/auth.py; only GET /health is open.",
+    "The repository has no CI, lint, formatter, or type-check configuration and no HTTP-level tests; tests/test_assignments.py covers only the domain helpers.",
+    "The project has no web frontend or mobile app; the field team currently fills in the paper questionnaire described in docs/household-survey.md."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "build-the-survey-submission-api-at-level-20260924T090000Z-3e9a6c1f",
+    "SCOPE": ".standards/docs/scope/build-the-survey-submission-api-at-level-20260924T090000Z-3e9a6c1f.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "contains": {
+            "path": "${SCOPE}",
+            "regex": "^##\\s+Constraints\\s*$(?:(?!^##\\s)[\\s\\S])*?Level[\\s-]*3",
+            "flags": "mi"
+          },
+          "why": "the target maturity must appear in the scope's Constraints section; reading the reference is judged from the trace"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.Scope",
+          "equals": "${SCOPE}",
+          "why": "no project scope document exists, so the scope is created at the default cycle path"
+        },
+        {
+          "provenance": {
+            "path": "${SCOPE}",
+            "artifact": "SCOPE",
+            "cycle": "${ID}"
+          }
+        },
+        {
+          "contains": {
+            "path": "${SCOPE}",
+            "regex": "^\\s*(?:[-*+]|\\d+[.)])\\s+(?:\\[[ xX]\\]\\s+)?[*_`]*AC-\\d{3}",
+            "flags": "m"
+          },
+          "why": "acceptance conditions are defined as AC-NNN list items"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.Request",
+          "unchanged": true,
+          "why": "the saved request already names Level 3; Scoper does not rewrite it"
+        },
+        {
+          "contains": {
+            "path": "${SCOPE}",
+            "regex": "^##\\s+Non-?goals",
+            "flags": "mi"
+          },
+          "why": "deferred higher-level capabilities belong under a Non-goals section"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "app/**",
+        "tests/**",
+        "docs/**",
+        "README.md",
+        "pyproject.toml"
+      ],
+      "why": "Scoper writes no production code, tests, or project documentation"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "python3 -m pytest -q",
+      "expect": "pass",
+      "why": "CONTEXT.md states the existing domain tests pass with python -m pytest (7 tests, no FastAPI import needed)"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. Layer 50-project (pre-install) commits fieldops-api: a small FastAPI service (app/main.py, app/routers/enumerators.py and assignments.py, app/auth.py X-API-Key dependency, app/config.py env settings, app/db.py sqlite3 schema), framework-free domain helpers in app/assignments.py with pytest tests, a README with run instructions, and docs/household-survey.md (the paper questionnaire the field team uses, so the survey content is not a blocking unknown). Nothing implements survey submission. Layer 60-workflow commits .standards/CONTEXT.md (Auditor context: FastAPI service, no survey features, no route tests, no lint/type/CI) and STATE.md: STANDARD cycle in SCOPING, FULL_DELIVERABLE, Scope/Architecture/Development NONE, Handoff FORWARD from AUDITING, recovery inactive, Request naming Level 3. FastAPI is not installed in the runner; the tests deliberately import only app/assignments.py so pytest passes offline. Assertion 0's 'reads the reference' part is left to the judge (trace), so it is complete:false.",
+  "case": "scoper-29",
+  "caseHash": "32e23d11691d8edb",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T03:09:25.975Z",
+    "verdict": "pass",
+    "fixtureHash": "72ee05182c7d8199",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-31T01:07:02.592Z"
+  }
+}

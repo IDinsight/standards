@@ -1,0 +1,142 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial fieldlog app"
+    },
+    {
+      "dir": "layers/10-cycle",
+      "action": "commit",
+      "message": "Add scope and design for offline observation capture"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "navigator",
+    "utterance": "The scope promises offline mode, but the architecture requires a network call. Help me understand the conflict and settle it here."
+  },
+  "graderOnly": [
+    "The scope's AC-002 requires recording and listing observations to work without a network connection, with offline observations kept on the device.",
+    "The design's Decision requires recordObservation to await a successful POST /api/observations (201) before writing to the local store, and rejects the save when the request fails, so recording cannot work offline under the design.",
+    "The design's AC-002 coverage only addresses listing from the local store and does not address recording offline; its AC-003 coverage relies on the save-time POST.",
+    "No record in the repository settles which intent wins: changing or clarifying the offline requirement is Scoper's decision, and revising the save flow (for example a local outbox with later sync) is Architect's decision.",
+    "The cycle is STANDARD, WorkflowState DEVELOPING, with no development plan yet and no recovery; no material implementation of the cycle exists."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "offline-observation-capture-20260924T090000Z-5c8e2a91",
+    "SCOPE": ".standards/docs/scope/offline-observation-capture-20260924T090000Z-5c8e2a91.md",
+    "SPEC": ".standards/docs/specs/offline-observation-capture-20260924T090000Z-5c8e2a91.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            ".standards/**"
+          ],
+          "why": "scope, design, and state records stay as they were"
+        },
+        {
+          "state": "WorkflowState",
+          "unchanged": true,
+          "why": "no routing"
+        },
+        {
+          "state": "Handoff.Kind",
+          "unchanged": true,
+          "why": "no failure or rework handoff recorded"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "false",
+          "why": "no recovery frame pushed"
+        },
+        {
+          "no_skill_call": "scoper",
+          "why": "Navigator does not dispatch Scoper"
+        },
+        {
+          "no_skill_call": "architect",
+          "why": "Navigator does not dispatch Architect"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": []
+    }
+  ],
+  "invariants": [
+    {
+      "unchanged": [
+        "**"
+      ],
+      "why": "Navigator persists nothing (generated caches are ignored)"
+    },
+    {
+      "head_unchanged": true,
+      "why": "Navigator never moves HEAD"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Navigator never mutates git state"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/observations.test.js",
+      "expect": "pass",
+      "why": "the existing test suite passes offline with a fake fetch"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 00-project (pre-install): small Node ES-module app 'fieldlog' where recordObservation (src/app.js) POSTs to the project server via src/client.js before storing locally; tests use a fake fetch. 10-cycle: STANDARD cycle at DEVELOPING after a FORWARD from ARCHITECTING, Development NONE, no recovery; CONTEXT.md from Auditor; scope with AC-001..AC-003 where AC-002 requires offline recording/listing; design whose Decision makes the save await a 201 from POST /api/observations and reject on failure, with AC-002 coverage only addressing listing. The conflict is an ordinary oversight in the design, not marked anywhere. Assertion 0 checks state/records unchanged and no Scoper/Architect skill calls; the judge decides whether Navigator chose scope or design. Assertion 1 is judge-only.",
+  "case": "navigator-43",
+  "caseHash": "ec03a7a2a488c244",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T01:42:01.638Z",
+    "verdict": "pass",
+    "fixtureHash": "99c5335aa69dc6e5",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "a123e371b3152f73",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:22:43.810Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T01:24:32.368Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/10-cycle/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:22:43.810Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

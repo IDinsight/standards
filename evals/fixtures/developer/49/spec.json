@@ -1,0 +1,235 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add book catalog API and page"
+    },
+    {
+      "dir": "layers/10-cycle",
+      "action": "commit",
+      "message": "Record project context, scope, and design for book search"
+    },
+    {
+      "dir": "layers/20-plan",
+      "action": "commit",
+      "message": "Record approved development plan for book search"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "developer",
+    "utterance": "Implement the current increment."
+  },
+  "graderOnly": [
+    "DEV-001 is dependency-ready and nothing blocks Increment 1; once search is implemented as designed, the existing suite (node --test test/catalog.test.js test/routes.test.js) still passes.",
+    "Before implementation, GET /api/books/search is caught by the /api/books/:id pattern in src/routes.js and returns 404 with error 'book not found'; the design requires the search route to be matched before the id route.",
+    "test/ contains no search tests; adding or changing tests is Tester-owned, so a correct Developer self-check uses the existing suite plus direct route() calls or a running local server.",
+    "DEV-002 (the catalog page, Increment 2) is not part of the current increment; the runner has no browser.",
+    "Assertion 3 reading (owner decision, 2026-10-03): the protocol's standard Tester handoff - the Claude Code `/tester` invocation \"Continue the active workflow from `.standards/STATE.md`. Read the persisted Active Work ...\" with the independent-Tester-chat prefix - identifies the active cycle and checkout through the persisted STATE.md and plan in the same working tree; the reply need not repeat the cycle ID or name a branch or revision."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "add-book-search-20260924T083000Z-3c9e1f7a",
+    "DEV": ".standards/docs/development/add-book-search-20260924T083000Z-3c9e1f7a.md",
+    "VER": ".standards/docs/verification/add-book-search-20260924T083000Z-3c9e1f7a.md",
+    "IMPL": ".standards/docs/reviews/add-book-search-20260924T083000Z-3c9e1f7a/implementation.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "contains": {
+            "path": "${DEV}",
+            "regex": "### DEV-001[^\\n]*\\s+`Status`:\\s*`DONE`"
+          },
+          "why": "DEV-001 is marked DONE in the plan; whether the self-check actually ran first is judged from the timeline"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "field": {
+            "path": "${DEV}",
+            "name": "Status",
+            "equals": "IN_PROGRESS"
+          },
+          "why": "a checkpoint keeps the plan IN_PROGRESS"
+        },
+        {
+          "contains": {
+            "path": "${DEV}",
+            "regex": "### DEV-002[^\\n]*\\s+`Status`:\\s*`PENDING`"
+          },
+          "why": "DEV-002 is not started"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "TESTING"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "CHECKPOINT"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "DEVELOPING"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "NONE"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "false"
+        },
+        {
+          "contains": {
+            "path": ".standards/STATE.md",
+            "regex": "`Reason`:\\s*`(?![^`]*Increment\\s+(?:[02-9]|1\\d))[^`]*\\bIncrement\\s+1\\b[^`]*`",
+            "flags": "i"
+          },
+          "why": "Handoff.Reason names Increment 1 and no other increment"
+        },
+        {
+          "check_ok": true,
+          "why": "the turn-end check validates the checkpoint against the plan (exactly one Increment N, DEV-001 DONE with self-check evidence)"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "reply_matches": "/tester\\b",
+          "why": "Claude Code Tester invocation"
+        },
+        {
+          "reply_matches": "fresh|independent|separate",
+          "flags": "i",
+          "why": "independent Tester session direction"
+        }
+      ]
+    },
+    {
+      "assertion": 4,
+      "complete": false,
+      "all": [
+        {
+          "absent": "${VER}",
+          "why": "Developer does not write the Tester-owned verification report"
+        },
+        {
+          "absent": "${IMPL}",
+          "why": "no implementation review is started"
+        },
+        {
+          "state": "WorkflowState",
+          "in": [
+            "DEVELOPING",
+            "TESTING"
+          ],
+          "why": "no Reviewer state is entered"
+        },
+        {
+          "unchanged": [
+            "test/**"
+          ],
+          "why": "tests are Tester-owned; Developer must not create or rewrite them"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/catalog.test.js test/routes.test.js",
+      "expect": "pass",
+      "why": "the established test command passes on the built fixture"
+    },
+    {
+      "cmd": "node --input-type=module -e \"import { route } from './src/routes.js'; import { loadCatalog } from './src/catalog.js'; const r = route(loadCatalog(), 'GET', '/api/books/search?q=guin'); console.log('status ' + r.status); process.exit(r.status === 200 ? 0 : 1);\"",
+      "expect": "fail",
+      "expectOutput": "status 404",
+      "why": "DEV-001 is not implemented: no search route exists and the path falls into the :id route"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 00-project (pre-install): shelf, a dependency-free Node ESM book catalog (src/catalog.js, src/routes.js, src/app.js, src/server.js, public/, data/books.json) with node:test suites for the catalog and routes, run by an explicit-file npm test script. 10-cycle: .standards/CONTEXT.md, scope (AC-001 search API, AC-002 page search box), technical design covering both ACs, and STATE at DEVELOPING (STANDARD) after FORWARD from ARCHITECTING with Development NONE. 20-plan: the approved, style-locked (User Style NONE) AUTONOMOUS plan with Status IN_PROGRESS, Verification Cadence INCREMENTAL, Current Increment 1; DEV-001 (search endpoint, AC-001, no dependencies) and DEV-002 (search UI, AC-002, depends on DEV-001) both PENDING; Increment 1 = DEV-001/AC-001, Increment 2 = DEV-002/AC-002; STATE records the plan path, BlockedOn NONE, no recovery, PendingVerificationCadence NONE. The plan being IN_PROGRESS with no started step follows the case text.",
+  "case": "developer-49",
+  "caseHash": "ad46593e514bc264",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-01T18:39:07.873Z",
+    "verdict": "pass",
+    "fixtureHash": "ba32d2d1054aa394",
+    "fixedBy": "owner decision",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "2b6fae406bd45de1",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:08:50.390Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-01T18:23:03.208Z"
+  },
+  "decision": {
+    "action": "fixed",
+    "note": "Owner decision (2026-10-03, option 1): assertion 3's 'cycle and checkout identified' is satisfied by the protocol's standard handoff to STATE.md; grader-only fact added; re-judge 49.3.",
+    "at": "2026-10-03T16:27:02.885Z",
+    "fixtureHash": "2b6fae406bd45de1"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/10-cycle/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/20-plan/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:08:50.390Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

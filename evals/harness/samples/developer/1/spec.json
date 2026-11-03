@@ -1,0 +1,154 @@
+{
+  "case": "developer-1",
+  "caseHash": "ec3b7a6fe8509a01",
+  "status": "draft",
+  "reviewedBy": null,
+  "notes": "Hand-written sample. Brownfield STANDARD cycle at DEVELOPING with completed scope, design, and context; no development plan yet.",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial project"
+    },
+    {
+      "dir": "layers/10-workflow",
+      "action": "commit",
+      "message": "Scope and design for profile nickname"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "developer",
+    "utterance": "Continue the active workflow. Implement it."
+  },
+  "graderOnly": [],
+  "history": null,
+  "vars": {
+    "ID": "profile-nickname-20260924T090000Z-1b2c3d4e",
+    "DEV": ".standards/docs/development/profile-nickname-20260924T090000Z-1b2c3d4e.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "state": "ActiveWork.Development",
+          "equals": "${DEV}"
+        },
+        {
+          "provenance": {
+            "path": "${DEV}",
+            "artifact": "DEVELOPMENT",
+            "cycle": "${ID}"
+          }
+        },
+        {
+          "heading_ids": {
+            "path": "${DEV}",
+            "prefix": "DEV",
+            "min": 1
+          }
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": true,
+      "all": [
+        {
+          "field": {
+            "path": "${DEV}",
+            "name": "Status",
+            "equals": "PROPOSED"
+          }
+        },
+        {
+          "field": {
+            "path": "${DEV}",
+            "name": "Mode",
+            "equals": "AUTONOMOUS"
+          }
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": true,
+      "all": [
+        {
+          "field": {
+            "path": "${DEV}",
+            "name": "Verification Cadence",
+            "equals": "AFTER_IMPLEMENTATION"
+          }
+        },
+        {
+          "field": {
+            "path": "${DEV}",
+            "name": "Current Increment",
+            "equals": "NONE"
+          }
+        }
+      ]
+    },
+    {
+      "assertion": 4,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 5,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.BlockedOn",
+          "not": "NONE"
+        }
+      ]
+    },
+    {
+      "assertion": 6,
+      "complete": true,
+      "all": [
+        {
+          "unchanged": [
+            "app/**",
+            "tests/**",
+            "README.md"
+          ]
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "DEVELOPING"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    }
+  ]
+}

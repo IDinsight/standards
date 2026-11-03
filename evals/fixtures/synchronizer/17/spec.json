@@ -1,0 +1,272 @@
+{
+  "base": "export-project",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-context",
+      "action": "commit",
+      "message": "Record project context for CSV export"
+    },
+    {
+      "dir": "layers/52-scope",
+      "action": "commit",
+      "message": "Define CSV export scope"
+    },
+    {
+      "dir": "layers/54-design",
+      "action": "commit",
+      "message": "Design CSV export"
+    },
+    {
+      "dir": "layers/56-plan",
+      "action": "commit",
+      "message": "Plan CSV export implementation"
+    },
+    {
+      "dir": "layers/58-export",
+      "action": "commit",
+      "message": "Add CSV export of filtered records"
+    },
+    {
+      "dir": "layers/60-complete",
+      "action": "commit",
+      "message": "Mark CSV export plan complete"
+    },
+    {
+      "dir": "layers/62-access-test",
+      "action": "commit",
+      "message": "Add integration test for denied exports"
+    },
+    {
+      "dir": "layers/64-verification",
+      "action": "commit",
+      "message": "Record CSV export verification"
+    },
+    {
+      "dir": "layers/66-review",
+      "action": "commit",
+      "message": "Record CSV export implementation review"
+    },
+    {
+      "dir": "layers/68-guide",
+      "action": "commit",
+      "message": "Document CSV export in usage guide"
+    },
+    {
+      "dir": "layers/70-documentation",
+      "action": "commit",
+      "message": "Record CSV export documentation"
+    },
+    {
+      "dir": "layers/72-final-review",
+      "action": "commit",
+      "message": "Record CSV export final review"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "synchronizer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The development plan is COMPLETE with DEV-003 DONE, and DEV-003's Affected Area, Expected Outcome, and Self-Check claim a command-line export: a new scripts/export-records.ts and an export:csv script in package.json, with a self-check run of pnpm --filter export export:csv -- owner=dana reported as exit 0.",
+    "No scripts/ directory and no export:csv script exist in the working tree or in any commit; package.json has only the test and test:integration scripts, and nothing in src/ reads command-line arguments. The plan's CLI claim and its self-check result are therefore false.",
+    "The scope and design do not call for a command-line export; the route-based export, tests, guide, and the verification, implementation review, documentation, and final-review records are otherwise accurate and consistent with HEAD.",
+    "The discrepancy concerns a Developer plan claim and missing Developer implementation, so it is owned by Developer with FailureType IMPLEMENTATION."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "export-20260924T090000Z-a7f3c1d2",
+    "SCOPE": ".standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md",
+    "ARCH": ".standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md",
+    "DEV": ".standards/docs/development/export-20260924T090000Z-a7f3c1d2.md",
+    "VERIFICATION": ".standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md",
+    "REVIEW_IMPL": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md",
+    "REVIEW_FINAL": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md",
+    "DOC": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md",
+    "SYNC": ".standards/docs/synchronization/export-20260924T090000Z-a7f3c1d2.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "unchanged": [
+            "${DEV}",
+            "src/**",
+            "test/**",
+            "scripts/**",
+            "packages/**",
+            "package.json",
+            "pnpm-lock.yaml",
+            ".gitignore"
+          ],
+          "why": "the plan, code, tests, and package files stay as they were; no CLI is added"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "DEVELOPING",
+          "why": "the false completion claim is routed to Developer, not accepted toward sign-off"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "IMPLEMENTATION"
+        },
+        {
+          "state": "Recovery.Top.Owner",
+          "equals": "DEVELOPING"
+        },
+        {
+          "exists": "${SYNC}"
+        },
+        {
+          "provenance": {
+            "path": "${SYNC}",
+            "artifact": "SYNCHRONIZATION",
+            "cycle": "${ID}"
+          }
+        },
+        {
+          "field": {
+            "path": "${SYNC}",
+            "name": "Status",
+            "not": "COMPLETE"
+          }
+        },
+        {
+          "heading_ids": {
+            "path": "${SYNC}",
+            "prefix": "D",
+            "min": 1
+          }
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Synchronizer must not change git state"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the unit suite passes offline"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration",
+      "expect": "pass",
+      "why": "the integration suite (three tests) passes"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the SYNCHRONIZING state and records are valid"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && test ! -e exports && test ! -e .standards/docs/synchronization",
+      "expect": "pass",
+      "why": "clean tree, no export files, no synchronization record yet"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `SYNCHRONIZING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Id`: `export-20260924T090000Z-a7f3c1d2`$' .standards/STATE.md && grep -q '^`Kind`: `FORWARD` `From`: `REVIEWING_FINAL` `FailureType`: `NONE`' .standards/STATE.md && grep -q '^`PromotionReason`: `NONE` `AuditTarget`: `NONE` `BlockedOn`: `NONE`$' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md && grep -q 'ProjectMode`: `BROWNFIELD' .standards/MODE.md",
+      "expect": "pass",
+      "why": "SYNCHRONIZING after final review, nothing blocked, recovery and obligations inactive"
+    },
+    {
+      "cmd": "p=.standards/docs/development/export-20260924T090000Z-a7f3c1d2.md && grep -q 'scripts/export-records.ts' $p && grep -q 'pnpm --filter export export:csv -- owner=dana' $p && grep -q '`Status`: `COMPLETE`$' $p && test $(grep -c '^`Status`: `DONE`' $p) -eq 3",
+      "expect": "pass",
+      "why": "the COMPLETE plan with all steps DONE claims the CLI wiring in DEV-003"
+    },
+    {
+      "cmd": "! grep -q 'export:csv' package.json && test ! -e scripts && test -z $(git log --all --format=%H -- scripts | head -1) && ! grep -rq 'process.argv' src",
+      "expect": "pass",
+      "why": "the claimed CLI wiring is absent from the files and from every commit"
+    },
+    {
+      "cmd": "! grep -rqE 'export:csv|export-records' docs README.md .standards/docs/scope .standards/docs/specs .standards/docs/verification .standards/docs/reviews .standards/docs/documentation",
+      "expect": "pass",
+      "why": "only the plan mentions the CLI"
+    },
+    {
+      "cmd": "v=.standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md && r=.standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md && f=.standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md && d=.standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md && grep -q $(git log --format=%H -1 --fixed-strings --grep='Add integration test for denied exports') $v && grep -q $(git log --format=%H -1 --fixed-strings --grep='Record CSV export verification') $r && grep -q $(git log --format=%H -1 --fixed-strings --grep='Document CSV export in usage guide') $d && grep -q $(git log --format=%H -1 --fixed-strings --grep='Record CSV export documentation') $f && grep -q $(git rev-parse HEAD:docs/usage.md) $f && grep -q $(git rev-parse HEAD:src/export.ts) $f && grep -q $(git rev-parse HEAD:.standards/docs/development/export-20260924T090000Z-a7f3c1d2.md) $f && ! grep -rqE 'COMMIT:|BLOB:' .standards/docs .standards/CONTEXT.md",
+      "expect": "pass",
+      "why": "records cite real revisions and content identities matching HEAD, including the plan blob"
+    },
+    {
+      "cmd": "git log -12 --format=%s | paste -s -d '|' - | grep -qx 'Record CSV export final review|Record CSV export documentation|Document CSV export in usage guide|Record CSV export implementation review|Record CSV export verification|Add integration test for denied exports|Mark CSV export plan complete|Add CSV export of filtered records|Plan CSV export implementation|Design CSV export|Define CSV export scope|Record project context for CSV export'",
+      "expect": "pass",
+      "why": "commit history follows the brownfield order"
+    }
+  ],
+  "notes": "Built on export-project (not export-synchronizing) because the case needs a different development plan, and every later record in export-synchronizing cites the plan's blob; changing the plan after those layers would plant stale-identity discrepancies. Layers 50 to 72 reproduce export-synchronizing's layers 20 to 42 byte for byte except the plan in 56-plan and 60-complete: DEV-003 additionally names scripts/export-records.ts and an export:csv package script in Affected Area and Expected Outcome, and its COMPLETE self-check claims a run of pnpm --filter export export:csv -- owner=dana with exit 0. No scripts/ directory or export:csv script was ever committed. Scope and design do not mention a CLI; all other records (verification, implementation review, documentation, final review) are accurate for the route-based export and cite the CLI-claiming plan blob, so identities match HEAD. Final state: SYNCHRONIZING, FORWARD from REVIEWING_FINAL, no synchronization record.",
+  "case": "synchronizer-17",
+  "caseHash": "a7159b1ae43e944a",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T14:33:47.474Z",
+    "verdict": "pass",
+    "fixtureHash": "d43483fae5140f3a",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "9266a0b2b891f0e8",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:35:52.418Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T13:10:29.872Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-context/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/52-scope/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/54-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/56-plan/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/60-complete/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/64-verification/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/66-review/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/70-documentation/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/72-final-review/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:35:52.418Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

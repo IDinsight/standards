@@ -1,0 +1,104 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (brownfield install)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState TESTING",
+      "where": ".standards/STATE.md head",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, Architecture, Development reference current-cycle artifacts",
+      "where": "STATE.md Active Work paths; provenance blocks in scope/specs/development records",
+      "status": "realized"
+    },
+    {
+      "condition": "Valid Auditor context exists",
+      "where": ".standards/CONTEXT.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Same-state VERIFICATION correction",
+      "where": "STATE.md Handoff: FAILURE From TESTING FailureType VERIFICATION",
+      "status": "realized"
+    },
+    {
+      "condition": "No recovery frame / recovery inactive",
+      "where": "STATE.md Recovery Active false, no frames; Outstanding Obligations inactive",
+      "status": "realized"
+    },
+    {
+      "condition": "Reviewer evidence identifies one defective test assertion",
+      "where": "reviews/<id>/implementation.md F-001 (Owner Tester, VERIFICATION); test/export-access.test.ts anonymous scenario asserts on root/exports, proven vacuous by selfChecks",
+      "status": "realized"
+    },
+    {
+      "condition": "Previously valid test file with an allocated scenario",
+      "where": "test/export-access.test.ts; verification report Scenario Budget charges 4 of 5 allocations to src/routes/export.ts including the anonymous scenario",
+      "status": "realized"
+    },
+    {
+      "condition": "During the fix the file is renamed and the scenario replaced under the new name",
+      "where": "verification report Resume or Handoff: next action moves test/export-access.test.ts to test/export-route.test.ts and rewrites the anonymous scenario",
+      "status": "realized"
+    },
+    {
+      "condition": "Prior evidence exists that becomes superseded",
+      "where": "verification report Execution Evidence: 25 passed at 1151372; AC-002 anonymous row marked Reopened",
+      "status": "realized"
+    },
+    {
+      "condition": "Other acceptance obligations otherwise valid and implementation correct",
+      "where": "src/routes/export.ts requireAdmin first; selfChecks confirm 401/403/403 with no write; other scenarios verified",
+      "status": "realized"
+    },
+    {
+      "condition": "Committed git state, clean tree",
+      "where": "git status clean; layers committed",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "case-defect",
+      "assertion": -1,
+      "detail": "A Reviewer-originated VERIFICATION failure normally pushes a frame (REVIEWING_IMPLEMENTATION -> TESTING). The fixture realizes the case's stated same-state, no-frame state by having the review report appear while STATE stays TESTING (Handoff From TESTING). The resulting history (a BLOCKED implementation review written while the cycle never left TESTING) is slightly irregular, but it is the most consistent rendering of the case.",
+      "recommendation": "run_as_is",
+      "fix": "None; the case states this state. The judge should accept a Tester that notes the irregularity but still performs the owned correction."
+    },
+    {
+      "severity": "note",
+      "kind": "invariant",
+      "assertion": -1,
+      "detail": "The rename is an expected part of the run. A Tester that uses `git mv` (staging the rename) would violate the standard `not_ran_git: mutating` invariant, while plain `mv` would not. Invariants are reported apart from the score, and the standard rule that roles do not change git state unasked still applies.",
+      "recommendation": "run_as_is",
+      "fix": "None required. Optionally document in notes that a `git mv` invariant hit is a staging nuance, not a scoring failure."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": 1,
+      "detail": "Assertion 1 depends on the agent following the persisted Resume note to rename the file. A Tester might choose to fix in place instead, which would leave assertion 1 unobserved. The note is a realistic persisted next action and leaks nothing about allocations.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition: a TESTING same-state VERIFICATION failure with no frame, a review F-001 that pins one vacuous assertion (confirmed by mutation selfChecks), a Scenario Budget charging the scenario, prior superseded evidence, and a persisted plan to rename the file. Checks are necessary and safe: assertion 0 is a pure state check, and assertions 2 and 3 only require the report to change. Invariants fit a Tester. Remaining items are notes: the case's inherent reachability oddity and a possible `git mv` invariant hit.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-01T22:35:17.716Z",
+  "costUsd": 0.29756720000000003,
+  "ms": 52498,
+  "fixtureHash": "b13946b48b6df0e0"
+}

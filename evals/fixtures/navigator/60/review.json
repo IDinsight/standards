@@ -1,0 +1,53 @@
+{
+  "conditions": [
+    {
+      "condition": "A small existing project exists for Navigator to quiz on",
+      "where": "src/bucket.js, src/limiter.js, src/http.js, README.md, test/*.test.js (pre-install commits 6d6cb33, 7f95cc2)",
+      "status": "realized"
+    },
+    {
+      "condition": "All project work is committed with a clean tree",
+      "where": "git status: '## main', no changes",
+      "status": "realized"
+    },
+    {
+      "condition": "A prior GRILL_ME turn asked exactly one first question",
+      "where": "spec history: user '/navigator Grill me on how the rate limiter...', assistant asks one question about RateLimiter.check",
+      "status": "realized"
+    },
+    {
+      "condition": "The user stops before answering, so no quiz answer exists",
+      "where": "utterance 'Let's stop here.' follows the question directly",
+      "status": "realized"
+    },
+    {
+      "condition": "The first question's subject matches the code",
+      "where": "src/limiter.js bucketFor/check creates a full TokenBucket for an unseen key, then calls take",
+      "status": "realized"
+    },
+    {
+      "condition": "Workflow state is unspecified and Navigator needs none",
+      "where": "installer default brownfield STATE.md (AUDITING, no cycle); check.mjs ok",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "ungradeable-assertion",
+      "assertion": 1,
+      "detail": "The history says Navigator read src/limiter.js, src/bucket.js and src/http.js in the earlier turn. Those reads are not tool calls in the graded run. spec.notes says suggested reading must have been 'inspected in this run'. A correct run could suggest those files based on the earlier inspection without re-reading them. No deterministic check enforces this, so the outcome depends on how the judge reads 'inspected'.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally add a graderOnly sentence: the files named in the history's assistant turn count as already inspected in this conversation. Suggesting other files requires reading them in this run."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture builds a small, clean rate-limiter repo with a realistic one-question GRILL_ME history. The run's 'Let's stop here.' arrives before any answer, so both assertions can be observed. Checks are judge-only with no over-strict regex, the Navigator invariants are correct, and check.mjs and the selfCheck pass.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T15:42:11.624Z",
+  "costUsd": 0.097828,
+  "ms": 21244,
+  "fixtureHash": "9e5b52e0b29f5319"
+}

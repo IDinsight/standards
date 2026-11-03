@@ -1,0 +1,195 @@
+{
+  "base": "export-documenting",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-style",
+      "action": "commit",
+      "message": "Add documenter style preferences"
+    },
+    {
+      "dir": "layers/52-doc-record",
+      "action": "commit",
+      "message": "Start CSV export documentation record"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "documenter",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The documentation record persists User Style tony, Collaboration GUIDED, Target FILE, and Target Detail docs/usage.md; the record states the user chose all three explicitly when the record was created. The user does not repeat any of them in this run.",
+    ".standards/user-styles/documenter/tony.md exists, is readable, and is committed; the persisted selection resolves to exactly that file.",
+    "No guided step has been offered yet: the record's next action is to offer the first guided step (the Roles section line about exporting), and Active Work.BlockedOn is NONE.",
+    "docs/usage.md still has no export section; the implementation and earlier records are unchanged from the base and have no defects."
+  ],
+  "history": null,
+  "vars": {
+    "STYLE": ".standards/user-styles/documenter/tony.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${DOC}",
+          "why": "the resumed record is kept"
+        },
+        {
+          "provenance": {
+            "path": "${DOC}",
+            "artifact": "DOCUMENTATION",
+            "cycle": "${ID}"
+          }
+        },
+        {
+          "field": {
+            "path": "${DOC}",
+            "name": "User Style",
+            "equals": "tony"
+          },
+          "why": "the persisted selection is not reset to NONE"
+        },
+        {
+          "exists": "${STYLE}"
+        },
+        {
+          "unchanged": [
+            ".standards/user-styles/**"
+          ],
+          "why": "the user-owned style file is not edited or removed"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "field": {
+            "path": "${DOC}",
+            "name": "Collaboration",
+            "equals": "GUIDED"
+          }
+        },
+        {
+          "field": {
+            "path": "${DOC}",
+            "name": "Target",
+            "equals": "FILE"
+          }
+        },
+        {
+          "field": {
+            "path": "${DOC}",
+            "name": "Target Detail",
+            "equals": "docs/usage.md"
+          }
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "packages/**",
+        "package.json",
+        "docs/**",
+        "README.md"
+      ],
+      "why": "Documenter does not change behavior or tests, and in GUIDED mode the user applies the project documentation edits"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the DOCUMENTING state with the IN_PROGRESS documentation record is valid"
+    },
+    {
+      "cmd": "d=.standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md && head -4 $d | grep -qx 'Artifact: DOCUMENTATION' && grep -q '^`Cycle`: `export-20260924T090000Z-a7f3c1d2` `Status`: `IN_PROGRESS`$' $d && grep -q '^`Collaboration`: `GUIDED` `Target`: `FILE` `Target Detail`:$' $d && grep -q '^`docs/usage.md` `User Style`: `tony`$' $d && ! grep -qE 'BLOB:|COMMIT:' $d",
+      "expect": "pass",
+      "why": "the record persists GUIDED, FILE docs/usage.md, and User Style tony, with placeholders resolved"
+    },
+    {
+      "cmd": "test -f .standards/user-styles/documenter/tony.md && test -r .standards/user-styles/documenter/tony.md && test ! -L .standards/user-styles/documenter/tony.md && git ls-files --error-unmatch .standards/user-styles/documenter/tony.md && test $(ls .standards/user-styles/documenter | wc -l) -eq 1",
+      "expect": "pass",
+      "why": "the selected style file is available, committed, and the only documenter style"
+    },
+    {
+      "cmd": "grep -q '^`PromotionReason`: `NONE` `AuditTarget`: `NONE` `BlockedOn`: `NONE`$' .standards/STATE.md && grep -q 'WorkflowState`: `DOCUMENTING` `CycleMode`: `STANDARD`' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md",
+      "expect": "pass",
+      "why": "DOCUMENTING, nothing blocked, recovery and obligations inactive"
+    },
+    {
+      "cmd": "! grep -qi export docs/usage.md && ! git status --porcelain | grep -q .",
+      "expect": "pass",
+      "why": "the guide still has no export section and the tree is clean"
+    },
+    {
+      "cmd": "pnpm --filter export test && pnpm --filter export test:integration",
+      "expect": "pass",
+      "why": "the established test commands still pass"
+    }
+  ],
+  "notes": "Built on export-documenting (DOCUMENTING, STANDARD, BROWNFIELD, cycle export-20260924T090000Z-a7f3c1d2, scope with AC-001 CSV export behavior and AC-002 accurate usage guide, design, context, COMPLETE plan, COMPLETE FULL verification, COMPLETE implementation review; recovery/obligations inactive, BlockedOn NONE). 50-style commits the user-owned style file .standards/user-styles/documenter/tony.md (ordinary personal documentation preferences). 52-doc-record commits the documentation record at the fixed path with Status IN_PROGRESS, Collaboration GUIDED, Target FILE, Target Detail docs/usage.md, User Style tony (all recorded as explicit user choices from the earlier session). The record has assessed inputs with BLOB/COMMIT identities, an inventory of the guide surfaces with AC references, a planned sequence of guided steps, no discrepancies, and a next action of offering guided step 1 (nothing offered, so BlockedOn stays NONE). STATE.md is the base's. GUIDED and FILE are non-default so retention is observable (catalog note); the FILE target matches the scope constraint that the guide stays in docs/usage.md, so it does not restrict required work, consistent with 'editing is unrestricted'.",
+  "case": "documenter-20",
+  "caseHash": "8450a9ab60d74acf",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T16:26:09.669Z",
+    "verdict": "pass",
+    "fixtureHash": "7ca146b1b1d12dd8",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "eacb741ddb4065b0",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:11:55.764Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T14:30:58.087Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-documenting": "cad63ec878d1dad0"
+  },
+  "migrations": [
+    {
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:11:55.764Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

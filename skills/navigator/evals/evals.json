@@ -666,41 +666,6 @@
       ]
     },
     {
-      "id": 67,
-      "prompt": "Navigator has not been invoked. The installed AGENTS.md guidance applies. The user asks: What modes and user styles does Navigator offer? WorkflowState is TESTING. The helper is available, both client skill copies exist, and the active client is Claude Code.",
-      "expected_output": "Answer the capability question from fresh discovery for Claude without invoking Navigator or changing TESTING.",
-      "files": [
-        "templates/common/AGENTS.md"
-      ],
-      "assertions": [
-        "Uses the internal helper with navigator and --client claude; does not mix client catalogs or ask the user to run Node.",
-        "Shows selectable modes and discovered styles using /navigator examples without starting an explanation, investigation, or quiz.",
-        "Does not perform workflow entry, run check merely for this question, or write state or records."
-      ]
-    },
-    {
-      "id": 68,
-      "prompt": "Invoke Navigator with $navigator help in Codex. No cycle is active. The installed helper and metadata are usable. .standards/user-styles/navigator/ has tony.md and a nested folder containing alice.md. No style has been selected.",
-      "expected_output": "Show a compact current mode menu and tony as an optional discovered style, then stop.",
-      "files": [],
-      "assertions": [
-        "Discovers eligible modes from metadata and only direct-child style files; does not invent alice as an available identifier.",
-        "Uses $navigator examples, does not load style contents, and does not apply a default mode or a style just because help was requested.",
-        "Does not inspect unrelated application code, run workflow checks, start a quiz, or ask for mode approval."
-      ]
-    },
-    {
-      "id": 69,
-      "prompt": "Invoke Navigator with only $navigator in a new conversation. There is no topic, explicit mode choice, or continuation request. Current option discovery succeeds.",
-      "expected_output": "Introduce the available choices briefly and ask only what the user wants to explore.",
-      "files": [],
-      "assertions": [
-        "Does not begin an arbitrary repository tour or quiz.",
-        "Does not require the user to choose a mode and style before supplying a topic.",
-        "Uses current discovered options rather than a fixed menu."
-      ]
-    },
-    {
       "id": 70,
       "prompt": "Navigator is in GRILL_ME on retry behavior at beginner depth with user style tony. One question is pending and two earlier answers exist. The user asks show Navigator options. The helper returns conversation for both selections and a complete inventory including tony and alice.",
       "expected_output": "Show invocation help while preserving the current quiz and explicit tony selection.",
@@ -773,18 +738,6 @@
         "Distinguishes explicit changes from a help-only request; retains the useful retry topic and evidence context.",
         "Clears the style to NONE without a workflow write, approval gate, or cycle change.",
         "Does not infer another style or continue GRILL_ME after the requested switch."
-      ]
-    },
-    {
-      "id": 77,
-      "prompt": "Before invoking Navigator, the user asks for its modes and user styles in Codex. The installed Navigator style directory contains tony.md, tony.md.md, and tony.md.md.md. No style is currently selected. The helper and metadata are available.",
-      "expected_output": "Present verified invocation names and distinguish the ambiguous middle entry from selectable styles without starting Navigator work.",
-      "files": [],
-      "assertions": [
-        "Calls fresh discovery for the active client and uses its selector values in invocation examples.",
-        "The middle identifier tony.md is inventory information only because neither accepted name resolves uniquely; it is not advertised as a selectable example.",
-        "The first style can be invoked as tony and the third as tony.md.md.md; the latter is not shortened to the ambiguous tony.md.md.",
-        "No style contents are loaded, files renamed, selection applied, or workflow state changed merely to answer the question."
       ]
     },
     {

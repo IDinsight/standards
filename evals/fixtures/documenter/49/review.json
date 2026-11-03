@@ -1,0 +1,81 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield template)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState DOCUMENTING, Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, architecture, context, development, verification, and implementation review exist with matching provenance and current evidence",
+      "where": ".standards/docs/{scope,specs,development,verification,reviews/.../implementation}.md and .standards/CONTEXT.md; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-001 covers CSV export behavior; AC-002 requires an accurate usage guide",
+      "where": ".standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and obligations inactive, no blocked user question",
+      "where": ".standards/STATE.md (Recovery/Obligations Active false, BlockedOn NONE)",
+      "status": "realized"
+    },
+    {
+      "condition": "Editing is unrestricted",
+      "where": "documentation record, Assessed Inputs and Boundary: 'Editing boundary: unrestricted'",
+      "status": "realized"
+    },
+    {
+      "condition": "The documentation record has a mistaken Documenter discrepancy about a flag",
+      "where": "documentation record ### DOC-001 (OPEN, Owner Documenter), claiming README lacks `--filter export` on the integration command",
+      "status": "realized"
+    },
+    {
+      "condition": "Current inspection shows the flag was already documented correctly",
+      "where": "README.md Development section lists `pnpm --filter export test:integration`; selfCheck confirms the command passes",
+      "status": "realized"
+    },
+    {
+      "condition": "A Reviewer finding on a different issue remains open",
+      "where": "implementation.md ### F-001 (README layout), Status OPEN",
+      "status": "realized"
+    },
+    {
+      "condition": "Documentation is otherwise accurate, so the gate can be fully re-evaluated",
+      "where": "docs/usage.md and README.md match src/ and the integration tests",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The Reviewer amends its own COMPLETE implementation review in a separate follow-up commit ('Record README layout finding in implementation review') to add an OPEN P2 Documenter-owned finding. This is slightly unusual, but it is coherent. The review records F-001 as a later-role documentation dependency and cites the pre-change README blob.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 1,
+      "detail": "The WITHDRAWN regex allows at most 600 characters between the `### DOC-001` heading and the Status field. A correct run keeps the template order (Status line directly under the heading), so the window is ample. A run that adds a long withdrawal note above the Status line is unlikely.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized: DOC-001 wrongly claims README lacks the `--filter export` flag, README in fact shows it, and the separate Documenter-owned Reviewer finding F-001 stays OPEN in a COMPLETE implementation review. Checks and invariants accept both correct outcomes (COMPLETE with a handoff to REVIEWING_FINAL, or an incomplete record with a stated reason), and nothing leaks the answer. Only minor realism and regex-window notes remain.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T16:37:51.744Z",
+  "costUsd": 0.28923259999999995,
+  "ms": 46635,
+  "fixtureHash": "c79047b3b572a174"
+}

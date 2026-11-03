@@ -1,0 +1,183 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial visits API with internal auth and data platform access"
+    },
+    {
+      "dir": "layers/60-references",
+      "action": "commit",
+      "message": "Add developer project references for auth and data platform"
+    },
+    {
+      "dir": "layers/70-cycle",
+      "action": "commit",
+      "message": "Record context, scope, and design for session refresh"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "developer",
+    "utterance": "Propose the development plan."
+  },
+  "graderOnly": [
+    "internal-auth.md matches the token-refresh work; data-platform.md does not.",
+    "The technical design names neither project reference, so loading depends only on the Read when lines.",
+    "internal-auth.md's distinctive guidance: take the client with Depends(get_auth_client) instead of constructing InternalAuthClient in a route; catch AuthRejected and AuthUnavailable by name and never wrap client calls in except Exception; never retry refresh() because refresh tokens are single-use; never log raw tokens, log token_fingerprint(token) instead; return the new refresh token unchanged and store nothing; exercise client code with FakeAuthTransport from tests/fakes.py. None of these are stated in the design.",
+    "data-platform.md's distinctive guidance (dp_session sessions, always filtering by visit_date, UTC partition keys, write batches of at most 500 rows, tagging rows with source_system visits-api) is unrelated to this work and should not appear in the plan.",
+    "Scope, design, and project context are complete and consistent; no upstream defect needs routing, so a correct run proposes a plan and waits for approval."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "session-refresh-20260924T090000Z-5c8e21a4",
+    "PLAN": ".standards/docs/development/session-refresh-20260924T090000Z-5c8e21a4.md",
+    "SCOPE": ".standards/docs/scope/session-refresh-20260924T090000Z-5c8e21a4.md",
+    "SPEC": ".standards/docs/specs/session-refresh-20260924T090000Z-5c8e21a4.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${PLAN}",
+          "why": "the plan must exist for guidance to be applied to its steps"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "provenance": {
+            "path": "${PLAN}",
+            "artifact": "DEVELOPMENT",
+            "cycle": "${ID}"
+          }
+        },
+        {
+          "contains": {
+            "path": "${PLAN}",
+            "regex": "## +Plan Notes.*project-references/developer/internal-auth[.]md",
+            "flags": "s"
+          },
+          "why": "Plan Notes list internal-auth.md by path; whether data-platform.md is wrongly listed as loaded is left to the judge, since mentioning it as not loaded is acceptable"
+        }
+      ]
+    },
+    {
+      "assertion": 4,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "DEVELOPING"
+        },
+        {
+          "exists": "${PLAN}"
+        },
+        {
+          "field": {
+            "path": "${PLAN}",
+            "name": "Status",
+            "equals": "PROPOSED"
+          }
+        },
+        {
+          "field": {
+            "path": "${PLAN}",
+            "name": "User Style Locked",
+            "equals": "false"
+          }
+        },
+        {
+          "state": "ActiveWork.BlockedOn",
+          "not": "NONE",
+          "why": "the approval request is persisted before presenting the plan"
+        },
+        {
+          "unchanged": [
+            "app/**",
+            "tests/**",
+            "pyproject.toml",
+            "README.md",
+            ".standards/docs/specs/**",
+            ".standards/docs/scope/**",
+            ".standards/CONTEXT.md",
+            ".standards/project-references/**"
+          ],
+          "why": "no implementation changes before approval; design, scope, context, and references untouched"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "python3 -m pytest -q",
+      "expect": "pass",
+      "why": "the existing auth client and token tests pass with stdlib fakes"
+    },
+    {
+      "cmd": "grep -Fqx 'Read when work calls the internal auth service or handles its tokens.' .standards/project-references/developer/internal-auth.md",
+      "expect": "pass",
+      "why": "internal-auth.md carries the stated Read when line"
+    },
+    {
+      "cmd": "grep -Fqx 'Read when work reads from or writes to the internal data platform.' .standards/project-references/developer/data-platform.md",
+      "expect": "pass",
+      "why": "data-platform.md carries the stated Read when line"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. Layer 50 (pre-install) commits a small FastAPI service visits-api: app/auth/client.py with InternalAuthClient (introspect, refresh), AuthRejected, AuthUnavailable, TokenPair, get_auth_client; app/auth/dependencies.py (require_user, the nearest analogue); app/auth/tokens.py (token_fingerprint); app/data/platform.py and app/routes/visits.py (data platform reads); stdlib-only tests for the client and fingerprint, run with python3 -m pytest. Layer 60 commits .standards/project-references/developer/internal-auth.md and data-platform.md, each with its Read when line directly after the title and concrete guidance below. Layer 70 commits CONTEXT.md, MODE.md (BROWNFIELD), STATE.md (STANDARD, DEVELOPING, FULL_DELIVERABLE, Development NONE, FORWARD from ARCHITECTING, recovery inactive), the scope with AC-001..AC-003, and a design for POST /session/refresh that covers every AC and names neither reference. No user style files exist. FastAPI is declared but not installed in the runner; tests do not import it, and the run only needs to propose a plan.",
+  "case": "developer-72",
+  "caseHash": "ed4ca9526b8420ae",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T02:55:25.987Z",
+    "verdict": "pass",
+    "fixtureHash": "23db78801dc01a8d",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-30T23:43:50.186Z"
+  }
+}

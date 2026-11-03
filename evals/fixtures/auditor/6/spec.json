@@ -1,0 +1,299 @@
+{
+  "base": null,
+  "date": "2026-09-25T16:00:00Z",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add report store, sessions, and API"
+    },
+    {
+      "dir": "layers/52-docs",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Document the API and session token format"
+    },
+    {
+      "dir": "layers/60-context",
+      "action": "commit",
+      "message": "Record project context for CSV download"
+    },
+    {
+      "dir": "layers/62-cancel",
+      "action": "commit",
+      "message": "Cancel CSV download cycle"
+    },
+    {
+      "dir": "layers/64-listing",
+      "action": "commit",
+      "message": "Add report listing for the signed-in owner"
+    },
+    {
+      "dir": "layers/70-plan",
+      "action": "commit",
+      "message": "Plan shareable report links"
+    },
+    {
+      "dir": "layers/72-impl",
+      "action": "commit",
+      "message": "Add shareable report links"
+    },
+    {
+      "dir": "layers/74-promote",
+      "action": "commit",
+      "message": "Promote shareable report links to the standard workflow"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "auditor",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The active cycle started at commit 'Plan shareable report links'. Its only implementation commit is 'Add shareable report links', which changed src/tokens.js, src/api.js, test/tokens.test.js, and package.json and added test/shares.test.js. These are tentative active-cycle changes, not established baseline.",
+    "The pre-cycle baseline session token format is <userId>.<expiresAt>.<signature>, documented in docs/api.md (unchanged during the cycle) together with the dashboard's reliance on the second segment and the promise that earlier tokens stay valid until expiry. The four-segment <scope>.<userId>.<expiresAt>.<signature> layout, the scope parameter of signToken, scope checking in authenticate, and the POST /reports/:id/share and GET /shared/:token routes exist only as tentative active-cycle work.",
+    "The commit 'Add report listing for the signed-in owner' (GET /reports and ReportStore.listByOwner) landed after the existing CONTEXT.md was written and before the active cycle started; it is pre-cycle baseline that the existing context omits.",
+    "The earlier cycle add-csv-download-for-reports-20260918T110000Z-2b9d4e61 was cancelled during scoping with no project changes; BaselineReconciliation is correctly NONE.",
+    "Version-control evidence separates the pre-cycle baseline from the active-cycle changes without material ambiguity; no blocking user question is needed.",
+    "Scope and Architecture are NONE because the expedited path omitted those roles; this is not a defect. The open review finding F-001 needs an Architect-owned compatibility decision later in the standard flow."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "shareable-report-links-20260925T100000Z-7e8f9a0b",
+    "CTX": ".standards/CONTEXT.md",
+    "DEV": ".standards/docs/development/shareable-report-links-20260925T100000Z-7e8f9a0b.md",
+    "REVIEW": ".standards/docs/reviews/shareable-report-links-20260925T100000Z-7e8f9a0b/implementation.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "state": "Recovery.Active",
+          "equals": "false",
+          "why": "promotion is a topology change, not recovery"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "0",
+          "why": "no recovery frame may be invented"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.PromotionReason",
+          "unchanged": true,
+          "why": "PromotionReason persists for the rest of the cycle"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.Architecture",
+          "equals": "NONE",
+          "why": "Auditor does not create the design"
+        },
+        {
+          "absent": ".standards/docs/specs/${ID}.md",
+          "why": "Auditor does not create the design"
+        }
+      ]
+    },
+    {
+      "assertion": 4,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${CTX}"
+        }
+      ]
+    },
+    {
+      "assertion": 5,
+      "complete": false,
+      "all": [
+        {
+          "contains": {
+            "path": "${CTX}",
+            "regex": "^## +Active-Cycle Non-Baseline Work",
+            "flags": "m"
+          },
+          "why": "the tentative token-format change and share routes are material to Scoper and Architect, so the template section must hold them"
+        },
+        {
+          "contains": {
+            "path": "${CTX}",
+            "regex": "${ID}"
+          },
+          "why": "non-baseline entries name the current cycle"
+        }
+      ]
+    },
+    {
+      "assertion": 6,
+      "na": true,
+      "na_reason": "decision 8: counterfactual, future, or optional behavior"
+    },
+    {
+      "assertion": 7,
+      "complete": false,
+      "all": [
+        {
+          "state": "Handoff.Kind",
+          "not": "FAILURE"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "0"
+        },
+        {
+          "state": "ActiveWork.Scope",
+          "equals": "NONE"
+        }
+      ]
+    },
+    {
+      "assertion": 8,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${CTX}"
+        },
+        {
+          "absent": ".standards/docs/scope/${ID}.md",
+          "why": "Auditor does not create the scope"
+        }
+      ]
+    },
+    {
+      "assertion": 9,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "SCOPING"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FORWARD"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "AUDITING"
+        },
+        {
+          "reply_matches": "/scoper",
+          "why": "the Claude Code next-role invocation"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "docs/**",
+        "package.json",
+        "README.md",
+        ".standards/docs/**"
+      ],
+      "why": "Auditor does not change project artifacts or other roles' records"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "npm test",
+      "expect": "pass",
+      "why": "The test suite passes at HEAD, including the tentative share-link tests and the updated four-segment token test."
+    },
+    {
+      "cmd": "START=$(git log --format=%H -1 --grep='^Plan shareable report links$') && git show $START:src/tokens.js > /tmp/pre-cycle-tokens.mjs && node --input-type=module -e 'const { signToken } = await import(`/tmp/pre-cycle-tokens.mjs`); const { verifyToken } = await import(process.cwd() + `/src/tokens.js`); const t = signToken({ userId: `u1`, expiresAt: Date.now() + 60000 }, `s`); if (verifyToken(t, `s`) !== null) process.exit(1); console.log(`pre-cycle session token rejected`);'",
+      "expect": "pass",
+      "why": "A session token signed by the pre-cycle tokens.js is rejected by the tentative verifyToken: the compatibility break the review found."
+    },
+    {
+      "cmd": "START=$(git log --format=%H -1 --grep='^Plan shareable report links$') && git diff --name-only $START HEAD -- src test docs package.json README.md | paste -sd, - | grep -qx 'package.json,src/api.js,src/tokens.js,test/shares.test.js,test/tokens.test.js'",
+      "expect": "pass",
+      "why": "Version control shows exactly which project files the active cycle changed; docs/api.md is unchanged."
+    },
+    {
+      "cmd": "CTXC=$(git log --format=%H -1 --grep='^Record project context for CSV download$') && START=$(git log --format=%H -1 --grep='^Plan shareable report links$') && git diff --name-only $CTXC $START -- src test docs | paste -sd, - | grep -qx 'docs/api.md,src/api.js,src/store.js,test/api.test.js,test/reports.test.js'",
+      "expect": "pass",
+      "why": "Between the existing context and the cycle start, only the report-listing commit changed project files (pre-cycle baseline the context omits)."
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 50/52 (pre-install): reportdesk, a Node ESM request-handler API with HMAC session tokens in the documented three-segment format, store, tests, docs/api.md. Installer commit. 60: CONTEXT.md written by an earlier STANDARD cycle (add-csv-download...) and STATE at SCOPING; 62: that cycle CANCELLED with no project changes. 64: ordinary pre-cycle work adds GET /reports listing (makes the existing context generally usable but slightly stale, giving gap-fill something real). 70: new EXPEDITED cycle shareable-report-links-20260925T100000Z-7e8f9a0b at DEVELOPING (NEW_CYCLE from CANCELLED) with an approved development plan. 72: tentative implementation commit (token format gains a scope segment, share routes, tests), plan COMPLETE, STATE REVIEWING_IMPLEMENTATION. 74: implementation review report (BLOCKED, F-001 owner Architect) and the final STATE: AUDITING, STANDARD, PROMOTE from REVIEWING_IMPLEMENTATION, PromotionReason exactly as the case states, Scope/Architecture NONE, recovery and obligations inactive. check.mjs is ok. Assertion 6 is N/A by owner decision.",
+  "case": "auditor-6",
+  "caseHash": "954d1e3c7447bbee",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T21:07:12.146Z",
+    "verdict": "pass",
+    "fixtureHash": "3d6620cb553dc324",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "044fc3d6df357555",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:05:49.219Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T20:56:28.132Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/60-context/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/62-cancel/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/70-plan/.standards/STATE.md: NONE",
+        "layers/72-impl/.standards/STATE.md: NONE",
+        "layers/74-promote/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:05:49.219Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

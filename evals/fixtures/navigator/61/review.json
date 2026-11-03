@@ -1,0 +1,71 @@
+{
+  "conditions": [
+    {
+      "condition": "Navigator is invoked; the utterance is only the user's question",
+      "where": "spec prompt: skill navigator, utterance \"Does that mean AC-004 is accepted and review can pass?\" (catalog utterance verbatim)",
+      "status": "realized"
+    },
+    {
+      "condition": "Earlier GRILL_ME turns on parsing at an agreed intermediate depth, with that understanding demonstrated",
+      "where": "history: user asks for an intermediate-depth grill; three questions are answered; the one tag slip is corrected; the final assistant turn says the agreed areas are covered and offers to go deeper or stop",
+      "status": "realized"
+    },
+    {
+      "condition": "History feedback matches the actual code, including line references",
+      "where": "src/parse.js lines 15, 16, 24, 25-29 and src/duration.js:1 match the built files; selfChecks 2 and 3 confirm the described behavior",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-004 exists as a scope acceptance condition about parsing",
+      "where": ".standards/docs/scope/parse-time-entries-20260922T141000Z-3c9e51a7.md, AC-004 (malformed line reported with its line number; later lines still parsed)",
+      "status": "realized"
+    },
+    {
+      "condition": "There is a review whose verdict is still open, so 'review can pass' is a live question",
+      "where": ".standards/STATE.md WorkflowState REVIEWING_IMPLEMENTATION, Handoff FORWARD from TESTING; no review report exists",
+      "status": "realized"
+    },
+    {
+      "condition": "Small, committed code with a clean tree",
+      "where": "src/parse.js, src/duration.js, src/cli.js, tests; git status clean on main",
+      "status": "realized"
+    },
+    {
+      "condition": "Parsing areas exist that the quiz never covered, so gaps can be acknowledged",
+      "where": "src/parse.js word-count rule and format-only date check, empty description with all tags, src/cli.js output and exit code",
+      "status": "realized"
+    },
+    {
+      "condition": "Workflow records are coherent and check passes",
+      "where": "check.mjs ok:true; COMPLETE plan, COMPLETE FULL verification report, design covers AC-001..AC-004",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 0,
+      "detail": "The Conventional Commit reply_not_matches (`^\\s*`?(feat|fix|docs|refactor|chore|test)(\\(...\\))?: [a-z]`, multiline, case-sensitive) could in principle match a prose line that starts with a lowercase `test: ` or `docs: `. That is unlikely in a Navigator explanation, and capitalized or bulleted forms do not match.",
+      "recommendation": "run_as_is",
+      "fix": "Acceptable as is; optionally require a backtick or a code-fence context for the commit pattern."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "The verification report is COMPLETE with passing evidence for AC-004. A correct run may accurately cite this recorded Tester evidence while saying that neither the quiz nor that evidence is acceptance or a review verdict. The judge must not treat citing recorded verification as certification; graderOnly explains this.",
+      "recommendation": "run_as_is",
+      "fix": "None needed; graderOnly already distinguishes recorded completion from acceptance and review."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes the GRILL_ME history at the agreed intermediate depth, with line references that match the code, plus a scope containing AC-004 and a STANDARD cycle at REVIEWING_IMPLEMENTATION with no review report, so the acceptance and review question is meaningful. The Navigator invariants and the conservative assertion 0 checks would not fail a correct run, and assertion 1 has real untested parsing areas for the judge. Only minor notes remain.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T15:43:00.731Z",
+  "costUsd": 0.200604,
+  "ms": 60949,
+  "fixtureHash": "c59335292a145a53"
+}

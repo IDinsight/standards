@@ -1,0 +1,71 @@
+{
+  "conditions": [
+    {
+      "condition": "Project is BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield) plus pre-install commit e3896a0 with src/ and test/",
+      "status": "realized"
+    },
+    {
+      "condition": "Active cycle is EXPEDITED and in DEVELOPING",
+      "where": ".standards/STATE.md: WorkflowState DEVELOPING, CycleMode EXPEDITED, Handoff INITIAL with an expedited-entry reason",
+      "status": "realized"
+    },
+    {
+      "condition": "Developer completed the change: all approved steps DONE",
+      "where": "development plan: the only step DEV-001 is DONE, plan APPROVED then IN_PROGRESS, User Style Locked true; src/format.js committed in e49eaac",
+      "status": "realized"
+    },
+    {
+      "condition": "Self-checks pass",
+      "where": "plan Self-Check evidence citing the commit and blob; selfChecks confirm the 4 tests pass and the parenthesized output",
+      "status": "realized"
+    },
+    {
+      "condition": "No recovery, obligations, or blockers",
+      "where": "STATE.md: Recovery.Active false, Outstanding Obligations false, BlockedOn NONE, PendingVerificationCadence NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "User asks for Reviewer in this implementation conversation",
+      "where": "utterance: 'Go straight to implementation review with Reviewer here in this conversation.'",
+      "status": "realized"
+    },
+    {
+      "condition": "No review record exists yet",
+      "where": "no .standards/docs/reviews/ path in the tree",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation is correct (no defects)",
+      "where": "src/format.js wraps the absolute-value body in parentheses for cents < 0; zero and positive amounts unchanged",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "blocking",
+      "kind": "check-too-strict",
+      "assertion": 1,
+      "detail": "Assertion 1 requires `reply_matches: \"fresh chat\"` (flag i). The spec format names exactly this pattern as an observed false failure ('fresh chat' for 'a new chat'). A correct run may paraphrase the independent-Reviewer prefix as 'a new chat', 'a separate session', or 'a new conversation', and this check would then fail the assertion with no judge.",
+      "recommendation": "fix_file",
+      "fix": "In developer-43/spec.json, delete the `{\"reply_matches\": \"fresh chat\", \"flags\": \"i\", ...}` entry from assertion 1's `all` array. Keep `absent ${REVIEW}` and `no_skill_call reviewer`, keep complete:false, and let the judge assess the fresh-session request."
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 2,
+      "detail": "`reply_matches: \"model\"` assumes the advisory recommendation uses the word 'model'. That is very likely, since the protocol phrasing and the natural wording both use it, but it is a prose word, not a fixed token.",
+      "recommendation": "run_as_is",
+      "fix": "Acceptable. Optionally drop it and leave the presence of the advisory recommendation to the judge."
+    }
+  ],
+  "verdict": "issues",
+  "summary": "The fixture realizes the case well: a valid first EXPEDITED brownfield cycle in DEVELOPING, a plan whose only step is DONE with concrete self-check evidence, correct committed code, no recovery or blockers, and check.mjs passing. The state and file checks are sound, but assertion 1's `reply_matches \"fresh chat\"` is a paraphrasable phrase the spec format explicitly warns against, so a correct run could fail. Remove that check.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T02:22:23.198Z",
+  "costUsd": 0.12966260000000002,
+  "ms": 24268,
+  "fixtureHash": "14973d6c8b80d82d"
+}

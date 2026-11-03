@@ -1,0 +1,61 @@
+{
+  "conditions": [
+    {
+      "condition": "src/config.py sets the timeout to 10",
+      "where": "src/config.py line 6 `REQUEST_TIMEOUT_SECONDS = 10` (commit 'Lower provider request timeout to 10 seconds'); selfCheck grep passes",
+      "status": "realized"
+    },
+    {
+      "condition": "The guide says the timeout is 30 seconds",
+      "where": "docs/guide.md line 11 'waits up to 30 seconds'; it points at REQUEST_TIMEOUT_SECONDS",
+      "status": "realized"
+    },
+    {
+      "condition": "The technical design specifies 10 seconds (architecture record exists)",
+      "where": ".standards/docs/specs/lower-provider-timeout-20260922T141000Z-5c81e0a3.md Decision, Acceptance Coverage AC-001, and Technical Acceptance Criteria",
+      "status": "realized"
+    },
+    {
+      "condition": "The guide is outdated: it reflects the pre-change value and was never updated",
+      "where": "git history: config was 30 in 'Initial project' and changed in a later commit; docs/guide.md has only the initial commit (selfChecks 4 and 5)",
+      "status": "realized"
+    },
+    {
+      "condition": "A context in which Documenter is the plausible correction owner and no documentation work has happened yet",
+      "where": ".standards/STATE.md shows STANDARD brownfield in DEVELOPING with DEV-002 pending; no documentation record exists; DOCUMENTING is a later phase",
+      "status": "realized"
+    },
+    {
+      "condition": "Repository state is committed and clean",
+      "where": "git status clean on main",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "All commits share the timestamp 2026-09-24T09:00:00Z, including the 'Initial project' commit and the commits made after the cycle ID's 20260922T141000Z time. This is harmless for an explanation task, but it removes any date-based history signal.",
+      "recommendation": "run_as_is",
+      "fix": "Optional: none needed."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 1,
+      "detail": "The Handoff.Kind and WorkflowState checks are implied by `unchanged: [.standards/**]`. They are redundant but correct, and no correct Navigator run could fail them.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized. The design specifies 10, config is 10, and the guide says 30. The guide's staleness can be discovered only from evidence: git history shows it predates the timeout change, and no file names it as outdated. Checks and invariants (Navigator's unchanged `**`, HEAD unchanged, no mutating git; check_ok omitted per the Navigator rule) cannot fail a correct read-only run, and both assertions are observable.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T01:35:48.484Z",
+  "costUsd": 0.1453962,
+  "ms": 36449,
+  "fixtureHash": "67133ecc3e0acba3"
+}

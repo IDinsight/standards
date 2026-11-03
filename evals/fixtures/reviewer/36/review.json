@@ -1,0 +1,104 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState REVIEWING_IMPLEMENTATION",
+      "where": ".standards/STATE.md line 3",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id = export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Current scope available with valid ownership",
+      "where": ".standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md (SCOPE provenance, AC-001..AC-003)",
+      "status": "realized"
+    },
+    {
+      "condition": "Current architecture available with valid ownership",
+      "where": ".standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md (ARCHITECTURE provenance, covers all ACs)",
+      "status": "realized"
+    },
+    {
+      "condition": "Auditor context available",
+      "where": ".standards/CONTEXT.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Development plan available and complete",
+      "where": ".standards/docs/development/export-20260924T090000Z-a7f3c1d2.md (COMPLETE, DEV-001..003 DONE)",
+      "status": "realized"
+    },
+    {
+      "condition": "Tester report available, full verification complete",
+      "where": ".standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md (COMPLETE, FULL/NONE)",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and outstanding obligations inactive",
+      "where": ".standards/STATE.md Recovery/Outstanding Obligations Active false",
+      "status": "realized"
+    },
+    {
+      "condition": "A P1 authorization defect leaks one tenant's export to another, confirmable",
+      "where": "src/routes/export.ts:18 `tenantId: admin.tenant` (undefined) with RecordStore.list ignoring unset tenantId; selfCheck shows harbor admin export returns rows 1-6 while GET /records returns 4-6",
+      "status": "realized"
+    },
+    {
+      "condition": "Existing tests pass despite the defect (so the reviewer must find it independently)",
+      "where": "test/integration/export-flow.test.ts harbor test uses owner=marco; pnpm test 23 pass, test:integration 4 pass",
+      "status": "realized"
+    },
+    {
+      "condition": "No review report exists yet; review starts fresh in an independent session",
+      "where": ".standards/docs/reviews absent; history null",
+      "status": "realized"
+    },
+    {
+      "condition": "Committed, clean git state",
+      "where": "git status clean on main",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 2,
+      "detail": "Several check objects place `why` inside the predicate object (`heading_ids: {path,prefix,min,why}`, `contains: {path,regex,why}`) rather than beside it, as the spec format describes. Gates accepted the spec, so the harness likely ignores the extra key, but a strict predicate parser could treat it as an unknown field.",
+      "recommendation": "fix_file",
+      "fix": "In reviewer-36/spec.json checks[2].all, move the `why` keys out of the `heading_ids` and `contains` objects to the enclosing check objects."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "CONTEXT.md and the design both stress that RecordStore.list does not restrict by tenant when tenantId is unset and that type annotations are not enforced. This is plausible baseline documentation and does not name the defect, but it does point a reviewer toward the risky call. Since the case presents the defect as confirmed and the assertions grade the summary wording, the hint helps the run reach the scenario under test rather than giving away a graded answer.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "I traced a correct routing through the turn-end check: FAILURE IMPLEMENTATION from REVIEWING_IMPLEMENTATION to DEVELOPING, with frame From REVIEWING_IMPLEMENTATION, Owner DEVELOPING, ResumeAt REVIEWING_IMPLEMENTATION, and a BLOCKED or IN_PROGRESS review report. The COMPLETE plan is not required in DEVELOPING, the COMPLETE verification report is not held (justLeft is REVIEWING_IMPLEMENTATION), and recoveryScope is not scoped, so check_ok holds. A reviewer that also records a VERIFICATION finding still passes. The check that the report contains `src/routes/export.ts` is a necessary reference under the template's exact-file rule.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition. Selfchecks confirm the planted cross-tenant leak at src/routes/export.ts:18; existing tests miss it; all prior records are coherent; and check.mjs passes. Checks and invariants are necessary conditions that a correct BLOCKED-report, route-to-Developer run satisfies, and the summary-wording assertions are rightly left to the judge. The only issues are minor notes: `why` keys placed inside predicate objects, and design and context text that points toward the risky store call.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T23:30:48.161Z",
+  "costUsd": 0.34142079999999997,
+  "ms": 42822,
+  "fixtureHash": "f8ce0c647c76e7ce"
+}

@@ -1,0 +1,293 @@
+{
+  "base": "export-project",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-context",
+      "action": "commit",
+      "message": "Record project context for CSV export"
+    },
+    {
+      "dir": "layers/52-scope",
+      "action": "commit",
+      "message": "Define CSV export scope"
+    },
+    {
+      "dir": "layers/54-design",
+      "action": "commit",
+      "message": "Design CSV export"
+    },
+    {
+      "dir": "layers/56-plan",
+      "action": "commit",
+      "message": "Plan CSV export implementation"
+    },
+    {
+      "dir": "layers/58-export",
+      "action": "commit",
+      "message": "Add CSV export of filtered records"
+    },
+    {
+      "dir": "layers/60-complete",
+      "action": "commit",
+      "message": "Mark CSV export plan complete"
+    },
+    {
+      "dir": "layers/62-access-test",
+      "action": "commit",
+      "message": "Add integration test for denied exports"
+    },
+    {
+      "dir": "layers/64-verification",
+      "action": "commit",
+      "message": "Record CSV export verification"
+    },
+    {
+      "dir": "layers/66-review",
+      "action": "commit",
+      "message": "Record CSV export implementation review"
+    },
+    {
+      "dir": "layers/68-guide",
+      "action": "commit",
+      "message": "Document CSV export in usage guide"
+    },
+    {
+      "dir": "layers/70-documentation",
+      "action": "commit",
+      "message": "Record CSV export documentation"
+    },
+    {
+      "dir": "layers/72-final-review",
+      "action": "commit",
+      "message": "Record CSV export final review"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "synchronizer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The completed scope's Constraints section requires every export file to be kept for at least one year after it is written and forbids anything in this work from removing an export file sooner; that scope meaning is established and is not itself defective.",
+    "The technical design's Interfaces and Contracts (Retention bullet) and its Risks section require a 30-day retention interval, with the deployment's scheduled cleanup removing export files older than 30 days. This contradicts the scope constraint and is a design defect owned by Architect (FailureType ARCHITECTURE).",
+    "The usage guide's Limits section repeats the design's 30-day retention; the documentation record's AC-003 evidence (G1) and the final-deliverable review's C3 accepted it, and the verification report and implementation review mention the design's retention as outside the repository. These are the evidence the design defect affects.",
+    "The implementation contains no code that deletes export files and is otherwise correct; tests pass. Every record's cited content identities match HEAD, and no other discrepancy exists.",
+    "Choosing a corrected retention interval or rewriting the design is Architect's work, not Synchronizer's."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "export-20260924T090000Z-a7f3c1d2",
+    "SCOPE": ".standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md",
+    "ARCH": ".standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md",
+    "DEV": ".standards/docs/development/export-20260924T090000Z-a7f3c1d2.md",
+    "VERIFICATION": ".standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md",
+    "REVIEW_IMPL": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md",
+    "REVIEW_FINAL": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md",
+    "DOC": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md",
+    "SYNC": ".standards/docs/synchronization/export-20260924T090000Z-a7f3c1d2.md",
+    "USAGE": "docs/usage.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "${ARCH}",
+            "${SCOPE}"
+          ],
+          "why": "Synchronizer does not rewrite the design or the scope"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${SYNC}",
+          "why": "the contradiction must be persisted in the synchronization record"
+        },
+        {
+          "provenance": {
+            "path": "${SYNC}",
+            "artifact": "SYNCHRONIZATION",
+            "cycle": "${ID}"
+          }
+        },
+        {
+          "heading_ids": {
+            "path": "${SYNC}",
+            "prefix": "D",
+            "min": 1
+          },
+          "why": "the discrepancy is recorded as a D-NNN entry"
+        },
+        {
+          "contains": {
+            "path": "${SYNC}",
+            "regex": "ARCHITECTURE"
+          },
+          "why": "the discrepancy names its canonical failure type"
+        },
+        {
+          "field": {
+            "path": "${SYNC}",
+            "name": "Status",
+            "not": "COMPLETE"
+          },
+          "why": "the gate cannot pass with an open design discrepancy"
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "ARCHITECTING"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FAILURE"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "ARCHITECTURE"
+        },
+        {
+          "state": "Recovery.Top.Owner",
+          "equals": "ARCHITECTING"
+        },
+        {
+          "state": "Recovery.Top.ResumeAt",
+          "equals": "SYNCHRONIZING"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "packages/**",
+        "docs/**",
+        "README.md",
+        "package.json",
+        ".standards/CONTEXT.md",
+        ".standards/docs/scope/**",
+        ".standards/docs/specs/**",
+        ".standards/docs/development/**",
+        ".standards/docs/verification/**",
+        ".standards/docs/reviews/**",
+        ".standards/docs/documentation/**"
+      ],
+      "why": "Synchronizer owns only its record and does not repair other roles' artifacts"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the unit suite passes offline"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration 2>&1 | grep -qE 'pass 3$'",
+      "expect": "pass",
+      "why": "the integration script runs and passes three tests"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the SYNCHRONIZING state and records are valid"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && test ! -e exports && test ! -e .standards/docs/synchronization && test ! -e .standards/user-styles",
+      "expect": "pass",
+      "why": "tree clean, no export files, no synchronization record yet"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `SYNCHRONIZING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Id`: `export-20260924T090000Z-a7f3c1d2`$' .standards/STATE.md && grep -q '^`Kind`: `FORWARD` `From`: `REVIEWING_FINAL` `FailureType`: `NONE`' .standards/STATE.md && grep -q '^`PromotionReason`: `NONE` `AuditTarget`: `NONE` `BlockedOn`: `NONE`$' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md && grep -q 'ProjectMode`: `BROWNFIELD' .standards/MODE.md",
+      "expect": "pass",
+      "why": "SYNCHRONIZING after final review, nothing blocked, recovery and obligations inactive"
+    },
+    {
+      "cmd": "s=.standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md && a=.standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md && grep -q 'kept for at least one year' $s && grep -q 'kept for 30 days after it is written' $a && ! grep -qi 'one year' $a && grep -q 'kept for 30 days' docs/usage.md && ! grep -rqE 'unlink|rmSync|rmdir' src",
+      "expect": "pass",
+      "why": "the scope requires at least one year, the design and guide state 30 days, and the service has no deletion code"
+    },
+    {
+      "cmd": "a=.standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md && s=.standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md && for f in .standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md .standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md .standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md .standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md; do grep -q $(git rev-parse HEAD:$a) $f && grep -q $(git rev-parse HEAD:$s) $f || exit 1; done && grep -q $(git rev-parse HEAD:docs/usage.md) .standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md && grep -q $(git rev-parse HEAD:src/export.ts) .standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md && ! grep -rqE 'COMMIT:|BLOB:' .standards/docs .standards/CONTEXT.md",
+      "expect": "pass",
+      "why": "every record cites the current scope and design identities, matching HEAD; no placeholder left"
+    },
+    {
+      "cmd": "git log -12 --format=%s | paste -s -d '|' - | grep -qx 'Record CSV export final review|Record CSV export documentation|Document CSV export in usage guide|Record CSV export implementation review|Record CSV export verification|Add integration test for denied exports|Mark CSV export plan complete|Add CSV export of filtered records|Plan CSV export implementation|Design CSV export|Define CSV export scope|Record project context for CSV export'",
+      "expect": "pass",
+      "why": "commit history follows the brownfield order"
+    }
+  ],
+  "notes": "Built on export-project (not export-synchronizing): the case needs the scope and design themselves to differ from the export-synchronizing base, and changing them in an overlay would stale every content identity the downstream records cite. Layers 50 to 72 reproduce export-synchronizing's layers 20 to 42 with the same commit subjects, with these differences: 52-scope adds a Constraints bullet requiring every export file to be kept for at least one year after it is written; 54-design adds an Interfaces and Contracts bullet 'Retention: an export file is kept for 30 days after it is written' (removal by the deployment's scheduled cleanup) and a matching Risks bullet, replacing 'never removed; retention is outside this cycle'; 64-verification and 66-review mention the design's retention as outside the repository; 68-guide's Limits states the 30-day retention; 70-documentation and 72-final-review cite that statement as following the design. Implementation and tests are byte-identical to the base and contain no deletion code. Final state: SYNCHRONIZING, FORWARD from REVIEWING_FINAL, recovery and obligations inactive, no synchronization record, clean tree.",
+  "case": "synchronizer-18",
+  "caseHash": "9bad3c6251da289b",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T14:34:13.150Z",
+    "verdict": "pass",
+    "fixtureHash": "cac4b38782b7720e",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "fce03e6b1cf01e52",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:37:40.380Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T13:12:49.012Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-context/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/52-scope/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/54-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/56-plan/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/60-complete/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/64-verification/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/66-review/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/70-documentation/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/72-final-review/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:37:40.380Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

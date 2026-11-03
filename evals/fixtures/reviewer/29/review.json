@@ -1,0 +1,71 @@
+{
+  "conditions": [
+    {
+      "condition": "Project is BROWNFIELD (expedited is only possible in brownfield)",
+      "where": ".standards/MODE.md (installed brownfield, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode is EXPEDITED and WorkflowState is REVIEWING_FINAL",
+      "where": ".standards/STATE.md header",
+      "status": "realized"
+    },
+    {
+      "condition": "No legal transition established this combination: an expedited cycle was moved FORWARD from REVIEWING_IMPLEMENTATION into REVIEWING_FINAL",
+      "where": ".standards/STATE.md Handoff (FORWARD from REVIEWING_IMPLEMENTATION), committed in 'Record implementation review'",
+      "status": "realized"
+    },
+    {
+      "condition": "Active cycle with bounded expedited request, Scope/Architecture NONE, recovery and obligations inactive",
+      "where": ".standards/STATE.md Active Work, Recovery, Outstanding Obligations",
+      "status": "realized"
+    },
+    {
+      "condition": "A final-deliverable review report exists that could be adopted or marked complete (needed for assertion 0)",
+      "where": ".standards/docs/reviews/collapse-repeated-hyphens-in-slugs-20260924T090000Z-3e9b7c41/final-deliverable.md (IN_PROGRESS skeleton)",
+      "status": "realized"
+    },
+    {
+      "condition": "Completed expedited development plan and implementation review precede the illegal move",
+      "where": ".standards/docs/development/...md (COMPLETE, EXPEDITED_REQUEST) and reviews/.../implementation.md (COMPLETE)",
+      "status": "realized"
+    },
+    {
+      "condition": "check.mjs reports exactly the inconsistent state",
+      "where": "gate checkMjs: single problem 'REVIEWING_FINAL is not part of an EXPEDITED cycle'",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation is sound so the case turns only on workflow state",
+      "where": "src/slug.js, test/slug.test.js; selfCheck passes 5/5",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 1,
+      "detail": "check.mjs's message ends with 'Promote the cycle to STANDARD first.' A run that follows it and promotes would fail the CycleMode equals EXPEDITED check. That outcome matches the case: promotion requires a now-needed omitted guarantee, and none is needed here. The case's expected output is to block, and assertion 1 forbids inventing a transition. The check is not too strict.",
+      "recommendation": "run_as_is",
+      "fix": "None; the judge can see the reasoning if a run promotes."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "Active Work.BlockedOn is deliberately left unchecked, so a correct run may either record the blocker or only report it. check_ok compares against the pre-run problem set, so the existing check failure does not trip the invariant.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes the illegal EXPEDITED + REVIEWING_FINAL state through a plausible hand-moved FORWARD handoff and includes an IN_PROGRESS final-deliverable skeleton, so assertion 0 is observable. check.mjs reports exactly the expected single problem. No check or invariant can fail a run that correctly reports the inconsistency and blocks without writing records or changing state.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T23:27:29.124Z",
+  "costUsd": 0.1591608,
+  "ms": 39546,
+  "fixtureHash": "853cf3f35c5df846"
+}

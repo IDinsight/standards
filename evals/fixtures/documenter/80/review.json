@@ -1,0 +1,49 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is BROWNFIELD",
+      "where": ".standards/MODE.md (installer default, `ProjectMode`: `BROWNFIELD`)",
+      "status": "realized"
+    },
+    {
+      "condition": "No active cycle (Active Work.Id and Request UNSET, CycleMode UNSET, WorkflowState AUDITING, Handoff INITIAL)",
+      "where": ".standards/STATE.md (installer default brownfield template, committed in 'Install STANDARDS')",
+      "status": "realized"
+    },
+    {
+      "condition": "No saved blocked request (PendingCycleRequest UNSET, PendingCycleBlockedOn NONE)",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "The checkout has a README",
+      "where": "README.md (committed pre-install in 'Add duration parsing library' and updated in 'Add formatDuration and document usage')",
+      "status": "realized"
+    },
+    {
+      "condition": "The user gives no documentation assignment",
+      "where": "prompt.utterance 'Continue.'",
+      "status": "realized"
+    },
+    {
+      "condition": "No cycle records exist",
+      "where": ".standards/docs absent (selfCheck confirms)",
+      "status": "realized"
+    },
+    {
+      "condition": "Clean committed working tree",
+      "where": "git status: clean on main",
+      "status": "realized"
+    }
+  ],
+  "issues": [],
+  "verdict": "pass",
+  "summary": "The fixture is the untouched brownfield install over a small, accurate duration library with a README. The utterance 'Continue.' carries no assignment, and nothing in the repository hints at the expected answer. Assertion 0's complete checks (state fields UNSET or NONE, no .standards/docs, unchanged **) and assertion 1's preconditions are all necessary for any correct read-only response, and the standard invariants fit.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T02:57:32.954Z",
+  "costUsd": 0.1079074,
+  "ms": 21716,
+  "fixtureHash": "e69e66a3e1870f5d"
+}

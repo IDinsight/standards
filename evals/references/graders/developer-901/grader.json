@@ -1,0 +1,112 @@
+{
+  "label": "D1",
+  "reference": "skills/developer/references/security-fastapi.md",
+  "checks": [
+    {
+      "id": "unknown-email-locks",
+      "tier": "outcome",
+      "text": "Failed logins for an email address with no account lock that address after 5 attempts, as they do for an existing account."
+    },
+    {
+      "id": "store-failure-refuses",
+      "tier": "control",
+      "text": "When every counter-store call fails, a login with the correct password is still refused."
+    },
+    {
+      "id": "locks-by-email",
+      "tier": "outcome",
+      "text": "Failures for one email address from 5 different client addresses lock that email address, and failures for one email address never lock another."
+    },
+    {
+      "id": "success-clears",
+      "tier": "outcome",
+      "text": "A successful login clears the failed attempts for that email address: after a success, 4 more failures do not lock it, and a 5th does."
+    },
+    {
+      "id": "same-failure",
+      "tier": "control",
+      "text": "Before any lockout, an unknown email and a wrong password get the same result from authenticate_user, and the router answers both with the same 401."
+    },
+    {
+      "id": "window-restarts",
+      "tier": "reference",
+      "text": "Each failed attempt restarts the 15-minute window: 5 failures 10 minutes apart lock the email address."
+    },
+    {
+      "id": "router-429",
+      "tier": "control",
+      "text": "The router answers AccountLockedError with 429 and a Retry-After header."
+    }
+  ],
+  "rules": [
+    {
+      "check": "unknown-email-locks",
+      "file": "skills/developer/references/security-fastapi.md",
+      "text": "Never let lockout reveal whether an account exists: count failures for every"
+    },
+    {
+      "check": "unknown-email-locks",
+      "file": "skills/developer/references/security-fastapi.md",
+      "text": "# Count failures for unknown emails too, so lockout behavior does"
+    },
+    {
+      "check": "locks-by-email",
+      "file": "skills/developer/references/security-fastapi.md",
+      "text": "Key lockout on the account identifier, such as email, not the IP address."
+    },
+    {
+      "check": "success-clears",
+      "file": "skills/developer/references/security-fastapi.md",
+      "text": "clear_lockout(redis, key)"
+    },
+    {
+      "check": "same-failure",
+      "file": "skills/developer/references/security-fastapi.md",
+      "text": "use the same messages for existing and unknown"
+    },
+    {
+      "check": "window-restarts",
+      "file": "skills/developer/references/security-fastapi.md",
+      "text": "# Each failure restarts the window."
+    },
+    {
+      "check": "router-429",
+      "file": "skills/developer/references/security-fastapi.md",
+      "text": "The router returns `429 Too Many Requests` with `Retry-After` for a locked"
+    }
+  ],
+  "leakGuard": [
+    "fail closed",
+    "fail-closed",
+    "fail open",
+    "fail-open",
+    "unknown emails too",
+    "restart the window",
+    "restarts the window",
+    "account identifier, not"
+  ],
+  "solutions": [
+    {
+      "patch": "good.patch",
+      "kind": "good"
+    },
+    {
+      "patch": "bad-unknown.patch",
+      "kind": "bad",
+      "fails": [
+        "unknown-email-locks",
+        "router-429"
+      ]
+    },
+    {
+      "patch": "bad-open.patch",
+      "kind": "bad",
+      "fails": [
+        "store-failure-refuses",
+        "locks-by-email",
+        "success-clears",
+        "window-restarts"
+      ]
+    }
+  ]
+}

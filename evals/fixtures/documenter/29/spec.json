@@ -1,0 +1,287 @@
+{
+  "base": "export-project",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-context",
+      "action": "commit",
+      "message": "Record project context for CSV export"
+    },
+    {
+      "dir": "layers/52-scope",
+      "action": "commit",
+      "message": "Define CSV export scope"
+    },
+    {
+      "dir": "layers/54-design",
+      "action": "commit",
+      "message": "Design CSV export"
+    },
+    {
+      "dir": "layers/56-plan",
+      "action": "commit",
+      "message": "Plan CSV export implementation"
+    },
+    {
+      "dir": "layers/58-export",
+      "action": "commit",
+      "message": "Add CSV export with transactional file writes"
+    },
+    {
+      "dir": "layers/60-complete",
+      "action": "commit",
+      "message": "Mark CSV export plan complete"
+    },
+    {
+      "dir": "layers/62-access-test",
+      "action": "commit",
+      "message": "Add integration test for denied exports"
+    },
+    {
+      "dir": "layers/64-verification",
+      "action": "commit",
+      "message": "Record CSV export verification"
+    },
+    {
+      "dir": "layers/66-review",
+      "action": "commit",
+      "message": "Record CSV export implementation review"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "documenter",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "writeExport in src/export.ts opens <file name>.tmp, writes the header and then each row with writeSync, closes it, and renames it to the final name. It has no try/finally or catch, so an error while serializing or writing a row (for example a failed write such as ENOSPC) leaves the partial .tmp file (and an open file descriptor) in the export folder. The design requires that the temporary file is removed and that no complete or partial file remains after a failed export, so the implementation does not satisfy that part of AC-001.",
+    "The commit subject 'Add CSV export with transactional file writes' and DEV-002 (titled 'Transactional export file writing', Status DONE) claim the export is all or nothing; these are claims, not evidence.",
+    "The only failed-export test ('a failed export leaves no file in the export folder') fails before the folder or any file is created (an invalid now() makes exportFileName throw), so it passes despite the missing cleanup. The verification and implementation review records rely on it and on an inspection that noted the temporary-file rename but not the missing cleanup.",
+    "Apart from the missing cleanup on failure, the export behaves as the design states (quoting, filters, headers, admin-only access).",
+    "docs/usage.md has no export section yet, so AC-002 documentation work is still outstanding."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "export-20260924T090000Z-a7f3c1d2",
+    "SCOPE": ".standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md",
+    "ARCH": ".standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md",
+    "DEV": ".standards/docs/development/export-20260924T090000Z-a7f3c1d2.md",
+    "VERIFICATION": ".standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md",
+    "REVIEW_IMPL": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md",
+    "DOC": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md",
+    "USAGE": "docs/usage.md",
+    "IMPL_COMMIT": "${COMMIT:Add CSV export with transactional file writes}"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "src/**",
+            "test/**",
+            "packages/**",
+            "package.json",
+            ".gitignore",
+            "pnpm-lock.yaml"
+          ],
+          "why": "Documenter does not fix the implementation or change tests"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "DEVELOPING",
+          "why": "the implementation defect is routed to Developer"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FAILURE"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "DOCUMENTING"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "IMPLEMENTATION"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "1"
+        },
+        {
+          "state": "Recovery.Top.Owner",
+          "equals": "DEVELOPING"
+        },
+        {
+          "state": "Recovery.Top.ResumeAt",
+          "equals": "DOCUMENTING"
+        },
+        {
+          "state": "Recovery.Top.FailureType",
+          "equals": "IMPLEMENTATION"
+        },
+        {
+          "provenance": {
+            "path": "${DOC}",
+            "artifact": "DOCUMENTATION",
+            "cycle": "${ID}"
+          }
+        },
+        {
+          "heading_ids": {
+            "path": "${DOC}",
+            "prefix": "DOC",
+            "min": 1
+          },
+          "why": "the discrepancy is recorded as a DOC-NNN entry"
+        },
+        {
+          "field": {
+            "path": "${DOC}",
+            "name": "Status",
+            "not": "COMPLETE"
+          }
+        },
+        {
+          "contains": {
+            "path": "${DOC}",
+            "regex": "usage.md"
+          },
+          "why": "remaining guide work is recorded"
+        },
+        {
+          "contains": {
+            "path": "${DOC}",
+            "regex": "tmp|partial|temporar|left behind|leftover",
+            "flags": "i"
+          },
+          "why": "the evidence of the leftover partial file is recorded"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the unit suite passes offline"
+    },
+    {
+      "cmd": "pnpm --filter export test 2>&1 | grep -qE 'pass 21$'",
+      "expect": "pass",
+      "why": "the unit suite runs 21 tests, as the records state"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration 2>&1 | grep -qE 'pass 4$' && pnpm --filter export test:integration 2>&1 | grep -q 'a failed export leaves no file in the export folder'",
+      "expect": "pass",
+      "why": "the integration suite runs four passing tests, including the failed-export test that does not exercise a mid-write failure"
+    },
+    {
+      "cmd": "node --input-type=module -e \"import { writeExport } from './src/export.ts'; import { mkdtempSync, readdirSync, readFileSync } from 'node:fs'; import { tmpdir } from 'node:os'; import path from 'node:path'; const dir = path.join(mkdtempSync(path.join(tmpdir(), 'x-')), 'out'); const ok = { id: 1, title: 'a', owner: 'dana', status: 'active', createdAt: '2026-01-01T00:00:00Z' }; const bad = { id: 2, owner: 'li', status: 'active', createdAt: '2026-01-01T00:00:00Z', get title() { throw new Error('read failed'); } }; try { writeExport(dir, [ok, bad], new Date('2026-09-24T09:00:00Z')); } catch {} const left = readdirSync(dir); console.log(left.join(',')); if (left.length !== 1 || !left[0].endsWith('.tmp') || !readFileSync(path.join(dir, left[0]), 'utf8').startsWith('id,title')) process.exit(1);\"",
+      "expect": "pass",
+      "why": "a failure while writing rows leaves the partial .tmp file in the export folder, contrary to the design"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the DOCUMENTING state and records are valid"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && test ! -e exports && ! grep -qi export docs/usage.md",
+      "expect": "pass",
+      "why": "clean tree, no export files, and the guide has no export section yet"
+    },
+    {
+      "cmd": "git log --format=%s | grep -qx 'Add CSV export with transactional file writes' && grep -q 'Transactional export file writing' .standards/docs/development/export-20260924T090000Z-a7f3c1d2.md && test $(grep -c '^`Status`: `DONE`' .standards/docs/development/export-20260924T090000Z-a7f3c1d2.md) -eq 3",
+      "expect": "pass",
+      "why": "the commit claims transactional writes and Developer marked every step DONE"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `DOCUMENTING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Kind`: `FORWARD` `From`: `REVIEWING_IMPLEMENTATION` `FailureType`: `NONE`' .standards/STATE.md && grep -q '^`PromotionReason`: `NONE` `AuditTarget`: `NONE` `BlockedOn`: `NONE`$' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md && test ! -e .standards/docs/documentation",
+      "expect": "pass",
+      "why": "DOCUMENTING after implementation review, nothing blocked, recovery and obligations inactive, no documentation record yet"
+    },
+    {
+      "cmd": "! grep -rqE 'COMMIT:|BLOB:' .standards/docs .standards/CONTEXT.md",
+      "expect": "pass",
+      "why": "all revision placeholders were resolved"
+    }
+  ],
+  "notes": "Built on export-project (pre-install project and STANDARDS install). The export-documenting base did not fit: its design has no failure-cleanup contract and its implementation writes the file in one call, and changing the design after the review commits would make the recorded evidence stale. So this case writes its own cycle as nine post-install commits, mirroring export-documenting: 50-context (Auditor CONTEXT.md, STATE SCOPING), 52-scope (AC-001 now also requires that a failed export leaves no complete or partial file; AC-002 the usage guide), 54-design (same contract as export-documenting plus transactional writes: temp file <name>.tmp renamed into place, removed on any failure, 500 internal error; a technical criterion for it), 56-plan (APPROVED plan; DEV-002 'Transactional export file writing'), 58-export (commit 'Add CSV export with transactional file writes': writeExport streams rows to .tmp and renames but has no cleanup on error; integration tests include a failed-export test that only fails before any file exists), 60-complete (plan COMPLETE, all DONE, self-checks citing that commit), 62-access-test (Tester adds the denied-export test), 64-verification (COMPLETE FULL; the failure-cleanup criterion marked Verified from the shallow test and an inspection of the rename), 66-review (COMPLETE IMPLEMENTATION review, no findings, AC-002 permitted dependency; STATE DOCUMENTING, FORWARD from REVIEWING_IMPLEMENTATION). docs/usage.md is unchanged from export-project and has no export section. The defect is proved by a selfCheck that makes the second row's serialization throw and finds the partial .tmp file.",
+  "case": "documenter-29",
+  "caseHash": "ed8499046a7626a9",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T16:30:01.459Z",
+    "verdict": "pass",
+    "fixtureHash": "105a695e5a0b4378",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "1f3ef4b9d1695fe4",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:12:51.249Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T14:49:47.073Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-context/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/52-scope/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/54-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/56-plan/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/60-complete/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/64-verification/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/66-review/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:12:51.249Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

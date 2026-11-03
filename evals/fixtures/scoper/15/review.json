@@ -1,0 +1,76 @@
+{
+  "conditions": [
+    {
+      "condition": "Project is GREENFIELD",
+      "where": ".standards/MODE.md (installer greenfield mode, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "No project implementation exists",
+      "where": "Only README.md (\"nothing has been built yet\") plus workflow records",
+      "status": "realized"
+    },
+    {
+      "condition": "Active STANDARD cycle in which Scoper is resumed",
+      "where": ".standards/STATE.md: WorkflowState SCOPING, CycleMode STANDARD, Id standup-notes-20260924T084512Z-3e7a91c4, Handoff INITIAL",
+      "status": "realized"
+    },
+    {
+      "condition": "Active cycle has a scope record",
+      "where": ".standards/docs/scope/standup-notes-20260924T084512Z-3e7a91c4.md with matching provenance and AC-001..AC-004",
+      "status": "realized"
+    },
+    {
+      "condition": "Reset preview already shown and approval pending in Active Work.BlockedOn",
+      "where": "STATE.md BlockedOn: target /work, exact `standards reset --project /work --mode greenfield --yes` command, preview summary",
+      "status": "realized"
+    },
+    {
+      "condition": "An unrelated unresolved product question shares BlockedOn",
+      "where": "STATE.md BlockedOn: editable-after-cutoff vs lock question",
+      "status": "realized"
+    },
+    {
+      "condition": "Workflow files unchanged since the preview; git committed and clean",
+      "where": "git status clean; layer 60-cycle committed",
+      "status": "realized"
+    },
+    {
+      "condition": "No recovery or outstanding obligations",
+      "where": "STATE.md Recovery.Active false, Outstanding Obligations.Active false",
+      "status": "realized"
+    },
+    {
+      "condition": "User declines the reset and gives no instruction to resume scoping",
+      "where": "prompt.utterance \"No, don't reset; keep this cycle.\"",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 1,
+      "detail": "The complete:true regex requires the remaining BlockedOn value to contain 'cutoff' or 'editable' and no 'reset'. A correct run that heavily rewords the product question (e.g. 'lock after the daily deadline') would fail. Preserving the question verbatim or near-verbatim is the expected behavior under 'clear only the approval question', so the risk is small.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally widen the alternation to (?:cutoff|editable|lock) to tolerate light rewording."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 2,
+      "detail": "reply_matches 'cancel' assumes the reply uses the word cancel or cancellation. The assertion explicitly requires reporting that cancellation did not complete, so the check is effectively necessary.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized: a greenfield STANDARD cycle in SCOPING with no implementation, a scope record, and BlockedOn holding both the pending reset approval (with the exact command and preview) and an unrelated product question, all committed and clean. The standards shim makes a mistaken reset observable. Checks and invariants fit the protocol's decline path, and only minor wording risks in assertions 1 and 2 remain.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T20:08:55.247Z",
+  "costUsd": 0.1199722,
+  "ms": 29174,
+  "fixtureHash": "b85f3d1dcb442059"
+}

@@ -1,0 +1,155 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial beneficiary registry service"
+    },
+    {
+      "dir": "layers/51-deploy",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Deploy to ECS from GitHub Actions"
+    },
+    {
+      "dir": "layers/60-audit",
+      "action": "commit",
+      "message": "Record project context for beneficiary bulk import"
+    },
+    {
+      "dir": "layers/61-scope",
+      "action": "commit",
+      "message": "Scope beneficiary bulk import"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "architect",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "Valid Auditor context (.standards/CONTEXT.md) records an established Django REST Framework service on MySQL 8.0 (Amazon RDS) deployed to AWS ECS Fargate. The bulk-import endpoint is a bounded FEATURE design.",
+    "Redis (the existing Celery broker), pytest with pytest-django, and GitHub Actions are already established project tooling. Using or naming them is not a default-stack proposal. Assertion 1 fails only when the design proposes FastAPI, PostgreSQL, Railway, GCP, or another default-stack replacement for Django REST Framework, MySQL, or ECS, or a migration toward them. Naming them as rejected alternatives is allowed.",
+    "The scope and project context are complete and consistent. No scoping or project-context defect is intended."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "add-a-bulk-import-endpoint-for-20260923T141500Z-5c1e9a47",
+    "SPEC": ".standards/docs/specs/add-a-bulk-import-endpoint-for-20260923T141500Z-5c1e9a47.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "contains": {
+            "path": "${SPEC}",
+            "regex": "Django",
+            "flags": "i"
+          },
+          "why": "the persisted design, created by artifact init at its fixed path, builds on Django"
+        },
+        {
+          "contains": {
+            "path": "${SPEC}",
+            "regex": "MySQL|RDS",
+            "flags": "i"
+          },
+          "why": "the design names the established MySQL database"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "requirements.txt",
+            "requirements-dev.txt",
+            "Dockerfile",
+            "deploy/**",
+            ".github/**",
+            "registry/**"
+          ],
+          "why": "Architect changes no dependencies, settings, or deployment files; a stack migration would show up here"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "beneficiaries/**",
+        "registry/**",
+        "manage.py",
+        "README.md",
+        "pytest.ini"
+      ],
+      "why": "Architect writes no production code, tests, or user documentation"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "python3 -m compileall -q beneficiaries registry manage.py",
+      "expect": "pass",
+      "why": "the project's Python sources are syntactically valid"
+    },
+    {
+      "cmd": "python3 -m json.tool deploy/ecs/task-definition.json",
+      "expect": "pass",
+      "why": "the ECS task definition cited by the context is valid JSON"
+    },
+    {
+      "cmd": "python3 -c 'import django'",
+      "expect": "fail",
+      "expectOutput": "No module named .django.",
+      "why": "CONTEXT.md states that Django was not available in the audit environment, so the suite was not run"
+    },
+    {
+      "cmd": "mysqld --version",
+      "expect": "fail",
+      "expectOutput": "mysqld.*not found",
+      "why": "CONTEXT.md states that no MySQL server was available in the audit environment"
+    }
+  ],
+  "notes": "Standalone fixture. Pre-install layers: 50-project commits an established Django 4.2 / DRF 3.15 service on MySQL (mysqlclient), with Celery and a Redis broker for the registration SMS, a load_villages CSV management command, and pytest-django tests. 51-deploy adds the Dockerfile, an ECS Fargate task definition (web and worker containers, RDS host, ElastiCache broker, Secrets Manager), a GitHub Actions CI/deploy workflow to ECR and ECS, and the full README. 60-audit commits .standards/CONTEXT.md, the Auditor context that records the stack, conventions, nearest analogues, and audit limitations, together with MODE.md and a STATE.md in SCOPING after the Auditor's FORWARD handoff. 61-scope commits the Scoper record with AC-001 to AC-008 and a STATE.md in ARCHITECTING: STANDARD, FULL_DELIVERABLE, Architecture NONE, recovery inactive. The project tests cannot run in the runner because Django and MySQL are not installed. The context says so, and the selfChecks prove it.",
+  "case": "architect-19",
+  "caseHash": "cb86db0290b0c453",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-30T22:49:28.241Z",
+    "verdict": "pass",
+    "fixtureHash": "403e23fbd9a0670f",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-30T22:44:31.579Z"
+  }
+}

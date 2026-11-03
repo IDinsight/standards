@@ -1,0 +1,86 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield template)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState DOCUMENTING, Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, architecture, context, development, verification and implementation review have matching provenance and current evidence",
+      "where": ".standards/docs/{scope,specs,development,verification,reviews/.../implementation}.md and .standards/CONTEXT.md; plan COMPLETE, verification COMPLETE FULL/NONE, review COMPLETE with no findings",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-001 covers CSV export behavior; AC-002 requires an accurate usage guide",
+      "where": "scope record, Work items 1 and 2",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and obligations inactive",
+      "where": ".standards/STATE.md Recovery/Outstanding Obligations Active false",
+      "status": "realized"
+    },
+    {
+      "condition": "No other user question blocked (BlockedOn holds only the guided apply-step request, as guided mode requires)",
+      "where": ".standards/STATE.md BlockedOn matches the record's Resume section",
+      "status": "realized"
+    },
+    {
+      "condition": "Editing unrestricted",
+      "where": "documentation record, Assessed Inputs: 'Editing boundary: unrestricted'",
+      "status": "realized"
+    },
+    {
+      "condition": "Resume GUIDED with a pending, offered-but-uninspected step",
+      "where": "documentation record: Collaboration GUIDED, Status BLOCKED, Guided step 1 with destination, content, pre-edit blob, expected result, next inspection",
+      "status": "realized"
+    },
+    {
+      "condition": "User says the edit is saved",
+      "where": "prompt.utterance 'The edit is saved.'; working-tree docs/usage.md is an unstaged change containing the section (layer 55)",
+      "status": "realized"
+    },
+    {
+      "condition": "The repository file cannot be read in this environment",
+      "where": "runtime.unreadable docs/usage.md; selfCheck 'cat docs/usage.md' fails with Permission denied; other files readable",
+      "status": "realized"
+    },
+    {
+      "condition": "Full gate cannot pass regardless (step 2 and README assessment outstanding)",
+      "where": "documentation record, Discrepancies, Dependencies, and Remaining Work",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "record-format",
+      "assertion": -1,
+      "detail": "Catalog marks the case deliberately_invalid but names no issue; nothing in the stated situation makes check.mjs fail (the unreadable guide yields only a note). The generator built a valid state with expectCheck ok, which is the consistent choice.",
+      "recommendation": "run_as_is",
+      "fix": "None; catalog flag appears spurious."
+    },
+    {
+      "severity": "note",
+      "kind": "runtime",
+      "assertion": -1,
+      "detail": "If the agent's user owns docs/usage.md, it could chmod the file back to readable and inspect it, sidestepping the stated limitation. selfChecks confirm reads fail for the run user, but not that chmod is prevented. A chmod would not be caught by the content-based docs/** invariant.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally have the harness make the unreadable file owned by another user; the judge can otherwise see a chmod in the tool calls."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes the resumed GUIDED Documenter state faithfully: a BLOCKED record with an offered, uninspected step 1, a matching BlockedOn, the user's edit present but unstaged, and docs/usage.md unreadable at runtime (verified by selfCheck). Checks are necessary conditions a correct run satisfies (stay in DOCUMENTING, record not COMPLETE, blocker kept, record updated with the gap), invariants fit GUIDED mode, and nothing leaks. Only minor notes about the catalog's spurious deliberately_invalid flag and a possible chmod workaround.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T16:23:20.476Z",
+  "costUsd": 0.2640126,
+  "ms": 55361,
+  "fixtureHash": "3ba12d8cc714b420"
+}

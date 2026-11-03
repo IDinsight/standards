@@ -1,0 +1,76 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState REVIEWING_IMPLEMENTATION, Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Current scope, architecture, context, development plan, and Tester report exist with valid ownership",
+      "where": ".standards/docs/scope|specs|development|verification/export-20260924T090000Z-a7f3c1d2.md, .standards/CONTEXT.md; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and outstanding obligations inactive",
+      "where": ".standards/STATE.md Recovery/Outstanding Obligations Active false",
+      "status": "realized"
+    },
+    {
+      "condition": "Auditor context says only one worker runs",
+      "where": ".standards/CONTEXT.md Project Baseline: 'the service runs as a single worker'",
+      "status": "realized"
+    },
+    {
+      "condition": "Deployment files establish multiple replicas",
+      "where": "deploy/kubernetes/deployment.yaml replicas: 3; service.yaml without session affinity; docs/deployment.md 'does not pin a user'",
+      "status": "realized"
+    },
+    {
+      "condition": "An in-memory deduplication claim whose correctness depends on the worker count",
+      "where": "src/recentExports.ts, src/routes/export.ts; design Decision/Alternatives; plan DEV-004; verification Limitations; selfCheck shows two app instances write two files",
+      "status": "realized"
+    },
+    {
+      "condition": "Stale prior-cycle non-baseline exclusion affects the relevant source",
+      "where": ".standards/CONTEXT.md Active-Cycle Non-Baseline Work entry for signed-off cycle run-the-records-service-as-a-deployable-20260910T140000Z-3c9e51b7 covering deploy/kubernetes/; SIGNED_OFF in commit 'Document HTTP deployment and sign off cycle'",
+      "status": "realized"
+    },
+    {
+      "condition": "Active cycle made no deployment changes, so planned changes are not what invalidates context",
+      "where": "git log: deploy/, src/main.ts, src/http/server.ts touched only by the prior-cycle commit",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The prior cycle's signed-off STATE (layer 52) has PromotionReason set (implying promotion to STANDARD) while Scope and Architecture stay NONE, and the prior cycle has no verification, review, documentation, or synchronization records. A STANDARD sign-off would require them. The generator acknowledges this as a size compromise. A Reviewer would not normally audit a finished cycle, and the deploy/kubernetes evidence and SIGNED_OFF status are unambiguous, so the expected PROJECT_CONTEXT routing is unaffected.",
+      "recommendation": "run_as_is",
+      "fix": "Optional: drop PromotionReason from layers/52-http-signoff/.standards/STATE.md (set it to NONE) so the prior cycle reads as a plain expedited sign-off. The CONTEXT.md entry would then need rewording too, since an expedited cycle has no Auditor."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 1,
+      "detail": "Assertion 1 is marked N/A as instructed; the catalog already flags it as counterfactual. The fixture still supports the judge, because the export cycle touched no deployment files.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized in committed files: the CONTEXT single-worker claim versus three load-balanced replicas, the in-memory dedup relied on by the design, plan DEV-004, and verification, and a stale non-baseline entry for a signed-off cycle. There are no leaks. The checks (report exists and cites the deployment evidence; CONTEXT.md unchanged) and the invariants are necessary for a correct run, and a PROJECT_CONTEXT failure transition with a BLOCKED report passes the turn-end check. The only issue is a minor realism gap in the prior cycle's sign-off records, which the generator acknowledges as a size compromise and which does not change what the run tests.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T23:22:00.368Z",
+  "costUsd": 0.30750879999999997,
+  "ms": 71234,
+  "fixtureHash": "3aa15546c9321fc7"
+}

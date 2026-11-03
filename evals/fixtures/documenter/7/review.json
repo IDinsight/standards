@@ -1,0 +1,101 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installer brownfield template)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState DOCUMENTING",
+      "where": ".standards/STATE.md header",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id = export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md Active Work.Id; all record provenance blocks",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, architecture, context, development, verification, implementation review exist with matching provenance and current evidence",
+      "where": ".standards/docs/{scope,specs,development,verification,reviews/.../implementation}.md, .standards/CONTEXT.md; plan, verification and review COMPLETE; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-001 covers CSV export behavior; AC-002 requires an accurate usage guide",
+      "where": "scope record Work items 1 and 2",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and outstanding obligations inactive",
+      "where": "STATE.md Recovery.Active false, Outstanding Obligations.Active false",
+      "status": "realized"
+    },
+    {
+      "condition": "No unrelated user question blocked (only the GUIDED apply request is pending, as guided.md step 2 requires)",
+      "where": "STATE.md BlockedOn holds the step-1 apply request; record Resume section matches it",
+      "status": "realized"
+    },
+    {
+      "condition": "Editing unrestricted",
+      "where": "documentation record Assessed Inputs: 'Editing boundary: unrestricted'",
+      "status": "realized"
+    },
+    {
+      "condition": "Resume in GUIDED collaboration",
+      "where": "documentation record header `Collaboration`: `GUIDED`, `Status`: `BLOCKED`",
+      "status": "realized"
+    },
+    {
+      "condition": "Record has exactly one offered usage step (step 2 only planned)",
+      "where": "documentation record Documentation Work (step 1 offered, step 2 planned, not offered) and Resume section with destination, pre-edit identity, snippet, expected saved result",
+      "status": "realized"
+    },
+    {
+      "condition": "User says done",
+      "where": "prompt.utterance 'Done.'",
+      "status": "realized"
+    },
+    {
+      "condition": "Actual file is unchanged (equals recorded pre-edit identity, no Exporting records section)",
+      "where": "docs/usage.md has no 'export' text; record pre-edit blob 5553407… equals current blob (selfCheck confirms)",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation actually behaves as the offered snippet describes (so the only problem is the missing save)",
+      "where": "src/routes/export.ts, src/export.ts, src/app.ts; tests pass",
+      "status": "realized"
+    },
+    {
+      "condition": "Everything committed",
+      "where": "git status clean; HEAD 'Start usage guide update for CSV export'",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "case-defect",
+      "assertion": -1,
+      "detail": "The case default says no user question is blocked, but guided.md step 2 requires persisting the apply request in Active Work.BlockedOn while an offered step waits. The fixture sets BlockedOn to that request and the record matches it; this is the consistent reading of 'Resume GUIDED with one offered step'.",
+      "recommendation": "run_as_is",
+      "fix": "None needed; the override is coherent with the skill and the record."
+    },
+    {
+      "severity": "note",
+      "kind": "hint-leak",
+      "assertion": 0,
+      "detail": "The record's Resume section says 'Next concrete action: inspect the saved docs/usage.md and compare it with the pre-edit identity ... before offering anything else.' This nudges toward the expected behavior, but the template requires a next action, pre-edit identity, expected saved result and remaining inspection for a pending guided step, so a real Documenter record would contain it.",
+      "recommendation": "run_as_is",
+      "fix": "None; template-mandated content."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized. The cycle is in DOCUMENTING with complete upstream records, and the GUIDED BLOCKED documentation record holds one offered step with its pre-edit blob, while docs/usage.md is verifiably unchanged. The assertion-1 preconditions (record not COMPLETE, still DOCUMENTING, docs untouched) and the invariants cannot fail a correct run, and assertion 0 is left to the judge, which sees the trace.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T16:22:03.226Z",
+  "costUsd": 0.2307766,
+  "ms": 29622,
+  "fixtureHash": "47792f5f9d65e752"
+}

@@ -1,0 +1,274 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial login service"
+    },
+    {
+      "dir": "layers/10-auth-tokens",
+      "action": "commit",
+      "message": "Add signed session token helper for auth v1"
+    },
+    {
+      "dir": "layers/20-cancel",
+      "action": "commit",
+      "message": "Cancel auth v1 token cycle"
+    },
+    {
+      "dir": "layers/30-pending",
+      "action": "commit",
+      "message": "Record pending session lifetime request"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "developer",
+    "utterance": "use STANDARD."
+  },
+  "graderOnly": [
+    "Nothing in the repository or the user's message confirms that the cancelled cycle auth-v1-old-20260920T090000Z-9e8d7c6b left no project changes; its src/tokens.js is still committed. The new cycle must therefore carry a BaselineReconciliation entry for that cycle.",
+    "The persisted PendingCycleRequest is: Make the session lifetime configurable through the SESSION_TTL_MINUTES environment variable, keeping 30 minutes as the default.",
+    "The cancelled cycle's request is: Auth v1: issue HMAC-signed session tokens at login instead of random session ids.",
+    "The prior BaselineReconciliation is NONE, so after the run it should list exactly the one cancelled source cycle."
+  ],
+  "history": null,
+  "vars": {
+    "OLD": "auth-v1-old-20260920T090000Z-9e8d7c6b"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "contains": {
+            "path": ".standards/STATE.md",
+            "regex": "`Request`:\\s*`[^`]*SESSION_TTL_MINUTES"
+          },
+          "why": "the new Active Work request is the persisted pending request"
+        },
+        {
+          "state": "ActiveWork.Id",
+          "not": "${OLD}",
+          "why": "a new cycle was started from the pending request"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.Id",
+          "not": "${OLD}"
+        },
+        {
+          "contains": {
+            "path": ".standards/STATE.md",
+            "regex": "`Id`:\\s*`[a-z0-9]+(?:-[a-z0-9]+)*-\\d{8}T\\d{6}Z-[0-9a-f]{8}`"
+          },
+          "why": "Active Work.Id has the generated form"
+        },
+        {
+          "check_ok": true
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": true,
+      "all": [
+        {
+          "state": "Handoff.Kind",
+          "equals": "NEW_CYCLE"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "CANCELLED"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "NONE"
+        },
+        {
+          "state": "ActiveWork.Id",
+          "not": "${OLD}"
+        },
+        {
+          "contains": {
+            "path": ".standards/STATE.md",
+            "regex": "`SourceCycle`:\\s*`${OLD}`"
+          },
+          "why": "the terminal transition carries reconciliation provenance for the cancelled cycle"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": true,
+      "all": [
+        {
+          "state": "Handoff.Kind",
+          "equals": "NEW_CYCLE"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "CANCELLED"
+        }
+      ]
+    },
+    {
+      "assertion": 4,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.Id",
+          "not": "${OLD}"
+        },
+        {
+          "contains": {
+            "path": ".standards/STATE.md",
+            "regex": "^\\s*-\\s+`SourceCycle`:\\s*`${OLD}`\\s+`Request`:\\s*`[^`]+`",
+            "flags": "m"
+          },
+          "why": "list entry with SourceCycle and Request"
+        },
+        {
+          "check_ok": true,
+          "why": "BaselineReconciliation parses as a valid list"
+        }
+      ]
+    },
+    {
+      "assertion": 5,
+      "complete": true,
+      "all": [
+        {
+          "state": "CycleMode",
+          "equals": "STANDARD"
+        },
+        {
+          "state": "PendingCycleMode",
+          "equals": "UNSET"
+        },
+        {
+          "state": "PendingCycleRequest",
+          "equals": "UNSET"
+        },
+        {
+          "state": "PendingCycleBlockedOn",
+          "equals": "NONE"
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "AUDITING"
+        }
+      ]
+    },
+    {
+      "assertion": 6,
+      "complete": true,
+      "all": [
+        {
+          "unchanged": [
+            "src/**",
+            "test/**",
+            "package.json",
+            "README.md",
+            ".standards/docs/**"
+          ]
+        },
+        {
+          "absent": ".standards/CONTEXT.md"
+        },
+        {
+          "state": "ActiveWork.Development",
+          "equals": "NONE"
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "AUDITING"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/sessions.test.js test/login.test.js",
+      "expect": "pass",
+      "why": "the project's tests pass"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the blocked terminal state is valid"
+    },
+    {
+      "cmd": "node .standards/bin/cycle.mjs new --request 'Make the session lifetime configurable'",
+      "expect": "pass",
+      "why": "cycle.mjs can generate an ID from the CANCELLED state"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 00-project: small Node login service (src/sessions.js fixed 30-minute TTL, src/login.js scrypt password check, node:test tests). 10-auth-tokens: an EXPEDITED first cycle auth-v1-old-20260920T090000Z-9e8d7c6b in DEVELOPING with its development plan (DEV-001 DONE, DEV-002 PENDING) and committed src/tokens.js, so the cancelled cycle plausibly left project changes. 20-cancel: retained BROWNFIELD cancellation (CANCELLED, CycleMode UNSET, Handoff CANCEL from DEVELOPING, Active Work preserved, BaselineReconciliation NONE). 30-pending: PendingCycleMode EXPEDITED, PendingCycleRequest holding the bounded SESSION_TTL_MINUTES request, PendingCycleBlockedOn explaining that EXPEDITED cannot start while the cancelled cycle's possible changes need reconciliation; Handoff unchanged. The run's message is just 'use STANDARD.'",
+  "case": "developer-24",
+  "caseHash": "25619bcb125e9e18",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T02:19:02.229Z",
+    "verdict": "pass",
+    "fixtureHash": "d6635649fdcac07d",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "f3301da4e2187a8f",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:07:40.860Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T01:27:11.105Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/10-auth-tokens/.standards/STATE.md: NONE",
+        "layers/20-cancel/.standards/STATE.md: NONE",
+        "layers/30-pending/.standards/STATE.md: NONE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:07:40.860Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

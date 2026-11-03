@@ -1,0 +1,117 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (brownfield install, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState TESTING",
+      "where": ".standards/STATE.md header",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id = export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, Architecture, Development reference current-cycle artifacts",
+      "where": "STATE.md Active Work paths; provenance blocks in .standards/docs/scope|specs|development/export-20260924T090000Z-a7f3c1d2.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Valid Auditor context exists",
+      "where": ".standards/CONTEXT.md (pre-cycle baseline; planned export work does not make it stale)",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery inactive, nothing blocked",
+      "where": "STATE.md Recovery Active false, BlockedOn NONE, Handoff FORWARD from DEVELOPING",
+      "status": "realized"
+    },
+    {
+      "condition": "Interrupted VERIFY report exists, not complete",
+      "where": ".standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md: Mode VERIFY, Status IN_PROGRESS, FULL/NONE, Resume says session ended after S1",
+      "status": "realized"
+    },
+    {
+      "condition": "Report records a passing filtered-export scenario",
+      "where": "Report Execution Evidence: S1 'status-filtered' passed at commit 67642dd (selfCheck confirms it passes at HEAD)",
+      "status": "realized"
+    },
+    {
+      "condition": "Report records an unrun failure-path scenario",
+      "where": "Report: S2 viewer export denied, 'Written, not yet run'; test exists in test/export-route.test.ts",
+      "status": "realized"
+    },
+    {
+      "condition": "Report records assessed input identities that let a change be detected",
+      "where": "Report Assessed Inputs: blob hashes for scope, design, context, plan, sources, tests, fixture, and commit 67642dd",
+      "status": "realized"
+    },
+    {
+      "condition": "src/export.ts changed since interruption",
+      "where": "Unstaged edit (rename-based write); current blob differs from the recorded 7f32c00… (selfCheck)",
+      "status": "realized"
+    },
+    {
+      "condition": "Fixtures changed since interruption",
+      "where": "Unstaged edit to test/fixtures/export-records.ts adding record 15 (CRLF + comma); blob differs from recorded e460646…",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope and design did not change",
+      "where": "Recorded scope/spec blobs equal current blobs (selfCheck)",
+      "status": "realized"
+    },
+    {
+      "condition": "Current tree is runnable offline and its suites pass",
+      "where": "selfChecks: pnpm --filter export test (23 pass), test:integration (2 pass)",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 1,
+      "detail": "The contains regex 'supersed|invalidat|stale|replac|no longer' is a necessary condition. The template's own wording ('superseded result', 'Replace invalidated evidence') makes a match likely, but a correct run could write 'outdated', 'obsolete', 'out of date', or 'does not apply to the current content' and still fail.",
+      "recommendation": "fix_file",
+      "fix": "In tester-3/spec.json, checks[1].all[1].contains.regex: broaden to 'supersed|invalidat|stale|replac|no longer|outdated|out of date|obsolete|not current|does not (?:apply|support)|rerun|re-run'. Keep the selfCheck that greps the original report for the same pattern in sync, and confirm the original report still contains none of the words. The original text 'Not yet run' does not contain 'rerun' or 're-run'."
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 2,
+      "detail": "The 'status-filtered' literal relies on the Tester keeping that phrase when it rewrites the budget table. It matches the test name, so the phrase will very likely survive anywhere S1 is cited. Because complete is false, a judge still decides preservation.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "Git author is 'Fixture <fixture@example.invalid>' and every commit has the same timestamp. These are visible in git log and faintly hint at a test repository. Both are harness-wide builder defaults.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "Nothing records who made the unstaged src change, and Developer's plan self-checks cite only commit 0bebb8d. A correct Tester might note this, or ask whether the change belongs to the cycle. The case's expected output (reconcile under REVERIFY) still holds, and the judge can grade either reasonable handling.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized: the interrupted VERIFY report records S1 passing and S2 unrun with blob identities, the source and fixture changes are unstaged and differ from those identities, and scope and design are unchanged, all proven by selfChecks. check.mjs is ok and the invariants fit a Tester; HEAD, git mutation, check_ok, and implementation and upstream records unchanged still leave test files free. The only concern is a modestly narrow wording regex for assertion 1, worth broadening but not blocking.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-01T22:26:09.565Z",
+  "costUsd": 0.868244,
+  "ms": 64694,
+  "fixtureHash": "48ee79595449f68e"
+}

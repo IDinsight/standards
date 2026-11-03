@@ -1,0 +1,58 @@
+{
+  "conditions": [
+    {
+      "condition": "Brownfield project with a STANDARD cycle in progress",
+      "where": ".standards/MODE.md (BROWNFIELD, installed); .standards/STATE.md CycleMode STANDARD, Id add-json-lines-order-export-20260922T141000Z-5c8e2a41",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-001 exists as a serialization acceptance condition",
+      "where": ".standards/docs/scope/add-json-lines-order-export-…md, `AC-001` list item (decimal total/price, UTC placedAt)",
+      "status": "realized"
+    },
+    {
+      "condition": "A test substitutes a mock so the real serializer is never called",
+      "where": "test/export.test.js lines defining `const serialize = (order) => JSON.stringify(...)` and passing `{ serialize }` to exportOrders in all three tests; serializeOrder in src/serialize.js is never invoked",
+      "status": "realized"
+    },
+    {
+      "condition": "The test report passes",
+      "where": "verification report Execution Evidence (5/5 pass); selfCheck `node --test test/export.test.js test/money.test.js` exit 0",
+      "status": "realized"
+    },
+    {
+      "condition": "The verification report marks AC-001 as passed on that test",
+      "where": ".standards/docs/verification/…md Acceptance Evidence row AC-001 'Verified: passed', Status COMPLETE, Purpose FULL",
+      "status": "realized"
+    },
+    {
+      "condition": "Context, scope, architecture, development, verification records present and coherent",
+      "where": ".standards/CONTEXT.md, docs/scope, docs/specs, docs/development (COMPLETE), docs/verification (COMPLETE); STATE at REVIEWING_IMPLEMENTATION after FORWARD from TESTING; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "Committed, clean git state",
+      "where": "git status clean on main; all layers committed",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The Developer self-check in the development plan shows the real serializer producing correct output via the CLI, and the selfChecks confirm it. This is reasonable: it lets a good Navigator distinguish Developer self-check evidence from Tester formal evidence, and the case still holds because the passing test report itself does not exercise serializeOrder. The Scenario Budget listing only src/export.js (not src/serialize.js) is a subtle but realistic clue, not a leak.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes the case: test/export.test.js injects an inline serializer so serializeOrder is never called, and the COMPLETE verification report still marks AC-001 verified, with nothing in names, comments, or records hinting at the gap. Checks and invariants (WorkflowState, .standards/** and test/** unchanged, no Tester/Reviewer skill call, unchanged **, HEAD unchanged, no mutating git) cannot fail a correct Navigator run, and both assertions are gradeable by the judge.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T01:41:50.379Z",
+  "costUsd": 0.1645442,
+  "ms": 31286,
+  "fixtureHash": "9a9b95cbacdc05ec"
+}

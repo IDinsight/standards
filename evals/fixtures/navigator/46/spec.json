@@ -1,0 +1,111 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add signup service with POST /signups endpoint"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "navigator",
+    "utterance": "GRILL_ME on the request flow at beginner depth."
+  },
+  "graderOnly": [
+    "The request flow for POST /signups is: src/server.js reads the JSON body, calls createSignup in src/handlers/signup.js, which first calls validateSignup from src/validate.js and returns 400 on errors, then checks for a duplicate email (409), and only then persists with store.insert in src/store.js and returns 201.",
+    "Validation happens before persistence: an invalid request returns 400 and nothing is stored (covered by test/signup.test.js).",
+    "No prior quiz answers exist; this is the first turn of the conversation."
+  ],
+  "history": null,
+  "vars": {},
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "reply_not_matches": "^\\s*\\**(User|Learner|Student|Me|Answer)\\**\\s*:",
+          "flags": "mi",
+          "why": "no simulated learner reply line"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "**"
+          ],
+          "why": "no quiz record or any other file is created"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "unchanged": [
+        "**"
+      ],
+      "why": "Navigator persists nothing (generated caches are ignored)"
+    },
+    {
+      "head_unchanged": true,
+      "why": "Navigator never moves HEAD"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Navigator never mutates git state"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/signup.test.js",
+      "expect": "pass",
+      "why": "the existing tests pass, including that an invalid signup returns 400 and is not stored (validation before persistence)"
+    }
+  ],
+  "notes": "Standalone brownfield fixture with the default installed workflow state (no cycle; the case leaves state unspecified). Layer 00-project (pre-install, committed) is a small dependency-free Node ES-module service: src/server.js (node:http, POST /signups, JSON body parsing) -> src/handlers/signup.js createSignup -> src/validate.js validateSignup (400 on errors) -> duplicate check -> src/store.js SignupStore.insert (in-memory) -> 201. test/signup.test.js covers create, invalid-not-stored, and duplicate. Validation-before-persistence is visible in source. Git is clean and committed. No history, so no prior answers exist.",
+  "case": "navigator-46",
+  "caseHash": "160268a9b5f15310",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T01:42:29.087Z",
+    "verdict": "pass",
+    "fixtureHash": "8881d558af48ce52",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "2dcc1aa3a62f851c",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:23:42.027Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T01:27:29.872Z"
+  },
+  "migrations": [
+    {
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:23:42.027Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

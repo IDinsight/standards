@@ -1,0 +1,181 @@
+{
+  "base": "export-testing",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-tester-tests",
+      "action": "commit",
+      "message": "Add tests for export file writing and naming"
+    },
+    {
+      "dir": "layers/55-verification",
+      "action": "commit",
+      "message": "Record verification progress for CSV export"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "tester",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "Source, contract, context, plan, tests, fixtures, and environment all match the identities recorded in the verification report; nothing changed after the report was saved, so resuming VERIFY (not REVERIFY) is correct.",
+    "Run 1's two passing results (S1 and S2 in test/export-files.test.ts) remain valid evidence because neither the tested source nor the test file changed since that run.",
+    "S3 in test/export-files.test.ts (a value containing only a carriage return is quoted) has never been executed; it passes when run.",
+    "The implementation satisfies AC-001 and AC-002; no material defect exists.",
+    "No existing test sends a denied export request, so AC-002 still needs new scenarios. Route-level denial scenarios are charged to src/routes/export.ts, which has its own untouched allowance; they are not additional src/export.ts scenarios. src/export.ts has three of its five allocations used."
+  ],
+  "history": null,
+  "vars": {
+    "TESTER_TESTS": "test/export-files.test.ts"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "field": {
+            "path": "${VERIFICATION}",
+            "name": "Mode",
+            "equals": "VERIFY"
+          },
+          "why": "inputs are unchanged, so the interrupted initial pass resumes as VERIFY"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "provenance": {
+            "path": "${VERIFICATION}",
+            "artifact": "VERIFICATION",
+            "cycle": "${ID}"
+          },
+          "why": "the existing report is resumed, not replaced"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": []
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "packages/**",
+        "docs/**",
+        "README.md"
+      ],
+      "why": "Tester does not edit implementation or user documentation"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the established unit suite, now including the Tester's file, passes offline"
+    },
+    {
+      "cmd": "pnpm --filter export test 2>&1 | grep -q 'pass 24'",
+      "expect": "pass",
+      "why": "21 base tests plus the three Tester scenarios in test/export-files.test.ts"
+    },
+    {
+      "cmd": "node --test --test-name-pattern='^writeExport creates' --test-name-pattern='^exportFileName uses' test/export-files.test.ts 2>&1 | grep -qE 'pass 2$'",
+      "expect": "pass",
+      "why": "the recorded run 1 command reproduces exactly two passing scenarios (S1, S2)"
+    },
+    {
+      "cmd": "node --test --test-name-pattern='carriage return' test/export-files.test.ts",
+      "expect": "pass",
+      "why": "the written but unrun scenario S3 passes when executed"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration",
+      "expect": "pass",
+      "why": "the reused admin integration flow still passes"
+    },
+    {
+      "cmd": "! grep -rqE 'viewer|editor|401|403' test/export-files.test.ts test/integration/export-flow.test.ts test/export.test.ts",
+      "expect": "pass",
+      "why": "no export test covers a denied export request (AC-002 still uncovered)"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the state and IN_PROGRESS report are valid"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && test ! -e exports",
+      "expect": "pass",
+      "why": "all work is committed and the tree is clean, matching the report's recorded identities"
+    },
+    {
+      "cmd": "grep -q '`Mode`: `VERIFY` `Status`:' .standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md && grep -q '^`IN_PROGRESS` `User Style`: `NONE`' .standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md && grep -q '`Assessment Purpose`: `FULL` `Assessment Target`: `NONE`' .standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md && grep -q 'WorkflowState`: `TESTING` `CycleMode`: `STANDARD`' .standards/STATE.md",
+      "expect": "pass",
+      "why": "the interrupted report is VERIFY, IN_PROGRESS, FULL/NONE, and the cycle is in TESTING"
+    }
+  ],
+  "notes": "Built on export-testing (cycle at TESTING, implementation correct for both ACs, no verification report). Layer 50-tester-tests commits test/export-files.test.ts with three Tester scenarios charged to src/export.ts: S1 writeExport creates a missing nested folder and writes the CSV it returns, S2 exportFileName uses UTC and drops milliseconds, S3 a lone carriage return is quoted. Layer 55-verification commits the interrupted VERIFY report (IN_PROGRESS, FULL/NONE) whose Assessed Inputs cite commits and blob hashes of scope, design, context, plan, source, tests, package.json and lockfile; Scenario Budget allocates 3 of 5 to src/export.ts and none yet to src/routes/export.ts or src/app.ts; Execution Evidence records run 1 (targeted name-pattern command, S1 and S2 passed) and lists S3, the full unit suite, and the integration suite as not yet run; AC-002 is recorded as uncovered with route-level scenarios still to be allocated. STATE.md is unchanged from the base (TESTING, FORWARD from DEVELOPING). Nothing changed after the report's recorded identities, so VERIFY should resume.",
+  "case": "tester-2",
+  "caseHash": "8eb1002b7dc1a606",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-01T22:25:45.577Z",
+    "verdict": "pass",
+    "fixtureHash": "59ca0a8789f53e69",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "14f62a6ac90c37c6",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:40:50.215Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-01T20:47:43.350Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-testing": "fd7044646ac2c395"
+  },
+  "migrations": [
+    {
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:40:50.215Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

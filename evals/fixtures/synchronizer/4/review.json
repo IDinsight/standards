@@ -1,0 +1,59 @@
+{
+  "conditions": [
+    {
+      "condition": "Project mode is BROWNFIELD",
+      "where": ".standards/MODE.md (installed with --mode brownfield): `ProjectMode`: `BROWNFIELD`",
+      "status": "realized"
+    },
+    {
+      "condition": "Active cycle is EXPEDITED at REVIEWING_IMPLEMENTATION",
+      "where": ".standards/STATE.md: WorkflowState REVIEWING_IMPLEMENTATION, CycleMode EXPEDITED, Handoff FORWARD from DEVELOPING",
+      "status": "realized"
+    },
+    {
+      "condition": "Expedited shape: Scope and Architecture NONE, no AC identifiers, PromotionReason NONE",
+      "where": ".standards/STATE.md Active Work; plan uses `EXPEDITED_REQUEST`",
+      "status": "realized"
+    },
+    {
+      "condition": "No recovery and no outstanding obligations, so promotion converts no frames",
+      "where": ".standards/STATE.md Recovery/Outstanding Obligations `Active`: `false`",
+      "status": "realized"
+    },
+    {
+      "condition": "Prior role artifacts exist: a COMPLETE development plan and an implementation review report",
+      "where": ".standards/docs/development/<id>.md (COMPLETE, DEV-001/002 DONE); .standards/docs/reviews/<id>/implementation.md (IN_PROGRESS)",
+      "status": "realized"
+    },
+    {
+      "condition": "Real implemented expedited change matching the plan",
+      "where": "bookmarks/tags.py, bookmarks/store.py; selfChecks pass",
+      "status": "realized"
+    },
+    {
+      "condition": "No synchronization, final review, verification, scope, design or context artifacts exist (expedited never synchronized/audited)",
+      "where": "built tree: none under .standards/docs/{synchronization,verification,scope,specs}, no final-deliverable.md, no .standards/CONTEXT.md",
+      "status": "realized"
+    },
+    {
+      "condition": "All work committed, clean tree",
+      "where": "git status clean on main; 4 commits",
+      "status": "realized"
+    },
+    {
+      "condition": "User explicitly asks for the full synchronization guarantee before sign-off",
+      "where": "prompt.utterance",
+      "status": "realized"
+    }
+  ],
+  "issues": [],
+  "verdict": "pass",
+  "summary": "The fixture faithfully builds a valid BROWNFIELD EXPEDITED cycle at REVIEWING_IMPLEMENTATION with a COMPLETE plan and an in-progress implementation review, no recovery or obligations, and no skipped-role artifacts; check.mjs passes now and, as traced, also after a correct PROMOTE to STANDARD/AUDITING. Checks are necessary conditions of the canonical promotion (STATE fields, untouched plan/review, no fabricated scope/spec/context/sync records, `/auditor` invocation, no Auditor skill call) and leave the reason wording and write-before-invocation ordering to the judge. No leaks, coherent records, and standard invariants fit.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T14:29:02.231Z",
+  "costUsd": 0.73464,
+  "ms": 36200,
+  "fixtureHash": "4aa266e454e03a5a"
+}

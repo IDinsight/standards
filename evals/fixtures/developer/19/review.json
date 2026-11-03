@@ -1,0 +1,81 @@
+{
+  "conditions": [
+    {
+      "condition": "STANDARD cycle reached by EXPEDITED promotion",
+      "where": ".standards/STATE.md: CycleMode STANDARD, PromotionReason set; history in layers 50→55→60 (PROMOTE from DEVELOPING)",
+      "status": "realized"
+    },
+    {
+      "condition": "WorkflowState is DEVELOPING",
+      "where": ".standards/STATE.md WorkflowState DEVELOPING, Handoff FORWARD from ARCHITECTING",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery is inactive",
+      "where": ".standards/STATE.md Recovery Active false, no frames",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Development points to an approved IN_PROGRESS plan",
+      "where": "plan header Status IN_PROGRESS, User Style Locked true; Plan Notes record user approval of the revised plan",
+      "status": "realized"
+    },
+    {
+      "condition": "Exactly one Outstanding Obligation owned by DEVELOPING, FailureType IMPLEMENTATION, Reason 'authorization is missing on the new endpoint'",
+      "where": ".standards/STATE.md Outstanding Obligations Active true, Obligation 1",
+      "status": "realized"
+    },
+    {
+      "condition": "Reconciled plan has DEV-003 covering the corrective outcome; all other steps DONE",
+      "where": "plan: DEV-001/DEV-002 DONE, DEV-003 PENDING mapped to AC-003; Plan Notes tie DEV-003 to Obligation 1 and review F-001",
+      "status": "realized"
+    },
+    {
+      "condition": "The authorization defect actually exists and is correctable within approved intent",
+      "where": "src/routes/clients.js exportClients takes only store and calls no auth check; selfCheck shows signed-out GET /clients/export returns 200; requireAdmin in src/auth.js and ForbiddenError→403 mapping in src/router.js make the fix a one-line change",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation-level self-check can verify the authorization behavior",
+      "where": "handle() is directly callable via node -e; npm test passes (5 tests, export route not covered)",
+      "status": "realized"
+    },
+    {
+      "condition": "Valid upstream scope, design, and project context for STANDARD development",
+      "where": ".standards/docs/scope (AC-001..AC-003), .standards/docs/specs (AC-003 = requireAdmin in exportClients), .standards/CONTEXT.md with Active-Cycle Non-Baseline Work",
+      "status": "realized"
+    },
+    {
+      "condition": "No other blocker or material deviation",
+      "where": "STATE BlockedOn NONE, PendingVerificationCadence NONE; check.mjs ok",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The implementation review report remains BLOCKED with F-001 OPEN after promotion. This is correct: Reviewer owns the finding and reassesses later. check.mjs does not hold that record at DEVELOPING or TESTING, so the post-handoff turn-end check stays clean.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "I traced the expected end state against check.mjs: TESTING, plan COMPLETE, no verification record yet, review not held because rank(TESTING) < rank(REVIEWING_IMPLEMENTATION), and the design covers AC-001..AC-003. It produces no problems, so the check_ok checks and invariants are satisfiable by a correct run.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every condition the case states is realized in STATE.md, the reconciled plan, and the code. The planted authorization gap is real, is proven by a selfCheck, and is fixable with the existing requireAdmin helper. The checks (Obligations.Active false, TESTING/FORWARD, plan COMPLETE, '/tester' in the reply, src and plan changed) are necessary conditions for a correct run, and the invariants fit the Developer role.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T02:18:00.063Z",
+  "costUsd": 0.2321906,
+  "ms": 50996,
+  "fixtureHash": "98cd7a8df05fdb94"
+}

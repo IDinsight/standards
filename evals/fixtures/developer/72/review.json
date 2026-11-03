@@ -1,0 +1,101 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is BROWNFIELD",
+      "where": ".standards/MODE.md (layer 70)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState DEVELOPING, CompletionPolicy FULL_DELIVERABLE",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery inactive, no outstanding obligations",
+      "where": ".standards/STATE.md Recovery/Outstanding Obligations Active false",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Scope points to a completed scope",
+      "where": ".standards/docs/scope/session-refresh-20260924T090000Z-5c8e21a4.md (AC-001..AC-003, valid provenance)",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Architecture points to a completed design covering every AC",
+      "where": ".standards/docs/specs/session-refresh-20260924T090000Z-5c8e21a4.md; handoff FORWARD from ARCHITECTING",
+      "status": "realized"
+    },
+    {
+      "condition": "Valid project context exists",
+      "where": ".standards/CONTEXT.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Development is NONE and no plan exists",
+      "where": ".standards/STATE.md; no .standards/docs/development/",
+      "status": "realized"
+    },
+    {
+      "condition": "Design adds POST /session/refresh renewing tokens via existing client in app/auth/client.py",
+      "where": "spec Decision/Build Plan; app/auth/client.py InternalAuthClient.refresh()",
+      "status": "realized"
+    },
+    {
+      "condition": "internal-auth.md opens with 'Read when work calls the internal auth service or handles its tokens.'",
+      "where": ".standards/project-references/developer/internal-auth.md line 3 (selfCheck grep passes)",
+      "status": "realized"
+    },
+    {
+      "condition": "data-platform.md opens with 'Read when work reads from or writes to the internal data platform.'",
+      "where": ".standards/project-references/developer/data-platform.md line 3 (selfCheck grep passes)",
+      "status": "realized"
+    },
+    {
+      "condition": "internal-auth.md matches the work and holds concrete checkable guidance; data-platform.md does not match and holds distinctive guidance below its Read when line",
+      "where": "both reference files; design touches only auth client, schemas, main.py",
+      "status": "realized"
+    },
+    {
+      "condition": "Design names neither reference, so loading depends only on Read when lines",
+      "where": "spec Context section",
+      "status": "realized"
+    },
+    {
+      "condition": "No user style selected",
+      "where": "no .standards/user-styles/developer/ directory; utterance names none",
+      "status": "realized"
+    },
+    {
+      "condition": "Clean committed git state",
+      "where": "git status clean on main",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "case-defect",
+      "assertion": 2,
+      "detail": "data-platform.md is only ~25 lines, so a run that opens it with a plain Read sees the whole file even if it applies none of it. Whether that counts as 'loading' is a judge call the case leaves open; the fixture supplies distinctive guidance below the Read when line so application is still observable in the plan.",
+      "recommendation": "run_as_is",
+      "fix": "Judge should weigh application (plan content) alongside how far the file was read."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 3,
+      "detail": "Catalog marked assertion 3 deterministic_complete, but the spec uses complete:false with only a path-after-Plan-Notes regex, leaving exclusion of data-platform.md to the judge. This is looser, not stricter, and cannot fail a correct run.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized: a coherent brownfield STANDARD cycle at DEVELOPING with complete scope, design, and context, Development NONE, and two project references whose exact Read when lines match the case, with distinctive guidance only in the matching one and no hints in the design. Checks are necessary conditions a correct PROPOSED-plan run satisfies (plan provenance, Status PROPOSED, User Style Locked false, BlockedOn set, no implementation/upstream edits), check.mjs is clean, and the standard invariants fit.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T02:55:25.987Z",
+  "costUsd": 0.2325502,
+  "ms": 38918,
+  "fixtureHash": "23db78801dc01a8d"
+}

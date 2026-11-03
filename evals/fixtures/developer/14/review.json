@@ -1,0 +1,81 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState DEVELOPING",
+      "where": ".standards/STATE.md header (layer 55)",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and outstanding obligations inactive",
+      "where": ".standards/STATE.md Recovery/Outstanding Obligations `Active`: `false`",
+      "status": "realized"
+    },
+    {
+      "condition": "Cycle was EXPEDITED and promoted to STANDARD; PromotionReason not NONE",
+      "where": "git history: commits 'Plan customer totals report' (EXPEDITED/DEVELOPING) and 'Promote customer totals cycle to standard' (PROMOTE handoff); STATE.md `PromotionReason` set",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Scope and Architecture point to completed standard artifacts",
+      "where": "STATE.md Scope/Architecture paths; scope record defines AC-001/AC-002; design accounts for both; Handoff FORWARD from ARCHITECTING",
+      "status": "realized"
+    },
+    {
+      "condition": "Valid refreshed project context exists",
+      "where": ".standards/CONTEXT.md with Active-Cycle Non-Baseline Work entry for this cycle",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Development points to the plan created during the expedited path",
+      "where": "STATE.md Development; plan added in 'Plan customer totals report' commit",
+      "status": "realized"
+    },
+    {
+      "condition": "Plan is COMPLETE with Implementation Contract Scope/Architecture NONE and DEV steps using EXPEDITED_REQUEST",
+      "where": ".standards/docs/development/<ID>.md header Status COMPLETE; contract lists `NONE`; DEV-001/DEV-002 `Acceptance`: `EXPEDITED_REQUEST`, both DONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Standard scope/architecture preserve the same implementation behavior (bookkeeping-only reconciliation)",
+      "where": "src/totals.js and bin/orders.js match scope AC-001/AC-002 and design contract (sum per exact customer, descending, ties by localeCompare); selfCheck confirms output",
+      "status": "realized"
+    },
+    {
+      "condition": "check.mjs reports ok",
+      "where": "gate_results checkMjs ok:true",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "Cycle ID timestamp is 2026-09-22 while every commit is dated 2026-09-24 (builder default); harmless and not observable as a hint.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 3,
+      "detail": "The DONE-status regex requires the `Status` field to be the first field after each `### DEV-NNN` heading, as the template prescribes; an in-place reconciliation keeps this, so a correct run should not fail it.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition: a promoted-from-expedited STANDARD cycle in DEVELOPING whose COMPLETE plan still has NONE contract paths and EXPEDITED_REQUEST mappings, with scope/design that exactly match the existing implementation. Checks are necessary conditions for an in-place bookkeeping reconciliation (paths, AC-001/AC-002 mappings, preserved DONE steps, no code change, no PROPOSED/blocker), and invariants fit both stopping after reconciliation and handing off to Tester. No leaks found; assertion 5 is reasonably N/A as a counterfactual.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T02:16:27.637Z",
+  "costUsd": 0.22596660000000002,
+  "ms": 49564,
+  "fixtureHash": "90846cc32d52cf30"
+}

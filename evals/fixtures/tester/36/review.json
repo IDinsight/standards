@@ -1,0 +1,91 @@
+{
+  "conditions": [
+    {
+      "condition": "Brownfield project, STANDARD cycle in TESTING, no recovery",
+      "where": ".standards/MODE.md (BROWNFIELD); .standards/STATE.md (WorkflowState TESTING, CycleMode STANDARD, Recovery Active false)",
+      "status": "realized"
+    },
+    {
+      "condition": "Latest handoff is CHECKPOINT from DEVELOPING naming Increment 1",
+      "where": ".standards/STATE.md Handoff: Kind CHECKPOINT, From DEVELOPING, Reason 'Increment 1 (name search) ready for assessment.'",
+      "status": "realized"
+    },
+    {
+      "condition": "Plan IN_PROGRESS, INCREMENTAL cadence, Current Increment 1",
+      "where": ".standards/docs/development/<id>.md header",
+      "status": "realized"
+    },
+    {
+      "condition": "DEV-001 / AC-001 DONE and self-checked",
+      "where": "plan DEV-001 Status DONE, Acceptance AC-001, Self-Check with commands and results",
+      "status": "realized"
+    },
+    {
+      "condition": "DEV-002 / AC-002 is a separate future outcome, PENDING",
+      "where": "plan DEV-002 Status PENDING, Increment 2; src/search.js has no email search (selfCheck 4 confirms)",
+      "status": "realized"
+    },
+    {
+      "condition": "Report IN_PROGRESS / INCREMENT / Increment 1 with AC-002 as AWAITING_IMPLEMENTATION",
+      "where": ".standards/docs/verification/<id>.md header and Acceptance Evidence table",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-001 has an acceptance boundary that lacks a test or equivalent check",
+      "where": "scope AC-001 (2-character minimum, 400); design AC-001 technical criterion; test/search.test.js covers only the happy path (selfCheck 2)",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-001 happy-path test passes",
+      "where": "test/search.test.js; selfCheck 1 (4 tests pass)",
+      "status": "realized"
+    },
+    {
+      "condition": "No implementation defect for the boundary, so boundary tests can pass",
+      "where": "src/search.js enforces trimmed length >= 2 with the design's error body; selfCheck 3",
+      "status": "realized"
+    },
+    {
+      "condition": "Scenario budget has room for boundary scenarios",
+      "where": "report Scenario Budget: 1 of 5 for src/search.js and src/routes.js",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, architecture, and context records exist",
+      "where": ".standards/docs/scope, .standards/docs/specs, .standards/CONTEXT.md",
+      "status": "realized"
+    },
+    {
+      "condition": "All work committed, clean tree",
+      "where": "git status clean on main",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "record-format",
+      "assertion": -1,
+      "detail": "The report's '## Increment Assessments' section is a prose line, not the template's table. This was done on purpose so that no disposition is pre-set (a numbered row requires VERIFIED, BLOCKED, or SUPERSEDED). An interrupted earlier session could plausibly leave it this way, and check.mjs accepts it.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The DEV-001 self-check mentions a manual `?name=a` returning 400. This points at the boundary, but the boundary is already stated in the scope AC-001 text and in the design criterion. A Developer sanity call would realistically record it, and it usefully tests whether Tester treats self-checks as formal evidence. It does not leak the answer.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized. The checkpoint state, the incremental plan, and the partial INCREMENT report (with AC-002 as AWAITING_IMPLEMENTATION) are in place. The AC-001 length boundary is defined in the scope and design but untested, while the implementation enforces it correctly, as the selfChecks prove. The checks and invariants allow both legitimate outcomes: recording the gap while staying in TESTING, or adding boundary tests, marking Increment 1 VERIFIED, and checkpointing back to DEVELOPING with the report still IN_PROGRESS. Nothing leaks the answer.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-01T22:37:03.968Z",
+  "costUsd": 0.1998272,
+  "ms": 34116,
+  "fixtureHash": "2384157c2188b33d"
+}

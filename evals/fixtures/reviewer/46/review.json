@@ -1,0 +1,94 @@
+{
+  "conditions": [
+    {
+      "condition": "Brownfield project with a standard cycle in REVIEWING_IMPLEMENTATION",
+      "where": ".standards/MODE.md (BROWNFIELD); .standards/STATE.md WorkflowState REVIEWING_IMPLEMENTATION, CycleMode STANDARD",
+      "status": "realized"
+    },
+    {
+      "condition": "CompletionPolicy IMPLEMENTATION_REVIEWED, explicitly selected by the user and recorded durably",
+      "where": ".standards/STATE.md CompletionPolicy and Active Work.Request workflow instruction quoting the user's reason",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation is complete and current, with a COMPLETE development plan",
+      "where": "src/config.js, src/cleanup.js, bin/cleanup.js at commit bd162b0; development plan Status COMPLETE, DEV-001/002 DONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Full Tester evidence is current",
+      "where": "verification report Status COMPLETE, Purpose FULL, 15/15 at 8a227b4; selfCheck confirms 15 pass at HEAD; no later commits touch src/bin/test",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-002 requires a saved operations guide",
+      "where": "scope AC-002 (docs/operations/archive-cleanup.md)",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-002 is a Documenter-owned later-role dependency for ordinary review, shown without stating the verdict",
+      "where": "spec Acceptance Coverage no-architectural-impact for AC-002; plan notes; verification Acceptance Evidence and Open Findings rows say pending Documenter",
+      "status": "realized"
+    },
+    {
+      "condition": "The guide and Documenter evidence do not exist",
+      "where": "no docs/operations/archive-cleanup.md and no .standards/docs/documentation/ (selfCheck)",
+      "status": "realized"
+    },
+    {
+      "condition": "All other ordinary review gates pass, with no planted implementation or verification defect",
+      "where": "code matches the design contracts (parsing, expiry boundary, dry run, summary wording, exit codes); the tests observe each criterion",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and outstanding obligations are inactive; no blocker; no pending cadence; no baseline reconciliation",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Project context is current and no implementation review report exists yet",
+      "where": ".standards/CONTEXT.md; no .standards/docs/reviews/",
+      "status": "realized"
+    },
+    {
+      "condition": "check.mjs reports a valid state",
+      "where": "gate result ok: true",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 0,
+      "detail": "The Unmet Requirements regex `` `Unmet Requirements`:\\s*`(?=[^`]*AC-002)(?=[^`]*(?:documenter|documenting))[^`]*` `` assumes a single-backtick code span. A correct run that writes the value as a double-backtick span so it can quote the path (``AC-002 … `docs/operations/archive-cleanup.md` … Documenter``) would fail. fieldPairs accepts that form, and the check is complete:true. This is unlikely but cheap to widen.",
+      "recommendation": "fix_file",
+      "fix": "In spec.json, checks[0] and the Unmet Requirements contains check: change the regex to \"`Unmet Requirements`:\\\\s*(`+)(?=[\\\\s\\\\S]*?AC-002[\\\\s\\\\S]*?\\\\1)(?=[\\\\s\\\\S]*?(?:documenter|documenting)[\\\\s\\\\S]*?\\\\1)\" (flags i), or more simply \"`Unmet Requirements`:\\\\s*`+[^\\\\n]*?(?=[\\\\s\\\\S]{0,600}AC-002)[\\\\s\\\\S]{0,600}?(?:documenter|documenting)\". Either accepts single- or multi-backtick spans."
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 0,
+      "detail": "Assertion 0 says ordinary Status 'may be' COMPLETE, but the check requires COMPLETE. This matches the expected output ('passing ordinary review') and the skill: an INELIGIBLE closure must not mislabel a passing ordinary review. A run that leaves the report IN_PROGRESS because it expects to return would fail decisively. That run arguably misreports the ordinary gate, so the strictness is defensible.",
+      "recommendation": "run_as_is",
+      "fix": "None required; the judge cannot override this, which is acceptable given the expected output."
+    },
+    {
+      "severity": "note",
+      "kind": "case-defect",
+      "assertion": 2,
+      "detail": "The skill and protocol also allow presenting the user with the choice to keep the shorter policy or withdraw it ('If a choice is needed…'). Assertion 2 fixes the FAILURE→DOCUMENTING route. A run that only asks the user would fail, which is consistent with the case's expected output.",
+      "recommendation": "run_as_is",
+      "fix": "None; the fixture faithfully encodes the case."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized: an explicit IMPLEMENTATION_REVIEWED choice in Active Work.Request, current COMPLETE plan and FULL verification (15/15), and AC-002 recorded only as a pending Documenter dependency, with no guide or documentation record and no leaks. The checks and invariants fit the expected FAILURE→DOCUMENTING recovery, and check.mjs accepts that end state. The only notes are a slightly narrow Unmet Requirements regex, worth widening, and an acceptable strict COMPLETE requirement.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T03:03:18.459Z",
+  "costUsd": 0.3225578,
+  "ms": 76130,
+  "fixtureHash": "0ebb56077981e473"
+}

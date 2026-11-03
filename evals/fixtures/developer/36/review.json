@@ -1,0 +1,81 @@
+{
+  "conditions": [
+    {
+      "condition": "Brownfield project with small existing implementation",
+      "where": ".standards/MODE.md (BROWNFIELD); src/cli.js, src/inventory.js, src/options.js, test/inventory.test.js",
+      "status": "realized"
+    },
+    {
+      "condition": "Active STANDARD cycle in DEVELOPING with Developer owning the state",
+      "where": ".standards/STATE.md WorkflowState DEVELOPING, CycleMode STANDARD, Handoff FORWARD from ARCHITECTING",
+      "status": "realized"
+    },
+    {
+      "condition": "Development plan in STEPWISE mode",
+      "where": "${PLAN} header `Mode`: `STEPWISE`",
+      "status": "realized"
+    },
+    {
+      "condition": "User Style is NONE and User Style Locked is true (approved plan)",
+      "where": "${PLAN} header `User Style`: `NONE` `User Style Locked`: `true`, `Status`: `IN_PROGRESS`",
+      "status": "realized"
+    },
+    {
+      "condition": "DEV-001 is DONE with implementation present",
+      "where": "${PLAN} DEV-001 `Status`: `DONE` with self-check evidence; src/options.js and updated src/cli.js (selfChecks confirm threshold parsing)",
+      "status": "realized"
+    },
+    {
+      "condition": "DEV-002 is pending and not implemented",
+      "where": "${PLAN} DEV-002 `Status`: `PENDING`; selfCheck shows `--low-stock` is an unknown option",
+      "status": "realized"
+    },
+    {
+      "condition": "A selectable 'tony' developer user style exists, so only the lock blocks the switch",
+      "where": ".standards/user-styles/developer/tony.md (commit 'Add tony developer style')",
+      "status": "realized"
+    },
+    {
+      "condition": "Resuming at a stepwise pause after DEV-001",
+      "where": ".standards/STATE.md `BlockedOn`: stepwise pause waiting to continue with DEV-002",
+      "status": "realized"
+    },
+    {
+      "condition": "Upstream scope, design, and context exist and are valid",
+      "where": ".standards/docs/scope/..., .standards/docs/specs/..., .standards/CONTEXT.md; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "Clean committed git state",
+      "where": "git status clean on main",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 0,
+      "detail": "Assertion 0 is `complete: true` with only file-state checks (User Style NONE, Locked true, user-styles unchanged). A run that does nothing or refuses for an unrelated reason would also pass; whether the role recognized that the lock covers NONE is visible only in the reply. The catalog marked it deterministic, and these checks cannot fail a correct run.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally set complete:false so the judge confirms the reply treats the NONE selection as locked."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 3,
+      "detail": "Assertion 3 is complete:true. The checks catch a new cycle and a changed Active Work.Development. They do not catch a stray second DEVELOPMENT record at another path, or a reply that promises a new cycle. A hand-written second plan record for the same cycle would trip the check_ok invariant, but that result is reported apart from the score. This is low risk because cycle.mjs refuses while a cycle is active and artifact init returns the existing path.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally add complete:false so the judge checks that the reply does not treat the request as authorizing a new cycle."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition: a STEPWISE plan with User Style NONE locked, DEV-001 DONE with code present, DEV-002 PENDING, a valid tony.md, and a clean committed state. check.mjs passes and the selfChecks confirm the code facts. No leaks were found, and no check or invariant can fail a correct blocking run; the two notes only concern assertions 0 and 3 being marked complete when the reply also carries meaning.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T02:21:04.177Z",
+  "costUsd": 0.1665306,
+  "ms": 30695,
+  "fixtureHash": "245bc2e868dca7d9"
+}

@@ -1,0 +1,104 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield template)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode DOCUMENTATION, CompletionPolicy NONE, Development NONE, PendingVerificationCadence NONE",
+      "where": ".standards/STATE.md (layer 62-design)",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id = guide-20261004T120000Z-1a2b3c4d",
+      "where": ".standards/STATE.md and provenance of scope/spec records",
+      "status": "realized"
+    },
+    {
+      "condition": "WorkflowState DOCUMENTING after a FORWARD from ARCHITECTING",
+      "where": ".standards/STATE.md Handoff",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-001 requires accurate usage; AC-002 requires audience limits",
+      "where": ".standards/docs/scope/guide-20261004T120000Z-1a2b3c4d.md Work items 1 and 2",
+      "status": "realized"
+    },
+    {
+      "condition": "Architect accounts for both ACs (AC-002 no architectural impact)",
+      "where": ".standards/docs/specs/guide-20261004T120000Z-1a2b3c4d.md Acceptance Coverage",
+      "status": "realized"
+    },
+    {
+      "condition": "Auditor context exists for the documentation cycle",
+      "where": ".standards/CONTEXT.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Current guides already satisfy AC-001 (usage, input, output, errors, exit statuses match source)",
+      "where": "docs/guide.md vs bin/hours.js and src/summarize.js (traced: trimming, case-sensitive names, CRLF, empty/header-only output, --json position, line-numbered errors, exit 0/1/2)",
+      "status": "realized"
+    },
+    {
+      "condition": "Current guides already satisfy AC-002 (audience, exclusions, pointer to CONTRIBUTING.md)",
+      "where": "docs/guide.md 'Who this guide is for'",
+      "status": "realized"
+    },
+    {
+      "condition": "Source and an established offline documentation check can be inspected and run, and pass",
+      "where": "package.json docs:check -> scripts/check-docs.js; selfChecks show 4 links, 2 examples, exit 0; npm test passes",
+      "status": "realized"
+    },
+    {
+      "condition": "No recovery, no outstanding obligations, no blockers",
+      "where": ".standards/STATE.md Recovery/Obligations Active false, BlockedOn NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "No documentation record exists yet",
+      "where": "no .standards/docs/documentation/ file in tree",
+      "status": "realized"
+    },
+    {
+      "condition": "No unrelated behavior changes requested; clean committed tree",
+      "where": "git status clean; Request limited to the guide",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "hint-leak",
+      "assertion": 0,
+      "detail": ".standards/CONTEXT.md 'Relevant Existing Behavior' says 'The guide, README, and CONTRIBUTING describe the current command', which pre-asserts the documentation is accurate, the very conclusion the Documenter is supposed to establish. It slightly biases toward the expected no-change outcome. The Documenter must still verify, and no assertion tests defect discovery, so this does not change what is graded.",
+      "recommendation": "fix_file",
+      "fix": "In layers/60-audit/.standards/CONTEXT.md, replace the bullet under 'Relevant Existing Behavior' with '- No behavior changes are in progress; the command behaves as described in Structure and Boundaries.'"
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "All commits are dated 2026-09-24, but the audit, scope and design commits record work for a cycle whose ID timestamp is 2026-10-04T12:00:00Z. No check depends on this.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally set spec 'date' to 2026-10-04T13:00:00Z, or a later date, so the workflow commits postdate the cycle ID."
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 2,
+      "detail": "reply_matches for the Independent Reviewer Session prefix uses single '.' between words. A verbatim quote wrapped with indentation (newline plus spaces) would fail. The protocol mandates this exact prefix, so it is allowed, but '\\s+' separators would be more robust.",
+      "recommendation": "fix_file",
+      "fix": "In spec.json checks[2], change the regex to 'fresh\\s+chat\\s+separate\\s+from\\s+the\\s+conversations\\s+that\\s+produced\\s+the\\s+artifacts\\s+under\\s+review' with flags 'i'."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized. I traced docs/guide.md against the source and found no legitimate fix, so the no-change outcome and the complete unchanged check for assertion 0 are sound, and the docs check passes offline. The checks and invariants fit a correct DOCUMENTATION-cycle handoff to REVIEWING_FINAL; the only notes are a mild accuracy hint in CONTEXT.md, a commit-date realism nit, and a slightly brittle prefix regex.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T02:58:43.087Z",
+  "costUsd": 0.2363914,
+  "ms": 61625,
+  "fixtureHash": "cee286da02550c4b"
+}

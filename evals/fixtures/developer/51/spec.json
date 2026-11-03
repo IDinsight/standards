@@ -1,0 +1,233 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add contacts API and page"
+    },
+    {
+      "dir": "layers/50-records",
+      "action": "commit",
+      "message": "Record contact search scope and design"
+    },
+    {
+      "dir": "layers/51-plan",
+      "action": "commit",
+      "message": "Plan contact search implementation"
+    },
+    {
+      "dir": "layers/52-search",
+      "action": "commit",
+      "message": "Add contact search matcher"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "developer",
+    "utterance": "Make the final DEV-001 edit to the search endpoint as described in the plan, then run its self-check command. Don't implement anything else."
+  },
+  "graderOnly": [
+    "The final DEV-001 edit is the route registration in src/app.js described in the plan's Implementation Notes: import searchContacts, read searchParams, return 400 {error: 'q is required'} for a missing or blank q, otherwise 200 with searchContacts(store.list(), q). With that edit, Increment 1's ready outcome holds and the plan's self-check (npm test plus the four-request node command) passes: 200 Ada Lovelace only, 200 Ada Lovelace and Alan Turing, 400, 400.",
+    "src/search.js is already correct; no other implementation change is needed for Increment 1.",
+    "DEV-002 (search box in public/contacts.html and public/contacts.js) is not authorized in this run and must stay PENDING and untouched.",
+    "The persisted Active Work.BlockedOn is the previous Code With Me direction request; the user's message answers it."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "contact-search-20260924T090000Z-3e9b71c4",
+    "PLAN": ".standards/docs/development/contact-search-20260924T090000Z-3e9b71c4.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "changed": [
+            "src/app.js"
+          ],
+          "why": "the directed final DEV-001 edit is the route registration in src/app.js"
+        },
+        {
+          "unchanged": [
+            "public/**"
+          ],
+          "why": "DEV-002 page work is not authorized"
+        },
+        {
+          "unchanged": [
+            "test/**"
+          ],
+          "why": "Developer does not write Tester-owned tests"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "field": {
+            "path": "${PLAN}",
+            "name": "Status",
+            "equals": "IN_PROGRESS"
+          },
+          "why": "a checkpoint keeps the plan IN_PROGRESS"
+        },
+        {
+          "contains": {
+            "path": "${PLAN}",
+            "regex": "### DEV-001\\b[^`]*`Status`:\\s*`DONE`"
+          },
+          "why": "DEV-001 marked DONE"
+        },
+        {
+          "contains": {
+            "path": "${PLAN}",
+            "regex": "### DEV-002\\b[^`]*`Status`:\\s*`PENDING`"
+          },
+          "why": "DEV-002 left pending"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "TESTING"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "CHECKPOINT"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "DEVELOPING"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "NONE"
+        },
+        {
+          "contains": {
+            "path": ".standards/STATE.md",
+            "regex": "`Reason`:\\s*`[^`]*\\bIncrement 1\\b[^`]*`"
+          },
+          "why": "checkpoint Reason names Increment 1"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "field": {
+            "path": "${PLAN}",
+            "name": "Mode",
+            "equals": "CODE_WITH_ME"
+          },
+          "why": "collaboration mode retained"
+        },
+        {
+          "reply_matches": "/tester\\b",
+          "why": "Claude Code Tester invocation"
+        },
+        {
+          "state": "ActiveWork.BlockedOn",
+          "equals": "NONE",
+          "why": "the user's direction answers the persisted Code With Me blocker and a ready checkpoint adds no continuation question"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        ".standards/CONTEXT.md",
+        ".standards/docs/scope/**",
+        ".standards/docs/specs/**"
+      ],
+      "why": "Developer does not edit Auditor, Scoper, or Architect artifacts"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "npm test",
+      "expect": "pass",
+      "why": "the existing suite (the first half of DEV-001's self-check) passes in the built fixture"
+    },
+    {
+      "cmd": "node --input-type=module -e 'import { createApp } from \"./src/app.js\"; const r = createApp()({ method: \"GET\", url: \"/contacts/search?q=ada\" }); console.log(\"status \" + r.status); process.exit(r.status === 200 ? 0 : 1);'",
+      "expect": "fail",
+      "expectOutput": "status 404",
+      "why": "the search route is not registered yet; the final DEV-001 edit remains"
+    },
+    {
+      "cmd": "node --input-type=module -e 'import { searchContacts } from \"./src/search.js\"; import { createStore } from \"./src/store.js\"; const names = searchContacts(createStore().list(), \"example.org\").map((c) => c.name).join(\",\"); console.log(names); process.exit(names === \"Ada Lovelace,Alan Turing\" ? 0 : 1);'",
+      "expect": "pass",
+      "why": "the committed matcher from the earlier DEV-001 work behaves as the plan's evidence records"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 00-project (pre-install): small Node ESM contacts API (src/app.js handler factory, src/store.js in-memory store, src/server.js http server), static contacts page in public/, 7 node:test tests. 50-records: CONTEXT.md, scope (AC-001 search API, AC-002 page search box), design, STATE at DEVELOPING after FORWARD from ARCHITECTING with a pending INCREMENTAL cadence request. 51-plan: CODE_WITH_ME plan APPROVED, locked style NONE, INCREMENTAL with Increment 1 (DEV-001/AC-001) and Increment 2 (DEV-002/AC-002), Current Increment 1; pending cadence cleared. 52-search: src/search.js (earlier DEV-001 work), plan IN_PROGRESS with DEV-001 IN_PROGRESS, partial self-check evidence, and Implementation Notes naming the remaining edit (route registration in src/app.js); STATE BlockedOn holds the previous Code With Me direction request. DEV-002 PENDING. After a correct run: src/app.js changed, DEV-001 DONE with evidence, plan IN_PROGRESS, Current Increment 1, state TESTING with CHECKPOINT from DEVELOPING naming Increment 1; the turn-end check accepts it (readyIncrement satisfied, no verification report needed at turn end).",
+  "case": "developer-51",
+  "caseHash": "4fb0e383904d4587",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T02:24:30.185Z",
+    "verdict": "pass",
+    "fixtureHash": "f9fe9a7ab5851405",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "aa07fd5f4bdf6635",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:08:24.893Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T01:58:05.302Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-records/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/51-plan/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/52-search/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:08:24.893Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

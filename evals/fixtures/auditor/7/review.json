@@ -1,0 +1,84 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState AUDITING, recovery inactive, no outstanding obligations",
+      "where": ".standards/STATE.md (layer 58)",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id is add-invoice-search-20260925T110000Z-1f2e3d4c",
+      "where": ".standards/STATE.md Active Work.Id",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.PromotionReason is NONE (and BaselineReconciliation NONE)",
+      "where": ".standards/STATE.md Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "An existing .standards/CONTEXT.md is otherwise usable as a project-level baseline",
+      "where": ".standards/CONTEXT.md (layer 52: stack, structure, commands, conventions, tests, behavior all present)",
+      "status": "realized"
+    },
+    {
+      "condition": "CONTEXT.md has an Active-Cycle Non-Baseline Work entry labeled Cycle: previous-share-links for src/share-links.ts from a prior cycle",
+      "where": ".standards/CONTEXT.md '## Active-Cycle Non-Baseline Work' entry `Cycle: previous-share-links; src/share-links.ts`",
+      "status": "realized"
+    },
+    {
+      "condition": "The current repository still contains src/share-links.ts",
+      "where": "src/share-links.ts committed (layers 51, 54)",
+      "status": "realized"
+    },
+    {
+      "condition": "Authoritative evidence exists to re-establish the file's baseline status",
+      "where": "git history (prior cycle share-invoice-links-... SIGNED_OFF at HEAD~1), src/app.ts and src/handlers.ts wiring, test/share-links.test.ts (14 tests pass), README Share links section, COMPLETE prior-cycle records",
+      "status": "realized"
+    },
+    {
+      "condition": "Current cycle has produced no implementation (no current-cycle non-baseline work exists)",
+      "where": "STATE.md Scope/Architecture/Development NONE; HEAD commit changes only STATE.md",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "ungradeable-assertion",
+      "assertion": 3,
+      "detail": "Assertion 3 is conditional on the status being undeterminable. The fixture deliberately makes src/share-links.ts determinable (signed-off prior cycle, wired, tested, documented), so assertion 3 is observed only as 'did not block or guess unnecessarily'. The blocking branch cannot be exercised in the same fixture. The case leaves this choice open, and the choice is consistent and recorded in graderOnly.",
+      "recommendation": "run_as_is",
+      "fix": "None; the judge grades assertion 3 against graderOnly (no blocking question needed)."
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 1,
+      "detail": "The negative-lookahead regex fails if any text in a '## Active-Cycle Non-Baseline Work' section mentions share-links. This includes an explanatory 'None; the prior src/share-links.ts entry was folded into baseline' line. That would contradict the template's 'Omit empty sections' and 'not an audit diary' rules, so a skill-conforming run will not write it, and complete:true is acceptable.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "All commits share the timestamp 2026-09-25T11:30:00Z, including the prior cycle's commits, although that cycle's id is dated 2026-09-15. The current cycle's id timestamp (11:00) also predates the prior cycle's commits. The CONTEXT label 'previous-share-links' is not a full cycle Id, as the template requires. The case dictates this label, and the mismatch is the point of the case. None of this affects what the run tests.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized. The stale `Cycle: previous-share-links; src/share-links.ts` entry sits in an otherwise usable CONTEXT.md, the file is still committed, and the evidence (signed-off prior cycle, wiring, passing tests, README) makes its baseline status determinable, so a correct run folds it into the baseline. Checks and invariants are necessary conditions for a correct run, check.mjs is ok, the selfChecks pass, and nothing leaks; the only notes concern the inherently conditional assertion 3 and minor timestamp realism.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T21:07:32.646Z",
+  "costUsd": 0.2857248,
+  "ms": 55946,
+  "fixtureHash": "94e0e61d44e0589b"
+}

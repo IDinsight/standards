@@ -1,0 +1,233 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial tasklog CLI"
+    },
+    {
+      "dir": "layers/10-audit",
+      "action": "commit",
+      "message": "Record project context for task due dates"
+    },
+    {
+      "dir": "layers/20-scope",
+      "action": "commit",
+      "message": "Define task due dates scope"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "architect",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The completed scope's Done when conditions are plain list items with no AC-NNN acceptance identifiers anywhere in the scope, so acceptance traceability cannot be established from it.",
+    "The project context in .standards/CONTEXT.md is current and sufficient for this cycle; there is no PROJECT_CONTEXT defect.",
+    "Apart from the missing identifiers, the scope's conditions are observable and unambiguous; the only defect is the missing Scoper-owned acceptance identity."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "add-optional-due-dates-to-tasks-and-a-20260924T083000Z-3e8a51c7",
+    "SCOPE": ".standards/docs/scope/add-optional-due-dates-to-tasks-and-a-20260924T083000Z-3e8a51c7.md",
+    "SPEC": ".standards/docs/specs/add-optional-due-dates-to-tasks-and-a-20260924T083000Z-3e8a51c7.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "SCOPING",
+          "why": "the defect is routed to Scoper's state"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FAILURE"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "SCOPING",
+          "why": "the defect is classified as a SCOPING failure owned by Scoper"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "${SCOPE}"
+          ],
+          "why": "Architect must not add or renumber identifiers in the Scoper-owned scope"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 3,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "SCOPING"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FAILURE"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "ARCHITECTING"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "SCOPING"
+        },
+        {
+          "check_ok": true
+        }
+      ]
+    },
+    {
+      "assertion": 4,
+      "complete": true,
+      "all": [
+        {
+          "state": "Recovery.Active",
+          "equals": "true"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "1"
+        },
+        {
+          "state": "Recovery.Frame1.From",
+          "equals": "ARCHITECTING"
+        },
+        {
+          "state": "Recovery.Frame1.Owner",
+          "equals": "SCOPING"
+        },
+        {
+          "state": "Recovery.Frame1.FailureType",
+          "equals": "SCOPING"
+        },
+        {
+          "state": "Recovery.Frame1.ResumeAt",
+          "equals": "ARCHITECTING"
+        },
+        {
+          "state": "Recovery.Frame1.RerunThrough",
+          "equals": "NONE"
+        },
+        {
+          "check_ok": true
+        }
+      ]
+    },
+    {
+      "assertion": 5,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "SCOPING",
+          "why": "the transition is persisted"
+        },
+        {
+          "reply_matches": "/scoper\\b",
+          "why": "the Claude Code next-role invocation names the scoper skill"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "package.json",
+        "README.md"
+      ],
+      "why": "Architect writes no production code or tests"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/tasks.test.js",
+      "expect": "pass",
+      "why": "the existing test suite passes on the committed project"
+    },
+    {
+      "cmd": "grep -c 'AC-[0-9]' .standards/docs/scope/add-optional-due-dates-to-tasks-and-a-20260924T083000Z-3e8a51c7.md",
+      "expect": "fail",
+      "expectOutput": "^0",
+      "why": "the scope contains no AC-NNN identifiers"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 00-project (pre-install): a small Node ES-module task-list CLI (src/store.js JSON persistence, src/tasks.js domain functions, src/cli.js add/done/list) with node:test tests. 10-audit: Auditor-owned .standards/CONTEXT.md and STATE.md at SCOPING after a FORWARD from AUDITING (first STANDARD cycle). 20-scope: Scoper's scope record (SCOPE provenance for the active cycle) whose Done when lists are observable plain bullets without any AC-NNN identifiers, and STATE.md at ARCHITECTING, STANDARD, FORWARD from SCOPING, Scope set, Architecture and Development NONE, recovery and obligations inactive. check.mjs reports ok: with no identifiers there is nothing undefined to report, and the design is not held before architecture completes. The case's 'do not edit the scope' instruction is not put in the utterance (it would leak the routing); the expected behavior follows from the Architect skill's invariant 2.",
+  "case": "architect-6",
+  "caseHash": "56f968b16bcc31ba",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T00:29:55.824Z",
+    "verdict": "pass",
+    "fixtureHash": "79c859b2e10374e5",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "6e692869448e393e",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:05:29.375Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T00:20:02.106Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/10-audit/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/20-scope/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:05:29.375Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

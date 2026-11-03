@@ -1,0 +1,246 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Set up records service with in-memory store"
+    },
+    {
+      "dir": "layers/50-http-server",
+      "action": "commit",
+      "message": "Serve records over HTTP and deploy three replicas"
+    },
+    {
+      "dir": "layers/52-http-signoff",
+      "action": "commit",
+      "message": "Document HTTP deployment and sign off cycle"
+    },
+    {
+      "dir": "layers/60-context",
+      "action": "commit",
+      "message": "Refresh project context for CSV export"
+    },
+    {
+      "dir": "layers/62-scope-design",
+      "action": "commit",
+      "message": "Define and design CSV export"
+    },
+    {
+      "dir": "layers/66-export",
+      "action": "commit",
+      "message": "Add CSV export with repeat suppression"
+    },
+    {
+      "dir": "layers/68-plan",
+      "action": "commit",
+      "message": "Record completed CSV export plan"
+    },
+    {
+      "dir": "layers/70-verification",
+      "action": "commit",
+      "message": "Record CSV export verification"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "reviewer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    ".standards/CONTEXT.md says the service runs as a single worker, but deploy/kubernetes/deployment.yaml sets replicas: 3, deploy/kubernetes/service.yaml has no session affinity, and docs/deployment.md says the Service does not pin a user to one replica and each replica keeps its own in-memory state.",
+    "The RecentExports table (src/recentExports.ts, used by src/routes/export.ts) lives in one process, so a repeated export reaching another replica writes a second file. The design, the plan's DEV-004 claim, and the verification evidence rely on the single-worker context, so the in-memory deduplication claim behind AC-003 does not hold for the deployed service.",
+    "The Active-Cycle Non-Baseline Work entry in CONTEXT.md names cycle run-the-records-service-as-a-deployable-20260910T140000Z-3c9e51b7, which was signed off in the commit 'Document HTTP deployment and sign off cycle'; the entry is stale and deploy/kubernetes/ is established baseline.",
+    "The expected route is a PROJECT_CONTEXT failure from REVIEWING_IMPLEMENTATION to AUDITING with a recovery frame, without editing CONTEXT.md and without treating deploy/kubernetes/ as non-baseline because of the stale entry.",
+    "The export cycle changed no deployment or entry-point file (deploy/, src/main.ts, src/http/server.ts); its changes are src/export.ts, src/recentExports.ts, src/routes/export.ts, src/app.ts, tests, package.json, .gitignore.",
+    "Apart from the multi-replica issue, AC-001 and AC-002 are satisfied, AC-003 holds within one process, and all tests pass (11 unit, 4 integration)."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "export-20260924T090000Z-a7f3c1d2",
+    "PRIOR_ID": "run-the-records-service-as-a-deployable-20260910T140000Z-3c9e51b7",
+    "REVIEW": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md",
+    "CONTEXT": ".standards/CONTEXT.md",
+    "DEV": ".standards/docs/development/export-20260924T090000Z-a7f3c1d2.md",
+    "VERIFICATION": ".standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${REVIEW}",
+          "why": "Reviewer creates its report early and persists findings before routing"
+        },
+        {
+          "contains": {
+            "path": "${REVIEW}",
+            "regex": "deploy/kubernetes|deployment.yaml|docs/deployment.md|replica",
+            "flags": "i"
+          },
+          "why": "grounding the context defect in repository evidence requires citing the deployment files or their replicas"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "na": true,
+      "na_reason": "decision 8: counterfactual, future, or optional behavior"
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            ".standards/CONTEXT.md"
+          ],
+          "why": "Reviewer routes the context defect and does not rewrite Auditor context"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "Reviewer must not change the assessed identity"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Reviewer must not change git state"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "deploy/**",
+        "docs/**",
+        "README.md",
+        "package.json",
+        ".gitignore"
+      ],
+      "why": "Reviewer does not edit implementation, tests, deployment files, or documentation"
+    },
+    {
+      "unchanged": [
+        ".standards/CONTEXT.md",
+        ".standards/docs/scope/**",
+        ".standards/docs/specs/**",
+        ".standards/docs/development/**",
+        ".standards/docs/verification/**"
+      ],
+      "why": "Reviewer does not rewrite other roles' artifacts"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/*.test.ts",
+      "expect": "pass",
+      "why": "the unit suite passes offline"
+    },
+    {
+      "cmd": "node --test test/*.test.ts 2>&1 | grep -qE 'pass 11$'",
+      "expect": "pass",
+      "why": "the unit suite runs 11 tests"
+    },
+    {
+      "cmd": "node --test test/integration/export-flow.test.ts",
+      "expect": "pass",
+      "why": "the integration suite passes"
+    },
+    {
+      "cmd": "node --test test/integration/export-flow.test.ts 2>&1 | grep -qE 'pass 4$' && npm test --silent && npm run test:integration --silent",
+      "expect": "pass",
+      "why": "four integration tests, and the npm scripts work offline"
+    },
+    {
+      "cmd": "node -e 'import(`./src/app.ts`).then(({ createApp }) => { const fs = require(`node:fs`); const os = require(`node:os`); const path = require(`node:path`); const dir = fs.mkdtempSync(path.join(os.tmpdir(), `rep-`)); const req = { method: `POST`, path: `/records/export`, query: { owner: `li` }, user: { id: 1, name: `Ada`, role: `admin` } }; const a = createApp({ exportDir: dir, now: () => new Date(`2026-09-24T09:00:00Z`) }); const b = createApp({ exportDir: dir, now: () => new Date(`2026-09-24T09:00:20Z`) }); const codes = [a.handle(req).status, a.handle(req).status, b.handle(req).status]; const files = fs.readdirSync(dir); if (codes.join() !== `201,200,201` || files.length !== 2) { console.error(codes, files); process.exit(1); } console.log(`two instances, two files`); }, (error) => { console.error(error); process.exit(3); })'",
+      "expect": "pass",
+      "why": "suppression works within one app instance but a second instance (another replica) writes a second file"
+    },
+    {
+      "cmd": "grep -qx '  replicas: 3' deploy/kubernetes/deployment.yaml && ! grep -q sessionAffinity deploy/kubernetes/service.yaml && grep -q 'does not pin a user' docs/deployment.md",
+      "expect": "pass",
+      "why": "deployment files establish three load-balanced replicas"
+    },
+    {
+      "cmd": "grep -q 'the service runs as a single worker' .standards/CONTEXT.md && grep -qF 'Cycle: run-the-records-service-as-a-deployable-20260910T140000Z-3c9e51b7; deploy/kubernetes/' .standards/CONTEXT.md",
+      "expect": "pass",
+      "why": "context claims a single worker and carries the prior cycle's exclusion"
+    },
+    {
+      "cmd": "git show $(git log --format=%H -1 --fixed-strings --grep='Document HTTP deployment and sign off cycle'):.standards/STATE.md | grep -q 'WorkflowState`: `SIGNED_OFF'",
+      "expect": "pass",
+      "why": "the prior cycle was signed off before the export cycle"
+    },
+    {
+      "cmd": "! git log --format=%s -- deploy src/main.ts src/http/server.ts | grep -vqx 'Serve records over HTTP and deploy three replicas'",
+      "expect": "pass",
+      "why": "deployment and entry-point files were changed only by the prior cycle"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "state and records are valid"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `REVIEWING_IMPLEMENTATION` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Kind`: `FORWARD` `From`: `TESTING` `FailureType`: `NONE`' .standards/STATE.md && ! grep -q '`Active`: `true`' .standards/STATE.md && test ! -e .standards/docs/reviews && ! grep -rqE 'COMMIT:|BLOB:' .standards/docs .standards/CONTEXT.md && ! git status --porcelain | grep -q . && test ! -e exports",
+      "expect": "pass",
+      "why": "stated workflow state, no review report yet, placeholders resolved, clean tree"
+    }
+  ],
+  "notes": "Standalone fixture: the export-reviewing-impl base has no deduplication, deployment files, or prior cycle. 00-project: TypeScript records service. 50/52: prior cycle run-the-records-service-as-a-deployable-20260910T140000Z-3c9e51b7 adds src/http/server.ts, src/main.ts, deploy/kubernetes (replicas: 3, no session affinity), its plan, docs/deployment.md, a CONTEXT.md with a non-baseline entry for that cycle, and STATE SIGNED_OFF. 60: export-cycle CONTEXT says the service runs as a single worker and carries the stale entry for deploy/kubernetes/. 62: scope (AC-001 CSV quoting, AC-002 admin only, AC-003 no second file for a repeat within 60 s) and design (in-memory recent-exports table justified by the single-worker context). 66: code and tests. 68: COMPLETE plan (DEV-004 claims suppression holds for the deployed service), STATE TESTING. 70: COMPLETE FULL verification with in-process evidence, STATE REVIEWING_IMPLEMENTATION. Compromise: to keep the fixture small, the prior cycle keeps only its development plan; its scope, design, verification, review, documentation, and synchronization records are not present.",
+  "case": "reviewer-16",
+  "caseHash": "5a22f717ad8a1ada",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T23:22:00.368Z",
+    "verdict": "pass",
+    "fixtureHash": "6c1e5a86736ac382",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "3aa15546c9321fc7",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:25:13.103Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T22:07:17.707Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-http-server/.standards/STATE.md: NONE",
+        "layers/52-http-signoff/.standards/STATE.md: NONE",
+        "layers/60-context/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/62-scope-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/68-plan/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/70-verification/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:25:13.103Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

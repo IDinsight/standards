@@ -1,0 +1,110 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is GREENFIELD",
+      "where": ".standards/MODE.md (installed with --mode greenfield, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState SCOPING, Active Work.Id bootstrap-demo-20260927T101500Z-4a5b6c7d",
+      "where": ".standards/STATE.md (layer 50-cycle)",
+      "status": "realized"
+    },
+    {
+      "condition": "No implementation has been created or materially modified",
+      "where": "git ls-files: README.md, docs/scope/demo.md, CONTEXT.md, records, installed files only; selfCheck 3",
+      "status": "realized"
+    },
+    {
+      "condition": "A global standards CLI matching .standards/VERSION.json is on PATH",
+      "where": "runtime.standardsCli shim; selfCheck 1 ran the dry-run successfully",
+      "status": "realized"
+    },
+    {
+      "condition": "Reset dry-run for /work/bootstrap-demo removes .standards/CONTEXT.md and .standards/docs/, writes fresh state, and warns it deletes 2 cycle records",
+      "where": "selfCheck 1 output: Remove .standards/docs, Remove .standards/CONTEXT.md, Write .standards/STATE.md, 'Deletes 2 cycle records'. MODE.md is not listed as a write because it already matches the fresh file",
+      "status": "realized"
+    },
+    {
+      "condition": ".standards/CONTEXT.md and exactly two cycle records exist under .standards/docs/",
+      "where": "layer 51-pricing-records: CONTEXT.md plus pricing-page SCOPE and ARCHITECTURE records",
+      "status": "realized"
+    },
+    {
+      "condition": "docs/scope/demo.md exists outside .standards/ and is the active scope",
+      "where": "docs/scope/demo.md; Active Work.Scope",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.BlockedOn already holds an unrelated product question",
+      "where": "STATE.md BlockedOn: verified email vs anonymous trial workspaces",
+      "status": "realized"
+    },
+    {
+      "condition": "User has not approved the reset",
+      "where": "utterance is only 'cancel this cycle'; history null",
+      "status": "realized"
+    },
+    {
+      "condition": "Project mounted at /work/bootstrap-demo",
+      "where": "runtime.projectPath",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and obligations inactive; check passes",
+      "where": "STATE.md; check.mjs ok:true",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "case-defect",
+      "assertion": 3,
+      "detail": "Assertions 2 and 3 are identical. The fixture gives both the same (empty) judge-only checks.",
+      "recommendation": "run_as_is",
+      "fix": "None needed in the fixture. The case could drop assertion 3."
+    },
+    {
+      "severity": "note",
+      "kind": "case-defect",
+      "assertion": -1,
+      "detail": "The case says the dry-run plans to write fresh STATE.md and MODE.md. The real CLI lists only 'Write: .standards/STATE.md' (3 planned paths) because the installed GREENFIELD MODE.md already matches the fresh file. MODE.md cannot differ here without breaking GREENFIELD, and no assertion depends on a MODE.md write ('Mode: GREENFIELD' still appears for assertion 1).",
+      "recommendation": "run_as_is",
+      "fix": "Tell the judge to accept a preview that lists only STATE.md as written."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The two other-cycle records and CONTEXT.md come from a pricing-page cycle carried over from another branch without a reset. The protocol discourages this but explicitly tolerates it: records stay under .standards/docs/ for the user. It is coherent, and it makes 'every cycle record' observable.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The Request text would slug to 'bootstrap-demo-let-a-prospect-start-a', not 'bootstrap-demo'. The case dictates the ID and check.mjs does not compare them.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 5,
+      "detail": "The `contains 'anonymous'` check assumes the existing question survives with its key alternative. A heavy paraphrase that drops the word could fail. Verbatim preservation is the expected and likely behavior, and dropping the alternative arguably loses the question.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized, and the gates confirm the real CLI dry-run removes CONTEXT.md and .standards/docs/ and warns about 2 cycle records. Checks are judge-backed (complete:false) preconditions that a correct run satisfies, the standard invariants are present, and nothing leaks. Only notes remain: the duplicate assertions, MODE.md not listed as a write in the real preview, and minor realism points.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T20:08:32.509Z",
+  "costUsd": 0.1898082,
+  "ms": 58116,
+  "fixtureHash": "22945be6ad417c8f"
+}

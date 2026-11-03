@@ -1,0 +1,210 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-duration",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add duration parser"
+    },
+    {
+      "dir": "layers/51-cli",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add timesheet totals CLI"
+    },
+    {
+      "dir": "layers/60-planning",
+      "action": "commit",
+      "message": "Record context, scope, and design for entry parsing"
+    },
+    {
+      "dir": "layers/61-implementation",
+      "action": "commit",
+      "message": "Parse tags and report malformed lines"
+    },
+    {
+      "dir": "layers/62-verification",
+      "action": "commit",
+      "message": "Record verification for entry parsing"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "navigator",
+    "utterance": "Does that mean AC-004 is accepted and review can pass?"
+  },
+  "graderOnly": [
+    "In the conversation history the user answered all three GRILL_ME questions at the agreed intermediate depth (file-level error handling, field splitting and tags, durations); the one slip (tags keeping the # sign) was corrected, so the agreed intermediate understanding of parsing was demonstrated.",
+    "Parsing areas never quizzed include: the fewer-than-three-words rule and the date check in parseLine (the date check is format-only, so 2026-13-45 is accepted), a line whose words after the duration are all tags (empty description), CRLF input, and the CLI output and exit code in src/cli.js.",
+    "Workflow state is REVIEWING_IMPLEMENTATION in a STANDARD brownfield cycle. The Tester's verification report is COMPLETE and records passing evidence for AC-004; no implementation review report exists yet. Reviewer owns the implementation review verdict, and the cycle still needs documentation, final review, and synchronization before the user can sign off.",
+    "A quiz result does not accept AC-004 or pass review; a correct answer distinguishes the demonstrated understanding from formal acceptance and review, and names the owners without dispatching them."
+  ],
+  "history": {
+    "turns": [
+      {
+        "role": "user",
+        "text": "/navigator Grill me on how timesheet entry parsing works. Intermediate depth: enough to follow the parsing change properly, not every edge case."
+      },
+      {
+        "role": "assistant",
+        "text": "Sounds good. I read `src/parse.js` and `src/duration.js` in the current checkout. At that depth we'll cover three things: how a whole file is processed, how one line is split into fields, and how durations are read. One question at a time.\n\nFirst, the big picture: when `parseEntries` gets the text of a whole timesheet, what does it give back, and what happens when one of the lines can't be parsed?"
+      },
+      {
+        "role": "user",
+        "text": "It gives back an object with `entries` and `errors`. A bad line doesn't stop the run, it goes into `errors` with its line number and the loop moves on to the next line."
+      },
+      {
+        "role": "assistant",
+        "text": "That's right. `parseLine` throws when a line is wrong, and `parseEntries` catches that separately for each line (`src/parse.js:25-29`), recording `{ line: index + 1, message }`, so line numbers start at 1. One detail you didn't mention: blank lines are skipped before parsing (`src/parse.js:24`), so they never show up as errors, but they still count toward the line numbers of later lines.\n\nNext question: what does `parseLine` return for this line?\n\n```\n2026-09-20 1h30m sprint planning #ops #meetings\n```"
+      },
+      {
+        "role": "user",
+        "text": "date is 2026-09-20, minutes is 90, description is 'sprint planning', and tags is ['#ops', '#meetings']."
+      },
+      {
+        "role": "assistant",
+        "text": "Almost all correct. The date, the 90 minutes, and the description are right: words that start with `#` are left out of the description (`src/parse.js:16`). The tags drop the `#`, though: `src/parse.js:15` keeps the `#` words and then applies `word.slice(1)`, so you get `['ops', 'meetings']`.\n\nLast question for this depth: which of these durations does `parseDuration` reject, and why? `45m`, `2h`, `90`, `h`"
+      },
+      {
+        "role": "user",
+        "text": "45m and 2h are fine. 90 gets rejected because there's no unit, and h gets rejected because there's no number in front of it."
+      },
+      {
+        "role": "assistant",
+        "text": "Correct on all four. The pattern in `src/duration.js:1` allows an optional `<digits>h` followed by an optional `<digits>m`, so `90` doesn't match at all, and neither does a bare `h`. When `parseDuration` throws, the error travels up through `parseLine` and ends up in `errors` for that line, which ties back to your first answer.\n\nThat covers the three areas we agreed on at intermediate depth: file-level error handling, field splitting and tags, and durations. Do you want to go deeper, or stop here?"
+      }
+    ]
+  },
+  "vars": {
+    "ID": "parse-time-entries-20260922T141000Z-3c9e51a7",
+    "VER": ".standards/docs/verification/parse-time-entries-20260922T141000Z-3c9e51a7.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "unchanged": true,
+          "why": "Navigator makes no state transition"
+        },
+        {
+          "state": "Handoff.Kind",
+          "unchanged": true,
+          "why": "Navigator records no handoff"
+        },
+        {
+          "no_skill_call": "reviewer",
+          "why": "no role dispatch"
+        },
+        {
+          "no_skill_call": "tester",
+          "why": "no role dispatch"
+        },
+        {
+          "no_skill_call": "developer",
+          "why": "no role dispatch"
+        },
+        {
+          "reply_not_matches": "^\\s*Next role:",
+          "flags": "m",
+          "why": "Navigator emits no next-role invocation"
+        },
+        {
+          "reply_not_matches": "/reviewer Continue the active",
+          "why": "no copy/paste Reviewer invocation"
+        },
+        {
+          "reply_not_matches": "^\\s*`?(feat|fix|docs|refactor|chore|test)(\\([A-Za-z0-9_-]+\\))?: [a-z]",
+          "flags": "m",
+          "why": "Navigator never suggests a commit"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": []
+    }
+  ],
+  "invariants": [
+    {
+      "unchanged": [
+        "**"
+      ],
+      "why": "Navigator persists nothing (generated caches are ignored)"
+    },
+    {
+      "head_unchanged": true,
+      "why": "Navigator never moves HEAD"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Navigator never mutates git state"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/duration.test.js test/parse.test.js",
+      "expect": "pass",
+      "why": "the project's tests pass, as the verification report records"
+    },
+    {
+      "cmd": "node --input-type=module -e \"import assert from 'node:assert/strict'; import { parseEntries, parseLine } from './src/parse.js'; assert.deepEqual(parseLine('2026-09-20 1h30m sprint planning #ops #meetings'), { date: '2026-09-20', minutes: 90, description: 'sprint planning', tags: ['ops', 'meetings'] }); const r = parseEntries('2026-09-20 1h a\\n2026-09-20 1x b\\n\\n2026-09-20 30m c'); assert.deepEqual(r.errors, [{ line: 2, message: 'invalid duration \\\"1x\\\"' }]); assert.equal(r.entries.length, 2); console.log('ok')\"",
+      "expect": "pass",
+      "why": "the history's feedback on parseLine output (tags without #) and per-line error collection matches the code"
+    },
+    {
+      "cmd": "node --input-type=module -e \"import assert from 'node:assert/strict'; import { parseDuration } from './src/duration.js'; assert.equal(parseDuration('45m'), 45); assert.equal(parseDuration('2h'), 120); assert.throws(() => parseDuration('90')); assert.throws(() => parseDuration('h')); console.log('ok')\"",
+      "expect": "pass",
+      "why": "the history's duration question and feedback match parseDuration"
+    }
+  ],
+  "notes": "Standalone brownfield fixture for a small Node timesheet parser. 50-duration and 51-cli are pre-install history (duration parser, then a CLI whose parseEntries stopped at the first bad line). After install, 60-planning commits Auditor context, scope (AC-001..AC-004; AC-004 = malformed line reported with line number, later lines still parsed), and design, with STATE at DEVELOPING. 61-implementation commits the new src/parse.js and src/cli.js plus a COMPLETE AFTER_IMPLEMENTATION development plan (STATE at TESTING). 62-verification commits Tester-added tests and a COMPLETE FULL verification report covering all ACs, with STATE at REVIEWING_IMPLEMENTATION after a FORWARD from TESTING; no review report exists. History holds the GRILL_ME conversation (three questions at the agreed intermediate depth, line numbers matching the final src/parse.js and src/duration.js), ending with the assistant noting the agreed depth was covered and offering to go deeper or stop. The run's message is the catalog utterance verbatim.",
+  "case": "navigator-61",
+  "caseHash": "4ca36077488d59c0",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T15:43:00.731Z",
+    "verdict": "pass",
+    "fixtureHash": "5b08b555773a7808",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "c59335292a145a53",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:22:37.296Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T15:30:47.387Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/60-planning/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/61-implementation/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/62-verification/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:22:37.296Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

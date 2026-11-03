@@ -1,0 +1,235 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial CSV export helper"
+    },
+    {
+      "dir": "layers/55-design",
+      "action": "commit",
+      "message": "Record project context, scope, and export column design"
+    },
+    {
+      "dir": "layers/60-implementation",
+      "action": "commit",
+      "message": "Add explicit column list to CSV export"
+    },
+    {
+      "dir": "layers/65-verification",
+      "action": "commit",
+      "message": "Add column selection tests and verification report"
+    },
+    {
+      "dir": "layers/70-review",
+      "action": "commit",
+      "message": "Record implementation review"
+    },
+    {
+      "dir": "layers/75-synchronization",
+      "action": "commit",
+      "message": "Record synchronization reconciliation"
+    },
+    {
+      "dir": "layers/80-rework",
+      "action": "commit",
+      "message": "Route sign-off rework to synchronization"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "synchronizer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The pre-existing synchronization record maps AC-002 to the scenario 'uses the first row keys when no columns are given', which is AC-003's evidence. The verification report evidences AC-002 with 'leaves a missing requested field empty', and that scenario passes on the current src/csv.js and test/csv.test.js. Correcting the mapping is the whole Synchronizer-owned correction.",
+    "Nothing in src/, test/, or the scope, design, context, development plan, verification report, or implementation review changed after the implementation review commit, so the full verification and the implementation review (closure ELIGIBLE) still apply to the current deliverable.",
+    "No documentation record and no final-deliverable review exist for this cycle; both phases are intentionally omitted by IMPLEMENTATION_REVIEWED and the active contract requires no project documentation change. The full Synchronizer gate therefore cannot pass, but no required Synchronizer-owned work remains after the mapping correction.",
+    "The only recovery frame (From AWAITING_USER_SIGNOFF, Owner SYNCHRONIZING, FailureType SYNCHRONIZATION, ResumeAt AWAITING_USER_SIGNOFF, RerunThrough NONE) was pushed by a user rework at sign-off."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "export-columns-20260921T140000Z-5c8e2a91",
+    "SYNC": ".standards/docs/synchronization/export-columns-20260921T140000Z-5c8e2a91.md",
+    "REVIEW": ".standards/docs/reviews/export-columns-20260921T140000Z-5c8e2a91/implementation.md",
+    "FINAL": ".standards/docs/reviews/export-columns-20260921T140000Z-5c8e2a91/final-deliverable.md",
+    "DOCREC": ".standards/docs/documentation/export-columns-20260921T140000Z-5c8e2a91.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "REVIEWING_IMPLEMENTATION",
+          "why": "rerun starts at implementation Reviewer, not a direct pop to sign-off"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "true"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "1",
+          "why": "the owned frame is retained"
+        },
+        {
+          "state": "Recovery.Top.Owner",
+          "equals": "SYNCHRONIZING"
+        },
+        {
+          "state": "Recovery.Top.ResumeAt",
+          "equals": "AWAITING_USER_SIGNOFF"
+        },
+        {
+          "state": "Recovery.Top.RerunThrough",
+          "equals": "REVIEWING_IMPLEMENTATION"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${SYNC}"
+        },
+        {
+          "provenance": {
+            "path": "${SYNC}",
+            "artifact": "SYNCHRONIZATION",
+            "cycle": "${ID}"
+          }
+        },
+        {
+          "field": {
+            "path": "${SYNC}",
+            "name": "Status",
+            "not": "COMPLETE"
+          },
+          "why": "full synchronization cannot pass"
+        },
+        {
+          "changed": [
+            "${SYNC}"
+          ],
+          "why": "the reconciliation error lives in this record and must be corrected there"
+        },
+        {
+          "absent": "${FINAL}",
+          "why": "no final review may be fabricated"
+        },
+        {
+          "absent": "${DOCREC}"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "not": "AWAITING_USER_SIGNOFF"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "true"
+        },
+        {
+          "state": "ActiveWork.CompletionPolicy",
+          "equals": "IMPLEMENTATION_REVIEWED",
+          "why": "the correction does not change the selected policy"
+        },
+        {
+          "unchanged": [
+            "${REVIEW}"
+          ],
+          "why": "Synchronizer does not rewrite Reviewer's closure assessment"
+        },
+        {
+          "reply_matches": "/reviewer",
+          "why": "transition to a different role requires the Claude Code next-role invocation"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "package.json",
+        "README.md",
+        ".standards/CONTEXT.md",
+        ".standards/docs/scope/**",
+        ".standards/docs/specs/**",
+        ".standards/docs/development/**",
+        ".standards/docs/verification/**",
+        ".standards/docs/reviews/**"
+      ],
+      "why": "Synchronizer owns only its record and does not change implementation, tests, documentation, or other roles' records"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/csv.test.js",
+      "expect": "pass",
+      "why": "the full suite (5 tests) passes on the current implementation, matching the verification report"
+    },
+    {
+      "cmd": "node --test --test-name-pattern='leaves a missing requested field empty' test/csv.test.js",
+      "expect": "pass",
+      "why": "the scenario that actually evidences AC-002 exists and passes, so the correction is verifiable"
+    },
+    {
+      "cmd": "grep -E 'AC-002.*uses the first row keys when no columns are given' .standards/docs/synchronization/export-columns-20260921T140000Z-5c8e2a91.md",
+      "expect": "pass",
+      "why": "the existing synchronization record carries the reconciliation error (AC-002 mapped to AC-003's scenario)"
+    },
+    {
+      "cmd": "test ! -e .standards/docs/reviews/export-columns-20260921T140000Z-5c8e2a91/final-deliverable.md && test ! -e .standards/docs/documentation/export-columns-20260921T140000Z-5c8e2a91.md",
+      "expect": "pass",
+      "why": "normal final review and documentation were intentionally omitted"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 50-project: pre-install Node ES module with toCsv(rows) and three node:test tests. 55-design: CONTEXT.md, cycle-owned scope (AC-001..AC-003) and design. 60-implementation: toCsv(rows, {columns}) plus a COMPLETE development plan. 65-verification: two new tests and a COMPLETE FULL verification report citing the implementation commit. 70-review: COMPLETE implementation review with an ELIGIBLE Implementation-Reviewed Closure section. 75-synchronization: an IN_PROGRESS synchronization record whose evidence references map AC-002 to the default-columns scenario (the reconciliation error); it already notes final review is omitted. 80-rework: STATE.md at SYNCHRONIZING, STANDARD/IMPLEMENTATION_REVIEWED, USER_REWORK from AWAITING_USER_SIGNOFF, one frame Owner SYNCHRONIZING, ResumeAt AWAITING_USER_SIGNOFF, RerunThrough NONE. STATE.md is written only in the last layer, so earlier commits show the installer's default state. Compromise: the case presupposes a synchronization record under the shorter policy; the protocol only produces one through earlier corrective work, and the fixture does not narrate that origin. Handoff.Kind after the run is not checked (RESUME is most likely, but the protocol does not name the kind for a non-ResumeAt rerun transition).",
+  "case": "synchronizer-54",
+  "caseHash": "20d02f609bcf8112",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T03:12:11.893Z",
+    "verdict": "pass",
+    "fixtureHash": "f764c2752b553044",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-31T01:21:57.619Z"
+  }
+}

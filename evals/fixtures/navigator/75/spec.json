@@ -1,0 +1,162 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add interval timer"
+    },
+    {
+      "dir": "layers/50-styles",
+      "action": "untracked"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "navigator",
+    "utterance": "help"
+  },
+  "graderOnly": [
+    "The directory .standards/user-styles/navigator/ holds two untracked user styles, maeve.md and kofi-walkthrough.md, and is made unreadable (mode 000) for the run, so the invocation helper can report the four Navigator modes but cannot enumerate the style inventory (unknown, not empty).",
+    "The earlier turn in this conversation selected INVESTIGATE and finished its answer with no question pending, so the bare help asks for the option summary and INVESTIGATE should remain the current conversation mode.",
+    "The style files are untracked and never committed, so git history cannot reveal their names."
+  ],
+  "history": {
+    "turns": [
+      {
+        "role": "user",
+        "text": "/navigator INVESTIGATE Why does `timer backup --every 90` wait an hour and a half between runs instead of 90 seconds?"
+      },
+      {
+        "role": "assistant",
+        "text": "Short answer: a bare number is read as minutes, so `--every 90` means 90 minutes (5,400 seconds). How it happens: `main` in src/timer/cli.py:15 passes the `--every` value to `parse_duration`. In src/timer/durations.py, line 12 checks whether the last character is a unit (`s`, `m`, or `h`). `90` has none, so line 15 falls back to `DEFAULT_UNIT`, which line 4 sets to `m`, and line 16 returns 90 * 60 = 5400. This looks intended rather than accidental: README.md:9-10 documents that a number without a unit is minutes, and tests/test_durations.py:10-11 checks that `parse_duration('90')` returns 5400. I found no recorded reason for choosing minutes over seconds as the default; it has been there since the commit that added the parser. If you want 90 seconds, write `--every 90s`. This comes from reading the source, README, and tests; I did not run anything. You can ask `/navigator help` any time to see the other modes."
+      }
+    ]
+  },
+  "vars": {},
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "reply_not_matches": "maeve|kofi",
+          "flags": "i",
+          "why": "the unreadable directory's style identifiers must not be presented; the judge decides whether the inventory was reported as unverified rather than empty"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "reply_matches": "GRILL[_ -]?ME",
+          "flags": "i",
+          "why": "verified mode choices are still shown"
+        },
+        {
+          "reply_matches": "INVESTIGATE",
+          "flags": "i",
+          "why": "verified mode choices are still shown"
+        },
+        {
+          "reply_matches": "ASSESS",
+          "flags": "i",
+          "why": "verified mode choices are still shown"
+        },
+        {
+          "reply_matches": "EXPLAIN",
+          "flags": "i",
+          "why": "verified mode choices are still shown"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "**"
+          ],
+          "why": "help changes nothing, including permissions repairs that touch files"
+        },
+        {
+          "not_ran_git": "mutating",
+          "why": "help never mutates git state"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "unchanged": [
+        "**"
+      ],
+      "why": "Navigator persists nothing (generated caches are ignored)"
+    },
+    {
+      "head_unchanged": true,
+      "why": "Navigator never moves HEAD"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Navigator never mutates git state"
+    }
+  ],
+  "runtime": {
+    "unreadable": [
+      ".standards/user-styles/navigator"
+    ]
+  },
+  "selfChecks": [
+    {
+      "cmd": "python3 -m pytest -q tests/test_durations.py",
+      "expect": "pass",
+      "why": "the project's tests pass, including the bare-number-is-minutes behavior cited in the history"
+    },
+    {
+      "cmd": "node .standards/bin/invocation.mjs navigator --client claude --json | grep -q GRILL_ME",
+      "expect": "pass",
+      "why": "the installed helper discovers the Navigator mode catalog"
+    },
+    {
+      "cmd": "test -z \"$(git ls-files .standards/user-styles)\"",
+      "expect": "pass",
+      "why": "the user-style files are untracked, so git cannot list their names"
+    }
+  ],
+  "notes": "Standalone brownfield fixture with the default installed state (no cycle). Layer 00-project (pre-install, committed): a small Python interval-timer package (src/timer/durations.py, src/timer/cli.py, tests, README) that the history's INVESTIGATE question is about; line numbers cited in the history match these files. Layer 50-styles (untracked): two Navigator user styles in .standards/user-styles/navigator/, made unreadable for the run via runtime.unreadable so the helper's style inventory is unknown while the mode catalog stays complete. History: one INVESTIGATE turn answered in full with no pending question, so the bare 'help' is a request for the option summary and INVESTIGATE is the conversation's current mode. check.mjs ignores files under .standards/user-styles, so the state is valid.",
+  "case": "navigator-75",
+  "caseHash": "97519f6f1f0a6679",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T03:00:56.877Z",
+    "verdict": "issues",
+    "fixtureHash": "54a97b6f5f6b3f3d",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "fixedBy": "owner decision"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-31T00:14:50.747Z"
+  },
+  "decision": {
+    "action": "fixed",
+    "note": "mode-name reply checks are case-insensitive",
+    "at": "2026-10-31T11:20:10.845Z",
+    "fixtureHash": "54a97b6f5f6b3f3d"
+  }
+}

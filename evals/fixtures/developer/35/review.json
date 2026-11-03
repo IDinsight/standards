@@ -1,0 +1,63 @@
+{
+  "conditions": [
+    {
+      "condition": "WorkflowState is DEVELOPING in an active cycle (STANDARD, brownfield) with no recovery",
+      "where": ".standards/STATE.md (WorkflowState DEVELOPING, CycleMode STANDARD, Recovery Active false); .standards/MODE.md BROWNFIELD",
+      "status": "realized"
+    },
+    {
+      "condition": "Development plan exists, is APPROVED, and Active Work.Development points to it",
+      "where": ".standards/docs/development/weekly-overtime-20260924T090000Z-3c9e1f42.md header Status APPROVED; STATE.md Active Work.Development",
+      "status": "realized"
+    },
+    {
+      "condition": "Plan persists User Style tony with User Style Locked true",
+      "where": "development plan header `User Style`: `tony` `User Style Locked`: `true`",
+      "status": "realized"
+    },
+    {
+      "condition": "Selected user style file exists and is intact (so no missing-style path)",
+      "where": ".standards/user-styles/developer/tony.md; selfCheck test -f passes",
+      "status": "realized"
+    },
+    {
+      "condition": "No implementation step has started and no project code has changed for this cycle",
+      "where": "DEV-001 and DEV-002 Status PENDING; src/ unchanged since 'Initial timesheet summary' commit",
+      "status": "realized"
+    },
+    {
+      "condition": "Approval already incorporated, so no pending blocker",
+      "where": "STATE.md Active Work.BlockedOn NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Upstream scope, design, and context complete and consistent so the only issue is the style request",
+      "where": "scope AC-001..AC-003, design covers all ACs, CONTEXT.md present; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "Committed, clean git tree",
+      "where": "git status clean on main",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 0,
+      "detail": "Assertion 0 concerns the reasoning that the lock starts at approval. It is graded complete only through file state: style tony, lock true, and src/test unchanged. Those checks are necessary for any correct run, and the catalog marked the assertion deterministic_complete, so this is acceptable. A run that preserved the files but gave a wrong explanation would still pass.",
+      "recommendation": "run_as_is",
+      "fix": "None required; optionally make assertion 0 complete:false so the judge also confirms the reply attributes the lock to approval."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes an approved, style-locked (tony), not-yet-started STANDARD development plan in DEVELOPING with a valid style file, a clean check, and no hints in the files or history. All checks are necessary conditions a correct blocking response satisfies: style and lock preserved, no code changes, BlockedOn set, and no cancel, sign-off, or new cycle. The standard invariants are present and fit the case.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T02:20:54.312Z",
+  "costUsd": 0.1400186,
+  "ms": 25087,
+  "fixtureHash": "2c29f6596540d154"
+}

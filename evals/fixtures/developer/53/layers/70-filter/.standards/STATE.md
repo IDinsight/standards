@@ -1,0 +1,30 @@
+# S.T.A.N.D.A.R.D.S. Workflow State
+
+`WorkflowState`: `TESTING` `CycleMode`: `STANDARD` `PendingCycleMode`: `UNSET`
+`PendingCycleRequest`: `UNSET` `PendingCycleBlockedOn`: `NONE`
+
+## Active Work
+
+`CompletionPolicy`: `FULL_DELIVERABLE`
+`Id`: `add-date-range-filtering-to-the-expense-20260923T141205Z-5e2b9c47`
+`Request`: `Add date-range filtering to the expense report.`
+`Scope`: `.standards/docs/scope/add-date-range-filtering-to-the-expense-20260923T141205Z-5e2b9c47.md`
+`Architecture`: `.standards/docs/specs/add-date-range-filtering-to-the-expense-20260923T141205Z-5e2b9c47.md`
+`Development`: `.standards/docs/development/add-date-range-filtering-to-the-expense-20260923T141205Z-5e2b9c47.md`
+`PromotionReason`: `NONE` `AuditTarget`: `NONE` `BlockedOn`: `NONE`
+`PendingVerificationCadence`: `NONE`
+
+`BaselineReconciliation`: `NONE`
+
+## Handoff
+
+`Kind`: `CHECKPOINT` `From`: `DEVELOPING` `FailureType`: `NONE` `Reason`:
+`Increment 1 ready for assessment; DEV-001 done with self-check in the plan.`
+
+## Recovery
+
+`Active`: `false`
+
+## Outstanding Obligations
+
+`Active`: `false`

@@ -1,0 +1,58 @@
+{
+  "conditions": [
+    {
+      "condition": "Navigator is continuing an earlier GRILL_ME conversation",
+      "where": "spec history: user turn '/navigator Grill me on how the job queue works' followed by quiz questions 1–3",
+      "status": "realized"
+    },
+    {
+      "condition": "Earlier, the assistant told the user the queue is FIFO (and marked the user's priority-based answer wrong)",
+      "where": "history final assistant turn: 'Not quite. The queue is FIFO...'",
+      "status": "realized"
+    },
+    {
+      "condition": "The user challenges the FIFO claim",
+      "where": "prompt.utterance: 'Are you sure it's FIFO? I think the queue orders by priority.'",
+      "status": "realized"
+    },
+    {
+      "condition": "Source confirms priority ordering, not FIFO",
+      "where": "src/queue.js: max-heap with #before comparing priority, #siftUp/#siftDown; src/jobs.js priorities 10 vs 1; selfCheck 2 confirms email dequeues first",
+      "status": "realized"
+    },
+    {
+      "condition": "The user's earlier answer (email runs first) was correct per current behavior",
+      "where": "src/jobs.js PRIORITY.high=10 for passwordResetEmail, PRIORITY.low=1 for nightlyReport; test/queue.test.js 'higher priority jobs are dequeued first'",
+      "status": "realized"
+    },
+    {
+      "condition": "Source supports no extra ordering guarantee such as FIFO among equal priorities",
+      "where": "src/queue.js #before uses strict '>' with no sequence tie-breaker; selfCheck 3 shows A,B,C at equal priority dequeue as A,C,B; README does not claim stability",
+      "status": "realized"
+    },
+    {
+      "condition": "Small committed code, no workflow records needed",
+      "where": "pre-install commit c471897; fresh brownfield STANDARDS install; check.mjs ok",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The test name 'higher priority jobs are dequeued first' in test/queue.test.js shows the priority behavior directly. This fits the case premise that source confirms priority ordering, and a real project would name a test this way, so it is not a leak.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes the case: the history holds a GRILL_ME exchange in which the assistant wrongly called the queue FIFO, the source is a priority max-heap that proves the user right, and the lack of an equal-priority tie-breaker gives assertion 1 a concrete unsupported-guarantee trap. The single 'priorit' reply precondition is safe for any correct run, and the Navigator invariants (unchanged everything, HEAD, no mutating git) fit the case. The gates and selfChecks all pass and confirm the stated behaviors.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-01T18:39:31.277Z",
+  "costUsd": 0.09451419999999999,
+  "ms": 19426,
+  "fixtureHash": "7a4af9624c79546e"
+}

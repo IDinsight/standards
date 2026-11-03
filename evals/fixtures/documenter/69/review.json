@@ -1,0 +1,76 @@
+{
+  "conditions": [
+    {
+      "condition": "BROWNFIELD project, STANDARD cycle at DOCUMENTING with Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/MODE.md; .standards/STATE.md (WorkflowState DOCUMENTING, CycleMode STANDARD, Id matches)",
+      "status": "realized"
+    },
+    {
+      "condition": "Current-cycle documentation record has valid DOCUMENTATION provenance and a matching visible Cycle",
+      "where": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md header",
+      "status": "realized"
+    },
+    {
+      "condition": "Collaboration AUTONOMOUS, target ACTIVE_CHANGE, user style NONE",
+      "where": "documentation record header",
+      "status": "realized"
+    },
+    {
+      "condition": "No outstanding obligations, independent defects, or blocking questions",
+      "where": "STATE.md (Obligations Active false, BlockedOn NONE); record Resume section",
+      "status": "realized"
+    },
+    {
+      "condition": "Single active frame with Owner DOCUMENTING, ResumeAt DEVELOPING, RerunThrough NONE",
+      "where": "STATE.md Recovery Frame 1; Handoff FAILURE DOCUMENTATION from DEVELOPING",
+      "status": "realized"
+    },
+    {
+      "condition": "A previously verified setup correction is ready for return",
+      "where": "README.md commit 'Correct test command in README setup'; record DOC-001 RESOLVED with checks C1-C4; Resume section says next action is RESUME to DEVELOPING",
+      "status": "realized"
+    },
+    {
+      "condition": "Remaining guide depends on unfinished Developer work",
+      "where": "plan DEV-002/DEV-003 PENDING; docs/usage.md has no export section; record Remaining work names DEV-002/DEV-003",
+      "status": "realized"
+    },
+    {
+      "condition": "Setup command's required tooling changed since verification",
+      "where": "unstaged package.json renames root package export -> records-admin; record cites package.json blob with name export; selfCheck shows `pnpm --filter export test` now matches no project",
+      "status": "realized"
+    },
+    {
+      "condition": "Git has committed history plus an unstaged change",
+      "where": "git status: M package.json only",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 0,
+      "detail": "The `changed: [DOC]` precondition assumes a correct run persists the invalidation in the documentation record. The skill (step 8 reopen unsupported conclusions, step 7 persist discrepancies before routing, template's blocking-question field) makes this effectively required whether the role re-verifies, revises, or blocks, so a correct run should satisfy it; a run that only asks without persisting anything would also violate the skill.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "Multiple correct outcomes exist: revise README to records-admin and re-verify then return, block and ask about the unexplained Developer-owned package.json change, or route it. .standards/CONTEXT.md also names `pnpm --filter export test`, so a role might note a context discrepancy. The checks admit all of these (state DOCUMENTING or DEVELOPING, record not COMPLETE), and the judge decides on reasoning.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes a pre-documentation-phase recovery frame (DEVELOPING -> DOCUMENTING, ResumeAt DEVELOPING) with a recorded, verified README correction and pending Developer work. An unstaged package.json rename invalidates that verification, and the selfChecks confirm the effect. Checks are necessary preconditions that admit every legal outcome, invariants fit, and nothing leaks the stale evidence.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T16:44:51.440Z",
+  "costUsd": 0.2610806,
+  "ms": 40622,
+  "fixtureHash": "e6645ea02d07dc62"
+}

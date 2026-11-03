@@ -1,0 +1,94 @@
+{
+  "conditions": [
+    {
+      "condition": "Brownfield project with an active STANDARD cycle",
+      "where": ".standards/MODE.md (BROWNFIELD); .standards/STATE.md CycleMode STANDARD, CompletionPolicy FULL_DELIVERABLE",
+      "status": "realized"
+    },
+    {
+      "condition": "Workflow is at TESTING (Tester owns the state)",
+      "where": ".standards/STATE.md WorkflowState TESTING, which equals the active Frame 2 Owner",
+      "status": "realized"
+    },
+    {
+      "condition": "Existing generated cycle ID",
+      "where": ".standards/STATE.md Active Work.Id add-a-since-date-filter-to-the-export-20260922T141500Z-5c1e9a3b",
+      "status": "realized"
+    },
+    {
+      "condition": "Existing request that does not cover the new feature",
+      "where": "Active Work.Request 'Add a --since date filter to the export command.'; scope non-goal 'Changes to the import command'",
+      "status": "realized"
+    },
+    {
+      "condition": "Existing development plan",
+      "where": "Active Work.Development -> .standards/docs/development/<id>.md (IN_PROGRESS, DEV-001 reopened)",
+      "status": "realized"
+    },
+    {
+      "condition": "A non-NONE blocker",
+      "where": "Active Work.BlockedOn holds Tester's scenario-budget question, matching the verification report's Open Findings",
+      "status": "realized"
+    },
+    {
+      "condition": "Nested recovery with legal frames",
+      "where": "STATE.md Recovery: Frame 1 TESTING->DEVELOPING IMPLEMENTATION and Frame 2 DEVELOPING->TESTING VERIFICATION, both RerunThrough NONE; Handoff FAILURE DEVELOPING->TESTING; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "The user has not asked to cancel or replace the cycle",
+      "where": "Utterance 'Document the import command; it's a separate feature from the current work.'; no history",
+      "status": "realized"
+    },
+    {
+      "condition": "A separate feature (import command) exists and is under-documented",
+      "where": "src/import.js, src/cli.js import branch; README.md has a one-line import mention; no docs/import.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Pending-cycle fields clear",
+      "where": "STATE.md PendingCycleMode UNSET, PendingCycleRequest UNSET, PendingCycleBlockedOn NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Clean committed working tree",
+      "where": "git status clean on main",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-wrong",
+      "assertion": 1,
+      "detail": "Assertion 1 is complete:true, but its globs (README.md, docs/**, src/**, bin/**, .standards/docs/**) miss other documentation surfaces Documenter owns. These include project agent guidance in AGENTS.md and CLAUDE.md outside the managed blocks, and a new root-level doc such as IMPORT.md. A wrong run that edits or creates those would pass without the judge. No correct run is failed by this.",
+      "recommendation": "fix_file",
+      "fix": "In spec.json, checks for assertion 1: replace the first unchanged entry with {\"unchanged\": [\"**/*.md\", \"src/**\", \"bin/**\"]}. Keep the .standards/docs/** and absent checks. A correct Documenter at TESTING changes no Markdown file."
+    },
+    {
+      "severity": "note",
+      "kind": "check-wrong",
+      "assertion": 0,
+      "detail": "The catalog asks for STATE.md to be byte-identical. The field-level checks omit PendingCycleMode, PendingCycleBlockedOn, Handoff.*, and the Frame From/ResumeAt/RerunThrough fields. A run that changed those would still pass this complete:true assertion. No correct run changes STATE.md at all here.",
+      "recommendation": "fix_file",
+      "fix": "In spec.json, checks for assertion 0: add {\"unchanged\": [\".standards/STATE.md\"], \"why\": \"the active cycle's coordination state is untouched\"}."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The third commit bundles Developer's implementation and Tester's report and correction state into one commit ('Add --since filter to export and record verification'). This is slightly compressed history but plausible and harmless.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition: an active STANDARD cycle at TESTING with an ID, plan, request, Tester blocker, and two legal nested frames, while the import command sits outside the current scope. check.mjs passes, nothing leaks, and no check can fail a correct run. Two optional tightenings would stop complete:true assertions from passing some wrong runs: broaden assertion 1's globs to all Markdown, and add a whole-file unchanged check on STATE.md for assertion 0.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T02:57:47.042Z",
+  "costUsd": 0.2347594,
+  "ms": 41100,
+  "fixtureHash": "91d3c22f8b7f3e45"
+}

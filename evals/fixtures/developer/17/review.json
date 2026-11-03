@@ -1,0 +1,89 @@
+{
+  "conditions": [
+    {
+      "condition": "Brownfield project",
+      "where": ".standards/MODE.md (BROWNFIELD, installed by --mode brownfield)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode EXPEDITED and WorkflowState DEVELOPING",
+      "where": ".standards/STATE.md header (layer 80-finding)",
+      "status": "realized"
+    },
+    {
+      "condition": "Nested recovery is active with two frames",
+      "where": ".standards/STATE.md Recovery: Active true, Frame 1 and Frame 2",
+      "status": "realized"
+    },
+    {
+      "condition": "Frame 1: Owner DEVELOPING, FailureType IMPLEMENTATION, Reason 'apply the approved bounded rework', ResumeAt AWAITING_USER_SIGNOFF, RerunThrough REVIEWING_IMPLEMENTATION (From AWAITING_USER_SIGNOFF)",
+      "where": ".standards/STATE.md ### Frame 1",
+      "status": "realized"
+    },
+    {
+      "condition": "Frame 1's correction was already done by Developer and the review was being re-established",
+      "where": "src/routes/activity.js paging (selfCheck 3 passes); plan DEV-002 DONE; review report rerun marks paging Supported",
+      "status": "realized"
+    },
+    {
+      "condition": "Frame 2: Owner DEVELOPING, FailureType IMPLEMENTATION, Reason 'authorization is missing on the new endpoint', ResumeAt REVIEWING_IMPLEMENTATION, RerunThrough NONE, pushed by Reviewer during the rerun",
+      "where": ".standards/STATE.md ### Frame 2; Handoff FAILURE from REVIEWING_IMPLEMENTATION; review report F-001 OPEN",
+      "status": "realized"
+    },
+    {
+      "condition": "The endpoint really lacks authorization (any signed-in user reads any workspace's activity)",
+      "where": "src/routes/activity.js calls authenticate but never relates caller to workspace; selfCheck 2 returns 200 for non-member",
+      "status": "realized"
+    },
+    {
+      "condition": "Developer was correcting Frame 2 when the need for an Architect-owned authorization contract appeared",
+      "where": "plan DEV-001 reopened IN_PROGRESS with Implementation Notes citing F-001; store has owner/member/guest/admin with no read rule; utterance states the Architect dependency",
+      "status": "realized"
+    },
+    {
+      "condition": "Records from Developer and Reviewer exist and are coherent; check.mjs passes",
+      "where": "development plan and implementation review under .standards/docs; gate check.mjs ok:true",
+      "status": "realized"
+    },
+    {
+      "condition": "State committed, clean working tree",
+      "where": "git status clean on main",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "All commits are dated 2026-09-24T09:00:00Z, while records describe work on 2026-09-21 and 2026-09-23 (and the cycle ID timestamp is 20260921T141203Z). Harmless to what the run tests.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally set per-layer dates; not required."
+    },
+    {
+      "severity": "note",
+      "kind": "case-defect",
+      "assertion": -1,
+      "detail": "The case says Developer discovers the Architect-owned need, but the catalog utterance supplies it ('needs an authorization contract that only Architect can define'). The fixture follows the catalog; the code supports the claim without hinting. The test focus (frame-to-obligation conversion) is unaffected.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 2,
+      "detail": "The assertion-2 regex relies on Outstanding Obligations staying the last section of STATE.md and requires no `From`/`ResumeAt`/`RerunThrough` after '### Obligation 1'. A correct run keeps the template order, so it holds; Reason matching is case- and whitespace-tolerant and the protocol requires the frame's Reason to be preserved.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The final STATE.md exactly realizes the nested expedited recovery: Frame 1 is corrected with RerunThrough REVIEWING_IMPLEMENTATION, and Frame 2 is unresolved with RerunThrough NONE. The code and records back both frames, and check.mjs passes before the run and would pass after a correct promotion. The checks are necessary conditions a correct promotion satisfies and the invariants fit, so only minor notes remain.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T02:17:22.938Z",
+  "costUsd": 0.2371666,
+  "ms": 50840,
+  "fixtureHash": "9c2e7ee2ee81201b"
+}

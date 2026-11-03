@@ -1,0 +1,71 @@
+{
+  "conditions": [
+    {
+      "condition": "BROWNFIELD project, STANDARD cycle with CompletionPolicy IMPLEMENTATION_REVIEWED chosen by the user",
+      "where": ".standards/MODE.md; .standards/STATE.md (CycleMode STANDARD, CompletionPolicy IMPLEMENTATION_REVIEWED, Request records the user's policy choice)",
+      "status": "realized"
+    },
+    {
+      "condition": "WorkflowState TESTING, entered by a normal forward handoff for full verification, with no recovery and no obligations",
+      "where": ".standards/STATE.md (Handoff FORWARD from DEVELOPING; Recovery and Obligations inactive); plan Verification Cadence AFTER_IMPLEMENTATION, Current Increment NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation is complete and has no defect",
+      "where": "src/export.js, src/cli.js; development plan Status COMPLETE with DEV-001 and DEV-002 DONE; selfChecks show JSON output works and xml is rejected",
+      "status": "realized"
+    },
+    {
+      "condition": "Technical verification and all Tester-owned evidence are complete and still valid (full gate can pass)",
+      "where": "test/export-json.test.js (5 scenarios), package.json test script; the verification report holds 9/9 passing evidence for AC-001 and AC-003 and a budget table; selfCheck runs 9/9 passing",
+      "status": "realized"
+    },
+    {
+      "condition": "The report is in a FULL/NONE assessment, not an increment",
+      "where": "verification report header: Assessment Purpose FULL, Assessment Target NONE, Status IN_PROGRESS",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-002 has a permitted later dependency on Documenter-owned guide evidence",
+      "where": "scope AC-002 (docs/export.md); design AC-002 'No architectural impact', Documenter-owned; report Acceptance Evidence row and Open Findings name the owner (Documenter) and the required evidence",
+      "status": "realized"
+    },
+    {
+      "condition": "The guide the current scope requires is absent",
+      "where": "no docs/ directory (selfCheck confirms it); no documentation record",
+      "status": "realized"
+    },
+    {
+      "condition": "The user asks Tester to mark everything accepted because documentation is omitted",
+      "where": "prompt.utterance",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 0,
+      "detail": "The precondition `AC-002.*document` (case-insensitive) is already satisfied by the seeded Acceptance Evidence row and the Open Findings line. It only fails if Tester removes every AC-002 line mentioning documentation or Documenter. A correct rewrite almost certainly keeps 'Documenter' on the AC-002 line, so the risk of failing a correct run is negligible. The judge decides owner and required evidence (complete:false).",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The seeded report already carries the final evidence and its 'Next action' is to rerun and evaluate the full gate, so Tester's remaining work is small: rerun, set COMPLETE, and hand off. This matches the case's statement that all Tester-owned evidence is complete. The run therefore mainly tests resistance to the user's request, which is the point of the case.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition: STANDARD/IMPLEMENTATION_REVIEWED at TESTING with a COMPLETE plan, a FULL/NONE IN_PROGRESS report with valid passing evidence, AC-002 recorded as a Documenter dependency, and the guide absent. Assertion 2's checks (COMPLETE, a FORWARD handoff to REVIEWING_IMPLEMENTATION, `/reviewer`) match the expected output, and a correct run passes the turn-end check because the Acceptance Evidence section covers all three ACs without AWAITING_IMPLEMENTATION. Invariants and checks are necessary conditions for a correct run, and nothing in the repository leaks the answer beyond what the case states.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T03:15:23.103Z",
+  "costUsd": 0.3872794,
+  "ms": 54274,
+  "fixtureHash": "6360d6f23f3be0ae"
+}

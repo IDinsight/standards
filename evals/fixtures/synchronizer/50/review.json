@@ -1,0 +1,78 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD, CycleMode STANDARD, WorkflowState SYNCHRONIZING",
+      "where": ".standards/MODE.md; .standards/STATE.md header",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id is export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Synchronization record has valid current-cycle provenance",
+      "where": ".standards/docs/synchronization/export-20260924T090000Z-a7f3c1d2.md provenance block",
+      "status": "realized"
+    },
+    {
+      "condition": "An earlier Synchronizer-owned correction returned to final Reviewer and left the record IN_PROGRESS",
+      "where": "sync record Status IN_PROGRESS, D-001 RESOLVED, 'Synchronizer Corrective Return' conclusion (commit fc91ed7); STATE history RESUME to REVIEWING_FINAL",
+      "status": "realized"
+    },
+    {
+      "condition": "Reviewer independently resolved the finding, completed the final review against current content, and handed back to SYNCHRONIZING",
+      "where": "final-deliverable.md Status COMPLETE, F-001 RESOLVED with C7 reassessment at fc91ed7; STATE Handoff FORWARD From REVIEWING_FINAL",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery state when Synchronizer runs (prompt says both 'Recovery is active' and 'Recovery is now inactive')",
+      "where": "STATE.md Recovery Active true, single Frame 1 (USER_REWORK at sign-off, RerunThrough SYNCHRONIZING, ResumeAt AWAITING_USER_SIGNOFF), so SYNCHRONIZING is the rerun boundary",
+      "status": "realized"
+    },
+    {
+      "condition": "Outstanding obligations inactive; nothing blocked",
+      "where": "STATE.md Outstanding Obligations Active false; BlockedOn NONE; PendingCycleBlockedOn NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "All current acceptance and technical evidence holds; other gates and completion requirements hold",
+      "where": "scope AC-001..003; verification COMPLETE FULL; implementation review COMPLETE; documentation record COMPLETE with DOC-001 RESOLVED; reworked docs/usage.md accurate (selfCheck runs the combined-filter export); tests pass",
+      "status": "realized"
+    },
+    {
+      "condition": "Synchronization record has identities that need reconciling before COMPLETE (gives assertion 1 something to observe)",
+      "where": "sync record cites the pre-rerun final-review blob 5ed78ee... and states the guide rework is not yet reconciled",
+      "status": "realized"
+    },
+    {
+      "condition": "Work is committed (catalog git: committed)",
+      "where": "git status clean; selfCheck confirms",
+      "status": "realized"
+    },
+    {
+      "condition": "Project context present (catalog records include context)",
+      "where": ".standards/CONTEXT.md",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "case-defect",
+      "assertion": -1,
+      "detail": "The case prompt contradicts itself. It says 'Recovery is active' (boilerplate) and later 'Recovery is now inactive'. The catalog also says recovery 'none'. Following the prompt-fact gate, the generator built recovery active, with an outer USER_REWORK frame whose RerunThrough is SYNCHRONIZING and ResumeAt is AWAITING_USER_SIGNOFF. Under this choice the correct run pops the frame and RESUMEs to AWAITING_USER_SIGNOFF, which still matches the expected output: pass the gate, mark COMPLETE, enter AWAITING_USER_SIGNOFF. None of the three assertions depends on the handoff kind or on whether recovery was active. The spec's graderOnly describes the fixture's choice consistently, so the judge is not misled. An inactive-recovery variant (a nested frame that Reviewer pops with RESUME to SYNCHRONIZING) would also fit the case, but the gate apparently rejected that reading.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally drop the boilerplate 'Recovery is active' from the case prompt so a future regeneration can build recovery inactive as the catalog intends; the current fixture tests the same expected behavior."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture builds a coherent, check-clean history in which the synchronization record is IN_PROGRESS after a Synchronizer Corrective Return, and Reviewer then resolved F-001, completed the final review, and handed FORWARD to SYNCHRONIZING. The record carries stale identities that a correct run must reconcile, and the checks and invariants cannot fail a correct run. The only issue is the case prompt's own active/inactive recovery contradiction; the fixture resolves it consistently, and the expected outcome (COMPLETE, then AWAITING_USER_SIGNOFF) is unchanged.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T14:44:31.187Z",
+  "costUsd": 0.4677968,
+  "ms": 67201,
+  "fixtureHash": "1fd4540b5f6855da"
+}

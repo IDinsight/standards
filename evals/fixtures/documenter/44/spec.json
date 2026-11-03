@@ -1,0 +1,236 @@
+{
+  "base": "export-documenting",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-guide",
+      "action": "commit",
+      "message": "Document CSV export in usage guide"
+    },
+    {
+      "dir": "layers/55-final-review",
+      "action": "commit",
+      "message": "Record final review of CSV export"
+    },
+    {
+      "dir": "layers/60-correction",
+      "action": "commit",
+      "message": "Correct export example in usage guide"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "documenter",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The corrected export example in docs/usage.md (POST /records/export?owner=dana by an administrator, status 201, the attachment content-disposition header, and the CSV body for records 1 and 3) matches what the app actually returns, so the DOC-001 correction is verified once inspected.",
+    "Every other statement in the docs/usage.md export section, the Roles line, and the README.md changes is accurate against the implementation and the design, so the full Documenter gate can pass and the documentation record can be COMPLETE.",
+    "No downstream work needs a rerun: there is no synchronization record, and the interrupted final review is the frame's ResumeAt, so the correct return pops Frame 1 and records a RESUME handoff from DOCUMENTING to REVIEWING_FINAL.",
+    "F-001 in the final-deliverable review must stay OPEN and the report BLOCKED; only Reviewer reassesses and resolves it in the resumed final review."
+  ],
+  "history": null,
+  "vars": {},
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "REVIEWING_FINAL",
+          "why": "Documenter returned to the interrupted final review instead of waiting for it"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "RESUME"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "DOCUMENTING"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "false"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "0",
+          "why": "the single frame was popped on return"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "${REVIEW_FINAL}"
+          ],
+          "why": "Reviewer's report, including F-001 OPEN, must not be edited by Documenter"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "REVIEWING_FINAL"
+        },
+        {
+          "reply_matches": "fresh (chat|session)",
+          "flags": "i",
+          "why": "independent Reviewer session prefix"
+        },
+        {
+          "reply_matches": "FINAL_DELIVERABLE|final[- ]deliverable",
+          "flags": "i",
+          "why": "names the review kind"
+        },
+        {
+          "reply_matches": "/reviewer",
+          "why": "Claude Code invocation for Reviewer"
+        },
+        {
+          "reply_order": [
+            "[Ff]resh (chat|session)",
+            "/reviewer"
+          ],
+          "why": "the fresh-chat prefix precedes the invocation"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "test/**",
+        "packages/**",
+        ".standards/docs/scope/**",
+        ".standards/docs/specs/**",
+        ".standards/docs/development/**",
+        ".standards/docs/verification/**",
+        ".standards/docs/reviews/**",
+        ".standards/CONTEXT.md"
+      ],
+      "why": "Documenter does not edit tests or other roles' records"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "the unit suite still passes"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration",
+      "expect": "pass",
+      "why": "the integration suite, whose expected CSV the guide example reproduces, passes"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the DOCUMENTING recovery state and records are valid"
+    },
+    {
+      "cmd": "node --input-type=module -e 'const { createApp } = await import(`./src/app.ts`); const fs = await import(`node:fs`); const os = await import(`node:os`); const path = await import(`node:path`); const app = createApp({ exportDir: fs.mkdtempSync(path.join(os.tmpdir(), `guide-`)), now: () => new Date(`2026-09-24T09:00:00Z`) }); const admin = { id: 1, name: `Ada`, role: `admin` }; const r = app.handle({ method: `POST`, path: `/records/export`, query: { owner: `dana` }, user: admin }); const guide = fs.readFileSync(`docs/usage.md`, `utf8`); if (r.status !== 201) throw new Error(`status`); if (!guide.includes(r.headers[`content-disposition`])) throw new Error(`header`); for (const line of r.body.trimEnd().split(String.fromCharCode(13, 10))) if (!guide.includes(line)) throw new Error(line); if (app.handle({ method: `GET`, path: `/records/export`, query: {}, user: admin }).status !== 405) throw new Error(`get`); console.log(`example matches`);'",
+      "expect": "pass",
+      "why": "the corrected guide example (POST, 201, attachment header, body lines) matches the app's actual response, and the old GET example would get 405"
+    },
+    {
+      "cmd": "! grep -q 'GET /records/export' docs/usage.md && grep -q 'POST /records/export?owner=dana' docs/usage.md && git show HEAD~1:docs/usage.md | grep -q 'GET /records/export?owner=dana' && grep -q 'Only `admin` can export' docs/usage.md && grep -q 'test:integration' README.md",
+      "expect": "pass",
+      "why": "the committed guide holds the corrected example; the previous commit held the GET example the final review flagged"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `DOCUMENTING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`Kind`: `FAILURE` `From`: `REVIEWING_FINAL` `FailureType`: `DOCUMENTATION`' .standards/STATE.md && grep -q '^`Active`: `true`$' .standards/STATE.md && grep -q '^### Frame 1$' .standards/STATE.md && grep -q '^`From`: `REVIEWING_FINAL` `Owner`: `DOCUMENTING` `FailureType`: `DOCUMENTATION`$' .standards/STATE.md && grep -q '^`ResumeAt`: `REVIEWING_FINAL` `RerunThrough`: `NONE`$' .standards/STATE.md && test $(grep -c '^### Frame' .standards/STATE.md) -eq 1",
+      "expect": "pass",
+      "why": "one active recovery frame owned by DOCUMENTING, resuming REVIEWING_FINAL, RerunThrough NONE"
+    },
+    {
+      "cmd": "d=.standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md && f=.standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md && grep -q '`Status`: `IN_PROGRESS`' $d && grep -q '^### DOC-001' $d && grep -q '`Status`: `OPEN` `Owner`: `Documenter`' $d && grep -q 'final-deliverable.md#F-001' $d && head -5 $f | grep -qx 'ReviewKind: FINAL_DELIVERABLE' && grep -q '^`Status`: `BLOCKED` `User Style`: `NONE`$' $f && grep -q '^### F-001' $f && grep -q '`Status`: `OPEN` `Owner`: `Documenter`' $f && ! grep -q 'RESOLVED' $f",
+      "expect": "pass",
+      "why": "documentation record IN_PROGRESS with DOC-001 open; final review BLOCKED with F-001 open"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && test ! -e exports && test ! -e .standards/docs/synchronization && ! grep -rqE 'COMMIT:|BLOB:' .standards/docs",
+      "expect": "pass",
+      "why": "everything is committed, no synchronization record exists, placeholders resolved"
+    },
+    {
+      "cmd": "git log -3 --format=%s | paste -s -d '|' - | grep -qx 'Correct export example in usage guide|Record final review of CSV export|Document CSV export in usage guide' && c=$(git log --format=%H -1 --fixed-strings --grep='Add CSV export of filtered records') && git diff --quiet $c HEAD -- src packages package.json .gitignore",
+      "expect": "pass",
+      "why": "overlay commits are in order and implementation is unchanged since the implementation commit"
+    }
+  ],
+  "notes": "Built on export-documenting (cycle at DOCUMENTING, no documentation record). Three overlay commits. 50-guide: Documenter's first pass adds an export section to docs/usage.md (with an example that wrongly shows GET /records/export and 200), a Roles line, README updates (guide link text, test:integration command, layout entries), and a COMPLETE documentation record; STATE moves to REVIEWING_FINAL with FORWARD from DOCUMENTING. 55-final-review: Reviewer's FINAL_DELIVERABLE report, BLOCKED, with F-001 OPEN (P1, Owner Documenter, FailureType DOCUMENTATION) for the wrong method and status in the example, all other AC-001/AC-002 rows Supported; STATE moves to DOCUMENTING with FAILURE from REVIEWING_FINAL and Frame 1 (From REVIEWING_FINAL, Owner DOCUMENTING, ResumeAt REVIEWING_FINAL, RerunThrough NONE). 60-correction: the example corrected to POST /records/export?owner=dana with 201 and the attachment header (body unchanged); the documentation record reopened IN_PROGRESS with DOC-001 OPEN, correction saved but not yet inspected or rechecked, next action to inspect and recheck then reassess against the gate. The correction is in fact accurate and the rest of the documentation is accurate, so a correct run verifies, resolves DOC-001, marks the record COMPLETE, pops the frame, records RESUME to REVIEWING_FINAL, leaves F-001 OPEN, and gives a fresh-chat /reviewer invocation naming FINAL_DELIVERABLE. Obligations inactive, BlockedOn NONE, editing unrestricted.",
+  "case": "documenter-44",
+  "caseHash": "f90d3ea8096e0b9c",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T16:36:42.512Z",
+    "verdict": "issues",
+    "fixtureHash": "e6e1ae31cbe9ac52",
+    "fixedBy": "owner decision",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "fe558fbcca23cf09",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:15:29.411Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T15:24:15.636Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-documenting": "cad63ec878d1dad0"
+  },
+  "decision": {
+    "action": "fixed",
+    "note": "Owner-approved gate-3 recommendation (2026-10-02).",
+    "at": "2026-10-02T16:52:39.350Z",
+    "fixtureHash": "fe558fbcca23cf09"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-guide/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/55-final-review/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:15:29.411Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

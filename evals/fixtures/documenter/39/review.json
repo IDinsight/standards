@@ -1,0 +1,84 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (brownfield install)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState DOCUMENTING, Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md head and Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, architecture, context, development, verification, and implementation review exist with matching provenance and current evidence",
+      "where": ".standards/docs/{scope,specs,development,verification,reviews/.../implementation.md}, .standards/CONTEXT.md; plan COMPLETE, verification COMPLETE/FULL, review COMPLETE with no findings",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-001 covers CSV export behavior; AC-002 requires an accurate usage guide",
+      "where": "scope list items AC-001 and AC-002; design Acceptance Coverage",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and obligations inactive, no blocked user question",
+      "where": "STATE.md Recovery/Outstanding Obligations Active false, BlockedOn NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Editing unrestricted",
+      "where": "no restriction in records or state; record says boundary unrestricted",
+      "status": "realized"
+    },
+    {
+      "condition": "COMPLETE documentation record saved, but the state transition was interrupted",
+      "where": "documentation record Status COMPLETE (commit 'Record CSV export documentation'); STATE.md still DOCUMENTING with Handoff FORWARD from REVIEWING_IMPLEMENTATION",
+      "status": "realized"
+    },
+    {
+      "condition": "All inputs and evidence identical to the saved record's identities",
+      "where": "record cites blob hashes resolved from current files (selfCheck confirms usage.md, README, sources, and review blobs); clean working tree; no commits after the record",
+      "status": "realized"
+    },
+    {
+      "condition": "Saved record has no remaining work, and the guide is actually accurate",
+      "where": "record Discrepancies section NONE; docs/usage.md export section matches src/export.ts, src/routes/export.ts, and src/app.ts (quoting set, CRLF, 201 headers, UTC name, exports default with mkdir, requireAdmin before parseFilter and writeExport)",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "hint-leak",
+      "assertion": 1,
+      "detail": "The record's Resume and Conclusion says 'On resumption, compare the content identities above with current content before relying on this conclusion.' This nudges toward the behavior assertion 1 grades. The template does require 'inputs to reconcile on resumption', and the skill mandates the comparison anyway, so it reads as a normal record.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 0,
+      "detail": "docs/usage.md says 'When an export request fails, nothing is written.' This is true for the listed 400, 401, and 403 errors, which throw before writeExport. If writeFileSync failed after mkdirSync (a 500), the folder would remain. In context the sentence follows the Export errors list, so it is accurate as documented. A very strict run might still tweak it and then fail the docs/** unchanged check.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The record cites the guide commit 370965d as the assessed revision. That implies the user committed the guide mid-run before the record was written. This is plausible and does not affect the test.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes the interrupted state faithfully. STATE.md is still at DOCUMENTING after FORWARD from implementation review, a single COMPLETE documentation record cites blob identities matching current content, and the guide accurately describes the implemented export. The checks are necessary conditions a correct run satisfies: the record is kept COMPLETE and docs/README are unchanged. check.mjs stays clean after the expected FORWARD to REVIEWING_FINAL, and the invariants are standard. Only minor notes remain.\n",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T16:34:25.867Z",
+  "costUsd": 0.29273259999999995,
+  "ms": 73609,
+  "fixtureHash": "357653d927297bee"
+}

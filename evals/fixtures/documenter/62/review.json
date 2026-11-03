@@ -1,0 +1,76 @@
+{
+  "conditions": [
+    {
+      "condition": "BROWNFIELD project, STANDARD cycle, WorkflowState DOCUMENTING, Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/MODE.md; .standards/STATE.md header and Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Current-cycle documentation record with valid DOCUMENTATION provenance and matching visible Cycle",
+      "where": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md provenance block and header",
+      "status": "realized"
+    },
+    {
+      "condition": "Collaboration AUTONOMOUS, target ACTIVE_CHANGE, User Style NONE",
+      "where": "documentation record header",
+      "status": "realized"
+    },
+    {
+      "condition": "No outstanding obligations and no blocking user question",
+      "where": "STATE.md Outstanding Obligations Active false, BlockedOn NONE; record 'Blocking question: NONE'",
+      "status": "realized"
+    },
+    {
+      "condition": "One active frame: Owner DOCUMENTING, ResumeAt AUDITING, RerunThrough NONE, entered by a DOCUMENTATION failure from AUDITING",
+      "where": "STATE.md Recovery Frame 1 and Handoff FAILURE From AUDITING",
+      "status": "realized"
+    },
+    {
+      "condition": "The frame's setup correction is saved and verified",
+      "where": "docs/setup.md 'Sample data' section (layer 56); record DOC-001 RESOLVED with checks C1 to C3; the db:seed selfChecks",
+      "status": "realized"
+    },
+    {
+      "condition": "The new feature guide awaits future implementation, with no scope, design, plan, or export code",
+      "where": "Scope/Architecture/Development NONE; no src/export.ts or CONTEXT.md; docs/usage.md has no export section; record 'Remaining work' item",
+      "status": "realized"
+    },
+    {
+      "condition": "An independent, materially incorrect installation instruction is known and correctable now by Documenter",
+      "where": "docs/setup.md Installation says 'Node.js 18 or later'. It contradicts README 'Requires Node 22' and the type-stripped .ts test script. The record has DOC-002 OPEN, owned by Documenter.",
+      "status": "realized"
+    },
+    {
+      "condition": "Committed, clean git state",
+      "where": "git status clean; selfCheck on porcelain",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "Node runs .ts files without a flag only from 22.18 (or 23.6). README's 'Requires Node 22' is therefore slightly imprecise, and graderOnly treats 'Node 22' as the correct value. A careful run might write '22.18 or later' or also adjust README. No check forbids either, and the judge should accept both.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally reword the first graderOnly fact to accept any Node 22.x-or-later wording, including a more precise 22.18+."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 0,
+      "detail": "The deterministic check for assertion 0 only requires that the `### DOC-002` heading persists. That is necessary for any correct run, but weak. The judge must decide whether the run relabeled DOC-002 as a future or other-owner dependency. This is appropriate with complete:false.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition: a DOCUMENTING recovery frame owned by Documenter that resumes at AUDITING, a verified DOC-001 sample-data correction, an open Documenter-owned DOC-002 Node.js 18 instruction that can be fixed now, and an export guide that legitimately depends on future work. check.mjs passes, and both the stay-in-DOCUMENTING path and the fix-then-RESUME-to-AUDITING path keep the turn-end check clean. The checks (record not COMPLETE, state in DOCUMENTING or AUDITING, DOC-002 heading kept) cannot fail a correct run, and nothing leaks the expected order of actions.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T16:54:41.811Z",
+  "costUsd": 0.80497,
+  "ms": 50608,
+  "fixtureHash": "97252f19cb070fe5"
+}

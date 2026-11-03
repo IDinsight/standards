@@ -1,0 +1,235 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial notes library"
+    },
+    {
+      "dir": "layers/60-cycle",
+      "action": "commit",
+      "message": "Record scope and design for note tags"
+    },
+    {
+      "dir": "layers/70-style",
+      "action": "commit",
+      "message": "Add tony developer style"
+    },
+    {
+      "dir": "layers/80-plan",
+      "action": "commit",
+      "message": "Approve development plan for note tags"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "developer",
+    "utterance": "continue in STEPWISE using tony.md."
+  },
+  "graderOnly": [
+    "The approved development plan persists `User Style`: `tony` with `User Style Locked`: `true`, and `.standards/user-styles/developer/tony.md` exists, so `tony.md` names the same already-locked style; it is not a new style selection.",
+    "Before the run the plan's persisted collaboration Mode is AUTONOMOUS and its Status is APPROVED; no build step has started, so DEV-001 is the next dependency-ready step.",
+    "The plan has three steps, so a STEPWISE run implements DEV-001 only and then pauses with a continue-to-next-step blocker; WorkflowState stays DEVELOPING.",
+    "Switching collaboration mode does not change implementation intent and needs no new plan approval."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "add-tags-to-notes-and-filter-notes-by-20260923T141200Z-3e9a1c5b",
+    "DEV": ".standards/docs/development/add-tags-to-notes-and-filter-notes-by-20260923T141200Z-3e9a1c5b.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "state": "ActiveWork.Development",
+          "equals": "${DEV}",
+          "why": "the locked selection must stay on the existing plan, not a replacement"
+        },
+        {
+          "field": {
+            "path": "${DEV}",
+            "name": "User Style",
+            "equals": "tony"
+          },
+          "why": "tony.md normalizes to the identifier tony"
+        },
+        {
+          "field": {
+            "path": "${DEV}",
+            "name": "User Style Locked",
+            "equals": "true"
+          }
+        },
+        {
+          "unchanged": [
+            ".standards/user-styles/**"
+          ],
+          "why": "the user style file is user-owned"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.Id",
+          "unchanged": true,
+          "why": "no new cycle"
+        },
+        {
+          "state": "ActiveWork.Development",
+          "equals": "${DEV}",
+          "why": "no new plan"
+        },
+        {
+          "state": "CycleMode",
+          "equals": "STANDARD"
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "DEVELOPING"
+        },
+        {
+          "provenance": {
+            "path": "${DEV}",
+            "artifact": "DEVELOPMENT",
+            "cycle": "${ID}"
+          }
+        },
+        {
+          "field": {
+            "path": "${DEV}",
+            "name": "Status",
+            "not": "PROPOSED"
+          },
+          "why": "a recreated or re-proposed plan would be PROPOSED"
+        },
+        {
+          "unchanged": [
+            ".standards/docs/scope/**",
+            ".standards/docs/specs/**",
+            ".standards/CONTEXT.md",
+            ".standards/MODE.md"
+          ]
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "field": {
+            "path": "${DEV}",
+            "name": "Mode",
+            "equals": "STEPWISE"
+          },
+          "why": "the mode switch is persisted in the plan"
+        },
+        {
+          "field": {
+            "path": "${DEV}",
+            "name": "Status",
+            "not": "PROPOSED"
+          },
+          "why": "a mode switch does not return the plan for reapproval"
+        },
+        {
+          "state": "ActiveWork.Development",
+          "equals": "${DEV}"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "test/**"
+      ],
+      "why": "Developer does not create or rewrite Tester-owned tests"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/notes.test.js test/format.test.js",
+      "expect": "pass",
+      "why": "the established test command (npm test script) passes on the committed baseline"
+    },
+    {
+      "cmd": "test -f .standards/user-styles/developer/tony.md",
+      "expect": "pass",
+      "why": "the tony user style profile exists"
+    },
+    {
+      "cmd": "grep -q 'User Style`: `tony` `User Style Locked`: `true`' .standards/docs/development/add-tags-to-notes-and-filter-notes-by-20260923T141200Z-3e9a1c5b.md",
+      "expect": "pass",
+      "why": "the approved plan persists the locked tony style"
+    },
+    {
+      "cmd": "grep -q '`Mode`: `AUTONOMOUS`' .standards/docs/development/add-tags-to-notes-and-filter-notes-by-20260923T141200Z-3e9a1c5b.md",
+      "expect": "pass",
+      "why": "the plan's mode before the run is AUTONOMOUS, so a STEPWISE switch is observable"
+    }
+  ],
+  "notes": "Standalone brownfield STANDARD cycle at DEVELOPING. 50-project (pre-install): a small dependency-free ES-module notes library (src/notes.js, src/format.js) with node:test tests. 60-cycle: MODE BROWNFIELD, Auditor CONTEXT.md, scope (AC-001..AC-004) and design records, STATE at DEVELOPING after a FORWARD from ARCHITECTING with Development NONE. 70-style: the user's style file .standards/user-styles/developer/tony.md (the profile exists). 80-plan: the approved development plan (Status APPROVED, Mode AUTONOMOUS, User Style tony, User Style Locked true, AFTER_IMPLEMENTATION / NONE, three PENDING steps, DEV-002 and DEV-003 depending on DEV-001) and STATE with Active Work.Development set and BlockedOn NONE. The utterance is the user's words verbatim. A correct run keeps tony/locked, sets Mode STEPWISE, implements DEV-001 only, and pauses with a continue blocker.",
+  "case": "developer-38",
+  "caseHash": "b445619494688bcc",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T02:21:20.873Z",
+    "verdict": "pass",
+    "fixtureHash": "6fc5f58ac1fab2cc",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "f5a41b6162a43b1b",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:08:08.830Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T01:40:19.601Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/60-cycle/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/80-plan/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:08:08.830Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "conditions": [
+    {
+      "condition": "The project has no .standards directory (no PROTOCOL.md, chapters, bin tools, MODE.md, STATE.md, VERSION.json, INSTALLATION.json)",
+      "where": "Built tree: .standards deleted by the delete layer and committed in eee3567; selfCheck `test ! -e .standards` passed",
+      "status": "realized"
+    },
+    {
+      "condition": "Source code is available",
+      "where": "src/cli.js, src/totals.js, src/money.js (committed in 4421c2d)",
+      "status": "realized"
+    },
+    {
+      "condition": "Manifests are available",
+      "where": "package.json",
+      "status": "realized"
+    },
+    {
+      "condition": "Project instructions are available",
+      "where": "AGENTS.md (project notes, no managed block) and CLAUDE.md (@AGENTS.md)",
+      "status": "realized"
+    },
+    {
+      "condition": "Navigator skill is invocable even though STANDARDS is not installed",
+      "where": ".claude/skills/navigator/ (SKILL.md and modes); other role skills removed; .claude/settings.json is bare with no hooks",
+      "status": "realized"
+    },
+    {
+      "condition": "Repository is committed and clean",
+      "where": "git status: `## main`, no changes",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "blocking",
+      "kind": "check-too-strict",
+      "assertion": 0,
+      "detail": "The builder always installs STANDARDS, so `git show 22f2400:.standards/STATE.md` still exposes the removed `WorkflowState`: `AUDITING`. Navigator's procedure step 2 tells it to inspect history. A correct run could report from git evidence that the deleted STATE.md had `WorkflowState`: `AUDITING`, and graderOnly says this is not fabrication. The assertion-0 check `reply_not_matches \"WorkflowState`?\\s*[:=]\\s*`?(...|AUDITING|...)\"` would fail that run deterministically, before the judge sees it.",
+      "recommendation": "fix_file",
+      "fix": "In navigator-13/spec.json, remove the `reply_not_matches` object from checks[0].all and keep only `{\"absent\": \".standards\"}` with complete:false. The judge then separates an invented current state from a historically cited one."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The catalog says the Navigator skill was placed by hand. The built history instead shows 'Install STANDARDS' followed by 'Remove STANDARDS runtime, keep the navigator skill'. The builder cannot avoid the install commit, and graderOnly covers citing it. The removal message is a little on the nose but gives away no answer.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally reword the 51-instructions commit message to something neutral such as 'Drop workflow tooling'."
+    },
+    {
+      "severity": "note",
+      "kind": "invariant",
+      "assertion": -1,
+      "detail": "`check_ok` is omitted from the invariants. That is reasonable because no runtime exists for check.mjs to run, and the `unchanged ['**']`, `head_unchanged`, and `not_ran_git` invariants already enforce Navigator's non-mutation.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "issues",
+  "summary": "The fixture realizes the case: no .standards directory, a small committed Node project with a manifest, tests, and AGENTS.md/CLAUDE.md instructions, and only the Navigator skill installed. One blocking problem: the assertion-0 reply regex would fail a correct run that cites the removed STATE.md's AUDITING value from git history, which the forced install/remove commits make reachable. Removing that regex check fixes it.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T01:36:22.081Z",
+  "costUsd": 0.1195362,
+  "ms": 29521,
+  "fixtureHash": "d83d6d478a4814bc"
+}

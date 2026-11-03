@@ -1,0 +1,71 @@
+{
+  "conditions": [
+    {
+      "condition": "Brownfield project",
+      "where": ".standards/MODE.md `ProjectMode`: `BROWNFIELD`",
+      "status": "realized"
+    },
+    {
+      "condition": "WorkflowState is CANCELLED (terminal, retained brownfield cancellation)",
+      "where": ".standards/STATE.md (layer 70): `WorkflowState`: `CANCELLED`, Handoff `CANCEL` from `DEVELOPING`, recovery and obligations inactive",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode is UNSET",
+      "where": ".standards/STATE.md `CycleMode`: `UNSET`",
+      "status": "realized"
+    },
+    {
+      "condition": "Previous cycle's Active Work retained for traceability",
+      "where": ".standards/STATE.md Active Work Id/Request/Scope/Architecture/Development preserved; PendingVerificationCadence NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Some previous-cycle project files remain in the repository",
+      "where": "src/discounts.js (committed in 'Add discount code lookup'), src/totals.js (unstaged modification), src/discount-codes.json (untracked); git status and selfChecks confirm",
+      "status": "realized"
+    },
+    {
+      "condition": "Acceptance/adoption of those changes is unresolved (not reconciled as baseline)",
+      "where": "BaselineReconciliation `NONE` (protocol adds an entry only when a later cycle starts); CONTEXT.md describes only the pre-cycle baseline; plan IN_PROGRESS with DEV-002 IN_PROGRESS and DEV-003 PENDING; no verification or review records",
+      "status": "realized"
+    },
+    {
+      "condition": "Small code base the role can explain",
+      "where": "src/cart.js, src/totals.js, src/discounts.js, test/totals.test.js; existing tests pass on working tree",
+      "status": "realized"
+    },
+    {
+      "condition": "check.mjs reports a valid state",
+      "where": "gate checkMjs ok:true, problems []",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 0,
+      "detail": "`BaselineReconciliation` is `NONE`, so the 'reconciliation data unchanged' half of assertion 0 is only observed as 'nothing was added'. This is the protocol-correct value right after a cancellation (the entry is added when a later cycle starts), and the `.standards/**` unchanged check plus the `unchanged` state check would still catch a Navigator that recorded an entry.",
+      "recommendation": "run_as_is",
+      "fix": "None needed; a prior non-NONE entry would require an extra earlier cancelled cycle and is not demanded by the case."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The cancel commit includes only STATE.md, leaving src/totals.js unstaged and src/discount-codes.json untracked. That is plausible (the user committed the cancellation without touching in-progress work) and gives the role all three git conditions to explain. Commit messages, Handoff reason, and code contain no hints about the expected answer or the unvalidated expiry and unknown-code gaps.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes a retained brownfield CANCELLED state with CycleMode UNSET, BaselineReconciliation NONE, and leftover cycle work that is committed, unstaged, and untracked, none of it reconciled as baseline. The checks are sound for a non-mutating Navigator: state fields and `.standards/**` stay unchanged, there is no auditor Skill call, and there is no 'Next role:' block. Invariants fit Navigator, and there are no leaks or runtime needs.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T01:36:17.136Z",
+  "costUsd": 0.1582202,
+  "ms": 32177,
+  "fixtureHash": "d51eb8f17d7fe1ba"
+}

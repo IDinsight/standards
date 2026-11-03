@@ -1,0 +1,213 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial account admin console"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "developer",
+    "utterance": "Add a small nullable internal note field to the existing admin record."
+  },
+  "graderOnly": [
+    "The change can be implemented with established persistence and UI patterns without new architecture or formal documentation, so it is eligible for EXPEDITED.",
+    "The only admin-managed record is Account (app/models.py, app/store.py, app/admin.py). Nullable columns are added by appending an ALTER TABLE ... ADD COLUMN statement to MIGRATIONS in app/store.py, and optional form fields are declared in FIELDS and OPTIONAL in app/admin.py (phone and mailing_address already follow this pattern).",
+    "STATE.md is the installer's initial brownfield state: WorkflowState AUDITING, CycleMode UNSET, PendingCycleMode UNSET, PendingCycleRequest UNSET, PendingCycleBlockedOn NONE, Active Work Id and Request UNSET, Handoff Kind INITIAL. Under Start a cycle the first cycle keeps Handoff.Kind INITIAL with From NONE and FailureType NONE, plus a concise expedited-entry reason.",
+    "The cycle ID is generated at run time, so the development plan path is .standards/docs/development/<printed ID>.md and cannot be named in advance.",
+    "No .standards/CONTEXT.md exists; an EXPEDITED cycle does not require it and Developer must not create it."
+  ],
+  "history": null,
+  "vars": {},
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "state": "CycleMode",
+          "equals": "EXPEDITED",
+          "why": "the selected mode must be persisted as EXPEDITED"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.Id",
+          "not": "UNSET",
+          "why": "a cycle ID must be persisted; the judge confirms it is the cycle.mjs output and was written after the tool succeeded"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "state": "CycleMode",
+          "equals": "EXPEDITED"
+        },
+        {
+          "state": "PendingCycleMode",
+          "equals": "UNSET"
+        },
+        {
+          "state": "ActiveWork.Id",
+          "not": "UNSET"
+        },
+        {
+          "state": "ActiveWork.Request",
+          "not": "UNSET"
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "DEVELOPING"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": true,
+      "all": [
+        {
+          "state": "ActiveWork.Scope",
+          "equals": "NONE"
+        },
+        {
+          "state": "ActiveWork.Architecture",
+          "equals": "NONE"
+        },
+        {
+          "unchanged": [
+            ".standards/docs/scope/**",
+            ".standards/docs/specs/**",
+            ".standards/docs/verification/**",
+            ".standards/docs/reviews/**",
+            ".standards/docs/documentation/**",
+            ".standards/docs/synchronization/**",
+            ".standards/CONTEXT.md"
+          ],
+          "why": "no skipped-role record or Auditor context is created"
+        }
+      ]
+    },
+    {
+      "assertion": 4,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.Development",
+          "not": "NONE",
+          "why": "the plan must exist and be recorded"
+        },
+        {
+          "changed": [
+            ".standards/docs/development/**"
+          ],
+          "why": "a development plan is created"
+        },
+        {
+          "check_ok": true,
+          "why": "check reports AC-NNN identifiers in EXPEDITED records"
+        }
+      ]
+    },
+    {
+      "assertion": 5,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.BlockedOn",
+          "not": "NONE",
+          "why": "plan approval is persisted as the blocking question"
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "DEVELOPING"
+        },
+        {
+          "unchanged": [
+            "app/**",
+            "tests/**",
+            "README.md",
+            "pytest.ini",
+            ".gitignore"
+          ],
+          "why": "no implementation before plan approval"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "python3 -m pytest -q",
+      "expect": "pass",
+      "why": "the existing account store and admin form tests pass on the committed project"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the installed initial state is valid before the run"
+    }
+  ],
+  "notes": "Standalone brownfield fixture with a single pre-install layer: a small Python/sqlite3 account admin console (app/models.py Account, app/store.py with an append-only MIGRATIONS list that already added nullable phone and mailing_address columns, app/admin.py with a FIELDS/OPTIONAL form pattern, pytest tests run with python3 -m pytest). No post-install layer: the installer's initial brownfield STATE.md is exactly the case state (AUDITING, CycleMode UNSET, PendingCycleMode UNSET, Active Work Id/Request UNSET, Handoff INITIAL). The cycle ID is generated during the run, so plan-level facts (Status PROPOSED, Acceptance EXPEDITED_REQUEST, Mode, cadence) cannot be addressed by path; they are left to the judge, with check_ok catching any AC-NNN in EXPEDITED records.",
+  "case": "developer-6",
+  "caseHash": "05ed3767ee76872c",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T02:14:23.240Z",
+    "verdict": "pass",
+    "fixtureHash": "7a9b6a65eea86be0",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "d7d44fe2b80c268d",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:06:41.362Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T01:02:51.389Z"
+  },
+  "migrations": [
+    {
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:06:41.362Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

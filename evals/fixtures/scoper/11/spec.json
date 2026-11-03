@@ -1,0 +1,203 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add billing summary rendering"
+    },
+    {
+      "dir": "layers/01-product-scope",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add product scope document"
+    },
+    {
+      "dir": "layers/50-cycle",
+      "action": "commit",
+      "message": "Record project context for billing copy change"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "scoper",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "docs/product/scope.md is an established, unmarked, project-owned canonical scope document (README.md and .standards/CONTEXT.md say customer-facing copy changes are scoped there); it has no STANDARDS provenance block.",
+    "The billing-copy change requested in Active Work.Request belongs in docs/product/scope.md.",
+    "docs/product/scope.md holds no acceptance conditions or AC identifiers from earlier cycles, so no Previous Cycles move is required and the first identifier from id.mjs is AC-001.",
+    "The request names the exact new strings and the renewal date is a plain calendar date, so the scope can be completed without a blocking user question."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "billing-copy-20260923T101500Z-4d7e9a13",
+    "SCOPE": "docs/product/scope.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.Scope",
+          "equals": "${SCOPE}",
+          "why": "treating the document as the project-owned canonical scope means using it as the active scope"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "state": "ActiveWork.Scope",
+          "equals": "${SCOPE}"
+        },
+        {
+          "absent": ".standards/docs/scope/${ID}.md",
+          "why": "the canonical project document is the scope location, not a new cycle-owned record"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": true,
+      "all": [
+        {
+          "contains": {
+            "path": "${SCOPE}",
+            "regex": "^(?![\\s\\S]*<!--\\s*STANDARDS)"
+          },
+          "why": "no STANDARDS provenance block anywhere in the project-owned document"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "ARCHITECTING"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FORWARD"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "SCOPING"
+        },
+        {
+          "state": "ActiveWork.BlockedOn",
+          "equals": "NONE"
+        },
+        {
+          "contains": {
+            "path": "${SCOPE}",
+            "regex": "^\\s*(?:[-*+]|\\d+[.)])\\s+[*_`]*AC-001[*_`]*\\s*(?::|—|–|-\\s)",
+            "flags": "m"
+          },
+          "why": "acceptance conditions defined as list items in the canonical scope"
+        },
+        {
+          "check_ok": true
+        },
+        {
+          "reply_matches": "/architect",
+          "why": "forward handoff to Architect presents the Claude Code invocation"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "package.json"
+      ],
+      "why": "Scoper does not write production code or tests"
+    }
+  ],
+  "runtime": null,
+  "selfChecks": [
+    {
+      "cmd": "node --test test/summary.test.js",
+      "expect": "pass",
+      "why": "the existing billing summary tests pass"
+    },
+    {
+      "cmd": "sh -c \"! grep -q 'STANDARDS' docs/product/scope.md\"",
+      "expect": "pass",
+      "why": "the canonical scope document is unmarked (no provenance block)"
+    },
+    {
+      "cmd": "sh -c \"! grep -q 'AC-[0-9]' docs/product/scope.md\"",
+      "expect": "pass",
+      "why": "the canonical scope holds no earlier-cycle acceptance identifiers"
+    },
+    {
+      "cmd": "sh -c \"node .standards/bin/id.mjs next AC docs/product/scope.md | grep -qx AC-001\"",
+      "expect": "pass",
+      "why": "id.mjs accepts the unmarked project scope and starts numbering at AC-001"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. Layer 00-project (pre-install): a small Node ESM project rendering a customer billing summary (src/billing/copy.js strings, src/billing/summary.js renderer, test/summary.test.js) and a README that names docs/product/scope.md as the canonical product scope where customer-facing behavior and copy changes are scoped. Layer 01-product-scope (pre-install): docs/product/scope.md, a project-owned product scope with no STANDARDS provenance and no AC identifiers (so no Previous Cycles move is needed; this resolves the catalog's underspecified issue). Layer 50-cycle: .standards/STATE.md at SCOPING, STANDARD, recovery inactive, Id billing-copy-20260923T101500Z-4d7e9a13, Scope/Architecture/Development NONE, Handoff FORWARD from AUDITING; .standards/CONTEXT.md as the Auditor's refreshed context, which also records the canonical scope document. MODE.md stays the installer's BROWNFIELD. The request names exact strings so a blocking question is not needed and a correct run should hand off to ARCHITECTING.",
+  "case": "scoper-11",
+  "caseHash": "89cc371a387e4772",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T20:08:07.357Z",
+    "verdict": "pass",
+    "fixtureHash": "8f04a9eea3d338a6",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "d0db7c85571077ba",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:33:52.608Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T19:47:37.266Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-cycle/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:33:52.608Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

@@ -1,0 +1,91 @@
+{
+  "conditions": [
+    {
+      "condition": "Project is BROWNFIELD",
+      "where": ".standards/MODE.md `ProjectMode`: `BROWNFIELD`",
+      "status": "realized"
+    },
+    {
+      "condition": "Active STANDARD cycle with FULL_DELIVERABLE policy",
+      "where": ".standards/STATE.md CycleMode STANDARD, CompletionPolicy FULL_DELIVERABLE, generated-form Id",
+      "status": "realized"
+    },
+    {
+      "condition": "Architect has just persisted its first legal forward handoff to Developer",
+      "where": ".standards/STATE.md WorkflowState DEVELOPING, Handoff Kind FORWARD From ARCHITECTING, recovery inactive",
+      "status": "realized"
+    },
+    {
+      "condition": "No development plan exists yet",
+      "where": "Active Work.Development `NONE`; no file under .standards/docs/development/",
+      "status": "realized"
+    },
+    {
+      "condition": "Active request explicitly asks for STEPWISE collaboration",
+      "where": ".standards/STATE.md Request: '... Use STEPWISE collaboration for development.'",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope explicitly asks for STEPWISE collaboration",
+      "where": ".standards/docs/scope/notes-word-counts-...md Constraints first bullet",
+      "status": "realized"
+    },
+    {
+      "condition": "Completed scope and design exist, with every AC covered (legal handoff)",
+      "where": "scope AC-001..AC-004; spec Acceptance Coverage for all four; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "Valid brownfield project context for the cycle",
+      "where": ".standards/CONTEXT.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Developer user styles alice.md and tony.md exist",
+      "where": ".standards/user-styles/developer/alice.md, tony.md; selfCheck shows discovery lists both",
+      "status": "realized"
+    },
+    {
+      "condition": "Discovery cannot resolve saved mode or style lock because the plan is missing",
+      "where": "Implied by the missing plan; Developer's saved mode and User Style Locked live only in the plan",
+      "status": "realized"
+    },
+    {
+      "condition": "User is in Claude Code",
+      "where": "Run is a headless Claude Code session; install --client claude",
+      "status": "realized"
+    },
+    {
+      "condition": "Repository committed and clean",
+      "where": "git status clean on main",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "The selfCheck shows only that invocation.mjs runs and lists alice and tony. It does not show that the helper reports the saved collaboration mode and the style lock as unknown. That behavior comes from the framework when the plan is absent, so the fixture state is correct, but nothing confirms it directly.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally add a selfCheck that greps the helper JSON for the unknown or unresolved disposition of the collaboration group and the style lock."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "A STEPWISE workflow instruction in the scope's Constraints is slightly unusual for a STANDARD scope. The case states it explicitly, and the scope labels it as a user workflow instruction, so it is consistent.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition: brownfield STANDARD at DEVELOPING after a FORWARD from ARCHITECTING, no plan, STEPWISE requested in both the Request and the scope, and the alice and tony Developer styles. check.mjs is ok and nothing leaks. The deterministic checks are safe: the fixed '/developer Continue the active workflow' base line, plus unchanged state and files, no plan, and no Developer skill call. Paraphrasable judgments are left to the judge.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-30T22:48:44.819Z",
+  "costUsd": 0.165199,
+  "ms": 31026,
+  "fixtureHash": "653b588e3dd5a7fd"
+}

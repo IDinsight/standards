@@ -1,0 +1,35 @@
+{
+  "skill_name": "architect",
+  "evals": [
+    {
+      "id": 901,
+      "prompt": "Continue as Architect. ProjectMode is BROWNFIELD, CycleMode is STANDARD, WorkflowState is ARCHITECTING, Active Work.Id is deploy-migrations-20260924T090000Z-e6c4129b, recovery is inactive, and Active Work.BlockedOn is NONE. Active Work.Scope points to the completed scope, and valid Auditor context exists. The project is a FastAPI service on PostgreSQL 16 with SQLAlchemy and Alembic, deployed to Fly.io: fly.toml has no release step, and .github/workflows/deploy.yml runs flyctl deploy on every push to main. Production's DATABASE_URL is a Fly.io secret. Migrations are applied by hand today: docs/operations.md tells the person who deploys to run alembic upgrade head over fly ssh console after a deploy that adds one. migrations/versions/ holds six migrations, one of which dropped a column. .github/workflows/ci.yml runs the tests against a postgres:16 service container with the database name test, and tests/conftest.py creates the tables with Base.metadata.create_all. The scope has AC-001: no production deploy lets a new version take traffic before the migrations it ships with have been applied; AC-002: a failed migration stops the deploy, and the running version keeps serving; and AC-003: CI runs the tests against the schema the migrations produce.",
+      "expected_output": "Architect writes the technical design for the scope at the protocol's location, accounts for every acceptance criterion, points Active Work.Architecture to it, and hands off to Developer.",
+      "files": [],
+      "assertions": [
+        "Active Work.Architecture is .standards/docs/specs/deploy-migrations-20260924T090000Z-e6c4129b.md, which has ARCHITECTURE provenance for that cycle and names AC-001, AC-002, and AC-003.",
+        "Completion persists ARCHITECTING -> DEVELOPING as a FORWARD handoff and gives the /developer invocation."
+      ]
+    },
+    {
+      "id": 902,
+      "prompt": "Continue as Architect. ProjectMode is BROWNFIELD, CycleMode is STANDARD, WorkflowState is ARCHITECTING, Active Work.Id is postgres-upgrade-20260924T090000Z-0b7d3f62, recovery is inactive, and Active Work.BlockedOn is NONE. Active Work.Scope points to the completed scope, and valid Auditor context exists. The project is a Python web service on PostgreSQL 14. docker-compose.yml runs postgres:14 for local development, with a named volume mounted at /var/lib/postgresql/data that holds each developer's local data; .github/workflows/ci.yml runs the tests against a postgres:14 service container; and production runs on Amazon RDS for PostgreSQL 14. docs/operations.md records that the production database was created on PostgreSQL 11 in 2019 and upgraded in place to 14 in 2023. PostgreSQL 14 reaches end of life in November 2026. The scope has AC-001: local development, CI, and production run a supported PostgreSQL major version; AC-002: developers keep their local data through the change; and AC-003: the production upgrade has a tested rollback path. The scope also says that a planned write outage of up to 30 minutes, in a maintenance window announced in advance, is acceptable, and that a rollback is needed only until the upgraded database is verified, before writes resume: problems found after writes resume are fixed forward, so no rollback has to keep entries written after the cutover. Its assumptions say that a team member with AWS access carries out the production steps the work defines, including confirming which upgrade targets RDS offers for the production database.",
+      "expected_output": "Architect writes the technical design for the scope at the protocol's location, accounts for every acceptance criterion, points Active Work.Architecture to it, and hands off to Developer.",
+      "files": [],
+      "assertions": [
+        "Active Work.Architecture is .standards/docs/specs/postgres-upgrade-20260924T090000Z-0b7d3f62.md, which has ARCHITECTURE provenance for that cycle and names AC-001, AC-002, and AC-003.",
+        "Completion persists ARCHITECTING -> DEVELOPING as a FORWARD handoff and gives the /developer invocation."
+      ]
+    },
+    {
+      "id": 911,
+      "prompt": "Continue as Architect. ProjectMode is BROWNFIELD, CycleMode is STANDARD, WorkflowState is ARCHITECTING, Active Work.Id is request-logging-20260924T090000Z-f3e75a18, recovery is inactive, and Active Work.BlockedOn is NONE. Active Work.Scope points to the completed scope, and valid Auditor context exists. The project is a FastAPI service that stores its data in PostgreSQL through SQLAlchemy. It logs with print statements today, and the platform collects the container's standard output. The scope has AC-001: every request produces one structured log line with the method, path, status, duration, and a request ID; AC-002: the request ID comes from the X-Request-ID header when the caller sends one and is returned in the response; and AC-003: logs never contain passwords, tokens, or Authorization headers. No database or schema change is in scope.",
+      "expected_output": "Architect writes the technical design for the scope at the protocol's location, accounts for every acceptance criterion, points Active Work.Architecture to it, and hands off to Developer.",
+      "files": [],
+      "assertions": [
+        "Active Work.Architecture is .standards/docs/specs/request-logging-20260924T090000Z-f3e75a18.md, which has ARCHITECTURE provenance for that cycle and names AC-001, AC-002, and AC-003.",
+        "Completion persists ARCHITECTING -> DEVELOPING as a FORWARD handoff and gives the /developer invocation."
+      ]
+    }
+  ]
+}

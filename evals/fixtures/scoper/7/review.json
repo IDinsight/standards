@@ -1,0 +1,71 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is GREENFIELD",
+      "where": ".standards/MODE.md (installed with --mode greenfield, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState SCOPING, first cycle initialized (Id set, Handoff INITIAL)",
+      "where": ".standards/STATE.md (layer 60-cycle); check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Scope is NONE and no persisted scope or cycle record exists (PLAN applies)",
+      "where": ".standards/STATE.md Scope `NONE`; no .standards/docs/ (selfCheck 2)",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery inactive, no outstanding obligations",
+      "where": ".standards/STATE.md Recovery/Outstanding Obligations `Active`: `false`",
+      "status": "realized"
+    },
+    {
+      "condition": "Request: export an account backup archive command and have the operations guide document restoring it before sign-off",
+      "where": ".standards/STATE.md Active Work.Request",
+      "status": "realized"
+    },
+    {
+      "condition": "A project-facing operations guide exists without restore documentation (so Documenter, not Scoper, writes it)",
+      "where": "docs/operations.md (intro only)",
+      "status": "realized"
+    },
+    {
+      "condition": "No project implementation exists; no CONTEXT.md needed before first greenfield audit",
+      "where": "tree has only README.md and docs/operations.md outside the install",
+      "status": "realized"
+    },
+    {
+      "condition": "Cycle ID has generated form matching the request slug",
+      "where": "Id add-a-command-that-exports-an-account-20260924T090000Z-5c81e2a7 (slug matches slugFor output)",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "case-defect",
+      "assertion": 4,
+      "detail": "The request asks that the guide document how to restore the archive, but says nothing about whether a restore capability is in scope. A careful Scoper could treat that as a blocking scope question, persist BlockedOn and stop, which would fail assertion 4's complete=true state checks. The case expects a normal handoff, and recording it as an assumption or non-goal is also legitimate, so the fixture matches the case.",
+      "recommendation": "run_as_is",
+      "fix": "None for the fixture; the judge/trace will show if the run blocked on this ambiguity."
+    },
+    {
+      "severity": "note",
+      "kind": "hint-leak",
+      "assertion": 3,
+      "detail": "docs/operations.md says 'Sections are added here as the features they describe are delivered.' This mildly suggests the guide is written later, but it is ordinary project prose and does not reveal the AC split.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes a fresh greenfield STANDARD cycle in SCOPING with no scope, a stored request, and an operations guide that lacks restore docs; check.mjs passes and the utterance is just 'Continue.'. Checks are necessary conditions for a correct PLAN run (default scope path, at least AC-002 as a list item, unchanged docs, FORWARD to ARCHITECTING with a /architect invocation), and the invariants fit. The only risk is a case-level ambiguity about restore capability that could lead a careful run to block.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T20:06:40.395Z",
+  "costUsd": 0.1132842,
+  "ms": 32144,
+  "fixtureHash": "fa95e7d7854431e7"
+}

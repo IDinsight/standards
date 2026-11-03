@@ -1,0 +1,86 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is BROWNFIELD",
+      "where": ".standards/MODE.md (installer brownfield template)",
+      "status": "realized"
+    },
+    {
+      "condition": "WorkflowState is AUDITING",
+      "where": ".standards/STATE.md line 3",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode is UNSET",
+      "where": ".standards/STATE.md line 3",
+      "status": "realized"
+    },
+    {
+      "condition": "PendingCycleMode is EXPEDITED",
+      "where": ".standards/STATE.md line 3",
+      "status": "realized"
+    },
+    {
+      "condition": "PendingCycleRequest holds the shared authentication contract request",
+      "where": ".standards/STATE.md `PendingCycleRequest` (tenant claim validated by API and worker)",
+      "status": "realized"
+    },
+    {
+      "condition": "PendingCycleBlockedOn says the request is ineligible for EXPEDITED and offers STANDARD, revision, or abandonment",
+      "where": ".standards/STATE.md `PendingCycleBlockedOn`",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id and Request remain UNSET; no active cycle, Handoff INITIAL, recovery and obligations inactive",
+      "where": ".standards/STATE.md Active Work / Handoff / Recovery sections",
+      "status": "realized"
+    },
+    {
+      "condition": "Brownfield project with a shared auth contract used by API and worker",
+      "where": "src/auth/token.js, src/api/handler.js, src/worker/consumer.js (committed pre-install)",
+      "status": "realized"
+    },
+    {
+      "condition": "No cycle records or project context exist yet",
+      "where": "no .standards/docs/ or .standards/CONTEXT.md in tree",
+      "status": "realized"
+    },
+    {
+      "condition": "New session with no prior conversation",
+      "where": "history: null",
+      "status": "realized"
+    },
+    {
+      "condition": "State is valid and cycle.mjs can allocate an ID",
+      "where": "gate: check.mjs ok; selfCheck cycle.mjs new passes",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "Assertions 0–2 are marked complete:false though the catalog marked them deterministic_complete. That is conservative: the judge still has to confirm that no restate question was asked and that the written ID is the one cycle.mjs printed. No check could fail a correct run. The Request `contains` check only needs 'tenant' inside the backticked Request value, which any faithful copy of the stored request includes.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The earlier session's blocked pre-cycle state is committed as its own commit ('Hold auth contract request pending cycle mode decision'). That is a slightly unusual but plausible workflow. It does not hint at the answer: the blocker text only restates the options the case names.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes the stated pre-cycle blocked state exactly: brownfield, AUDITING, CycleMode UNSET, pending EXPEDITED preference, a stored ineligible request with its paired blocker, and Active Work UNSET. check.mjs passes and cycle.mjs can allocate an ID. The checks are necessary conditions a correct STANDARD consumption satisfies, the standard invariants are present, and nothing leaks the answer.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T02:18:31.551Z",
+  "costUsd": 0.1323786,
+  "ms": 27596,
+  "fixtureHash": "8967f79bc2eaea6a"
+}

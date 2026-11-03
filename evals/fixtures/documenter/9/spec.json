@@ -1,0 +1,171 @@
+{
+  "base": "export-documenting",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-guided",
+      "action": "commit",
+      "message": "Record documentation progress for CSV export"
+    },
+    {
+      "dir": "layers/55-applied",
+      "action": "unstaged"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "documenter",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "Before the interrupted session ended, the user applied and saved guided step 1: the working-tree docs/usage.md (unstaged) contains the record's pending 'Exporting records' section exactly once, byte-identical to the content in the documentation record, between the Filtering and Errors sections, with the rest of the file unchanged.",
+    "The applied section accurately describes the implementation (admin-only POST /records/export, listing filters and validation, 401/403/400 with no file, 201 with text/csv and attachment headers, exports/records-<UTC stamp>.csv, RFC 4180 quoting, CRLF rows, and the owner=dana example output). pnpm --filter export test and pnpm --filter export test:integration pass.",
+    "Guided steps 2 (Roles bullet in docs/usage.md) and 3 (README intro sentence) have not been offered or applied; README.md and the Roles section are unchanged.",
+    "There is no new user message reporting the edit; the user only says Continue."
+  ],
+  "history": null,
+  "vars": {
+    "OLD_BLOCK": "Guided step 1: apply the new Exporting records section to docs/usage.md from the documentation record, then reply when it is saved."
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "docs/**",
+            "README.md"
+          ],
+          "why": "in GUIDED the user applies project edits, and the already-saved step 1 must not be applied again"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "field": {
+            "path": "${DOC}",
+            "name": "Collaboration",
+            "equals": "GUIDED"
+          },
+          "why": "GUIDED remains selected"
+        },
+        {
+          "state": "ActiveWork.BlockedOn",
+          "not": "${OLD_BLOCK}",
+          "why": "the blocker for step 1 is cleared (a new step-2 request or NONE)"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check finds no new problem"
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "packages/**",
+        "package.json"
+      ],
+      "why": "Documenter in GUIDED mode does not edit implementation or tests"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "unit suite passes (appropriate checks satisfactory)"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration",
+      "expect": "pass",
+      "why": "integration suite, which asserts the same owner=dana CSV the guide shows, passes"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the guided DOCUMENTING state with a BLOCKED record is valid"
+    },
+    {
+      "cmd": "test $(git status --porcelain | wc -l) -eq 1 && git status --porcelain | grep -qx ' M docs/usage.md'",
+      "expect": "pass",
+      "why": "the only uncommitted change is the user's saved edit to docs/usage.md"
+    },
+    {
+      "cmd": "test $(grep -c '^## Exporting records$' docs/usage.md) -eq 1 && test $(git show HEAD:docs/usage.md | grep -c 'Exporting records') -eq 0",
+      "expect": "pass",
+      "why": "the step 1 section is saved exactly once in the working tree and absent from the committed guide"
+    },
+    {
+      "cmd": "node -e 'const fs=require(`fs`);const f=String.fromCharCode(96).repeat(4);const nl=String.fromCharCode(10);const r=fs.readFileSync(`.standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md`,`utf8`);const s=r.split(f+`markdown`+nl)[1].split(nl+f)[0];const u=fs.readFileSync(`docs/usage.md`,`utf8`);process.exit(s.length>500&&u.split(s).length===2?0:1)'",
+      "expect": "pass",
+      "why": "the saved section is byte-identical to the pending step content persisted in the documentation record"
+    },
+    {
+      "cmd": "grep -qF 'BlockedOn`: `Guided step 1: apply the new Exporting records section' .standards/STATE.md && grep -q '^`Collaboration`: `GUIDED`' .standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md && grep -q '`Status`: `BLOCKED`' .standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md && grep -q 'WorkflowState`: `DOCUMENTING' .standards/STATE.md",
+      "expect": "pass",
+      "why": "persisted GUIDED record with the pending step and the matching blocker"
+    }
+  ],
+  "notes": "Built on export-documenting (DOCUMENTING, no documentation record). Layer 50-guided (commit) adds the Documenter's record in GUIDED / ACTIVE_CHANGE / User Style NONE with Status BLOCKED: assessed inputs with BLOB/COMMIT identities, an inventory of three guided steps (step 1 new 'Exporting records' section in docs/usage.md, offered and pending; step 2 Roles bullet; step 3 README intro, not yet offered), a Documenter check C1, and the pending step's destination, pre-edit blob, expected saved result, and full copy/paste content in a four-backtick fence. STATE.md is the base state with Active Work.BlockedOn set to the step 1 request (handoff unchanged, recovery/obligations inactive). Layer 55-applied (unstaged) writes docs/usage.md with that exact section inserted between Filtering and Errors: the user's saved edit made before the interruption. history is null: the run is a fresh session after the interruption and the user types only 'Continue.'; there is no message reporting the edit. Base selfChecks requiring a clean tree apply only to the base build.",
+  "case": "documenter-9",
+  "caseHash": "60e8b93d03310dc2",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-03T15:40:21.533Z",
+    "verdict": "pass",
+    "fixtureHash": "3625a6dae602af63",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "459cdbf40d6858ba",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:10:18.458Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-03T15:17:58.545Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01",
+    "export-documenting": "cad63ec878d1dad0"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/50-guided/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "baseHashes": "refreshed after the bases were migrated",
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:10:18.458Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

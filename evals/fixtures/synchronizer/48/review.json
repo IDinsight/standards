@@ -1,0 +1,81 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState SYNCHRONIZING",
+      "where": ".standards/STATE.md header (layer 52-rework)",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id = export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Synchronization record has valid current-cycle provenance",
+      "where": ".standards/docs/synchronization/export-20260924T090000Z-a7f3c1d2.md provenance block and visible Cycle field; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery active with one frame: Owner SYNCHRONIZING, ResumeAt AWAITING_USER_SIGNOFF, RerunThrough NONE, pushed by user rework",
+      "where": "STATE.md Handoff USER_REWORK From AWAITING_USER_SIGNOFF FailureType SYNCHRONIZATION; Frame 1",
+      "status": "realized"
+    },
+    {
+      "condition": "Outstanding obligations inactive; no blocked user question",
+      "where": "STATE.md Outstanding Obligations Active false; BlockedOn NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "The incorrect record reference is already corrected",
+      "where": "sync record AC-003 entry now cites final-deliverable.md C3; D-001 RESOLVED with S7; prior wrong version preserved in commit 754ebd9",
+      "status": "realized"
+    },
+    {
+      "condition": "Final review is stale against current content",
+      "where": "unstaged edit to docs/usage.md (git status ' M docs/usage.md'); final-deliverable review, documentation record, and sync record cite committed blob 995623f…, which differs from the working-tree blob (selfCheck confirms)",
+      "status": "realized"
+    },
+    {
+      "condition": "Other cycle records complete and coherent (scope, design, context, plan, verification, both reviews, documentation)",
+      "where": ".standards/docs/** and .standards/CONTEXT.md from base export-synchronizing",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation and tests pass on current tree (no hidden defect beyond staleness)",
+      "where": "selfChecks pnpm test (21 pass) and test:integration (3 pass); added guide sentence is accurate per integration test 2",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "Assertions 0 and 1 are decided largely by the same state observation (frame not popped, no transition to AWAITING_USER_SIGNOFF); the catalog already records this as a duplicate. Both state checks hold under every acceptable route (nested FAILURE to REVIEWING_FINAL or DOCUMENTING, or a persisted blocking question in SYNCHRONIZING), since Frame 1's Owner and ResumeAt are preserved in each.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The unstaged guide edit has no recorded author; a correct run may reasonably ask the user about it rather than route immediately. graderOnly lists this as acceptable and no check forbids it, so it does not change what the run tests.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized: the single user-rework frame with user-owned ResumeAt, the corrected AC-003 reference recorded as D-001, and an unstaged docs/usage.md edit that makes the final review (and documentation evidence) cite a superseded blob. The checks only require that the frame is not popped, the state does not reach AWAITING_USER_SIGNOFF, the sync record is not COMPLETE, and other roles' records stay unchanged, which hold under every legal routing. The invariants fit Synchronizer's ownership and nothing leaks the answer.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T14:43:11.293Z",
+  "costUsd": 0.3239808,
+  "ms": 38081,
+  "fixtureHash": "2cc776ab42177869"
+}

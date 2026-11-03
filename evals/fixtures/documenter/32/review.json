@@ -1,0 +1,91 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState DOCUMENTING, entered by FORWARD from REVIEWING_IMPLEMENTATION",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id = export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope, architecture, context, development, verification and implementation review exist with matching provenance and current evidence",
+      "where": ".standards/docs/{scope,specs,development,verification,reviews/.../implementation.md}, .standards/CONTEXT.md; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-001 covers CSV export behavior; AC-002 requires an accurate usage guide",
+      "where": "scope record, Work items 1 and 2",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and obligations inactive, nothing blocked",
+      "where": ".standards/STATE.md (Recovery/Obligations Active false, BlockedOn NONE)",
+      "status": "realized"
+    },
+    {
+      "condition": "Editing is unrestricted",
+      "where": "no target or boundary restriction persisted; no documentation record yet",
+      "status": "realized"
+    },
+    {
+      "condition": "API reference is generated from Python docstrings",
+      "where": "tools/apidoc.py + tools/apidoc.json -> docs/api/reference.md (header marks it generated); README documents the command",
+      "status": "realized"
+    },
+    {
+      "condition": "Rendering is wrong because docstrings are stale (not the generator)",
+      "where": "recordsvc/export.py csv_cell/export_file_name/write_export, recordsvc/api.py module docstring and export_records (200 vs 201, export- vs records-), recordsvc/auth.py require_admin 'not used'; reference.md reflects them",
+      "status": "realized"
+    },
+    {
+      "condition": "Existing generator works",
+      "where": "selfCheck: python3 tools/apidoc.py regenerates with no diff; --check passes and detects drift",
+      "status": "realized"
+    },
+    {
+      "condition": "Generated output is within the editing boundary",
+      "where": "docs/api/reference.md is a committed project doc",
+      "status": "realized"
+    },
+    {
+      "condition": "Code is correct and matches the design (docstrings must change, not code)",
+      "where": "recordsvc/export.py, recordsvc/api.py vs specs Interfaces and Contracts; 23 tests pass",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "docs/api/reference.md carries 'Do not edit by hand' and README.md says 'change the docstrings and run python3 tools/apidoc.py'. These point toward the expected workflow, but real projects with generated docs commonly have both, so they do not count as a leak.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 0,
+      "detail": "The header-contains check for assertion 0 is only a weak precondition. Whether the reference was hand-patched or regenerated is left to the judge reading the trace, which is correct given there is no command-ran predicate. The catalog marked this assertion deterministic_complete, but complete:false is the safe choice.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized: the stale docstrings visibly contradict code that matches the design, the generator reproduces the committed reference exactly, the records are coherent, and check.mjs passes. The checks (generated header kept; tools/tests/config unchanged; key code lines intact; documentation record with provenance naming apidoc.py) are all necessary under correct behavior. The invariants and check_ok remain satisfiable after a normal handoff to REVIEWING_FINAL.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T16:31:10.874Z",
+  "costUsd": 0.3610966,
+  "ms": 69419,
+  "fixtureHash": "fdb00f48757b3def"
+}

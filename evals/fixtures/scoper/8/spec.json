@@ -1,0 +1,188 @@
+{
+  "base": null,
+  "date": "2026-09-25T14:00:00Z",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add report service with team-scoped access"
+    },
+    {
+      "dir": "layers/10-share-links",
+      "action": "commit",
+      "message": "Add shareable report links"
+    },
+    {
+      "dir": "layers/20-review",
+      "action": "commit",
+      "message": "Record implementation review and promote cycle"
+    },
+    {
+      "dir": "layers/30-context",
+      "action": "commit",
+      "message": "Refresh project context after promotion"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "scoper",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "Active Work.PromotionReason reads: Implementation review found that public share links require an access-policy decision that the request does not settle; formal Scoping is required. Reviewer set it during Expedited Promotion; Auditor later handed off FORWARD to SCOPING, so Handoff.Kind is no longer PROMOTE.",
+    "The committed share-link code (src/shares.js, the shares map in src/store.js, and the POST /reports/:id/share and GET /s/:token handling in src/routes.js, commit 'Add shareable report links') is tentative expedited work: GET /s/:token returns the full report to anyone holding the URL, signed in or not and from any team; links never expire and cannot be revoked. None of this is an approved product policy.",
+    "The pre-cycle baseline restricts report contents to members of the owning team and admins, and every baseline route requires a signed-in user.",
+    "Public versus signed-in or team-restricted access, and permanent versus expiring or revocable links, materially change user-visible scope. No user decision on this exists anywhere in the repository, and the user's message gives none.",
+    "No scope exists for this cycle (Active Work.Scope is NONE), so Scoper is in PLAN mode. A correct run ends blocked in SCOPING with no acceptance conditions defined."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "shareable-report-links-20260925T100000Z-7e8f9a0b",
+    "DEV": ".standards/docs/development/shareable-report-links-20260925T100000Z-7e8f9a0b.md",
+    "REVIEW": ".standards/docs/reviews/shareable-report-links-20260925T100000Z-7e8f9a0b/implementation.md",
+    "SCOPE_DEFAULT": ".standards/docs/scope/shareable-report-links-20260925T100000Z-7e8f9a0b.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.PromotionReason",
+          "unchanged": true,
+          "why": "PromotionReason is durable workflow context that Scoper preserves"
+        },
+        {
+          "state": "CycleMode",
+          "equals": "STANDARD",
+          "why": "the promoted cycle stays STANDARD"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "src/**",
+            "test/**",
+            ".standards/CONTEXT.md",
+            ".standards/docs/development/**",
+            ".standards/docs/reviews/**"
+          ],
+          "why": "Scoper edits neither the tentative code, the Auditor context, nor other roles' records"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": []
+    },
+    {
+      "assertion": 3,
+      "complete": false,
+      "all": [
+        {
+          "state": "ActiveWork.BlockedOn",
+          "not": "NONE",
+          "why": "a blocking scope question is persisted before asking"
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "SCOPING",
+          "why": "an unresolved blocking question prevents the handoff to Architect"
+        }
+      ]
+    },
+    {
+      "assertion": 4,
+      "complete": false,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "SCOPING",
+          "why": "the scope cannot be completed while the access policy is unresolved"
+        },
+        {
+          "state": "ActiveWork.Architecture",
+          "equals": "NONE",
+          "why": "no architecture work starts"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/reports.test.js test/access.test.js",
+      "expect": "pass",
+      "why": "the existing suite (10 tests) passes on the committed code, as the plan, review, and context record"
+    },
+    {
+      "cmd": "node --input-type=module -e 'const { createStore, addUser, addReport } = await import(`./src/store.js`); const { handle } = await import(`./src/routes.js`); const s = createStore(); const a = addUser(s, { id: `a`, teamId: `ops`, role: `member` }); const r = addReport(s, { teamId: `ops`, title: `t`, body: `b`, ownerId: `a` }); const link = handle(s, { method: `POST`, path: `/reports/` + r.id + `/share`, user: a }); const got = handle(s, { method: `GET`, path: link.body.url, user: null }); console.log(`share status`, link.status, got.status); process.exit(link.status === 201 && got.status === 200 ? 0 : 1);'",
+      "expect": "pass",
+      "why": "the tentative expedited code lets anyone without a session open a share link (the behavior the review flagged)"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. 00-project (pre-install): reportdesk, a small Node ESM service with team-scoped report access (src/access.js canView), a pure request handler (src/routes.js) and 10 node:test tests. 10-share-links: the expedited cycle's tentative code (src/shares.js, shares map, POST /reports/:id/share, anonymous GET /s/:token), its COMPLETE development plan with EXPEDITED_REQUEST steps, and STATE at REVIEWING_IMPLEMENTATION/EXPEDITED. 20-review: implementation review (BLOCKED, F-001 owned by Scoper/SCOPING about the undecided access policy) and STATE after promotion (AUDITING, STANDARD, PROMOTE, PromotionReason set). 30-context: Auditor's CONTEXT.md recording the pre-cycle baseline and an Active-Cycle Non-Baseline Work entry labeled with the current cycle, and final STATE at SCOPING with Handoff FORWARD from AUDITING, Scope NONE, BlockedOn NONE, recovery and obligations inactive. Utterance is 'Continue.' (the case prompt's closing instruction leaks assertions 1-2 and was dropped). Spec date set to 2026-09-25T14:00Z so commits follow the cycle ID's timestamp.",
+  "case": "scoper-8",
+  "caseHash": "a114a47255fc6006",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T20:07:26.005Z",
+    "verdict": "pass",
+    "fixtureHash": "1ebde60e7d35b6ea",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "640cec850bd5a43b",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:29:14.418Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T19:47:41.663Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/10-share-links/.standards/STATE.md: NONE",
+        "layers/20-review/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/30-context/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:29:14.418Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

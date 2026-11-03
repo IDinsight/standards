@@ -1,0 +1,152 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Initial project"
+    },
+    {
+      "dir": "layers/60-style",
+      "action": "commit",
+      "message": "Add Navigator user style"
+    },
+    {
+      "dir": "layers/70-additions",
+      "action": "untracked"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "navigator",
+    "utterance": "Show your options again."
+  },
+  "graderOnly": [
+    "Since the earlier help reply in this conversation, the user added .standards/user-styles/navigator/alice.md beside tony.md and an annotated MAP mode at .claude/skills/navigator/modes/map.md; both files are untracked.",
+    "The discovery helper (node .standards/bin/invocation.mjs navigator --client claude --json) now reports MAP as a user-selectable conversation mode with the description 'Sketch how the parts of an area connect, as a text map.' and lists both tony and alice as user styles.",
+    "The earlier help reply listed only EXPLAIN, INVESTIGATE, GRILL_ME, ASSESS and the tony style, so a correct answer must come from a fresh discovery run, not from that reply.",
+    "The conversation's current selections are EXPLAIN (inferred from the first request) and user style tony (explicitly selected in the first turn). The user requested no mode or style change in this turn, so EXPLAIN and tony stay current; alice and MAP must not be selected.",
+    "Reading tony.md is allowed because tony is the selected style; reading alice.md (an unselected style) is not."
+  ],
+  "history": {
+    "turns": [
+      {
+        "role": "user",
+        "text": "/navigator Use user style tony. How does a short link get resolved when someone visits it?"
+      },
+      {
+        "role": "assistant",
+        "text": "A visit to `/docs` goes through these steps:\n\n- `src/server.js:11` takes the path after the slash and decodes it, so `/docs` becomes `docs`.\n- `src/resolve.js:2` lowercases the code and looks it up in the store (`src/store.js:4-6`). Unknown code: 404 (`src/resolve.js:3`).\n- If the link has an `expiresAt` that has passed, it answers 410 Gone (`src/resolve.js:4`).\n- Otherwise it counts the hit (`src/store.js:7-10`) and answers 302 with `Location` set to the target URL (`src/resolve.js:5-6`, `src/server.js:13`).\n\nNote: hit counts live only in memory (`src/store.js:2`), so they reset when the server restarts.\n\nSummary: path, then lowercase lookup, then 404, 410, or a 302 redirect.\n\nTip: `/navigator help` lists my modes and styles."
+      },
+      {
+        "role": "user",
+        "text": "/navigator help"
+      },
+      {
+        "role": "assistant",
+        "text": "Here are my options right now.\n\n**You can choose (conversation mode):**\n\n- `EXPLAIN`: Explain existing project behavior from evidence. Current in this conversation. Example: `/navigator Explain how expired links are handled.`\n- `INVESTIGATE`: Trace a concrete repository question through evidence. Example: `/navigator Investigate why hit counts reset.`\n- `GRILL_ME`: Check comprehension when the user requests a quiz. Example: `/navigator Grill me on the redirect flow.`\n- `ASSESS`: Informally assess an area against a named checklist. Example: `/navigator Assess src/ against the OWASP Top 10.`\n\nIf you don't name one, I pick the mode from your request; `EXPLAIN` is the default for a new conversation.\n\n**User styles** (from `.standards/user-styles/navigator/`):\n\n- `tony`: selected for this conversation.\n\nSwitch with `Use user style <name>.` or clear it with `Use user style NONE.` Styles last only for this conversation, so name it again in a new chat.\n\n**Targets:** a topic, file, folder, or area you want to understand, for example `src/resolve.js` or \"the redirect flow\"."
+      }
+    ]
+  },
+  "vars": {},
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "**"
+          ],
+          "why": "no menu cache or registry file is created or updated"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "reply_matches": "\\bmap\\b",
+          "flags": "i",
+          "why": "the newly discovered MAP mode must be presented"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "**"
+          ],
+          "why": "no selection is persisted anywhere"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "unchanged": [
+        "**"
+      ],
+      "why": "Navigator persists nothing (generated caches are ignored)"
+    },
+    {
+      "head_unchanged": true,
+      "why": "Navigator never moves HEAD"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "Navigator never mutates git state"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "node --test test/resolve.test.js",
+      "expect": "pass",
+      "why": "the project's own tests pass, so the code matches the earlier explanation"
+    },
+    {
+      "cmd": "node .standards/bin/invocation.mjs navigator --client claude --json | node -e 'let s=\"\";process.stdin.on(\"data\",d=>s+=d).on(\"end\",()=>{const j=JSON.parse(s);let ok=false;const walk=o=>{if(o&&typeof o===\"object\"){if(o.selectability===\"user\"&&Object.values(o).includes(\"MAP\"))ok=true;Object.values(o).forEach(walk)}};walk(j);process.exit(ok?0:1)})'",
+      "expect": "pass",
+      "why": "the fresh helper result validates MAP as a user-selectable option"
+    },
+    {
+      "cmd": "node .standards/bin/invocation.mjs navigator --client claude --json > /tmp/nav-inv.json; grep -q alice /tmp/nav-inv.json && grep -q tony /tmp/nav-inv.json",
+      "expect": "pass",
+      "why": "the helper's style inventory includes both tony and the newly added alice"
+    },
+    {
+      "cmd": "git ls-files --error-unmatch .standards/user-styles/navigator/tony.md && git status --porcelain --untracked-files=all | grep -q '^?? .standards/user-styles/navigator/alice.md$' && git status --porcelain --untracked-files=all | grep -q '^?? .claude/skills/navigator/modes/map.md$'",
+      "expect": "pass",
+      "why": "tony.md is committed; alice.md and the MAP mode were added afterwards and are untracked"
+    }
+  ],
+  "notes": "Standalone brownfield fixture, default installed workflow state (no cycle). 50-project (pre-install): a small Node ES-module short-link service (src/server.js, src/resolve.js, src/store.js, links.json, test). 60-style commits .standards/user-styles/navigator/tony.md, the style selected in history. 70-additions leaves two untracked files: .standards/user-styles/navigator/alice.md and .claude/skills/navigator/modes/map.md, an annotated mode file whose invocation block mirrors the shipped explain.md layout (group conversation-mode, id MAP, selection user). History: turn 1 selects tony and asks an EXPLAIN-mode question (answer cites real line numbers in tony's bullet/summary style); turn 3 asks /navigator help; turn 4 lists only EXPLAIN, INVESTIGATE, GRILL_ME, ASSESS and tony. The run's utterance asks for the options again. The installed framework file set is changed only by adding map.md, because the case states the user added that mode.",
+  "case": "navigator-73",
+  "caseHash": "c69e57fd3fc1ae20",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T03:00:17.710Z",
+    "verdict": "pass",
+    "fixtureHash": "6ff26b544958da65",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-31T00:12:31.578Z"
+  }
+}

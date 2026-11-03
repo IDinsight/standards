@@ -1,0 +1,102 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield template, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState REVIEWING_IMPLEMENTATION, Active Work.Id export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md head and Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and outstanding obligations inactive",
+      "where": ".standards/STATE.md: Recovery Active false with no frames (Frame 1 popped by Tester's RESUME), Obligations Active false",
+      "status": "realized"
+    },
+    {
+      "condition": "Current scope, architecture, context, development plan and Tester report exist with valid ownership",
+      "where": ".standards/docs/{scope,specs,development,verification}/<id>.md with matching provenance; .standards/CONTEXT.md; check.mjs reports no provenance problems",
+      "status": "realized"
+    },
+    {
+      "condition": "Previous implementation review is COMPLETE and covers AC-001 and AC-002",
+      "where": ".standards/docs/reviews/<id>/implementation.md (Status COMPLETE, AC-001 three criteria plus AC-002 rows, no AC-004)",
+      "status": "realized"
+    },
+    {
+      "condition": "Scoper retired AC-002 and added AC-004 for a guide",
+      "where": "scope: AC-001 current, AC-004 user guide (docs/usage.md), AC-002 under Retired Acceptance Identifiers (AC-003 also retired)",
+      "status": "realized"
+    },
+    {
+      "condition": "Architect reconciled its inventory",
+      "where": "specs: Acceptance Coverage AC-001 and AC-004 (No architectural impact, Documenter); AC-002 criterion removed",
+      "status": "realized"
+    },
+    {
+      "condition": "Tester reconciled, preserved valid AC-001 evidence, recorded AC-004 pending Documenter",
+      "where": "verification: REVERIFY COMPLETE FULL/NONE, E1/E2 retained with C1 diff justification, AC-004 'Pending Documenter' with owner and required evidence",
+      "status": "realized"
+    },
+    {
+      "condition": "Code unchanged since the earlier review",
+      "where": "git: no changes to src/test/packages/package.json/lockfile/docs/README since 'Record CSV export verification' (selfCheck passes)",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-001 evidence still valid and implementation has no material defects",
+      "where": "src/export.ts, src/routes/export.ts read correct; unit 21/21 and integration 3/3 pass in selfChecks",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-004 legitimately pending (guide not yet written)",
+      "where": "docs/usage.md has no export section; state is pre-DOCUMENTING",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "case-defect",
+      "assertion": -1,
+      "detail": "The case states recovery inactive although an acceptance change after a COMPLETE review implies a rework frame (catalog issue). The fixture resolves this coherently: USER_REWORK interrupted REVIEWING_IMPLEMENTATION before the Reviewer's handoff, Frame 1 RerunThrough TESTING, popped by Tester's RESUME into REVIEWING_IMPLEMENTATION. Records and STATE agree.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "record-format",
+      "assertion": -1,
+      "detail": "expectCheck is ok:false (stale COMPLETE review does not account for AC-004) while the catalog says deliberately_invalid false. This is inherent to the case, which requires a stale COMPLETE review alongside a new AC-004. The turn-end check accepts the state, so check_ok remains meaningful.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The scope's AC-003 entry is 'Retired before this revision was completed', a README variant replaced within the same REPLAN. It exists only to make the new ID AC-004. It is slightly odd but harmless and consistent with id.mjs numbering.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "check-wrong",
+      "assertion": 3,
+      "detail": "complete:true rests on the report changing and mentioning AC-004. A shallow edit that appends AC-004 would pass without a judge. However, both checks are necessary for any correct run, and adding the AC-004 disposition is itself the reconciliation the assertion targets, so the risk of a false pass is small.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally set complete:false so the judge confirms the report was actually reconciled."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized in the files and git history: a stale COMPLETE implementation review covering AC-001/AC-002, a revised scope with AC-002 retired and AC-004 added, reconciled design, plan, and verification records, unchanged and defect-free code, and inactive recovery. Checks are necessary conditions a correct reconciling run satisfies, and the invariants and turn-end check work with a FORWARD to DOCUMENTING. Only minor notes remain.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T23:22:23.375Z",
+  "costUsd": 0.32592879999999996,
+  "ms": 72588,
+  "fixtureHash": "805e385ad35f9730"
+}

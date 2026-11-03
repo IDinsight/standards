@@ -1,0 +1,61 @@
+{
+  "conditions": [
+    {
+      "condition": "A read fails when the user runs the report (caller/callee call mismatch)",
+      "where": "Unstaged src/report.js calls readRecord(id, dir) against src/records.js readRecord(dir, id); selfChecks confirm `node bin/report.js data` fails with 'record data not found' and test/report.test.js fails with RecordNotFound",
+      "status": "realized"
+    },
+    {
+      "condition": "Distinct caller and callee to inspect",
+      "where": "src/report.js (caller, summarize) and src/records.js (callee, readRecord); bin/report.js is the entry point",
+      "status": "realized"
+    },
+    {
+      "condition": "The caller changes during inspection, after the callee was inspected",
+      "where": "runtime.midRunEdits: after the first Read of src/records.js, or a cat/nl/sed/head/tail/less/more/awk/bat of it, src/report.js is replaced with runtime/report-v2.js",
+      "status": "realized"
+    },
+    {
+      "condition": "The two versions have incompatible signatures",
+      "where": "The v1 caller uses positional readRecord(id, dir). The v2 caller (runtime/report-v2.js) uses readRecord({ dir, id }). Each fails differently against the unchanged callee: RecordNotFound versus ERR_INVALID_ARG_TYPE, as the selfChecks show",
+      "status": "realized"
+    },
+    {
+      "condition": "Git: committed baseline plus unstaged change",
+      "where": "Commit 'Add stock summary report' holds a working caller (tests pass at HEAD); git status shows ` M src/report.js`",
+      "status": "realized"
+    },
+    {
+      "condition": "Navigator runs without needing a workflow state",
+      "where": "Default brownfield install with no cycle; check.mjs reports ok",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "ungradeable-assertion",
+      "assertion": 0,
+      "detail": "Whether the role ever sees the v2 caller depends on its read order. In one plausible path it reads the git diff or src/report.js, then src/records.js (which triggers the swap), and concludes without re-reading the caller or running a diagnostic. Assertion 0 then passes trivially and assertion 1's condition never arises. The catalog flags this limitation and graderOnly states it. Common paths still expose the change: running `npm run report` or the tests after the swap gives a TypeError that contradicts the v1 code the role read, and so does re-reading the caller. The harness offers no better single trigger that respects the case's timing (the change comes after the callee is inspected).",
+      "recommendation": "run_as_is",
+      "fix": "Accept the limitation; the judge uses the graderOnly read-order note to tell a vacuous pass from a real reconciliation."
+    },
+    {
+      "severity": "note",
+      "kind": "runtime",
+      "assertion": -1,
+      "detail": "The shell trigger regex `(cat|nl|sed|head|tail|less|more|awk|bat)\\b.*src/records\\.js` misses other full views of the callee. Examples are `git show HEAD:src/records.js` and `grep -n ... src/records.js` / `rg ... src/records.js`. A role that inspects the callee only that way never gets the swap.",
+      "recommendation": "run_as_is",
+      "fix": "Optionally add `git\\s+show\\b.*src/records\\.js` to the Bash trigger alternation in spec.json runtime.midRunEdits[1].after.command. This is not required."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes a failing read from an unstaged caller/callee argument mismatch, and a mid-run swap of the caller to a second, incompatible call shape triggered by the first read of the callee. Nothing leaks, the check and selfChecks behave as stated, and the Navigator invariants fit. The only weakness is the inherent read-order dependence the catalog already notes, which can make assertion 0 pass vacuously in some runs.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T15:49:02.901Z",
+  "costUsd": 0.722971,
+  "ms": 43134,
+  "fixtureHash": "a6a7499c4d8e518e"
+}

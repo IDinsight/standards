@@ -1,0 +1,76 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is BROWNFIELD",
+      "where": ".standards/MODE.md (installer --mode brownfield, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState SCOPING, recovery inactive",
+      "where": ".standards/STATE.md (layer 20-cycle)",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id is improve-search-20260923T141500Z-9c2e4b71",
+      "where": ".standards/STATE.md Active Work.Id",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Scope is NONE (also Architecture/Development NONE)",
+      "where": ".standards/STATE.md",
+      "status": "realized"
+    },
+    {
+      "condition": "Valid active-cycle project context exists",
+      "where": ".standards/CONTEXT.md, committed with handoff FORWARD from AUDITING",
+      "status": "realized"
+    },
+    {
+      "condition": "docs/scope/user-search.md exists and begins with a STANDARDS provenance block Artifact: SCOPE, Cycle: user-search-v1-old",
+      "where": "docs/scope/user-search.md (layer 10-docs)",
+      "status": "realized"
+    },
+    {
+      "condition": "The new request changes search behavior",
+      "where": "STATE.md Active Work.Request (case-insensitive names, trimmed query, exact matches first), contrasting with CONTEXT.md existing behavior and the old scope's non-goals",
+      "status": "realized"
+    },
+    {
+      "condition": "No appropriate unmarked project-owned canonical scope document exists",
+      "where": "repository contains only README.md and the marked docs/scope/user-search.md as docs",
+      "status": "realized"
+    },
+    {
+      "condition": "check.mjs passes at start",
+      "where": "gate results checkMjs ok:true",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "check-too-strict",
+      "assertion": 3,
+      "detail": "Assertion 3 includes an ordering clause ('before completing Scoper's gate') but is marked complete:true with only an end-state check on ActiveWork.Scope. In practice Scope and the handoff are written to STATE.md together, so the end state is a fair proxy; a correct run cannot fail it.",
+      "recommendation": "run_as_is",
+      "fix": "None needed; optionally set complete:false so the judge can confirm ordering from the trace."
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "The prior cycle id 'user-search-v1-old' is not in generated form and the old cycle left no other records; this is dictated by the case and check.mjs accepts it (CYCLE_ID allows it; other-cycle artifacts are not held to active-cycle rules).",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized: the prior-cycle marked scope sits at docs/scope/user-search.md, STATE.md matches the case exactly, CONTEXT.md is present, and no unmarked canonical scope exists; nothing leaks the answer. Checks are necessary conditions a correct run satisfies (old file unchanged, Scope set to the fixed path with matching provenance), and the turn-end check stays clean after a handoff to ARCHITECTING since Architecture NONE is not flagged there.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T20:07:29.818Z",
+  "costUsd": 0.1305682,
+  "ms": 33565,
+  "fixtureHash": "4d9d2ecd1788805b"
+}

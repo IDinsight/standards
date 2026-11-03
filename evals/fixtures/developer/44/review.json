@@ -1,0 +1,68 @@
+{
+  "conditions": [
+    {
+      "condition": "Project is BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "Cycle is EXPEDITED and active, state DEVELOPING",
+      "where": ".standards/STATE.md: WorkflowState DEVELOPING, CycleMode EXPEDITED, Scope/Architecture NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery has one IMPLEMENTATION frame with Owner DEVELOPING, ResumeAt REVIEWING_IMPLEMENTATION, RerunThrough NONE, entered from implementation review",
+      "where": ".standards/STATE.md Recovery Frame 1 and Handoff FAILURE from REVIEWING_IMPLEMENTATION",
+      "status": "realized"
+    },
+    {
+      "condition": "Implementation review exists with an open Developer-owned finding that caused the recovery",
+      "where": ".standards/docs/reviews/<id>/implementation.md: Status BLOCKED, F-001 OPEN, Owner Developer, FailureType IMPLEMENTATION",
+      "status": "realized"
+    },
+    {
+      "condition": "Developer has corrected the defect within unchanged approved intent",
+      "where": "unstaged src/totals.js (Math.floor to Math.round); plan DEV-002 reopened IN_PROGRESS with an unchanged expected outcome and the user style lock still true",
+      "status": "realized"
+    },
+    {
+      "condition": "Self-checks pass on the corrected code",
+      "where": "selfChecks: node --test passes; the reproducer gives 1795 on the working tree and 1796 at HEAD",
+      "status": "realized"
+    },
+    {
+      "condition": "No downstream rerun is needed before review",
+      "where": "Expedited topology has no states between DEVELOPING and REVIEWING_IMPLEMENTATION; graderOnly",
+      "status": "realized"
+    },
+    {
+      "condition": "No Tester artifacts exist, since the cycle is expedited",
+      "where": "no verification record; the review notes that Tester is not part of the cycle",
+      "status": "realized"
+    },
+    {
+      "condition": "Git has committed history plus unstaged changes",
+      "where": "git log of 4 commits; git status shows src/totals.js and the plan modified",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "The case's expected output requires persisting self-check evidence, popping the frame, and a RESUME. The catalog notes no assertion covers these, but the fixture's assertion 2 checks require the RESUME, inactive recovery, and REVIEWING_IMPLEMENTATION state, so the transition is graded. The plan's implementation note ('self-check evidence is not recorded yet') is plausible resume context and does not dictate the handoff.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "Every stated condition is realized: an expedited brownfield cycle in DEVELOPING, with one IMPLEMENTATION frame from review, an unstaged Math.round correction within unchanged intent, passing self-checks, and an open F-001 in the implementation review. The checks are necessary conditions for a correct run (no verification record, tests and reviews unchanged, RESUME to REVIEWING_IMPLEMENTATION, a fixed /reviewer invocation), and the turn-end check passes for the correct end state with the plan COMPLETE. Invariants are standard, and nothing leaks the answer.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T02:22:44.910Z",
+  "costUsd": 0.1773066,
+  "ms": 37378,
+  "fixtureHash": "66cbc48b1dae6ac7"
+}

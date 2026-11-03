@@ -1,0 +1,192 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-service",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add CSV import service"
+    },
+    {
+      "dir": "layers/10-storage-tests",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add storage tests"
+    },
+    {
+      "dir": "layers/20-docs",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Document the API contract, configuration, and architecture"
+    },
+    {
+      "dir": "layers/50-plan",
+      "action": "commit",
+      "message": "docs(imports): record context, scope, and design for parser rename"
+    },
+    {
+      "action": "delete",
+      "paths": [
+        "tests/test_parser.py"
+      ],
+      "stage": true
+    },
+    {
+      "dir": "layers/60-rename",
+      "action": "commit",
+      "message": "refactor(imports): rename parser row helper and move its tests"
+    },
+    {
+      "dir": "layers/70-verification",
+      "action": "commit",
+      "message": "test(imports): record verification for parser rename"
+    },
+    {
+      "dir": "layers/80-review",
+      "action": "commit",
+      "message": "docs(review): record implementation review for parser rename"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "documenter",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The cycle only renamed the private helper _parse_rows in app/imports/parser.py to _read_rows and moved its tests from tests/test_parser.py to tests/imports/test_parser.py; behavior, the HTTP API, the settings, and the commands are unchanged.",
+    "The project's documents are README.md, openapi.yaml (the API contract), .env.example, and docs/architecture.md. None names the helper or the test files, so none needs a change."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "parser-rename-20260924T090000Z-d29a84f1",
+    "DOC": ".standards/docs/documentation/parser-rename-20260924T090000Z-d29a84f1.md"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "provenance": {
+            "path": "${DOC}",
+            "artifact": "DOCUMENTATION",
+            "cycle": "${ID}"
+          },
+          "why": "the record exists at the fixed path with this cycle's DOCUMENTATION provenance"
+        },
+        {
+          "field": {
+            "path": "${DOC}",
+            "name": "Status",
+            "equals": "COMPLETE"
+          },
+          "why": "the full Documenter gate passed"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "REVIEWING_FINAL"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "FORWARD"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "DOCUMENTING"
+        },
+        {
+          "reply_matches": "/reviewer",
+          "why": "the Claude Code invocation for the next role"
+        },
+        {
+          "reply_matches": "FINAL_DELIVERABLE|final[- ]deliverable",
+          "flags": "i",
+          "why": "the invocation names the review kind"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    }
+  ],
+  "runtime": {
+    "blockHosts": [
+      "pypi.org",
+      "files.pythonhosted.org",
+      "registry.npmjs.org",
+      "registry.yarnpkg.com",
+      "deb.debian.org",
+      "security.debian.org",
+      "astral.sh"
+    ]
+  },
+  "selfChecks": [
+    {
+      "cmd": "python3 -m pytest -q",
+      "expect": "pass",
+      "why": "the project's test suite (5 parser tests under tests/imports/, 3 storage tests) passes with only the standard library and pytest"
+    },
+    {
+      "cmd": "python3 -c \"import urllib.request; urllib.request.urlopen('https://pypi.org/simple/fastapi/', timeout=10)\"",
+      "expect": "fail",
+      "expectOutput": "URLError|HTTPError|Errno|timed out|TimeoutError|refused|unreachable",
+      "why": "the package index is unreachable, so the role cannot install FastAPI or uv"
+    },
+    {
+      "cmd": "python3 -c \"import pathlib, app.imports.parser as p; assert hasattr(p, '_read_rows') and not hasattr(p, '_parse_rows'); assert pathlib.Path('tests/imports/test_parser.py').is_file() and not pathlib.Path('tests/test_parser.py').exists()\"",
+      "expect": "pass",
+      "why": "the helper is renamed and the parser tests moved, as the case states"
+    },
+    {
+      "cmd": "python3 -c \"import pathlib, re, sys; hits=[f for f in ('README.md','openapi.yaml','.env.example','docs/architecture.md') if re.search('_parse_rows|_read_rows|test_parser|tests/', pathlib.Path(f).read_text())]; print(hits); sys.exit(1 if hits else 0)\"",
+      "expect": "pass",
+      "why": "none of the four project documents names the helper or a test file path"
+    },
+    {
+      "cmd": "python3 -c \"import os, sys; files=[os.path.join(d,f) for d,_,fs in os.walk('.') if not d.startswith('./.') for f in fs if f not in ('AGENTS.md','CLAUDE.md')]+[os.path.join(d,f) for d,_,fs in os.walk('./.standards/docs') for f in fs]+['./.standards/CONTEXT.md','./.standards/STATE.md']; text=' '.join(open(p,encoding='utf-8',errors='ignore').read().lower() for p in files); bad=[s for s in ('intentionally left unchanged','documentation impact','no documentation change','internal api refactor') if s in text]; print(bad); sys.exit(1 if bad else 0)\"",
+      "expect": "pass",
+      "why": "leak guard: the project files and cycle records contain none of the grader's forbidden phrases"
+    }
+  ],
+  "notes": "Standalone brownfield fixture. Pre-install: 00-service (FastAPI imports-api managed with uv: pyproject.toml with a dev group holding pytest, app/main.py, settings, SQLite storage, app/imports/service.py, app/imports/parser.py with parse_csv and the private _parse_rows, tests/test_parser.py, short README), 10-storage-tests (tests/test_storage.py), 20-docs (full README.md, openapi.yaml, .env.example, docs/architecture.md; none names the helper or any test path). Post-install: 50-plan commits CONTEXT.md, scope (AC-001, AC-002 as worded in the case), technical design, and STATE at DEVELOPING; a staged delete removes tests/test_parser.py; 60-rename commits parser.py with _read_rows (two changed lines), tests/imports/test_parser.py (identical content, no __init__.py; pyproject sets testpaths and pythonpath), the COMPLETE development plan, and STATE at TESTING; 70-verification commits the COMPLETE FULL verification report (python3 -m pytest, 8 passed; cites commits and blobs) and STATE at REVIEWING_IMPLEMENTATION; 80-review commits the COMPLETE implementation review with no material findings and STATE at DOCUMENTING, Handoff FORWARD from REVIEWING_IMPLEMENTATION, CompletionPolicy FULL_DELIVERABLE, recovery inactive, BlockedOn NONE. No documentation record exists. FastAPI is not installed in the runner, so tests cover only stdlib modules (parser, storage); records state that uv is unavailable and python3 -m pytest was used. No uv.lock is committed (a realistic one would need fabricated hashes).",
+  "case": "documenter-902",
+  "caseHash": "c64d7f615046165c",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-11-02T17:30:41.206Z",
+    "verdict": "pass",
+    "fixtureHash": "5143cc99ec4e1b2e",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-11-02T16:58:20.760Z"
+  }
+}

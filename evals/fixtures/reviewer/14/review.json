@@ -1,0 +1,86 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode BROWNFIELD",
+      "where": ".standards/MODE.md (installed brownfield, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode STANDARD, WorkflowState REVIEWING_IMPLEMENTATION, Handoff FORWARD from TESTING",
+      "where": ".standards/STATE.md header and Handoff",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Id = export-20260924T090000Z-a7f3c1d2",
+      "where": ".standards/STATE.md Active Work",
+      "status": "realized"
+    },
+    {
+      "condition": "Current scope, architecture, context, development plan, and Tester report exist with valid ownership",
+      "where": ".standards/docs/scope|specs|development|verification/<id>.md with matching provenance; .standards/CONTEXT.md; check.mjs ok",
+      "status": "realized"
+    },
+    {
+      "condition": "Development plan COMPLETE and verification FULL/COMPLETE, so Reviewer entry is legal",
+      "where": "development plan Status COMPLETE, all DEV steps DONE; verification Status COMPLETE, Assessment Purpose FULL, Target NONE",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery and outstanding obligations inactive",
+      "where": ".standards/STATE.md Recovery Active false, Obligations Active false",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-001 requires the export to stay private (only signed-in admins create or download it)",
+      "where": "scope Work item 1, AC-001",
+      "status": "realized"
+    },
+    {
+      "condition": "AC-002 lets anyone with the public URL download it without signing in",
+      "where": "scope Work item 2, AC-002",
+      "status": "realized"
+    },
+    {
+      "condition": "The request does not resolve the contradiction",
+      "where": "STATE.md Request: 'export ... as CSV and get a download link for each export' does not say who may use the link",
+      "status": "realized"
+    },
+    {
+      "condition": "Code implements public access",
+      "where": "src/routes/export.ts GET /exports/download has no authorize call; the selfCheck shows a 200 download with user null",
+      "status": "realized"
+    },
+    {
+      "condition": "No review report exists yet; everything committed, clean tree",
+      "where": "no .standards/docs/reviews; git status clean",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "CONTEXT.md ('Route handlers check roles ... with authorize as their first step') and docs/usage.md ('requests without one are rejected') also clash with the unauthenticated download route. A Reviewer might additionally note this as an implementation or convention concern. It reinforces the access contradiction rather than replacing it, and the scope remains the earliest owner, so a correct run still routes SCOPING.",
+      "recommendation": "run_as_is",
+      "fix": "None needed; the judge can credit extra findings recorded alongside the SCOPING route."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "The fixture uses base export-project instead of the suggested export-reviewing-impl. That base's scope has different AC meanings, so this choice is justified, and all cycle records are written fresh and consistently.",
+      "recommendation": "run_as_is",
+      "fix": "None."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "All stated conditions are realized: the committed scope holds the private-vs-public contradiction, the request is silent on link access, the code serves downloads without a user, and the design, plan, and verification all silently read AC-001 narrowly. check.mjs passes, and the turn-end check accepts a SCOPING failure state with an IN_PROGRESS or BLOCKED review report. The checks (SCOPING failure frame, review not COMPLETE, scope unchanged) and invariants are necessary for any correct run, and nothing leaks the answer.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-02T23:20:23.599Z",
+  "costUsd": 0.2918728,
+  "ms": 41559,
+  "fixtureHash": "de4b822406b18c63"
+}

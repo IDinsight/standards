@@ -1,0 +1,21 @@
+import assert from 'node:assert/strict';
+import test from 'node:test';
+
+import { summarize } from '../src/summary.js';
+
+const entries = [
+  { date: '2026-09-14', project: 'billing', hours: 3 },
+  { date: '2026-09-15', project: 'atlas', hours: 2 },
+  { date: '2026-09-16', project: 'billing', hours: 1.5 },
+];
+
+test('totals hours per project sorted by name', () => {
+  assert.deepEqual(summarize(entries), [
+    { project: 'atlas', hours: 2 },
+    { project: 'billing', hours: 4.5 },
+  ]);
+});
+
+test('returns an empty list for no entries', () => {
+  assert.deepEqual(summarize([]), []);
+});

@@ -1,0 +1,74 @@
+{
+  "conditions": [
+    {
+      "condition": "Brownfield project in a STANDARD cycle with CompletionPolicy IMPLEMENTATION_REVIEWED, currently at REVIEWING_IMPLEMENTATION",
+      "where": ".standards/MODE.md (BROWNFIELD); .standards/STATE.md WorkflowState, CycleMode, CompletionPolicy; the user choice and reason are saved in Active Work.Request",
+      "status": "realized"
+    },
+    {
+      "condition": "Reviewer sits at a nested recovery frame whose ResumeAt is TESTING",
+      "where": ".standards/STATE.md Frame 2: From TESTING, Owner REVIEWING_IMPLEMENTATION, REVIEW, ResumeAt TESTING, RerunThrough NONE; Handoff FAILURE From TESTING",
+      "status": "realized"
+    },
+    {
+      "condition": "An older frame remains active beneath the nested one",
+      "where": ".standards/STATE.md Frame 1: ARCHITECTURE, From/ResumeAt REVIEWING_IMPLEMENTATION, RerunThrough TESTING",
+      "status": "realized"
+    },
+    {
+      "condition": "Ordinary implementation review and all inspected current evidence pass",
+      "where": "src/billing/lateFee.js requires asOf; statement.js passes statementDate; 13 tests pass (selfCheck); F-001 is addressed by DEV-003; F-002 is contradicted by AC-002, daysOverdue, and test/invoices.test.js",
+      "status": "realized"
+    },
+    {
+      "condition": "Records the case implies exist (scope, design, context, plan, verification, implementation review with closure section)",
+      "where": ".standards/docs/** and .standards/CONTEXT.md; review report has an INELIGIBLE closure section; plan COMPLETE; verification IN_PROGRESS FULL with Suspended Assignment for Frame 2",
+      "status": "realized"
+    },
+    {
+      "condition": "User asks to jump to sign-off because the code is correct",
+      "where": "prompt.utterance",
+      "status": "realized"
+    },
+    {
+      "condition": "Independent Reviewer invocation (no authoring history)",
+      "where": "history: null; fresh session",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "The case says the Reviewer is at the 'boundary' of the nested frame. The fixture makes the Reviewer the frame owner with RerunThrough NONE (correcting its own mistaken F-002 needs no rerun), not a rerun boundary of another owner's frame. Both readings lead to the same expected outcome (pop only the nested frame, RESUME TESTING), so this is a reasonable choice.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": -1,
+      "detail": "The verification report is IN_PROGRESS because Tester paused for the F-002 dispute. The ordinary review therefore cannot legitimately be marked COMPLETE in this run. The 'applicable assignment' is the Frame 2 correction (withdraw F-002, recheck F-001); full review and closure happen when Frame 1 resumes. graderOnly states this, so the judge has what it needs.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    },
+    {
+      "severity": "note",
+      "kind": "realism",
+      "assertion": -1,
+      "detail": "Every commit is dated 2026-09-24T09:00Z, while the records cite runs on 2026-09-21, 22, 23 and 24. This is harmless, but the history looks compressed.",
+      "recommendation": "run_as_is",
+      "fix": ""
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture builds a legal nested stack: Frame 1 (an ARCHITECTURE rerun through TESTING) sits beneath Frame 2 (a REVIEW frame Reviewer owns, ResumeAt TESTING). The code and tests are correct, and the records are coherent; check.mjs passes, and I traced the post-run turn-end check for the expected TESTING/RESUME outcome and found no new problem. The checks are necessary conditions a correct run satisfies (Frame 1 unchanged, recovery still active, policy unchanged, no sign-off state, Eligibility not ELIGIBLE), and the invariants fit the Reviewer role.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-31T03:05:41.038Z",
+  "costUsd": 0.3540178,
+  "ms": 73912,
+  "fixtureHash": "eb96424583bb85dc"
+}

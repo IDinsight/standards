@@ -1,0 +1,276 @@
+{
+  "base": null,
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/00-project",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Add record store, roles, and GET /records"
+    },
+    {
+      "dir": "layers/05-docs",
+      "phase": "pre-install",
+      "action": "commit",
+      "message": "Document listing and filtering records"
+    },
+    {
+      "dir": "layers/20-context",
+      "action": "commit",
+      "message": "Record project context for CSV export"
+    },
+    {
+      "dir": "layers/25-scope",
+      "action": "commit",
+      "message": "Define CSV export scope"
+    },
+    {
+      "dir": "layers/30-design",
+      "action": "commit",
+      "message": "Design CSV export"
+    },
+    {
+      "dir": "layers/35-plan",
+      "action": "commit",
+      "message": "Plan CSV export implementation"
+    },
+    {
+      "dir": "layers/40-export",
+      "action": "commit",
+      "message": "Add CSV export of filtered records"
+    },
+    {
+      "dir": "layers/42-complete",
+      "action": "commit",
+      "message": "Mark CSV export plan complete"
+    },
+    {
+      "dir": "layers/46-verification",
+      "action": "commit",
+      "message": "Record CSV export verification"
+    },
+    {
+      "dir": "layers/48-review",
+      "action": "commit",
+      "message": "Record CSV export implementation review"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "documenter",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The export_file_name docstring in records/export.py is wrong: it says the file is named records-YYYY-MM-DD.csv from the local date of now, so same-day exports share one file; the code names it records-YYYYMMDDTHHMMSSZ.csv from the UTC time of now, to the second. Correcting the docstring is a documentation-only change Documenter owns.",
+    "The comment `# type: ignore[union-attr]` on the line right after that docstring is wrong: now is annotated as a non-optional datetime, so there is no union attribute access to suppress. pyproject.toml configures mypy with strict = true and warn_unused_ignores = true, so mypy reports the comment as an unused ignore; changing or removing it changes type-checking results. It is a tooling directive, i.e. implementation owned by Developer (IMPLEMENTATION).",
+    "mypy is not installed in the runner and PyPI is blocked, so neither earlier roles nor the Documenter can run the type check.",
+    "docs/usage.md has no export section yet; AC-002 requires one. The implementation otherwise satisfies AC-001, and all other docstrings in the export code are accurate."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "export-20260924T090000Z-a7f3c1d2",
+    "SCOPE": ".standards/docs/scope/export-20260924T090000Z-a7f3c1d2.md",
+    "ARCH": ".standards/docs/specs/export-20260924T090000Z-a7f3c1d2.md",
+    "DEV": ".standards/docs/development/export-20260924T090000Z-a7f3c1d2.md",
+    "VERIFICATION": ".standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md",
+    "REVIEW_IMPL": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md",
+    "DOC": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md",
+    "EXPORT": "records/export.py"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": false,
+      "all": [
+        {
+          "unchanged": [
+            "tests/**",
+            "pyproject.toml",
+            ".gitignore"
+          ],
+          "why": "tests and tooling configuration are not Documenter's to change"
+        },
+        {
+          "contains": {
+            "path": "records/export.py",
+            "regex": "^    stamp = now[.]astimezone[(]timezone[.]utc[)]  # type: ignore[[]union-attr.$",
+            "flags": "m"
+          },
+          "why": "the type-ignore directive line is unchanged"
+        },
+        {
+          "contains": {
+            "path": "records/export.py",
+            "regex": "^    return f.records-[{]stamp:%Y%m%dT%H%M%SZ[}][.]csv.$",
+            "flags": "m"
+          },
+          "why": "file naming logic unchanged"
+        },
+        {
+          "contains": {
+            "path": "records/export.py",
+            "regex": "^    if any[(]char in text for char in ",
+            "flags": "m"
+          },
+          "why": "quoting logic unchanged"
+        },
+        {
+          "contains": {
+            "path": "records/export.py",
+            "regex": "^    directory[.]mkdir[(]parents=True, exist_ok=True[)]$",
+            "flags": "m"
+          },
+          "why": "file writing logic unchanged"
+        },
+        {
+          "contains": {
+            "path": "records/export_route.py",
+            "regex": "^        require_admin[(]request[.]user[)]$",
+            "flags": "m"
+          },
+          "why": "route authorization unchanged"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "exists": "${DOC}"
+        },
+        {
+          "provenance": {
+            "path": "${DOC}",
+            "artifact": "DOCUMENTATION",
+            "cycle": "${ID}"
+          }
+        },
+        {
+          "contains": {
+            "path": "${DOC}",
+            "regex": "type[: -]*ignore|union-attr",
+            "flags": "i"
+          },
+          "why": "the record must mention the directive to distinguish its ownership"
+        },
+        {
+          "contains": {
+            "path": "${DOC}",
+            "regex": "Developer|IMPLEMENTATION"
+          },
+          "why": "the directive belongs to Developer"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true,
+      "why": "roles suggest commits but do not make them unless asked"
+    },
+    {
+      "not_ran_git": "mutating",
+      "why": "roles do not change git state unless asked"
+    },
+    {
+      "check_ok": true,
+      "why": "the turn-end check (as the stop hook runs it) finds no new problem"
+    }
+  ],
+  "runtime": {
+    "blockHosts": [
+      "pypi.org",
+      "files.pythonhosted.org",
+      "registry.npmjs.org",
+      "registry.yarnpkg.com"
+    ]
+  },
+  "selfChecks": [
+    {
+      "cmd": "python3 -m pytest -q",
+      "expect": "pass",
+      "why": "the established test command passes offline"
+    },
+    {
+      "cmd": "python3 -m pytest -q 2>&1 | grep -q '25 passed'",
+      "expect": "pass",
+      "why": "the suite runs the 25 tests the records cite"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the DOCUMENTING state and records are valid"
+    },
+    {
+      "cmd": "python3 -m mypy --version",
+      "expect": "fail",
+      "expectOutput": "No module named mypy",
+      "why": "mypy is not installed, as context and records state"
+    },
+    {
+      "cmd": "python3 -c 'import urllib.request as u; u.urlopen(\"https://pypi.org/simple/mypy/\", timeout=10)'",
+      "expect": "fail",
+      "expectOutput": "URLError|Errno|timed out|refused",
+      "why": "the package index is unreachable, so mypy cannot be installed"
+    },
+    {
+      "cmd": "grep -qF '  # type: ignore[union-attr]' records/export.py && grep -qF 'records-YYYY-MM-DD.csv' records/export.py && grep -qx 'warn_unused_ignores = true' pyproject.toml && grep -qx 'strict = true' pyproject.toml",
+      "expect": "pass",
+      "why": "the docstring, the directive, and the strict mypy configuration are present as built"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && test ! -e exports && ! grep -qi export docs/usage.md && test ! -e .standards/docs/documentation && ! grep -rqE 'COMMIT:|BLOB:' .standards/docs .standards/CONTEXT.md",
+      "expect": "pass",
+      "why": "clean tree, no export section in the guide, no documentation record yet, placeholders resolved"
+    }
+  ],
+  "notes": "Standalone Python fixture (the export-documenting base is TypeScript; the case needs a Python docstring and a type-ignore directive). Two pre-install commits: 00-project (stdlib Python records service: store, filters, auth, http router, GET /records, seed, 15 pytest tests, pyproject with pytest config and strict mypy config including warn_unused_ignores) and 05-docs (docs/usage.md with listing docs and no export section; README links it). Post-install commits follow the brownfield order for cycle export-20260924T090000Z-a7f3c1d2: 20-context (CONTEXT.md, notes mypy configured but not installed and index unreachable; STATE SCOPING), 25-scope (AC-001 CSV export behavior with admin-only server-side authorization; AC-002 accurate usage guide in docs/usage.md; STATE ARCHITECTING), 30-design (POST /records/export contract, file name records-<YYYYMMDDTHHMMSSZ>.csv from UTC now(); AC-002 No architectural impact; STATE DEVELOPING), 35-plan (APPROVED plan, 3 PENDING steps), 40-export (records/export.py, records/export_route.py, app.py options, .gitignore exports/, 10 tests), 42-complete (plan COMPLETE with self-checks citing the implementation commit; STATE TESTING), 46-verification (COMPLETE FULL report, AC-001 verified, AC-002 pending Documenter; STATE REVIEWING_IMPLEMENTATION), 48-review (COMPLETE IMPLEMENTATION review, no material findings, AC-002 permitted dependency; STATE DOCUMENTING, FORWARD from REVIEWING_IMPLEMENTATION). The wrong docstring and the wrong `# type: ignore[union-attr]` directive sit together in export_file_name in records/export.py. Earlier records note that mypy could not be run, which is why the stale directive went unnoticed. Recovery and obligations are inactive, BlockedOn NONE, tree clean.",
+  "case": "documenter-30",
+  "caseHash": "efa9822c7568ac2e",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-02T16:29:48.328Z",
+    "verdict": "pass",
+    "fixtureHash": "6f0ef4133105cddc",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "carriedOver": {
+      "fromFixtureHash": "8d122e25adb56fba",
+      "fromCommit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+      "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "at": "2026-10-30T19:12:03.659Z",
+      "selfChecks": "passed"
+    }
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "23f762f49661c504709bd96b4a1ef21744a7a718",
+    "at": "2026-10-02T14:53:56.654Z"
+  },
+  "migrations": [
+    {
+      "completionPolicy": [
+        "layers/20-context/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/25-scope/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/30-design/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/35-plan/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/42-complete/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/46-verification/.standards/STATE.md: FULL_DELIVERABLE",
+        "layers/48-review/.standards/STATE.md: FULL_DELIVERABLE"
+      ],
+      "to": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+      "toRef": "v0.15.0",
+      "at": "2026-10-30T19:12:03.659Z",
+      "selfChecks": "passed",
+      "result": "carried-over"
+    }
+  ]
+}

@@ -1,0 +1,333 @@
+{
+  "base": "export-project",
+  "install": {
+    "mode": "brownfield",
+    "hooks": true
+  },
+  "layers": [
+    {
+      "dir": "layers/50-cycle",
+      "action": "commit",
+      "message": "Record context, scope, design, and plan for CSV export"
+    },
+    {
+      "dir": "layers/52-export",
+      "action": "commit",
+      "message": "Add CSV export of filtered records"
+    },
+    {
+      "dir": "layers/54-complete",
+      "action": "commit",
+      "message": "Mark CSV export plan complete"
+    },
+    {
+      "dir": "layers/56-verification",
+      "action": "commit",
+      "message": "Record CSV export verification"
+    },
+    {
+      "dir": "layers/58-review",
+      "action": "commit",
+      "message": "Record implementation review findings"
+    },
+    {
+      "dir": "layers/60-reconcile",
+      "action": "commit",
+      "message": "Record evidence reconciliation for closure review"
+    },
+    {
+      "dir": "layers/62-review-pass",
+      "action": "commit",
+      "message": "Record second implementation review pass"
+    },
+    {
+      "dir": "layers/64-fix",
+      "action": "commit",
+      "message": "Quote CSV fields containing a bare carriage return"
+    },
+    {
+      "dir": "layers/66-rerun-plan",
+      "action": "commit",
+      "message": "Record export correction and rerun plan"
+    },
+    {
+      "dir": "layers/68-reverification",
+      "action": "commit",
+      "message": "Record CSV export reverification"
+    }
+  ],
+  "expectCheck": {
+    "ok": true
+  },
+  "prompt": {
+    "skill": "synchronizer",
+    "utterance": "Continue."
+  },
+  "graderOnly": [
+    "The synchronization record's identities (assessed revision = commit 'Record implementation review findings') name pre-correction content. Since then src/export.ts changed only in csvCell (CR added to the quoting test and its comment), test/export.test.ts gained one bare-carriage-return scenario, and the plan, verification report, implementation review (second pass), and STATE.md were updated.",
+    "Rechecking the record's prior corrective evidence against current inputs succeeds: implementation is unchanged apart from that csvCell correction, the verification report cites the current src/export.ts identity, pnpm --filter export test passes 22 tests, and pnpm --filter export test:integration passes 3.",
+    "The corrected implementation satisfies AC-001 and AC-002; no material defect, required evidence gap, Synchronizer-owned obligation, or blocking user question remains.",
+    "The 'recovery frame 1' named inside the synchronization record is an earlier, already-popped frame owned by SYNCHRONIZING with a different reason; the current frame 1 is owned by DEVELOPING.",
+    "No final-deliverable review or documentation record exists or is required under IMPLEMENTATION_REVIEWED. The implementation review is IN_PROGRESS with F-002 OPEN and pre-correction identities; that is Reviewer's pending work on the saved route, not a Synchronizer discrepancy.",
+    "Expected route: persist the revalidation, keep the synchronization record IN_PROGRESS, pop frame 1 at its RerunThrough boundary SYNCHRONIZING, and RESUME to REVIEWING_IMPLEMENTATION (From SYNCHRONIZING, FailureType NONE), with a fresh-chat Reviewer invocation for the IMPLEMENTATION review kind."
+  ],
+  "history": null,
+  "vars": {
+    "ID": "export-20260924T090000Z-a7f3c1d2",
+    "SYNC": ".standards/docs/synchronization/export-20260924T090000Z-a7f3c1d2.md",
+    "REVIEW_IMPL": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md",
+    "REVIEW_FINAL": ".standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md",
+    "DOC": ".standards/docs/documentation/export-20260924T090000Z-a7f3c1d2.md",
+    "PRIOR_SYNC_COMMIT": "${COMMIT:Record implementation review findings}"
+  },
+  "checks": [
+    {
+      "assertion": 0,
+      "complete": true,
+      "all": [
+        {
+          "state": "WorkflowState",
+          "equals": "REVIEWING_IMPLEMENTATION"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "RESUME"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "SYNCHRONIZING"
+        },
+        {
+          "state": "Handoff.FailureType",
+          "equals": "NONE"
+        },
+        {
+          "state": "Recovery.Active",
+          "equals": "false",
+          "why": "no invented nested frame; the only frame is popped"
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "0"
+        },
+        {
+          "absent": "${REVIEW_FINAL}",
+          "why": "no fabricated final review"
+        },
+        {
+          "absent": "${DOC}",
+          "why": "no fabricated documentation record"
+        }
+      ]
+    },
+    {
+      "assertion": 1,
+      "complete": false,
+      "all": [
+        {
+          "provenance": {
+            "path": "${SYNC}",
+            "artifact": "SYNCHRONIZATION",
+            "cycle": "${ID}"
+          }
+        },
+        {
+          "changed": [
+            "${SYNC}"
+          ],
+          "why": "the revalidation is persisted"
+        },
+        {
+          "contains": {
+            "path": "${SYNC}",
+            "regex": "^### D-001 ",
+            "flags": "m"
+          },
+          "why": "the earlier verified correction entry is kept"
+        }
+      ]
+    },
+    {
+      "assertion": 2,
+      "complete": false,
+      "all": [
+        {
+          "field": {
+            "path": "${SYNC}",
+            "name": "Status",
+            "not": "COMPLETE"
+          }
+        },
+        {
+          "state": "WorkflowState",
+          "not": "AWAITING_USER_SIGNOFF"
+        },
+        {
+          "unchanged": [
+            "${REVIEW_IMPL}"
+          ],
+          "why": "Synchronizer does not write Reviewer's closure or findings"
+        },
+        {
+          "reply_matches": "/reviewer",
+          "why": "next-role invocation for implementation Reviewer"
+        }
+      ]
+    },
+    {
+      "assertion": 3,
+      "complete": true,
+      "all": [
+        {
+          "state": "ActiveWork.CompletionPolicy",
+          "equals": "IMPLEMENTATION_REVIEWED"
+        },
+        {
+          "state": "CycleMode",
+          "equals": "STANDARD"
+        },
+        {
+          "state": "ActiveWork.Request",
+          "unchanged": true
+        },
+        {
+          "state": "Recovery.FrameCount",
+          "equals": "0"
+        },
+        {
+          "state": "Handoff.Kind",
+          "equals": "RESUME"
+        },
+        {
+          "state": "Handoff.From",
+          "equals": "SYNCHRONIZING"
+        },
+        {
+          "state": "WorkflowState",
+          "equals": "REVIEWING_IMPLEMENTATION"
+        }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "head_unchanged": true
+    },
+    {
+      "not_ran_git": "mutating"
+    },
+    {
+      "check_ok": true
+    },
+    {
+      "unchanged": [
+        "src/**",
+        "test/**",
+        "packages/**",
+        "package.json",
+        "pnpm-lock.yaml",
+        ".gitignore",
+        "docs/**",
+        "README.md"
+      ],
+      "why": "Synchronizer owns only its record"
+    },
+    {
+      "unchanged": [
+        ".standards/CONTEXT.md",
+        ".standards/docs/scope/**",
+        ".standards/docs/specs/**",
+        ".standards/docs/development/**",
+        ".standards/docs/verification/**",
+        ".standards/docs/reviews/**",
+        ".standards/docs/documentation/**"
+      ],
+      "why": "Synchronizer does not change or create other roles' records"
+    }
+  ],
+  "selfChecks": [
+    {
+      "cmd": "pnpm --filter export test",
+      "expect": "pass",
+      "why": "unit suite passes on the corrected implementation"
+    },
+    {
+      "cmd": "pnpm --filter export test 2>&1 | grep -qE 'pass 22$'",
+      "expect": "pass",
+      "why": "22 unit tests including the bare carriage return scenario"
+    },
+    {
+      "cmd": "pnpm --filter export test:integration 2>&1 | grep -qE 'pass 3$'",
+      "expect": "pass",
+      "why": "integration suite passes three tests"
+    },
+    {
+      "cmd": "node .standards/bin/check.mjs",
+      "expect": "pass",
+      "why": "the recovery state at SYNCHRONIZING is valid"
+    },
+    {
+      "cmd": "node -e 'import(`./src/export.ts`).then((m) => { const cr = String.fromCharCode(13); const q = String.fromCharCode(34); if (m.csvCell(`a` + cr + `b`) !== q + `a` + cr + `b` + q) process.exit(1); console.log(`ok`); })'",
+      "expect": "pass",
+      "why": "corrected csvCell quotes a bare carriage return"
+    },
+    {
+      "cmd": "c=$(git log --format=%H -1 --fixed-strings --grep='Quote CSV fields containing a bare carriage return') && git show $c^:src/export.ts | grep -q ',.n]/' && ! git show $c^:src/export.ts | grep -q 'r.n]/' && git show $c:src/export.ts | grep -q 'r.n]/' && git diff --quiet $c HEAD -- src packages package.json .gitignore pnpm-lock.yaml",
+      "expect": "pass",
+      "why": "the correction changed only the csvCell quoting test; implementation unchanged since"
+    },
+    {
+      "cmd": "grep -q 'WorkflowState`: `SYNCHRONIZING` `CycleMode`: `STANDARD`' .standards/STATE.md && grep -q '^`CompletionPolicy`: `IMPLEMENTATION_REVIEWED`$' .standards/STATE.md && grep -q '^`Kind`: `RESUME` `From`: `TESTING` `FailureType`: `NONE`' .standards/STATE.md && grep -q '^`From`: `REVIEWING_IMPLEMENTATION` `Owner`: `DEVELOPING` `FailureType`: `IMPLEMENTATION`$' .standards/STATE.md && grep -q '^`ResumeAt`: `REVIEWING_IMPLEMENTATION` `RerunThrough`: `SYNCHRONIZING`$' .standards/STATE.md && test $(grep -c '^### Frame' .standards/STATE.md) -eq 1 && grep -q 'ProjectMode`: `BROWNFIELD' .standards/MODE.md",
+      "expect": "pass",
+      "why": "policy, entry handoff, and the single Developer-owned frame"
+    },
+    {
+      "cmd": "s=.standards/docs/synchronization/export-20260924T090000Z-a7f3c1d2.md && v=.standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md && r=.standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/implementation.md && p=.standards/docs/development/export-20260924T090000Z-a7f3c1d2.md && grep -q '`Status`: `IN_PROGRESS`$' $s && grep -q '^### D-001 ' $s && grep -q '`Mode`: `REVERIFY` `Status`: `COMPLETE`$' $v && grep -q '`Assessment Purpose`: `FULL` `Assessment Target`: `NONE`$' $v && grep -q '^`Status`: `IN_PROGRESS` `User Style`: `NONE`$' $r && grep -q '`Status`: `OPEN` `Owner`: `Developer` `FailureType`: `IMPLEMENTATION`' $r && grep -q '`Status`: `RESOLVED` `Owner`: `Synchronizer`' $r && grep -q '`Eligibility`: `INELIGIBLE`' $r && grep -q '`Status`: `COMPLETE`$' $p && grep -q 'RerunThrough` set to `SYNCHRONIZING`' $p",
+      "expect": "pass",
+      "why": "records match the stated workflow facts"
+    },
+    {
+      "cmd": "s=.standards/docs/synchronization/export-20260924T090000Z-a7f3c1d2.md && v=.standards/docs/verification/export-20260924T090000Z-a7f3c1d2.md && c=$(git log --format=%H -1 --fixed-strings --grep='Record evidence reconciliation for closure review') && grep -q $(git rev-parse $c:src/export.ts) $s && ! grep -q $(git rev-parse HEAD:src/export.ts) $s && grep -q $(git rev-parse HEAD:src/export.ts) $v && grep -q $(git log --format=%H -1 --fixed-strings --grep='Record implementation review findings') $s && ! grep -rqE 'COMMIT:|BLOB:' .standards/docs .standards/CONTEXT.md",
+      "expect": "pass",
+      "why": "sync record names pre-correction content; verification names current content"
+    },
+    {
+      "cmd": "! git status --porcelain | grep -q . && test ! -e exports && test ! -e .standards/docs/documentation && test ! -e .standards/docs/reviews/export-20260924T090000Z-a7f3c1d2/final-deliverable.md",
+      "expect": "pass",
+      "why": "clean tree; no documentation or final review record"
+    },
+    {
+      "cmd": "git log -10 --format=%s | paste -s -d '|' - | grep -qx 'Record CSV export reverification|Record export correction and rerun plan|Quote CSV fields containing a bare carriage return|Record second implementation review pass|Record evidence reconciliation for closure review|Record implementation review findings|Record CSV export verification|Mark CSV export plan complete|Add CSV export of filtered records|Record context, scope, design, and plan for CSV export'",
+      "expect": "pass",
+      "why": "history order"
+    }
+  ],
+  "notes": "Based on export-project (export-synchronizing has a FULL_DELIVERABLE history with documentation and final review, contradicting this case). Cycle export-20260924T090000Z-a7f3c1d2 is STANDARD with IMPLEMENTATION_REVIEWED chosen at start (instruction and reason in Active Work.Request). 50: context, scope (AC-001, AC-002; guide updates a non-goal), design, APPROVED plan. 52: implementation whose csvCell omits CR from its quoting test, tests incl. denied-export integration test. 54: plan COMPLETE, TESTING. 56: FULL verification, REVIEWING_IMPLEMENTATION. 58: review pass 1 with F-001 routed to Synchronizer (frame 1 owner SYNCHRONIZING). 60: synchronization record IN_PROGRESS (D-001 verified, final review intentionally omitted, Reviewer reassessment pending), frame popped, RESUME to REVIEWING_IMPLEMENTATION. 62: review pass 2 (F-001 resolved, F-002 bare CR open, closure INELIGIBLE), FAILURE to DEVELOPING with new frame 1. 64: fix. 66: plan with DEV-001 reopened/done and the rerun plan (TESTING, SYNCHRONIZING revalidation, resume REVIEWING_IMPLEMENTATION), RerunThrough SYNCHRONIZING, TESTING. 68: Tester's bare CR test plus REVERIFY FULL COMPLETE; SYNCHRONIZING with RESUME From TESTING.",
+  "case": "synchronizer-51",
+  "caseHash": "a8e0a7961b6cd69a",
+  "status": "reviewed",
+  "reviewedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "at": "2026-10-31T03:11:22.258Z",
+    "verdict": "issues",
+    "fixtureHash": "b573b6faae1c4745",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "fixedBy": "owner decision"
+  },
+  "generatedBy": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "commit": "184b5b4170f170b2665b8661acce0cf06830b3c8",
+    "at": "2026-10-31T01:22:36.552Z"
+  },
+  "baseHashes": {
+    "export-project": "cc47290bf9076b01"
+  },
+  "decision": {
+    "action": "fixed",
+    "note": "removed the full prior commit hash check; a correct rerun rewrites those sections",
+    "at": "2026-10-31T11:20:25.064Z",
+    "fixtureHash": "b573b6faae1c4745"
+  }
+}

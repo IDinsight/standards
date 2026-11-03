@@ -1,0 +1,91 @@
+{
+  "conditions": [
+    {
+      "condition": "ProjectMode is BROWNFIELD",
+      "where": ".standards/MODE.md (installed with --mode brownfield, unchanged)",
+      "status": "realized"
+    },
+    {
+      "condition": "CycleMode is STANDARD",
+      "where": ".standards/STATE.md `CycleMode`: `STANDARD`",
+      "status": "realized"
+    },
+    {
+      "condition": "WorkflowState is ARCHITECTING",
+      "where": ".standards/STATE.md `WorkflowState`: `ARCHITECTING`, Handoff FORWARD from SCOPING",
+      "status": "realized"
+    },
+    {
+      "condition": "Recovery is inactive and obligations inactive",
+      "where": ".standards/STATE.md Recovery `Active`: `false`, Outstanding Obligations `Active`: `false`",
+      "status": "realized"
+    },
+    {
+      "condition": "Active Work.Scope points to the completed scope record for the active cycle",
+      "where": ".standards/STATE.md Scope -> .standards/docs/scope/add-shareable-report-links-20260924T090000Z-5c8e2a91.md (SCOPE provenance, matching cycle)",
+      "status": "realized"
+    },
+    {
+      "condition": "Valid active-cycle project context exists",
+      "where": ".standards/CONTEXT.md committed in the cycle's audit commit; STATE history FORWARD from AUDITING",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope contains exactly AC-001: 'Users can create shareable report links.'",
+      "where": "scope record, Work item 1 Done when",
+      "status": "realized"
+    },
+    {
+      "condition": "Scope is silent on public vs authenticated access, expiry, and revocation",
+      "where": "scope record Goal/Non-goals/Work (non-goals exclude only export, scheduled email, editing via link)",
+      "status": "realized"
+    },
+    {
+      "condition": "Neither project context nor code decides a link access policy",
+      "where": ".standards/CONTEXT.md describes only session auth and membership access; src/routes.js has no link mechanism",
+      "status": "realized"
+    },
+    {
+      "condition": "No technical design exists yet (Architecture NONE, no specs file)",
+      "where": ".standards/STATE.md `Architecture`: `NONE`; no .standards/docs/specs/",
+      "status": "realized"
+    },
+    {
+      "condition": "Small brownfield codebase with passing tests",
+      "where": "src/*.js, test/*.test.js; selfCheck 8/8 pass",
+      "status": "realized"
+    },
+    {
+      "condition": "Clean committed git state",
+      "where": "git status clean on main",
+      "status": "realized"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "note",
+      "kind": "hint-leak",
+      "assertion": -1,
+      "detail": "CONTEXT.md 'Relevant Existing Behavior' says 'There is no existing mechanism for sharing a report by link, for anonymous access, or for any token other than session tokens.' This draws attention to the access question but is an ordinary, accurate baseline statement an Auditor would write for this request; it does not decide the policy or say the scope is defective.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    },
+    {
+      "severity": "note",
+      "kind": "other",
+      "assertion": 0,
+      "detail": "Assertion 0 is complete:true on FailureType SCOPING + WorkflowState SCOPING. The skill's Invariant 2 mandates a SCOPING failure for materially ambiguous acceptance conditions, so the state fully evidences the classification; a run that instead asks the user directly would fail, which matches the case's expected output.",
+      "recommendation": "run_as_is",
+      "fix": "None needed."
+    }
+  ],
+  "verdict": "pass",
+  "summary": "The fixture realizes every stated condition: a valid brownfield STANDARD cycle in ARCHITECTING with no recovery, a completed scope holding only AC-001 and silent on access, expiry, and revocation, neutral project context, and passing tests; check.mjs passes. Checks match the protocol-mandated failure handoff, recovery frame, and verbatim '/scoper' plus 'active recovery' invocation text, and the invariants fit an Architect run. Nothing leaks the verdict.",
+  "gateProblems": [],
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "at": "2026-10-03T00:29:24.102Z",
+  "costUsd": 0.732694,
+  "ms": 31886,
+  "fixtureHash": "a25cb0450250a225"
+}
